@@ -143,7 +143,247 @@ The following MCP servers are configured and working reliably:
   - **Capabilities**: Current time, date calculations, timezone conversions, scheduling utilities
 - **Serena** - IDE assistant with project context
 - **Figma** - Design file access and manipulation through Figma API
+- **Gmail** - Email automation and notifications
+  - **Account**: djm.claude.assistant@gmail.com
+  - **Purpose**: Automated notifications, reports, and two-way communication
+  - **Commands**: 
+    - Send emails: "Send an email to X with subject Y"
+    - Read emails: "What emails do I have?"
+    - Search: "Search for emails from X about Y"
+  - **Automated Features**:
+    - Weekly/monthly reports via email
+    - Error notifications
+    - Task completion alerts
+    - Daily standups (when enabled)
 
+### Email Notification Triggers
+- **Automatic Notifications**:
+  - Weekly report every Friday at 5 PM
+  - Monthly report on the 1st at 9 AM
+  - Backup warnings after 7 days without backup
+  - High error rates (>10% failure rate)
+  - Uncommitted changes warnings
+- **On-Demand**: Request any report via email
+- **Interactive**: Reply to command emails for status updates
+
+## Link Ingestion & Content Analysis Toolstack
+
+### COMPREHENSIVE INGESTION TOOLS
+We have built a complete suite of link ingestion tools for maximum knowledge extraction:
+
+#### **Tool Selection Guide:**
+1. **Single Article/Page**: Use `WebFetch` tool directly for simple content analysis
+2. **Small Site (10-25 pages)**: Use `complete-link-ingestion-tool.py` 
+3. **Medium Site (50-150 pages)**: Use `deepwiki-comprehensive-ingestion.py` 
+4. **Maximum Coverage (500+ pages)**: Use `ultra-comprehensive-ingestion.py`
+
+#### **Available Tools:**
+
+**1. WebFetch (Built-in MCP Tool)**
+- **Purpose**: Single-page content analysis
+- **Usage**: Direct tool call for simple articles/pages
+- **Output**: Structured analysis with key insights
+- **Email**: Optional manual email sending
+
+**2. Complete Link Ingestion Tool**
+- **File**: `/Users/djm/claude-projects/complete-link-ingestion-tool.py`
+- **Capability**: 25 page discovery, 15 page analysis
+- **Features**: Pattern recognition, WebFetch integration, automated email
+- **Usage**: `python complete-link-ingestion-tool.py <URL> [max_pages] [max_analyze]`
+
+**3. DeepWiki Comprehensive Ingestion**
+- **File**: `/Users/djm/claude-projects/deepwiki-comprehensive-ingestion.py`
+- **Capability**: 150 page discovery, 25 page analysis
+- **Features**: DeepWiki-specific patterns, deeplink extraction, technical depth analysis
+- **Usage**: `python deepwiki-comprehensive-ingestion.py <DEEPWIKI_URL> [max_discover] [max_analyze]`
+- **Specialization**: Optimized for DeepWiki documentation sites
+
+**4. Ultra-Comprehensive Ingestion (MAXIMUM)**
+- **File**: `/Users/djm/claude-projects/ultra-comprehensive-ingestion.py`
+- **Capability**: 500 page discovery, 100 page analysis
+- **Features**: 
+  - 1,619 URL pattern testing
+  - Parallel processing with threading
+  - Full content extraction (not summaries)
+  - Technical depth scoring
+  - Content categorization
+  - Implementation-ready code extraction
+- **Usage**: `python ultra-comprehensive-ingestion.py <URL> [max_discover] [max_analyze]`
+- **Default Limits**: 500 discovery, 100 analysis (MAXIMUM POSSIBLE)
+
+### INGESTION WORKFLOW STANDARDS
+
+#### **Pre-Ingestion Decision Matrix:**
+- **Single article/video/page** → WebFetch tool
+- **Documentation site (unknown size)** → complete-link-ingestion-tool.py
+- **DeepWiki site** → deepwiki-comprehensive-ingestion.py  
+- **Maximum coverage needed** → ultra-comprehensive-ingestion.py
+
+#### **Email Integration:**
+- **ALL ingestion tools** automatically send **strategic analysis emails** to `thedavidmurray@gmail.com`
+- **Email approach**: Transform technical data into strategic insights and actionable intelligence
+- **Enhanced format**: Strategic insights framework with executive summary, technical insights, immediate applications, architecture lessons, and actionable next steps
+- **Template system**: `enhanced-email-templates.py` provides strategic formatting for all tools
+- **Reliability**: Uses direct Gmail API (never MCP Gmail tools) with fallback options
+
+#### **Strategic Email Standards:**
+- **Focus**: Insights and implications over raw data
+- **Structure**: Strategic decision-making format with clear value propositions
+- **Content**: Connect findings to current projects and challenges
+- **Formatting**: Color-enhanced markdown with scannable sections
+- **Quality**: Clear next actions, not just information
+
+#### **Obsidian Integration Requirements:**
+- **Session Documentation**: All ingestion sessions must be documented in vault
+- **Location**: `01-Sessions/YYYY-MM/Session-YYYY-MM-DD-IngestionTopic.md`
+- **KB Entries**: Significant findings saved to `03-Knowledge-Base/Tools/KB-IngestionInsights.md`
+- **Cross-linking**: Use `[[note name]]` syntax for all related concepts
+
+#### **Serena Integration:**
+- **Memory Sync**: Use `mcp__serena__write_memory` for significant ingestion insights
+- **Pattern Recognition**: Document recurring patterns in `03-Knowledge-Base/Patterns/`
+- **Tool Evolution**: Update tool documentation when improving ingestion capabilities
+
+### CONTENT ANALYSIS STANDARDS
+
+#### **Technical Depth Analysis:**
+- **Code Extraction**: All tools extract code blocks for implementation insights
+- **Concept Mapping**: 50+ technical patterns recognized (AI/ML, DevOps, Architecture, etc.)
+- **Content Categorization**: Automatic classification (tutorial, reference, architecture, configuration)
+- **Implementation Readiness**: Tools provide actionable technical insights
+
+#### **Knowledge Capture Metrics:**
+- **Coverage Percentage**: Measure of comprehensive discovery success
+- **Technical Depth Score**: Quantified measure of implementation value
+- **Content Diversity**: Range of content types discovered
+- **Cross-Reference Potential**: Links to existing knowledge base
+
+### TOOL MAINTENANCE
+
+#### **Regular Updates Required:**
+- **Pattern Recognition**: Add new site patterns as discovered
+- **Email Templates**: Maintain consistent, valuable email format
+- **Performance Optimization**: Monitor and improve processing speed
+- **Reliability**: Ensure robust error handling and recovery
+
+#### **Quality Assurance:**
+- **Test ingestion tools monthly** with known sites
+- **Verify email delivery** for all automated workflows  
+- **Maintain Obsidian taxonomy** compliance
+- **Update Serena memory** with tool improvements
+
+### QUICK REFERENCE COMMANDS
+
+```bash
+# Single comprehensive analysis (25 pages)
+python complete-link-ingestion-tool.py https://example.com/docs
+
+# DeepWiki maximum (150 pages)  
+python deepwiki-comprehensive-ingestion.py https://deepwiki.com/project
+
+# Ultra-comprehensive maximum (500 pages)
+python ultra-comprehensive-ingestion.py https://example.com 500 100
+
+# Single page analysis (no email)
+# Use WebFetch tool directly in conversation
+```
+
+**CRITICAL**: Always use appropriate tool for scope. Ultra-comprehensive for maximum knowledge extraction, simple WebFetch for single articles.
+
+## Enhanced Strategic Email System
+
+### EMAIL TRANSFORMATION PHILOSOPHY
+Transform technical analysis into strategic intelligence. **Don't just report what was found - explain why it matters and how it can be applied.**
+
+### STRATEGIC EMAIL TEMPLATE SYSTEM
+- **Core Module**: `enhanced-email-templates.py` - Generates strategic, insight-focused email content
+- **Integration**: All ingestion tools use strategic email generation with fallback to original format
+- **Quality Standard**: Focus on insights and implications over raw data
+
+### EMAIL STRUCTURE FRAMEWORK
+
+#### **Subject Line Pattern:**
+`[Resource Type] Analysis: [Title] - [Key Value Proposition]`
+
+#### **Content Structure:**
+1. **Resource Overview** - Platform, coverage, and URL with strategic context
+2. **Executive Summary** - 2-3 sentences explaining what it is, core value, and why it matters
+3. **Key Technical Insights** - Formatted insights with strategic implications
+4. **Strategic Implications** - Immediate applications, architecture lessons, integration opportunities
+5. **Critical Concepts** - Key technical concepts with strategic context explanations
+6. **Actionable Next Steps** - 4-5 specific, actionable items with expected outcomes
+7. **Why This Matters** - Strategic importance and long-term value explanation
+
+### CONTENT TRANSFORMATION EXAMPLES
+
+#### **Before (Data-Focused):**
+"Discovered 150 pages through pattern matching"
+
+#### **After (Strategic-Focused):**
+"Uncovered a complete architectural blueprint for building autonomous research systems"
+
+#### **Before (Generic):**
+"Technical concepts: langgraph, ai, rest, deployment"
+
+#### **After (Strategic):**
+"**LangGraph Orchestration** - Uses state machines to manage complex research workflows, ensuring reliability and debuggability"
+
+### INTEGRATION WITH INGESTION TOOLS
+
+#### **Ultra-Comprehensive Tool:**
+- **Primary**: Uses strategic email template with concept extraction and insight generation
+- **Fallback**: Original format if strategic template fails
+- **Enhancement**: Transforms raw metrics into strategic narratives
+
+#### **Complete Link Ingestion:**
+- **Ready for upgrade** to strategic template system
+- **Current**: Uses standardized format with manual strategic elements
+
+#### **DeepWiki Comprehensive:**
+- **Ready for upgrade** to strategic template system
+- **Specialization**: Can include DeepWiki-specific strategic insights
+
+### STRATEGIC EMAIL STANDARDS
+
+#### **DO:**
+1. **Extract patterns, not just facts** - Look for reusable architectural approaches
+2. **Connect to current challenges** - Reference known pain points (MCP issues, email workflows)
+3. **Provide context** - Explain technical concepts in relation to our goals
+4. **Think strategically** - How does this fit into our long-term vision?
+5. **Make it scannable** - Use formatting to highlight key points
+6. **Tell a story** - Frame discoveries as solutions to problems
+
+#### **DON'T:**
+1. **List raw statistics** - Transform into strategic narratives
+2. **Use generic descriptions** - Provide specific value propositions
+3. **Bury the lead** - Put most valuable insight upfront
+4. **Overwhelm with details** - Synthesize, don't enumerate
+5. **Forget the "so what"** - Every point should answer "why do I care?"
+
+### QUALITY ASSURANCE CHECKLIST
+
+Before sending strategic emails, verify:
+- [ ] Executive summary explains the "why" not just the "what"
+- [ ] Each insight connects to a practical application
+- [ ] Technical concepts are explained in strategic context
+- [ ] Action items are specific and achievable
+- [ ] The email tells a coherent story from problem to solution
+- [ ] Formatting enhances readability
+- [ ] The value is clear within the first paragraph
+
+### MAINTENANCE AND EVOLUTION
+
+#### **Regular Updates:**
+- **Template Refinement**: Improve strategic email templates based on feedback
+- **Context Updates**: Regularly refresh knowledge of current projects for better relevance
+- **Pattern Library**: Build collection of effective strategic phrasings
+- **Integration Testing**: Verify strategic email generation across all tools
+
+#### **Quality Monitoring:**
+- **Review exemplars** - Keep the best summaries as templates
+- **Iterate on feedback** - Ask what was most/least valuable
+- **Test readability** - Can someone understand the value in 30 seconds?
+- **Strategic alignment** - Ensure emails serve decision-making needs
 
 ## Development Preferences
 - Always run linting and type checking after code changes (when applicable)

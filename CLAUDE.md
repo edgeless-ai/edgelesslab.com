@@ -29,6 +29,7 @@
 | Development/TDD | [[KB-Development-Guidelines-TDD]] | `development-mode-settings` |
 | Quality Standards | [[KB-Quality-Standards-Workspace]] | `quality-gates-active` |
 | MCP Servers | [[KB-MCP-Server-Reference]] | - |
+| FZF Productivity | [[KB-FZF-Fuzzy-Finder-Integration]] | `fzf-fuzzy-finder-integration` |
 | Critical Paths | - | `critical-paths` |
 
 ### 🚀 Quick Commands

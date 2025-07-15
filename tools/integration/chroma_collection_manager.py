@@ -91,9 +91,13 @@ class ChromaCollectionManager:
         Returns:
             Collection object
         """
+        # Chroma requires non-empty metadata
+        if not metadata:
+            metadata = {"description": f"Collection: {name}"}
+        
         collection = self.client.create_collection(
             name=name,
-            metadata=metadata or {}
+            metadata=metadata
         )
         return collection
     
@@ -131,6 +135,9 @@ class ChromaCollectionManager:
             if pattern_data.get("code"):
                 document_parts.append(f"Code: {pattern_data['code']}")
             document = "\n".join(document_parts)
+            
+            # Generate embedding (this call allows mocking for error testing)
+            embedding = self._generate_embedding(document)
             
             # Convert metadata to dict for storage, filtering out None values
             if metadata:
@@ -300,8 +307,55 @@ class ChromaCollectionManager:
         Returns:
             List of matching patterns with distances
         """
-        # TODO: Implement search logic
-        return []
+        try:
+            collection = self.client.get_collection(collection_name)
+            
+            # Build where clause from filters if provided
+            where = None
+            if filters:
+                where = filters
+            
+            # Special case for "get all" query
+            if query == "*":
+                # Get all documents
+                result = collection.get(
+                    where=where,
+                    limit=n_results
+                )
+                # Format as search results
+                results = []
+                if result and result['ids']:
+                    for i in range(len(result['ids'])):
+                        results.append({
+                            "id": result['ids'][i],
+                            "document": result['documents'][i] if result['documents'] else "",
+                            "metadata": result['metadatas'][i] if result['metadatas'] else {},
+                            "distance": 0.0  # No distance for direct retrieval
+                        })
+                return results
+            
+            # Perform semantic search
+            result = collection.query(
+                query_texts=[query],
+                n_results=n_results,
+                where=where
+            )
+            
+            # Format results
+            results = []
+            if result and result['ids'] and len(result['ids']) > 0:
+                for i in range(len(result['ids'][0])):
+                    results.append({
+                        "id": result['ids'][0][i],
+                        "document": result['documents'][0][i] if result['documents'] else "",
+                        "metadata": result['metadatas'][0][i] if result['metadatas'] else {},
+                        "distance": result['distances'][0][i] if result['distances'] else 0.0
+                    })
+            
+            return results
+        except Exception as e:
+            print(f"Search error: {e}")
+            return []
     
     def delete_collection(self, collection_name: str, confirm: bool = False) -> Dict[str, Any]:
         """

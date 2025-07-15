@@ -1,0 +1,170 @@
+{
+  "project": "refactored-org-inventory",
+  "language": "C#",
+  "framework": ".NET 9.0",
+  "patterns": [
+    {
+      "id": "di-factory-pattern",
+      "name": "Service Registration with Factory Pattern",
+      "category": "Dependency Injection",
+      "description": "Complex service initialization using factory patterns within DI container",
+      "complexity": "medium",
+      "reusability": "high",
+      "files": ["Program.cs"],
+      "codeExample": "services.AddScoped<IRoleExtractionService>(serviceProvider => { var logger = serviceProvider.GetRequiredService<ILogger<RoleExtractionService>>(); return new RoleExtractionService(...); });",
+      "relatedPatterns": ["Factory Pattern", "Service Locator"],
+      "tags": ["dependency-injection", "factory", "service-registration"]
+    },
+    {
+      "id": "typed-logger-injection",
+      "name": "Typed Logger Injection",
+      "category": "Logging",
+      "description": "Consistent use of strongly-typed ILogger<T> throughout all services",
+      "complexity": "low",
+      "reusability": "high",
+      "files": ["Services/*"],
+      "codeExample": "private readonly ILogger<RoleIDGenerator> _logger;",
+      "relatedPatterns": ["Dependency Injection", "Logging Facade"],
+      "tags": ["logging", "dependency-injection", "type-safety"]
+    },
+    {
+      "id": "modular-config",
+      "name": "Modular Hierarchical Configuration",
+      "category": "Configuration",
+      "description": "Configuration split into focused, strongly-typed classes with nested properties",
+      "complexity": "medium",
+      "reusability": "high",
+      "files": ["Configuration/InventoryConfig.cs", "Configuration/AzureConfig.cs"],
+      "codeExample": "public class InventoryConfig { public FilePathConfig FilePaths { get; set; } = new(); }",
+      "relatedPatterns": ["Options Pattern", "Configuration as Code"],
+      "tags": ["configuration", "modular", "strongly-typed"]
+    },
+    {
+      "id": "comprehensive-validation",
+      "name": "Comprehensive Validation Service",
+      "category": "Validation",
+      "description": "Multi-level validation with severity levels, scoring, and detailed reporting",
+      "complexity": "high",
+      "reusability": "high",
+      "files": ["Services/InterviewValidationService.cs", "Services/TemplateValidationService.cs"],
+      "keyFeatures": [
+        "Severity levels (Critical, Error, Warning, Info)",
+        "Weighted scoring system",
+        "Batch validation support",
+        "Detailed validation reports"
+      ],
+      "relatedPatterns": ["Strategy Pattern", "Chain of Responsibility"],
+      "tags": ["validation", "error-handling", "reporting"]
+    },
+    {
+      "id": "contextual-error-handling",
+      "name": "Try-Catch with Contextual Logging",
+      "category": "Error Handling",
+      "description": "Consistent error handling with detailed logging and graceful degradation",
+      "complexity": "medium",
+      "reusability": "high",
+      "files": ["Services/SharePointService.cs"],
+      "codeExample": "catch (Exception ex) { _logger.LogError(ex, \"Error uploading file to SharePoint: {FileName}\", fileName); }",
+      "relatedPatterns": ["Exception Shielding", "Logging"],
+      "tags": ["error-handling", "logging", "resilience"]
+    },
+    {
+      "id": "unique-id-generation",
+      "name": "ID Generation with Duplicate Detection",
+      "category": "Data Processing",
+      "description": "Sophisticated ID generation with collision detection and duplicate merging",
+      "complexity": "high",
+      "reusability": "medium",
+      "files": ["Services/RoleIDGenerator.cs"],
+      "keyFeatures": [
+        "Configurable ID format",
+        "Duplicate detection with similarity threshold",
+        "Automatic duplicate collapse",
+        "Fallback to timestamp-based IDs"
+      ],
+      "relatedPatterns": ["Factory Pattern", "Strategy Pattern"],
+      "tags": ["id-generation", "deduplication", "data-processing"]
+    },
+    {
+      "id": "multi-backend-repository",
+      "name": "Abstract Repository Pattern",
+      "category": "Data Access",
+      "description": "Interface-based repository pattern supporting multiple storage backends",
+      "complexity": "medium",
+      "reusability": "high",
+      "files": ["Services/ITranscriptRepository.cs", "Services/AzureBlobTranscriptRepository.cs", "Services/SharePointTranscriptRepository.cs"],
+      "relatedPatterns": ["Repository Pattern", "Strategy Pattern"],
+      "tags": ["repository", "data-access", "abstraction"]
+    },
+    {
+      "id": "progressive-enhancement",
+      "name": "Progressive Enhancement Model",
+      "category": "Domain Modeling",
+      "description": "Base models extended with additional metadata through inheritance",
+      "complexity": "medium",
+      "reusability": "high",
+      "files": ["Models/Role.cs", "Models/RoleWithID.cs", "Models/EnhancedRole.cs"],
+      "codeExample": "public class EnhancedRole : RoleWithID { public string StandardizedTitle { get; set; } }",
+      "relatedPatterns": ["Decorator Pattern", "Builder Pattern"],
+      "tags": ["domain-model", "inheritance", "data-enrichment"]
+    },
+    {
+      "id": "async-await-pattern",
+      "name": "Consistent Async/Await Implementation",
+      "category": "Asynchronous Programming",
+      "description": "All I/O operations use async/await with proper Task propagation",
+      "complexity": "low",
+      "reusability": "high",
+      "files": ["Services/*"],
+      "relatedPatterns": ["Task-based Asynchronous Pattern (TAP)"],
+      "tags": ["async", "performance", "io-operations"]
+    },
+    {
+      "id": "template-based-excel",
+      "name": "Template-Based Excel Generation",
+      "category": "File Processing",
+      "description": "Excel file generation using validated templates with dynamic data insertion",
+      "complexity": "high",
+      "reusability": "medium",
+      "files": ["Services/InventoryExcelExporter.cs", "Services/ExcelReaderService.cs"],
+      "relatedPatterns": ["Template Method Pattern"],
+      "tags": ["excel", "file-generation", "templates"]
+    }
+  ],
+  "uniqueApproaches": [
+    {
+      "name": "Profile Management System",
+      "description": "Interactive profile selection and storage for runtime configuration",
+      "innovation": "Saves user preferences for quick re-use with emoji-based CLI",
+      "files": ["Services/ProfileManager.cs", "Program.cs"]
+    },
+    {
+      "name": "Heat Map Transformation Wave Algorithm",
+      "description": "Matrix-based decision making for transformation readiness",
+      "innovation": "Considers complexity, interaction level, and location dependency",
+      "files": ["Models/EnhancedRole.cs"]
+    },
+    {
+      "name": "Multi-Source Common Functions",
+      "description": "Runtime source selection between Azure Blob and local Excel files",
+      "innovation": "Abstraction allowing flexible data source switching",
+      "files": ["Services/ICommonFunctionsService.cs"]
+    }
+  ],
+  "architectureInsights": {
+    "strengths": [
+      "Strong Interface Segregation",
+      "Configuration Flexibility",
+      "Comprehensive Logging",
+      "Error Recovery Mechanisms",
+      "High Testability"
+    ],
+    "bestPractices": [
+      "Every service has a corresponding interface",
+      "Dependency injection used throughout",
+      "Consistent async/await patterns",
+      "Structured logging with context",
+      "Graceful error handling with fallbacks"
+    ]
+  }
+}

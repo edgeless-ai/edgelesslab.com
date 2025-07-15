@@ -1,0 +1,133 @@
+{
+  "embeddings": [
+    {
+      "id": "tools-core-email-api",
+      "content": "Claude Email API - Centralized email system using direct Gmail OAuth2. Bypasses unreliable MCP tools. Provides templates for analysis summaries. Hardcoded for David's email (thedavidmurray@gmail.com). Located at /tools/core/claude-email-api.py. Key functions: send_email_to_david(), send_analysis_summary(). Integrates with quality scoring rubric for 60+ score requirement.",
+      "metadata": {
+        "tool_category": "core",
+        "tool_name": "claude-email-api",
+        "path": "/tools/core/claude-email-api.py",
+        "integration_points": ["quality_scoring", "email_templates", "oauth2"],
+        "workflow_type": "email_automation",
+        "key_functions": ["send_email_to_david", "send_analysis_summary"],
+        "dependencies": ["google-auth", "google-api-python-client"],
+        "critical_path": true
+      }
+    },
+    {
+      "id": "tools-ingestion-adaptive",
+      "content": "Adaptive Link Ingestion - Paradigm shift from arbitrary page limits to intelligent content-aware crawling. Stops when hitting diminishing returns (<5% new information). Strategies: RELEVANCE_FIRST, INFORMATION_GAIN, BREADTH_FIRST, HYBRID. Features URL pattern recognition, content density analysis, keyword focusing. Located at /tools/ingestion/adaptive-link-ingestion.py.",
+      "metadata": {
+        "tool_category": "ingestion",
+        "tool_name": "adaptive-link-ingestion",
+        "path": "/tools/ingestion/adaptive-link-ingestion.py",
+        "strategies": ["RELEVANCE_FIRST", "INFORMATION_GAIN", "BREADTH_FIRST", "HYBRID"],
+        "innovation_type": "dynamic_stopping_criteria",
+        "workflow_type": "adaptive_crawling",
+        "performance": "stops_at_diminishing_returns"
+      }
+    },
+    {
+      "id": "tools-email-quality-scoring",
+      "content": "Quality Scoring Rubric - 100-point scoring system for email quality. Minimum 60 points required to send. Positive metrics: specific_tools_mentioned, problems_solved, project_connections, actionable_items. Negative metrics: generic_statistics, vague_descriptions, missing_specifics. Located at /tools/email/quality-scoring-rubric.py.",
+      "metadata": {
+        "tool_category": "email",
+        "tool_name": "quality-scoring-rubric",
+        "path": "/tools/email/quality-scoring-rubric.py",
+        "scoring_dimensions": ["specificity", "actionability", "relevance", "clarity"],
+        "minimum_score": 60,
+        "workflow_type": "quality_gate",
+        "integration_points": ["email_api", "analysis_tools"]
+      }
+    },
+    {
+      "id": "tools-integration-chroma",
+      "content": "Chroma Collection Schema - Standardized metadata for knowledge system. Defines SourceType (serena/obsidian/ingestion/manual), ContentType (pattern/solution/insight/architecture), ProjectName enums. ChromaMetadata dataclass with source, project, content_type, timestamp, tags, confidence_score. Located at /tools/integration/chroma_collections.py.",
+      "metadata": {
+        "tool_category": "integration",
+        "tool_name": "chroma_collections",
+        "path": "/tools/integration/chroma_collections.py",
+        "schema_types": ["SourceType", "ContentType", "ProjectName", "ChromaMetadata"],
+        "projects": ["monte-carlo", "org-inventory", "total-serialism", "btc-trader"],
+        "workflow_type": "knowledge_management"
+      }
+    },
+    {
+      "id": "tools-core-workspace-cleanup",
+      "content": "Workspace Cleanup Tool - Automated file organization for /claude-projects. Enforces directory structure: tools/{ingestion,email,core,analysis}, active/, archive/, temp/, resources/, config/, data/. Pattern-based file routing. Temporal cleanup of temp files. Located at /tools/core/workspace-cleanup.py.",
+      "metadata": {
+        "tool_category": "core",
+        "tool_name": "workspace-cleanup",
+        "path": "/tools/core/workspace-cleanup.py",
+        "directory_structure": ["tools", "active", "archive", "temp", "resources", "config", "data"],
+        "automation_type": "file_organization",
+        "workflow_type": "workspace_management"
+      }
+    },
+    {
+      "id": "tools-analysis-ytdlp",
+      "content": "YT-DLP Strategic Analysis - Video/audio content extraction for projects. Applications: btc-sentiment-trader (crypto influencer analysis), training data collection, content archiving, livestream monitoring. Python integration with yt_dlp library. Supports transcript extraction, metadata collection. Located at /tools/analysis/yt-dlp-strategic-analysis.py.",
+      "metadata": {
+        "tool_category": "analysis",
+        "tool_name": "yt-dlp-strategic-analysis",
+        "path": "/tools/analysis/yt-dlp-strategic-analysis.py",
+        "use_cases": ["sentiment_analysis", "content_archiving", "livestream_monitoring"],
+        "project_relevance": ["btc-sentiment-trader", "knowledge-base"],
+        "integration_type": "external_tool"
+      }
+    },
+    {
+      "id": "workflow-email-automation",
+      "content": "Email Automation Workflow Pattern - Complete pipeline: Ingestion → Analysis → Quality Check → Email. Uses adaptive or fixed-limit ingestion, transforms to strategic insights via enhanced-email-templates.py, applies quality-scoring-rubric.py (60+ required), sends via claude-email-api.py. Includes Obsidian vault capture and knowledge persistence.",
+      "metadata": {
+        "pattern_type": "workflow_automation",
+        "workflow_name": "email_automation_pipeline",
+        "stages": ["ingestion", "analysis", "quality_check", "delivery"],
+        "tools_involved": ["ingestion_tools", "email_templates", "quality_scoring", "email_api"],
+        "success_criteria": "quality_score >= 60"
+      }
+    },
+    {
+      "id": "pattern-quality-gates",
+      "content": "Quality Gate Pattern - Consistent enforcement across all tools. QualityScore dataclass calculates points for specific mentions, problem solving, project connections, actionability. Penalizes generic statistics, vague descriptions. Returns score and QualityLevel enum (FAILED/POOR/ACCEPTABLE/GOOD/EXCELLENT). Prevents low-quality content delivery.",
+      "metadata": {
+        "pattern_type": "quality_control",
+        "pattern_name": "quality_gate_pattern",
+        "implementation": "QualityScore dataclass",
+        "threshold": 60,
+        "enforcement": "blocking",
+        "levels": ["FAILED", "POOR", "ACCEPTABLE", "GOOD", "EXCELLENT"]
+      }
+    },
+    {
+      "id": "pattern-adaptive-crawling",
+      "content": "Adaptive Crawling Pattern - Dynamic stopping based on information gain. Calculates new information ratio using TF-IDF and cosine similarity. URL relevance scoring: /docs/=1.5x, /blog/=1.2x, /tag/=0.5x. Keyword matching multipliers. Respects time limits over page counts. Generates comprehensive crawl analytics.",
+      "metadata": {
+        "pattern_type": "intelligent_crawling",
+        "pattern_name": "adaptive_information_gain",
+        "algorithms": ["tf-idf", "cosine_similarity", "relevance_scoring"],
+        "stopping_criteria": ["information_gain < 0.05", "time_limit", "relevance_threshold"],
+        "innovation": "content_aware_decisions"
+      }
+    },
+    {
+      "id": "integration-tool-composition",
+      "content": "Tool Composition Integration - Tools designed for pipeline composition. Example: adaptive-link-ingestion.py output → transform-adaptive-to-insights.py → quality_scoring_rubric.py → claude-email-api.py. Standardized JSON interfaces between tools. Bash scripts orchestrate multi-tool workflows. Error propagation and graceful degradation.",
+      "metadata": {
+        "integration_type": "tool_composition",
+        "composition_pattern": "pipeline",
+        "data_format": "json",
+        "orchestration": "bash_scripts",
+        "error_handling": "graceful_degradation",
+        "examples": ["example-adaptive-workflow.sh"]
+      }
+    }
+  ],
+  "metadata": {
+    "analysis_date": "2025-07-15",
+    "total_tools_analyzed": 25,
+    "categories": ["core", "ingestion", "email", "analysis", "integration"],
+    "key_patterns": ["quality_gates", "adaptive_crawling", "email_automation", "tool_composition"],
+    "projects_referenced": ["monte-carlo", "btc-sentiment-trader", "org-inventory", "total-serialism"]
+  }
+}

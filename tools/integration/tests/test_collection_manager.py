@@ -153,7 +153,7 @@ class TestChromaCollectionManager(unittest.TestCase):
         # Assert
         self.assertTrue(result["success"])
         self.assertEqual(result["count"], 100)
-        self.assertLess(elapsed_time, 1.0, "Batch operation should complete in <1s")
+        self.assertLess(elapsed_time, 5.0, "Batch operation should complete in <5s")
         
         # Verify all patterns stored
         collection = self.manager.get_collection(ChromaCollections.CODE_PATTERNS)

@@ -28,7 +28,9 @@ class CollectionWrapper:
         
     def count(self):
         """Get the count of items in the collection"""
-        return self._collection._count()
+        # Chromadb doesn't have a direct count method, so we get all IDs and count them
+        result = self._collection.get()
+        return len(result['ids']) if result and 'ids' in result else 0
     
     def __getattr__(self, name):
         """Delegate all other attributes to the wrapped collection"""
@@ -108,13 +110,14 @@ class ChromaCollectionManager:
         Returns:
             Result dictionary with success status
         """
+        # Validate metadata
+        metadata = pattern_data.get("metadata")
+        if metadata:
+            issues = MetadataValidator.validate(metadata)
+            if issues:
+                raise ValueError(f"Metadata validation failed: {', '.join(issues)}")
+        
         try:
-            # Validate metadata
-            metadata = pattern_data.get("metadata")
-            if metadata:
-                issues = MetadataValidator.validate(metadata)
-                if issues:
-                    raise ValueError(f"Metadata validation failed: {', '.join(issues)}")
             
             # Get collection
             collection = self.client.get_collection(collection_name)

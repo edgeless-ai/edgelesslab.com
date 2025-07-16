@@ -1,0 +1,63 @@
+[pytest]
+# Test discovery patterns
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+
+# Test execution settings
+addopts = 
+    -v
+    --strict-markers
+    --tb=short
+    --cov=core
+    --cov-report=html
+    --cov-report=term-missing
+    --cov-fail-under=90
+    --asyncio-mode=auto
+
+# Custom markers
+markers =
+    unit: Unit tests that test individual components
+    integration: Integration tests that test component interactions
+    e2e: End-to-end tests that test complete workflows
+    slow: Tests that take longer than 1 second to run
+    requires_network: Tests that require network access to blockchain
+    requires_agentek: Tests that require agentek to be installed
+    performance: Performance and benchmark tests
+
+# Timeout settings
+timeout = 30
+timeout_method = thread
+
+# Asyncio configuration
+asyncio_default_fixture_loop_scope = function
+
+# Coverage settings
+[coverage:run]
+source = core
+omit = 
+    */tests/*
+    */test_*
+    */__pycache__/*
+    */venv/*
+    */node_modules/*
+
+[coverage:report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+
+[coverage:html]
+directory = htmlcov
+
+# Logging configuration for tests
+[tool:pytest]
+log_cli = true
+log_cli_level = INFO
+log_cli_format = %(asctime)s [%(levelname)8s] %(message)s
+log_cli_date_format = %Y-%m-%d %H:%M:%S

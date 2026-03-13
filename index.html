@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edgeless — Tools for people who build with AI</title>
+  <meta name="description" content="Direct, technical, opinionated tools for AI builders. Templates, guides, and systems that work in production.">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://edgelesslab.com/">
+  <meta property="og:title" content="Edgeless — Tools for people who build with AI">
+  <meta property="og:description" content="Direct, technical, opinionated tools for AI builders. Templates, guides, and systems that work in production.">
+  <meta property="og:image" content="https://edgelesslab.com/og-image.png">
+  <meta property="og:site_name" content="Edgeless">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Edgeless — Tools for people who build with AI">
+  <meta name="twitter:description" content="Direct, technical, opinionated tools for AI builders. Templates, guides, and systems that work in production.">
+  <meta name="twitter:image" content="https://edgelesslab.com/og-image.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/logo-v3-1024.png">
+  <link rel="apple-touch-icon" href="/logo-v3-1024.png">
+
+  <!-- Google Fonts: Roboto Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- PostHog placeholder -->
+
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --navy:        #0f172a;
+      --navy-soft:   #131c31;
+      --navy-card:   #1a2540;
+      --navy-border: #1e2d47;
+      --indigo:      #6366f1;
+      --indigo-light:#818cf8;
+      --indigo-dim:  #3730a3;
+      --white:       #f8fafc;
+      --muted:       #94a3b8;
+      --faint:       #334155;
+      --green:       #10b981;
+      --amber:       #f59e0b;
+
+      --font: 'Roboto Mono', 'Courier New', monospace;
+      --radius: 8px;
+      --max-w: 1100px;
+      --transition: 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    /* ─── Scrollbar ────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--navy); }
+    ::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 3px; }
+
+    /* ─── Layout ───────────────────────────────────────────────── */
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ─── Noise texture overlay ────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ─── Hero glow ────────────────────────────────────────────── */
+    .hero-glow {
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 700px;
+      background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Navigation ───────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(30, 45, 71, 0.8);
+      backdrop-filter: blur(16px) saturate(120%);
+      -webkit-backdrop-filter: blur(16px) saturate(120%);
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      transition: opacity var(--transition);
+    }
+
+    .nav-logo:hover { opacity: 0.8; }
+
+    .nav-logo img {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      color: var(--muted);
+      transition: color var(--transition);
+    }
+
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-cta {
+      font-size: 13px;
+      padding: 7px 16px;
+      background: var(--indigo);
+      color: var(--white) !important;
+      border-radius: var(--radius);
+      transition: background var(--transition), opacity var(--transition) !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--indigo-light) !important;
+      color: var(--white) !important;
+    }
+
+    /* ─── Hero ─────────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      padding: 100px 0 88px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--indigo-light);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 100px;
+      padding: 5px 14px;
+      margin-bottom: 32px;
+    }
+
+    .hero-label-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--indigo);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 68px);
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      color: var(--white);
+      max-width: 600px;
+      margin: 0 auto 20px;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--indigo-light) 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 460px;
+      margin: 0 auto 40px;
+      line-height: 1.65;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--indigo);
+      color: var(--white);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      text-decoration: none;
+    }
+
+    .btn-primary:hover {
+      background: var(--indigo-light);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+    }
+
+    .btn-free {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--green);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      text-decoration: none;
+    }
+
+    .btn-free:hover {
+      background: rgba(16, 185, 129, 0.2);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 400;
+      border-radius: var(--radius);
+      border: 1px solid var(--navy-border);
+      cursor: pointer;
+      transition: color var(--transition), border-color var(--transition), transform var(--transition);
+      text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+      color: var(--white);
+      border-color: var(--faint);
+      transform: translateY(-1px);
+    }
+
+    /* ─── Divider ──────────────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--navy-border), transparent);
+      margin: 0 24px;
+    }
+
+    /* ─── Section header ───────────────────────────────────────── */
+    .section-header {
+      margin-bottom: 48px;
+    }
+
+    .section-eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--indigo);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(22px, 3vw, 30px);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .section-desc {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 500px;
+      line-height: 1.6;
+    }
+
+    /* ─── Free lead magnet banner ───────────────────────────────── */
+    .lead-magnet {
+      margin: 0 0 48px;
+      background: linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(99,102,241,0.06) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 12px;
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lead-magnet::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--green), rgba(99,102,241,0.6));
+    }
+
+    .lead-magnet-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .lead-magnet-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .lead-magnet-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--green);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 100px;
+      padding: 2px 9px;
+      margin-bottom: 6px;
+    }
+
+    .lead-magnet-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .lead-magnet-desc {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ─── Featured product ──────────────────────────────────────── */
+    #featured {
+      padding: 88px 0 48px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .featured-card {
+      background: var(--navy-card);
+      border: 1px solid var(--navy-border);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .featured-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--indigo), #a78bfa, var(--indigo-light));
+    }
+
+    .featured-inner {
+      padding: 48px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .featured-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .featured-eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--indigo-light);
+    }
+
+    .featured-title {
+      font-size: clamp(22px, 3.5vw, 34px);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .featured-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 560px;
+      margin-bottom: 28px;
+    }
+
+    .featured-specs {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .featured-spec {
+      font-size: 11px;
+      color: var(--muted);
+      background: rgba(148, 163, 184, 0.06);
+      border: 1px solid var(--navy-border);
+      border-radius: 4px;
+      padding: 3px 9px;
+    }
+
+    .featured-spec strong {
+      color: var(--indigo-light);
+    }
+
+    .featured-tiers {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 220px;
+    }
+
+    .tier-card {
+      background: var(--navy-soft);
+      border: 1px solid var(--navy-border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      transition: border-color var(--transition), background var(--transition);
+    }
+
+    .tier-card:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      background: rgba(99, 102, 241, 0.04);
+    }
+
+    .tier-card.tier-popular {
+      border-color: rgba(99, 102, 241, 0.45);
+      background: rgba(99, 102, 241, 0.06);
+      position: relative;
+    }
+
+    .tier-popular-tag {
+      position: absolute;
+      top: -9px;
+      right: 14px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--indigo-light);
+      background: var(--navy-card);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      border-radius: 100px;
+      padding: 2px 9px;
+    }
+
+    .tier-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+
+    .tier-price {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .tier-includes {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .tier-cta {
+      display: block;
+      margin-top: 10px;
+      text-align: center;
+      padding: 7px 12px;
+      background: var(--indigo);
+      color: var(--white);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 6px;
+      transition: background var(--transition);
+    }
+
+    .tier-cta:hover { background: var(--indigo-light); }
+
+    /* ─── Products grid section ─────────────────────────────────── */
+    #products {
+      padding: 48px 0 88px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--navy-border);
+      border: 1px solid var(--navy-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .product-card {
+      background: var(--navy-card);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      transition: background var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--indigo), #a78bfa);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .product-card:hover { background: #1e2d47; }
+    .product-card:hover::before { opacity: 1; }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--navy-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      background: var(--navy-soft);
+      flex-shrink: 0;
+    }
+
+    .card-tag {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 9px;
+      border-radius: 100px;
+    }
+
+    .tag-templates {
+      color: #a78bfa;
+      background: rgba(167, 139, 250, 0.1);
+      border: 1px solid rgba(167, 139, 250, 0.2);
+    }
+
+    .tag-tools {
+      color: var(--indigo-light);
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+
+    .tag-guides {
+      color: #67e8f9;
+      background: rgba(103, 232, 249, 0.08);
+      border: 1px solid rgba(103, 232, 249, 0.18);
+    }
+
+    .tag-free {
+      color: var(--green);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.65;
+      flex: 1;
+      margin-bottom: 20px;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--navy-border);
+    }
+
+    .card-price {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.2;
+    }
+
+    .card-price strong {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -0.02em;
+      display: block;
+    }
+
+    .card-price .price-free {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--green);
+      letter-spacing: -0.02em;
+      display: block;
+    }
+
+    .card-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 14px;
+      background: var(--indigo);
+      color: var(--white);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+    }
+
+    .card-cta:hover {
+      background: var(--indigo-light);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+    }
+
+    .card-cta-free {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 14px;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--green);
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 6px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background var(--transition), transform var(--transition);
+    }
+
+    .card-cta-free:hover {
+      background: rgba(16, 185, 129, 0.2);
+      transform: translateY(-1px);
+    }
+
+    /* ─── Stats strip ──────────────────────────────────────────── */
+    .stats-strip {
+      padding: 56px 0;
+      border-top: 1px solid var(--navy-border);
+      border-bottom: 1px solid var(--navy-border);
+      background: var(--navy-soft);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 32px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 30px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-value span {
+      background: linear-gradient(135deg, var(--indigo-light), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ─── About Section ────────────────────────────────────────── */
+    #about {
+      padding: 88px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .about-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .about-copy p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 16px;
+    }
+
+    .about-copy p:last-child { margin-bottom: 0; }
+
+    .about-copy strong { color: var(--white); }
+
+    .about-panel {
+      background: var(--navy-card);
+      border: 1px solid var(--navy-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .about-panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--navy-border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot:nth-child(1) { background: #ff5f57; }
+    .terminal-dot:nth-child(2) { background: #ffbd2e; }
+    .terminal-dot:nth-child(3) { background: #28c840; }
+
+    .about-panel-body { padding: 20px; }
+
+    .code-line {
+      font-size: 12px;
+      line-height: 2;
+      color: var(--muted);
+    }
+
+    .code-line .kw   { color: #a78bfa; }
+    .code-line .fn   { color: var(--indigo-light); }
+    .code-line .str  { color: #34d399; }
+    .code-line .cm   { color: var(--faint); }
+    .code-line .num  { color: #fb923c; }
+
+    /* ─── Footer ───────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--navy-border);
+      padding: 48px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--navy-border);
+    }
+
+    .footer-brand-block {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-brand-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .footer-brand-row img {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      opacity: 0.7;
+    }
+
+    .footer-brand-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .footer-tagline {
+      font-size: 12px;
+      color: var(--faint);
+      max-width: 220px;
+      line-height: 1.5;
+    }
+
+    .footer-nav {
+      display: flex;
+      gap: 56px;
+      flex-wrap: wrap;
+    }
+
+    .footer-nav-col h4 {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .footer-nav-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-nav-col a {
+      font-size: 12px;
+      color: var(--faint);
+      transition: color var(--transition);
+    }
+
+    .footer-nav-col a:hover { color: var(--muted); }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--faint);
+    }
+
+    .footer-legal {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .footer-legal a {
+      font-size: 12px;
+      color: var(--faint);
+      transition: color var(--transition);
+    }
+
+    .footer-legal a:hover { color: var(--muted); }
+
+    /* ─── Scroll reveal animations ─────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 500ms ease, transform 500ms ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 80ms; }
+    .reveal-delay-2 { transition-delay: 160ms; }
+    .reveal-delay-3 { transition-delay: 240ms; }
+    .reveal-delay-4 { transition-delay: 320ms; }
+    .reveal-delay-5 { transition-delay: 400ms; }
+
+    /* ─── Badge ────────────────────────────────────────────────── */
+    .badge {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 100px;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-live {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    /* ─── Responsive ───────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .featured-inner {
+        grid-template-columns: 1fr;
+        padding: 32px;
+        gap: 32px;
+      }
+
+      .featured-tiers {
+        flex-direction: row;
+        min-width: unset;
+      }
+
+      .tier-card { flex: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hero { padding: 72px 0 64px; }
+
+      .products-grid {
+        grid-template-columns: 1fr;
+        background: transparent;
+        border: none;
+        gap: 12px;
+      }
+
+      .product-card {
+        border: 1px solid var(--navy-border);
+        border-radius: 12px;
+      }
+
+      .about-layout {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .about-panel { display: none; }
+
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+      .footer-top {
+        flex-direction: column;
+        gap: 32px;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .lead-magnet {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .featured-tiers {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 30px; }
+      .hero-sub { font-size: 13px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .featured-inner { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Navigation ──────────────────────────────────────────── -->
+  <nav>
+    <div class="container">
+      <div class="nav-inner">
+        <a href="/" class="nav-logo">
+          <img src="../logo-v3-1024.png" alt="Edgeless">
+          edgeless
+        </a>
+        <ul class="nav-links">
+          <li><a href="#featured">featured</a></li>
+          <li><a href="#products">all products</a></li>
+          <li><a href="#about">about</a></li>
+          <li>
+            <a href="https://edgelessai.gumroad.com" target="_blank" rel="noopener" class="nav-cta">
+              shop gumroad →
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── Hero ────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="container" style="position:relative;z-index:1;">
+      <div class="hero-label">
+        <span class="hero-label-dot"></span>
+        Edgeless Labs LLC
+      </div>
+      <h1><span>Edgeless</span></h1>
+      <p class="hero-sub">
+        Tools for people who build with AI.<br>
+        Direct. Technical. Opinionated.
+      </p>
+      <div class="hero-actions">
+        <a href="#featured" class="btn-primary">
+          See featured product →
+        </a>
+        <a href="#" target="_blank" rel="noopener" class="btn-free">
+          Get cheat sheet free ↓
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Stats strip ─────────────────────────────────────────── -->
+  <div class="stats-strip">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item reveal">
+          <div class="stat-value"><span>10</span></div>
+          <div class="stat-label">Products</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-1">
+          <div class="stat-value"><span>100+</span></div>
+          <div class="stat-label">Templates</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-2">
+          <div class="stat-value"><span>22</span></div>
+          <div class="stat-label">Hook scripts</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-3">
+          <div class="stat-value"><span>16</span></div>
+          <div class="stat-label">Agent chapters</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Featured Product ─────────────────────────────────────── -->
+  <section id="featured">
+    <div class="container">
+      <div class="section-header reveal" style="padding-top: 88px;">
+        <p class="section-eyebrow">// featured product</p>
+        <h2 class="section-title">The Prompt Engineering OS</h2>
+        <p class="section-desc">A complete operating system for writing prompts that work in production.</p>
+      </div>
+
+      <div class="featured-card reveal">
+        <div class="featured-inner">
+          <div class="featured-body">
+            <div class="featured-meta">
+              <span class="badge badge-live">● live</span>
+              <span class="featured-eyebrow">// flagship</span>
+            </div>
+            <h3 class="featured-title">The Prompt Engineering OS</h3>
+            <p class="featured-desc">
+              Covers everything from first principles to multi-agent orchestration —
+              with the templates and code to skip straight to applying it. Built from
+              real production usage of Claude Code, not conference talks.
+              30 chapters, 8 template schemas, 100+ templates, 125 code examples.
+            </p>
+            <ul class="featured-specs">
+              <li class="featured-spec"><strong>30</strong> chapters</li>
+              <li class="featured-spec"><strong>8</strong> template schemas</li>
+              <li class="featured-spec"><strong>100+</strong> templates</li>
+              <li class="featured-spec"><strong>125</strong> code examples</li>
+              <li class="featured-spec">CLAUDE.md blueprints</li>
+              <li class="featured-spec">Multi-agent patterns</li>
+              <li class="featured-spec">System prompt frameworks</li>
+              <li class="featured-spec">Claude Code config</li>
+            </ul>
+          </div>
+
+          <div class="featured-tiers">
+            <div class="tier-card">
+              <div class="tier-name">Starter</div>
+              <div class="tier-price">$29</div>
+              <div class="tier-includes">Core guide + templates</div>
+              <a href="https://edgelessai.gumroad.com/l/prompt-engineering-os" target="_blank" rel="noopener" class="tier-cta">Buy →</a>
+            </div>
+            <div class="tier-card tier-popular">
+              <div class="tier-popular-tag">popular</div>
+              <div class="tier-name">Full</div>
+              <div class="tier-price">$59</div>
+              <div class="tier-includes">Everything + all extras</div>
+              <a href="https://edgelessai.gumroad.com/l/prompt-engineering-os" target="_blank" rel="noopener" class="tier-cta">Buy →</a>
+            </div>
+            <div class="tier-card">
+              <div class="tier-name">Team</div>
+              <div class="tier-price">$99</div>
+              <div class="tier-includes">Full + team license</div>
+              <a href="https://edgelessai.gumroad.com/l/prompt-engineering-os" target="_blank" rel="noopener" class="tier-cta">Buy →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Products Grid ────────────────────────────────────────── -->
+  <section id="products">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="section-eyebrow">// all products</p>
+        <h2 class="section-title">The full toolkit</h2>
+        <p class="section-desc">
+          Each product starts as something we needed and couldn't find.
+          No fluff added to hit a word count.
+        </p>
+      </div>
+
+      <!-- Free lead magnet -->
+      <div class="lead-magnet reveal">
+        <div class="lead-magnet-left">
+          <div class="lead-magnet-icon">📋</div>
+          <div>
+            <div class="lead-magnet-tag">free</div>
+            <div class="lead-magnet-title">Claude Code Cheat Sheet</div>
+            <div class="lead-magnet-desc">One-page command reference. Every slash command, flag, and shortcut — on a single printable sheet.</div>
+          </div>
+        </div>
+        <a href="#" target="_blank" rel="noopener" class="btn-free">
+          Get it free →
+        </a>
+      </div>
+
+      <div class="products-grid">
+
+        <!-- CLAUDE.md Template Pack -->
+        <div class="product-card reveal">
+          <div class="card-top">
+            <div class="card-icon">📄</div>
+            <span class="card-tag tag-templates">Templates</span>
+          </div>
+          <h3 class="card-title">CLAUDE.md Template Pack</h3>
+          <p class="card-desc">
+            14 project-specific CLAUDE.md templates. Drop one into any repo and your Claude Code session inherits the right conventions immediately. Python, TypeScript, Next.js, Go, and more.
+          </p>
+          <div class="card-footer">
+            <div class="card-price">
+              <strong>$14</strong>
+              14 templates
+            </div>
+            <a href="#" target="_blank" rel="noopener" class="card-cta">Buy on Gumroad →</a>
+          </div>
+        </div>
+
+        <!-- Quick Reference Cards -->
+        <div class="product-card reveal reveal-delay-1">
+          <div class="card-top">
+            <div class="card-icon">🃏</div>
+            <span class="card-tag tag-tools">Tools</span>
+          </div>
+          <h3 class="card-title">Quick Reference Cards</h3>
+          <p class="card-desc">
+            6 printable reference cards covering Claude Code commands, prompt patterns, agent architectures, tool-use patterns, CLAUDE.md syntax, and hook triggers.
+          </p>
+          <div class="card-footer">
+            <div class="card-price">
+              <strong>$9</strong>
+              6 cards
+            </div>
+            <a href="#" target="_blank" rel="noopener" class="card-cta">Buy on Gumroad →</a>
+          </div>
+        </div>
+
+        <!-- MCP Server Starter Kit -->
+        <div class="product-card reveal reveal-delay-2">
+          <div class="card-top">
+            <div class="card-icon">🔌</div>
+            <span class="card-tag tag-tools">Tools</span>
+          </div>
+          <h3 class="card-title">MCP Server Starter Kit</h3>
+          <p class="card-desc">
+            Build custom Claude Code tools without starting from scratch. Includes server scaffold, tool registration patterns, error handling, and 4 example servers ready to fork.
+          </p>
+          <div class="card-footer">
+            <div class="card-price">
+              <strong>$24</strong>
+              4 examples
+            </div>
+            <a href="#" target="_blank" rel="noopener" class="card-cta">Buy on Gumroad →</a>
+          </div>
+        </div>
+
+        <!-- Prompt Testing Framework -->
+        <div class="product-card reveal reveal-delay-3">
+          <div class="card-top">
+            <div class="card-icon">🧪</div>
+            <span class="card-tag tag-guides">Guides</span>
+          </div>
+          <h3 class="card-title">Prompt Testing Framework</h3>
+          <p class="card-desc">
+            Systematic prompt evaluation methodology with scoring rubrics, regression test harnesses, and A/B comparison tooling. Stop guessing if your prompt got better.
+          </p>
+          <div class="card-footer">
+            <div class="card-price">
+              <strong>$19</strong>
+              Full framework
+            </div>
+            <a href="#" target="_blank" rel="noopener" class="card-cta">Buy on Gumroad →</a>
+          </div>
+        </div>
+
+        <!-- Obsidian + Claude Code Setup Kit -->
+        <div class="product-card reveal reveal-delay-4">
+          <div class="card-top">
+            <div class="card-icon">🗂</div>
+            <span class="card-tag tag-tools">Tools</span>
+          </div>
+          <h3 class="card-title">Obsidian + Claude Code Setup Kit</h3>
+          <p class="card-desc">
+            Vault template and Claude config wired together out of the box. Pre-built folder structure, Dataview queries, Templater setup, and Claude memory hooks. Skip the 20-hour yak shave.
+          </p>
+          <div class="card-footer">
+            <div class="card-price">
+              <strong>$19</strong>
+              Full setup
+            </div>
+            <a href="#" target="_blank" rel="noopener" class="card-cta">Buy on Gumroad →</a>
+          </div>
+        </div>
+
+        <!-- Hooks Library -->
+        <div class="product-card reveal reveal-delay-5">
+          <div class="card-top">
+            <div class="card-icon">⚡</div>
+            <span class="card-tag tag-tools">Tools</span>
+          </div>
+          <h3 class="card-title">Hooks Library</h3>
+          <p class="card-desc">
+            22 ready-to-use automation hooks for Claude Code. Pre-task validation, post-task reporting, damage control, linting enforcement, session logging, and more.
+          </p>
+          <div class="card-footer">
+            <div class="card-price">
+              <strong>$14</strong>
+              22 hooks
+            </div>
+            <a href="#" target="_blank" rel="noopener" class="card-cta">Buy on Gumroad →</a>
+          </div>
+        </div>
+
+        <!-- Agent Cookbook -->
+        <div class="product-card reveal">
+          <div class="card-top">
+            <div class="card-icon">🤖</div>
+            <span class="card-tag tag-guides">Guides</span>
+          </div>
+          <h3 class="card-title">Agent Cookbook</h3>
+          <p class="card-desc">
+            16 chapters on multi-agent patterns from production. Builder/validator loops, tool-use architectures, memory systems, rate-limit handling — everything you'd learn the hard way.
+          </p>
+          <div class="card-footer">
+            <div class="card-price">
+              <strong>$39</strong>
+              16 chapters
+            </div>
+            <a href="#" target="_blank" rel="noopener" class="card-cta">Buy on Gumroad →</a>
+          </div>
+        </div>
+
+        <!-- AI Code Review Playbook -->
+        <div class="product-card reveal reveal-delay-1">
+          <div class="card-top">
+            <div class="card-icon">🔍</div>
+            <span class="card-tag tag-guides">Guides</span>
+          </div>
+          <h3 class="card-title">AI Code Review Playbook</h3>
+          <p class="card-desc">
+            AI-assisted code review patterns that actually catch things. Prompt templates for security, architecture, and correctness reviews. Includes CI integration examples.
+          </p>
+          <div class="card-footer">
+            <div class="card-price">
+              <strong>$24</strong>
+              Full playbook
+            </div>
+            <a href="#" target="_blank" rel="noopener" class="card-cta">Buy on Gumroad →</a>
+          </div>
+        </div>
+
+        <!-- Claude Code Cheat Sheet (free, mirrored in grid) -->
+        <div class="product-card reveal reveal-delay-2">
+          <div class="card-top">
+            <div class="card-icon">📋</div>
+            <span class="card-tag tag-free">Free</span>
+          </div>
+          <h3 class="card-title">Claude Code Cheat Sheet</h3>
+          <p class="card-desc">
+            One-page command reference covering every slash command, useful flags, keyboard shortcuts, and hook trigger events. Printable. No email required.
+          </p>
+          <div class="card-footer">
+            <div class="card-price">
+              <span class="price-free">FREE</span>
+              No signup
+            </div>
+            <a href="#" target="_blank" rel="noopener" class="card-cta-free">Get it free →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── About ────────────────────────────────────────────────── -->
+  <section id="about">
+    <div class="container">
+      <div class="about-layout">
+        <div class="about-copy reveal">
+          <p class="section-eyebrow">// about</p>
+          <h2 class="section-title">Built by Edgeless Labs LLC</h2>
+          <p>
+            <strong>Direct, technical, opinionated.</strong> We build tools for people who are
+            already using AI to build things — not introductory content for people wondering if they should try it.
+          </p>
+          <p>
+            Every product starts as something we needed and couldn't find. The Prompt Engineering OS came from
+            months of running Claude Code in real projects. The patterns in it are distilled from what actually
+            worked, not what sounded good in a tweet thread.
+          </p>
+          <p>
+            The backlog is full of tools that follow the same principle:
+            <strong>specific, opinionated, immediately useful.</strong>
+          </p>
+        </div>
+
+        <div class="about-panel reveal reveal-delay-1">
+          <div class="about-panel-header">
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+          </div>
+          <div class="about-panel-body">
+            <div class="code-line"><span class="cm"># CLAUDE.md — project config</span></div>
+            <div class="code-line">&nbsp;</div>
+            <div class="code-line"><span class="cm">## Core rules</span></div>
+            <div class="code-line"><span class="kw">iron_law</span>: <span class="str">"test first, code second"</span></div>
+            <div class="code-line"><span class="kw">error_handling</span>: <span class="str">"never ignore"</span></div>
+            <div class="code-line"><span class="kw">lint_violations</span>: <span class="num">0</span></div>
+            <div class="code-line">&nbsp;</div>
+            <div class="code-line"><span class="cm">## Patterns</span></div>
+            <div class="code-line"><span class="kw">recon</span>: <span class="str">"look before you leap"</span></div>
+            <div class="code-line"><span class="kw">simplicity</span>: <span class="str">"deletions that maintain</span></div>
+            <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">quality are celebrated"</span></div>
+            <div class="code-line">&nbsp;</div>
+            <div class="code-line"><span class="cm">## Never do</span></div>
+            <div class="code-line"><span class="fn">- skip required tests</span></div>
+            <div class="code-line"><span class="fn">- make architectural decisions</span></div>
+            <div class="code-line"><span class="fn">- return code with lint issues</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Footer ───────────────────────────────────────────────── -->
+  <footer>
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand-block">
+          <div class="footer-brand-row">
+            <img src="../logo-v3-1024.png" alt="Edgeless">
+            <span class="footer-brand-name">Edgeless</span>
+          </div>
+          <p class="footer-tagline">Tools for people who build with AI. Direct, technical, opinionated.</p>
+        </div>
+
+        <div class="footer-nav">
+          <div class="footer-nav-col">
+            <h4>Products</h4>
+            <ul>
+              <li><a href="#featured">Prompt Engineering OS</a></li>
+              <li><a href="#products">CLAUDE.md Templates</a></li>
+              <li><a href="#products">Agent Cookbook</a></li>
+              <li><a href="#products">Hooks Library</a></li>
+              <li><a href="#products">MCP Starter Kit</a></li>
+            </ul>
+          </div>
+          <div class="footer-nav-col">
+            <h4>Free</h4>
+            <ul>
+              <li><a href="#">Cheat Sheet</a></li>
+            </ul>
+            <h4 style="margin-top: 20px;">Store</h4>
+            <ul>
+              <li><a href="https://edgelessai.gumroad.com" target="_blank" rel="noopener">Gumroad store</a></li>
+              <li><a href="mailto:hello@edgelesslab.com">Contact</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 Edgeless Labs LLC. All rights reserved.</p>
+        <ul class="footer-legal">
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ─── Scroll reveal ────────────────────────────────────────── -->
+  <script>
+    (function () {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.10, rootMargin: '0px 0px -32px 0px' });
+
+      document.querySelectorAll('.reveal').forEach(function (el) {
+        observer.observe(el);
+      });
+    })();
+  </script>
+
+</body>
+</html>

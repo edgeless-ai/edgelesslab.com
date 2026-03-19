@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+html {
+  color-scheme: light only;
+}
+
+:root {
+  /* Mint Lab palette */
+  --bg-base: #F0F2F4;
+  --bg-surface: #FAFBFC;
+  --bg-surface-hover: #F5F6F8;
+  --bg-elevated: #FFFFFF;
+  --border-subtle: #E2E5E9;
+  --border-focus: #CBD0D6;
+
+  --text-primary: #1A1E24;
+  --text-secondary: #6B7580;
+  --text-tertiary: #9CA3AD;
+
+  --accent: #0D9668;
+  --accent-hover: #0BAD7A;
+  --accent-muted: rgba(13, 150, 104, 0.10);
+
+  --accent-alt: #2563EB;
+  --accent-alt-hover: #3B82F6;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  --background: var(--bg-base);
+  --foreground: var(--text-primary);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+}

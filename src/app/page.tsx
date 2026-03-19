@@ -23,6 +23,8 @@ const projects = [
       "Autonomous prediction market agent. TypeScript, ML-driven position sizing, live on Polymarket.",
     tags: ["TypeScript", "ML", "Trading"],
     icon: BrainCircuit,
+    visual: "terminal",
+    snippet: "$ pm2 status pamela\n│ online │ 47h │ 0 restarts\n\nP&L: +$247.30 (7d)",
   },
   {
     title: "MCP Server Toolkit",
@@ -30,6 +32,8 @@ const projects = [
       "Production MCP servers for ChromaDB, knowledge search, and multi-agent orchestration.",
     tags: ["MCP", "TypeScript", "Effect-TS"],
     icon: Layers,
+    visual: "code",
+    snippet: 'server.tool("search", {\n  query: z.string(),\n  collection: z.enum(["vault",\n    "memory", "embeddings"])\n})',
   },
   {
     title: "Pen Plotter Art",
@@ -37,6 +41,8 @@ const projects = [
       "105+ generative art experiments scored by an AI judge. SVG to physical media pipeline.",
     tags: ["Generative Art", "Python", "SVG"],
     icon: Palette,
+    visual: "svg",
+    snippet: '<svg viewBox="0 0 400 400">\n  <path d="M200,50 C350,100\n    350,300 200,350 C50,300\n    50,100 200,50" />\n</svg>',
   },
   {
     title: "Mastra Orchestrator",
@@ -44,6 +50,8 @@ const projects = [
       "Multi-agent routing and task dispatch across Claude, Gemini, and local models.",
     tags: ["Mastra", "Agents", "VPS"],
     icon: Bot,
+    visual: "terminal",
+    snippet: "router → claude-opus (thinking)\nrouter → gemini-flash (search)\nrouter → local-llama (draft)\n✓ consensus reached",
   },
 ];
 
@@ -206,14 +214,21 @@ export default function Home() {
                   }}
                 >
                   <div
-                    className="w-full h-40 rounded-xl mb-6 flex items-center justify-center"
-                    style={{ background: "var(--bg-base)" }}
+                    className="w-full h-40 rounded-xl mb-6 overflow-hidden relative"
+                    style={{ background: project.visual === "terminal" ? "#1A1E24" : "#1A1E24" }}
                   >
-                    <project.icon
-                      size={48}
-                      strokeWidth={1.2}
-                      style={{ color: "var(--accent)", opacity: 0.5 }}
-                    />
+                    {/* Window chrome dots */}
+                    <div className="flex items-center gap-1.5 px-4 pt-3 pb-2">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-400/60" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/60" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-400/60" />
+                      <span className="ml-2 text-[10px] font-mono opacity-30 text-white">
+                        {project.visual === "terminal" ? "terminal" : project.title.toLowerCase().replace(/\s+/g, ".")}{project.visual === "code" ? ".ts" : ""}
+                      </span>
+                    </div>
+                    <pre className="px-4 text-[11px] leading-[1.6] font-mono text-green-300/70 whitespace-pre overflow-hidden">
+                      {project.snippet}
+                    </pre>
                   </div>
                   <h3
                     className="text-xl font-semibold mb-2"

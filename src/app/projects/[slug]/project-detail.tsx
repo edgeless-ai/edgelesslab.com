@@ -1,0 +1,196 @@
+"use client";
+
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { Nav } from "@/components/nav";
+import { Footer } from "@/components/footer";
+import type { projects } from "@/lib/data";
+
+type Project = (typeof projects)[number];
+
+export function ProjectDetail({ project }: { project: Project }) {
+  return (
+    <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
+      <Nav />
+
+      <section className="px-6 pt-32 pb-16">
+        <div className="max-w-[1280px] mx-auto">
+          <motion.a
+            href="/projects"
+            className="inline-flex items-center gap-1.5 text-sm mb-8 transition-colors hover:text-white"
+            style={{ color: "var(--text-tertiary)" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <ArrowLeft size={14} /> All projects
+          </motion.a>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-16">
+            {/* Main content */}
+            <div>
+              <motion.div
+                className="flex items-center gap-3 mb-6"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <span
+                  className="text-[10px] font-mono uppercase tracking-[0.12em] px-2.5 py-1 rounded-md"
+                  style={{ background: "var(--accent-muted)", color: "var(--accent)" }}
+                >
+                  {project.category}
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ background: "var(--green)" }}
+                  />
+                  <span
+                    className="text-[11px] font-mono"
+                    style={{ color: "var(--text-tertiary)" }}
+                  >
+                    {project.status}
+                  </span>
+                </div>
+              </motion.div>
+
+              <motion.h1
+                className="text-4xl sm:text-5xl font-bold tracking-[-0.03em] mb-6"
+                style={{ color: "var(--text-primary)" }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {project.title}
+              </motion.h1>
+
+              <motion.p
+                className="text-lg font-light max-w-xl mb-10"
+                style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {project.longDescription}
+              </motion.p>
+
+              {/* Code window */}
+              <motion.div
+                className="rounded-xl border overflow-hidden mb-10"
+                style={{
+                  background: "var(--bg-surface)",
+                  borderColor: "var(--border-subtle)",
+                }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <div
+                  className="flex items-center gap-1.5 px-4 py-3 border-b"
+                  style={{ borderColor: "var(--border-subtle)" }}
+                >
+                  <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+                  <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+                  <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+                  <span
+                    className="ml-2 text-[10px] font-mono"
+                    style={{ color: "var(--text-tertiary)" }}
+                  >
+                    {project.slug}
+                  </span>
+                </div>
+                <pre
+                  className="px-4 py-4 text-[12px] leading-[1.8] font-mono whitespace-pre overflow-x-auto"
+                  style={{ color: "var(--green)" }}
+                >
+                  {project.snippet}
+                </pre>
+              </motion.div>
+
+              <motion.div
+                className="flex flex-wrap gap-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.25 }}
+              >
+                {project.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1.5 text-[11px] font-mono rounded-md"
+                    style={{
+                      background: "var(--accent-muted)",
+                      color: "var(--accent)",
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </motion.div>
+            </div>
+
+            {/* Sidebar */}
+            <motion.div
+              className="space-y-6"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {/* Stack */}
+              <div
+                className="rounded-xl border p-6"
+                style={{
+                  background: "var(--bg-surface)",
+                  borderColor: "var(--border-subtle)",
+                }}
+              >
+                <h3
+                  className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
+                  style={{ color: "var(--text-tertiary)" }}
+                >
+                  Stack
+                </h3>
+                <ul className="space-y-2.5">
+                  {project.stack.map((item) => (
+                    <li
+                      key={item}
+                      className="text-[13px] font-mono"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Links */}
+              <div
+                className="rounded-xl border p-6"
+                style={{
+                  background: "var(--bg-surface)",
+                  borderColor: "var(--border-subtle)",
+                }}
+              >
+                <h3
+                  className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
+                  style={{ color: "var(--text-tertiary)" }}
+                >
+                  Links
+                </h3>
+                <a
+                  href="https://github.com/edgeless-ai"
+                  className="text-[13px] hover:text-white transition-colors inline-flex items-center gap-1"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  GitHub <ArrowUpRight size={12} />
+                </a>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+}

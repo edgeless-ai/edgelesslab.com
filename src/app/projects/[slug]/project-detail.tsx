@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Nav } from "@/components/nav";
+import { JsonLd } from "@/components/json-ld";
 import { Footer } from "@/components/footer";
 import type { projects } from "@/lib/data";
 
@@ -11,6 +12,15 @@ type Project = (typeof projects)[number];
 export function ProjectDetail({ project }: { project: Project }) {
   return (
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": project.title,
+        "description": project.longDescription,
+        "applicationCategory": "DeveloperApplication",
+        "author": { "@type": "Organization", "name": "Edgeless Labs", "url": "https://edgelesslab.com" },
+        "url": `https://edgelesslab.com/projects/${project.slug}`,
+      }} />
       <Nav />
 
       <section className="px-6 pt-32 pb-16">

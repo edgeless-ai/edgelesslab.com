@@ -13,6 +13,14 @@ export function generateMetadata({ params }: { params: Promise<{ slug: string }>
     return {
       title: `${project.title} - Edgeless Labs`,
       description: project.description,
+      openGraph: {
+        title: `${project.title} - Edgeless Labs`,
+        description: project.description,
+        url: `https://edgelesslab.com/projects/${project.slug}`,
+      },
+      alternates: {
+        canonical: `https://edgelesslab.com/projects/${project.slug}`,
+      },
     };
   });
 }

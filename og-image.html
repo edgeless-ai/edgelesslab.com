@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px;
+    height: 630px;
+    background: #09090B;
+    font-family: system-ui, -apple-system, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .gradient-orb {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.15;
+  }
+  .orb-1 { background: #818CF8; top: -200px; right: -100px; }
+  .orb-2 { background: #34D399; bottom: -300px; left: -100px; opacity: 0.08; }
+  .label {
+    font-size: 14px;
+    font-family: monospace;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 24px;
+  }
+  h1 {
+    font-size: 72px;
+    font-weight: 700;
+    color: #FAFAFA;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+  }
+  h1 span { color: #818CF8; }
+  p {
+    font-size: 24px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 300;
+    max-width: 600px;
+    line-height: 1.5;
+  }
+  .url {
+    position: absolute;
+    bottom: 48px;
+    left: 80px;
+    font-size: 16px;
+    font-family: monospace;
+    color: rgba(255,255,255,0.3);
+  }
+  .dot {
+    position: absolute;
+    bottom: 52px;
+    right: 80px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-family: monospace;
+    color: rgba(255,255,255,0.3);
+  }
+  .dot::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #34D399;
+  }
+</style>
+</head>
+<body>
+  <div class="gradient-orb orb-1"></div>
+  <div class="gradient-orb orb-2"></div>
+  <div class="label">edgeless labs</div>
+  <h1>Tools for<br><span>AI-native</span><br>developers.</h1>
+  <p>Agents, MCP servers, generative art, and developer tools.</p>
+  <div class="url">edgelesslab.com</div>
+  <div class="dot">shipping daily</div>
+</body>
+</html>

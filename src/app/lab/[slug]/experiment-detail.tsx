@@ -3,6 +3,7 @@
 import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { Nav } from "@/components/nav";
+import { JsonLd } from "@/components/json-ld";
 import { Footer } from "@/components/footer";
 import type { experiments } from "@/lib/data";
 
@@ -11,6 +12,15 @@ type Experiment = (typeof experiments)[number];
 export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
   return (
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "CreativeWork",
+        "name": experiment.title,
+        "description": experiment.description,
+        "creator": { "@type": "Organization", "name": "Edgeless Labs", "url": "https://edgelesslab.com" },
+        "genre": experiment.category,
+        "url": `https://edgelesslab.com/lab/${experiment.slug}`,
+      }} />
       <Nav />
 
       <section className="px-6 pt-32 pb-16">

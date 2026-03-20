@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { JsonLd } from "@/components/json-ld";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,9 +14,47 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Edgeless Labs",
-  description:
-    "Creative technology lab. Tools for the AI-native developer.",
+  metadataBase: new URL('https://edgelesslab.com'),
+  title: {
+    default: 'Edgeless Labs - Tools for AI-Native Developers',
+    template: '%s | Edgeless Labs',
+  },
+  description: 'Creative technology lab building AI agents, MCP servers, generative art pipelines, and developer tools. One-person studio shipping production infrastructure.',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://edgelesslab.com',
+    siteName: 'Edgeless Labs',
+    title: 'Edgeless Labs - Tools for AI-Native Developers',
+    description: 'AI agents, MCP servers, generative art, and developer tools built by a solo creative technology lab.',
+    images: [{
+      url: '/og-image.png',
+      width: 1200,
+      height: 630,
+      alt: 'Edgeless Labs - Tools for AI-Native Developers',
+    }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Edgeless Labs - Tools for AI-Native Developers',
+    description: 'AI agents, MCP servers, generative art, and developer tools.',
+    images: ['/og-image.png'],
+  },
+  alternates: {
+    canonical: 'https://edgelesslab.com',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  icons: {
+    icon: '/favicon.svg',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({
@@ -28,7 +67,24 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <JsonLd data={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Edgeless Labs",
+          "url": "https://edgelesslab.com",
+          "description": "Creative technology lab building AI agents, MCP servers, generative art pipelines, and developer tools",
+          "founder": {
+            "@type": "Person",
+            "name": "David Murray"
+          },
+          "sameAs": [
+            "https://github.com/edgeless-ai",
+            "https://edgelessai.gumroad.com"
+          ]
+        }} />
+        {children}
+      </body>
     </html>
   );
 }

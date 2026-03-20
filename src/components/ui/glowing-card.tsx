@@ -30,14 +30,14 @@ export function GlowingCard({
       <div
         className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
-          background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${glowColor}15, transparent 40%)`,
+          background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${glowColor}10, transparent 40%)`,
         }}
       />
       {/* Top border glow */}
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
-          background: `linear-gradient(90deg, transparent, ${glowColor}40, transparent)`,
+          background: `linear-gradient(90deg, transparent, ${glowColor}30, transparent)`,
         }}
       />
       <div className="relative">{children}</div>

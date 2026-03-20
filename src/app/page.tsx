@@ -1,206 +1,217 @@
 "use client";
 
-import {
-  ArrowRight,
-  Bot,
-  BrainCircuit,
-  Code2,
-  FlaskConical,
-  Layers,
-  Palette,
-  Sparkles,
-  Terminal,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { AnimatedText, AnimatedFadeIn } from "@/components/ui/animated-text";
 import { GlowingCard } from "@/components/ui/glowing-card";
 import { DotBackground } from "@/components/ui/dot-background";
 
-const projects = [
+const featured = [
   {
     title: "Pamela",
     description:
-      "Autonomous prediction market agent. TypeScript, ML-driven position sizing, live on Polymarket.",
-    tags: ["TypeScript", "ML", "Trading"],
-    icon: BrainCircuit,
-    visual: "terminal",
-    snippet: "$ pm2 status pamela\n│ online │ 47h │ 0 restarts\n\nP&L: +$247.30 (7d)",
+      "Autonomous prediction market agent. ML-driven position sizing, live on Polymarket 24/7.",
+    tags: ["TypeScript", "ML", "Polymarket"],
+    snippet: `$ pm2 status pamela
+│ online │ 47h │ 0 restarts
+
+P&L: +$247.30 (7d)`,
+    span: "md:col-span-2 md:row-span-2",
+    tall: true,
   },
   {
-    title: "MCP Server Toolkit",
-    description:
-      "Production MCP servers for ChromaDB, knowledge search, and multi-agent orchestration.",
-    tags: ["MCP", "TypeScript", "Effect-TS"],
-    icon: Layers,
-    visual: "code",
-    snippet: 'server.tool("search", {\n  query: z.string(),\n  collection: z.enum(["vault",\n    "memory", "embeddings"])\n})',
+    title: "MCP Servers",
+    description: "Production servers for ChromaDB, knowledge search, and multi-agent orchestration.",
+    tags: ["MCP", "Effect-TS"],
+    snippet: `server.tool("search", {
+  query: z.string(),
+  collection: z.enum([
+    "vault", "memory"
+  ])
+})`,
+    span: "",
+    tall: false,
   },
   {
     title: "Pen Plotter Art",
-    description:
-      "105+ generative art experiments scored by an AI judge. SVG to physical media pipeline.",
-    tags: ["Generative Art", "Python", "SVG"],
-    icon: Palette,
-    visual: "svg",
-    snippet: '<svg viewBox="0 0 400 400">\n  <path d="M200,50 C350,100\n    350,300 200,350 C50,300\n    50,100 200,50" />\n</svg>',
-  },
-  {
-    title: "Mastra Orchestrator",
-    description:
-      "Multi-agent routing and task dispatch across Claude, Gemini, and local models.",
-    tags: ["Mastra", "Agents", "VPS"],
-    icon: Bot,
-    visual: "terminal",
-    snippet: "router → claude-opus (thinking)\nrouter → gemini-flash (search)\nrouter → local-llama (draft)\n✓ consensus reached",
+    description: "105+ generative experiments. AI-scored. SVG to physical media.",
+    tags: ["Generative", "Python", "SVG"],
+    snippet: `<svg viewBox="0 0 400 400">
+  <path d="M200,50 C350,100
+    350,300 200,350" />
+</svg>`,
+    span: "",
+    tall: false,
   },
 ];
 
 const capabilities = [
-  { icon: BrainCircuit, label: "AI Agents" },
-  { icon: Terminal, label: "CLI Tools" },
-  { icon: FlaskConical, label: "Experiments" },
-  { icon: Palette, label: "Generative Art" },
-  { icon: Layers, label: "MCP Servers" },
-  { icon: Code2, label: "Open Source" },
-  { icon: Bot, label: "Multi-Agent" },
-  { icon: Sparkles, label: "Creative Tech" },
+  {
+    label: "Multi-Agent Orchestration",
+    snippet: `POST /api/agents/router/generate
+{ "messages": [{ "role": "user",
+  "content": "dispatch research to gemini-1" }] }`,
+  },
+  {
+    label: "MCP Tool Servers",
+    snippet: `server.tool("search", {
+  query: z.string(),
+  collection: z.enum(["vault", "memory"])
+})`,
+  },
+  {
+    label: "Autonomous Trading",
+    snippet: `$ pm2 status pamela
+│ pamela │ online │ 47h │ 0 restarts │
+│ P&L: +$247.30 (7d)                 │`,
+  },
+  {
+    label: "Knowledge Pipelines",
+    snippet: `qmd search "agent orchestration"
+  --collection claude-vault
+  --top-k 10 --min-score 0.6
+  # 6,889 documents indexed`,
+  },
 ];
 
 const experiments = [
-  {
-    title: "Strange Attractors",
-    description:
-      "Lorenz system visualization rendered for pen plotting. Real-time parameter exploration.",
-    category: "Generative",
-  },
-  {
-    title: "Knowledge Graph",
-    description:
-      "Live visualization of 7,000+ documents across ChromaDB, Obsidian, and vector embeddings.",
-    category: "Data Viz",
-  },
-  {
-    title: "Total Serialism",
-    description:
-      "Algorithmic music composition using serialist techniques. Audio + visual score generation.",
-    category: "Audio",
-  },
+  { title: "Strange Attractors", category: "Generative" },
+  { title: "Knowledge Graph", category: "Data" },
+  { title: "Total Serialism", category: "Audio" },
+  { title: "Mastra Orchestrator", category: "Agents" },
 ];
+
 
 export default function Home() {
   return (
-    <div
-      className="flex flex-col min-h-full"
-      style={{ background: "var(--bg-base)" }}
-    >
-      {/* Nav */}
-      <nav
-        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b"
-        style={{
-          background: "rgba(240, 242, 244, 0.8)",
-          borderColor: "var(--border-subtle)",
-        }}
-      >
-        <div className="max-w-[1280px] mx-auto px-6 h-14 flex items-center justify-between">
-          <span
-            className="text-sm font-semibold tracking-tight"
-            style={{ color: "var(--text-primary)" }}
+    <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
+      {/* Nav — minimal, floating */}
+      <nav className="fixed top-0 left-0 right-0 z-50">
+        <div className="max-w-[1280px] mx-auto px-6 pt-5">
+          <div
+            className="flex items-center justify-between h-12 px-5 rounded-full border backdrop-blur-xl"
+            style={{
+              background: "rgba(17, 17, 19, 0.7)",
+              borderColor: "var(--border-subtle)",
+            }}
           >
-            Edgeless Labs
-          </span>
-          <div className="flex items-center gap-6">
-            {["Projects", "Lab", "About", "Journal"].map((link) => (
+            <span
+              className="text-sm font-semibold tracking-tight font-mono"
+              style={{ color: "var(--text-primary)" }}
+            >
+              edgeless
+            </span>
+            <div className="flex items-center gap-5">
+              {["Projects", "Lab", "About"].map((link) => (
+                <a
+                  key={link}
+                  href={`/${link.toLowerCase()}`}
+                  className="text-[13px] hover:text-white transition-colors"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  {link}
+                </a>
+              ))}
               <a
-                key={link}
-                href={`/${link.toLowerCase()}`}
-                className="text-sm hover:opacity-80 transition-opacity"
+                href="https://github.com/edgeless-ai"
+                className="text-[13px] hover:text-white transition-colors flex items-center gap-1"
                 style={{ color: "var(--text-secondary)" }}
               >
-                {link}
+                GitHub <ArrowUpRight size={12} />
               </a>
-            ))}
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="relative flex items-center justify-center min-h-screen px-6 pt-14">
+      {/* Hero — dramatic, asymmetric */}
+      <section className="relative min-h-screen flex items-end px-6 pb-24 pt-32">
         <DotBackground />
-        <div className="relative max-w-[1280px] w-full">
+        <div className="relative max-w-[1280px] w-full mx-auto">
+          {/* Small status badge */}
           <AnimatedFadeIn>
-            <p
-              className="text-sm font-medium mb-4 uppercase"
-              style={{
-                color: "var(--accent)",
-                letterSpacing: "0.08em",
-              }}
-            >
-              Creative Technology Lab
-            </p>
+            <div className="flex items-center gap-2 mb-8">
+              <span
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: "var(--green)" }}
+              />
+              <span
+                className="text-xs font-mono"
+                style={{ color: "var(--text-tertiary)" }}
+              >
+                Shipping daily
+              </span>
+            </div>
           </AnimatedFadeIn>
+
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-bold max-w-3xl"
-            style={{
-              color: "var(--text-primary)",
-              letterSpacing: "-0.03em",
-              lineHeight: 0.95,
-            }}
+            className="text-[clamp(3rem,8vw,7.5rem)] font-bold leading-[0.9] tracking-[-0.04em] max-w-5xl"
+            style={{ color: "var(--text-primary)" }}
           >
-            <AnimatedText text="Tools for the" delay={0.1} />
+            <AnimatedText text="Tools for" delay={0.1} />
+            <br />
             <span style={{ color: "var(--accent)" }}>
-              <AnimatedText text=" AI-native" delay={0.35} />
+              <AnimatedText text="AI-native" delay={0.3} />
             </span>
-            <AnimatedText text=" developer." delay={0.5} />
+            <br />
+            <AnimatedText text="developers." delay={0.45} />
           </h1>
-          <AnimatedFadeIn delay={0.6}>
+
+          <AnimatedFadeIn delay={0.7}>
             <p
-              className="mt-6 text-lg sm:text-xl max-w-xl"
-              style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
+              className="mt-8 text-lg max-w-md font-light"
+              style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
             >
-              We build agents, MCP servers, generative art pipelines, and
-              experimental tools at the intersection of AI and craft.
+              Agents that trade. Pipelines that learn. Art that plots itself.
+              A one-person lab at the edge of what ships.
             </p>
           </AnimatedFadeIn>
-          <AnimatedFadeIn delay={0.8}>
-            <div className="mt-10 flex flex-col sm:flex-row gap-4">
+
+          <AnimatedFadeIn delay={0.9}>
+            <div className="mt-12 flex items-center gap-6">
               <a
                 href="/projects"
-                className="inline-flex items-center justify-center gap-2 h-12 px-6 text-sm font-medium text-white rounded-full transition-colors hover:brightness-110"
+                className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
                 style={{ background: "var(--accent)" }}
               >
-                View Projects <ArrowRight size={16} />
+                View projects <ArrowRight size={15} />
               </a>
               <a
-                href="/lab"
-                className="inline-flex items-center justify-center h-12 px-6 text-sm font-medium rounded-full border hover:bg-black/[0.03] transition-colors"
-                style={{
-                  color: "var(--text-primary)",
-                  borderColor: "var(--border-subtle)",
-                }}
+                href="https://github.com/edgeless-ai"
+                className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-white"
+                style={{ color: "var(--text-secondary)" }}
               >
-                Explore the Lab
+                GitHub <ArrowUpRight size={14} />
               </a>
             </div>
           </AnimatedFadeIn>
         </div>
       </section>
 
-      {/* Featured Projects */}
-      <section className="px-6 py-20 sm:py-24">
+      {/* Projects — asymmetric bento grid */}
+      <section className="px-6 py-20">
         <div className="max-w-[1280px] mx-auto">
-          <h2
-            className="text-3xl sm:text-4xl font-semibold mb-12"
-            style={{
-              color: "var(--text-primary)",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            Featured Projects
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {projects.map((project, i) => (
+          <div className="flex items-baseline justify-between mb-10">
+            <h2
+              className="text-sm font-mono uppercase tracking-[0.15em]"
+              style={{ color: "var(--text-tertiary)" }}
+            >
+              Featured
+            </h2>
+            <a
+              href="/projects"
+              className="text-sm flex items-center gap-1 transition-colors hover:text-white"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              All projects <ArrowRight size={13} />
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:grid-rows-[auto_auto]">
+            {featured.map((project, i) => (
+              <div key={project.title} className={project.span}>
               <GlowingCard
-                key={project.title}
+                className="h-full"
                 href={`/projects/${project.title.toLowerCase().replace(/\s+/g, "-")}`}
               >
                 <motion.div
@@ -213,43 +224,57 @@ export default function Home() {
                     ease: [0.16, 1, 0.3, 1],
                   }}
                 >
+                  {/* Code window */}
                   <div
-                    className="w-full h-40 rounded-xl mb-6 overflow-hidden relative"
-                    style={{ background: project.visual === "terminal" ? "#1A1E24" : "#1A1E24" }}
+                    className="w-full rounded-lg mb-6 overflow-hidden"
+                    style={{
+                      background: "rgba(0,0,0,0.4)",
+                      border: "1px solid var(--border-subtle)",
+                    }}
                   >
-                    {/* Window chrome dots */}
-                    <div className="flex items-center gap-1.5 px-4 pt-3 pb-2">
-                      <div className="w-2.5 h-2.5 rounded-full bg-red-400/60" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/60" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-green-400/60" />
-                      <span className="ml-2 text-[10px] font-mono opacity-30 text-white">
-                        {project.visual === "terminal" ? "terminal" : project.title.toLowerCase().replace(/\s+/g, ".")}{project.visual === "code" ? ".ts" : ""}
+                    <div className="flex items-center gap-1.5 px-3 py-2.5 border-b" style={{ borderColor: "var(--border-subtle)" }}>
+                      <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+                      <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+                      <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+                      <span
+                        className="ml-2 text-[10px] font-mono"
+                        style={{ color: "var(--text-tertiary)" }}
+                      >
+                        {project.title.toLowerCase().replace(/\s+/g, "-")}
                       </span>
                     </div>
-                    <pre className="px-4 text-[11px] leading-[1.6] font-mono text-green-300/70 whitespace-pre overflow-hidden">
+                    <pre
+                      className={`px-3 py-3 text-[11px] leading-[1.7] font-mono whitespace-pre overflow-hidden ${
+                        i === 0 ? "min-h-[120px]" : "min-h-[80px]"
+                      }`}
+                      style={{ color: "var(--green)" }}
+                    >
                       {project.snippet}
                     </pre>
                   </div>
-                  <h3
-                    className="text-xl font-semibold mb-2"
-                    style={{ color: "var(--text-primary)" }}
-                  >
-                    {project.title}
-                  </h3>
-                  <p
-                    className="text-sm mb-4 max-w-lg"
-                    style={{
-                      color: "var(--text-secondary)",
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    {project.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
+
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3
+                        className="text-lg font-semibold mb-1.5"
+                        style={{ color: "var(--text-primary)" }}
+                      >
+                        {project.title}
+                      </h3>
+                      <p
+                        className="text-sm max-w-md"
+                        style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
+                      >
+                        {project.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mt-4">
                     {project.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-3 py-1 text-xs font-medium rounded-full"
+                        className="px-2.5 py-1 text-[11px] font-mono rounded-md"
                         style={{
                           background: "var(--accent-muted)",
                           color: "var(--accent)",
@@ -261,268 +286,286 @@ export default function Home() {
                   </div>
                 </motion.div>
               </GlowingCard>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Capabilities Strip */}
+      {/* Capabilities — The Technical Foundation (Gemini recommendation: Vercel-style modular blocks) */}
       <section
-        className="px-6 py-16"
+        className="px-6 py-20"
         style={{ background: "var(--bg-surface)" }}
       >
         <div className="max-w-[1280px] mx-auto">
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-8">
-            {capabilities.map(({ icon: Icon, label }, i) => (
+          <h2
+            className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
+            style={{ color: "var(--text-tertiary)" }}
+          >
+            Infrastructure
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {capabilities.map((cap, i) => (
               <motion.div
-                key={label}
-                className="flex flex-col items-center gap-3 text-center"
-                initial={{ opacity: 0, y: 12 }}
+                key={cap.label}
+                className="rounded-xl border overflow-hidden"
+                style={{
+                  background: "var(--bg-base)",
+                  borderColor: "var(--border-subtle)",
+                }}
+                initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{
                   duration: 0.4,
-                  delay: i * 0.05,
+                  delay: i * 0.08,
                   ease: [0.16, 1, 0.3, 1],
                 }}
               >
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center"
-                  style={{ background: "var(--accent-muted)" }}
+                  className="px-5 py-3 border-b flex items-center justify-between"
+                  style={{ borderColor: "var(--border-subtle)" }}
                 >
-                  <Icon size={22} style={{ color: "var(--accent)" }} />
+                  <span
+                    className="text-[11px] font-mono"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {cap.label}
+                  </span>
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ background: "var(--green)" }}
+                  />
                 </div>
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: "var(--text-secondary)" }}
+                <pre
+                  className="px-5 py-4 text-[11px] leading-[1.8] font-mono whitespace-pre overflow-x-auto"
+                  style={{ color: "var(--green)" }}
                 >
-                  {label}
-                </span>
+                  {cap.snippet}
+                </pre>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Lab Preview */}
-      <section className="px-6 py-20 sm:py-24">
+      {/* Lab — horizontal scroll tease */}
+      <section className="px-6 py-20">
         <div className="max-w-[1280px] mx-auto">
-          <div className="flex items-center justify-between mb-12">
+          <div className="flex items-baseline justify-between mb-10">
             <h2
-              className="text-3xl sm:text-4xl font-semibold"
-              style={{
-                color: "var(--text-primary)",
-                letterSpacing: "-0.02em",
-              }}
+              className="text-sm font-mono uppercase tracking-[0.15em]"
+              style={{ color: "var(--text-tertiary)" }}
             >
-              From the Lab
+              Lab
             </h2>
             <a
               href="/lab"
-              className="text-sm font-medium flex items-center gap-1"
-              style={{ color: "var(--accent)" }}
+              className="text-sm flex items-center gap-1 transition-colors hover:text-white"
+              style={{ color: "var(--text-secondary)" }}
             >
-              All experiments <ArrowRight size={14} />
+              All experiments <ArrowRight size={13} />
             </a>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {experiments.map((exp, i) => (
-              <GlowingCard
+              <motion.a
                 key={exp.title}
                 href={`/lab/${exp.title.toLowerCase().replace(/\s+/g, "-")}`}
+                className="group relative rounded-xl border p-5 transition-colors hover:border-white/[0.12]"
+                style={{
+                  background: "var(--bg-surface)",
+                  borderColor: "var(--border-subtle)",
+                }}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.4,
+                  delay: i * 0.08,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
               >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{
-                    duration: 0.5,
-                    delay: i * 0.1,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
+                <span
+                  className="text-[10px] font-mono uppercase tracking-[0.12em] block mb-3"
+                  style={{ color: "var(--accent)" }}
                 >
-                  <div
-                    className="w-full h-48 rounded-xl mb-4"
-                    style={{ background: "var(--bg-base)" }}
-                  />
-                  <span
-                    className="text-xs font-medium uppercase"
-                    style={{
-                      color: "var(--accent)",
-                      letterSpacing: "0.08em",
-                    }}
-                  >
-                    {exp.category}
-                  </span>
-                  <h3
-                    className="text-lg font-semibold mt-2 mb-2"
-                    style={{ color: "var(--text-primary)" }}
-                  >
-                    {exp.title}
-                  </h3>
-                  <p
-                    className="text-sm"
-                    style={{
-                      color: "var(--text-secondary)",
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    {exp.description}
-                  </p>
-                </motion.div>
-              </GlowingCard>
+                  {exp.category}
+                </span>
+                <span
+                  className="text-sm font-medium block"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  {exp.title}
+                </span>
+                <ArrowUpRight
+                  size={14}
+                  className="absolute top-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ color: "var(--text-tertiary)" }}
+                />
+              </motion.a>
             ))}
           </div>
         </div>
       </section>
 
-      {/* About Teaser */}
-      <section
-        className="px-6 py-20 sm:py-24"
-        style={{ background: "var(--bg-surface)" }}
-      >
-        <div className="max-w-[768px] mx-auto text-center">
-          <h2
-            className="text-3xl sm:text-4xl font-semibold mb-6"
-            style={{
-              color: "var(--text-primary)",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            Built different.
-          </h2>
-          <p
-            className="text-lg mb-8"
-            style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
-          >
-            Edgeless Labs is a one-person creative technology studio. We ship
-            real tools -- agents that trade, pipelines that learn, art that
-            plots itself. No pitch decks. No vaporware. Just working software
-            at the edge of what&apos;s possible.
-          </p>
-          <a
-            href="/about"
-            className="inline-flex items-center gap-2 text-sm font-medium"
-            style={{ color: "var(--accent)" }}
-          >
-            Learn more about the lab <ArrowRight size={14} />
-          </a>
+      {/* About — editorial, left-aligned */}
+      <section className="px-6 py-24">
+        <div className="max-w-[1280px] mx-auto">
+          <div className="max-w-2xl">
+            <motion.p
+              className="text-2xl sm:text-3xl font-light leading-[1.5]"
+              style={{ color: "var(--text-secondary)" }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <span style={{ color: "var(--text-primary)" }}>Edgeless Labs</span> is a
+              one-person creative technology studio. We ship agents, MCP servers,
+              generative art pipelines, and tools that work.{" "}
+              <span style={{ color: "var(--text-primary)" }}>No pitch decks. No vaporware.</span>
+            </motion.p>
+            <motion.div
+              className="mt-8"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+            >
+              <a
+                href="/about"
+                className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-white"
+                style={{ color: "var(--accent)" }}
+              >
+                About the lab <ArrowRight size={14} />
+              </a>
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer
-        className="px-6 py-12 border-t"
-        style={{
-          background: "var(--bg-base)",
-          borderColor: "var(--border-subtle)",
-        }}
-      >
+      {/* Footer — multi-column infrastructure map (Gemini: Vercel-style structured footer) */}
+      <footer className="px-6 pt-16 pb-8 mt-auto border-t" style={{ borderColor: "var(--border-subtle)" }}>
         <div className="max-w-[1280px] mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
             <div>
-              <span
-                className="text-sm font-semibold"
-                style={{ color: "var(--text-primary)" }}
-              >
-                Edgeless Labs
-              </span>
-              <p
-                className="text-sm mt-2 max-w-xs"
+              <h3
+                className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
                 style={{ color: "var(--text-tertiary)" }}
               >
-                Creative technology lab. Tools for the AI-native developer.
-              </p>
-            </div>
-            <div>
-              <span
-                className="text-xs font-medium uppercase mb-3 block"
-                style={{
-                  color: "var(--text-tertiary)",
-                  letterSpacing: "0.08em",
-                }}
-              >
-                Links
-              </span>
-              <div className="flex flex-col gap-2">
-                {["Projects", "Lab", "About", "Journal", "Contact"].map(
-                  (link) => (
+                Tools
+              </h3>
+              <ul className="space-y-2.5">
+                {["Pamela Agent", "MCP Servers", "Knowledge API", "LLM Client"].map((item) => (
+                  <li key={item}>
                     <a
-                      key={link}
-                      href={`/${link.toLowerCase()}`}
-                      className="text-sm hover:opacity-80 transition-opacity"
+                      href={`/projects/${item.toLowerCase().replace(/\s+/g, "-")}`}
+                      className="text-[13px] hover:text-white transition-colors"
                       style={{ color: "var(--text-secondary)" }}
                     >
-                      {link}
+                      {item}
                     </a>
-                  )
-                )}
-              </div>
+                  </li>
+                ))}
+              </ul>
             </div>
             <div>
-              <span
-                className="text-xs font-medium uppercase mb-3 block"
-                style={{
-                  color: "var(--text-tertiary)",
-                  letterSpacing: "0.08em",
-                }}
+              <h3
+                className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
+                style={{ color: "var(--text-tertiary)" }}
               >
-                Connect
-              </span>
-              <div className="flex flex-col gap-2">
-                <a
-                  href="https://github.com/edgeless-labs"
-                  className="text-sm hover:opacity-80 transition-opacity"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  GitHub
-                </a>
-                <a
-                  href="mailto:hello@edgelesslab.com"
-                  className="text-sm hover:opacity-80 transition-opacity"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  hello@edgelesslab.com
-                </a>
-              </div>
+                Lab
+              </h3>
+              <ul className="space-y-2.5">
+                {["Pen Plotter Art", "Strange Attractors", "Total Serialism", "Knowledge Graph"].map((item) => (
+                  <li key={item}>
+                    <a
+                      href={`/lab/${item.toLowerCase().replace(/\s+/g, "-")}`}
+                      className="text-[13px] hover:text-white transition-colors"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {item}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3
+                className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
+                style={{ color: "var(--text-tertiary)" }}
+              >
+                Social
+              </h3>
+              <ul className="space-y-2.5">
+                {[
+                  { label: "GitHub", href: "https://github.com/edgeless-ai" },
+                  { label: "Gumroad", href: "https://edgelessai.gumroad.com" },
+                  { label: "Email", href: "mailto:hello@edgelesslab.com" },
+                ].map((item) => (
+                  <li key={item.label}>
+                    <a
+                      href={item.href}
+                      className="text-[13px] hover:text-white transition-colors inline-flex items-center gap-1"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {item.label}
+                      <ArrowUpRight size={11} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3
+                className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
+                style={{ color: "var(--text-tertiary)" }}
+              >
+                Legal
+              </h3>
+              <ul className="space-y-2.5">
+                {[
+                  { label: "Privacy", href: "/privacy" },
+                  { label: "Terms", href: "/terms" },
+                ].map((item) => (
+                  <li key={item.label}>
+                    <a
+                      href={item.href}
+                      className="text-[13px] hover:text-white transition-colors"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
+
+          {/* Bottom bar with lab status */}
           <div
-            className="pt-6 border-t flex items-center justify-between"
+            className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-6 border-t"
             style={{ borderColor: "var(--border-subtle)" }}
           >
-            <div className="flex items-center gap-4">
-              <span
-                className="text-xs"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                &copy; 2026 Edgeless Labs
-              </span>
-              <a
-                href="/privacy"
-                className="text-xs hover:opacity-80 transition-opacity"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                Privacy
-              </a>
-              <a
-                href="/terms"
-                className="text-xs hover:opacity-80 transition-opacity"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                Terms
-              </a>
-            </div>
+            <span
+              className="text-xs font-mono"
+              style={{ color: "var(--text-tertiary)" }}
+            >
+              &copy; 2026 Edgeless Labs
+            </span>
             <div className="flex items-center gap-2">
               <span
-                className="w-2 h-2 rounded-full"
-                style={{ background: "#4ADE80" }}
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: "var(--green)" }}
               />
               <span
-                className="text-xs"
+                className="text-[11px] font-mono"
                 style={{ color: "var(--text-tertiary)" }}
               >
-                All systems operational
+                7 agents active
               </span>
             </div>
           </div>

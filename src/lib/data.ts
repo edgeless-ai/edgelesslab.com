@@ -87,7 +87,16 @@ export const experiments = [
     title: "Total Serialism",
     description: "Algorithmic music composition using serialist techniques. Generates both audio output and visual score notation from tone rows and transformation matrices.",
     category: "Audio",
-    status: "Prototype",
+    status: "Live",
+    href: "https://djmclaudeassistant-web.github.io/total-serialism/",
+  },
+  {
+    slug: "tartanism",
+    title: "Tartanism",
+    description: "Generative tartan pattern explorer. Procedural plaid generation with historical clan data, color theory, and interactive weaving visualization.",
+    category: "Generative",
+    status: "Live",
+    href: "https://djmclaudeassistant-web.github.io/tartanism/",
   },
   {
     slug: "mastra-orchestrator",

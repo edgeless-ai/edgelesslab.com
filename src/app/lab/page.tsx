@@ -27,8 +27,18 @@ const experiments = [
     category: "Audio",
     description:
       "Algorithmic music composition using serialist techniques. Generates both audio output and visual score notation from tone rows.",
-    status: "Prototype",
+    status: "Live",
     slug: "total-serialism",
+    href: "https://djmclaudeassistant-web.github.io/total-serialism/",
+  },
+  {
+    title: "Tartanism",
+    category: "Generative",
+    description:
+      "Generative tartan pattern explorer. Procedural plaid generation with historical clan data, color theory, and interactive weaving visualization.",
+    status: "Live",
+    slug: "tartanism",
+    href: "https://djmclaudeassistant-web.github.io/tartanism/",
   },
   {
     title: "Mastra Orchestrator",
@@ -128,7 +138,8 @@ export default function LabPage() {
             {experiments.map((exp, i) => (
               <motion.a
                 key={exp.slug}
-                href={`/lab/${exp.slug}`}
+                href={exp.href || `/lab/${exp.slug}`}
+                {...(exp.href ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                 className="group relative flex flex-col rounded-xl border p-6 transition-colors"
                 style={{
                   background: "var(--bg-surface)",

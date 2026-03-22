@@ -26,6 +26,7 @@ export function Nav() {
           <div className="flex items-center gap-5">
             {[
               { label: "Projects", href: "/projects" },
+              { label: "Products", href: "/products" },
               { label: "Lab", href: "/lab" },
               { label: "Blog", href: "/blog" },
               { label: "About", href: "/about" },

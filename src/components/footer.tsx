@@ -15,7 +15,7 @@ export function Footer() {
               Tools
             </h3>
             <ul className="space-y-2.5">
-              {["Pamela Agent", "MCP Servers", "Knowledge API", "LLM Client"].map((item) => (
+              {["Pamela Agent", "MCP Servers", "Knowledge API", "Products"].map((item) => (
                 <li key={item}>
                   <a
                     href={`/projects/${item.toLowerCase().replace(/\s+/g, "-")}`}

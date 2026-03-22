@@ -27,6 +27,7 @@ export function Nav() {
             {[
               { label: "Projects", href: "/projects" },
               { label: "Lab", href: "/lab" },
+              { label: "Blog", href: "/blog" },
               { label: "About", href: "/about" },
             ].map((link) => (
               <a

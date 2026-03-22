@@ -36,14 +36,19 @@ export function Footer() {
               Lab
             </h3>
             <ul className="space-y-2.5">
-              {["Pen Plotter Art", "Strange Attractors", "Total Serialism", "Knowledge Graph"].map((item) => (
-                <li key={item}>
+              {[
+                { label: "Pen Plotter Art", href: "/lab/pen-plotter-art" },
+                { label: "Strange Attractors", href: "/lab/strange-attractors" },
+                { label: "Total Serialism", href: "/lab/total-serialism" },
+                { label: "Blog", href: "/blog" },
+              ].map((item) => (
+                <li key={item.label}>
                   <a
-                    href={`/lab/${item.toLowerCase().replace(/\s+/g, "-")}`}
+                    href={item.href}
                     className="text-[13px] hover:text-white transition-colors"
                     style={{ color: "var(--text-secondary)" }}
                   >
-                    {item}
+                    {item.label}
                   </a>
                 </li>
               ))}

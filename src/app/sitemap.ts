@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { projects, experiments } from '@/lib/data';
+import { posts } from '@/lib/blog';
 
 export const dynamic = 'force-static';
 
@@ -24,6 +25,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: 'https://edgelesslab.com/blog',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
       url: 'https://edgelesslab.com/about',
       lastModified: new Date(),
       changeFrequency: 'monthly',
@@ -45,5 +52,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...projectPages, ...experimentPages];
+  const blogPages: MetadataRoute.Sitemap = posts.map((post) => ({
+    url: `https://edgelesslab.com/blog/${post.slug}`,
+    lastModified: new Date(post.date),
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  }));
+
+  return [...staticPages, ...projectPages, ...experimentPages, ...blogPages];
 }

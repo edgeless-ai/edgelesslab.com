@@ -1,11 +1,15 @@
-"use client";
-
-import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { motion } from "framer-motion";
-import { useState, type FormEvent } from "react";
-import { AnimatedText, AnimatedFadeIn } from "@/components/ui/animated-text";
-import { GlowingCard } from "@/components/ui/glowing-card";
-import { DotBackground } from "@/components/ui/dot-background";
+import { ArrowRight } from "lucide-react";
+import {
+  HeroSection,
+  FeaturedGrid,
+  CapabilitiesGrid,
+  StackFlow,
+  ExperimentsGrid,
+  AboutBlurb,
+  SubscribeSection,
+} from "@/components/home-client";
+import { Nav } from "@/components/nav";
+import { Footer } from "@/components/footer";
 
 const featured = [
   {
@@ -90,226 +94,16 @@ const stackNodes = [
   { label: "VPS / Hermes", sublabel: "always-on runtime", color: "var(--green)" },
 ];
 
-
-function SubscribeSection() {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "done">("idle");
-
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!email || status !== "idle") return;
-    setStatus("loading");
-    // Placeholder — wire to your list provider
-    setTimeout(() => {
-      setStatus("done");
-      setEmail("");
-    }, 800);
-  }
-
-  return (
-    <section
-      className="px-6 py-20 border-t"
-      style={{ borderColor: "var(--border-subtle)" }}
-    >
-      <div className="max-w-[1280px] mx-auto">
-        <div className="max-w-lg">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <span
-                className="w-1.5 h-1.5 rounded-full"
-                style={{ background: "var(--green)" }}
-              />
-              <span
-                className="text-xs font-mono"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                Lab dispatch
-              </span>
-            </div>
-            <h2
-              className="text-2xl font-semibold tracking-tight mb-2"
-              style={{ color: "var(--text-primary)" }}
-            >
-              Occasional dispatches from the lab.
-            </h2>
-            <p
-              className="text-sm mb-6"
-              style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
-            >
-              Agent experiments, generative art drops, and infra notes. No noise.
-            </p>
-
-            {status === "done" ? (
-              <motion.div
-                className="flex items-center gap-2 h-11"
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.25 }}
-              >
-                <span
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{ background: "var(--green)" }}
-                />
-                <span
-                  className="text-sm font-mono"
-                  style={{ color: "var(--green)" }}
-                >
-                  You&apos;re on the list.
-                </span>
-              </motion.div>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex items-center gap-2">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  required
-                  className="flex-1 h-11 px-4 rounded-full text-sm font-mono outline-none transition-colors"
-                  style={{
-                    background: "var(--bg-surface)",
-                    border: "1px solid var(--border-subtle)",
-                    color: "var(--text-primary)",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "var(--border-focus)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "var(--border-subtle)";
-                  }}
-                />
-                <motion.button
-                  type="submit"
-                  disabled={status === "loading"}
-                  className="h-11 px-5 rounded-full text-sm font-medium text-white shrink-0 transition-opacity disabled:opacity-60"
-                  style={{ background: "var(--accent)" }}
-                  whileHover={{ scale: 1.02, filter: "brightness(1.1)" }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  {status === "loading" ? "..." : "Subscribe"}
-                </motion.button>
-              </form>
-            )}
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export default function Home() {
   return (
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
-      {/* Nav — minimal, floating */}
-      <nav className="fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-[1280px] mx-auto px-6 pt-5">
-          <div
-            className="flex items-center justify-between h-12 px-5 rounded-full border backdrop-blur-xl"
-            style={{
-              background: "rgba(17, 17, 19, 0.7)",
-              borderColor: "var(--border-subtle)",
-            }}
-          >
-            <span
-              className="text-sm font-semibold tracking-tight font-mono"
-              style={{ color: "var(--text-primary)" }}
-            >
-              edgeless
-            </span>
-            <div className="flex items-center gap-5">
-              {["Projects", "Lab", "About"].map((link) => (
-                <a
-                  key={link}
-                  href={`/${link.toLowerCase()}`}
-                  className="text-[13px] hover:text-white transition-colors"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  {link}
-                </a>
-              ))}
-              <a
-                href="https://github.com/edgeless-ai"
-                className="text-[13px] hover:text-white transition-colors flex items-center gap-1"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                GitHub <ArrowUpRight size={12} />
-              </a>
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* Nav */}
+      <Nav />
 
-      {/* Hero — dramatic, asymmetric */}
-      <section className="relative min-h-screen flex items-end px-6 pb-24 pt-32">
-        <DotBackground />
-        <div className="relative max-w-[1280px] w-full mx-auto">
-          {/* Small status badge */}
-          <AnimatedFadeIn>
-            <div className="flex items-center gap-2 mb-8">
-              <span
-                className="w-1.5 h-1.5 rounded-full"
-                style={{ background: "var(--green)" }}
-              />
-              <span
-                className="text-xs font-mono"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                Shipping daily
-              </span>
-            </div>
-          </AnimatedFadeIn>
+      {/* Hero */}
+      <HeroSection />
 
-          <h1
-            className="text-[clamp(3rem,8vw,7.5rem)] font-bold leading-[0.9] tracking-[-0.04em] max-w-5xl"
-            style={{ color: "var(--text-primary)" }}
-          >
-            <AnimatedText text="Tools for" delay={0.1} />
-            <br />
-            <span style={{ color: "var(--accent)" }}>
-              <AnimatedText text="AI-native" delay={0.3} />
-            </span>
-            <br />
-            <AnimatedText text="developers." delay={0.45} />
-          </h1>
-
-          <AnimatedFadeIn delay={0.7}>
-            <p
-              className="mt-8 text-lg max-w-md font-light"
-              style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
-            >
-              Agents that trade. Pipelines that learn. Art that plots itself.
-              A one-person lab at the edge of what ships.
-            </p>
-          </AnimatedFadeIn>
-
-          <AnimatedFadeIn delay={0.9}>
-            <div className="mt-12 flex items-center gap-6">
-              <a
-                href="/projects"
-                className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
-                style={{ background: "var(--accent)" }}
-              >
-                View projects <ArrowRight size={15} />
-              </a>
-              <a
-                href="https://github.com/edgeless-ai"
-                className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-white"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                GitHub <ArrowUpRight size={14} />
-              </a>
-            </div>
-          </AnimatedFadeIn>
-        </div>
-      </section>
-
-      {/* Projects — asymmetric bento grid */}
+      {/* Featured Projects */}
       <section className="px-6 py-20">
         <div className="max-w-[1280px] mx-auto">
           <div className="flex items-baseline justify-between mb-10">
@@ -328,92 +122,11 @@ export default function Home() {
             </a>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:grid-rows-[auto_auto]">
-            {featured.map((project, i) => (
-              <div key={project.title} className={project.span}>
-              <GlowingCard
-                className="h-full"
-                href={`/projects/${project.title.toLowerCase().replace(/\s+/g, "-")}`}
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{
-                    duration: 0.5,
-                    delay: i * 0.1,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                >
-                  {/* Code window */}
-                  <div
-                    className="w-full rounded-lg mb-6 overflow-hidden"
-                    style={{
-                      background: "rgba(0,0,0,0.4)",
-                      border: "1px solid var(--border-subtle)",
-                    }}
-                  >
-                    <div className="flex items-center gap-1.5 px-3 py-2.5 border-b" style={{ borderColor: "var(--border-subtle)" }}>
-                      <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
-                      <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
-                      <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
-                      <span
-                        className="ml-2 text-[10px] font-mono"
-                        style={{ color: "var(--text-tertiary)" }}
-                      >
-                        {project.title.toLowerCase().replace(/\s+/g, "-")}
-                      </span>
-                    </div>
-                    <pre
-                      className={`px-3 py-3 text-[11px] leading-[1.7] font-mono whitespace-pre overflow-hidden ${
-                        i === 0 ? "min-h-[120px]" : "min-h-[80px]"
-                      }`}
-                      style={{ color: "var(--green)" }}
-                    >
-                      {project.snippet}
-                    </pre>
-                  </div>
-
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3
-                        className="text-lg font-semibold mb-1.5"
-                        style={{ color: "var(--text-primary)" }}
-                      >
-                        {project.title}
-                      </h3>
-                      <p
-                        className="text-sm max-w-md"
-                        style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
-                      >
-                        {project.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2.5 py-1 text-[11px] font-mono rounded-md"
-                        style={{
-                          background: "var(--accent-muted)",
-                          color: "var(--accent)",
-                        }}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </motion.div>
-              </GlowingCard>
-              </div>
-            ))}
-          </div>
+          <FeaturedGrid projects={featured} />
         </div>
       </section>
 
-      {/* Capabilities — The Technical Foundation (Gemini recommendation: Vercel-style modular blocks) */}
+      {/* Infrastructure */}
       <section
         className="px-6 py-20"
         style={{ background: "var(--bg-surface)" }}
@@ -426,145 +139,25 @@ export default function Home() {
             Infrastructure
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {capabilities.map((cap, i) => (
-              <motion.div
-                key={cap.label}
-                className="rounded-xl border overflow-hidden"
-                style={{
-                  background: "var(--bg-base)",
-                  borderColor: "var(--border-subtle)",
-                }}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.4,
-                  delay: i * 0.08,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-              >
-                <div
-                  className="px-5 py-3 border-b flex items-center justify-between"
-                  style={{ borderColor: "var(--border-subtle)" }}
-                >
-                  <span
-                    className="text-[11px] font-mono"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
-                    {cap.label}
-                  </span>
-                  <span
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ background: "var(--green)" }}
-                  />
-                </div>
-                <pre
-                  className="px-5 py-4 text-[11px] leading-[1.8] font-mono whitespace-pre overflow-x-auto"
-                  style={{ color: "var(--green)" }}
-                >
-                  {cap.snippet}
-                </pre>
-              </motion.div>
-            ))}
-          </div>
+          <CapabilitiesGrid capabilities={capabilities} />
         </div>
       </section>
 
-      {/* Stack — horizontal flow showing the tech pipeline */}
+      {/* How it works */}
       <section className="px-6 py-20" style={{ background: "var(--bg-base)" }}>
         <div className="max-w-[1280px] mx-auto">
-          <motion.h2
+          <h2
             className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
             style={{ color: "var(--text-tertiary)" }}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
           >
             How it works
-          </motion.h2>
+          </h2>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-0">
-            {stackNodes.map((node, i) => (
-              <div key={node.label} className="flex flex-col sm:flex-row items-start sm:items-center min-w-0">
-                {/* Node pill */}
-                <motion.div
-                  className="flex flex-col gap-1 px-4 py-3 rounded-xl border shrink-0"
-                  style={{
-                    background: "var(--bg-surface)",
-                    borderColor: "var(--border-subtle)",
-                  }}
-                  initial={{ opacity: 0, scale: 0.92 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{
-                    duration: 0.35,
-                    delay: i * 0.09,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                  whileHover={{
-                    borderColor: node.color,
-                    scale: 1.03,
-                    transition: { duration: 0.15 },
-                  }}
-                >
-                  <span
-                    className="text-[13px] font-semibold font-mono leading-none"
-                    style={{ color: "var(--text-primary)" }}
-                  >
-                    {node.label}
-                  </span>
-                  <span
-                    className="text-[10px] font-mono"
-                    style={{ color: "var(--text-tertiary)" }}
-                  >
-                    {node.sublabel}
-                  </span>
-                </motion.div>
-
-                {/* Arrow connector — hidden after last node */}
-                {i < stackNodes.length - 1 && (
-                  <motion.div
-                    className="flex items-center justify-center sm:px-3 py-2 sm:py-0"
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.3, delay: i * 0.09 + 0.15 }}
-                  >
-                    {/* Vertical line on mobile, horizontal arrow on desktop */}
-                    <span
-                      className="hidden sm:block text-[11px] font-mono select-none"
-                      style={{ color: "var(--border-focus)" }}
-                    >
-                      ──▶
-                    </span>
-                    <span
-                      className="sm:hidden block text-[11px] font-mono ml-6 select-none"
-                      style={{ color: "var(--border-focus)" }}
-                    >
-                      ↓
-                    </span>
-                  </motion.div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <motion.p
-            className="mt-8 text-sm max-w-lg"
-            style={{ color: "var(--text-tertiary)", lineHeight: 1.7 }}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.5 }}
-          >
-            Claude Code agents dispatch tasks through MCP servers, persist knowledge in ChromaDB and Obsidian, and run autonomously on a Hetzner VPS via the Hermes gateway.
-          </motion.p>
+          <StackFlow nodes={stackNodes} />
         </div>
       </section>
 
-      {/* Lab — horizontal scroll tease */}
+      {/* Lab */}
       <section className="px-6 py-20">
         <div className="max-w-[1280px] mx-auto">
           <div className="flex items-baseline justify-between mb-10">
@@ -583,228 +176,22 @@ export default function Home() {
             </a>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {experiments.map((exp, i) => (
-              <motion.a
-                key={exp.title}
-                href={exp.href || `/lab/${exp.title.toLowerCase().replace(/\s+/g, "-")}`}
-                {...(exp.href ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                className="group relative rounded-xl border p-5"
-                style={{
-                  background: "var(--bg-surface)",
-                  borderColor: "var(--border-subtle)",
-                }}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.4,
-                  delay: i * 0.08,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                whileHover={{
-                  scale: 1.03,
-                  borderColor: "var(--accent)",
-                  boxShadow: "0 0 0 1px var(--accent-muted), 0 8px 24px rgba(129,140,248,0.08)",
-                  transition: { duration: 0.18, ease: [0.16, 1, 0.3, 1] },
-                }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <span
-                  className="text-[10px] font-mono uppercase tracking-[0.12em] block mb-3"
-                  style={{ color: "var(--accent)" }}
-                >
-                  {exp.category}
-                </span>
-                <span
-                  className="text-sm font-medium block"
-                  style={{ color: "var(--text-primary)" }}
-                >
-                  {exp.title}
-                </span>
-                <motion.div
-                  className="absolute top-5 right-5"
-                  initial={{ opacity: 0, x: 2, y: -2 }}
-                  whileHover={{ opacity: 1, x: 0, y: 0 }}
-                  style={{ color: "var(--text-tertiary)" }}
-                >
-                  <ArrowUpRight size={14} />
-                </motion.div>
-              </motion.a>
-            ))}
-          </div>
+          <ExperimentsGrid experiments={experiments} />
         </div>
       </section>
 
-      {/* About — editorial, left-aligned */}
+      {/* About */}
       <section className="px-6 py-24">
         <div className="max-w-[1280px] mx-auto">
-          <div className="max-w-2xl">
-            <motion.p
-              className="text-2xl sm:text-3xl font-light leading-[1.5]"
-              style={{ color: "var(--text-secondary)" }}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <span style={{ color: "var(--text-primary)" }}>Edgeless Labs</span> is a
-              one-person creative technology studio. We ship agents, MCP servers,
-              generative art pipelines, and tools that work.{" "}
-              <span style={{ color: "var(--text-primary)" }}>No pitch decks. No vaporware.</span>
-            </motion.p>
-            <motion.div
-              className="mt-8"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            >
-              <a
-                href="/about"
-                className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-white"
-                style={{ color: "var(--accent)" }}
-              >
-                About the lab <ArrowRight size={14} />
-              </a>
-            </motion.div>
-          </div>
+          <AboutBlurb />
         </div>
       </section>
 
-      {/* Subscribe — minimal CTA before footer */}
+      {/* Subscribe */}
       <SubscribeSection />
 
-      {/* Footer — multi-column infrastructure map (Gemini: Vercel-style structured footer) */}
-      <footer className="px-6 pt-16 pb-8 mt-auto border-t" style={{ borderColor: "var(--border-subtle)" }}>
-        <div className="max-w-[1280px] mx-auto">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
-            <div>
-              <h3
-                className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                Tools
-              </h3>
-              <ul className="space-y-2.5">
-                {["Pamela Agent", "MCP Servers", "Knowledge API", "LLM Client"].map((item) => (
-                  <li key={item}>
-                    <a
-                      href={`/projects/${item.toLowerCase().replace(/\s+/g, "-")}`}
-                      className="text-[13px] hover:text-white transition-colors"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3
-                className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                Lab
-              </h3>
-              <ul className="space-y-2.5">
-                {[
-                  { label: "Pen Plotter Art", href: "/lab/pen-plotter-art" },
-                  { label: "Strange Attractors", href: "/lab/strange-attractors" },
-                  { label: "Total Serialism", href: "https://djmclaudeassistant-web.github.io/total-serialism/" },
-                  { label: "Tartanism", href: "https://djmclaudeassistant-web.github.io/tartanism/" },
-                ].map((item) => (
-                  <li key={item.label}>
-                    <a
-                      href={item.href}
-                      {...(item.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                      className="text-[13px] hover:text-white transition-colors"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
-                      {item.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3
-                className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                Social
-              </h3>
-              <ul className="space-y-2.5">
-                {[
-                  { label: "GitHub", href: "https://github.com/edgeless-ai" },
-                  { label: "Gumroad", href: "https://edgelessai.gumroad.com" },
-                  { label: "Email", href: "mailto:hello@edgelesslab.com" },
-                ].map((item) => (
-                  <li key={item.label}>
-                    <a
-                      href={item.href}
-                      className="text-[13px] hover:text-white transition-colors inline-flex items-center gap-1"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
-                      {item.label}
-                      <ArrowUpRight size={11} />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3
-                className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                Legal
-              </h3>
-              <ul className="space-y-2.5">
-                {[
-                  { label: "Privacy", href: "/privacy" },
-                  { label: "Terms", href: "/terms" },
-                ].map((item) => (
-                  <li key={item.label}>
-                    <a
-                      href={item.href}
-                      className="text-[13px] hover:text-white transition-colors"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
-                      {item.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom bar with lab status */}
-          <div
-            className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-6 border-t"
-            style={{ borderColor: "var(--border-subtle)" }}
-          >
-            <span
-              className="text-xs font-mono"
-              style={{ color: "var(--text-tertiary)" }}
-            >
-              &copy; 2026 Edgeless Labs
-            </span>
-            <div className="flex items-center gap-2">
-              <span
-                className="w-1.5 h-1.5 rounded-full"
-                style={{ background: "var(--green)" }}
-              />
-              <span
-                className="text-[11px] font-mono"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                7 agents active
-              </span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

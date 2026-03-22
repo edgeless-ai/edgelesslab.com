@@ -1,0 +1,531 @@
+"use client";
+
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { useState, type FormEvent } from "react";
+import { AnimatedText, AnimatedFadeIn } from "@/components/ui/animated-text";
+import { GlowingCard } from "@/components/ui/glowing-card";
+import { DotBackground } from "@/components/ui/dot-background";
+
+/* ── Hero ────────────────────────────────────────────────── */
+
+export function HeroSection() {
+  return (
+    <section className="relative min-h-screen flex items-end px-6 pb-24 pt-32">
+      <DotBackground />
+      <div className="relative max-w-[1280px] w-full mx-auto">
+        <AnimatedFadeIn>
+          <div className="flex items-center gap-2 mb-8">
+            <span
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: "var(--green)" }}
+            />
+            <span
+              className="text-xs font-mono"
+              style={{ color: "var(--text-tertiary)" }}
+            >
+              Shipping daily
+            </span>
+          </div>
+        </AnimatedFadeIn>
+
+        <h1
+          className="text-[clamp(3rem,8vw,7.5rem)] font-bold leading-[0.9] tracking-[-0.04em] max-w-5xl"
+          style={{ color: "var(--text-primary)" }}
+        >
+          <AnimatedText text="Tools for" delay={0.1} />
+          <br />
+          <span style={{ color: "var(--accent)" }}>
+            <AnimatedText text="AI-native" delay={0.3} />
+          </span>
+          <br />
+          <AnimatedText text="developers." delay={0.45} />
+        </h1>
+
+        <AnimatedFadeIn delay={0.7}>
+          <p
+            className="mt-8 text-lg max-w-md font-light"
+            style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
+          >
+            Agents that trade. Pipelines that learn. Art that plots itself.
+            A one-person lab at the edge of what ships.
+          </p>
+        </AnimatedFadeIn>
+
+        <AnimatedFadeIn delay={0.9}>
+          <div className="mt-12 flex items-center gap-6">
+            <a
+              href="/projects"
+              className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
+              style={{ background: "var(--accent)" }}
+            >
+              View projects <ArrowRight size={15} />
+            </a>
+            <a
+              href="https://github.com/edgeless-ai"
+              className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-white"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              GitHub <ArrowUpRight size={14} />
+            </a>
+          </div>
+        </AnimatedFadeIn>
+      </div>
+    </section>
+  );
+}
+
+/* ── Featured Projects (animated bento grid) ─────────────── */
+
+interface FeaturedProject {
+  title: string;
+  description: string;
+  tags: string[];
+  snippet: string;
+  span: string;
+  tall: boolean;
+}
+
+export function FeaturedGrid({ projects }: { projects: FeaturedProject[] }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:grid-rows-[auto_auto]">
+      {projects.map((project, i) => (
+        <div key={project.title} className={project.span}>
+          <GlowingCard
+            className="h-full"
+            href={`/projects/${project.title.toLowerCase().replace(/\s+/g, "-")}`}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{
+                duration: 0.5,
+                delay: i * 0.1,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+            >
+              <div
+                className="w-full rounded-lg mb-6 overflow-hidden"
+                style={{
+                  background: "rgba(0,0,0,0.4)",
+                  border: "1px solid var(--border-subtle)",
+                }}
+              >
+                <div
+                  className="flex items-center gap-1.5 px-3 py-2.5 border-b"
+                  style={{ borderColor: "var(--border-subtle)" }}
+                >
+                  <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+                  <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+                  <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
+                  <span
+                    className="ml-2 text-[10px] font-mono"
+                    style={{ color: "var(--text-tertiary)" }}
+                  >
+                    {project.title.toLowerCase().replace(/\s+/g, "-")}
+                  </span>
+                </div>
+                <pre
+                  className={`px-3 py-3 text-[11px] leading-[1.7] font-mono whitespace-pre overflow-hidden ${
+                    i === 0 ? "min-h-[120px]" : "min-h-[80px]"
+                  }`}
+                  style={{ color: "var(--green)" }}
+                >
+                  {project.snippet}
+                </pre>
+              </div>
+
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3
+                    className="text-lg font-semibold mb-1.5"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    {project.title}
+                  </h3>
+                  <p
+                    className="text-sm max-w-md"
+                    style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
+                  >
+                    {project.description}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mt-4">
+                {project.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2.5 py-1 text-[11px] font-mono rounded-md"
+                    style={{
+                      background: "var(--accent-muted)",
+                      color: "var(--accent)",
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          </GlowingCard>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Capabilities (animated cards) ────────────────────────── */
+
+interface Capability {
+  label: string;
+  snippet: string;
+}
+
+export function CapabilitiesGrid({ capabilities }: { capabilities: Capability[] }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {capabilities.map((cap, i) => (
+        <motion.div
+          key={cap.label}
+          className="rounded-xl border overflow-hidden"
+          style={{
+            background: "var(--bg-base)",
+            borderColor: "var(--border-subtle)",
+          }}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{
+            duration: 0.4,
+            delay: i * 0.08,
+            ease: [0.16, 1, 0.3, 1],
+          }}
+        >
+          <div
+            className="px-5 py-3 border-b flex items-center justify-between"
+            style={{ borderColor: "var(--border-subtle)" }}
+          >
+            <span
+              className="text-[11px] font-mono"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              {cap.label}
+            </span>
+            <span
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: "var(--green)" }}
+            />
+          </div>
+          <pre
+            className="px-5 py-4 text-[11px] leading-[1.8] font-mono whitespace-pre overflow-x-auto"
+            style={{ color: "var(--green)" }}
+          >
+            {cap.snippet}
+          </pre>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Stack Flow (animated pipeline) ──────────────────────── */
+
+interface StackNode {
+  label: string;
+  sublabel: string;
+  color: string;
+}
+
+export function StackFlow({ nodes }: { nodes: StackNode[] }) {
+  return (
+    <>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-0">
+        {nodes.map((node, i) => (
+          <div key={node.label} className="flex flex-col sm:flex-row items-start sm:items-center min-w-0">
+            <motion.div
+              className="flex flex-col gap-1 px-4 py-3 rounded-xl border shrink-0"
+              style={{
+                background: "var(--bg-surface)",
+                borderColor: "var(--border-subtle)",
+              }}
+              initial={{ opacity: 0, scale: 0.92 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.35,
+                delay: i * 0.09,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              whileHover={{
+                borderColor: node.color,
+                scale: 1.03,
+                transition: { duration: 0.15 },
+              }}
+            >
+              <span
+                className="text-[13px] font-semibold font-mono leading-none"
+                style={{ color: "var(--text-primary)" }}
+              >
+                {node.label}
+              </span>
+              <span
+                className="text-[10px] font-mono"
+                style={{ color: "var(--text-tertiary)" }}
+              >
+                {node.sublabel}
+              </span>
+            </motion.div>
+
+            {i < nodes.length - 1 && (
+              <motion.div
+                className="flex items-center justify-center sm:px-3 py-2 sm:py-0"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: i * 0.09 + 0.15 }}
+              >
+                <span
+                  className="hidden sm:block text-[11px] font-mono select-none"
+                  style={{ color: "var(--border-focus)" }}
+                >
+                  ──▶
+                </span>
+                <span
+                  className="sm:hidden block text-[11px] font-mono ml-6 select-none"
+                  style={{ color: "var(--border-focus)" }}
+                >
+                  ↓
+                </span>
+              </motion.div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <motion.p
+        className="mt-8 text-sm max-w-lg"
+        style={{ color: "var(--text-tertiary)", lineHeight: 1.7 }}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: 0.5 }}
+      >
+        Claude Code agents dispatch tasks through MCP servers, persist knowledge in ChromaDB and Obsidian, and run autonomously on a Hetzner VPS via the Hermes gateway.
+      </motion.p>
+    </>
+  );
+}
+
+/* ── Lab Experiments (animated cards) ─────────────────────── */
+
+interface Experiment {
+  title: string;
+  category: string;
+  href?: string;
+}
+
+export function ExperimentsGrid({ experiments }: { experiments: Experiment[] }) {
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {experiments.map((exp, i) => (
+        <motion.a
+          key={exp.title}
+          href={exp.href || `/lab/${exp.title.toLowerCase().replace(/\s+/g, "-")}`}
+          {...(exp.href ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          className="group relative rounded-xl border p-5"
+          style={{
+            background: "var(--bg-surface)",
+            borderColor: "var(--border-subtle)",
+          }}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{
+            duration: 0.4,
+            delay: i * 0.08,
+            ease: [0.16, 1, 0.3, 1],
+          }}
+          whileHover={{
+            scale: 1.03,
+            borderColor: "var(--accent)",
+            boxShadow: "0 0 0 1px var(--accent-muted), 0 8px 24px rgba(129,140,248,0.08)",
+            transition: { duration: 0.18, ease: [0.16, 1, 0.3, 1] },
+          }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <span
+            className="text-[10px] font-mono uppercase tracking-[0.12em] block mb-3"
+            style={{ color: "var(--accent)" }}
+          >
+            {exp.category}
+          </span>
+          <span
+            className="text-sm font-medium block"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {exp.title}
+          </span>
+          <motion.div
+            className="absolute top-5 right-5"
+            initial={{ opacity: 0, x: 2, y: -2 }}
+            whileHover={{ opacity: 1, x: 0, y: 0 }}
+            style={{ color: "var(--text-tertiary)" }}
+          >
+            <ArrowUpRight size={14} />
+          </motion.div>
+        </motion.a>
+      ))}
+    </div>
+  );
+}
+
+/* ── About Blurb (animated) ───────────────────────────────── */
+
+export function AboutBlurb() {
+  return (
+    <div className="max-w-2xl">
+      <motion.p
+        className="text-2xl sm:text-3xl font-light leading-[1.5]"
+        style={{ color: "var(--text-secondary)" }}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <span style={{ color: "var(--text-primary)" }}>Edgeless Labs</span> is a
+        one-person creative technology studio. We ship agents, MCP servers,
+        generative art pipelines, and tools that work.{" "}
+        <span style={{ color: "var(--text-primary)" }}>No pitch decks. No vaporware.</span>
+      </motion.p>
+      <motion.div
+        className="mt-8"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+      >
+        <a
+          href="/about"
+          className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-white"
+          style={{ color: "var(--accent)" }}
+        >
+          About the lab <ArrowRight size={14} />
+        </a>
+      </motion.div>
+    </div>
+  );
+}
+
+/* ── Subscribe Form ───────────────────────────────────────── */
+
+export function SubscribeSection() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "done">("idle");
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!email || status !== "idle") return;
+    setStatus("loading");
+    setTimeout(() => {
+      setStatus("done");
+      setEmail("");
+    }, 800);
+  }
+
+  return (
+    <section
+      className="px-6 py-20 border-t"
+      style={{ borderColor: "var(--border-subtle)" }}
+    >
+      <div className="max-w-[1280px] mx-auto">
+        <div className="max-w-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <span
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: "var(--green)" }}
+              />
+              <span
+                className="text-xs font-mono"
+                style={{ color: "var(--text-tertiary)" }}
+              >
+                Lab dispatch
+              </span>
+            </div>
+            <h2
+              className="text-2xl font-semibold tracking-tight mb-2"
+              style={{ color: "var(--text-primary)" }}
+            >
+              Occasional dispatches from the lab.
+            </h2>
+            <p
+              className="text-sm mb-6"
+              style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
+            >
+              Agent experiments, generative art drops, and infra notes. No noise.
+            </p>
+
+            {status === "done" ? (
+              <motion.div
+                className="flex items-center gap-2 h-11"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ background: "var(--green)" }}
+                />
+                <span
+                  className="text-sm font-mono"
+                  style={{ color: "var(--green)" }}
+                >
+                  You&apos;re on the list.
+                </span>
+              </motion.div>
+            ) : (
+              <form onSubmit={handleSubmit} className="flex items-center gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                  className="flex-1 h-11 px-4 rounded-full text-sm font-mono outline-none transition-colors"
+                  style={{
+                    background: "var(--bg-surface)",
+                    border: "1px solid var(--border-subtle)",
+                    color: "var(--text-primary)",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "var(--border-focus)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "var(--border-subtle)";
+                  }}
+                />
+                <motion.button
+                  type="submit"
+                  disabled={status === "loading"}
+                  className="h-11 px-5 rounded-full text-sm font-medium text-white shrink-0 transition-opacity disabled:opacity-60"
+                  style={{ background: "var(--accent)" }}
+                  whileHover={{ scale: 1.02, filter: "brightness(1.1)" }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {status === "loading" ? "..." : "Subscribe"}
+                </motion.button>
+              </form>
+            )}
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}

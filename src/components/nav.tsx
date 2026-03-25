@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -16,13 +17,13 @@ export function Nav() {
             borderColor: "var(--border-subtle)",
           }}
         >
-          <a
+          <Link
             href="/"
             className="text-sm font-semibold tracking-tight font-mono hover:opacity-80 transition-opacity"
             style={{ color: "var(--text-primary)" }}
           >
             edgeless
-          </a>
+          </Link>
           <div className="flex items-center gap-5">
             {[
               { label: "Projects", href: "/projects" },
@@ -31,7 +32,7 @@ export function Nav() {
               { label: "Blog", href: "/blog" },
               { label: "About", href: "/about" },
             ].map((link) => (
-              <a
+              <Link
                 key={link.label}
                 href={link.href}
                 className="text-[13px] hover:text-white transition-colors"
@@ -40,7 +41,7 @@ export function Nav() {
                 }}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <a
               href="https://github.com/edgeless-ai"

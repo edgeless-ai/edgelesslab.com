@@ -1,14 +1,15 @@
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { ArrowUpRight } from "lucide-react";
-import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Products",
   description:
     "Developer tools and templates for AI agent infrastructure. Built from production systems.",
-  alternates: { canonical: "https://edgelesslab.com/products" },
-};
+  path: "/products",
+  keywords: ["AI products", "Claude Memory Kit", "prompt engineering", "developer templates"],
+});
 
 const products = [
   {
@@ -22,7 +23,7 @@ const products = [
       "Advanced patterns: multi-project, team memory, CI integration",
       "CLAUDE.md templates for solo and monorepo projects",
     ],
-    href: "https://edgelessai.gumroad.com/l/claude-memory-kit",
+    href: "https://edgelessai.gumroad.com/l/claude-memory-kit?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
     badge: "New",
   },
   {
@@ -36,7 +37,7 @@ const products = [
       "100+ production-tested prompt templates",
       "Covers Claude, GPT-4, Gemini, and open models",
     ],
-    href: "https://edgelessai.gumroad.com/l/prompt-engineering-os",
+    href: "https://edgelessai.gumroad.com/l/prompt-engineering-os?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
     badge: null,
   },
   {
@@ -50,8 +51,22 @@ const products = [
       "CLAUDE.md snippet for instant setup",
       "Real-world examples included",
     ],
-    href: "https://github.com/edgeless-ai/claude-memory-kit",
+    href: "https://github.com/edgeless-ai/claude-memory-kit?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
     badge: "Open Source",
+  },
+  {
+    name: "Excalidraw Mastery Kit",
+    price: "$19",
+    description:
+      "20+ diagram templates, custom libraries, a Python generator, and the complete guide to Excalidraw in Obsidian. Generate architecture diagrams programmatically from Claude Code or scripts.",
+    features: [
+      "20+ .excalidraw.md templates across 6 categories",
+      "Python diagram generator with hub-spoke, flow, and grid layouts",
+      "Claude Code skill file for AI-generated diagrams",
+      "3 custom libraries: cloud icons, UI components, status indicators",
+    ],
+    href: "https://edgelessai.gumroad.com/l/excalidraw-mastery?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
+    badge: "New",
   },
 ];
 

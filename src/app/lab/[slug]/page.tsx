@@ -1,27 +1,33 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { experiments } from "@/lib/data";
+import { createPageMetadata } from "@/lib/metadata";
 import { ExperimentDetail } from "./experiment-detail";
+
+const NOT_FOUND_METADATA: Metadata = {
+  title: {
+    absolute: "Not Found | Edgeless Labs",
+  },
+};
 
 export function generateStaticParams() {
   return experiments.map((e) => ({ slug: e.slug }));
 }
 
-export function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  return params.then(({ slug }) => {
-    const experiment = experiments.find((e) => e.slug === slug);
-    if (!experiment) return { title: "Not Found - Edgeless Labs" };
-    return {
-      title: `${experiment.title} - Lab - Edgeless Labs`,
-      description: experiment.description,
-      openGraph: {
-        title: `${experiment.title} - Lab - Edgeless Labs`,
-        description: experiment.description,
-        url: `https://edgelesslab.com/lab/${experiment.slug}`,
-      },
-      alternates: {
-        canonical: `https://edgelesslab.com/lab/${experiment.slug}`,
-      },
-    };
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const experiment = experiments.find((e) => e.slug === slug);
+  if (!experiment) return NOT_FOUND_METADATA;
+
+  return createPageMetadata({
+    title: `${experiment.title} Lab Experiment`,
+    description: experiment.description,
+    path: `/lab/${experiment.slug}`,
+    keywords: [experiment.category, "lab experiments", "Edgeless Labs"],
   });
 }
 

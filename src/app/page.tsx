@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import {
   HeroSection,
   FeaturedGrid,
@@ -113,13 +114,13 @@ export default function Home() {
             >
               Featured
             </h2>
-            <a
+            <Link
               href="/projects"
               className="text-sm flex items-center gap-1 transition-colors hover:text-white"
               style={{ color: "var(--text-secondary)" }}
             >
               All projects <ArrowRight size={13} />
-            </a>
+            </Link>
           </div>
 
           <FeaturedGrid projects={featured} />
@@ -167,13 +168,13 @@ export default function Home() {
             >
               Lab
             </h2>
-            <a
+            <Link
               href="/lab"
               className="text-sm flex items-center gap-1 transition-colors hover:text-white"
               style={{ color: "var(--text-secondary)" }}
             >
               All experiments <ArrowRight size={13} />
-            </a>
+            </Link>
           </div>
 
           <ExperimentsGrid experiments={experiments} />

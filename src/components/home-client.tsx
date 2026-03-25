@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, type FormEvent } from "react";
+import { trackCTA, trackSubscribe } from "@/lib/analytics";
 import { AnimatedText, AnimatedFadeIn } from "@/components/ui/animated-text";
 import { GlowingCard } from "@/components/ui/glowing-card";
 import { DotBackground } from "@/components/ui/dot-background";
@@ -54,13 +56,14 @@ export function HeroSection() {
 
         <AnimatedFadeIn delay={0.9}>
           <div className="mt-12 flex items-center gap-6">
-            <a
+            <Link
               href="/projects"
               className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
               style={{ background: "var(--accent)" }}
+              onClick={() => trackCTA("hero_view_projects", "/projects")}
             >
               View projects <ArrowRight size={15} />
-            </a>
+            </Link>
             <a
               href="https://github.com/edgeless-ai"
               className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-white"
@@ -427,6 +430,7 @@ export function SubscribeSection() {
     e.preventDefault();
     if (!email || status !== "idle") return;
     setStatus("loading");
+    trackSubscribe(email);
     setTimeout(() => {
       setStatus("done");
       setEmail("");

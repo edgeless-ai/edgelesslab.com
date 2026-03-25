@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Terms of Service - Edgeless",
@@ -18,13 +19,13 @@ export default function TermsOfService() {
       }}
     >
       <div className="max-w-[640px] mx-auto px-6 py-12">
-        <a
+        <Link
           href="/"
           className="inline-block text-sm mb-8 opacity-50 hover:opacity-80 transition-opacity"
           style={{ color: "#F2F0ED" }}
         >
           &larr; Edgeless Labs
-        </a>
+        </Link>
 
         <h1 className="text-[28px] font-bold mb-2">
           Edgeless Terms of Service

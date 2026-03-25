@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacy Policy - Edgeless",
@@ -18,17 +19,17 @@ export default function PrivacyPolicy() {
       }}
     >
       <div className="max-w-[640px] mx-auto px-6 py-12">
-        <a
+        <Link
           href="/"
           className="inline-block text-sm mb-8 opacity-50 hover:opacity-80 transition-opacity"
           style={{ color: "#F2F0ED" }}
         >
           &larr; Edgeless Labs
-        </a>
+        </Link>
 
         <h1 className="text-[28px] font-bold mb-2">Edgeless Privacy Policy</h1>
         <p className="text-sm mb-8" style={{ color: "#5C5955" }}>
-          Last updated: March 13, 2026
+          Last updated: March 25, 2026
         </p>
 
         <Section title="The Short Version">
@@ -105,8 +106,17 @@ export default function PrivacyPolicy() {
             .
           </p>
           <p>
-            We do not use any third-party analytics, advertising, or tracking
-            services.
+            Our website (edgelesslab.com) uses{" "}
+            <a
+              href="https://posthog.com"
+              className="hover:underline"
+              style={{ color: "#E8856C" }}
+            >
+              PostHog
+            </a>{" "}
+            for privacy-friendly analytics. PostHog collects anonymous page
+            views and interaction data to help us improve the site. No
+            advertising or cross-site tracking is used.
           </p>
         </Section>
 

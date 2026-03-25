@@ -2,6 +2,20 @@
 
 import { ArrowUpRight } from "lucide-react";
 
+const toolLinks = [
+  { label: "Pamela", href: "/projects/pamela" },
+  { label: "MCP Servers", href: "/projects/mcp-servers" },
+  { label: "Knowledge API", href: "/projects/knowledge-api" },
+  { label: "LLM Client", href: "/projects/llm-client" },
+];
+
+const labLinks = [
+  { label: "Pen Plotter Art", href: "/lab/pen-plotter-art" },
+  { label: "Strange Attractors", href: "/lab/strange-attractors" },
+  { label: "Total Serialism", href: "/lab/total-serialism" },
+  { label: "Excalidraw Diagrams", href: "/lab/excalidraw-diagrams" },
+];
+
 export function Footer() {
   return (
     <footer className="px-6 pt-16 pb-8 mt-auto border-t" style={{ borderColor: "var(--border-subtle)" }}>
@@ -15,14 +29,14 @@ export function Footer() {
               Tools
             </h3>
             <ul className="space-y-2.5">
-              {["Pamela Agent", "MCP Servers", "Knowledge API", "Products"].map((item) => (
-                <li key={item}>
+              {toolLinks.map((item) => (
+                <li key={item.href}>
                   <a
-                    href={`/projects/${item.toLowerCase().replace(/\s+/g, "-")}`}
+                    href={item.href}
                     className="text-[13px] hover:text-white transition-colors"
                     style={{ color: "var(--text-secondary)" }}
                   >
-                    {item}
+                    {item.label}
                   </a>
                 </li>
               ))}
@@ -36,12 +50,7 @@ export function Footer() {
               Lab
             </h3>
             <ul className="space-y-2.5">
-              {[
-                { label: "Pen Plotter Art", href: "/lab/pen-plotter-art" },
-                { label: "Strange Attractors", href: "/lab/strange-attractors" },
-                { label: "Total Serialism", href: "/lab/total-serialism" },
-                { label: "Blog", href: "/blog" },
-              ].map((item) => (
+              {labLinks.map((item) => (
                 <li key={item.label}>
                   <a
                     href={item.href}

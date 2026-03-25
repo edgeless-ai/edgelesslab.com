@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { JsonLd } from "@/components/json-ld";
+import { PostHogProvider } from "@/components/posthog-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -83,7 +84,9 @@ export default function RootLayout({
             "https://edgelessai.gumroad.com"
           ]
         }} />
-        {children}
+        <PostHogProvider>
+          {children}
+        </PostHogProvider>
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 import { posts } from "@/lib/blog";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
@@ -18,11 +19,16 @@ export async function generateMetadata({
   const post = posts.find((p) => p.slug === slug);
   if (!post) return {};
 
+  const fullTitle = `${post.title} | Edgeless Labs`;
+
   return {
-    title: post.title,
+    title: {
+      absolute: fullTitle,
+    },
     description: post.description,
+    keywords: post.tags,
     openGraph: {
-      title: post.title,
+      title: fullTitle,
       description: post.description,
       type: "article",
       publishedTime: post.date,
@@ -30,6 +36,12 @@ export async function generateMetadata({
     },
     alternates: {
       canonical: `https://edgelesslab.com/blog/${post.slug}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: fullTitle,
+      description: post.description,
+      images: ["/og-image.png"],
     },
   };
 }
@@ -126,13 +138,13 @@ export default async function BlogPostPage({
 
           {/* Back link */}
           <div className="mt-16 pt-8 border-t" style={{ borderColor: "var(--border-subtle)" }}>
-            <a
+            <Link
               href="/blog"
               className="text-sm font-medium transition-colors hover:text-white"
               style={{ color: "var(--text-secondary)" }}
             >
               &larr; All posts
-            </a>
+            </Link>
           </div>
         </div>
       </article>

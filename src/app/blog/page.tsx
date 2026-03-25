@@ -1,15 +1,15 @@
-import { ArrowRight } from "lucide-react";
 import { posts } from "@/lib/blog";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { BlogPostCard } from "@/components/blog-client";
-import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Blog",
   description: "Notes on building AI agents, MCP servers, generative art, and developer tools.",
-  alternates: { canonical: "https://edgelesslab.com/blog" },
-};
+  path: "/blog",
+  keywords: ["AI engineering blog", "MCP servers", "Claude Code", "developer tools"],
+});
 
 export default function BlogPage() {
   return (

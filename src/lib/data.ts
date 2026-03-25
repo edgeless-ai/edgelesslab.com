@@ -113,7 +113,7 @@ export const experiments = [
     status: "105+ experiments",
   },
   {
-    slug: "knowledge-graph-viz",
+    slug: "excalidraw-diagrams",
     title: "Excalidraw Diagrams",
     description: "Auto-generated architecture diagrams using a custom Excalidraw generator. 54 diagrams indexed covering system topology, data flows, and agent interactions.",
     category: "Data",

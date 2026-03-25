@@ -7,13 +7,14 @@ import {
   Timeline,
   ConnectGrid,
 } from "@/components/about-client";
-import type { Metadata } from "next";
+import { createPageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
-  title: "About",
+export const metadata = createPageMetadata({
+  title: "About the Studio",
   description: "One-person creative technology studio building agents, pipelines, and tools that run in production.",
-  alternates: { canonical: "https://edgelesslab.com/about" },
-};
+  path: "/about",
+  keywords: ["about Edgeless Labs", "David Murray", "creative technology studio", "AI-native developer tools"],
+});
 
 const stats = [
   { label: "Agents deployed", value: "7" },

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { motion } from "framer-motion";
 import { useState, FormEvent } from "react";
 import { trackCTA, trackSubscribe } from "@/lib/analytics";
 import { AnimatedText, AnimatedFadeIn } from "@/components/ui/animated-text";
@@ -109,14 +108,9 @@ export function FeaturedGrid({ projects }: { projects: FeaturedProject[] }) {
             className="h-full"
             href={project.href}
           >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{
-                duration: 0.5,
-                delay: i * 0.1,
-                ease: [0.16, 1, 0.3, 1],
+            <div
+              style={{
+                animation: `fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) ${i * 0.1}s both`,
               }}
             >
               <div
@@ -181,7 +175,7 @@ export function FeaturedGrid({ projects }: { projects: FeaturedProject[] }) {
                   </span>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </GlowingCard>
         </div>
       ))}
@@ -200,20 +194,13 @@ export function CapabilitiesGrid({ capabilities }: { capabilities: Capability[] 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {capabilities.map((cap, i) => (
-        <motion.div
+        <div
           key={cap.label}
           className="rounded-xl border overflow-hidden"
           style={{
             background: "var(--bg-base)",
             borderColor: "var(--border-subtle)",
-          }}
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{
-            duration: 0.4,
-            delay: i * 0.08,
-            ease: [0.16, 1, 0.3, 1],
+            animation: `fadeInUp 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 0.08}s both`,
           }}
         >
           <div
@@ -237,7 +224,7 @@ export function CapabilitiesGrid({ capabilities }: { capabilities: Capability[] 
           >
             {cap.snippet}
           </pre>
-        </motion.div>
+        </div>
       ))}
     </div>
   );
@@ -257,24 +244,12 @@ export function StackFlow({ nodes }: { nodes: StackNode[] }) {
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-0">
         {nodes.map((node, i) => (
           <div key={node.label} className="flex flex-col sm:flex-row items-start sm:items-center min-w-0">
-            <motion.div
-              className="flex flex-col gap-1 px-4 py-3 rounded-xl border shrink-0"
+            <div
+              className="flex flex-col gap-1 px-4 py-3 rounded-xl border shrink-0 transition-all hover:scale-[1.02]"
               style={{
                 background: "var(--bg-surface)",
                 borderColor: "var(--border-subtle)",
-              }}
-              initial={{ opacity: 0, scale: 0.92 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.35,
-                delay: i * 0.09,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              whileHover={{
-                borderColor: node.color,
-                scale: 1.03,
-                transition: { duration: 0.15 },
+                animation: `fadeInUp 0.35s cubic-bezier(0.16,1,0.3,1) ${i * 0.09}s both`,
               }}
             >
               <span
@@ -289,16 +264,10 @@ export function StackFlow({ nodes }: { nodes: StackNode[] }) {
               >
                 {node.sublabel}
               </span>
-            </motion.div>
+            </div>
 
             {i < nodes.length - 1 && (
-              <motion.div
-                className="flex items-center justify-center sm:px-3 py-2 sm:py-0"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: i * 0.09 + 0.15 }}
-              >
+              <div className="flex items-center justify-center sm:px-3 py-2 sm:py-0">
                 <span
                   className="hidden sm:block text-xs font-mono select-none"
                   style={{ color: "var(--border-focus)" }}
@@ -311,22 +280,18 @@ export function StackFlow({ nodes }: { nodes: StackNode[] }) {
                 >
                   ↓
                 </span>
-              </motion.div>
+              </div>
             )}
           </div>
         ))}
       </div>
 
-      <motion.p
+      <p
         className="mt-8 text-sm max-w-lg"
         style={{ color: "var(--text-tertiary)", lineHeight: 1.7 }}
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4, delay: 0.5 }}
       >
         Claude Code agents dispatch tasks through MCP servers, persist knowledge in ChromaDB and Obsidian, and run autonomously on a Hetzner VPS via the Hermes gateway.
-      </motion.p>
+      </p>
     </>
   );
 }
@@ -344,30 +309,16 @@ export function ExperimentsGrid({ experiments }: { experiments: Experiment[] }) 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {experiments.map((exp, i) => (
-        <motion.a
+        <a
           key={exp.title}
           href={exp.href}
           {...(exp.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-          className="group relative rounded-xl border p-5"
+          className="group relative rounded-xl border p-5 transition-all hover:scale-[1.02]"
           style={{
             background: "var(--bg-surface)",
             borderColor: "var(--border-subtle)",
+            animation: `fadeInUp 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 0.08}s both`,
           }}
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{
-            duration: 0.4,
-            delay: i * 0.08,
-            ease: [0.16, 1, 0.3, 1],
-          }}
-          whileHover={{
-            scale: 1.03,
-            borderColor: "var(--accent)",
-            boxShadow: "0 0 0 1px var(--accent-muted), 0 8px 24px rgba(129,140,248,0.08)",
-            transition: { duration: 0.18, ease: [0.16, 1, 0.3, 1] },
-          }}
-          whileTap={{ scale: 0.98 }}
         >
           <span
             className="text-xs font-mono uppercase tracking-[0.12em] block mb-3"
@@ -381,15 +332,13 @@ export function ExperimentsGrid({ experiments }: { experiments: Experiment[] }) 
           >
             {exp.title}
           </span>
-          <motion.div
-            className="absolute top-5 right-5"
-            initial={{ opacity: 0, x: 2, y: -2 }}
-            whileHover={{ opacity: 1, x: 0, y: 0 }}
+          <div
+            className="absolute top-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity"
             style={{ color: "var(--text-tertiary)" }}
           >
             <ArrowUpRight size={14} />
-          </motion.div>
-        </motion.a>
+          </div>
+        </a>
       ))}
     </div>
   );
@@ -400,25 +349,21 @@ export function ExperimentsGrid({ experiments }: { experiments: Experiment[] }) 
 export function AboutBlurb() {
   return (
     <div className="max-w-2xl">
-      <motion.p
+      <p
         className="text-2xl sm:text-3xl font-light leading-[1.5]"
-        style={{ color: "var(--text-secondary)" }}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          color: "var(--text-secondary)",
+          animation: "fadeInUp 0.6s cubic-bezier(0.16,1,0.3,1) both",
+        }}
       >
         <span style={{ color: "var(--text-primary)" }}>Edgeless Labs</span> is a
         one-person creative technology studio. We ship agents, MCP servers,
         generative art pipelines, and tools that work.{" "}
         <span style={{ color: "var(--text-primary)" }}>No pitch decks. No vaporware.</span>
-      </motion.p>
-      <motion.div
+      </p>
+      <div
         className="mt-8"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4, delay: 0.2 }}
+        style={{ animation: "fadeInUp 0.4s cubic-bezier(0.16,1,0.3,1) 0.2s both" }}
       >
         <Link
           href="/about"
@@ -427,7 +372,7 @@ export function AboutBlurb() {
         >
           About the lab <ArrowRight size={14} />
         </Link>
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -456,11 +401,8 @@ export function SubscribeSection() {
     >
       <div className="max-w-[1280px] mx-auto">
         <div className="max-w-lg">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          <div
+            style={{ animation: "fadeInUp 0.4s cubic-bezier(0.16,1,0.3,1) both" }}
           >
             <div className="flex items-center gap-2 mb-4">
               <span
@@ -488,12 +430,7 @@ export function SubscribeSection() {
             </p>
 
             {status === "done" ? (
-              <motion.div
-                className="flex items-center gap-2 h-11"
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.25 }}
-              >
+              <div className="flex items-center gap-2 h-11">
                 <span
                   className="w-1.5 h-1.5 rounded-full"
                   style={{ background: "var(--green)" }}
@@ -504,7 +441,7 @@ export function SubscribeSection() {
                 >
                   You&apos;re on the list.
                 </span>
-              </motion.div>
+              </div>
             ) : (
               <form
                 onSubmit={handleSubmit}
@@ -530,20 +467,17 @@ export function SubscribeSection() {
                     e.currentTarget.style.borderColor = "var(--border-subtle)";
                   }}
                 />
-                <motion.button
+                <button
                   type="submit"
                   disabled={status === "loading"}
-                  className="h-11 shrink-0 rounded-full px-5 text-sm font-medium text-white transition-opacity disabled:opacity-60 sm:w-auto"
+                  className="h-11 shrink-0 rounded-full px-5 text-sm font-medium text-white transition-all hover:brightness-110 hover:scale-[1.02] disabled:opacity-60 sm:w-auto"
                   style={{ background: "var(--accent)" }}
-                  whileHover={{ scale: 1.02, filter: "brightness(1.1)" }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
                 >
                   {status === "loading" ? "..." : "Subscribe"}
-                </motion.button>
+                </button>
               </form>
             )}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

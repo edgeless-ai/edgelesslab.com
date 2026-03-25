@@ -1,7 +1,4 @@
-"use client";
-
 import { ArrowLeft } from "lucide-react";
-import { motion } from "framer-motion";
 import { Nav } from "@/components/nav";
 import { JsonLd } from "@/components/json-ld";
 import { Footer } from "@/components/footer";
@@ -23,25 +20,22 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
       }} />
       <Nav />
 
-      <main id="main-content">
       <section className="px-6 pt-32 pb-16">
         <div className="max-w-[768px] mx-auto">
-          <motion.a
+          <a
             href="/lab"
             className="inline-flex items-center gap-1.5 text-sm mb-8 transition-colors hover:text-white"
-            style={{ color: "var(--text-tertiary)" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
+            style={{
+              color: "var(--text-tertiary)",
+              animation: "fadeInUp 0.3s cubic-bezier(0.16,1,0.3,1) both",
+            }}
           >
             <ArrowLeft size={14} /> All experiments
-          </motion.a>
+          </a>
 
-          <motion.div
+          <div
             className="flex items-center gap-3 mb-6"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            style={{ animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both" }}
           >
             <span
               className="text-xs font-mono uppercase tracking-[0.12em] px-2.5 py-1 rounded-md"
@@ -61,38 +55,37 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                 {experiment.status}
               </span>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.h1
+          <h1
             className="text-4xl sm:text-5xl font-bold tracking-[-0.03em] mb-6"
-            style={{ color: "var(--text-primary)" }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              color: "var(--text-primary)",
+              animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.1s both",
+            }}
           >
             {experiment.title}
-          </motion.h1>
+          </h1>
 
-          <motion.p
+          <p
             className="text-lg font-light mb-12"
-            style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              color: "var(--text-secondary)",
+              lineHeight: 1.7,
+              animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.15s both",
+            }}
           >
             {experiment.description}
-          </motion.p>
+          </p>
 
           {/* Placeholder for future media/visuals */}
-          <motion.div
+          <div
             className="w-full aspect-video rounded-xl border mb-12"
             style={{
               background: "var(--bg-surface)",
               borderColor: "var(--border-subtle)",
+              animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.2s both",
             }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="flex items-center justify-center h-full">
               <span
@@ -102,21 +95,20 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                 Visual documentation coming soon
               </span>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.a
+          <a
             href="/lab"
             className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-white"
-            style={{ color: "var(--accent)" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
+            style={{
+              color: "var(--accent)",
+              animation: "fadeInUp 0.4s cubic-bezier(0.16,1,0.3,1) 0.3s both",
+            }}
           >
             <ArrowLeft size={14} /> Back to Lab
-          </motion.a>
+          </a>
         </div>
       </section>
-      </main>
 
       <Footer />
     </div>

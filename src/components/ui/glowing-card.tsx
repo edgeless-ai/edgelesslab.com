@@ -1,7 +1,5 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
+import Link from "next/link";
 
 interface GlowingCardProps {
   children: ReactNode;
@@ -17,14 +15,12 @@ export function GlowingCard({
   glowColor = "var(--accent)",
 }: GlowingCardProps) {
   const content = (
-    <motion.div
-      className={`group relative overflow-hidden rounded-2xl border p-8 transition-colors ${className}`}
+    <div
+      className={`group relative overflow-hidden rounded-2xl border p-8 transition-all duration-200 hover:scale-[1.01] ${className}`}
       style={{
         background: "var(--bg-surface)",
         borderColor: "var(--border-subtle)",
       }}
-      whileHover={{ scale: 1.01 }}
-      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
     >
       {/* Glow effect on hover */}
       <div
@@ -41,11 +37,15 @@ export function GlowingCard({
         }}
       />
       <div className="relative">{children}</div>
-    </motion.div>
+    </div>
   );
 
   if (href) {
-    return <a href={href}>{content}</a>;
+    const isInternal = href.startsWith("/");
+    if (isInternal) {
+      return <Link href={href}>{content}</Link>;
+    }
+    return <a href={href} target="_blank" rel="noopener noreferrer">{content}</a>;
   }
   return content;
 }

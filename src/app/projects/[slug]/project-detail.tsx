@@ -23,6 +23,7 @@ export function ProjectDetail({ project }: { project: Project }) {
       }} />
       <Nav />
 
+      <main id="main-content">
       <section className="px-6 pt-32 pb-16">
         <div className="max-w-[1280px] mx-auto">
           <motion.a
@@ -46,7 +47,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               >
                 <span
-                  className="text-[10px] font-mono uppercase tracking-[0.12em] px-2.5 py-1 rounded-md"
+                  className="text-xs font-mono uppercase tracking-[0.12em] px-2.5 py-1 rounded-md"
                   style={{ background: "var(--accent-muted)", color: "var(--accent)" }}
                 >
                   {project.category}
@@ -57,7 +58,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                     style={{ background: "var(--green)" }}
                   />
                   <span
-                    className="text-[11px] font-mono"
+                    className="text-xs font-mono"
                     style={{ color: "var(--text-tertiary)" }}
                   >
                     {project.status}
@@ -104,7 +105,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                   <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
                   <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
                   <span
-                    className="ml-2 text-[10px] font-mono"
+                    className="ml-2 text-xs font-mono"
                     style={{ color: "var(--text-tertiary)" }}
                   >
                     {project.slug}
@@ -127,7 +128,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                 {project.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1.5 text-[11px] font-mono rounded-md"
+                    className="px-3 py-1.5 text-xs font-mono rounded-md"
                     style={{
                       background: "var(--accent-muted)",
                       color: "var(--accent)",
@@ -154,12 +155,12 @@ export function ProjectDetail({ project }: { project: Project }) {
                   borderColor: "var(--border-subtle)",
                 }}
               >
-                <h3
-                  className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
+                <h2
+                  className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
                   style={{ color: "var(--text-tertiary)" }}
                 >
                   Stack
-                </h3>
+                </h2>
                 <ul className="space-y-2.5">
                   {project.stack.map((item) => (
                     <li
@@ -181,12 +182,12 @@ export function ProjectDetail({ project }: { project: Project }) {
                   borderColor: "var(--border-subtle)",
                 }}
               >
-                <h3
-                  className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
+                <h2
+                  className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
                   style={{ color: "var(--text-tertiary)" }}
                 >
                   Links
-                </h3>
+                </h2>
                 <a
                   href="https://github.com/edgeless-ai"
                   className="text-[13px] hover:text-white transition-colors inline-flex items-center gap-1"
@@ -199,6 +200,7 @@ export function ProjectDetail({ project }: { project: Project }) {
           </div>
         </div>
       </section>
+      </main>
 
       <Footer />
     </div>

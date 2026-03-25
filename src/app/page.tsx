@@ -92,100 +92,100 @@ const stackNodes = [
 export default function Home() {
   return (
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
-      {/* Nav */}
       <Nav />
 
-      {/* Hero */}
-      <HeroSection />
+      <main id="main-content">
+        {/* Hero */}
+        <HeroSection />
 
-      {/* Featured Projects */}
-      <section className="px-6 py-20">
-        <div className="max-w-[1280px] mx-auto">
-          <div className="flex items-baseline justify-between mb-10">
+        {/* Featured Projects */}
+        <section className="px-6 py-20">
+          <div className="max-w-[1280px] mx-auto">
+            <div className="flex items-baseline justify-between mb-10">
+              <h2
+                className="text-sm font-mono uppercase tracking-[0.15em]"
+                style={{ color: "var(--text-tertiary)" }}
+              >
+                Featured
+              </h2>
+              <Link
+                href="/projects"
+                className="text-sm flex items-center gap-1 transition-colors hover:text-white"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                All projects <ArrowRight size={13} />
+              </Link>
+            </div>
+
+            <FeaturedGrid projects={featured} />
+          </div>
+        </section>
+
+        {/* Infrastructure */}
+        <section
+          className="px-6 py-20"
+          style={{ background: "var(--bg-surface)" }}
+        >
+          <div className="max-w-[1280px] mx-auto">
             <h2
-              className="text-sm font-mono uppercase tracking-[0.15em]"
+              className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
               style={{ color: "var(--text-tertiary)" }}
             >
-              Featured
+              Infrastructure
             </h2>
-            <Link
-              href="/projects"
-              className="text-sm flex items-center gap-1 transition-colors hover:text-white"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              All projects <ArrowRight size={13} />
-            </Link>
+
+            <CapabilitiesGrid capabilities={capabilities} />
           </div>
+        </section>
 
-          <FeaturedGrid projects={featured} />
-        </div>
-      </section>
-
-      {/* Infrastructure */}
-      <section
-        className="px-6 py-20"
-        style={{ background: "var(--bg-surface)" }}
-      >
-        <div className="max-w-[1280px] mx-auto">
-          <h2
-            className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
-            style={{ color: "var(--text-tertiary)" }}
-          >
-            Infrastructure
-          </h2>
-
-          <CapabilitiesGrid capabilities={capabilities} />
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="px-6 py-20" style={{ background: "var(--bg-base)" }}>
-        <div className="max-w-[1280px] mx-auto">
-          <h2
-            className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
-            style={{ color: "var(--text-tertiary)" }}
-          >
-            How it works
-          </h2>
-
-          <StackFlow nodes={stackNodes} />
-        </div>
-      </section>
-
-      {/* Lab */}
-      <section className="px-6 py-20">
-        <div className="max-w-[1280px] mx-auto">
-          <div className="flex items-baseline justify-between mb-10">
+        {/* How it works */}
+        <section className="px-6 py-20" style={{ background: "var(--bg-base)" }}>
+          <div className="max-w-[1280px] mx-auto">
             <h2
-              className="text-sm font-mono uppercase tracking-[0.15em]"
+              className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
               style={{ color: "var(--text-tertiary)" }}
             >
-              Lab
+              How it works
             </h2>
-            <Link
-              href="/lab"
-              className="text-sm flex items-center gap-1 transition-colors hover:text-white"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              All experiments <ArrowRight size={13} />
-            </Link>
+
+            <StackFlow nodes={stackNodes} />
           </div>
+        </section>
 
-          <ExperimentsGrid experiments={homepageExperiments} />
-        </div>
-      </section>
+        {/* Lab */}
+        <section className="px-6 py-20">
+          <div className="max-w-[1280px] mx-auto">
+            <div className="flex items-baseline justify-between mb-10">
+              <h2
+                className="text-sm font-mono uppercase tracking-[0.15em]"
+                style={{ color: "var(--text-tertiary)" }}
+              >
+                Lab
+              </h2>
+              <Link
+                href="/lab"
+                className="text-sm flex items-center gap-1 transition-colors hover:text-white"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                All experiments <ArrowRight size={13} />
+              </Link>
+            </div>
 
-      {/* About */}
-      <section className="px-6 py-24">
-        <div className="max-w-[1280px] mx-auto">
-          <AboutBlurb />
-        </div>
-      </section>
+            <ExperimentsGrid experiments={homepageExperiments} />
+          </div>
+        </section>
 
-      {/* Subscribe */}
-      <SubscribeSection />
+        {/* About */}
+        <section className="px-6 py-24">
+          <div className="max-w-[1280px] mx-auto">
+            <AboutBlurb />
+          </div>
+        </section>
 
-      {/* Footer */}
+        {/* Subscribe */}
+        <SubscribeSection />
+      </main>
+
       <Footer />
     </div>
   );

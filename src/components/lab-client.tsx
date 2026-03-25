@@ -1,7 +1,4 @@
-"use client";
-
 import { ArrowUpRight } from "lucide-react";
-import { motion } from "framer-motion";
 
 interface Experiment {
   title: string;
@@ -15,39 +12,36 @@ interface Experiment {
 export function LabHeader() {
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      >
+      <div style={{ animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both" }}>
         <span
-          className="text-[11px] font-mono uppercase tracking-[0.15em] block mb-4"
+          className="text-xs font-mono uppercase tracking-[0.15em] block mb-4"
           style={{ color: "var(--text-tertiary)" }}
         >
           Lab
         </span>
-      </motion.div>
+      </div>
 
-      <motion.h1
+      <h1
         className="text-[clamp(2.5rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.03em] mb-6"
-        style={{ color: "var(--text-primary)" }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          color: "var(--text-primary)",
+          animation: "fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.05s both",
+        }}
       >
         Experiments
-      </motion.h1>
+      </h1>
 
-      <motion.p
+      <p
         className="text-lg max-w-xl font-light"
-        style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          color: "var(--text-secondary)",
+          lineHeight: 1.7,
+          animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.15s both",
+        }}
       >
         Generative systems, data visualizations, and agent interfaces.
         Prototypes that explore the edge of what the toolchain can do.
-      </motion.p>
+      </p>
     </>
   );
 }
@@ -56,7 +50,7 @@ function StatusBadge({ status }: { status: string }) {
   const isLive = status === "Live";
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono"
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono"
       style={{
         background: isLive ? "var(--green-muted)" : "var(--accent-muted)",
         color: isLive ? "var(--green)" : "var(--accent)",
@@ -77,25 +71,15 @@ export function LabGrid({ experiments }: { experiments: Experiment[] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {experiments.map((exp, i) => (
-        <motion.a
+        <a
           key={exp.slug}
           href={exp.href || `/lab/${exp.slug}`}
           {...(exp.href ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-          className="group relative flex flex-col rounded-xl border p-6 transition-colors"
+          className="group relative flex flex-col rounded-xl border p-6 transition-colors hover:border-white/20"
           style={{
             background: "var(--bg-surface)",
             borderColor: "var(--border-subtle)",
-          }}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{
-            duration: 0.45,
-            delay: i * 0.07,
-            ease: [0.16, 1, 0.3, 1],
-          }}
-          whileHover={{
-            borderColor: "var(--border-focus)",
+            animation: `fadeInUp 0.45s cubic-bezier(0.16,1,0.3,1) ${i * 0.07}s both`,
           }}
         >
           <ArrowUpRight
@@ -104,7 +88,7 @@ export function LabGrid({ experiments }: { experiments: Experiment[] }) {
             style={{ color: "var(--text-tertiary)" }}
           />
           <span
-            className="text-[10px] font-mono uppercase tracking-[0.14em] block mb-3"
+            className="text-xs font-mono uppercase tracking-[0.14em] block mb-3"
             style={{ color: "var(--accent)" }}
           >
             {exp.category}
@@ -124,7 +108,7 @@ export function LabGrid({ experiments }: { experiments: Experiment[] }) {
           <div>
             <StatusBadge status={exp.status} />
           </div>
-        </motion.a>
+        </a>
       ))}
     </div>
   );

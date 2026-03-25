@@ -23,12 +23,12 @@ export function Footer() {
       <div className="max-w-[1280px] mx-auto">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
           <div>
-            <h3
-              className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
+            <h2
+              className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
               style={{ color: "var(--text-tertiary)" }}
             >
               Tools
-            </h3>
+            </h2>
             <ul className="space-y-2.5">
               {toolLinks.map((item) => (
                 <li key={item.href}>
@@ -44,12 +44,12 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3
-              className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
+            <h2
+              className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
               style={{ color: "var(--text-tertiary)" }}
             >
               Lab
-            </h3>
+            </h2>
             <ul className="space-y-2.5">
               {labLinks.map((item) => (
                 <li key={item.label}>
@@ -65,12 +65,12 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3
-              className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
+            <h2
+              className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
               style={{ color: "var(--text-tertiary)" }}
             >
               Social
-            </h3>
+            </h2>
             <ul className="space-y-2.5">
               {[
                 { label: "GitHub", href: "https://github.com/edgeless-ai" },
@@ -91,12 +91,12 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3
-              className="text-[11px] font-mono uppercase tracking-[0.12em] mb-4"
+            <h2
+              className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
               style={{ color: "var(--text-tertiary)" }}
             >
               Legal
-            </h3>
+            </h2>
             <ul className="space-y-2.5">
               {[
                 { label: "Privacy", href: "/privacy" },
@@ -132,7 +132,7 @@ export function Footer() {
               style={{ background: "var(--green)" }}
             />
             <span
-              className="text-[11px] font-mono"
+              className="text-xs font-mono"
               style={{ color: "var(--text-tertiary)" }}
             >
               7 agents active

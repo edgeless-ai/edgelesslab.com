@@ -1,48 +1,73 @@
 "use client";
 
-import posthog from "posthog-js";
-import { PostHogProvider as PHProvider } from "posthog-js/react";
+import { useEffect, Suspense, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, Suspense } from "react";
 
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 
-if (typeof window !== "undefined" && POSTHOG_KEY) {
-  posthog.init(POSTHOG_KEY, {
-    api_host: POSTHOG_HOST,
-    person_profiles: "identified_only",
-    capture_pageview: false, // We capture manually on route change
-    capture_pageleave: true,
-    autocapture: true,
-  });
-}
 
 function PostHogPageView() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (pathname && posthog) {
+    if (!POSTHOG_KEY || !window.posthog) return;
+    if (pathname) {
       let url = window.origin + pathname;
       const search = searchParams.toString();
       if (search) url += "?" + search;
-      posthog.capture("$pageview", { $current_url: url });
+      window.posthog.capture("$pageview", { $current_url: url });
     }
   }, [pathname, searchParams]);
 
   return null;
 }
 
+function PostHogScript() {
+  useEffect(() => {
+    if (!POSTHOG_KEY || typeof window === "undefined") return;
+    if (window.posthog) return;
+
+    // Load PostHog via script tag to keep it out of the JS bundle
+    const script = document.createElement("script");
+    script.src = `${POSTHOG_HOST}/static/array.js`;
+    script.async = true;
+    script.onload = () => {
+      if (window.posthog) {
+        window.posthog.init(POSTHOG_KEY!, {
+          api_host: POSTHOG_HOST,
+          person_profiles: "identified_only",
+          capture_pageview: false,
+          capture_pageleave: true,
+          autocapture: true,
+        });
+      }
+    };
+    document.head.appendChild(script);
+  }, []);
+
+  return null;
+}
+
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
-  if (!POSTHOG_KEY) return <>{children}</>;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <PHProvider client={posthog}>
-      <Suspense fallback={null}>
-        <PostHogPageView />
-      </Suspense>
+    <>
+      {mounted && POSTHOG_KEY && (
+        <>
+          <PostHogScript />
+          <Suspense fallback={null}>
+            <PostHogPageView />
+          </Suspense>
+        </>
+      )}
       {children}
-    </PHProvider>
+    </>
   );
 }

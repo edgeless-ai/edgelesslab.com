@@ -44,7 +44,7 @@ const products = [
     name: "Claude Memory Kit",
     price: "Free",
     description:
-      "Drop-in memory template for Claude Code. Persists context, feedback, and project knowledge across conversations.",
+      "Start here. Drop-in memory template for Claude Code. Persists context, feedback, and project knowledge across conversations. Upgrade to Pro for 12x more templates and advanced patterns.",
     features: [
       "4 memory types: user, feedback, project, reference",
       "MEMORY.md index auto-loaded each session",
@@ -94,6 +94,31 @@ export default function ProductsPage() {
             template comes from a system running 24/7.
           </p>
 
+          {/* Social proof strip */}
+          <div
+            className="flex flex-wrap items-center gap-6 mb-12 pb-12 border-b"
+            style={{ borderColor: "var(--border-subtle)" }}
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-mono" style={{ color: "var(--green)" }}>★★★★★</span>
+              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                Trusted by Claude Code users worldwide
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--green)" }} />
+              <span className="text-sm font-mono" style={{ color: "var(--text-tertiary)" }}>
+                Built from production systems running 24/7
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--accent)" }} />
+              <span className="text-sm font-mono" style={{ color: "var(--text-tertiary)" }}>
+                100+ downloads
+              </span>
+            </div>
+          </div>
+
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((product) => (
               <a
@@ -109,7 +134,7 @@ export default function ProductsPage() {
               >
                 {product.badge && (
                   <span
-                    className="absolute top-4 right-4 px-2 py-0.5 text-[10px] font-mono rounded-md"
+                    className="absolute top-4 right-4 px-2 py-0.5 text-xs font-mono rounded-md"
                     style={{
                       background:
                         product.price === "Free"
@@ -176,7 +201,9 @@ export default function ProductsPage() {
                   className="flex items-center gap-1 text-sm font-medium group-hover:text-white transition-colors"
                   style={{ color: "var(--text-secondary)" }}
                 >
-                  {product.price === "Free" ? "View on GitHub" : "Get it on Gumroad"}
+                  {product.price === "Free"
+                    ? "Get it free on GitHub"
+                    : `Buy now — ${product.price}`}
                   <ArrowUpRight size={14} />
                 </div>
               </a>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState, type FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import { trackCTA, trackSubscribe } from "@/lib/analytics";
 import { AnimatedText, AnimatedFadeIn } from "@/components/ui/animated-text";
 import { GlowingCard } from "@/components/ui/glowing-card";
@@ -57,12 +57,23 @@ export function HeroSection() {
         <AnimatedFadeIn delay={0.9}>
           <div className="mt-12 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-6">
             <Link
-              href="/projects"
+              href="/products"
               className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
               style={{ background: "var(--accent)" }}
+              onClick={() => trackCTA("hero_view_products", "/products")}
+            >
+              View Products <ArrowRight size={15} />
+            </Link>
+            <Link
+              href="/projects"
+              className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium rounded-full border transition-all hover:brightness-110 hover:scale-[1.02]"
+              style={{
+                color: "var(--text-secondary)",
+                borderColor: "var(--border-subtle)",
+              }}
               onClick={() => trackCTA("hero_view_projects", "/projects")}
             >
-              View projects <ArrowRight size={15} />
+              Browse projects <ArrowRight size={15} />
             </Link>
             <a
               href="https://github.com/edgeless-ai"
@@ -123,14 +134,14 @@ export function FeaturedGrid({ projects }: { projects: FeaturedProject[] }) {
                   <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
                   <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
                   <span
-                    className="ml-2 text-[10px] font-mono"
+                    className="ml-2 text-xs font-mono"
                     style={{ color: "var(--text-tertiary)" }}
                   >
                     {project.title.toLowerCase().replace(/\s+/g, "-")}
                   </span>
                 </div>
                 <pre
-                  className={`px-3 py-3 text-[11px] leading-[1.7] font-mono whitespace-pre overflow-hidden ${
+                  className={`px-3 py-3 text-xs leading-[1.7] font-mono whitespace-pre overflow-hidden ${
                     i === 0 ? "min-h-[120px]" : "min-h-[80px]"
                   }`}
                   style={{ color: "var(--green)" }}
@@ -160,7 +171,7 @@ export function FeaturedGrid({ projects }: { projects: FeaturedProject[] }) {
                 {project.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-2.5 py-1 text-[11px] font-mono rounded-md"
+                    className="px-2.5 py-1 text-xs font-mono rounded-md"
                     style={{
                       background: "var(--accent-muted)",
                       color: "var(--accent)",
@@ -210,7 +221,7 @@ export function CapabilitiesGrid({ capabilities }: { capabilities: Capability[] 
             style={{ borderColor: "var(--border-subtle)" }}
           >
             <span
-              className="text-[11px] font-mono"
+              className="text-xs font-mono"
               style={{ color: "var(--text-secondary)" }}
             >
               {cap.label}
@@ -221,7 +232,7 @@ export function CapabilitiesGrid({ capabilities }: { capabilities: Capability[] 
             />
           </div>
           <pre
-            className="px-5 py-4 text-[11px] leading-[1.8] font-mono whitespace-pre overflow-x-auto"
+            className="px-5 py-4 text-xs leading-[1.8] font-mono whitespace-pre overflow-x-auto"
             style={{ color: "var(--green)" }}
           >
             {cap.snippet}
@@ -273,7 +284,7 @@ export function StackFlow({ nodes }: { nodes: StackNode[] }) {
                 {node.label}
               </span>
               <span
-                className="text-[10px] font-mono"
+                className="text-xs font-mono"
                 style={{ color: "var(--text-tertiary)" }}
               >
                 {node.sublabel}
@@ -289,13 +300,13 @@ export function StackFlow({ nodes }: { nodes: StackNode[] }) {
                 transition={{ duration: 0.3, delay: i * 0.09 + 0.15 }}
               >
                 <span
-                  className="hidden sm:block text-[11px] font-mono select-none"
+                  className="hidden sm:block text-xs font-mono select-none"
                   style={{ color: "var(--border-focus)" }}
                 >
                   ──▶
                 </span>
                 <span
-                  className="sm:hidden block text-[11px] font-mono ml-6 select-none"
+                  className="sm:hidden block text-xs font-mono ml-6 select-none"
                   style={{ color: "var(--border-focus)" }}
                 >
                   ↓
@@ -359,7 +370,7 @@ export function ExperimentsGrid({ experiments }: { experiments: Experiment[] }) 
           whileTap={{ scale: 0.98 }}
         >
           <span
-            className="text-[10px] font-mono uppercase tracking-[0.12em] block mb-3"
+            className="text-xs font-mono uppercase tracking-[0.12em] block mb-3"
             style={{ color: "var(--accent)" }}
           >
             {exp.category}
@@ -505,6 +516,7 @@ export function SubscribeSection() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
                   required
+                  aria-label="Email address for newsletter subscription"
                   className="flex-1 h-11 px-4 rounded-full text-sm font-mono outline-none transition-colors"
                   style={{
                     background: "var(--bg-surface)",

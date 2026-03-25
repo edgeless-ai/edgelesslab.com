@@ -1,7 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
-
 interface AnimatedTextProps {
   text: string;
   className?: string;
@@ -14,20 +10,22 @@ export function AnimatedText({ text, className, delay = 0 }: AnimatedTextProps) 
   return (
     <span className={className}>
       {words.map((word, i) => (
-        <motion.span
+        <span
           key={i}
-          initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{
-            duration: 0.5,
-            delay: delay + i * 0.08,
-            ease: [0.16, 1, 0.3, 1],
-          }}
           className="inline-block mr-[0.25em]"
+          style={{
+            animation: `fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) ${delay + i * 0.08}s both`,
+          }}
         >
           {word}
-        </motion.span>
+        </span>
       ))}
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); filter: blur(8px); }
+          to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+      `}</style>
     </span>
   );
 }
@@ -42,17 +40,19 @@ export function AnimatedFadeIn({
   delay?: number;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.6,
-        delay,
-        ease: [0.16, 1, 0.3, 1],
-      }}
+    <div
       className={className}
+      style={{
+        animation: `fadeInUpSimple 0.6s cubic-bezier(0.16,1,0.3,1) ${delay}s both`,
+      }}
     >
       {children}
-    </motion.div>
+      <style>{`
+        @keyframes fadeInUpSimple {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </div>
   );
 }

@@ -1,8 +1,16 @@
-import posthog from "posthog-js";
+declare global {
+  interface Window {
+    posthog?: {
+      init: (key: string, options: Record<string, unknown>) => void;
+      capture: (event: string, properties?: Record<string, unknown>) => void;
+      __loaded?: boolean;
+    };
+  }
+}
 
 export function trackEvent(event: string, properties?: Record<string, unknown>) {
-  if (typeof window !== "undefined" && posthog.__loaded) {
-    posthog.capture(event, properties);
+  if (typeof window !== "undefined" && window.posthog?.__loaded) {
+    window.posthog.capture(event, properties);
   }
 }
 

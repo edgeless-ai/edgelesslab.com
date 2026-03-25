@@ -23,6 +23,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
       }} />
       <Nav />
 
+      <main id="main-content">
       <section className="px-6 pt-32 pb-16">
         <div className="max-w-[768px] mx-auto">
           <motion.a
@@ -43,7 +44,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
             <span
-              className="text-[10px] font-mono uppercase tracking-[0.12em] px-2.5 py-1 rounded-md"
+              className="text-xs font-mono uppercase tracking-[0.12em] px-2.5 py-1 rounded-md"
               style={{ background: "var(--accent-muted)", color: "var(--accent)" }}
             >
               {experiment.category}
@@ -54,7 +55,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                 style={{ background: "var(--green)" }}
               />
               <span
-                className="text-[11px] font-mono"
+                className="text-xs font-mono"
                 style={{ color: "var(--text-tertiary)" }}
               >
                 {experiment.status}
@@ -115,6 +116,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
           </motion.a>
         </div>
       </section>
+      </main>
 
       <Footer />
     </div>

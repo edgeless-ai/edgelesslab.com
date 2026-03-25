@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const navLinks = [
   { label: "Projects", href: "/projects" },
@@ -16,6 +16,16 @@ const navLinks = [
 export function Nav() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
@@ -41,6 +51,7 @@ export function Nav() {
                   key={link.label}
                   href={link.href}
                   className="text-[13px] hover:text-white transition-colors"
+                  aria-current={pathname === link.href ? "page" : undefined}
                   style={{
                     color: pathname === link.href ? "var(--text-primary)" : "var(--text-secondary)",
                   }}
@@ -50,10 +61,13 @@ export function Nav() {
               ))}
               <a
                 href="https://github.com/edgeless-ai"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-[13px] hover:text-white transition-colors flex items-center gap-1"
                 style={{ color: "var(--text-secondary)" }}
               >
                 GitHub <ArrowUpRight size={12} />
+                <span className="sr-only">(opens in new tab)</span>
               </a>
             </div>
             <button
@@ -82,6 +96,7 @@ export function Nav() {
                     key={link.label}
                     href={link.href}
                     className="rounded-2xl px-4 py-3 text-sm transition-colors"
+                    aria-current={pathname === link.href ? "page" : undefined}
                     onClick={() => setIsOpen(false)}
                     style={{
                       background:
@@ -94,11 +109,14 @@ export function Nav() {
                 ))}
                 <a
                   href="https://github.com/edgeless-ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 rounded-2xl px-4 py-3 text-sm transition-colors hover:text-white"
                   style={{ color: "var(--text-secondary)" }}
                   onClick={() => setIsOpen(false)}
                 >
                   GitHub <ArrowUpRight size={12} />
+                  <span className="sr-only">(opens in new tab)</span>
                 </a>
               </div>
             </div>

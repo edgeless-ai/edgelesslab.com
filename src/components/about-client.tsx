@@ -1,14 +1,5 @@
-"use client";
-
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { motion } from "framer-motion";
-
-const fade = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true as const },
-  transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const },
-};
 
 interface Stat {
   label: string;
@@ -27,40 +18,44 @@ interface Link {
   description: string;
 }
 
+const fadeInStyle = (delay = 0): React.CSSProperties => ({
+  animation: `fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) ${delay}s both`,
+});
+
 export function AboutHeader() {
   return (
     <>
-      <motion.p
+      <p
         className="text-sm font-mono uppercase tracking-[0.15em] mb-6"
-        style={{ color: "var(--text-tertiary)" }}
-        {...fade}
+        style={{ color: "var(--text-tertiary)", ...fadeInStyle(0) }}
       >
         About
-      </motion.p>
-      <motion.h1
+      </p>
+      <Image
+        src="/og-image.png"
+        alt="Edgeless Labs"
+        width={0}
+        height={0}
+        className="sr-only"
+        aria-hidden="true"
+        loading="lazy"
+      />
+      <h1
         className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[0.95] tracking-[-0.03em] max-w-3xl"
-        style={{ color: "var(--text-primary)" }}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        style={{ color: "var(--text-primary)", ...fadeInStyle(0.1) }}
       >
         One person.
         <br />
         <span style={{ color: "var(--accent)" }}>Real tools.</span>
-      </motion.h1>
-      <motion.p
+      </h1>
+      <p
         className="mt-8 text-lg max-w-xl font-light"
-        style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        style={{ color: "var(--text-secondary)", lineHeight: 1.7, ...fadeInStyle(0.2) }}
       >
         Edgeless Labs is a solo creative technology studio building agents,
         pipelines, and tools that actually run in production. No team. No
         funding. No vaporware.
-      </motion.p>
+      </p>
     </>
   );
 }
@@ -69,12 +64,9 @@ export function StatsGrid({ stats }: { stats: Stat[] }) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
       {stats.map((stat, i) => (
-        <motion.div
+        <div
           key={stat.label}
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+          style={fadeInStyle(i * 0.08)}
         >
           <span
             className="text-3xl sm:text-4xl font-bold font-mono block mb-2"
@@ -83,12 +75,12 @@ export function StatsGrid({ stats }: { stats: Stat[] }) {
             {stat.value}
           </span>
           <span
-            className="text-[11px] font-mono uppercase tracking-[0.12em]"
+            className="text-xs font-mono uppercase tracking-[0.12em]"
             style={{ color: "var(--text-tertiary)" }}
           >
             {stat.label}
           </span>
-        </motion.div>
+        </div>
       ))}
     </div>
   );
@@ -97,20 +89,15 @@ export function StatsGrid({ stats }: { stats: Stat[] }) {
 export function Philosophy() {
   return (
     <div className="max-w-2xl">
-      <motion.h2
+      <h2
         className="text-sm font-mono uppercase tracking-[0.15em] mb-8"
-        style={{ color: "var(--text-tertiary)" }}
-        {...fade}
+        style={{ color: "var(--text-tertiary)", ...fadeInStyle(0) }}
       >
         Philosophy
-      </motion.h2>
-      <motion.div
+      </h2>
+      <div
         className="space-y-6 text-lg font-light"
-        style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        style={{ color: "var(--text-secondary)", lineHeight: 1.7, ...fadeInStyle(0.1) }}
       >
         <p>
           Most AI companies are building demos. We build{" "}
@@ -131,7 +118,7 @@ export function Philosophy() {
           work. The memory system stores our own knowledge. The agents manage
           our own portfolio.
         </p>
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -139,23 +126,18 @@ export function Philosophy() {
 export function Timeline({ items }: { items: TimelineItem[] }) {
   return (
     <>
-      <motion.h2
+      <h2
         className="text-sm font-mono uppercase tracking-[0.15em] mb-12"
-        style={{ color: "var(--text-tertiary)" }}
-        {...fade}
+        style={{ color: "var(--text-tertiary)", ...fadeInStyle(0) }}
       >
         Timeline
-      </motion.h2>
+      </h2>
       <div className="space-y-0">
         {items.map((item, i) => (
-          <motion.div
+          <div
             key={item.period}
             className="grid grid-cols-[80px_1fr] sm:grid-cols-[120px_1fr] gap-6 py-8 border-t"
-            style={{ borderColor: "var(--border-subtle)" }}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+            style={{ borderColor: "var(--border-subtle)", ...fadeInStyle(i * 0.1) }}
           >
             <span
               className="text-sm font-mono"
@@ -177,7 +159,7 @@ export function Timeline({ items }: { items: TimelineItem[] }) {
                 {item.description}
               </p>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
     </>
@@ -187,27 +169,23 @@ export function Timeline({ items }: { items: TimelineItem[] }) {
 export function ConnectGrid({ links }: { links: Link[] }) {
   return (
     <>
-      <motion.h2
+      <h2
         className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
-        style={{ color: "var(--text-tertiary)" }}
-        {...fade}
+        style={{ color: "var(--text-tertiary)", ...fadeInStyle(0) }}
       >
         Connect
-      </motion.h2>
+      </h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {links.map((link, i) => (
-          <motion.a
+          <a
             key={link.label}
             href={link.href}
             className="group rounded-xl border p-6 transition-colors hover:border-white/[0.12]"
             style={{
               background: "var(--bg-surface)",
               borderColor: "var(--border-subtle)",
+              ...fadeInStyle(i * 0.08),
             }}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="flex items-center justify-between mb-3">
               <span
@@ -228,7 +206,7 @@ export function ConnectGrid({ links }: { links: Link[] }) {
             >
               {link.description}
             </p>
-          </motion.a>
+          </a>
         ))}
       </div>
     </>

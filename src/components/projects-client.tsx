@@ -1,7 +1,4 @@
-"use client";
-
 import { ArrowUpRight } from "lucide-react";
-import { motion } from "framer-motion";
 import { GlowingCard } from "@/components/ui/glowing-card";
 
 interface Project {
@@ -16,11 +13,9 @@ interface Project {
 export function ProjectsHeader() {
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      <div
         className="flex items-center gap-2 mb-6"
+        style={{ animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both" }}
       >
         <span
           className="w-1.5 h-1.5 rounded-full"
@@ -32,28 +27,29 @@ export function ProjectsHeader() {
         >
           What ships
         </span>
-      </motion.div>
+      </div>
 
-      <motion.h1
+      <h1
         className="text-[clamp(2.5rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.03em]"
-        style={{ color: "var(--text-primary)" }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          color: "var(--text-primary)",
+          animation: "fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.08s both",
+        }}
       >
         Projects
-      </motion.h1>
+      </h1>
 
-      <motion.p
+      <p
         className="mt-5 text-base max-w-md font-light"
-        style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          color: "var(--text-secondary)",
+          lineHeight: 1.7,
+          animation: "fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.18s both",
+        }}
       >
         Agents, APIs, and pipelines built in the open. Every project runs in
         production.
-      </motion.p>
+      </p>
     </>
   );
 }
@@ -62,15 +58,10 @@ export function ProjectsGrid({ projects }: { projects: Project[] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {projects.map((project, i) => (
-        <motion.div
+        <div
           key={project.slug}
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{
-            duration: 0.5,
-            delay: i * 0.07,
-            ease: [0.16, 1, 0.3, 1],
+          style={{
+            animation: `fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) ${i * 0.07}s both`,
           }}
         >
           <GlowingCard href={`/projects/${project.slug}`} className="h-full">
@@ -89,14 +80,14 @@ export function ProjectsGrid({ projects }: { projects: Project[] }) {
                 <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
                 <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
                 <span
-                  className="ml-2 text-[10px] font-mono"
+                  className="ml-2 text-xs font-mono"
                   style={{ color: "var(--text-tertiary)" }}
                 >
                   {project.slug}
                 </span>
               </div>
               <pre
-                className="px-3 py-3 text-[11px] leading-[1.7] font-mono whitespace-pre overflow-hidden min-h-[80px]"
+                className="px-3 py-3 text-xs leading-[1.7] font-mono whitespace-pre overflow-hidden min-h-[80px]"
                 style={{ color: "var(--green)" }}
               >
                 {project.snippet}
@@ -113,7 +104,7 @@ export function ProjectsGrid({ projects }: { projects: Project[] }) {
                     {project.title}
                   </h2>
                   <span
-                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono"
+                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-mono"
                     style={{
                       background: "var(--green-muted)",
                       color: "var(--green)",
@@ -144,7 +135,7 @@ export function ProjectsGrid({ projects }: { projects: Project[] }) {
               {project.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2.5 py-1 text-[11px] font-mono rounded-md"
+                  className="px-2.5 py-1 text-xs font-mono rounded-md"
                   style={{
                     background: "var(--accent-muted)",
                     color: "var(--accent)",
@@ -155,7 +146,7 @@ export function ProjectsGrid({ projects }: { projects: Project[] }) {
               ))}
             </div>
           </GlowingCard>
-        </motion.div>
+        </div>
       ))}
     </div>
   );

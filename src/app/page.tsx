@@ -11,45 +11,27 @@ import {
 } from "@/components/home-client";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
+import { experiments, projects } from "@/lib/data";
 
 const featured = [
-  {
-    title: "Pamela",
-    description:
-      "Autonomous prediction market agent. ML-driven position sizing, live on Polymarket 24/7.",
-    tags: ["TypeScript", "ML", "Polymarket"],
-    snippet: `$ pm2 status pamela
-│ online │ 47h │ 0 restarts
+  { slug: "pamela", span: "md:col-span-2 md:row-span-2" },
+  { slug: "mcp-servers", span: "" },
+  { slug: "pen-plotter-art", span: "" },
+].map(({ slug, span }) => {
+  const project = projects.find((item) => item.slug === slug);
+  if (!project) {
+    throw new Error(`Missing homepage featured project: ${slug}`);
+  }
 
-P&L: +$247.30 (7d)`,
-    span: "md:col-span-2 md:row-span-2",
-    tall: true,
-  },
-  {
-    title: "MCP Servers",
-    description: "Production servers for ChromaDB, knowledge search, and multi-agent orchestration.",
-    tags: ["MCP", "Effect-TS"],
-    snippet: `server.tool("search", {
-  query: z.string(),
-  collection: z.enum([
-    "vault", "memory"
-  ])
-})`,
-    span: "",
-    tall: false,
-  },
-  {
-    title: "Pen Plotter Art",
-    description: "105+ generative experiments. AI-scored. SVG to physical media.",
-    tags: ["Generative", "Python", "SVG"],
-    snippet: `<svg viewBox="0 0 400 400">
-  <path d="M200,50 C350,100
-    350,300 200,350" />
-</svg>`,
-    span: "",
-    tall: false,
-  },
-];
+  return {
+    title: project.title,
+    description: project.description,
+    tags: project.tags.slice(0, 3),
+    snippet: project.snippet,
+    href: `/projects/${project.slug}`,
+    span,
+  };
+});
 
 const capabilities = [
   {
@@ -80,12 +62,24 @@ const capabilities = [
   },
 ];
 
-const experiments = [
-  { title: "Strange Attractors", category: "Generative" },
-  { title: "Knowledge Graph", category: "Data" },
-  { title: "Total Serialism", category: "Audio", href: "https://djmclaudeassistant-web.github.io/total-serialism/" },
-  { title: "Tartanism", category: "Generative", href: "https://djmclaudeassistant-web.github.io/tartanism/" },
-];
+const homepageExperiments = [
+  "strange-attractors",
+  "knowledge-graph",
+  "total-serialism",
+  "tartanism",
+].map((slug) => {
+  const experiment = experiments.find((item) => item.slug === slug);
+  if (!experiment) {
+    throw new Error(`Missing homepage experiment: ${slug}`);
+  }
+
+  return {
+    title: experiment.title,
+    category: experiment.category,
+    href: experiment.href ?? `/lab/${experiment.slug}`,
+    external: Boolean(experiment.href),
+  };
+});
 
 const stackNodes = [
   { label: "Claude Code", sublabel: "AI agent layer", color: "var(--accent)" },
@@ -177,7 +171,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <ExperimentsGrid experiments={experiments} />
+          <ExperimentsGrid experiments={homepageExperiments} />
         </div>
       </section>
 

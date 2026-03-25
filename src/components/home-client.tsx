@@ -13,7 +13,7 @@ import { DotBackground } from "@/components/ui/dot-background";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-end px-6 pb-24 pt-32">
+    <section className="relative flex min-h-[92svh] items-center px-6 pb-16 pt-28 md:min-h-screen md:items-end md:pb-24 md:pt-32">
       <DotBackground />
       <div className="relative max-w-[1280px] w-full mx-auto">
         <AnimatedFadeIn>
@@ -46,7 +46,7 @@ export function HeroSection() {
 
         <AnimatedFadeIn delay={0.7}>
           <p
-            className="mt-8 text-lg max-w-md font-light"
+            className="mt-8 max-w-lg text-lg font-light"
             style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
           >
             Agents that trade. Pipelines that learn. Art that plots itself.
@@ -55,7 +55,7 @@ export function HeroSection() {
         </AnimatedFadeIn>
 
         <AnimatedFadeIn delay={0.9}>
-          <div className="mt-12 flex items-center gap-6">
+          <div className="mt-12 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-6">
             <Link
               href="/projects"
               className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
@@ -85,8 +85,8 @@ interface FeaturedProject {
   description: string;
   tags: string[];
   snippet: string;
+  href: string;
   span: string;
-  tall: boolean;
 }
 
 export function FeaturedGrid({ projects }: { projects: FeaturedProject[] }) {
@@ -96,7 +96,7 @@ export function FeaturedGrid({ projects }: { projects: FeaturedProject[] }) {
         <div key={project.title} className={project.span}>
           <GlowingCard
             className="h-full"
-            href={`/projects/${project.title.toLowerCase().replace(/\s+/g, "-")}`}
+            href={project.href}
           >
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -325,17 +325,18 @@ export function StackFlow({ nodes }: { nodes: StackNode[] }) {
 interface Experiment {
   title: string;
   category: string;
-  href?: string;
+  href: string;
+  external?: boolean;
 }
 
 export function ExperimentsGrid({ experiments }: { experiments: Experiment[] }) {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {experiments.map((exp, i) => (
         <motion.a
           key={exp.title}
-          href={exp.href || `/lab/${exp.title.toLowerCase().replace(/\s+/g, "-")}`}
-          {...(exp.href ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          href={exp.href}
+          {...(exp.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
           className="group relative rounded-xl border p-5"
           style={{
             background: "var(--bg-surface)",
@@ -408,13 +409,13 @@ export function AboutBlurb() {
         viewport={{ once: true }}
         transition={{ duration: 0.4, delay: 0.2 }}
       >
-        <a
+        <Link
           href="/about"
           className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-white"
           style={{ color: "var(--accent)" }}
         >
           About the lab <ArrowRight size={14} />
-        </a>
+        </Link>
       </motion.div>
     </div>
   );
@@ -494,7 +495,10 @@ export function SubscribeSection() {
                 </span>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex items-center gap-2">
+              <form
+                onSubmit={handleSubmit}
+                className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-2"
+              >
                 <input
                   type="email"
                   value={email}
@@ -517,7 +521,7 @@ export function SubscribeSection() {
                 <motion.button
                   type="submit"
                   disabled={status === "loading"}
-                  className="h-11 px-5 rounded-full text-sm font-medium text-white shrink-0 transition-opacity disabled:opacity-60"
+                  className="h-11 shrink-0 rounded-full px-5 text-sm font-medium text-white transition-opacity disabled:opacity-60 sm:w-auto"
                   style={{ background: "var(--accent)" }}
                   whileHover={{ scale: 1.02, filter: "brightness(1.1)" }}
                   whileTap={{ scale: 0.97 }}

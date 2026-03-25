@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 const toolLinks = [
@@ -31,13 +32,13 @@ export function Footer() {
             <ul className="space-y-2.5">
               {toolLinks.map((item) => (
                 <li key={item.href}>
-                  <a
+                  <Link
                     href={item.href}
                     className="text-[13px] hover:text-white transition-colors"
                     style={{ color: "var(--text-secondary)" }}
                   >
                     {item.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -52,13 +53,13 @@ export function Footer() {
             <ul className="space-y-2.5">
               {labLinks.map((item) => (
                 <li key={item.label}>
-                  <a
+                  <Link
                     href={item.href}
                     className="text-[13px] hover:text-white transition-colors"
                     style={{ color: "var(--text-secondary)" }}
                   >
                     {item.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -102,13 +103,13 @@ export function Footer() {
                 { label: "Terms", href: "/terms" },
               ].map((item) => (
                 <li key={item.label}>
-                  <a
+                  <Link
                     href={item.href}
                     className="text-[13px] hover:text-white transition-colors"
                     style={{ color: "var(--text-secondary)" }}
                   >
                     {item.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

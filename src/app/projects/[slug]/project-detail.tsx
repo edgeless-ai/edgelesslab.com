@@ -24,7 +24,7 @@ export function ProjectDetail({ project }: { project: Project }) {
       <main id="main-content">
         <section className="px-6 pt-32 pb-16">
           <div className="max-w-[1280px] mx-auto">
-            <a
+            <Link
               href="/projects"
               className="inline-flex items-center gap-1.5 text-sm mb-8 transition-colors hover:text-white"
               style={{
@@ -33,7 +33,7 @@ export function ProjectDetail({ project }: { project: Project }) {
               }}
             >
               <ArrowLeft size={14} /> All projects
-            </a>
+            </Link>
 
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-16">
               {/* Main content */}

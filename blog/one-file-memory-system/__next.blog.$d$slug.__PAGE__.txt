@@ -1,0 +1,64 @@
+1:"$Sreact.fragment"
+2:I[82591,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js","/_next/static/chunks/0g~iewxayin15.js"],"Nav"]
+8:I[63560,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js","/_next/static/chunks/0g~iewxayin15.js"],""]
+9:I[52150,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js","/_next/static/chunks/0g~iewxayin15.js"],"Footer"]
+a:I[2579,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js"],"OutletBoundary"]
+b:"$Sreact.suspense"
+3:T1459,<p>Every session, I used to start the same way. "We're using TypeScript, not JavaScript." "Don't use default exports." "The API is in <code>src/api/</code>, not root." "We already tried Redis here and it didn't work."</p>
+<p>Five minutes of throat-clearing before any real work happened. Every. Single. Session.</p>
+<p>Then I set up a memory file, and that problem disappeared.</p>
+<h2>The Pain Point</h2>
+<p>Claude Code is stateless by design. Every session starts fresh. There's no session history, no learned preferences, no memory of last week's architecture decision. This isn't a bug -- it's a consequence of how the model works. But it creates real friction.</p>
+<p>The compounding effect is the worst part. Every correction you make in one session is a correction you'll make again next week. You're not building on previous sessions; you're re-establishing context every time.</p>
+<p>This is especially painful with project-specific knowledge: "Don't touch the authentication middleware -- it's under active refactor." "The staging database is read-only." "We deploy from the <code>release</code> branch, not <code>main</code>."</p>
+<h2>The Simplest Possible Fix</h2>
+<p>Claude Code reads a file called <code>CLAUDE.md</code> at session start. That's the hook. Put things in that file that Claude should always know, and it will always know them.</p>
+<p>Here's a minimal <code>CLAUDE.md</code> that solves 80% of the problem:</p>
+<p><code>`</code>
+# Project: My App</p>
+<h2>Stack
+- TypeScript (strict mode), React 19, Next.js 16
+- Postgres via Drizzle ORM
+- Vitest for tests (no Jest)
+- Tailwind CSS</h2>
+<h2>Conventions
+- No default exports
+- API lives in src/api/
+- Tests colocated with source files</h2>
+<h2>Don't Do
+- Don't use mocks in integration tests -- hit the real DB
+- Don't add inline styles -- use Tailwind classes
+```</h2>
+<p>That's it. Three sections. Less than 20 lines. Claude reads it at session start and you never repeat those instructions again.</p>
+<h2>The Before/After</h2>
+<p><strong>Before memory:</strong>
+> Me: "Let's add a new API endpoint."
+> Claude: *writes a JavaScript file with a default export and Jest tests*
+> Me: "TypeScript, no default exports, Vitest please."
+> Claude: *rewrites*
+> (Repeat every session)</p>
+<p><strong>After memory:</strong>
+> Me: "Let's add a new API endpoint."
+> Claude: *writes TypeScript, named exports, Vitest tests, in <code>src/api/</code>*
+> (Never needs to be said again)</p>
+<p>After a month of accumulated memory, I tracked roughly 60% fewer correction cycles per session. Not a formal benchmark -- just counting how often I typed "I already told you that."</p>
+<h2>The Memory File Pattern</h2>
+<p>A single <code>CLAUDE.md</code> works. But once you start accumulating more context, a simple structure helps.</p>
+<p>The pattern I use across projects on this system (documented in detail in the <a href="/products/claude-memory-kit">Claude Memory Kit</a>):</p>
+<p><strong>User memory</strong> -- who you are and how you work. Goes in your home directory CLAUDE.md so it follows you across every project. Things like: "I'm a backend engineer who's new to React. Explain frontend patterns using backend analogies."</p>
+<p><strong>Feedback memory</strong> -- corrections that stick. When Claude does something wrong and you correct it, add that correction to a memory file. It becomes permanent. "Don't use try-catch in React components -- use error boundaries."</p>
+<p><strong>Project memory</strong> -- architecture decisions, frozen APIs, deployment conventions. Project-specific.</p>
+<p><strong>Reference memory</strong> -- where things live. "Staging environment: staging.myapp.com. Admin dashboard: Linear workspace 'Platform'."</p>
+<h2>Set It Up in 10 Minutes</h2>
+<ol><li>Create <code>CLAUDE.md</code> in your project root</li><li>Add your stack, 3-5 conventions, and 2-3 "never do this" rules</li><li>Start a new Claude Code session -- it will read the file automatically</li><li>For the first few sessions, notice when Claude gets something wrong. Add that correction to the file</li><li>After a week, the file has become a trained reflex</li></ol>
+<p>The free version of the <a href="https://github.com/edgeless-ai/claude-memory-kit">Claude Memory Kit</a> includes templates for all four memory types and a starter CLAUDE.md structure. If you want stack-specific libraries and multi-project memory patterns, the <a href="/products/claude-memory-kit">Pro version</a> covers those.</p>
+<h2>One More Thing</h2>
+<p>Memory files do accumulate cruft. Review monthly. Archive anything that's no longer true. Keep each file under 200 lines. Memory that's too long wastes context window on stale instructions.</p>
+<p>The discipline: when you update your architecture, update your memory file the same day. It takes 30 seconds, and it means next session Claude already knows.</p>
+<p>That 10-minute setup has probably saved me 10 hours over the past few months. It's the highest-leverage thing I've done to improve how I work with Claude Code.</p>
+<p>Read the longer technical version in <a href="/blog/how-claude-code-memory-works">How Claude Code Memory Actually Works</a> if you want the full breakdown of the four memory types.</p>0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"flex flex-col min-h-full","style":{"background":"var(--bg-base)"},"children":[["$","$L2",null,{}],["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"{\"@context\":\"https://schema.org\",\"@type\":\"BlogPosting\",\"headline\":\"The One-File Memory System That Changed How I Use Claude\",\"description\":\"You shouldn't have to re-explain your stack every session. Here's the simplest possible setup to give Claude persistent memory -- and how to do it in 10 minutes.\",\"datePublished\":\"2026-03-26\",\"author\":{\"@type\":\"Person\",\"name\":\"David Murray\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"Edgeless Labs\",\"url\":\"https://edgelesslab.com\"},\"url\":\"https://edgelesslab.com/blog/one-file-memory-system\"}"}}],["$","article",null,{"className":"pt-28 pb-20 px-6","children":["$","div",null,{"className":"max-w-[680px] mx-auto","children":[["$","div",null,{"className":"mb-12","children":[["$","div",null,{"className":"flex items-center gap-3 mb-4","children":[["$","time",null,{"className":"text-xs font-mono","style":{"color":"var(--text-tertiary)"},"dateTime":"2026-03-26","children":"March 26, 2026"}],["$","span",null,{"className":"text-xs font-mono","style":{"color":"var(--text-tertiary)"},"children":"4 min"}]]}],["$","h1",null,{"className":"text-3xl sm:text-4xl font-bold tracking-tight leading-[1.2] mb-4","style":{"color":"var(--text-primary)"},"children":"The One-File Memory System That Changed How I Use Claude"}],["$","p",null,{"className":"text-lg font-light","style":{"color":"var(--text-secondary)","lineHeight":1.7},"children":"You shouldn't have to re-explain your stack every session. Here's the simplest possible setup to give Claude persistent memory -- and how to do it in 10 minutes."}],["$","div",null,{"className":"flex flex-wrap gap-2 mt-4","children":[["$","span","Claude Code",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Claude Code"}],["$","span","Productivity",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Productivity"}],["$","span","Memory",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Memory"}]]}]]}],["$","div",null,{"className":"prose-custom","dangerouslySetInnerHTML":{"__html":"$3"}}],"$L4"]}]}],"$L5"]}],["$L6"],"$L7"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"F7gp_IPkQ7p3EQn58oxfh"}
+4:["$","div",null,{"className":"mt-16 pt-8 border-t","style":{"borderColor":"var(--border-subtle)"},"children":["$","$L8",null,{"href":"/blog","className":"text-sm font-medium transition-colors hover:text-white","style":{"color":"var(--text-secondary)"},"children":"← All posts"}]}]
+5:["$","$L9",null,{}]
+6:["$","script","script-0",{"src":"/_next/static/chunks/0g~iewxayin15.js","async":true}]
+7:["$","$La",null,{"children":["$","$b",null,{"name":"Next.MetadataOutlet","children":"$@c"}]}]
+c:null

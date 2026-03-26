@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Edgeless Labs Blog</title>
+    <link>https://edgelesslab.com/blog</link>
+    <description>Agent experiments, developer tools, and creative coding from a solo lab.</description>
+    <language>en-us</language>
+    <atom:link href="https://edgelesslab.com/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The One-File Memory System That Changed How I Use Claude</title>
+      <link>https://edgelesslab.com/blog/one-file-memory-system</link>
+      <description>You shouldn&apos;t have to re-explain your stack every session. Here&apos;s the simplest possible setup to give Claude persistent memory -- and how to do it in 10 minutes.</description>
+      <pubDate>Thu, 26 Mar 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/one-file-memory-system</guid>
+    </item>
+    <item>
+      <title>Why MCP Servers Are the Unix Pipes of AI</title>
+      <link>https://edgelesslab.com/blog/mcp-servers-unix-pipes-of-ai</link>
+      <description>The Unix philosophy changed software forever: small tools, composable via pipes. MCP does the same thing for AI agents. Here&apos;s why that matters.</description>
+      <pubDate>Tue, 24 Mar 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/mcp-servers-unix-pipes-of-ai</guid>
+    </item>
+    <item>
+      <title>Generative Art for Pen Plotters: A Technical Primer</title>
+      <link>https://edgelesslab.com/blog/generative-art-pen-plotters</link>
+      <description>Pen plotter art isn&apos;t screen art printed on paper. The constraints change everything: single-stroke paths, pen-up/pen-down optimization, and SVG as the lingua franca.</description>
+      <pubDate>Mon, 23 Mar 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/generative-art-pen-plotters</guid>
+    </item>
+    <item>
+      <title>Building AI Agent Infrastructure as a Solo Developer</title>
+      <link>https://edgelesslab.com/blog/building-ai-agent-infrastructure-solo</link>
+      <description>How I built a multi-agent system with MCP servers, vector memory, and autonomous trading -- all running 24/7 from a single VPS.</description>
+      <pubDate>Sat, 21 Mar 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/building-ai-agent-infrastructure-solo</guid>
+    </item>
+    <item>
+      <title>How Claude Code Memory Actually Works</title>
+      <link>https://edgelesslab.com/blog/how-claude-code-memory-works</link>
+      <description>Claude forgets everything between sessions. Here&apos;s how file-based memory fixes that, and why it changes how you work with AI.</description>
+      <pubDate>Sat, 21 Mar 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/how-claude-code-memory-works</guid>
+    </item>
+  </channel>
+</rss>

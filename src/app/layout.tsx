@@ -43,6 +43,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: 'https://edgelesslab.com',
+    types: {
+      'application/rss+xml': 'https://edgelesslab.com/feed.xml',
+    },
   },
   robots: {
     index: true,

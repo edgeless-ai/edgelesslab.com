@@ -41,6 +41,8 @@ function PostHogScript() {
           capture_pageview: false,
           capture_pageleave: true,
           autocapture: true,
+          scroll_depth: true,
+          capture_performance: true,
         });
       }
     };

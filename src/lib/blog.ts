@@ -78,7 +78,7 @@ After a month of accumulated memory, I tracked roughly 60% fewer correction cycl
 
 A single \`CLAUDE.md\` works. But once you start accumulating more context, a simple structure helps.
 
-The pattern I use across projects on this system (documented in detail in the [Claude Memory Kit](/products/claude-memory-kit)):
+The pattern I use across projects on this system (documented in detail in the [Claude Memory Kit](/products)):
 
 **User memory** -- who you are and how you work. Goes in your home directory CLAUDE.md so it follows you across every project. Things like: "I'm a backend engineer who's new to React. Explain frontend patterns using backend analogies."
 
@@ -96,7 +96,7 @@ The pattern I use across projects on this system (documented in detail in the [C
 4. For the first few sessions, notice when Claude gets something wrong. Add that correction to the file
 5. After a week, the file has become a trained reflex
 
-The free version of the [Claude Memory Kit](https://github.com/edgeless-ai/claude-memory-kit) includes templates for all four memory types and a starter CLAUDE.md structure. If you want stack-specific libraries and multi-project memory patterns, the [Pro version](/products/claude-memory-kit) covers those.
+The free version of the [Claude Memory Kit](https://github.com/edgeless-ai/claude-memory-kit) includes templates for all four memory types and a starter CLAUDE.md structure. If you want stack-specific libraries and multi-project memory patterns, the [Pro version](/products) covers those.
 
 ## One More Thing
 
@@ -254,7 +254,7 @@ Instead, every generator gets scored by an LLM judge before it ever touches the 
 
 The judge generates a score from 0-10 and a brief explanation. I only plot generators that score 7+. This has saved a significant amount of time and paper.
 
-The current scoring prompt and rubric are in the [pen plotter experiment log](/lab/pen-plotter-experiments).
+The current scoring prompt and rubric are in the [pen plotter experiment log](/lab/pen-plotter-art).
 
 ## Materials Matter
 

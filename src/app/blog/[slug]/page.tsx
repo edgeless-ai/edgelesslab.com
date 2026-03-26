@@ -32,7 +32,14 @@ export async function generateMetadata({
       description: post.description,
       type: "article",
       publishedTime: post.date,
+      siteName: "Edgeless Labs",
       url: `https://edgelesslab.com/blog/${post.slug}`,
+      images: [{
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: post.title,
+      }],
     },
     alternates: {
       canonical: `https://edgelesslab.com/blog/${post.slug}`,
@@ -155,36 +162,85 @@ export default async function BlogPostPage({
 }
 
 function renderMarkdown(content: string): string {
-  return content
-    .split("\n\n")
-    .map((block) => {
-      const trimmed = block.trim();
-      if (!trimmed) return "";
+  const lines = content.split("\n");
+  const blocks: string[] = [];
+  let i = 0;
 
-      if (trimmed.startsWith("## ")) {
-        return `<h2>${trimmed.slice(3)}</h2>`;
-      }
-      if (trimmed.startsWith("### ")) {
-        return `<h3>${trimmed.slice(4)}</h3>`;
-      }
+  while (i < lines.length) {
+    const line = lines[i];
 
-      if (trimmed.startsWith("1. ") || trimmed.startsWith("- ")) {
-        const isOrdered = trimmed.startsWith("1. ");
-        const tag = isOrdered ? "ol" : "ul";
-        const items = trimmed
-          .split("\n")
-          .filter((l) => l.trim())
-          .map((l) => {
-            const text = l.replace(/^\d+\.\s+/, "").replace(/^-\s+/, "");
-            return `<li>${inlineFormat(text)}</li>`;
-          })
-          .join("");
-        return `<${tag}>${items}</${tag}>`;
+    // Fenced code blocks
+    if (line.trimStart().startsWith("```")) {
+      const codeLines: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].trimStart().startsWith("```")) {
+        codeLines.push(escapeHtml(lines[i]));
+        i++;
       }
+      i++; // skip closing ```
+      blocks.push(`<pre><code>${codeLines.join("\n")}</code></pre>`);
+      continue;
+    }
 
-      return `<p>${inlineFormat(trimmed)}</p>`;
-    })
-    .join("\n");
+    // Blockquotes
+    if (line.trimStart().startsWith("> ")) {
+      const quoteLines: string[] = [];
+      while (i < lines.length && lines[i].trimStart().startsWith("> ")) {
+        quoteLines.push(inlineFormat(lines[i].replace(/^>\s?/, "")));
+        i++;
+      }
+      blocks.push(`<blockquote>${quoteLines.join("<br/>")}</blockquote>`);
+      continue;
+    }
+
+    // Headings
+    if (line.startsWith("### ")) {
+      blocks.push(`<h3>${inlineFormat(line.slice(4))}</h3>`);
+      i++;
+      continue;
+    }
+    if (line.startsWith("## ")) {
+      blocks.push(`<h2>${inlineFormat(line.slice(3))}</h2>`);
+      i++;
+      continue;
+    }
+
+    // Lists
+    if (line.trimStart().startsWith("- ") || /^\d+\.\s/.test(line.trimStart())) {
+      const isOrdered = /^\d+\.\s/.test(line.trimStart());
+      const tag = isOrdered ? "ol" : "ul";
+      const items: string[] = [];
+      while (i < lines.length && (lines[i].trimStart().startsWith("- ") || /^\d+\.\s/.test(lines[i].trimStart()))) {
+        const text = lines[i].trimStart().replace(/^\d+\.\s+/, "").replace(/^-\s+/, "");
+        items.push(`<li>${inlineFormat(text)}</li>`);
+        i++;
+      }
+      blocks.push(`<${tag}>${items.join("")}</${tag}>`);
+      continue;
+    }
+
+    // Empty lines
+    if (!line.trim()) {
+      i++;
+      continue;
+    }
+
+    // Paragraphs: collect consecutive non-empty, non-special lines
+    const paraLines: string[] = [];
+    while (i < lines.length && lines[i].trim() && !lines[i].startsWith("#") && !lines[i].trimStart().startsWith("```") && !lines[i].trimStart().startsWith("> ") && !lines[i].trimStart().startsWith("- ") && !/^\d+\.\s/.test(lines[i].trimStart())) {
+      paraLines.push(lines[i]);
+      i++;
+    }
+    if (paraLines.length) {
+      blocks.push(`<p>${inlineFormat(paraLines.join(" "))}</p>`);
+    }
+  }
+
+  return blocks.join("\n");
+}
+
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function inlineFormat(text: string): string {

@@ -4,7 +4,7 @@
 9:I[52150,["/_next/static/chunks/0gp_5rilm7taj.js","/_next/static/chunks/0yf~h7j8iiy~n.js","/_next/static/chunks/0.y-6rdfb1fek.js","/_next/static/chunks/0g~iewxayin15.js"],"Footer"]
 a:I[2579,["/_next/static/chunks/0gp_5rilm7taj.js","/_next/static/chunks/0yf~h7j8iiy~n.js","/_next/static/chunks/0.y-6rdfb1fek.js"],"OutletBoundary"]
 b:"$Sreact.suspense"
-3:T11f7,<p>Every Claude Code session starts the same way: a blank slate. No memory of yesterday's architecture decisions. No recall of your coding conventions. No idea that you spent three hours debugging that OAuth flow last week.</p>
+3:T11b3,<p>Every Claude Code session starts the same way: a blank slate. No memory of yesterday's architecture decisions. No recall of your coding conventions. No idea that you spent three hours debugging that OAuth flow last week.</p>
 <p>This is the single biggest friction point in AI-assisted development. Not model capability. Not context windows. Memory.</p>
 <h2>The Problem Is Structural</h2>
 <p>Claude Code reads instructions from a file called <code>CLAUDE.md</code> at the start of every session. That's it. There's no built-in persistence layer. No session history. No learning from past interactions.</p>
@@ -18,42 +18,34 @@ b:"$Sreact.suspense"
 <p>After running this pattern in production across multiple projects, I've found four distinct memory types that cover every use case.</p>
 <h3>1. User Memory</h3>
 <p>Who you are and how you work. Follows you across every project.</p>
-<p><code>`</code>yaml
-name: User Role
+<pre><code>name: User Role
 type: user
 ---
 Senior backend engineer, 8 years Go.
 New to React frontend in this project.
-Prefer explanations mapping frontend concepts to backend analogues.
-<code>`</code></p>
+Prefer explanations mapping frontend concepts to backend analogues.</code></pre>
 <h3>2. Feedback Memory</h3>
 <p>Corrections that stick. The highest-value memory type -- every correction makes every future session better.</p>
-<p><code>`</code>yaml
-name: No mocking in integration tests
+<pre><code>name: No mocking in integration tests
 type: feedback
 ---
 Integration tests must hit a real database, not mocks.
-Why: Mocked tests passed but prod migration failed last quarter.
-<code>`</code></p>
+Why: Mocked tests passed but prod migration failed last quarter.</code></pre>
 <h3>3. Project Memory</h3>
 <p>Architecture decisions, conventions, and infrastructure specific to one codebase.</p>
-<p><code>`</code>yaml
-name: API Migration Freeze
+<pre><code>name: API Migration Freeze
 type: project
 ---
 No breaking API changes until 2026-03-15 (mobile release cut).
-Any endpoint modifications must be backwards-compatible.
-<code>`</code></p>
+Any endpoint modifications must be backwards-compatible.</code></pre>
 <h3>4. Reference Memory</h3>
 <p>Pointers to where things live. Tools, APIs, dashboards.</p>
-<p><code>`</code>yaml
-name: Bug Tracker
+<pre><code>name: Bug Tracker
 type: reference
 ---
 Production bugs: Linear project "PLATFORM"
 Feature requests: Linear project "ROADMAP"
-Design specs: Figma workspace "Product Design 2026"
-<code>`</code></p>
+Design specs: Figma workspace "Product Design 2026"</code></pre>
 <h2>What Changes in Practice</h2>
 <p>With memory in place, sessions start differently. Instead of 10 minutes of context-setting, you jump straight into the work.</p>
 <p>Claude remembers that your test suite uses Vitest, not Jest. It knows the deploy script is at <code>scripts/deploy.sh</code>, not <code>deploy.sh</code>. It recalls that you tried Redis caching last month and hit connection pooling issues.</p>
@@ -66,7 +58,7 @@ Design specs: Figma workspace "Product Design 2026"
 <p><strong>Free:</strong> <a href="https://github.com/edgeless-ai/claude-memory-kit">Claude Memory Kit on GitHub</a></p>
 <p>The free version covers 90% of use cases. For production patterns including stack-specific libraries (React/Next.js, Python/FastAPI, Go, Rails, Rust), multi-project memory architectures, and CLAUDE.md templates:</p>
 <p><strong>Pro ($29):</strong> <a href="https://edgelessai.gumroad.com/l/claude-memory-kit">Claude Memory Kit Pro on Gumroad</a></p>
-<p>The best time to set up memory is before your next session. Takes 15 minutes, saves hours every week.</p>0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"flex flex-col min-h-full","style":{"background":"var(--bg-base)"},"children":[["$","$L2",null,{}],["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"{\"@context\":\"https://schema.org\",\"@type\":\"BlogPosting\",\"headline\":\"How Claude Code Memory Actually Works\",\"description\":\"Claude forgets everything between sessions. Here's how file-based memory fixes that, and why it changes how you work with AI.\",\"datePublished\":\"2026-03-21\",\"author\":{\"@type\":\"Person\",\"name\":\"David Murray\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"Edgeless Labs\",\"url\":\"https://edgelesslab.com\"},\"url\":\"https://edgelesslab.com/blog/how-claude-code-memory-works\"}"}}],["$","article",null,{"className":"pt-28 pb-20 px-6","children":["$","div",null,{"className":"max-w-[680px] mx-auto","children":[["$","div",null,{"className":"mb-12","children":[["$","div",null,{"className":"flex items-center gap-3 mb-4","children":[["$","time",null,{"className":"text-xs font-mono","style":{"color":"var(--text-tertiary)"},"dateTime":"2026-03-21","children":"March 21, 2026"}],["$","span",null,{"className":"text-xs font-mono","style":{"color":"var(--text-tertiary)"},"children":"6 min"}]]}],["$","h1",null,{"className":"text-3xl sm:text-4xl font-bold tracking-tight leading-[1.2] mb-4","style":{"color":"var(--text-primary)"},"children":"How Claude Code Memory Actually Works"}],["$","p",null,{"className":"text-lg font-light","style":{"color":"var(--text-secondary)","lineHeight":1.7},"children":"Claude forgets everything between sessions. Here's how file-based memory fixes that, and why it changes how you work with AI."}],["$","div",null,{"className":"flex flex-wrap gap-2 mt-4","children":[["$","span","Claude Code",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Claude Code"}],["$","span","Memory",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Memory"}],["$","span","Developer Tools",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Developer Tools"}]]}]]}],["$","div",null,{"className":"prose-custom","dangerouslySetInnerHTML":{"__html":"$3"}}],"$L4"]}]}],"$L5"]}],["$L6"],"$L7"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"gFQj_D5L2HgKO2It4FAJG"}
+<p>The best time to set up memory is before your next session. Takes 15 minutes, saves hours every week.</p>0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"flex flex-col min-h-full","style":{"background":"var(--bg-base)"},"children":[["$","$L2",null,{}],["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"{\"@context\":\"https://schema.org\",\"@type\":\"BlogPosting\",\"headline\":\"How Claude Code Memory Actually Works\",\"description\":\"Claude forgets everything between sessions. Here's how file-based memory fixes that, and why it changes how you work with AI.\",\"datePublished\":\"2026-03-21\",\"author\":{\"@type\":\"Person\",\"name\":\"David Murray\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"Edgeless Labs\",\"url\":\"https://edgelesslab.com\"},\"url\":\"https://edgelesslab.com/blog/how-claude-code-memory-works\"}"}}],["$","article",null,{"className":"pt-28 pb-20 px-6","children":["$","div",null,{"className":"max-w-[680px] mx-auto","children":[["$","div",null,{"className":"mb-12","children":[["$","div",null,{"className":"flex items-center gap-3 mb-4","children":[["$","time",null,{"className":"text-xs font-mono","style":{"color":"var(--text-tertiary)"},"dateTime":"2026-03-21","children":"March 21, 2026"}],["$","span",null,{"className":"text-xs font-mono","style":{"color":"var(--text-tertiary)"},"children":"6 min"}]]}],["$","h1",null,{"className":"text-3xl sm:text-4xl font-bold tracking-tight leading-[1.2] mb-4","style":{"color":"var(--text-primary)"},"children":"How Claude Code Memory Actually Works"}],["$","p",null,{"className":"text-lg font-light","style":{"color":"var(--text-secondary)","lineHeight":1.7},"children":"Claude forgets everything between sessions. Here's how file-based memory fixes that, and why it changes how you work with AI."}],["$","div",null,{"className":"flex flex-wrap gap-2 mt-4","children":[["$","span","Claude Code",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Claude Code"}],["$","span","Memory",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Memory"}],["$","span","Developer Tools",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Developer Tools"}]]}]]}],["$","div",null,{"className":"prose-custom","dangerouslySetInnerHTML":{"__html":"$3"}}],"$L4"]}]}],"$L5"]}],["$L6"],"$L7"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"pILCiyF9iVNhJEf2gg1kZ"}
 4:["$","div",null,{"className":"mt-16 pt-8 border-t","style":{"borderColor":"var(--border-subtle)"},"children":["$","$L8",null,{"href":"/blog","className":"text-sm font-medium transition-colors hover:text-white","style":{"color":"var(--text-secondary)"},"children":"← All posts"}]}]
 5:["$","$L9",null,{}]
 6:["$","script","script-0",{"src":"/_next/static/chunks/0g~iewxayin15.js","async":true}]

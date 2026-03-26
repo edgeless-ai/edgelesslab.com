@@ -1,4 +1,5 @@
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { Nav } from "@/components/nav";
 import { JsonLd } from "@/components/json-ld";
 import { Footer } from "@/components/footer";
@@ -186,6 +187,37 @@ export function ProjectDetail({ project }: { project: Project }) {
                     GitHub <ArrowUpRight size={12} />
                   </a>
                 </div>
+
+                {/* Related */}
+                {project.related && project.related.length > 0 && (
+                  <div
+                    className="rounded-xl border p-6"
+                    style={{
+                      background: "var(--bg-surface)",
+                      borderColor: "var(--border-subtle)",
+                    }}
+                  >
+                    <h2
+                      className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
+                      style={{ color: "var(--text-tertiary)" }}
+                    >
+                      Related
+                    </h2>
+                    <ul className="space-y-2.5">
+                      {project.related.map((item) => (
+                        <li key={item.href}>
+                          <Link
+                            href={item.href}
+                            className="text-[13px] hover:text-white transition-colors"
+                            style={{ color: "var(--text-secondary)" }}
+                          >
+                            {item.title}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
           </div>

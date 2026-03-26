@@ -343,6 +343,55 @@ export function ExperimentsGrid({ experiments }: { experiments: Experiment[] }) 
   );
 }
 
+/* ── Product Highlight (single featured product card) ──────── */
+
+export function ProductHighlight() {
+  return (
+    <>
+      <a
+        href="/products"
+        className="group block rounded-xl border p-6 transition-all hover:scale-[1.01]"
+        style={{
+          background: "var(--bg-surface)",
+          borderColor: "var(--border-subtle)",
+          animation: "fadeInUp 0.4s cubic-bezier(0.16,1,0.3,1) both",
+        }}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span
+                className="text-sm font-semibold"
+                style={{ color: "var(--text-primary)" }}
+              >
+                Claude Memory Kit
+              </span>
+              <span
+                className="text-xs font-mono px-2 py-0.5 rounded-md"
+                style={{ background: "var(--accent-muted)", color: "var(--accent)" }}
+              >
+                Free
+              </span>
+            </div>
+            <p
+              className="text-sm"
+              style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
+            >
+              Drop-in persistent memory for Claude Code. Three-layer system: ChromaDB, PyTorch, and Obsidian vault.
+            </p>
+          </div>
+          <div
+            className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5"
+            style={{ color: "var(--text-tertiary)" }}
+          >
+            <ArrowUpRight size={16} />
+          </div>
+        </div>
+      </a>
+    </>
+  );
+}
+
 /* ── About Blurb (animated) ───────────────────────────────── */
 
 export function AboutBlurb() {

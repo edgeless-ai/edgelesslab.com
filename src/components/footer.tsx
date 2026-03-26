@@ -11,10 +11,10 @@ const toolLinks = [
 ];
 
 const labLinks = [
-  { label: "Pen Plotter Art", href: "/lab/pen-plotter-art" },
-  { label: "Strange Attractors", href: "/lab/strange-attractors" },
-  { label: "Total Serialism", href: "/lab/total-serialism" },
-  { label: "Excalidraw Diagrams", href: "/lab/excalidraw-diagrams" },
+  { label: "Pen Plotter Art", href: "/lab/pen-plotter-art", external: false },
+  { label: "Strange Attractors", href: "/lab/strange-attractors", external: false },
+  { label: "Total Serialism", href: "https://djmclaudeassistant-web.github.io/total-serialism/", external: true },
+  { label: "Excalidraw Diagrams", href: "/lab/excalidraw-diagrams", external: false },
 ];
 
 export function Footer() {
@@ -53,13 +53,26 @@ export function Footer() {
             <ul className="space-y-2.5">
               {labLinks.map((item) => (
                 <li key={item.label}>
-                  <Link
-                    href={item.href}
-                    className="text-[13px] hover:text-white transition-colors"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
-                    {item.label}
-                  </Link>
+                  {item.external ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[13px] hover:text-white transition-colors inline-flex items-center gap-1"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {item.label}
+                      <ArrowUpRight size={11} />
+                    </a>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className="text-[13px] hover:text-white transition-colors"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -75,7 +88,7 @@ export function Footer() {
               {[
                 { label: "GitHub", href: "https://github.com/edgeless-ai" },
                 { label: "Gumroad", href: "https://edgelessai.gumroad.com" },
-                { label: "Email", href: "mailto:hello@edgelesslab.com" },
+                { label: "Email", href: "mailto:david@edgelesslab.com" },
               ].map((item) => (
                 <li key={item.label}>
                   <a

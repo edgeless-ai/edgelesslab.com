@@ -47,7 +47,7 @@ const timeline = [
 const links = [
   { label: "GitHub", href: "https://github.com/edgeless-ai", description: "Open source projects and tools" },
   { label: "Gumroad", href: "https://edgelessai.gumroad.com", description: "Digital products and templates" },
-  { label: "Email", href: "mailto:hello@edgelesslab.com", description: "hello@edgelesslab.com" },
+  { label: "Email", href: "mailto:david@edgelesslab.com", description: "david@edgelesslab.com" },
 ];
 
 export default function About() {

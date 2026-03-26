@@ -6,6 +6,7 @@ import {
   CapabilitiesGrid,
   StackFlow,
   ExperimentsGrid,
+  ProductHighlight,
   AboutBlurb,
   SubscribeSection,
 } from "@/components/home-client";
@@ -171,6 +172,29 @@ export default function Home() {
             </div>
 
             <ExperimentsGrid experiments={homepageExperiments} />
+          </div>
+        </section>
+
+        {/* Products */}
+        <section className="px-6 py-20" style={{ background: "var(--bg-surface)" }}>
+          <div className="max-w-[1280px] mx-auto">
+            <div className="flex items-baseline justify-between mb-10">
+              <h2
+                className="text-sm font-mono uppercase tracking-[0.15em]"
+                style={{ color: "var(--text-tertiary)" }}
+              >
+                Products
+              </h2>
+              <Link
+                href="/products"
+                className="text-sm flex items-center gap-1 transition-colors hover:text-white"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                All products <ArrowRight size={13} />
+              </Link>
+            </div>
+
+            <ProductHighlight />
           </div>
         </section>
 

@@ -9,6 +9,9 @@ export const projects = [
     snippet: `$ pm2 status pamela\n│ online │ 0 restarts\n\n24/7 autonomous execution`,
     stack: ["TypeScript", "Node.js", "PM2", "Hetzner VPS", "Polymarket API"],
     status: "Live",
+    related: [
+      { title: "Mastra Orchestrator", href: "/projects/mastra-orchestrator" },
+    ],
   },
   {
     slug: "mcp-servers",
@@ -20,6 +23,9 @@ export const projects = [
     snippet: `server.tool("search", {\n  query: z.string(),\n  collection: z.enum([\n    "vault", "memory"\n  ])\n})`,
     stack: ["TypeScript", "Effect-TS", "ChromaDB", "Zod", "MCP SDK"],
     status: "Live",
+    related: [
+      { title: "Knowledge API", href: "/projects/knowledge-api" },
+    ],
   },
   {
     slug: "pen-plotter-art",
@@ -31,6 +37,9 @@ export const projects = [
     snippet: `<svg viewBox="0 0 400 400">\n  <path d="M200,50 C350,100\n    350,300 200,350" />\n</svg>`,
     stack: ["Python", "SVG", "AxiDraw", "Pillow", "NumPy"],
     status: "Active",
+    related: [
+      { title: "Strange Attractors", href: "/lab/strange-attractors" },
+    ],
   },
   {
     slug: "mastra-orchestrator",
@@ -42,6 +51,9 @@ export const projects = [
     snippet: `router → claude-opus (thinking)\nrouter → gemini-flash (search)\nrouter → local-llama (draft)\n✓ consensus reached`,
     stack: ["TypeScript", "Mastra", "OpenRouter", "PM2"],
     status: "Live",
+    related: [
+      { title: "Pamela", href: "/projects/pamela" },
+    ],
   },
   {
     slug: "knowledge-api",
@@ -53,6 +65,9 @@ export const projects = [
     snippet: `qmd search "agent orchestration"\n  --collection claude-vault\n  --top-k 10 --min-score 0.6`,
     stack: ["Python", "ChromaDB", "FastAPI", "Sentence Transformers"],
     status: "Live",
+    related: [
+      { title: "MCP Servers", href: "/projects/mcp-servers" },
+    ],
   },
   {
     slug: "llm-client",
@@ -64,6 +79,7 @@ export const projects = [
     snippet: `client = UnifiedLLM()\nresult = client.complete(\n  "analyze this market",\n  model="auto"  # best available\n)`,
     stack: ["Python", "OpenRouter", "Gemini API", "Anthropic SDK"],
     status: "Live",
+    related: [],
   },
 ];
 

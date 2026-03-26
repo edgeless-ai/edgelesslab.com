@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { useState, FormEvent } from "react";
-import { trackCTA, trackSubscribe } from "@/lib/analytics";
+import { trackCTA } from "@/lib/analytics";
 import { AnimatedText, AnimatedFadeIn } from "@/components/ui/animated-text";
 import { GlowingCard } from "@/components/ui/glowing-card";
 import { DotBackground } from "@/components/ui/dot-background";
@@ -377,23 +376,9 @@ export function AboutBlurb() {
   );
 }
 
-/* ── Subscribe Form ───────────────────────────────────────── */
+/* ── Subscribe / CTA Section ──────────────────────────────── */
 
 export function SubscribeSection() {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "done">("idle");
-
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!email || status !== "idle") return;
-    setStatus("loading");
-    trackSubscribe(email);
-    setTimeout(() => {
-      setStatus("done");
-      setEmail("");
-    }, 800);
-  }
-
   return (
     <section
       className="px-6 py-20 border-t"
@@ -413,70 +398,31 @@ export function SubscribeSection() {
                 className="text-xs font-mono"
                 style={{ color: "var(--text-tertiary)" }}
               >
-                Lab dispatch
+                Stay in the loop
               </span>
             </div>
             <h2
               className="text-2xl font-semibold tracking-tight mb-2"
               style={{ color: "var(--text-primary)" }}
             >
-              Occasional dispatches from the lab.
+              Follow the lab on GitHub.
             </h2>
             <p
               className="text-sm mb-6"
               style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
             >
-              Agent experiments, generative art drops, and infra notes. No noise.
+              Agent experiments, generative art drops, and infra updates. All open source.
             </p>
 
-            {status === "done" ? (
-              <div className="flex items-center gap-2 h-11">
-                <span
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{ background: "var(--green)" }}
-                />
-                <span
-                  className="text-sm font-mono"
-                  style={{ color: "var(--green)" }}
-                >
-                  You&apos;re on the list.
-                </span>
-              </div>
-            ) : (
-              <form
-                onSubmit={handleSubmit}
-                className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-2"
-              >
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  required
-                  aria-label="Email address for newsletter subscription"
-                  className="flex-1 h-11 px-4 rounded-full text-sm font-mono outline-none transition-colors"
-                  style={{
-                    background: "var(--bg-surface)",
-                    border: "1px solid var(--border-subtle)",
-                    color: "var(--text-primary)",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "var(--border-focus)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "var(--border-subtle)";
-                  }}
-                />
-                <button
-                  type="submit"
-                  disabled={status === "loading"}
-                  className="h-11 shrink-0 rounded-full px-5 text-sm font-medium text-white transition-all hover:brightness-110 hover:scale-[1.02] disabled:opacity-60 sm:w-auto"
-                  style={{ background: "var(--accent)" }}
-                >
-                  {status === "loading" ? "..." : "Subscribe"}
-                </button>
-              </form>
-            )}
+            <a
+              href="https://github.com/edgeless-ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
+              style={{ background: "var(--accent)" }}
+            >
+              GitHub <ArrowUpRight size={14} />
+            </a>
           </div>
         </div>
       </div>

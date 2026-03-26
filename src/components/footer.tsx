@@ -135,7 +135,7 @@ export function Footer() {
               className="text-xs font-mono"
               style={{ color: "var(--text-tertiary)" }}
             >
-              7 agents active
+              Systems online
             </span>
           </div>
         </div>

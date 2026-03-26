@@ -50,15 +50,14 @@ const capabilities = [
   {
     label: "Autonomous Trading",
     snippet: `$ pm2 status pamela
-│ pamela │ online │ 47h │ 0 restarts │
-│ P&L: +$247.30 (7d)                 │`,
+│ pamela │ online │ 0 restarts │
+│ 24/7 autonomous execution     │`,
   },
   {
     label: "Knowledge Pipelines",
     snippet: `qmd search "agent orchestration"
   --collection claude-vault
-  --top-k 10 --min-score 0.6
-  # 6,889 documents indexed`,
+  --top-k 10 --min-score 0.6`,
   },
 ];
 

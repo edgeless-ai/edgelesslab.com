@@ -22,9 +22,6 @@ export function trackProductView(product: string) {
   trackEvent("product_viewed", { product_name: product });
 }
 
-export function trackSubscribe(email: string) {
-  trackEvent("newsletter_subscribed", { email_domain: email.split("@")[1] });
-}
 
 export function trackOutboundLink(url: string, label?: string) {
   trackEvent("outbound_link_clicked", { url, label });

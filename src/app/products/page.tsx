@@ -94,31 +94,6 @@ export default function ProductsPage() {
             template comes from a system running 24/7.
           </p>
 
-          {/* Social proof strip */}
-          <div
-            className="flex flex-wrap items-center gap-6 mb-12 pb-12 border-b"
-            style={{ borderColor: "var(--border-subtle)" }}
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-mono" style={{ color: "var(--green)" }}>★★★★★</span>
-              <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                Trusted by Claude Code users worldwide
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--green)" }} />
-              <span className="text-sm font-mono" style={{ color: "var(--text-tertiary)" }}>
-                Built from production systems running 24/7
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--accent)" }} />
-              <span className="text-sm font-mono" style={{ color: "var(--text-tertiary)" }}>
-                100+ downloads
-              </span>
-            </div>
-          </div>
-
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((product) => (
               <a

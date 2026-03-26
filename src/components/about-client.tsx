@@ -100,7 +100,7 @@ export function Philosophy() {
         style={{ color: "var(--text-secondary)", lineHeight: 1.7, ...fadeInStyle(0.1) }}
       >
         <p>
-          Most AI companies are building demos. We build{" "}
+          Most AI companies are building demos. This lab builds{" "}
           <span style={{ color: "var(--text-primary)" }}>infrastructure that runs 24/7</span>.
           Pamela trades autonomously. The knowledge pipeline indexes thousands of
           documents. The MCP servers handle real queries from real agents.
@@ -112,11 +112,11 @@ export function Philosophy() {
           production, it doesn&apos;t exist.
         </p>
         <p>
-          We believe the best AI tools are built by people who{" "}
+          The best AI tools are built by people who{" "}
           <span style={{ color: "var(--text-primary)" }}>use them every day</span>.
-          Everything here is dogfooded. The orchestration layer routes our own
-          work. The memory system stores our own knowledge. The agents manage
-          our own portfolio.
+          Everything here is dogfooded. The orchestration layer routes my own
+          work. The memory system stores my own knowledge. The agents manage
+          my own portfolio.
         </p>
       </div>
     </div>

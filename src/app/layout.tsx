@@ -17,28 +17,28 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://edgelesslab.com'),
   title: {
-    default: 'Edgeless Labs - Tools for AI-Native Developers',
-    template: '%s | Edgeless Labs',
+    default: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
+    template: '%s | Edgeless Lab',
   },
-  description: 'Creative technology lab building AI agents, MCP servers, generative art pipelines, and developer tools. One-person studio shipping production infrastructure.',
+  description: 'One person shipping autonomous agents, generative art, and developer tools. Built in production, released in the open.',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://edgelesslab.com',
     siteName: 'Edgeless Labs',
-    title: 'Edgeless Labs - Tools for AI-Native Developers',
-    description: 'AI agents, MCP servers, generative art, and developer tools built by a solo creative technology lab.',
+    title: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
+    description: 'One person shipping autonomous agents, generative art, and developer tools. Built in production, released in the open.',
     images: [{
       url: '/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'Edgeless Labs - Tools for AI-Native Developers',
+      alt: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
     }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Edgeless Labs - Tools for AI-Native Developers',
-    description: 'AI agents, MCP servers, generative art, and developer tools.',
+    title: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
+    description: 'One person shipping autonomous agents, generative art, and developer tools.',
     images: ['/og-image.png'],
   },
   alternates: {

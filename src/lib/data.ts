@@ -54,6 +54,20 @@ export const products: Product[] = [
     badge: null,
   },
   {
+    name: "Production MCP Server Kit",
+    price: "$29",
+    description:
+      "Take MCP servers past the tutorial stage. Auth middleware, rate limiting, Docker deployment, health checks, and error handling patterns from running 4+ MCP servers in production.",
+    features: [
+      "Auth middleware: API key validation and OAuth2 token checking",
+      "Rate limiting, usage tracking, and health check endpoints",
+      "Docker + compose deployment configs with monitoring",
+      "3 production server examples: filesystem, database, external API",
+    ],
+    href: `https://edgelessai.gumroad.com/l/production-mcp-kit?${UTM}`,
+    badge: "New",
+  },
+  {
     name: "AI Code Review Playbook",
     price: "$24",
     description:
@@ -110,20 +124,6 @@ export const products: Product[] = [
     badge: null,
   },
   {
-    name: "CLAUDE.md Template Pack",
-    price: "$14",
-    description:
-      "14 battle-tested CLAUDE.md templates for every project type. Drop one into your repo and start building.",
-    features: [
-      "14 templates: iOS, Android, ML, API, DevOps, Next.js, and more",
-      "CLI Tools, Monorepos, and Game Dev configurations",
-      "Embedded/IoT, Security Audits, and Open Source templates",
-      "Startup MVP and Technical Writing presets",
-    ],
-    href: `https://edgelessai.gumroad.com/l/kszapk?${UTM}`,
-    badge: null,
-  },
-  {
     name: "Autonomous Agent Safety Patterns",
     price: "$19",
     description:
@@ -150,6 +150,20 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/hooks-deep-dive?${UTM}`,
     badge: "New",
+  },
+  {
+    name: "CLAUDE.md Template Pack",
+    price: "$14",
+    description:
+      "14 battle-tested CLAUDE.md templates for every project type. Drop one into your repo and start building.",
+    features: [
+      "14 templates: iOS, Android, ML, API, DevOps, Next.js, and more",
+      "CLI Tools, Monorepos, and Game Dev configurations",
+      "Embedded/IoT, Security Audits, and Open Source templates",
+      "Startup MVP and Technical Writing presets",
+    ],
+    href: `https://edgelessai.gumroad.com/l/kszapk?${UTM}`,
+    badge: null,
   },
   {
     name: "Hooks Library",

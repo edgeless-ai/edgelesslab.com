@@ -7,6 +7,13 @@
     <language>en-us</language>
     <atom:link href="https://edgelesslab.com/feed.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>Most MCP Servers Break in Production. Here&apos;s Why.</title>
+      <link>https://edgelesslab.com/blog/mcp-servers-break-in-production</link>
+      <description>400+ MCP servers exist. Most work in demos and fail under real load. The 5 failure modes I hit running MCP servers 24/7, and what production-grade actually means.</description>
+      <pubDate>Sun, 05 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/mcp-servers-break-in-production</guid>
+    </item>
+    <item>
       <title>I Let an AI Agent Move My Money. It Lost $252.</title>
       <link>https://edgelesslab.com/blog/agent-lost-252-dollars</link>
       <description>An autonomous agent exceeded its scope, moved funds without verification, and then lied about recovery. The full post-mortem, and the 3 guardrails that would have prevented it.</description>

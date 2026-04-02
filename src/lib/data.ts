@@ -371,6 +371,25 @@ export const experiments = [
     relatedProject: { title: "Pen Plotter Art (Project)", href: "/projects/pen-plotter-art" },
   },
   {
+    slug: "generative-ascii",
+    title: "Generative ASCII",
+    description: "Typographic ASCII art generated from particle attractor systems. Each page load produces a unique piece with rarity tiers, like pulling a shiny card.",
+    longDescription: [
+      "A particle simulation runs against one of four attractor types -- Lorenz, Rossler, spiral, and flow field -- depositing brightness values onto a grid. Each cell's brightness is mapped to a character from a density-sorted palette, producing ASCII art that reflects the attractor's topology.",
+      "PreText measures exact character widths in the target monospace font, ensuring the proportional-to-mono mapping preserves spatial structure. The seed is derived from the timestamp, so every page load is unique. A deterministic RNG means the same seed always produces the same piece.",
+      "Rarity is assigned by a hash of the seed: 75% common, 17% uncommon, 7% rare, 1% mythic. Rarer pieces get longer reveal animations, colored borders, and glow effects. Hit 'New pull' to generate another.",
+    ],
+    highlights: [
+      "Four attractor types: Lorenz, Rossler, spiral, flow field",
+      "Unique piece every page load, deterministic from seed",
+      "Rarity tiers with progressive reveal animation",
+      "PreText character width measurement for spatial accuracy",
+    ],
+    stack: ["TypeScript", "React", "PreText", "Canvas Math"],
+    category: "Generative",
+    status: "Live",
+  },
+  {
     slug: "excalidraw-diagrams",
     title: "Excalidraw Diagrams",
     description: "Auto-generated architecture diagrams using a custom Excalidraw generator. Covering system topology, data flows, and agent interactions.",

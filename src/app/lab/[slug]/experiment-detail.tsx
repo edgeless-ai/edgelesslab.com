@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Nav } from "@/components/nav";
 import { JsonLd } from "@/components/json-ld";
 import { Footer } from "@/components/footer";
+import { GenerativeAscii } from "@/components/generative-ascii";
 import type { experiments } from "@/lib/data";
 
 type Experiment = (typeof experiments)[number];
@@ -102,6 +103,16 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                 >
                   {experiment.description}
                 </p>
+
+                {/* Interactive embed for experiments with live components */}
+                {experiment.slug === "generative-ascii" && (
+                  <div
+                    className="mb-10"
+                    style={{ animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.18s both" }}
+                  >
+                    <GenerativeAscii />
+                  </div>
+                )}
 
                 {/* Long description paragraphs */}
                 {hasLongDescription && (

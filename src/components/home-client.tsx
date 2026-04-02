@@ -10,6 +10,7 @@ import { DotBackground } from "@/components/ui/dot-background";
 import { KineticPreText } from "@/components/ui/kinetic-pretext";
 import { StaggerReveal } from "@/components/ui/pretext-stagger-reveal";
 import { PreTextRichFlow, type RichFlowSegment } from "@/components/ui/pretext-rich-flow";
+import { PreTextOrbs } from "@/components/ui/pretext-orbs";
 import { useShrinkWrap } from "@/hooks/use-shrink-wrap";
 import { products } from "@/lib/data";
 
@@ -297,14 +298,14 @@ export function StackFlow({ nodes }: { nodes: StackNode[] }) {
         />
       </div>
 
-      <div className="mt-8 max-w-lg">
-        <StaggerReveal
-          text="Agents call tools through MCP. Knowledge persists across sessions. A single VPS keeps the whole system running, unattended."
+      <div className="mt-8 max-w-2xl">
+        <PreTextOrbs
+          text="Agents call tools through MCP. Knowledge persists across sessions in vector memory and markdown vaults. A single VPS keeps the whole system running, unattended. Every tool is an MCP server. Every agent can use any tool. Add a new capability and it's immediately available to every agent in the system."
           font='300 14px "Geist"'
           lineHeight={24}
-          staggerMs={50}
-          maxSlide={20}
-          style={{ color: "var(--text-tertiary)" }}
+          orbCount={3}
+          orbRadius={36}
+          textColor="var(--text-tertiary)"
         />
       </div>
     </>

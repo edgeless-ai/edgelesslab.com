@@ -82,6 +82,20 @@ export const products: Product[] = [
     badge: null,
   },
   {
+    name: "n8n AI Workflow Templates",
+    price: "$24",
+    description:
+      "5 importable n8n workflows that connect AI to real business processes. YouTube monitoring, RSS intelligence, AI code review, content embedding, and scheduled health checks.",
+    features: [
+      "5 ready-to-import n8n workflow JSON files",
+      "YouTube monitor -> Claude summary -> email digest pipeline",
+      "RSS aggregator -> AI analysis -> Telegram notification",
+      "Docker n8n setup guide with environment configuration",
+    ],
+    href: `https://edgelessai.gumroad.com/l/n8n-ai-workflows?${UTM}`,
+    badge: "New",
+  },
+  {
     name: "MCP Server Starter Kit",
     price: "$24",
     description:
@@ -135,7 +149,7 @@ export const products: Product[] = [
       "Scope containment patterns: keeping agents within boundaries",
     ],
     href: `https://edgelessai.gumroad.com/l/agent-safety-patterns?${UTM}`,
-    badge: "New",
+    badge: null,
   },
   {
     name: "Claude Code Hooks Deep Dive",
@@ -149,7 +163,7 @@ export const products: Product[] = [
       "Template hooks for common scenarios you can customize in minutes",
     ],
     href: `https://edgelessai.gumroad.com/l/hooks-deep-dive?${UTM}`,
-    badge: "New",
+    badge: null,
   },
   {
     name: "CLAUDE.md Template Pack",

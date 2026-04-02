@@ -7,6 +7,13 @@
     <language>en-us</language>
     <atom:link href="https://edgelesslab.com/feed.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>5 n8n Workflows That Run My AI Business</title>
+      <link>https://edgelesslab.com/blog/n8n-workflows-ai-business</link>
+      <description>Visual automation for solo developers. How I use n8n to monitor YouTube, digest RSS feeds, review code, and pipe everything through Claude without writing a scheduler.</description>
+      <pubDate>Mon, 06 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/n8n-workflows-ai-business</guid>
+    </item>
+    <item>
       <title>Most MCP Servers Break in Production. Here&apos;s Why.</title>
       <link>https://edgelesslab.com/blog/mcp-servers-break-in-production</link>
       <description>400+ MCP servers exist. Most work in demos and fail under real load. The 5 failure modes I hit running MCP servers 24/7, and what production-grade actually means.</description>

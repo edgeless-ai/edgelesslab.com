@@ -52,6 +52,12 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  text-wrap: pretty;
+}
+
+/* Typography: balanced headlines, pretty body text */
+h1, h2, h3 {
+  text-wrap: balance;
 }
 
 /* Focus styles for keyboard navigation */
@@ -120,6 +126,7 @@ body {
   font-size: 0.9375rem;
   line-height: 1.8;
   margin-bottom: 1.25rem;
+  text-wrap: pretty;
 }
 
 .prose-custom strong {

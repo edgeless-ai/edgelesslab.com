@@ -1,3 +1,171 @@
+export interface Product {
+  name: string;
+  price: string;
+  description: string;
+  features: string[];
+  href: string;
+  badge: string | null;
+}
+
+const UTM = "utm_source=edgelesslab&utm_medium=website&utm_campaign=products";
+
+export const products: Product[] = [
+  {
+    name: "The Agent Cookbook",
+    price: "$39",
+    description:
+      "Build AI agents that actually work. 15 production-ready agent patterns with complete implementations for Claude, GPT, and open-source models.",
+    features: [
+      "15 production-ready agent patterns with working code",
+      "Multi-agent orchestration and memory systems",
+      "Error recovery and deployment strategies",
+      "Architecture diagrams and production lessons learned",
+    ],
+    href: `https://edgelessai.gumroad.com/l/plbzo?${UTM}`,
+    badge: null,
+  },
+  {
+    name: "Claude Memory Kit Pro",
+    price: "$29",
+    description:
+      "The complete memory system for Claude Code power users. 12 templates, 5 stack libraries, advanced patterns guide, and CLAUDE.md templates.",
+    features: [
+      "12 ready-to-customize memory templates",
+      "Stack libraries: React/Next.js, Python/FastAPI, Go, Rails, Rust",
+      "Advanced patterns: multi-project, team memory, CI integration",
+      "CLAUDE.md templates for solo and monorepo projects",
+    ],
+    href: `https://edgelessai.gumroad.com/l/claude-memory-kit?${UTM}`,
+    badge: "Popular",
+  },
+  {
+    name: "The Prompt Engineering OS",
+    price: "$29",
+    description:
+      "The complete system for writing AI prompts that work in production. 30 chapters, 8 template schemas, 100+ templates.",
+    features: [
+      "30 chapters covering every prompt pattern",
+      "8 template schemas with fill-in-the-blank structure",
+      "100+ production-tested prompt templates",
+      "Covers Claude, GPT-4, Gemini, and open models",
+    ],
+    href: `https://edgelessai.gumroad.com/l/prompt-engineering-os?${UTM}`,
+    badge: null,
+  },
+  {
+    name: "AI Code Review Playbook",
+    price: "$24",
+    description:
+      "Systematic AI-powered code review that catches security vulnerabilities, performance issues, and logic errors before they ship.",
+    features: [
+      "Review checklists and prompt templates for Claude/GPT",
+      "GitHub Actions and CI/CD integration guides",
+      "Security vulnerability and performance issue detection",
+      "Built from real experience reviewing thousands of PRs",
+    ],
+    href: `https://edgelessai.gumroad.com/l/uacjr?${UTM}`,
+    badge: null,
+  },
+  {
+    name: "MCP Server Starter Kit",
+    price: "$24",
+    description:
+      "TypeScript and Python templates for building MCP servers. Go from zero to a running server in under an hour.",
+    features: [
+      "TypeScript and Python server templates",
+      "8-chapter guide from architecture to deployment",
+      "3 working example servers: file search, database query, API proxy",
+      "Complete build-to-deploy walkthrough",
+    ],
+    href: `https://edgelessai.gumroad.com/l/lixicg?${UTM}`,
+    badge: null,
+  },
+  {
+    name: "Obsidian + Claude Code Setup Kit",
+    price: "$19",
+    description:
+      "Turn Obsidian into an AI-powered development environment with pre-configured vault, Claude Code integration, and workflow automations.",
+    features: [
+      "Pre-configured vault with Claude Code integration",
+      "CLAUDE.md templates and hook configurations",
+      "Custom templates and plugin recommendations",
+      "Complete knowledge management system for AI developers",
+    ],
+    href: `https://edgelessai.gumroad.com/l/fyuwpn?${UTM}`,
+    badge: null,
+  },
+  {
+    name: "Prompt Testing Framework",
+    price: "$19",
+    description:
+      "Regression testing, A/B comparison templates, and quality scoring rubrics for AI prompts. Built for teams shipping AI features.",
+    features: [
+      "Regression testing and A/B comparison templates",
+      "Quality scoring rubrics with structured evaluation criteria",
+      "Test harnesses for Claude, GPT, and Gemini",
+      "Repeatable, measurable prompt quality workflows",
+    ],
+    href: `https://edgelessai.gumroad.com/l/yrail?${UTM}`,
+    badge: null,
+  },
+  {
+    name: "CLAUDE.md Template Pack",
+    price: "$14",
+    description:
+      "14 battle-tested CLAUDE.md templates for every project type. Drop one into your repo and start building.",
+    features: [
+      "14 templates: iOS, Android, ML, API, DevOps, Next.js, and more",
+      "CLI Tools, Monorepos, and Game Dev configurations",
+      "Embedded/IoT, Security Audits, and Open Source templates",
+      "Startup MVP and Technical Writing presets",
+    ],
+    href: `https://edgelessai.gumroad.com/l/kszapk?${UTM}`,
+    badge: null,
+  },
+  {
+    name: "Hooks Library",
+    price: "$14",
+    description:
+      "24 production-ready hooks across 6 categories. Drop in, configure, ship.",
+    features: [
+      "Quality hooks: linting, testing, secrets detection",
+      "Safety hooks: damage control, backup, force-push guard",
+      "Integration hooks: Slack, Telegram, Linear, Obsidian",
+      "AI hooks: context preload, completion verify, cost tracking",
+    ],
+    href: `https://edgelessai.gumroad.com/l/ztaflt?${UTM}`,
+    badge: null,
+  },
+  {
+    name: "Quick Reference Cards",
+    price: "$9",
+    description:
+      "Printable cheat sheets for prompt patterns, Claude Code shortcuts, MCP tool reference, and common workflows.",
+    features: [
+      "Prompt pattern and system prompt reference cards",
+      "Claude Code shortcuts and slash commands",
+      "Token optimization and temperature settings guide",
+      "PDF and markdown formats, pin-next-to-monitor ready",
+    ],
+    href: `https://edgelessai.gumroad.com/l/dihxts?${UTM}`,
+    badge: null,
+  },
+  {
+    name: "Claude Memory Kit",
+    price: "Free",
+    description:
+      "Start here. Drop-in memory template for Claude Code. Persists context, feedback, and project knowledge across conversations.",
+    features: [
+      "4 memory types: user, feedback, project, reference",
+      "MEMORY.md index auto-loaded each session",
+      "CLAUDE.md snippet for instant setup",
+      "Real-world examples included",
+    ],
+    href: "https://github.com/edgeless-ai/claude-memory-kit?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
+    badge: "Open Source",
+  },
+];
+
 export const projects = [
   {
     slug: "pamela",
@@ -161,8 +329,8 @@ export const experiments = [
     href: "https://djmclaudeassistant-web.github.io/tartanism/",
   },
   {
-    slug: "mastra-orchestrator",
-    title: "Mastra Orchestrator",
+    slug: "mastra-dashboard",
+    title: "Mastra Dashboard",
     description: "Visual dashboard for multi-agent task routing. Real-time display of agent states, message passing, and consensus formation across Claude, Gemini, and local models.",
     longDescription: [
       "The Mastra Orchestrator is a TypeScript-based multi-agent routing layer deployed on a Hetzner VPS and managed by PM2. A router agent reads incoming tasks, classifies them by reasoning depth and latency requirements, and dispatches to the best-fit model: Claude Opus for deep reasoning, Gemini Flash for fast search queries, and local models for drafting and summarization.",
@@ -178,11 +346,11 @@ export const experiments = [
     stack: ["TypeScript", "Mastra", "React", "OpenRouter", "PM2"],
     category: "Agents",
     status: "Live",
-    relatedProject: { title: "Mastra Orchestrator", href: "/projects/mastra-orchestrator" },
+    relatedProject: { title: "Mastra Orchestrator (Project)", href: "/projects/mastra-orchestrator" },
   },
   {
-    slug: "pen-plotter-art",
-    title: "Pen Plotter Art",
+    slug: "pen-plotter-pipeline",
+    title: "Pen Plotter Pipeline",
     description: "Generative SVG art pipeline with AI scoring. Dozens of unique generators producing work across flow fields, attractors, tessellations, and algorithmic calligraphy.",
     longDescription: [
       "A Python pipeline that runs dozens of independent SVG generators, feeds each output to an AI judge, and routes high-scoring pieces to the physical plotter. Generators span four categories: flow fields (curl noise, streamlines from vector fields), strange attractors (Lorenz, Rossler, Chen), geometric tessellations (Penrose, Voronoi, Truchet), and algorithmic calligraphy (stroke-based glyph systems).",
@@ -198,7 +366,7 @@ export const experiments = [
     stack: ["Python", "NumPy", "Pillow", "SVG", "AxiDraw"],
     category: "Generative",
     status: "Active",
-    relatedProject: { title: "Pen Plotter Art", href: "/projects/pen-plotter-art" },
+    relatedProject: { title: "Pen Plotter Art (Project)", href: "/projects/pen-plotter-art" },
   },
   {
     slug: "excalidraw-diagrams",

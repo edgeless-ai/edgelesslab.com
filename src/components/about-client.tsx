@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
+import { EditorialBlock } from "@/components/ui/pretext-pull-quote";
 
 interface Stat {
   label: string;
@@ -86,6 +89,27 @@ export function StatsGrid({ stats }: { stats: Stat[] }) {
   );
 }
 
+const philosophyParagraphs = [
+  "Most AI companies are building demos. This lab builds infrastructure that runs 24/7. Pamela trades autonomously. The knowledge pipeline indexes thousands of documents. The MCP servers handle real queries from real agents.",
+  "The lab exists at the intersection of AI, craft, and systems thinking. Every project ships. Every tool gets used. If it doesn\u2019t work in production, it doesn\u2019t exist.",
+  "The best AI tools are built by people who use them every day. Everything here is dogfooded. The orchestration layer routes my own work. The memory system stores my own knowledge. The agents manage my own portfolio.",
+];
+
+const philosophyPullQuotes = [
+  {
+    text: "Infrastructure that runs 24/7.",
+    side: "right" as const,
+    yOffset: 20,
+    width: 240,
+  },
+  {
+    text: "If it doesn\u2019t work in production, it doesn\u2019t exist.",
+    side: "right" as const,
+    yOffset: 200,
+    width: 260,
+  },
+];
+
 export function Philosophy() {
   return (
     <div className="max-w-2xl">
@@ -95,29 +119,17 @@ export function Philosophy() {
       >
         Philosophy
       </h2>
-      <div
-        className="space-y-6 text-lg font-light"
-        style={{ color: "var(--text-secondary)", lineHeight: 1.7, ...fadeInStyle(0.1) }}
-      >
-        <p>
-          Most AI companies are building demos. This lab builds{" "}
-          <span style={{ color: "var(--text-primary)" }}>infrastructure that runs 24/7</span>.
-          Pamela trades autonomously. The knowledge pipeline indexes thousands of
-          documents. The MCP servers handle real queries from real agents.
-        </p>
-        <p>
-          The lab exists at the intersection of{" "}
-          <span style={{ color: "var(--text-primary)" }}>AI, craft, and systems thinking</span>.
-          Every project ships. Every tool gets used. If it doesn&apos;t work in
-          production, it doesn&apos;t exist.
-        </p>
-        <p>
-          The best AI tools are built by people who{" "}
-          <span style={{ color: "var(--text-primary)" }}>use them every day</span>.
-          Everything here is dogfooded. The orchestration layer routes my own
-          work. The memory system stores my own knowledge. The agents manage
-          my own portfolio.
-        </p>
+      <div style={fadeInStyle(0.1)}>
+        <EditorialBlock
+          paragraphs={philosophyParagraphs}
+          pullQuotes={philosophyPullQuotes}
+          font='300 18px "Geist"'
+          lineHeight={30}
+          quoteFont='600 22px "Geist"'
+          quoteLineHeight={30}
+          className="text-lg font-light"
+          style={{ color: "var(--text-secondary)" }}
+        />
       </div>
     </div>
   );

@@ -1,3 +1,9 @@
+"use client";
+
+/**
+ * Animated gradient orb background with grid lines.
+ * Pure CSS animation -- no JS tick loop.
+ */
 export function DotBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -10,7 +16,7 @@ export function DotBackground() {
           backgroundSize: "64px 64px",
         }}
       />
-      {/* Primary gradient orb — indigo (CSS animation) */}
+      {/* Primary gradient orb -- indigo */}
       <div
         className="absolute top-0 left-1/2 h-[600px] w-[900px] -translate-x-1/2 -translate-y-1/3 rounded-full blur-[150px]"
         style={{
@@ -18,7 +24,7 @@ export function DotBackground() {
           animation: "orbPulse 10s ease-in-out infinite",
         }}
       />
-      {/* Secondary orb — green, offset (CSS animation) */}
+      {/* Secondary orb -- green, offset */}
       <div
         className="absolute top-1/3 right-0 h-[400px] w-[500px] translate-x-1/4 rounded-full blur-[130px]"
         style={{

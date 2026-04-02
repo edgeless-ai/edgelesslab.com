@@ -23,12 +23,20 @@ export default function ProductsPage() {
 
       <section className="pt-28 pb-20 px-6">
         <div className="max-w-[1080px] mx-auto">
-          <h1
-            className="text-3xl sm:text-4xl font-bold tracking-tight mb-3"
-            style={{ color: "var(--text-primary)" }}
-          >
-            Products
-          </h1>
+          <div className="flex items-baseline gap-4 mb-3">
+            <h1
+              className="text-3xl sm:text-4xl font-bold tracking-tight"
+              style={{ color: "var(--text-primary)" }}
+            >
+              Products
+            </h1>
+            <span
+              className="text-xs font-mono"
+              style={{ color: "var(--text-tertiary)" }}
+            >
+              {products.length} tools &middot; {products.filter(p => p.price === "Free").length} free
+            </span>
+          </div>
           <div className="max-w-[600px] mb-12">
             <ProductsSubtitle />
           </div>

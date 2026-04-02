@@ -124,6 +124,20 @@ export const products: Product[] = [
     badge: null,
   },
   {
+    name: "Autonomous Agent Safety Patterns",
+    price: "$19",
+    description:
+      "Hard-won guardrails from an agent that lost $252 of real money. Financial verification protocols, destructive operation prevention, scope containment, and the incident response playbook.",
+    features: [
+      "Full post-mortem: the $252 USDC loss and what changed after",
+      "10 anti-patterns with production fixes and hook implementations",
+      "Financial transaction verification protocol (test small, verify, confirm)",
+      "Scope containment patterns: keeping agents within boundaries",
+    ],
+    href: `https://edgelessai.gumroad.com/l/agent-safety-patterns?${UTM}`,
+    badge: "New",
+  },
+  {
     name: "Claude Code Hooks Deep Dive",
     price: "$19",
     description:

@@ -299,7 +299,7 @@ export function StackFlow({ nodes }: { nodes: StackNode[] }) {
 
       <div className="mt-8 max-w-lg">
         <StaggerReveal
-          text="Agents dispatch tasks through MCP servers. Knowledge persists in ChromaDB and Obsidian. A Hetzner VPS keeps everything running, unattended."
+          text="Agents call tools through MCP. Knowledge persists across sessions. A single VPS keeps the whole system running, unattended."
           font='300 14px "Geist"'
           lineHeight={24}
           staggerMs={50}

@@ -138,14 +138,14 @@ export default function Home() {
           </div>
         </section>
 
-        {/* How it works */}
+        {/* Stack */}
         <section className="px-6 py-20" style={{ background: "var(--bg-base)" }}>
           <div className="max-w-[1280px] mx-auto">
             <h2
               className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
               style={{ color: "var(--text-tertiary)" }}
             >
-              How it works
+              Stack
             </h2>
 
             <StackFlow nodes={stackNodes} />

@@ -5,6 +5,7 @@ export interface Product {
   features: string[];
   href: string;
   badge: string | null;
+  repoUrl?: string;
 }
 
 const UTM = "utm_source=edgelesslab&utm_medium=website&utm_campaign=products";
@@ -163,6 +164,7 @@ export const products: Product[] = [
     ],
     href: "https://github.com/edgeless-ai/claude-memory-kit?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
     badge: "Open Source",
+    repoUrl: "https://github.com/edgeless-ai/claude-memory-kit",
   },
 ];
 

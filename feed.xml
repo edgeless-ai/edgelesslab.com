@@ -7,6 +7,27 @@
     <language>en-us</language>
     <atom:link href="https://edgelesslab.com/feed.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>The Hook That Saved My Codebase</title>
+      <link>https://edgelesslab.com/blog/the-hook-that-saved-my-codebase</link>
+      <description>A single Claude Code hook prevented a cascading rm -rf from wiping source files. Here&apos;s how damage-control hooks work, and 3 you can steal today.</description>
+      <pubDate>Fri, 03 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/the-hook-that-saved-my-codebase</guid>
+    </item>
+    <item>
+      <title>PreText: Typography That Thinks</title>
+      <link>https://edgelesslab.com/blog/pretext-typography-that-thinks</link>
+      <description>Most web text is a dumb rectangle. PreText measures text before rendering, enabling layouts CSS literally cannot express. Here&apos;s how we use it.</description>
+      <pubDate>Thu, 02 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/pretext-typography-that-thinks</guid>
+    </item>
+    <item>
+      <title>Writing Prompts That Survive Production</title>
+      <link>https://edgelesslab.com/blog/writing-prompts-that-survive-production</link>
+      <description>Most prompt guides optimize for demos. Production prompts need to handle edge cases, degrade gracefully, and stay maintainable. Here&apos;s the difference.</description>
+      <pubDate>Mon, 30 Mar 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/writing-prompts-that-survive-production</guid>
+    </item>
+    <item>
       <title>The One-File Memory System That Changed How I Use Claude</title>
       <link>https://edgelesslab.com/blog/one-file-memory-system</link>
       <description>You shouldn&apos;t have to re-explain your stack every session. Here&apos;s the simplest possible setup to give Claude persistent memory -- and how to do it in 10 minutes.</description>

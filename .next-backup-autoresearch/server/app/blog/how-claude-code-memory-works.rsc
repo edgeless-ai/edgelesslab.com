@@ -1,0 +1,87 @@
+1:"$Sreact.fragment"
+2:I[39785,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js"],"PostHogProvider"]
+3:I[44053,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js"],"default"]
+4:I[60490,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js"],"default"]
+6:I[2579,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js"],"OutletBoundary"]
+7:"$Sreact.suspense"
+a:I[2579,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js"],"ViewportBoundary"]
+c:I[2579,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js"],"MetadataBoundary"]
+e:I[16202,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js"],"default",1]
+:HL["/_next/static/chunks/157q4c0zqt4x8.css","style"]
+:HL["/_next/static/media/797e433ab948586e-s.p.0.q-h669a_dqa.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/_next/static/media/caa3a2e1cccd8315-s.p.16t1db8_9y2o~.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+0:{"P":null,"c":["","blog","how-claude-code-memory-works",""],"q":"","i":false,"f":[[["",{"children":["blog",{"children":[["slug","how-claude-code-memory-works","d",null],{"children":["__PAGE__",{}]}]}]},"$undefined","$undefined",16],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/157q4c0zqt4x8.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/_next/static/chunks/0r6k.ywzkruzy.js","async":true,"nonce":"$undefined"}],["$","script","script-1",{"src":"/_next/static/chunks/0.y-6rdfb1fek.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","className":"geist_a71539c9-module__T19VSG__variable geist_mono_8d43a2aa-module__8Li5zG__variable h-full antialiased","children":[["$","head",null,{"children":[["$","link",null,{"rel":"preconnect","href":"https://us.i.posthog.com","crossOrigin":"anonymous"}],["$","link",null,{"rel":"preconnect","href":"https://edgelessai.gumroad.com","crossOrigin":"anonymous"}],["$","link",null,{"rel":"dns-prefetch","href":"https://github.com"}]]}],["$","body",null,{"className":"min-h-full flex flex-col","children":[["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"{\"@context\":\"https://schema.org\",\"@type\":\"Organization\",\"name\":\"Edgeless Labs\",\"url\":\"https://edgelesslab.com\",\"description\":\"Creative technology lab building AI agents, MCP servers, generative art pipelines, and developer tools\",\"founder\":{\"@type\":\"Person\",\"name\":\"David Murray\"},\"sameAs\":[\"https://github.com/edgeless-ai\",\"https://edgelessai.gumroad.com\"]}"}}],["$","a",null,{"href":"#main-content","className":"sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-full focus:text-sm focus:font-medium focus:text-white","style":{"background":"var(--accent)"},"children":"Skip to main content"}],["$","$L2",null,{"children":["$","$L3",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L4",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]]}]]}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L3",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L4",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":[null,["$","$L3",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L4",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":[["$","$1","c",{"children":["$L5",[["$","script","script-0",{"src":"/_next/static/chunks/054~j~kx6aw5n.js","async":true,"nonce":"$undefined"}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],{},null,false,null]},null,false,"$@9"]},null,false,"$@9"]},null,false,null],["$","$1","h",{"children":[null,["$","$La",null,{"children":"$Lb"}],["$","div",null,{"hidden":true,"children":["$","$Lc",null,{"children":["$","$7",null,{"name":"Next.Metadata","children":"$Ld"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],false]],"m":"$undefined","G":["$e",[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/157q4c0zqt4x8.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]]],"S":true,"h":null,"s":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"YuHA4iNoScLrpRTZtYdkv"}
+f:[]
+9:"$Wf"
+10:I[82591,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js","/_next/static/chunks/054~j~kx6aw5n.js"],"Nav"]
+11:T11f7,<p>Every Claude Code session starts the same way: a blank slate. No memory of yesterday's architecture decisions. No recall of your coding conventions. No idea that you spent three hours debugging that OAuth flow last week.</p>
+<p>This is the single biggest friction point in AI-assisted development. Not model capability. Not context windows. Memory.</p>
+<h2>The Problem Is Structural</h2>
+<p>Claude Code reads instructions from a file called <code>CLAUDE.md</code> at the start of every session. That's it. There's no built-in persistence layer. No session history. No learning from past interactions.</p>
+<p>So every session, you repeat yourself: "We use TypeScript, not JavaScript." "The API lives in <code>src/api/</code>, not <code>api/</code>." "Don't use default exports." "We already tried approach X and it failed because Y."</p>
+<p>This isn't a minor annoyance. It's a compounding tax on every interaction.</p>
+<h2>File-Based Memory Fixes This</h2>
+<p>The solution is surprisingly simple: structured markdown files that Claude reads automatically at session start.</p>
+<p>No databases. No vector stores. No infrastructure. Just files in your repo that Claude already knows how to read.</p>
+<p>The memory system layers on top of Claude Code's built-in <code>CLAUDE.md</code> hierarchy. Claude loads these files automatically. You don't need plugins or configuration.</p>
+<h2>The 4 Memory Types</h2>
+<p>After running this pattern in production across multiple projects, I've found four distinct memory types that cover every use case.</p>
+<h3>1. User Memory</h3>
+<p>Who you are and how you work. Follows you across every project.</p>
+<p><code>`</code>yaml
+name: User Role
+type: user
+---
+Senior backend engineer, 8 years Go.
+New to React frontend in this project.
+Prefer explanations mapping frontend concepts to backend analogues.
+<code>`</code></p>
+<h3>2. Feedback Memory</h3>
+<p>Corrections that stick. The highest-value memory type -- every correction makes every future session better.</p>
+<p><code>`</code>yaml
+name: No mocking in integration tests
+type: feedback
+---
+Integration tests must hit a real database, not mocks.
+Why: Mocked tests passed but prod migration failed last quarter.
+<code>`</code></p>
+<h3>3. Project Memory</h3>
+<p>Architecture decisions, conventions, and infrastructure specific to one codebase.</p>
+<p><code>`</code>yaml
+name: API Migration Freeze
+type: project
+---
+No breaking API changes until 2026-03-15 (mobile release cut).
+Any endpoint modifications must be backwards-compatible.
+<code>`</code></p>
+<h3>4. Reference Memory</h3>
+<p>Pointers to where things live. Tools, APIs, dashboards.</p>
+<p><code>`</code>yaml
+name: Bug Tracker
+type: reference
+---
+Production bugs: Linear project "PLATFORM"
+Feature requests: Linear project "ROADMAP"
+Design specs: Figma workspace "Product Design 2026"
+<code>`</code></p>
+<h2>What Changes in Practice</h2>
+<p>With memory in place, sessions start differently. Instead of 10 minutes of context-setting, you jump straight into the work.</p>
+<p>Claude remembers that your test suite uses Vitest, not Jest. It knows the deploy script is at <code>scripts/deploy.sh</code>, not <code>deploy.sh</code>. It recalls that you tried Redis caching last month and hit connection pooling issues.</p>
+<p>After a month of accumulated feedback memory, Claude makes roughly 60% fewer mistakes that require correction. That's not a benchmark -- that's from tracking corrections across my own projects.</p>
+<h2>The Maintenance Problem</h2>
+<p>Raw memory files work, but they accumulate cruft. Outdated entries. Contradictory instructions. Files that grow past useful size.</p>
+<p>The discipline: review monthly, archive aggressively, keep each file under 200 lines. Memory that's too long defeats the purpose -- Claude spends context window on stale instructions instead of your actual task.</p>
+<h2>Get Started</h2>
+<p>I've open-sourced the base memory kit with templates for all four memory types, a starter CLAUDE.md structure, and setup instructions.</p>
+<p><strong>Free:</strong> <a href="https://github.com/edgeless-ai/claude-memory-kit">Claude Memory Kit on GitHub</a></p>
+<p>The free version covers 90% of use cases. For production patterns including stack-specific libraries (React/Next.js, Python/FastAPI, Go, Rails, Rust), multi-project memory architectures, and CLAUDE.md templates:</p>
+<p><strong>Pro ($29):</strong> <a href="https://edgelessai.gumroad.com/l/claude-memory-kit">Claude Memory Kit Pro on Gumroad</a></p>
+<p>The best time to set up memory is before your next session. Takes 15 minutes, saves hours every week.</p>5:["$","div",null,{"className":"flex flex-col min-h-full","style":{"background":"var(--bg-base)"},"children":[["$","$L10",null,{}],["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"{\"@context\":\"https://schema.org\",\"@type\":\"BlogPosting\",\"headline\":\"How Claude Code Memory Actually Works\",\"description\":\"Claude forgets everything between sessions. Here's how file-based memory fixes that, and why it changes how you work with AI.\",\"datePublished\":\"2026-03-21\",\"author\":{\"@type\":\"Person\",\"name\":\"David Murray\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"Edgeless Labs\",\"url\":\"https://edgelesslab.com\"},\"url\":\"https://edgelesslab.com/blog/how-claude-code-memory-works\"}"}}],["$","article",null,{"className":"pt-28 pb-20 px-6","children":["$","div",null,{"className":"max-w-[680px] mx-auto","children":[["$","div",null,{"className":"mb-12","children":[["$","div",null,{"className":"flex items-center gap-3 mb-4","children":[["$","time",null,{"className":"text-xs font-mono","style":{"color":"var(--text-tertiary)"},"dateTime":"2026-03-21","children":"March 21, 2026"}],["$","span",null,{"className":"text-xs font-mono","style":{"color":"var(--text-tertiary)"},"children":"6 min"}]]}],["$","h1",null,{"className":"text-3xl sm:text-4xl font-bold tracking-tight leading-[1.2] mb-4","style":{"color":"var(--text-primary)"},"children":"How Claude Code Memory Actually Works"}],["$","p",null,{"className":"text-lg font-light","style":{"color":"var(--text-secondary)","lineHeight":1.7},"children":"Claude forgets everything between sessions. Here's how file-based memory fixes that, and why it changes how you work with AI."}],["$","div",null,{"className":"flex flex-wrap gap-2 mt-4","children":[["$","span","Claude Code",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Claude Code"}],["$","span","Memory",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Memory"}],["$","span","Developer Tools",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Developer Tools"}]]}]]}],["$","div",null,{"className":"prose-custom","dangerouslySetInnerHTML":{"__html":"$11"}}],"$L12"]}]}],"$L13"]}]
+14:I[63560,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js","/_next/static/chunks/054~j~kx6aw5n.js"],""]
+15:I[52150,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js","/_next/static/chunks/054~j~kx6aw5n.js"],"Footer"]
+12:["$","div",null,{"className":"mt-16 pt-8 border-t","style":{"borderColor":"var(--border-subtle)"},"children":["$","$L14",null,{"href":"/blog","className":"text-sm font-medium transition-colors hover:text-white","style":{"color":"var(--text-secondary)"},"children":"← All posts"}]}]
+13:["$","$L15",null,{}]
+b:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+16:I[13103,["/_next/static/chunks/0r6k.ywzkruzy.js","/_next/static/chunks/0.y-6rdfb1fek.js"],"IconMark"]
+8:null
+d:[["$","title","0",{"children":"How Claude Code Memory Actually Works | Edgeless Labs"}],["$","meta","1",{"name":"description","content":"Claude forgets everything between sessions. Here's how file-based memory fixes that, and why it changes how you work with AI."}],["$","meta","2",{"name":"keywords","content":"Claude Code,Memory,Developer Tools"}],["$","meta","3",{"name":"robots","content":"index, follow"}],["$","meta","4",{"name":"googlebot","content":"index, follow"}],["$","link","5",{"rel":"canonical","href":"https://edgelesslab.com/blog/how-claude-code-memory-works/"}],["$","meta","6",{"property":"og:title","content":"How Claude Code Memory Actually Works | Edgeless Labs"}],["$","meta","7",{"property":"og:description","content":"Claude forgets everything between sessions. Here's how file-based memory fixes that, and why it changes how you work with AI."}],["$","meta","8",{"property":"og:url","content":"https://edgelesslab.com/blog/how-claude-code-memory-works/"}],["$","meta","9",{"property":"og:type","content":"article"}],["$","meta","10",{"property":"article:published_time","content":"2026-03-21"}],["$","meta","11",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","12",{"name":"twitter:title","content":"How Claude Code Memory Actually Works | Edgeless Labs"}],["$","meta","13",{"name":"twitter:description","content":"Claude forgets everything between sessions. Here's how file-based memory fixes that, and why it changes how you work with AI."}],["$","meta","14",{"name":"twitter:image","content":"https://edgelesslab.com/og-image.png"}],["$","link","15",{"rel":"icon","href":"/favicon.svg"}],["$","link","16",{"rel":"apple-touch-icon","href":"/apple-touch-icon.png"}],["$","$L16","17",{}]]

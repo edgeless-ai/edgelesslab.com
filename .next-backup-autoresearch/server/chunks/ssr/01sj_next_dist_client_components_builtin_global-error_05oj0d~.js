@@ -1,0 +1,3 @@
+module.exports=[54857,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(6533);a.n(d("[project]/claude-projects/edgeless-website/node_modules/next/dist/client/components/builtin/global-error.js <module evaluation>"))},30275,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(6533);a.n(d("[project]/claude-projects/edgeless-website/node_modules/next/dist/client/components/builtin/global-error.js"))},49973,a=>{"use strict";a.i(54857);var b=a.i(30275);a.n(b)},53464,a=>{a.n(a.i(49973))}];
+
+//# sourceMappingURL=01sj_next_dist_client_components_builtin_global-error_05oj0d~.js.map

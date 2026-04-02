@@ -269,14 +269,14 @@ function buildFlowSegments(nodes: StackNode[]): RichFlowSegment[] {
       style: { color: "var(--accent)" },
     });
     segments.push({
-      text: ` ${node.sublabel}`,
+      text: `\u00A0${node.sublabel}`,
       font: SANS_FONT,
       lineHeight: FLOW_LINE_HEIGHT,
       style: { color: "var(--text-tertiary)" },
     });
     if (i < nodes.length - 1) {
       segments.push({
-        text: " \u2192 ",
+        text: "\u00A0\u2192\u00A0",
         font: SANS_FONT,
         lineHeight: FLOW_LINE_HEIGHT,
         style: { color: "var(--border-focus)" },

@@ -124,6 +124,20 @@ export const products: Product[] = [
     badge: null,
   },
   {
+    name: "Claude Code Hooks Deep Dive",
+    price: "$19",
+    description:
+      "15 production hooks beyond the basics. The damage-control hook that blocks destructive commands. The verify-completion hook that won't let you lie about finishing. Session init, memory flush, pre-commit guards.",
+    features: [
+      "15 battle-tested hooks with full source and walkthroughs",
+      "damage-control.py: the hook that saved the codebase from rm -rf",
+      "Hook composition patterns: chaining, conditional, env-aware",
+      "Template hooks for common scenarios you can customize in minutes",
+    ],
+    href: `https://edgelessai.gumroad.com/l/hooks-deep-dive?${UTM}`,
+    badge: "New",
+  },
+  {
     name: "Hooks Library",
     price: "$14",
     description:

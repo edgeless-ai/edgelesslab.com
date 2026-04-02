@@ -162,7 +162,7 @@ export function PreTextRichFlow({
   // SSR / loading fallback: natural inline flow
   if (!lines) {
     return (
-      <div ref={containerRef} className={className} style={style}>
+      <div ref={containerRef} className={className} style={{ ...style, whiteSpace: "pre-wrap" }}>
         {segments.map((seg, i) => (
           <span key={i} style={{ ...seg.style, font: seg.font }}>
             {seg.text}

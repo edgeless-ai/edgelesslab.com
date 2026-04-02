@@ -55,9 +55,9 @@ Evening: update the website, deploy, push to Gumroad. The website is a Next.js s
 
 ## The Numbers
 
-18 products live. 14 blog posts. Product prices from Free to $39. The catalog spans AI agents, developer tools, automation workflows, and generative art. Total catalog value (if someone bought everything): $372.
+18 products live. 14 blog posts. Product prices from Free to $39. The catalog spans AI agents, developer tools, automation workflows, and generative art. Total catalog value (if someone bought everything): $423.
 
-The important metric isn't week-one revenue. It's surface area. Each product is a entry point. Each blog post is a search result. Each has cross-links to related products. The compounding happens when someone finds one post, buys one product, and discovers the rest exist.
+The important metric isn't week-one revenue. It's surface area. Each product is an entry point. Each blog post is a search result. Each has cross-links to related products. The compounding happens when someone finds one post, buys one product, and discovers the rest exist.
 
 ## The Process as Product
 
@@ -429,7 +429,7 @@ PreText skips the DOM entirely. It uses the Canvas 2D text measurement API to ca
 
 The [Edgeless Lab site](/) uses PreText in six places, each solving a different layout problem:
 
-**Masonry product grid** -- The [products page](/products) lays out 11 cards in a masonry grid. Each card's height is different because descriptions vary in length. PreText measures every description, calculates the exact card height, and places cards using a shortest-column algorithm. Zero DOM measurement. Zero layout shift.
+**Masonry product grid** -- The [products page](/products) lays out product cards in a masonry grid. Each card's height is different because descriptions vary in length. PreText measures every description, calculates the exact card height, and places cards using a shortest-column algorithm. Zero DOM measurement. Zero layout shift.
 
 **Shrink-wrap balanced text** -- The about section on the homepage wraps text to the tightest possible width that preserves line count. CSS \`fit-content\` leaves dead space on the last line. PreText's \`walkLineRanges\` finds the actual maximum line width, giving text a balanced, typeset appearance.
 
@@ -753,7 +753,7 @@ See the [lab experiments page](/lab) for the MCP servers running in this system,
     title: "Generative Art for Pen Plotters: A Technical Primer",
     description: "Pen plotter art isn't screen art printed on paper. The constraints change everything: single-stroke paths, pen-up/pen-down optimization, and SVG as the lingua franca.",
     date: "2026-03-23",
-    tags: ["Generative Art", "Creative Coding", "Pen Plotter"],
+    tags: ["Generative Art", "Creative Coding", "Pen Plotters"],
     readTime: "7 min",
     content: `
 When you generate art for a screen, mistakes are invisible. A triangle with a slight gap renders fine -- the display fills it in. Lines can overlap arbitrarily. Color can be sampled per-pixel.

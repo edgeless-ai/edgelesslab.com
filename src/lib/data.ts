@@ -32,7 +32,7 @@ export const products: Product[] = [
       "Build AI agents that actually work. 15 production-ready agent patterns with complete implementations for Claude, GPT, and open-source models.",
     features: [
       "15 production-ready agent patterns with working code",
-      "Multi-agent orchestration and memory systems",
+      "Memory systems, tool integration, and context management",
       "Error recovery and deployment strategies",
       "Architecture diagrams and production lessons learned",
     ],

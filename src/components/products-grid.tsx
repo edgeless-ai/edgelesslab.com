@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect, useMemo, useCallback } from "react";
 import { ArrowUpRight, ChevronDown } from "lucide-react";
 import { usePreText } from "@/hooks/use-pretext";
+import { KineticPreText } from "@/components/ui/kinetic-pretext";
 import { PreTextMasonry } from "@/components/ui/pretext-masonry";
 import type { Product } from "@/lib/data";
 
@@ -134,6 +135,13 @@ function ProductCard({
   featuresHeight: number;
   onToggle: () => void;
 }) {
+  const [wasExpanded, setWasExpanded] = useState(false);
+  const justExpanded = expanded && !wasExpanded;
+
+  useEffect(() => {
+    setWasExpanded(expanded);
+  }, [expanded]);
+
   return (
     <div
       className="group relative flex flex-col rounded-xl border p-6 h-full transition-colors hover:border-white/20"
@@ -174,14 +182,24 @@ function ProductCard({
         {product.price}
       </span>
 
-      <p
-        className="text-sm mb-5"
-        style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
-      >
-        {product.description}
-      </p>
+      {/* Cursor-reactive description -- text flows around your mouse */}
+      <div className="mb-5">
+        <KineticPreText
+          text={product.description}
+          font={DESC_FONT}
+          lineHeight={DESC_LINE_HEIGHT}
+          cursorRadius={24}
+          cursorColor="var(--accent)"
+          style={{ color: "var(--text-secondary)" }}
+          fallback={
+            <p className="text-sm" style={{ lineHeight: 1.6 }}>
+              {product.description}
+            </p>
+          }
+        />
+      </div>
 
-      {/* Accordion: features */}
+      {/* Accordion toggle */}
       <button
         onClick={(e) => {
           e.preventDefault();
@@ -200,6 +218,7 @@ function ProductCard({
         {expanded ? "Less" : `${product.features.length} features`}
       </button>
 
+      {/* Staggered feature reveal */}
       <div
         style={{
           maxHeight: expanded ? `${featuresHeight}px` : "0px",
@@ -208,15 +227,30 @@ function ProductCard({
         }}
       >
         <ul className="space-y-2 py-2">
-          {product.features.map((feature) => (
+          {product.features.map((feature, i) => (
             <li
               key={feature}
               className="text-xs flex items-start gap-2"
-              style={{ color: "var(--text-tertiary)" }}
+              style={{
+                color: "var(--text-tertiary)",
+                opacity: expanded ? 1 : 0,
+                transform: expanded
+                  ? "translateX(0)"
+                  : `translateX(${-12 - i * 4}px)`,
+                transition: justExpanded
+                  ? `opacity 0.35s ease ${i * 55}ms, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${i * 55}ms`
+                  : "opacity 0.15s ease, transform 0.15s ease",
+              }}
             >
               <span
                 className="mt-1 w-1 h-1 rounded-full flex-shrink-0"
-                style={{ background: "var(--accent)" }}
+                style={{
+                  background: "var(--accent)",
+                  opacity: expanded ? 1 : 0,
+                  transition: justExpanded
+                    ? `opacity 0.3s ease ${i * 55 + 30}ms`
+                    : "opacity 0.1s ease",
+                }}
               />
               {feature}
             </li>

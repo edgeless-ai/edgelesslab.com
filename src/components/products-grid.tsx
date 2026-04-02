@@ -364,11 +364,17 @@ function ProductCard({
           className="absolute top-4 right-4 px-2 py-0.5 text-xs font-mono rounded-md"
           style={{
             background:
-              product.price === "Free"
-                ? "rgba(34,197,94,0.15)"
-                : "var(--accent-muted)",
+              product.comingSoon
+                ? "rgba(255,255,255,0.08)"
+                : product.price === "Free"
+                  ? "rgba(34,197,94,0.15)"
+                  : "var(--accent-muted)",
             color:
-              product.price === "Free" ? "var(--green)" : "var(--accent)",
+              product.comingSoon
+                ? "var(--text-tertiary)"
+                : product.price === "Free"
+                  ? "var(--green)"
+                  : "var(--accent)",
           }}
         >
           {product.badge}
@@ -465,19 +471,28 @@ function ProductCard({
         </ul>
       </div>
 
-      <a
-        href={product.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-1 text-sm font-medium hover:text-white transition-colors mt-auto pt-2"
-        style={{ color: "var(--text-secondary)" }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {product.price === "Free"
-          ? "Get it free on GitHub"
-          : `Buy now \u2014 ${product.price}`}
-        <ArrowUpRight size={14} />
-      </a>
+      {product.comingSoon ? (
+        <span
+          className="flex items-center gap-1 text-sm font-medium mt-auto pt-2"
+          style={{ color: "var(--text-tertiary)" }}
+        >
+          Coming soon
+        </span>
+      ) : (
+        <a
+          href={product.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 text-sm font-medium hover:text-white transition-colors mt-auto pt-2"
+          style={{ color: "var(--text-secondary)" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {product.price === "Free"
+            ? "Get it free on GitHub"
+            : `Buy now \u2014 ${product.price}`}
+          <ArrowUpRight size={14} />
+        </a>
+      )}
     </div>
   );
 }

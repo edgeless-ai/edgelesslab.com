@@ -34,7 +34,7 @@ export default function ProductsPage() {
               className="text-xs font-mono"
               style={{ color: "var(--text-tertiary)" }}
             >
-              {products.length} tools &middot; {products.filter(p => p.price === "Free").length} free
+              {products.filter(p => !p.comingSoon).length} available &middot; {products.filter(p => p.comingSoon).length} coming soon
             </span>
           </div>
           <div className="max-w-[600px] mb-12">

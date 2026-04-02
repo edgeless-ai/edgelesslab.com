@@ -6,6 +6,7 @@ export interface Product {
   href: string;
   badge: string | null;
   repoUrl?: string;
+  comingSoon?: boolean;
 }
 
 const UTM = "utm_source=edgelesslab&utm_medium=website&utm_campaign=products";
@@ -23,7 +24,8 @@ export const products: Product[] = [
       "3 reference pipelines: research, code review, content processing",
     ],
     href: `https://edgelessai.gumroad.com/l/multi-agent-blueprint?${UTM}`,
-    badge: "New",
+    badge: "Coming Soon",
+    comingSoon: true,
   },
   {
     name: "The Agent Cookbook",
@@ -79,7 +81,8 @@ export const products: Product[] = [
       "Print-ready export: A4, A3, letter sizes with plotter setup guides",
     ],
     href: `https://edgelessai.gumroad.com/l/gen-art-starter?${UTM}`,
-    badge: null,
+    badge: "Coming Soon",
+    comingSoon: true,
   },
   {
     name: "Production MCP Server Kit",
@@ -93,7 +96,8 @@ export const products: Product[] = [
       "3 production server examples: filesystem, database, external API",
     ],
     href: `https://edgelessai.gumroad.com/l/production-mcp-kit?${UTM}`,
-    badge: "New",
+    badge: "Coming Soon",
+    comingSoon: true,
   },
   {
     name: "AI Code Review Playbook",
@@ -121,7 +125,8 @@ export const products: Product[] = [
       "Cross-sell and bundle strategies with real revenue examples",
     ],
     href: `https://edgelessai.gumroad.com/l/launch-toolkit?${UTM}`,
-    badge: null,
+    badge: "Coming Soon",
+    comingSoon: true,
   },
   {
     name: "n8n AI Workflow Templates",
@@ -135,7 +140,8 @@ export const products: Product[] = [
       "Docker n8n setup guide with environment configuration",
     ],
     href: `https://edgelessai.gumroad.com/l/n8n-ai-workflows?${UTM}`,
-    badge: null,
+    badge: "Coming Soon",
+    comingSoon: true,
   },
   {
     name: "MCP Server Starter Kit",
@@ -191,7 +197,8 @@ export const products: Product[] = [
       "Scope containment patterns: keeping agents within boundaries",
     ],
     href: `https://edgelessai.gumroad.com/l/agent-safety-patterns?${UTM}`,
-    badge: null,
+    badge: "Coming Soon",
+    comingSoon: true,
   },
   {
     name: "Claude Code Hooks Deep Dive",
@@ -205,7 +212,8 @@ export const products: Product[] = [
       "Template hooks for common scenarios you can customize in minutes",
     ],
     href: `https://edgelessai.gumroad.com/l/hooks-deep-dive?${UTM}`,
-    badge: null,
+    badge: "Coming Soon",
+    comingSoon: true,
   },
   {
     name: "CLAUDE.md Template Pack",

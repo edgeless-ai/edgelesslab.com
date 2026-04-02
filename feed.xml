@@ -7,6 +7,13 @@
     <language>en-us</language>
     <atom:link href="https://edgelesslab.com/feed.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>I Built 75 Generative Art Algorithms. Here Are the 10 That Actually Look Good.</title>
+      <link>https://edgelesslab.com/blog/generative-art-algorithms-that-work</link>
+      <description>Most generative art looks like noise. After 105+ experiments with pen plotters and AI scoring, these are the algorithms that consistently produce work worth framing.</description>
+      <pubDate>Wed, 08 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/generative-art-algorithms-that-work</guid>
+    </item>
+    <item>
       <title>How I Run 5 AI Agents That Talk to Each Other</title>
       <link>https://edgelesslab.com/blog/agents-that-talk-to-each-other</link>
       <description>A dispatch agent routes tasks to specialist workers. They communicate through a real-time bus and async inboxes. Here&apos;s the architecture, and why most multi-agent frameworks get it wrong.</description>

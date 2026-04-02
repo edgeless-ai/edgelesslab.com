@@ -68,6 +68,20 @@ export const products: Product[] = [
     badge: null,
   },
   {
+    name: "Generative Art Starter Kit",
+    price: "$29",
+    description:
+      "10 Python generators for pen plotters: flow fields, L-systems, Voronoi, spirals, reaction-diffusion. Each with parameter guides, example SVGs, and AI scoring rubrics from 105+ experiments.",
+    features: [
+      "10 generators with source code, parameter guides, and 3 example outputs each",
+      "SVG optimization for pen plotters: stroke ordering, travel minimization",
+      "AI scoring rubric for evaluating generative art quality",
+      "Print-ready export: A4, A3, letter sizes with plotter setup guides",
+    ],
+    href: `https://edgelessai.gumroad.com/l/gen-art-starter?${UTM}`,
+    badge: null,
+  },
+  {
     name: "Production MCP Server Kit",
     price: "$29",
     description:

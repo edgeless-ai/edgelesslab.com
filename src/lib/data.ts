@@ -110,6 +110,20 @@ export const products: Product[] = [
     badge: null,
   },
   {
+    name: "Digital Product Launch Toolkit",
+    price: "$24",
+    description:
+      "The exact process used to ship 18 digital products as a solo developer. Gumroad page templates, pricing strategy, launch checklists, and the daily shipping workflow.",
+    features: [
+      "3 Gumroad page layouts: simple, detailed, and premium tiers",
+      "Pricing strategy guide: why $9/$14/$19/$24/$29/$39 tiers work",
+      "18-step launch checklist from idea to live listing",
+      "Cross-sell and bundle strategies with real revenue examples",
+    ],
+    href: `https://edgelessai.gumroad.com/l/launch-toolkit?${UTM}`,
+    badge: null,
+  },
+  {
     name: "n8n AI Workflow Templates",
     price: "$24",
     description:

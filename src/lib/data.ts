@@ -12,6 +12,20 @@ const UTM = "utm_source=edgelesslab&utm_medium=website&utm_campaign=products";
 
 export const products: Product[] = [
   {
+    name: "Multi-Agent Orchestration Blueprint",
+    price: "$39",
+    description:
+      "The dispatch/worker architecture for coordinating multiple AI agents. Agent Bus messaging, async inboxes, state machines, and 3 reference implementations from a system that runs 5 agents 24/7.",
+    features: [
+      "Dispatch/worker topology: routing tasks to specialist agents",
+      "Agent Bus setup: real-time inter-session messaging patterns",
+      "State machines: queued -> acked -> running -> done/failed",
+      "3 reference pipelines: research, code review, content processing",
+    ],
+    href: `https://edgelessai.gumroad.com/l/multi-agent-blueprint?${UTM}`,
+    badge: "New",
+  },
+  {
     name: "The Agent Cookbook",
     price: "$39",
     description:
@@ -93,7 +107,7 @@ export const products: Product[] = [
       "Docker n8n setup guide with environment configuration",
     ],
     href: `https://edgelessai.gumroad.com/l/n8n-ai-workflows?${UTM}`,
-    badge: "New",
+    badge: null,
   },
   {
     name: "MCP Server Starter Kit",

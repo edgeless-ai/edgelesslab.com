@@ -7,6 +7,13 @@
     <language>en-us</language>
     <atom:link href="https://edgelesslab.com/feed.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>How I Run 5 AI Agents That Talk to Each Other</title>
+      <link>https://edgelesslab.com/blog/agents-that-talk-to-each-other</link>
+      <description>A dispatch agent routes tasks to specialist workers. They communicate through a real-time bus and async inboxes. Here&apos;s the architecture, and why most multi-agent frameworks get it wrong.</description>
+      <pubDate>Tue, 07 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/agents-that-talk-to-each-other</guid>
+    </item>
+    <item>
       <title>5 n8n Workflows That Run My AI Business</title>
       <link>https://edgelesslab.com/blog/n8n-workflows-ai-business</link>
       <description>Visual automation for solo developers. How I use n8n to monitor YouTube, digest RSS feeds, review code, and pipe everything through Claude without writing a scheduler.</description>

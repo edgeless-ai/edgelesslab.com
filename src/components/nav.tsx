@@ -40,10 +40,14 @@ export function Nav() {
           >
             <Link
               href="/"
-              className="text-sm font-semibold tracking-tight font-mono hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2 text-[15px] font-semibold tracking-tight font-mono hover:opacity-80 transition-opacity"
               style={{ color: "var(--text-primary)" }}
             >
-              edgeless
+              <span
+                className="inline-block w-1.5 h-1.5 rounded-full"
+                style={{ background: "var(--accent)" }}
+              />
+              edgeless<span style={{ color: "var(--text-tertiary)" }}>/lab</span>
             </Link>
             <div className="hidden md:flex items-center gap-5">
               {navLinks.map((link) => (

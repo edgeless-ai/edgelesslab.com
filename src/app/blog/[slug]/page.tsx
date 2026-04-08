@@ -1,4 +1,5 @@
 import { posts } from "@/lib/blog";
+import { products } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Nav } from "@/components/nav";
@@ -142,6 +143,37 @@ export default async function BlogPostPage({
             className="prose-custom"
             dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }}
           />
+
+          {/* Companion product CTA */}
+          {post.productSlug && (() => {
+            const product = products.find((p) => p.href.includes(`/l/${post.productSlug}`));
+            if (!product || product.comingSoon) return null;
+            return (
+              <a
+                href={product.href}
+                className="block mt-12 p-6 rounded-lg border transition-colors hover:border-white/30"
+                style={{
+                  background: "var(--accent-muted)",
+                  borderColor: "var(--border-subtle)",
+                }}
+              >
+                <div className="text-xs font-mono uppercase tracking-wider mb-2" style={{ color: "var(--accent)" }}>
+                  Companion product
+                </div>
+                <div className="flex items-baseline justify-between gap-4 mb-2">
+                  <div className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+                    {product.name}
+                  </div>
+                  <div className="text-base font-mono" style={{ color: "var(--text-secondary)" }}>
+                    {product.price}
+                  </div>
+                </div>
+                <p className="text-sm" style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}>
+                  This post is adapted from {product.name}. Get the full implementation, code, and templates.
+                </p>
+              </a>
+            );
+          })()}
 
           {/* Back link */}
           <div className="mt-16 pt-8 border-t" style={{ borderColor: "var(--border-subtle)" }}>

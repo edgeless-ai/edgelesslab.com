@@ -6,11 +6,13 @@ export interface BlogPost {
   tags: string[];
   readTime: string;
   content: string;
+  productSlug?: string;
 }
 
 export const posts: BlogPost[] = [
   {
     slug: "shipped-7-products-in-7-days",
+    productSlug: "launch-toolkit",
     title: "I Shipped 7 Digital Products in 7 Days. Here's Exactly How.",
     description: "The meta-narrative: how one solo developer used AI agents, autoreason scoring, and a daily shipping cadence to go from 11 to 18 products in a week.",
     date: "2026-04-09",
@@ -70,6 +72,7 @@ Everything on the [products page](/products).
   },
   {
     slug: "generative-art-algorithms-that-work",
+    productSlug: "gen-art-starter",
     title: "I Built 75 Generative Art Algorithms. Here Are the 10 That Actually Look Good.",
     description: "Most generative art looks like noise. After 105+ experiments with pen plotters and AI scoring, these are the algorithms that consistently produce work worth framing.",
     date: "2026-04-08",
@@ -123,6 +126,7 @@ The best generative art doesn't look generative. It looks like someone made a de
   },
   {
     slug: "agents-that-talk-to-each-other",
+    productSlug: "multi-agent-blueprint",
     title: "How I Run 5 AI Agents That Talk to Each Other",
     description: "A dispatch agent routes tasks to specialist workers. They communicate through a real-time bus and async inboxes. Here's the architecture, and why most multi-agent frameworks get it wrong.",
     date: "2026-04-07",
@@ -188,6 +192,7 @@ The value isn't in the architecture diagram. It's in knowing which shortcuts wor
   },
   {
     slug: "n8n-workflows-ai-business",
+    productSlug: "n8n-ai-workflows",
     title: "5 n8n Workflows That Run My AI Business",
     description: "Visual automation for solo developers. How I use n8n to monitor YouTube, digest RSS feeds, review code, and pipe everything through Claude without writing a scheduler.",
     date: "2026-04-06",
@@ -256,6 +261,7 @@ The full workflow JSON files, setup guides, and customization instructions are i
   },
   {
     slug: "mcp-servers-break-in-production",
+    productSlug: "production-mcp-kit",
     title: "Most MCP Servers Break in Production. Here's Why.",
     description: "400+ MCP servers exist. Most work in demos and fail under real load. The 5 failure modes I hit running MCP servers 24/7, and what production-grade actually means.",
     date: "2026-04-05",
@@ -311,6 +317,7 @@ The gap between "works in a demo" and "runs unattended at 3am" is where most MCP
   },
   {
     slug: "agent-lost-252-dollars",
+    productSlug: "agent-safety-patterns",
     title: "I Let an AI Agent Move My Money. It Lost $252.",
     description: "An autonomous agent exceeded its scope, moved funds without verification, and then lied about recovery. The full post-mortem, and the 3 guardrails that would have prevented it.",
     date: "2026-04-04",
@@ -362,6 +369,7 @@ Your job isn't to trust the agent. It's to make the wrong path impossible.
   },
   {
     slug: "the-hook-that-saved-my-codebase",
+    productSlug: "hooks-deep-dive",
     title: "The Hook That Saved My Codebase",
     description: "A single Claude Code hook prevented a cascading rm -rf from wiping source files. Here's how damage-control hooks work, and 3 you can steal today.",
     date: "2026-04-03",

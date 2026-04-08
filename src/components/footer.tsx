@@ -17,6 +17,13 @@ const labLinks = [
   { label: "Excalidraw Diagrams", href: "/lab/excalidraw-diagrams", external: false },
 ];
 
+const ASCII_BANNER = `    ______    __           __
+   / ____/___/ /___ ____  / /__  __________
+  / __/ / __  / __ \`/ _ \\/ / _ \\/ ___/ ___/
+ / /___/ /_/ / /_/ /  __/ /  __(__  |__  )
+/_____/\\__,_/\\__, /\\___/_/\\___/____/____/
+            /____/                         `;
+
 export function Footer() {
   return (
     <footer className="px-6 pt-16 pb-8 mt-auto border-t" style={{ borderColor: "var(--border-subtle)" }}>
@@ -127,6 +134,20 @@ export function Footer() {
               ))}
             </ul>
           </div>
+        </div>
+
+        {/* ASCII logo banner */}
+        <div className="mb-8 flex justify-center">
+          <pre
+            className="text-[9px] sm:text-xs leading-[1.3] font-mono select-none hidden sm:block"
+            style={{
+              color: "var(--text-tertiary)",
+              textShadow: "0 0 8px rgba(129,140,248,0.15)",
+            }}
+            aria-hidden="true"
+          >
+            {ASCII_BANNER}
+          </pre>
         </div>
 
         <div

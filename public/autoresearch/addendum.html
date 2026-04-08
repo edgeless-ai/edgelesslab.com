@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Full Catalog · Pen Plotter Autoresearch — Edgeless Lab</title>
+
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=boska@301,401,501,1701,1401&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* shares the editorial palette but strips ALL decoration */
+
+:root {
+  --paper:        #f3eddd;
+  --paper-deep:   #ebe3cf;
+  --ink:          #0c0a08;
+  --ink-soft:     #2a2520;
+  --ink-faint:    #6a6256;
+  --rule:         #d4cab4;
+  --amber:        #c2410c;
+  --amber-deep:   #9a3412;
+  --serif:        "Boska", "Times New Roman", Georgia, serif;
+  --mono:         "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --margin-x:     clamp(1rem, 4vw, 4rem);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-feature-settings: "liga" on, "kern" on;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+::selection { background: var(--amber); color: var(--paper); }
+
+/* ── persistent meta strip ── */
+.meta-strip {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem var(--margin-x);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: linear-gradient(to bottom, var(--paper) 70%, transparent);
+  z-index: 100;
+  pointer-events: auto;
+}
+.meta-strip a { color: var(--ink-faint); text-decoration: none; border-bottom: 1px solid transparent; transition: all 200ms; }
+.meta-strip a:hover { color: var(--amber); border-color: var(--amber); }
+.meta-strip .dot { color: var(--amber); }
+
+/* ── warning gate ── */
+.gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rem var(--margin-x) 4rem;
+}
+.gate.is-hidden { display: none; }
+
+.gate__inner {
+  max-width: 60ch;
+  text-align: center;
+}
+.gate__marker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+}
+.gate__marker::before, .gate__marker::after {
+  content: "";
+  display: inline-block;
+  height: 1px;
+  width: 4rem;
+  background: var(--amber);
+}
+.gate__hed {
+  font-family: var(--serif);
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+  margin-bottom: 2rem;
+}
+.gate__hed em { font-style: italic; font-weight: 300; color: var(--ink-soft); }
+.gate__deck {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin-bottom: 1.5rem;
+  max-width: 50ch;
+  margin-inline: auto;
+}
+.gate__warning {
+  margin: 2.5rem 0;
+  padding: 1.5rem 2rem;
+  border: 1px solid var(--amber);
+  background: rgba(194,65,12,0.05);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink);
+  line-height: 1.6;
+}
+.gate__warning strong { color: var(--amber); }
+.gate__warning .row { display: flex; justify-content: space-between; gap: 2rem; padding: 0.4rem 0; }
+.gate__warning .row + .row { border-top: 1px dashed var(--rule); margin-top: 0.4rem; padding-top: 0.8rem; }
+.gate__actions {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+.gate__btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 1rem 1.75rem;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+  transition: all 200ms cubic-bezier(0.2,0.8,0.2,1);
+  text-decoration: none;
+  display: inline-block;
+}
+.gate__btn:hover {
+  background: var(--amber);
+  border-color: var(--amber);
+}
+.gate__btn--ghost {
+  background: transparent;
+  color: var(--ink);
+}
+.gate__btn--ghost:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ── catalog ── */
+.full {
+  display: none;
+  padding: 6rem var(--margin-x) 4rem;
+}
+.full.is-active { display: block; }
+
+.full__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.full__head strong { color: var(--ink); font-weight: 500; }
+.full__head .amber { color: var(--amber); }
+.full__title {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.full__title em { font-style: italic; }
+
+.full__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  gap: 2px;
+  max-width: 100%;
+}
+
+.full-tile {
+  position: relative;
+  aspect-ratio: 1;
+  background: white;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 200ms cubic-bezier(0.2,0.8,0.2,1),
+              border-color 200ms,
+              z-index 0s linear 200ms;
+}
+.full-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.full-tile.placeholder {
+  background: var(--paper-deep);
+}
+.full-tile:hover {
+  transform: scale(2.5);
+  z-index: 50;
+  border-color: var(--ink);
+  transition-delay: 0s;
+  box-shadow: 0 10px 30px -10px rgba(12,10,8,0.4);
+}
+
+/* hover caption — same shape as the curated catalog */
+.cat-caption {
+  position: fixed;
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 6px 10px 7px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 180ms, transform 180ms;
+  z-index: 1000;
+}
+.cat-caption.is-visible { opacity: 1; transform: translateY(0); }
+.cat-caption .amber { color: var(--amber); font-weight: 700; margin-left: 0.5rem; }
+
+/* ── lightbox ── */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(12,10,8,0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 250ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.lightbox.is-open { display: flex; opacity: 1; }
+.lightbox__inner {
+  display: grid;
+  grid-template-columns: auto 320px;
+  gap: 3rem;
+  max-width: 1400px;
+  width: 100%;
+  align-items: stretch;
+}
+@media (max-width: 900px) { .lightbox__inner { grid-template-columns: 1fr; } }
+.lightbox__plate {
+  background: white;
+  padding: 1.5rem 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,0.5);
+}
+.lightbox__plate::before, .lightbox__plate::after {
+  content: "+";
+  position: absolute;
+  top: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+.lightbox__plate::before { left: 8px; }
+.lightbox__plate::after { right: 8px; }
+.lightbox__plate img {
+  display: block;
+  width: 100%;
+  max-height: 78vh;
+  object-fit: contain;
+}
+.lightbox__plate__caption {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--rule);
+  padding-top: 0.7rem;
+}
+.lightbox__plate__caption strong { color: var(--ink); font-weight: 500; }
+
+.lightbox__meta {
+  color: var(--paper);
+  font-family: var(--serif);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+.lightbox__meta__head {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(243,237,221,0.5);
+  margin-bottom: 0.5rem;
+}
+.lightbox__meta__id {
+  font-family: var(--serif);
+  font-size: 1.8rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.3rem;
+  color: var(--paper);
+}
+.lightbox__meta__factory {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(243,237,221,0.6);
+  margin-bottom: 2.5rem;
+}
+.lightbox__meta__score {
+  font-family: var(--serif);
+  font-size: 5.5rem;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--amber);
+  font-weight: 400;
+}
+.lightbox__meta__score__label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(243,237,221,0.5);
+  margin-top: 0.4rem;
+}
+.lightbox__meta__nav {
+  margin-top: 2.5rem;
+  display: flex;
+  gap: 1rem;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.lightbox__meta__nav button {
+  background: none;
+  border: 1px solid rgba(243,237,221,0.25);
+  color: var(--paper);
+  padding: 0.6rem 1rem;
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  transition: all 180ms;
+}
+.lightbox__meta__nav button:hover {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--ink);
+}
+.lightbox__close {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  background: none;
+  border: 1px solid rgba(243,237,221,0.25);
+  color: var(--paper);
+  width: 44px;
+  height: 44px;
+  font-family: var(--mono);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 180ms;
+}
+.lightbox__close:hover {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--ink);
+}
+
+/* perf meter (top-right) */
+.perfmeter {
+  position: fixed;
+  top: 4rem;
+  right: var(--margin-x);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--paper);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--rule);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  text-align: right;
+}
+.perfmeter .amber { color: var(--amber); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header class="meta-strip">
+  <span><span class="dot">●</span> <a href="index.html">← back to the catalog</a></span>
+  <span>ADDENDUM · THE FULL CATALOG</span>
+</header>
+
+<!-- ── WARNING GATE ── -->
+<section class="gate" id="gate">
+  <div class="gate__inner">
+    <div class="gate__marker">addendum to §03</div>
+    <h1 class="gate__hed">
+      The full catalog.<br>
+      <em>All sixteen thousand<br>seven hundred and<br>thirty-two pieces.</em>
+    </h1>
+    <p class="gate__deck">
+      Every kept specimen the autoresearch loop has produced, on a single page.
+      Loaded in viewport-only batches — but it is still, by any reasonable
+      measure, an enormous amount of data.
+    </p>
+
+    <div class="gate__warning">
+      <div class="row">
+        <span><strong>⚠ this page is very slow</strong></span>
+        <span>read before continuing</span>
+      </div>
+      <div class="row">
+        <span>plates</span>
+        <span><strong id="gate-count">15,833</strong></span>
+      </div>
+      <div class="row">
+        <span>thumbnail size</span>
+        <span><strong>40 × 40 px</strong></span>
+      </div>
+      <div class="row">
+        <span>est. download</span>
+        <span><strong id="gate-bytes">~7 MB images · loaded as you scroll</strong></span>
+      </div>
+      <div class="row">
+        <span>recommended on</span>
+        <span><strong>desktop, wifi, fresh tab</strong></span>
+      </div>
+    </div>
+
+    <div class="gate__actions">
+      <button class="gate__btn" id="gate-continue">I understand · load all 15,833 plates</button>
+      <a class="gate__btn gate__btn--ghost" href="index.html">Take me back</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FULL CATALOG ── -->
+<main class="full" id="full">
+  <div class="perfmeter" id="perfmeter">
+    <span><span id="pm-rendered">0</span> / <span id="pm-total">0</span> rendered</span>
+    <span class="amber" id="pm-time">—</span>
+  </div>
+
+  <header class="full__head">
+    <span class="full__title">The full catalog · <em>all kept specimens</em></span>
+    <span><strong id="full-count">—</strong> plates · sorted by composite descending</span>
+  </header>
+
+  <div class="full__grid" id="full-grid"></div>
+</main>
+
+<!-- hover caption -->
+<div class="cat-caption" id="cat-caption"></div>
+
+<!-- lightbox -->
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <button class="lightbox__close" id="lightbox-close" aria-label="Close">×</button>
+  <div class="lightbox__inner">
+    <figure class="lightbox__plate">
+      <img id="lightbox-img" alt="">
+      <figcaption class="lightbox__plate__caption">
+        <span><strong id="lightbox-plate-num">Plate</strong> &nbsp;<span id="lightbox-plate-id"></span></span>
+        <span id="lightbox-plate-rank"></span>
+      </figcaption>
+    </figure>
+    <div class="lightbox__meta">
+      <div>
+        <div class="lightbox__meta__head">Specimen</div>
+        <div class="lightbox__meta__id" id="lightbox-meta-id"></div>
+        <div class="lightbox__meta__factory" id="lightbox-meta-factory"></div>
+      </div>
+      <div>
+        <div class="lightbox__meta__score" id="lightbox-meta-score">—</div>
+        <div class="lightbox__meta__score__label">Algorithmic composite</div>
+        <div class="lightbox__meta__nav">
+          <button id="lightbox-prev">← prev</button>
+          <button id="lightbox-next">next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const gate = document.getElementById('gate');
+  const full = document.getElementById('full');
+  const grid = document.getElementById('full-grid');
+  const caption = document.getElementById('cat-caption');
+  const gateContinue = document.getElementById('gate-continue');
+  const gateCount = document.getElementById('gate-count');
+  const fullCount = document.getElementById('full-count');
+  const pmRendered = document.getElementById('pm-rendered');
+  const pmTotal = document.getElementById('pm-total');
+  const pmTime = document.getElementById('pm-time');
+
+  let manifest = [];
+  let observer;
+  let renderedCount = 0;
+  let startTime = 0;
+
+  // ── preflight: count entries ───────────────────────────────
+  fetch('assets/manifest-full.json', { method: 'HEAD' })
+    .then(r => {
+      // we don't really get count from HEAD; just verify it exists
+      if (!r.ok) throw new Error('manifest missing');
+    })
+    .catch(() => {
+      gateCount.textContent = '— (manifest not yet generated)';
+      gateContinue.disabled = true;
+      gateContinue.textContent = 'Manifest not generated yet';
+    });
+
+  // ── continue button ─────────────────────────────────────────
+  gateContinue.addEventListener('click', async () => {
+    gateContinue.disabled = true;
+    gateContinue.textContent = 'Loading manifest…';
+    try {
+      const res = await fetch('assets/manifest-full.json');
+      manifest = await res.json();
+    } catch (err) {
+      gateContinue.textContent = 'Failed to load manifest';
+      console.error(err);
+      return;
+    }
+
+    gate.classList.add('is-hidden');
+    full.classList.add('is-active');
+    fullCount.textContent = manifest.length.toLocaleString();
+    pmTotal.textContent = manifest.length.toLocaleString();
+    startTime = performance.now();
+
+    // Build all placeholder tiles up-front so the grid has correct dimensions
+    const frag = document.createDocumentFragment();
+    manifest.forEach((p, i) => {
+      const tile = document.createElement('div');
+      tile.className = 'full-tile placeholder';
+      tile.dataset.index = i;
+      tile.setAttribute('aria-label', `${p.id} ${p.score}`);
+      frag.appendChild(tile);
+    });
+    grid.appendChild(frag);
+
+    // Observe each tile; load its image when it crosses the viewport
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const tile = entry.target;
+        if (tile.dataset.loaded === '1') return;
+        const i = +tile.dataset.index;
+        const p = manifest[i];
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.src = p.thumb;
+        img.alt = p.id;
+        tile.appendChild(img);
+        tile.classList.remove('placeholder');
+        tile.dataset.loaded = '1';
+        renderedCount++;
+        if (renderedCount % 100 === 0 || renderedCount === manifest.length) {
+          pmRendered.textContent = renderedCount.toLocaleString();
+          pmTime.textContent = `${((performance.now() - startTime) / 1000).toFixed(1)}s`;
+        }
+        observer.unobserve(tile);
+      });
+    }, { rootMargin: '500px 0px', threshold: 0 });
+
+    // Wire up observer to all tiles
+    grid.querySelectorAll('.full-tile').forEach(t => observer.observe(t));
+  });
+
+  // ── hover caption ──────────────────────────────────────────
+  let hoverFrame = null;
+  document.addEventListener('mouseover', (e) => {
+    const tile = e.target.closest('.full-tile');
+    if (!tile || !manifest.length) return;
+    const idx = +tile.dataset.index;
+    const p = manifest[idx];
+    if (!p) return;
+    caption.innerHTML = `${p.id} <span class="amber">${p.score.toFixed(1)}</span>`;
+    caption.classList.add('is-visible');
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!caption.classList.contains('is-visible')) return;
+    if (hoverFrame) cancelAnimationFrame(hoverFrame);
+    hoverFrame = requestAnimationFrame(() => {
+      caption.style.left = (e.clientX + 14) + 'px';
+      caption.style.top = (e.clientY - 32) + 'px';
+    });
+  });
+  document.addEventListener('mouseout', (e) => {
+    const tile = e.target.closest('.full-tile');
+    if (!tile) return;
+    if (e.relatedTarget && tile.contains(e.relatedTarget)) return;
+    caption.classList.remove('is-visible');
+  });
+
+  // ── click → lightbox ───────────────────────────────────────
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightbox-img');
+  const lbPlateId = document.getElementById('lightbox-plate-id');
+  const lbPlateRank = document.getElementById('lightbox-plate-rank');
+  const lbMetaId = document.getElementById('lightbox-meta-id');
+  const lbMetaFactory = document.getElementById('lightbox-meta-factory');
+  const lbMetaScore = document.getElementById('lightbox-meta-score');
+  const lbClose = document.getElementById('lightbox-close');
+  const lbPrev = document.getElementById('lightbox-prev');
+  const lbNext = document.getElementById('lightbox-next');
+  let activeIndex = -1;
+
+  function openLightbox(idx) {
+    if (idx < 0 || !manifest.length || idx >= manifest.length) return;
+    activeIndex = idx;
+    const p = manifest[idx];
+    // load 400px medium webp (deployable, no symlink)
+    lbImg.src = `assets/mediums-all/${p.id}.webp`;
+    lbImg.alt = p.id;
+    lbPlateId.textContent = p.id;
+    lbPlateRank.textContent = `#${idx + 1} of ${manifest.length.toLocaleString()}`;
+    lbMetaId.textContent = p.id;
+    lbMetaFactory.textContent = p.factory;
+    lbMetaScore.textContent = p.score.toFixed(1);
+    lightbox.classList.add('is-open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    // prefetch neighbors
+    [-1, 1].forEach(d => {
+      const n = manifest[idx + d];
+      if (n) {
+        const i = new Image();
+        i.src = `assets/mediums-all/${n.id}.webp`;
+      }
+    });
+  }
+  function closeLightbox() {
+    lightbox.classList.remove('is-open');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    activeIndex = -1;
+  }
+
+  document.addEventListener('click', (e) => {
+    const tile = e.target.closest('.full-tile');
+    if (!tile || !manifest.length) return;
+    openLightbox(+tile.dataset.index);
+  });
+
+  lbClose.addEventListener('click', closeLightbox);
+  lbPrev.addEventListener('click', () => openLightbox(activeIndex - 1));
+  lbNext.addEventListener('click', () => openLightbox(activeIndex + 1));
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('is-open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') openLightbox(activeIndex - 1);
+    else if (e.key === 'ArrowRight') openLightbox(activeIndex + 1);
+  });
+})();
+</script>
+
+</body>
+</html>

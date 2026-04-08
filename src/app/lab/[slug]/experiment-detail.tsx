@@ -4,6 +4,8 @@ import { Nav } from "@/components/nav";
 import { JsonLd } from "@/components/json-ld";
 import { Footer } from "@/components/footer";
 import { GenerativeAscii } from "@/components/generative-ascii";
+import { PenPlotterGallery } from "@/components/pen-plotter-gallery";
+import { ExcalidrawDiagrams } from "@/components/excalidraw-diagrams";
 import type { experiments } from "@/lib/data";
 
 type Experiment = (typeof experiments)[number];
@@ -111,6 +113,52 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                     style={{ animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.18s both" }}
                   >
                     <GenerativeAscii />
+                  </div>
+                )}
+                {experiment.slug === "pen-plotter-pipeline" && (
+                  <div
+                    className="mb-10"
+                    style={{ animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.18s both" }}
+                  >
+                    <PenPlotterGallery />
+                  </div>
+                )}
+                {experiment.slug === "excalidraw-diagrams" && (
+                  <div
+                    style={{ animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.18s both" }}
+                  >
+                    <ExcalidrawDiagrams />
+                  </div>
+                )}
+                {experiment.slug === "strange-attractors" && (
+                  <div
+                    className="mb-10"
+                    style={{ animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.18s both" }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/lab/strange-attractors/hero.png"
+                      alt="Topographic line study from the pen plotter autoresearch catalog"
+                      loading="lazy"
+                      className="block w-full rounded-md"
+                      style={{
+                        background: "white",
+                        border: "1px solid var(--border-subtle)",
+                      }}
+                    />
+                    <p
+                      className="mt-3 text-[11px] font-mono uppercase tracking-wider"
+                      style={{ color: "var(--text-tertiary)" }}
+                    >
+                      Sample line study from the autoresearch catalog ·{" "}
+                      <a
+                        href="/pen-plotter/"
+                        className="underline hover:no-underline"
+                        style={{ color: "var(--accent)" }}
+                      >
+                        view the field journal →
+                      </a>
+                    </p>
                   </div>
                 )}
 

@@ -534,7 +534,7 @@ export const experiments = [
   {
     slug: "excalidraw-diagrams",
     title: "Excalidraw Diagrams",
-    description: "Auto-generated architecture diagrams using a custom Excalidraw generator. Covering system topology, data flows, and agent interactions.",
+    description: "Auto-generated architecture diagrams using a custom Excalidraw generator. Covering system topology, data flows, and agent interactions. Draft: rendered diagrams live in a private Obsidian vault and aren't yet exported as embeddable images on this page.",
     longDescription: [
       "excalidraw_generator.py is a Python script that produces .excalidraw.md files directly from code — no manual diagramming. It supports three layout algorithms: hub-spoke (for agent/tool topology), flow (for data pipeline sequences), and grid (for comparison matrices). Each element is positioned by the layout engine and serialized as Excalidraw JSON embedded in a markdown code block.",
       "Output files are dropped into the Obsidian vault where the Excalidraw plugin renders them natively. This means diagrams are versioned alongside the code they describe and can be edited visually in Obsidian after generation. A key constraint: elbow routing breaks when arrows are bound to nodes, so the generator exclusively uses 2-point straight connectors.",
@@ -548,6 +548,6 @@ export const experiments = [
     ],
     stack: ["Python", "Excalidraw JSON", "Obsidian", "Markdown"],
     category: "Data",
-    status: "Active",
+    status: "Draft",
   },
 ];

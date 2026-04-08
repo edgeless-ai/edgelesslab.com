@@ -116,6 +116,7 @@ body {
 
 .hero {
   min-height: 100vh;
+  min-height: 100svh;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto 1fr auto;
@@ -160,11 +161,15 @@ body {
   font-family: var(--serif);
   font-weight: 400;
   font-size: clamp(3.5rem, 9vw, 9.5rem);
-  line-height: 0.92;
+  line-height: 0.96;
   letter-spacing: -0.03em;
   color: var(--ink);
-  opacity: 0;
-  animation: fadeUp 1200ms cubic-bezier(0.2, 0.8, 0.2, 1) 400ms forwards;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero__title {
+    opacity: 0;
+    animation: fadeUp 1200ms cubic-bezier(0.2, 0.8, 0.2, 1) 400ms forwards;
+  }
 }
 .hero__title em {
   font-style: italic;
@@ -248,7 +253,7 @@ body {
   content: "↓";
   font-size: 14px;
   color: var(--amber);
-  animation: bob 2.4s ease-in-out infinite;
+  animation: bob 2.4s ease-in-out 3;
 }
 
 @keyframes fadeUp {
@@ -258,6 +263,22 @@ body {
 @keyframes bob {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(6px); }
+}
+
+/* Reduced motion: kill all entrance animations + the bob.
+   The score recalibration is already gated in JS. */
+@media (prefers-reduced-motion: reduce) {
+  .hero__filing,
+  .hero__title,
+  .hero__deck,
+  .hero__plate,
+  .hero__footer {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+  .hero__footer .scroll-cue::after {
+    animation: none !important;
+  }
 }
 
 /* ────────── §01 METHOD ────────── */
@@ -430,7 +451,7 @@ body {
   color: var(--ink);
   font-weight: 400;
   letter-spacing: -0.02em;
-  transition: color 600ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: color 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
   display: inline-block;
   font-variant-numeric: tabular-nums;
 }
@@ -1159,8 +1180,12 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--ink-faint);
-  transition: all 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              background 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              border-color 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
   position: relative;
+  box-shadow: 0 0 0 transparent;
 }
 .colophon__link strong {
   color: var(--ink);
@@ -1190,6 +1215,8 @@ body {
   background: var(--ink);
   border-color: var(--ink);
   transform: translateY(-2px);
+  box-shadow: 0 14px 30px -12px rgba(12,10,8,0.35),
+              0 30px 60px -25px rgba(194,65,12,0.18);
 }
 .colophon__link:hover strong { color: var(--paper); }
 .colophon__link:hover span { color: rgba(243,237,221,0.7); }
@@ -1769,7 +1796,7 @@ body {
     requestAnimationFrame(step);
   }
 
-  function animateRow(row) {
+  function animateRow(row, baseDelay) {
     if (row.dataset.animated === '1') return;
     row.dataset.animated = '1';
     const numEl = row.querySelector('.score-num');
@@ -1777,26 +1804,42 @@ body {
     const from = parseFloat(numEl.dataset.from);
     const to = parseFloat(numEl.dataset.to);
     if (Number.isNaN(from) || Number.isNaN(to)) return;
-    // small delay so the user catches the original number first
     setTimeout(() => {
       row.classList.add('is-recalibrated');
       tweenNumber(numEl, from, to, 900);
-    }, 350);
+    }, baseDelay);
   }
 
+  // Stagger multiple judge rows so the eye reads them as a sequence,
+  // not in parallel. First row at 350ms (so the visitor catches the
+  // original number), second row at 350+550ms so it lands while the
+  // first is still finishing.
+  const STAGGER = [350, 900, 1450, 2000];
+
   if ('IntersectionObserver' in window) {
+    // Track when the FIRST row enters and use a SHARED start time so
+    // multiple rows that enter together still get sequential delays.
+    let sequenceIndex = 0;
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          animateRow(entry.target);
-          observer.unobserve(entry.target);
-        }
+      // Sort by document order so the left specimen tweens before the right
+      const intersecting = entries
+        .filter(e => e.isIntersecting)
+        .sort((a, b) => {
+          const pos = a.target.compareDocumentPosition(b.target);
+          if (pos & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
+          if (pos & Node.DOCUMENT_POSITION_PRECEDING) return 1;
+          return 0;
+        });
+      intersecting.forEach((entry) => {
+        const delay = STAGGER[Math.min(sequenceIndex, STAGGER.length - 1)];
+        animateRow(entry.target, delay);
+        sequenceIndex++;
+        observer.unobserve(entry.target);
       });
-    }, { threshold: 0.55 });
+    }, { threshold: 0.5 });
     judgeRows.forEach(row => observer.observe(row));
   } else {
-    // fallback: animate immediately
-    judgeRows.forEach(animateRow);
+    judgeRows.forEach((row, i) => animateRow(row, STAGGER[Math.min(i, STAGGER.length - 1)]));
   }
 })();
 </script>

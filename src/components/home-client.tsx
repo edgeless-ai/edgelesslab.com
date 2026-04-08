@@ -82,15 +82,40 @@ export function HeroSection() {
             </div>
           </AnimatedFadeIn>
 
+          <AnimatedFadeIn delay={0.85}>
+            <div
+              className="mt-8 flex items-center gap-2.5 max-w-xl text-[12px] font-mono"
+              style={{ color: "var(--text-tertiary)" }}
+            >
+              <span
+                className="px-2 py-0.5 rounded uppercase tracking-[0.12em]"
+                style={{ background: "var(--accent-muted)", color: "var(--accent)" }}
+              >
+                Now
+              </span>
+              <span>
+                Shipping{" "}
+                <Link
+                  href="/products/launch-toolkit"
+                  className="underline-offset-2 hover:underline transition-colors hover:text-white"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Digital Product Launch Toolkit
+                </Link>
+                {" "}&middot; 7 products in 7 days
+              </span>
+            </div>
+          </AnimatedFadeIn>
+
           <AnimatedFadeIn delay={0.9}>
-            <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5">
+            <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5">
               <Link
                 href="/products"
                 className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
                 style={{ background: "var(--accent)" }}
                 onClick={() => trackCTA("hero_view_products", "/products")}
               >
-                Browse products <ArrowRight size={15} />
+                Browse 18 products <ArrowRight size={15} />
               </Link>
               <Link
                 href="/projects"

@@ -44,7 +44,7 @@ export function AboutHeader() {
           className="text-[11px] font-mono uppercase tracking-[0.14em]"
           style={{ color: "var(--text-secondary)" }}
         >
-          About &middot; David Murray
+          The studio
         </span>
       </div>
       <Image
@@ -60,15 +60,15 @@ export function AboutHeader() {
         className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[0.92] tracking-[-0.035em] max-w-4xl"
         style={{ color: "var(--text-primary)", ...fadeInStyle(0.1) }}
       >
-        One developer.
+        One person.
         <br />
-        <span style={{ color: "var(--accent)" }}>Production systems.</span>
+        <span style={{ color: "var(--accent)" }}>Real tools.</span>
       </h1>
       <p
         className="mt-8 text-lg max-w-2xl font-light"
         style={{ color: "var(--text-secondary)", lineHeight: 1.55, ...fadeInStyle(0.2) }}
       >
-        Edgeless Labs is one person shipping autonomous agents, MCP servers, and generative art. 18 products live, 4 services running 24/7 on a single VPS. No team, no funding, no vaporware.
+        David Murray. Solo creative tech studio, 4 MCP servers in production, 6,300 notes in the vault. No team, no funding, no vaporware.
       </p>
     </>
   );
@@ -190,6 +190,47 @@ export function Timeline({ items }: { items: TimelineItem[] }) {
         ))}
       </div>
     </>
+  );
+}
+
+export function Manifesto() {
+  const lines = [
+    "Ship weekly.",
+    "Price honestly.",
+    "Open-source the boring parts.",
+    "Run it in production before selling it.",
+    "Answer every email.",
+    "No vaporware. Ever.",
+  ];
+  return (
+    <div className="max-w-3xl">
+      <h2
+        className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
+        style={{ color: "var(--text-tertiary)", ...fadeInStyle(0) }}
+      >
+        Operating principles
+      </h2>
+      <ul className="space-y-3">
+        {lines.map((line, i) => (
+          <li
+            key={line}
+            className="flex items-baseline gap-4 text-2xl sm:text-3xl font-light tracking-tight"
+            style={{
+              color: "var(--text-primary)",
+              ...fadeInStyle(0.08 + i * 0.06),
+            }}
+          >
+            <span
+              className="text-xs font-mono shrink-0 w-6 text-right"
+              style={{ color: "var(--accent)" }}
+            >
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <span>{line}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

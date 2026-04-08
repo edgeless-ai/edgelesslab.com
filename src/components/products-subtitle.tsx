@@ -3,7 +3,7 @@
 import { StaggerReveal } from "@/components/ui/pretext-stagger-reveal";
 
 const SUBTITLE =
-  "Templates, kits, and blueprints extracted from systems running 24/7. Every product is what I actually use, packaged so you can ship it tomorrow.";
+  "18 small tools between $9 and $59. Claude Code skills, MCP kits, agent blueprints, and n8n workflows I use daily.";
 
 export function ProductsSubtitle() {
   return (

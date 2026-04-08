@@ -38,7 +38,7 @@ export default function ProductsPage() {
               className="text-[11px] font-mono uppercase tracking-[0.14em]"
               style={{ color: "var(--accent)" }}
             >
-              Shop &middot; {products.filter(p => !p.comingSoon).length} live on Gumroad
+              On Gumroad &middot; {products.filter(p => !p.comingSoon).length} live
             </span>
           </div>
 

@@ -5,6 +5,7 @@ import {
   StatsGrid,
   Philosophy,
   Timeline,
+  Manifesto,
   ConnectGrid,
 } from "@/components/about-client";
 import { createPageMetadata } from "@/lib/metadata";
@@ -80,6 +81,12 @@ export default function About() {
       </section>
 
       <section className="px-6 py-24">
+        <div className="max-w-[1280px] mx-auto">
+          <Manifesto />
+        </div>
+      </section>
+
+      <section className="px-6 py-24" style={{ background: "var(--bg-surface)" }}>
         <div className="max-w-[1280px] mx-auto">
           <ConnectGrid links={links} />
         </div>

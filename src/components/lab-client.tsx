@@ -28,7 +28,7 @@ export function LabHeader() {
           className="text-[11px] font-mono uppercase tracking-[0.14em]"
           style={{ color: "var(--accent)" }}
         >
-          Lab &middot; Prototypes in flight
+          Works in progress
         </span>
       </div>
 
@@ -50,7 +50,7 @@ export function LabHeader() {
           animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.15s both",
         }}
       >
-        100+ generative-art studies, 8 live interactive prototypes, and the failed experiments that taught me what to ship. Open source.
+        75 generative art systems and 100+ pen plotter runs. Prototypes I keep loose on purpose.
       </p>
     </>
   );

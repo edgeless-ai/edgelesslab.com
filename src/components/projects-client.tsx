@@ -35,7 +35,7 @@ export function ProjectsHeader() {
           className="text-[11px] font-mono uppercase tracking-[0.14em]"
           style={{ color: "var(--green)" }}
         >
-          Live in production
+          Running now
         </span>
       </div>
 
@@ -57,7 +57,7 @@ export function ProjectsHeader() {
           animation: "fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.18s both",
         }}
       >
-        4 services running 24/7 on a single VPS. Pamela trades real money. Hermes runs unattended. Every project ships, none of them are demos.
+        Four always-on services on one Hetzner box. Pamela trades, Hermes assists, pm2 managed, zero restarts.
       </p>
     </>
   );

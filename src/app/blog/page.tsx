@@ -48,7 +48,7 @@ export default function BlogPage() {
             className="text-base mb-8 max-w-xl"
             style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
           >
-            Post-mortems, architecture notes, and the receipts behind every Edgeless product. One developer, real systems, no hot takes.
+            Shipping logs from a solo AI studio. Claude Code agents, MCP servers, pen plotter runs, and whatever broke last week.
           </p>
 
           <div className="flex items-center gap-4 mb-12">

@@ -12,17 +12,28 @@ interface Experiment {
 export function LabHeader() {
   return (
     <>
-      <div style={{ animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both" }}>
+      <div
+        className="inline-flex items-center gap-2.5 mb-6 px-3 py-1.5 rounded-full border"
+        style={{
+          borderColor: "rgba(129, 140, 248, 0.25)",
+          background: "var(--accent-muted)",
+          animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both",
+        }}
+      >
         <span
-          className="text-xs font-mono uppercase tracking-[0.15em] block mb-4"
-          style={{ color: "var(--text-tertiary)" }}
+          className="w-1.5 h-1.5 rounded-full"
+          style={{ background: "var(--accent)" }}
+        />
+        <span
+          className="text-[11px] font-mono uppercase tracking-[0.14em]"
+          style={{ color: "var(--accent)" }}
         >
-          Lab
+          Lab &middot; Prototypes in flight
         </span>
       </div>
 
       <h1
-        className="text-[clamp(2.5rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.03em] mb-6"
+        className="text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.92] tracking-[-0.035em] mb-6"
         style={{
           color: "var(--text-primary)",
           animation: "fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.05s both",
@@ -32,15 +43,14 @@ export function LabHeader() {
       </h1>
 
       <p
-        className="text-lg max-w-xl font-light"
+        className="text-lg max-w-xl font-light mb-3"
         style={{
           color: "var(--text-secondary)",
-          lineHeight: 1.7,
+          lineHeight: 1.55,
           animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.15s both",
         }}
       >
-        Generative systems, data visualizations, and agent interfaces.
-        Prototypes that explore the edge of what the toolchain can do.
+        100+ generative-art studies, 8 live interactive prototypes, and the failed experiments that taught me what to ship. Open source.
       </p>
     </>
   );

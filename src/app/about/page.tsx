@@ -17,10 +17,10 @@ export const metadata = createPageMetadata({
 });
 
 const stats = [
-  { label: "Agents deployed", value: "Live" },
-  { label: "Documents indexed", value: "Thousands" },
-  { label: "Generative experiments", value: "100+" },
-  { label: "MCP servers", value: "Live" },
+  { label: "Products live", value: "18" },
+  { label: "Services 24/7", value: "4" },
+  { label: "Vault docs indexed", value: "6,300+" },
+  { label: "MCP servers in prod", value: "4" },
 ];
 
 const timeline = [

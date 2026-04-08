@@ -3,7 +3,7 @@
 import { StaggerReveal } from "@/components/ui/pretext-stagger-reveal";
 
 const SUBTITLE =
-  "Developer tools built from production agent infrastructure. Every template comes from a system running 24/7.";
+  "Templates, kits, and blueprints extracted from systems running 24/7. Every product is what I actually use, packaged so you can ship it tomorrow.";
 
 export function ProductsSubtitle() {
   return (

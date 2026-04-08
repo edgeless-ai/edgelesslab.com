@@ -14,23 +14,33 @@ export function ProjectsHeader() {
   return (
     <>
       <div
-        className="flex items-center gap-2 mb-6"
-        style={{ animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both" }}
+        className="inline-flex items-center gap-2.5 mb-6 px-3 py-1.5 rounded-full border"
+        style={{
+          borderColor: "rgba(52, 211, 153, 0.25)",
+          background: "rgba(52, 211, 153, 0.06)",
+          animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both",
+        }}
       >
+        <span className="relative flex h-2 w-2">
+          <span
+            className="absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping"
+            style={{ background: "var(--green)" }}
+          />
+          <span
+            className="relative inline-flex h-2 w-2 rounded-full"
+            style={{ background: "var(--green)" }}
+          />
+        </span>
         <span
-          className="w-1.5 h-1.5 rounded-full"
-          style={{ background: "var(--green)" }}
-        />
-        <span
-          className="text-xs font-mono uppercase tracking-[0.15em]"
-          style={{ color: "var(--text-tertiary)" }}
+          className="text-[11px] font-mono uppercase tracking-[0.14em]"
+          style={{ color: "var(--green)" }}
         >
-          What ships
+          Live in production
         </span>
       </div>
 
       <h1
-        className="text-[clamp(2.5rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.03em]"
+        className="text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.92] tracking-[-0.035em]"
         style={{
           color: "var(--text-primary)",
           animation: "fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.08s both",
@@ -40,15 +50,14 @@ export function ProjectsHeader() {
       </h1>
 
       <p
-        className="mt-5 text-base max-w-md font-light"
+        className="mt-5 text-lg max-w-xl font-light"
         style={{
           color: "var(--text-secondary)",
-          lineHeight: 1.7,
+          lineHeight: 1.55,
           animation: "fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.18s both",
         }}
       >
-        Agents, APIs, and pipelines built in the open. Every project runs in
-        production.
+        4 services running 24/7 on a single VPS. Pamela trades real money. Hermes runs unattended. Every project ships, none of them are demos.
       </p>
     </>
   );

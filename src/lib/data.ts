@@ -378,7 +378,7 @@ export const experiments = [
     title: "Strange Attractors",
     description: "Lorenz, Rossler, and Chen attractor systems rendered as SVG paths for pen plotting. Part of the broader pen-plotter autoresearch loop.",
     longDescription: [
-      "The three classical strange attractors — Lorenz (sigma=10, rho=28, beta=8/3), Rossler, and Chen — are solved numerically using a 4th-order Runge-Kutta integrator. The solver runs with configurable dt and num_steps, producing X/Y/Z coordinate traces that are then projected into 2D and serialized as SVG path data.",
+      "The three classical strange attractors, Lorenz (sigma=10, rho=28, beta=8/3), Rossler, and Chen, are solved numerically using a 4th-order Runge-Kutta integrator. The solver runs with configurable dt and num_steps, producing X/Y/Z coordinate traces that are then projected into 2D and serialized as SVG path data.",
       "Output is optimized for physical pen plotting on an iDraw. This means path ordering matters: the generator clusters nearby strokes to minimize pen-up travel, and outputs a single continuous path where possible to avoid unnecessary lifts. Line width is modulated by the local velocity of the attractor trajectory, giving the strokes a natural weight variation.",
       "The attractor generators feed into the larger pen-plotter autoresearch corpus alongside flow fields, op-art, and constructivist studies. The full scored catalog with 16,832 specimens is browsable in the field journal.",
     ],
@@ -400,14 +400,14 @@ export const experiments = [
     description: "Design for a force-directed visualization of documents across ChromaDB collections, Obsidian vault links, and semantic similarity edges. Draft: backend prototype runs locally; the rendered D3 graph is not yet exported as an embeddable artifact on this page.",
     longDescription: [
       "Documents from multiple ChromaDB collections and the Obsidian vault are loaded into a unified node graph. Each node represents a document; edges are drawn from two sources: explicit markdown links parsed from vault files, and semantic similarity scores from ChromaDB embeddings that exceed a configurable threshold.",
-      "The intended renderer is D3.js with a force-directed layout — charge, link, and collision forces tuned to avoid overlap at scale. Nodes color-coded by source collection. Filtering controls to isolate topic clusters, hide weak-similarity edges, or focus on a single vault folder.",
-      "A FastAPI backend prototype exposes an endpoint that accepts collection names and a similarity threshold, queries ChromaDB for all embeddings, computes pairwise cosine similarity in NumPy, and returns the edge list. The frontend renderer is not yet built — the design specification and backend exist, but the rendered graph is not yet shipping as an artifact on this page.",
+      "The intended renderer is D3.js with a force-directed layout: charge, link, and collision forces tuned to avoid overlap at scale. Nodes color-coded by source collection. Filtering controls to isolate topic clusters, hide weak-similarity edges, or focus on a single vault folder.",
+      "A FastAPI backend prototype exposes an endpoint that accepts collection names and a similarity threshold, queries ChromaDB for all embeddings, computes pairwise cosine similarity in NumPy, and returns the edge list. The frontend renderer is not yet built. The design specification and backend exist, but the rendered graph is not yet shipping as an artifact on this page.",
     ],
     highlights: [
       "Dual edge sources: explicit Obsidian markdown links + ChromaDB cosine similarity above threshold",
       "D3.js force-directed layout planned (charge, link, collision forces)",
       "FastAPI backend prototype computes pairwise cosine similarity in NumPy",
-      "Currently a design + backend prototype — the rendered graph is not yet exportable",
+      "Currently a design + backend prototype. The rendered graph is not yet exportable",
     ],
     stack: ["D3.js", "ChromaDB", "Python", "FastAPI", "NumPy"],
     category: "Data",
@@ -437,7 +437,7 @@ export const experiments = [
     title: "Tartanism",
     description: "Generative tartan pattern explorer. Procedural plaid generation with historical clan data, color theory, and interactive weaving visualization.",
     longDescription: [
-      "Tartans are defined by a thread count sequence and palette — a compact notation that encodes the full weave structure. This explorer parses the Scottish Register of Tartans thread count format and renders authentic over-under weave simulations at arbitrary resolution.",
+      "Tartans are defined by a thread count sequence and palette, a compact notation that encodes the full weave structure. This explorer parses the Scottish Register of Tartans thread count format and renders authentic over-under weave simulations at arbitrary resolution.",
       "The generative layer allows mutation: vary thread counts within a palette, evolve new colorways from a base clan tartan, or compose entirely novel patterns using constrained random generation. A color harmony module enforces period-appropriate dye relationships.",
     ],
     highlights: [
@@ -457,14 +457,14 @@ export const experiments = [
     description: "Design for a visual dashboard layered on top of the Mastra Orchestrator multi-agent routing system. Draft: orchestrator and 10-tool API run on the VPS; the dashboard UI is specified but not yet exported as an embeddable artifact on this page.",
     longDescription: [
       "The Mastra Orchestrator is a TypeScript-based multi-agent routing layer deployed on a Hetzner VPS and managed by PM2. A router agent reads incoming tasks, classifies them by reasoning depth and latency requirements, and dispatches to the best-fit model: Claude Opus for deep reasoning, Gemini Flash for fast search queries, and local models for drafting and summarization. The orchestrator and its 10-tool API are live on the VPS.",
-      "The dashboard layer is the unfinished part. As designed, it would visualize the agent registry in real time: current task queue, per-agent latency histograms, message passing graph, and consensus state for tasks requiring multi-agent agreement. None of those views currently ship as embeddable artifacts on this page — the project lives at the API and rsync layer, not yet at the visualization layer.",
-      "Agent state is already synced to /opt/david-sync via rsync every 60 seconds, making it readable from the Mac-side inbox system. This creates the two-way async channel — inbox directives flow from Mac to VPS, agent observations and task completions flow back — that the planned dashboard would visualize.",
+      "The dashboard layer is the unfinished part. As designed, it would visualize the agent registry in real time: current task queue, per-agent latency histograms, message passing graph, and consensus state for tasks requiring multi-agent agreement. None of those views currently ship as embeddable artifacts on this page. The project lives at the API and rsync layer, not yet at the visualization layer.",
+      "Agent state is already synced to /opt/david-sync via rsync every 60 seconds, making it readable from the Mac-side inbox system. This creates the two-way async channel: inbox directives flow from Mac to VPS, agent observations and task completions flow back. That is what the planned dashboard would visualize.",
     ],
     highlights: [
       "Routes tasks across Claude Opus (reasoning), Gemini Flash (search), and local models (drafting)",
       "10-tool API: backlog, vault search, dispatch, outbox, VPS health",
       "Async two-way channel via rsync: inbox directives in, agent observations out",
-      "Dashboard UI is designed but not yet built — currently a backend + API, not a visualization",
+      "Dashboard UI is designed but not yet built. Currently a backend + API, not a visualization",
     ],
     stack: ["TypeScript", "Mastra", "React", "OpenRouter", "PM2"],
     category: "Agents",
@@ -477,9 +477,9 @@ export const experiments = [
     description: "Generative SVG art pipeline with AI scoring. 18 procedural factories producing work across moire interference, op-art, voxel sculpture, hatching, ridgelines, calligraphic gestures, and more.",
     longDescription: [
       "A Python pipeline that runs 18 independent factory generators, feeds each output through a scoring engine combining six algorithmic signals and five vision-language judges, and routes high-scoring pieces to the physical plotter. Factories span the full visual range: moire interference (highest avg), op-art warps, isometric voxel sculpture, density hatching, topographic line work, ridgeline waveforms, calligraphic gestures, generative grids, L-systems, stippling, wireframes, and more.",
-      "The scoring stack: ink coverage, line complexity, composition (rule-of-thirds focal density), entropy (edge + local variance), uniqueness (perceptual hash), and feasibility (estimated plot time). On top of those, five vision-language judges score the top pieces — Claude via subagents, Gemini twice (aesthetic + adversarial), Qwen via OpenRouter, and Cerebras. The full composite is 55% algorithmic + 45% judge.",
-      "Physical output goes through iDraw 2.0 with archival-quality pigment ink on A3 cotton paper. Pen speed, acceleration, and lift height are tuned per factory. Path optimization via vpype reduces pen-up travel by 93–96% before every plot.",
-      "16,832 specimens have been scored to date. The full editorial field journal — including the discovery that 26% of the algorithmic top-50 are 'grey rectangles' the algorithms loved but Claude rated 1.8/10 — is published as a separate artifact.",
+      "The scoring stack: ink coverage, line complexity, composition (rule-of-thirds focal density), entropy (edge + local variance), uniqueness (perceptual hash), and feasibility (estimated plot time). On top of those, five vision-language judges score the top pieces: Claude via subagents, Gemini twice (aesthetic + adversarial), Qwen via OpenRouter, and Cerebras. The full composite is 55% algorithmic + 45% judge.",
+      "Physical output goes through iDraw 2.0 with archival-quality pigment ink on A3 cotton paper. Pen speed, acceleration, and lift height are tuned per factory. Path optimization via vpype reduces pen-up travel by 93 to 96% before every plot.",
+      "16,832 specimens have been scored to date. The full editorial field journal, including the discovery that 26% of the algorithmic top-50 are 'grey rectangles' the algorithms loved but Claude rated 1.8/10, is published as a separate artifact.",
     ],
     highlights: [
       "18 procedural factories · 16,832 scored specimens · top score 89.1",
@@ -500,8 +500,8 @@ export const experiments = [
       "An editorial field journal for an autonomous loop running on 18 generative art factories. 16,832 specimens, scored by six algorithmic signals and five vision-language judges. Set in Boska, printed on aged paper.",
     longDescription: [
       "An autonomous research loop, in the spirit of Karpathy's nanochat experiments, applied to generative pen plotter art. Each cycle audits all factories, identifies the single weakest metric across the catalog, edits the corresponding generator, regenerates a thousand new variants, scores them, and either commits the change or reverts. The loop has been running since the third week of March 2026.",
-      "The most interesting finding is what the algorithms get wrong. A piece that scores 88.3 on six algorithmic signals — top five of 16,832 — can score 1.8 on a vision-language judge that calls it 'a degenerate parameter combination, no discernible composition, focal point, or visual interest.' The algorithm cannot tell the difference between a starburst and a piece of woven fabric. That is what the judges are for.",
-      "The published artifact is a five-section editorial: method, anomaly, catalog, best of run, colophon. It is set in Boska and JetBrains Mono and reads like a real catalog. An addendum page contains every kept specimen — all sixteen thousand eight hundred and thirty-two of them — laid out as a single grid you can scroll through and click into.",
+      "The most interesting finding is what the algorithms get wrong. A piece that scores 88.3 on six algorithmic signals, top five of 16,832, can score 1.8 on a vision-language judge that calls it 'a degenerate parameter combination, no discernible composition, focal point, or visual interest.' The algorithm cannot tell the difference between a starburst and a piece of woven fabric. That is what the judges are for.",
+      "The published artifact is a five-section editorial: method, anomaly, catalog, best of run, colophon. It is set in Boska and JetBrains Mono and reads like a real catalog. An addendum page contains every kept specimen, all sixteen thousand eight hundred and thirty-two of them, laid out as a single grid you can scroll through and click into.",
     ],
     highlights: [
       "18 procedural factories · 16,832 scored specimens · top score 89.1",
@@ -521,7 +521,7 @@ export const experiments = [
     title: "Generative ASCII",
     description: "Typographic ASCII art generated from particle attractor systems. Each page load produces a unique piece with rarity tiers, like pulling a shiny card.",
     longDescription: [
-      "A particle simulation runs against one of four attractor types -- Lorenz, Rossler, spiral, and flow field -- depositing brightness values onto a grid. Each cell's brightness is mapped to a character from a density-sorted palette, producing ASCII art that reflects the attractor's topology.",
+      "A particle simulation runs against one of four attractor types: Lorenz, Rossler, spiral, and flow field, depositing brightness values onto a grid. Each cell's brightness is mapped to a character from a density-sorted palette, producing ASCII art that reflects the attractor's topology.",
       "PreText measures exact character widths in the target monospace font, ensuring the proportional-to-mono mapping preserves spatial structure. The seed is derived from the timestamp, so every page load is unique. A deterministic RNG means the same seed always produces the same piece.",
       "Rarity is assigned by a hash of the seed: 75% common, 17% uncommon, 7% rare, 1% mythic. Rarer pieces get longer reveal animations, colored borders, and glow effects. Hit 'New pull' to generate another.",
     ],
@@ -538,17 +538,17 @@ export const experiments = [
   {
     slug: "excalidraw-diagrams",
     title: "Excalidraw Diagrams",
-    description: "Auto-generated architecture diagrams using a custom Excalidraw generator. Covering system topology, data flows, and agent interactions — 61 diagrams exported as embeddable SVGs.",
+    description: "Auto-generated architecture diagrams using a custom Excalidraw generator. Covering system topology, data flows, and agent interactions. 61 diagrams exported as embeddable SVGs.",
     longDescription: [
-      "excalidraw_generator.py is a Python script that produces .excalidraw.md files directly from code — no manual diagramming. It supports three layout algorithms: hub-spoke (for agent/tool topology), flow (for data pipeline sequences), and grid (for comparison matrices). Each element is positioned by the layout engine and serialized as Excalidraw JSON embedded in a markdown code block.",
+      "excalidraw_generator.py is a Python script that produces .excalidraw.md files directly from code. No manual diagramming. It supports three layout algorithms: hub-spoke (for agent/tool topology), flow (for data pipeline sequences), and grid (for comparison matrices). Each element is positioned by the layout engine and serialized as Excalidraw JSON embedded in a markdown code block.",
       "Output files are dropped into the Obsidian vault where the Excalidraw plugin renders them natively. This means diagrams are versioned alongside the code they describe and can be edited visually in Obsidian after generation. A key constraint: elbow routing breaks when arrows are bound to nodes, so the generator exclusively uses 2-point straight connectors.",
-      "61 diagrams are embedded on this page as SVGs — click any thumbnail for a full-screen view. They cover the agent registry, ChromaDB collection topology, n8n workflow flows, VPS service graph, and MCP server dependency tree, and were exported from the source .excalidraw.md files via excalidraw_export.",
+      "61 diagrams are embedded on this page as SVGs. Click any thumbnail for a full-screen view. They cover the agent registry, ChromaDB collection topology, n8n workflow flows, VPS service graph, and MCP server dependency tree, and were exported from the source .excalidraw.md files via excalidraw_export.",
     ],
     highlights: [
       "Three layout algorithms: hub-spoke, flow pipeline, and grid comparison",
       "Outputs .excalidraw.md files editable in Obsidian Excalidraw plugin",
       "61 embedded diagrams: agent registry, VPS services, MCP topology, n8n workflows",
-      "2-point straight connectors only — elbow routing breaks with node bindings",
+      "2-point straight connectors only. Elbow routing breaks with node bindings",
     ],
     stack: ["Python", "Excalidraw JSON", "Obsidian", "Markdown", "SVG"],
     category: "Data",

@@ -140,7 +140,7 @@ export function HeroSection() {
           </AnimatedFadeIn>
         </div>
 
-        {/* Right column: live system panel — fills the right side, balances composition */}
+        {/* Right column: live system panel, fills the right side and balances composition */}
         <AnimatedFadeIn delay={0.5}>
           <div
             className="hidden lg:block rounded-xl border overflow-hidden shadow-2xl"

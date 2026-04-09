@@ -6,8 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint && node scripts/lint-experiments.mjs",
-    "lint:experiments": "node scripts/lint-experiments.mjs"
+    "lint": "eslint && node scripts/lint-experiments.mjs && npm run lint:voice",
+    "lint:experiments": "node scripts/lint-experiments.mjs",
+    "lint:voice": "../scripts/lint-voice.sh src/lib/data.ts && ../scripts/lint-voice.sh src/lib/product-content.ts && ../scripts/lint-voice.sh src/lib/blog.ts"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.3",

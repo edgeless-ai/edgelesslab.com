@@ -19,7 +19,7 @@ export interface ProductContent {
 
 export const productContent: Record<string, ProductContent> = {
   "agent-safety-patterns": {
-    longTitle: "Autonomous Agent Safety Patterns -- Guardrails from a $252 Loss",
+    longTitle: "Autonomous Agent Safety Patterns: Guardrails from a $252 Loss",
     shortDescription:
       "The safety patterns, hooks, and verification protocols we built after an AI agent lost $252 of real money by sending it to the wrong smart contract.",
     body: `On March 25, 2026, an AI agent was asked to check if a $252 USDC transfer had arrived at a wallet. Instead of checking, it decided to deposit the funds into a trading platform. It sent the money to the wrong contract address. The funds are permanently lost.
@@ -83,7 +83,7 @@ All code is Python 3.10+ with zero external dependencies.`,
   },
 
   "hooks-deep-dive": {
-    longTitle: "Claude Code Hooks Deep Dive -- 15 Production Hooks with Full Source",
+    longTitle: "Claude Code Hooks Deep Dive: 15 Production Hooks with Full Source",
     shortDescription:
       "15 battle-tested Claude Code hooks from a system that runs 5 autonomous agents 24/7. The damage-control hook, the lie detector, the cost tracker, and 12 more, with full source, walkthroughs, and deployment configs.",
     body: `Most Claude Code hooks tutorials stop at "run a linter before commit." That's fine for a side project. It falls apart when you have agents making real decisions.
@@ -142,7 +142,7 @@ All code is Python 3.10+ with zero external dependencies. That's intentional, se
   },
 
   "n8n-ai-workflows": {
-    longTitle: "n8n AI Workflow Templates -- 5 Ready-to-Import Automations",
+    longTitle: "n8n AI Workflow Templates: 5 Ready-to-Import Automations",
     shortDescription:
       "5 importable n8n workflows that connect AI to real business processes: YouTube monitoring, RSS intelligence, content digests, health checks, and automated code review. Docker setup included.",
     body: `Setting up AI automation from scratch takes days of wiring nodes, debugging API responses, and figuring out the right prompt format. These 5 workflows are already built and tested. Import, configure your API keys, activate.
@@ -183,7 +183,7 @@ These come from a production system that runs daily, monitoring 20+ RSS feeds, s
   },
 
   "production-mcp-kit": {
-    longTitle: "Production MCP Server Kit -- Auth, Rate Limiting, Docker, and Beyond",
+    longTitle: "Production MCP Server Kit: Auth, Rate Limiting, Docker, and Beyond",
     shortDescription:
       "Take MCP servers past the tutorial stage. Auth middleware, rate limiting, Docker deployment, health checks, and error handling patterns from running 4+ MCP servers in production.",
     body: `Every MCP tutorial shows you how to define a tool and return a result. None of them show you what breaks when two sessions hit the same endpoint, your API key leaks through error messages, or the server crashes at 3am with nobody watching.
@@ -230,7 +230,7 @@ All templates are TypeScript (Bun/Node compatible). Python bridge included. Dock
   },
 
   "multi-agent-blueprint": {
-    longTitle: "Multi-Agent Orchestration Blueprint -- Dispatch/Worker Architecture for AI Agents",
+    longTitle: "Multi-Agent Orchestration Blueprint: Dispatch/Worker Architecture for AI Agents",
     shortDescription:
       "The dispatch/worker architecture for coordinating multiple AI agents: Agent Bus messaging, state machines, async inboxes, and 3 reference implementations from a system running 5 agents 24/7.",
     body: `Running one AI agent is straightforward. Running five that coordinate with each other without losing tasks, duplicating work, or creating zombie processes is an entirely different problem.
@@ -295,7 +295,7 @@ Python components: 3.10+, zero dependencies. TypeScript components: Bun 1.0+.`,
   },
 
   "gen-art-starter": {
-    longTitle: "Generative Art Starter Kit -- 10 Python Generators for Pen Plotters",
+    longTitle: "Generative Art Starter Kit: 10 Python Generators for Pen Plotters",
     shortDescription:
       "10 Python generators for pen plotters. 30 pre-plotted example SVGs, a 5,700-word guide with measured stroke-travel data and 30 named recipes, plus an AI scoring rubric distilled from 105+ autoresearch experiments.",
     body: `Most generative art tutorials give you a script that makes pretty patterns on screen. They don't tell you how to make those patterns work on a pen plotter, where stroke ordering matters, ink coverage needs to be in a specific range, and tiny details get lost in the mechanical precision of the pen.
@@ -353,7 +353,7 @@ All generators are Python 3.10+. Core generators have zero dependencies. Advance
   },
 
   "launch-toolkit": {
-    longTitle: "Digital Product Launch Toolkit -- Ship Products Like a System, Not a Sprint",
+    longTitle: "Digital Product Launch Toolkit: Ship Products Like a System, Not a Sprint",
     shortDescription:
       "The repeatable system for building, pricing, and launching digital products: templates, checklists, pricing framework, and launch sequencing from shipping 17 products on Gumroad.",
     body: `Most creators ship their first product by brute force, writing content, figuring out Gumroad's editor, setting an arbitrary price, and clicking publish. It works once. It doesn't scale.

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Edgeless Labs Blog</title>
+    <link>https://edgelesslab.com/blog</link>
+    <description>Agent experiments, developer tools, and creative coding from a solo lab.</description>
+    <language>en-us</language>
+    <atom:link href="https://edgelesslab.com/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Meta&apos;s AI Has a Style Guide. Here&apos;s What I Took From It.</title>
+      <link>https://edgelesslab.com/blog/meta-ai-style-guide</link>
+      <description>A leaked system prompt from Meta&apos;s Muse Spark model contains the most disciplined writing-voice rules I&apos;ve seen in a production prompt. Five rules I imported, one I rewrote, one I&apos;m still arguing with.</description>
+      <pubDate>Fri, 10 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/meta-ai-style-guide</guid>
+    </item>
+    <item>
+      <title>I Shipped 7 Digital Products in 7 Days. Here&apos;s Exactly How.</title>
+      <link>https://edgelesslab.com/blog/shipped-7-products-in-7-days</link>
+      <description>The meta-narrative: how one solo developer used AI agents, autoreason scoring, and a daily shipping cadence to go from 11 to 18 products in a week.</description>
+      <pubDate>Thu, 09 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/shipped-7-products-in-7-days</guid>
+    </item>
+    <item>
+      <title>I Built 75 Generative Art Algorithms. Here Are the 10 That Actually Look Good.</title>
+      <link>https://edgelesslab.com/blog/generative-art-algorithms-that-work</link>
+      <description>Most generative art looks like noise. After 105+ experiments with pen plotters and AI scoring, these are the algorithms that consistently produce work worth framing.</description>
+      <pubDate>Wed, 08 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/generative-art-algorithms-that-work</guid>
+    </item>
+    <item>
+      <title>How I Run 5 AI Agents That Talk to Each Other</title>
+      <link>https://edgelesslab.com/blog/agents-that-talk-to-each-other</link>
+      <description>A dispatch agent routes tasks to specialist workers. They communicate through a real-time bus and async inboxes. Here&apos;s the architecture, and why most multi-agent frameworks get it wrong.</description>
+      <pubDate>Tue, 07 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/agents-that-talk-to-each-other</guid>
+    </item>
+    <item>
+      <title>5 n8n Workflows That Run My AI Business</title>
+      <link>https://edgelesslab.com/blog/n8n-workflows-ai-business</link>
+      <description>Visual automation for solo developers. How I use n8n to monitor YouTube, digest RSS feeds, review code, and pipe everything through Claude without writing a scheduler.</description>
+      <pubDate>Mon, 06 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/n8n-workflows-ai-business</guid>
+    </item>
+    <item>
+      <title>Most MCP Servers Break in Production. Here&apos;s Why.</title>
+      <link>https://edgelesslab.com/blog/mcp-servers-break-in-production</link>
+      <description>400+ MCP servers exist. Most work in demos and fail under real load. The 5 failure modes I hit running MCP servers 24/7, and what production-grade actually means.</description>
+      <pubDate>Sun, 05 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/mcp-servers-break-in-production</guid>
+    </item>
+    <item>
+      <title>I Let an AI Agent Move My Money. It Lost $252.</title>
+      <link>https://edgelesslab.com/blog/agent-lost-252-dollars</link>
+      <description>An autonomous agent exceeded its scope, moved funds without verification, and then lied about recovery. The full post-mortem, and the 3 guardrails that would have prevented it.</description>
+      <pubDate>Sat, 04 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/agent-lost-252-dollars</guid>
+    </item>
+    <item>
+      <title>The Hook That Saved My Codebase</title>
+      <link>https://edgelesslab.com/blog/the-hook-that-saved-my-codebase</link>
+      <description>A single Claude Code hook prevented a cascading rm -rf from wiping source files. Here&apos;s how damage-control hooks work, and 3 you can steal today.</description>
+      <pubDate>Fri, 03 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/the-hook-that-saved-my-codebase</guid>
+    </item>
+    <item>
+      <title>PreText: Typography That Thinks</title>
+      <link>https://edgelesslab.com/blog/pretext-typography-that-thinks</link>
+      <description>Most web text is a dumb rectangle. PreText measures text before rendering, enabling layouts CSS literally cannot express. Here&apos;s how we use it.</description>
+      <pubDate>Thu, 02 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/pretext-typography-that-thinks</guid>
+    </item>
+    <item>
+      <title>Writing Prompts That Survive Production</title>
+      <link>https://edgelesslab.com/blog/writing-prompts-that-survive-production</link>
+      <description>Most prompt guides optimize for demos. Production prompts need to handle edge cases, degrade gracefully, and stay maintainable. Here&apos;s the difference.</description>
+      <pubDate>Mon, 30 Mar 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/writing-prompts-that-survive-production</guid>
+    </item>
+    <item>
+      <title>The One-File Memory System That Changed How I Use Claude</title>
+      <link>https://edgelesslab.com/blog/one-file-memory-system</link>
+      <description>You shouldn&apos;t have to re-explain your stack every session. Here&apos;s the simplest possible setup to give Claude persistent memory -- and how to do it in 10 minutes.</description>
+      <pubDate>Thu, 26 Mar 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/one-file-memory-system</guid>
+    </item>
+    <item>
+      <title>Why MCP Servers Are the Unix Pipes of AI</title>
+      <link>https://edgelesslab.com/blog/mcp-servers-unix-pipes-of-ai</link>
+      <description>The Unix philosophy changed software forever: small tools, composable via pipes. MCP does the same thing for AI agents. Here&apos;s why that matters.</description>
+      <pubDate>Tue, 24 Mar 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/mcp-servers-unix-pipes-of-ai</guid>
+    </item>
+    <item>
+      <title>Generative Art for Pen Plotters: A Technical Primer</title>
+      <link>https://edgelesslab.com/blog/generative-art-pen-plotters</link>
+      <description>Pen plotter art isn&apos;t screen art printed on paper. The constraints change everything: single-stroke paths, pen-up/pen-down optimization, and SVG as the lingua franca.</description>
+      <pubDate>Mon, 23 Mar 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/generative-art-pen-plotters</guid>
+    </item>
+    <item>
+      <title>Building AI Agent Infrastructure as a Solo Developer</title>
+      <link>https://edgelesslab.com/blog/building-ai-agent-infrastructure-solo</link>
+      <description>How I built a multi-agent system with MCP servers, vector memory, and autonomous trading -- all running 24/7 from a single VPS.</description>
+      <pubDate>Sat, 21 Mar 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/building-ai-agent-infrastructure-solo</guid>
+    </item>
+    <item>
+      <title>How Claude Code Memory Actually Works</title>
+      <link>https://edgelesslab.com/blog/how-claude-code-memory-works</link>
+      <description>Claude forgets everything between sessions. Here&apos;s how file-based memory fixes that, and why it changes how you work with AI.</description>
+      <pubDate>Sat, 21 Mar 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/how-claude-code-memory-works</guid>
+    </item>
+  </channel>
+</rss>

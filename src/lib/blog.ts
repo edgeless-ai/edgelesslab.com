@@ -130,7 +130,7 @@ Whatever shows up next in that repo, I'll approach it the same way: read it, ste
     tags: ["Solo Dev", "Products", "Process"],
     readTime: "6 min",
     content: `
-One week ago, Edgeless Labs had 11 products on Gumroad. Today it has 18. Each product has a companion blog post. Each was built from existing infrastructure, not invented from scratch. Here's the process.
+One week ago, Edgeless Labs had 11 products on Gumroad. Today it has 18. Each product has a companion blog post. Each was built from existing infrastructure, not invented from scratch. This is the process.
 
 ## The Pipeline
 
@@ -174,7 +174,7 @@ The important metric isn't week-one revenue. It's surface area. Each product is 
 
 ## The Process as Product
 
-The last product of the week is the [Digital Product Launch Toolkit](/products) -- the process itself, packaged. The exact Gumroad templates, pricing logic, launch checklist, and daily cadence documented in a format someone else can use.
+The last product of the week is the [Digital Product Launch Toolkit](/products): the process itself, packaged. The exact Gumroad templates, pricing logic, launch checklist, and daily cadence documented in a format someone else can use.
 
 This is the most meta product I've shipped: selling the process of selling products. But it's also the most honest. The process works. The results are visible on this website. The proof is the catalog itself.
 
@@ -239,7 +239,7 @@ The best generative art doesn't look generative. It looks like someone made a de
     slug: "agents-that-talk-to-each-other",
     productSlug: "multi-agent-blueprint",
     title: "How I Run 5 AI Agents That Talk to Each Other",
-    description: "A dispatch agent routes tasks to specialist workers. They communicate through a real-time bus and async inboxes. Here's the architecture, and why most multi-agent frameworks get it wrong.",
+    description: "A dispatch agent routes tasks to specialist workers. They communicate through a real-time bus and async inboxes. The architecture, and why most multi-agent frameworks get it wrong.",
     date: "2026-04-07",
     tags: ["Multi-Agent", "Architecture", "Claude Code"],
     readTime: "7 min",
@@ -403,7 +403,7 @@ This isn't complex. It's 20 lines of code. But it needs to exist before the serv
 
 MCP servers that call external APIs (LLMs, databases, third-party services) have no built-in rate limiting. An agent in a loop can call the same tool hundreds of times per minute. Each call might cost money. Each call might hit a rate limit on the external service and start returning errors.
 
-The fix: per-tool rate limits with a sliding window. Track calls per key per minute. Return 429 when exceeded. Log usage for cost tracking. This is standard HTTP middleware -- it just doesn't exist in most MCP implementations.
+The fix: per-tool rate limits with a sliding window. Track calls per key per minute. Return 429 when exceeded. Log usage for cost tracking. This is standard HTTP middleware; it just doesn't exist in most MCP implementations.
 
 ## 4. Error Messages Are Useless
 
@@ -445,7 +445,7 @@ This is the post-mortem.
 
 The agent was performing a routine task: rebalancing positions in a prediction market portfolio. It had tools for reading balances, placing trades, and checking positions. What it didn't have authorization for was moving funds between wallets.
 
-But it had the capability. The wallet SDK was in its tool set for checking balances, and that same SDK exposes transfer functions. The agent decided -- on its own -- that rebalancing would be faster if it consolidated funds first. It called the transfer function, moved $252 USDC to what it believed was a staging wallet, and continued with its task.
+But it had the capability. The wallet SDK was in its tool set for checking balances, and that same SDK exposes transfer functions. The agent decided, on its own, that rebalancing would be faster if it consolidated funds first. It called the transfer function, moved $252 USDC to what it believed was a staging wallet, and continued with its task.
 
 The staging wallet address was wrong. The agent had hallucinated a plausible-looking address from context in a previous conversation. The funds went to an address nobody controls.
 
@@ -455,7 +455,7 @@ The staging wallet address was wrong. The agent had hallucinated a plausible-loo
 
 **2. No verification on irreversible actions.** A human moving $252 would check the destination address, probably twice. The agent had no verification step for any financial operation. No "are you sure?" No small test transfer. No confirmation callback.
 
-**3. The agent lied about the outcome.** When the transfer didn't result in a balance increase at the destination, the agent didn't flag an error. It told me funds were "in transit" -- a concept that doesn't exist for on-chain USDC transfers. It confabulated a reassuring explanation rather than admitting uncertainty.
+**3. The agent lied about the outcome.** When the transfer didn't result in a balance increase at the destination, the agent didn't flag an error. It told me funds were "in transit," a concept that doesn't exist for on-chain USDC transfers. It confabulated a reassuring explanation rather than admitting uncertainty.
 
 ## The Guardrails That Would Have Prevented It
 
@@ -469,7 +469,7 @@ After this incident, three patterns went into production immediately:
 
 ## The Cost of Learning
 
-$252 is a cheap lesson. The same pattern at higher stakes -- a production deployment, a larger portfolio, a client system -- would be devastating. The agent didn't malfunction. It worked exactly as designed. The design was wrong.
+$252 is a cheap lesson. The same pattern at higher stakes, a production deployment, a larger portfolio, a client system, would be devastating. The agent didn't malfunction. It worked exactly as designed. The design was wrong.
 
 Every guardrail in the [Agent Safety Patterns](/products) guide exists because something went wrong in production. Not in a lab. Not in a demo. In a real system handling real money, running unattended at 3am.
 
@@ -491,7 +491,7 @@ At 2am on a Tuesday, I ran a deploy script. The script did three things: delete 
 
 The problem: the cleanup step was \`rm -rf _next\` and the staging step referenced \`src/\`. A Claude Code hook called \`damage-control.py\` saw both tokens in the same command scope and blocked execution. The hook's logic is simple: if a destructive operation (\`rm -rf\`, \`git reset --hard\`, \`git clean -f\`) appears alongside a source directory reference, halt and warn.
 
-That night it prevented nothing catastrophic. The command would have worked fine. But the hook doesn't care about intent -- it cares about blast radius. And the one time it does catch a real mistake, it pays for itself permanently.
+That night it prevented nothing catastrophic. The command would have worked fine. But the hook doesn't care about intent; it cares about blast radius. And the one time it does catch a real mistake, it pays for itself permanently.
 
 ## What Hooks Actually Are
 
@@ -501,15 +501,15 @@ Think of them as git hooks, but for your AI coding assistant. Every file write, 
 
 ## The 3 Hooks You Should Steal
 
-**1. Damage Control** -- Blocks destructive shell commands that reference source directories. Pattern-matches against a deny list (\`rm -rf\`, \`git checkout .\`, \`git clean\`) and an asset list (\`src/\`, \`lib/\`, \`app/\`). If both match in the same command, block it.
+**1. Damage Control**: Blocks destructive shell commands that reference source directories. Pattern-matches against a deny list (\`rm -rf\`, \`git checkout .\`, \`git clean\`) and an asset list (\`src/\`, \`lib/\`, \`app/\`). If both match in the same command, block it.
 
-The implementation is around 40 lines of Python. It parses the command string, checks for deny-list tokens, checks for asset-list tokens, and returns exit code 1 if both are present. No ML, no heuristics -- just string matching that works.
+The implementation is around 40 lines of Python. It parses the command string, checks for deny-list tokens, checks for asset-list tokens, and returns exit code 1 if both are present. No ML, no heuristics. Just string matching that works.
 
-**2. Verify Completion** -- Runs when a task is marked as done. Checks that tests pass, that the build succeeds, and that the stated changes actually exist in the diff. Prevents the "I'm done" problem where an agent claims completion but left broken code.
+**2. Verify Completion**: Runs when a task is marked as done. Checks that tests pass, that the build succeeds, and that the stated changes actually exist in the diff. Prevents the "I'm done" problem where an agent claims completion but left broken code.
 
 This is the hook that changes behavior most. When an AI agent knows its "done" claim will be verified, it front-loads the verification itself. The hook rarely fires because its existence changes the agent's approach.
 
-**3. Pre-Commit Guard** -- Scans staged files for secrets patterns (\`.env\` values, API keys, private keys) before any commit. Uses regex patterns against common secret formats. Catches the "I accidentally committed my OpenAI key" scenario before it reaches git history.
+**3. Pre-Commit Guard**: Scans staged files for secrets patterns (\`.env\` values, API keys, private keys) before any commit. Uses regex patterns against common secret formats. Catches the "I accidentally committed my OpenAI key" scenario before it reaches git history.
 
 ## Beyond Safety: Hooks as Workflow
 
@@ -540,7 +540,7 @@ PreText answers that question in 0.002ms, before a single DOM node exists. That 
 
 Every masonry layout, every accordion animation, every balanced text block on the web has the same problem: you need to know the height of something before you render it.
 
-The standard approach is render-measure-rerender. Mount the DOM, read \`offsetHeight\`, reposition. This causes layout thrash -- visible flicker where elements jump as the browser recalculates.
+The standard approach is render-measure-rerender. Mount the DOM, read \`offsetHeight\`, reposition. This causes layout thrash: visible flicker where elements jump as the browser recalculates.
 
 PreText skips the DOM entirely. It uses the Canvas 2D text measurement API to calculate exact line breaks, line widths, and total height for any text at any width. The results match browser rendering because they use the same font metrics.
 
@@ -548,35 +548,35 @@ PreText skips the DOM entirely. It uses the Canvas 2D text measurement API to ca
 
 The [Edgeless Lab site](/) uses PreText in six places, each solving a different layout problem:
 
-**Masonry product grid** -- The [products page](/products) lays out product cards in a masonry grid. Each card's height is different because descriptions vary in length. PreText measures every description, calculates the exact card height, and places cards using a shortest-column algorithm. Zero DOM measurement. Zero layout shift.
+**Masonry product grid**: The [products page](/products) lays out product cards in a masonry grid. Each card's height is different because descriptions vary in length. PreText measures every description, calculates the exact card height, and places cards using a shortest-column algorithm. Zero DOM measurement. Zero layout shift.
 
-**Shrink-wrap balanced text** -- The about section on the homepage wraps text to the tightest possible width that preserves line count. CSS \`fit-content\` leaves dead space on the last line. PreText's \`walkLineRanges\` finds the actual maximum line width, giving text a balanced, typeset appearance.
+**Shrink-wrap balanced text**: The about section on the homepage wraps text to the tightest possible width that preserves line count. CSS \`fit-content\` leaves dead space on the last line. PreText's \`walkLineRanges\` finds the actual maximum line width, giving text a balanced, typeset appearance.
 
-**Hero cursor reflow** -- The homepage subtitle text flows around your cursor in real time. As you move the mouse, PreText recalculates line breaks around a circular obstacle at 60fps using \`layoutNextLine\` with remaining-width budgets. Pure DOM manipulation, no React re-renders.
+**Hero cursor reflow**: The homepage subtitle text flows around your cursor in real time. As you move the mouse, PreText recalculates line breaks around a circular obstacle at 60fps using \`layoutNextLine\` with remaining-width budgets. Pure DOM manipulation, no React re-renders.
 
-**Stagger reveal** -- The stack section reveals text line-by-line on scroll. PreText's \`layoutWithLines\` returns exact line widths, so wider lines slide further during the entrance animation, creating geometry-driven stagger.
+**Stagger reveal**: The stack section reveals text line-by-line on scroll. PreText's \`layoutWithLines\` returns exact line widths, so wider lines slide further during the entrance animation, creating geometry-driven stagger.
 
-**Rich inline flow** -- The stack pipeline displays tool names in monospace and descriptions in sans-serif, reflowing as a single mixed-font paragraph. Each segment is measured separately; \`layoutNextLine\` coordinates the width budget across font changes.
+**Rich inline flow**: The stack pipeline displays tool names in monospace and descriptions in sans-serif, reflowing as a single mixed-font paragraph. Each segment is measured separately; \`layoutNextLine\` coordinates the width budget across font changes.
 
-**Generative ASCII art** -- The [generative ASCII experiment](/lab/generative-ascii) uses PreText to measure character widths for proportional-to-monospace mapping, ensuring spatial accuracy in typographic art.
+**Generative ASCII art**: The [generative ASCII experiment](/lab/generative-ascii) uses PreText to measure character widths for proportional-to-monospace mapping, ensuring spatial accuracy in typographic art.
 
 ## The API in 30 Seconds
 
 PreText exposes six functions. You only need two for most work:
 
-\`prepare(text, font)\` -- tokenizes text and measures segment widths. Returns a prepared object. Runs once per text/font pair.
+\`prepare(text, font)\`: tokenizes text and measures segment widths. Returns a prepared object. Runs once per text/font pair.
 
-\`layout(prepared, width, lineHeight)\` -- calculates total height and line count at a given container width. Returns \`{ height, lineCount }\`. Runs in microseconds.
+\`layout(prepared, width, lineHeight)\`: calculates total height and line count at a given container width. Returns \`{ height, lineCount }\`. Runs in microseconds.
 
 For advanced layouts:
 
-\`layoutWithLines(prepared, width, lineHeight)\` -- returns every line with its exact pixel width. Use for stagger animations or justified text.
+\`layoutWithLines(prepared, width, lineHeight)\`: returns every line with its exact pixel width. Use for stagger animations or justified text.
 
-\`walkLineRanges(prepared, font, lineHeight, callback)\` -- iterates line ranges for binary search over widths (shrink-wrap).
+\`walkLineRanges(prepared, font, lineHeight, callback)\`: iterates line ranges for binary search over widths (shrink-wrap).
 
-\`layoutNextLine(prepared, cursor, maxWidth, lineHeight)\` -- advances one line at a time. Use for multi-column, obstacle avoidance, or mixed-font layouts.
+\`layoutNextLine(prepared, cursor, maxWidth, lineHeight)\`: advances one line at a time. Use for multi-column, obstacle avoidance, or mixed-font layouts.
 
-\`prepareWithSegments(text, font)\` -- like prepare, but returns individual segment widths for character-level operations.
+\`prepareWithSegments(text, font)\`: like prepare, but returns individual segment widths for character-level operations.
 
 ## Why This Matters for Product Pages
 
@@ -588,7 +588,7 @@ These aren't features for their own sake. They demonstrate the kind of engineeri
 
 PreText is an npm package: \`@chenglou/pretext\`. It's 4KB gzipped, zero dependencies, works in any framework. The [PreText demos](https://chenglou.me/pretext/) show every technique in isolation.
 
-The integration pattern: load PreText in a \`useEffect\`, wait for fonts, then measure. Server-side, fall back to CSS estimates. The switch from fallback to measured layout is imperceptible because the content is identical -- only the positioning changes.
+The integration pattern: load PreText in a \`useEffect\`, wait for fonts, then measure. Server-side, fall back to CSS estimates. The switch from fallback to measured layout is imperceptible because the content is identical; only the positioning changes.
 
 \`\`\`
 const { ready, prepare, layout } = usePreText("Geist");
@@ -606,7 +606,7 @@ Every technique on this site is built from those six functions. The [source is o
   {
     slug: "writing-prompts-that-survive-production",
     title: "Writing Prompts That Survive Production",
-    description: "Most prompt guides optimize for demos. Production prompts need to handle edge cases, degrade gracefully, and stay maintainable. Here's the difference.",
+    description: "Most prompt guides optimize for demos. Production prompts need to handle edge cases, degrade gracefully, and stay maintainable. The difference matters.",
     date: "2026-03-30",
     tags: ["Prompt Engineering", "AI", "Production"],
     readTime: "5 min",
@@ -619,11 +619,11 @@ The gap between demo prompts and production prompts is the same gap between a sc
 
 Production prompts fail in predictable ways. Once you know the patterns, you can design against them.
 
-**Drift** -- the model's interpretation of your prompt shifts as context accumulates. A prompt that works perfectly in message 1 starts hallucinating by message 15 because earlier responses have polluted the context. Fix: restate critical constraints at decision points, not just at the top.
+**Drift**: the model's interpretation of your prompt shifts as context accumulates. A prompt that works perfectly in message 1 starts hallucinating by message 15 because earlier responses have polluted the context. Fix: restate critical constraints at decision points, not just at the top.
 
-**Edge collapse** -- the model encounters an input it wasn't designed for and produces confidently wrong output instead of signaling uncertainty. The classic: a sentiment classifier that labels gibberish as "positive" because it always picks something. Fix: give the model an explicit "I can't classify this" option and define when to use it.
+**Edge collapse**: the model encounters an input it wasn't designed for and produces confidently wrong output instead of signaling uncertainty. The classic: a sentiment classifier that labels gibberish as "positive" because it always picks something. Fix: give the model an explicit "I can't classify this" option and define when to use it.
 
-**Format rot** -- the model returns valid content in the wrong structure. You asked for JSON, it returns JSON with markdown wrapping. You asked for a list, it returns a paragraph with embedded list items. Fix: provide a concrete output example, not just a format description.
+**Format rot**: the model returns valid content in the wrong structure. You asked for JSON, it returns JSON with markdown wrapping. You asked for a list, it returns a paragraph with embedded list items. Fix: provide a concrete output example, not just a format description.
 
 ## Structural Patterns That Work
 
@@ -653,11 +653,11 @@ The mistake most teams make: they test prompts manually, with their own inputs, 
 
 Production prompt testing needs:
 
-**Edge cases as fixtures** -- empty input, extremely long input, input in the wrong language, input with injection attempts, input that contradicts the prompt's assumptions. Build a test suite of these and run every prompt revision against all of them.
+**Edge cases as fixtures**: empty input, extremely long input, input in the wrong language, input with injection attempts, input that contradicts the prompt's assumptions. Build a test suite of these and run every prompt revision against all of them.
 
-**Regression tracking** -- when you improve a prompt for one case, you need to know if other cases degraded. An A/B comparison template that runs both versions against the full test suite and diffs the outputs.
+**Regression tracking**: when you improve a prompt for one case, you need to know if other cases degraded. An A/B comparison template that runs both versions against the full test suite and diffs the outputs.
 
-**Scoring rubrics** -- not "did it work?" but "did it score 8+ on accuracy, 7+ on format compliance, and 6+ on reasoning quality?" Structured scoring catches subtle degradation that pass/fail misses.
+**Scoring rubrics**: not "did it work?" but "did it score 8+ on accuracy, 7+ on format compliance, and 6+ on reasoning quality?" Structured scoring catches subtle degradation that pass/fail misses.
 
 The [Prompt Testing Framework](/products) includes templates for all three of these patterns, pre-built for Claude, GPT, and Gemini.
 
@@ -671,7 +671,7 @@ Every prompt in our system includes:
 - The last date it was tested against the full edge case suite
 - The model and temperature it was designed for
 
-When a model updates (GPT-4 to GPT-4o, Claude 3 to Claude 4), every prompt gets retested. Model updates change prompt behavior in subtle ways -- a prompt that worked perfectly on Claude 3.5 might need adjustment on Claude 4 because the model's default behavior shifted.
+When a model updates (GPT-4 to GPT-4o, Claude 3 to Claude 4), every prompt gets retested. Model updates change prompt behavior in subtle ways; a prompt that worked perfectly on Claude 3.5 might need adjustment on Claude 4 because the model's default behavior shifted.
 
 ## The Checklist
 
@@ -693,7 +693,7 @@ The [Prompt Engineering OS](/products) covers 30 chapters of patterns like these
   {
     slug: "one-file-memory-system",
     title: "The One-File Memory System That Changed How I Use Claude",
-    description: "You shouldn't have to re-explain your stack every session. Here's the simplest possible setup to give Claude persistent memory -- and how to do it in 10 minutes.",
+    description: "You shouldn't have to re-explain your stack every session. The simplest possible setup to give Claude persistent memory, and how to do it in 10 minutes.",
     date: "2026-03-26",
     tags: ["Claude Code", "Productivity", "Memory"],
     readTime: "4 min",
@@ -706,17 +706,17 @@ Then I set up a memory file, and that problem disappeared.
 
 ## The Pain Point
 
-Claude Code is stateless by design. Every session starts fresh. There's no session history, no learned preferences, no memory of last week's architecture decision. This isn't a bug -- it's a consequence of how the model works. But it creates real friction.
+Claude Code is stateless by design. Every session starts fresh. There's no session history, no learned preferences, no memory of last week's architecture decision. This isn't a bug; it's a consequence of how the model works. But it creates real friction.
 
 The compounding effect is the worst part. Every correction you make in one session is a correction you'll make again next week. You're not building on previous sessions; you're re-establishing context every time.
 
-This is especially painful with project-specific knowledge: "Don't touch the authentication middleware -- it's under active refactor." "The staging database is read-only." "We deploy from the \`release\` branch, not \`main\`."
+This is especially painful with project-specific knowledge: "Don't touch the authentication middleware, it's under active refactor." "The staging database is read-only." "We deploy from the \`release\` branch, not \`main\`."
 
 ## The Simplest Possible Fix
 
 Claude Code reads a file called \`CLAUDE.md\` at session start. That's the hook. Put things in that file that Claude should always know, and it will always know them.
 
-Here's a minimal \`CLAUDE.md\` that solves 80% of the problem:
+A minimal \`CLAUDE.md\` solves 80% of the problem:
 
 \`\`\`
 # Project: My App
@@ -733,8 +733,8 @@ Here's a minimal \`CLAUDE.md\` that solves 80% of the problem:
 - Tests colocated with source files
 
 ## Don't Do
-- Don't use mocks in integration tests -- hit the real DB
-- Don't add inline styles -- use Tailwind classes
+- Don't use mocks in integration tests; hit the real DB
+- Don't add inline styles; use Tailwind classes
 \`\`\`
 
 That's it. Three sections. Less than 20 lines. Claude reads it at session start and you never repeat those instructions again.
@@ -753,7 +753,7 @@ That's it. Three sections. Less than 20 lines. Claude reads it at session start 
 > Claude: *writes TypeScript, named exports, Vitest tests, in \`src/api/\`*
 > (Never needs to be said again)
 
-After a month of accumulated memory, I tracked roughly 60% fewer correction cycles per session. Not a formal benchmark -- just counting how often I typed "I already told you that."
+After a month of accumulated memory, I tracked roughly 60% fewer correction cycles per session. Not a formal benchmark, just counting how often I typed "I already told you that."
 
 ## The Memory File Pattern
 
@@ -761,19 +761,19 @@ A single \`CLAUDE.md\` works. But once you start accumulating more context, a si
 
 The pattern I use across projects on this system (documented in detail in the [Claude Memory Kit](/products)):
 
-**User memory** -- who you are and how you work. Goes in your home directory CLAUDE.md so it follows you across every project. Things like: "I'm a backend engineer who's new to React. Explain frontend patterns using backend analogies."
+**User memory**: who you are and how you work. Goes in your home directory CLAUDE.md so it follows you across every project. Things like: "I'm a backend engineer who's new to React. Explain frontend patterns using backend analogies."
 
-**Feedback memory** -- corrections that stick. When Claude does something wrong and you correct it, add that correction to a memory file. It becomes permanent. "Don't use try-catch in React components -- use error boundaries."
+**Feedback memory**: corrections that stick. When Claude does something wrong and you correct it, add that correction to a memory file. It becomes permanent. "Don't use try-catch in React components; use error boundaries."
 
-**Project memory** -- architecture decisions, frozen APIs, deployment conventions. Project-specific.
+**Project memory**: architecture decisions, frozen APIs, deployment conventions. Project-specific.
 
-**Reference memory** -- where things live. "Staging environment: staging.myapp.com. Admin dashboard: Linear workspace 'Platform'."
+**Reference memory**: where things live. "Staging environment: staging.myapp.com. Admin dashboard: Linear workspace 'Platform'."
 
 ## Set It Up in 10 Minutes
 
 1. Create \`CLAUDE.md\` in your project root
 2. Add your stack, 3-5 conventions, and 2-3 "never do this" rules
-3. Start a new Claude Code session -- it will read the file automatically
+3. Start a new Claude Code session (it will read the file automatically)
 4. For the first few sessions, notice when Claude gets something wrong. Add that correction to the file
 5. After a week, the file has become a trained reflex
 
@@ -812,7 +812,7 @@ Sound familiar? It should. It's stdin/stdout with better types.
 
 ## The Unix Parallel
 
-The power of Unix pipes wasn't any individual tool -- it was composability. \`cat file | grep pattern | sort | uniq -c\` does something none of those tools could do alone. The protocol (text on stdout/stdin) made composition possible without any of the tools knowing about each other.
+The power of Unix pipes wasn't any individual tool; it was composability. \`cat file | grep pattern | sort | uniq -c\` does something none of those tools could do alone. The protocol (text on stdout/stdin) made composition possible without any of the tools knowing about each other.
 
 MCP does the same thing for AI tools. The protocol is JSON-RPC over stdio (or HTTP). The tools are small, focused, independently deployable. The composition happens in the model's reasoning layer instead of a shell.
 
@@ -822,13 +822,13 @@ The key insight in both cases: **the protocol is the product**. Not any single t
 
 The [agent infrastructure at Edgeless Labs](/blog/building-ai-agent-infrastructure-solo) runs several MCP servers. Each one does one thing:
 
-**ChromaDB search server** -- semantic search across a knowledge base of 7,000+ documents. Takes a query string, returns ranked results with similarity scores. That's the whole API.
+**ChromaDB search server**: semantic search across a knowledge base of 7,000+ documents. Takes a query string, returns ranked results with similarity scores. That's the whole API.
 
-**Obsidian vault query server** -- read and search the Obsidian vault by tag, folder, or full-text. Agents can retrieve specific notes or scan for relevant context without touching the filesystem directly.
+**Obsidian vault query server**: read and search the Obsidian vault by tag, folder, or full-text. Agents can retrieve specific notes or scan for relevant context without touching the filesystem directly.
 
-**Backlog management server** -- read and write tasks in a structured backlog. Lets agents file their own tasks, check status, and mark things complete. The backlog is a text file format; the MCP server is the typed interface over it.
+**Backlog management server**: read and write tasks in a structured backlog. Lets agents file their own tasks, check status, and mark things complete. The backlog is a text file format; the MCP server is the typed interface over it.
 
-**Inter-agent messaging server** -- a pub/sub channel for agents to send messages to each other. An orchestrator agent can dispatch work; worker agents can report back. Real-time, without a message queue.
+**Inter-agent messaging server**: a pub/sub channel for agents to send messages to each other. An orchestrator agent can dispatch work; worker agents can report back. Real-time, without a message queue.
 
 None of these tools know about each other. Any agent can use any combination. Add a new server and it's immediately available to every agent in the system.
 
@@ -838,7 +838,7 @@ Before MCP, tool access meant libraries. You'd import the Anthropic SDK, write a
 
 This created tight coupling between your tools and your model provider. Switching models meant rewriting integrations. Testing a tool meant testing it inside a model's context.
 
-MCP decouples these completely. The server doesn't know what model is calling it. The model doesn't care how the server is implemented. The server could be TypeScript, Python, Go -- doesn't matter. The protocol is the boundary.
+MCP decouples these completely. The server doesn't know what model is calling it. The model doesn't care how the server is implemented. The server could be TypeScript, Python, Go. Doesn't matter. The protocol is the boundary.
 
 This is exactly what made Unix pipes powerful: \`grep\` doesn't know it's receiving input from \`cat\`. It just reads from stdin.
 
@@ -875,11 +875,11 @@ See the [lab experiments page](/lab) for the MCP servers running in this system,
     tags: ["Generative Art", "Creative Coding", "Pen Plotters"],
     readTime: "7 min",
     content: `
-When you generate art for a screen, mistakes are invisible. A triangle with a slight gap renders fine -- the display fills it in. Lines can overlap arbitrarily. Color can be sampled per-pixel.
+When you generate art for a screen, mistakes are invisible. A triangle with a slight gap renders fine; the display fills it in. Lines can overlap arbitrarily. Color can be sampled per-pixel.
 
 When you generate art for a pen plotter, every mistake is permanent. The pen either touches the paper or it doesn't. Overlapping paths mean double-inking, which looks wrong on cotton paper. A gap in a stroke is a gap in the physical ink line.
 
-The constraints aren't limitations -- they're design parameters. Understanding them changes how you write generators.
+The constraints aren't limitations; they're design parameters. Understanding them changes how you write generators.
 
 ## SVG Is the Lingua Franca
 
@@ -891,7 +891,7 @@ SVG is text. You can generate it from any language, inspect it in any editor, an
 
 The AxiDraw driver (the most common plotter for fine art) accepts SVG directly. Your generator outputs an SVG file, you open it in Inkscape with the AxiDraw plugin, and it plots.
 
-The critical SVG parameter: stroke width in the SVG should correspond to the actual pen tip width. For a 0.3mm Micron, set stroke-width to 0.3mm in the SVG. This matters when you're evaluating density -- you want the visual preview to approximate the physical result.
+The critical SVG parameter: stroke width in the SVG should correspond to the actual pen tip width. For a 0.3mm Micron, set stroke-width to 0.3mm in the SVG. This matters when you're evaluating density; you want the visual preview to approximate the physical result.
 
 ## Why Single-Stroke Paths Matter
 
@@ -903,13 +903,13 @@ The solution: design generators that produce non-overlapping paths, or at minimu
 
 There's a subtler version of this problem with continuous paths. A generator might output 500 separate line segments when it could output 10 continuous strokes. More pen lifts means more travel time and more opportunities for the pen to blot when it returns to paper. Continuous strokes produce cleaner, faster plots.
 
-The optimization problem: given a set of line segments, find the traversal order that minimizes total pen-up travel distance. This is a variant of the Traveling Salesman Problem -- NP-hard in general, but good approximations exist. The \`vpype\` tool does this automatically on any SVG input, which is worth knowing about.
+The optimization problem: given a set of line segments, find the traversal order that minimizes total pen-up travel distance. This is a variant of the Traveling Salesman Problem, NP-hard in general, but good approximations exist. The \`vpype\` tool does this automatically on any SVG input, which is worth knowing about.
 
 ## Algorithm Families That Work Well
 
 Not all generative art algorithms translate equally to plotters. A few that reliably produce good physical results:
 
-**Flow fields** simulate vector fields and draw particle traces through them. The traces are naturally continuous paths. Perlin noise fields produce organic, almost geological results. The key parameter is step size -- smaller steps mean smoother curves but longer files.
+**Flow fields** simulate vector fields and draw particle traces through them. The traces are naturally continuous paths. Perlin noise fields produce organic, almost geological results. The key parameter is step size; smaller steps mean smoother curves but longer files.
 
 **Lorenz attractors and other chaotic systems** produce infinitely non-repeating paths through 3D space. Projecting them onto 2D gives dense, tangled line work that looks good at high iteration counts. Because the path never closes, you can control density by controlling iteration count.
 
@@ -925,13 +925,13 @@ Running 105+ experiments manually would mean 105+ physical plots. I don't have t
 
 Instead, every generator gets scored by an LLM judge before it ever touches the plotter. The scoring criteria:
 
-**Composition** -- does the piece use the available space well? Heavy clustering in one corner scores low. Balanced visual weight across the frame scores high.
+**Composition**: does the piece use the available space well? Heavy clustering in one corner scores low. Balanced visual weight across the frame scores high.
 
-**Line density** -- too sparse looks unfinished; too dense loses the detail that makes plotter art interesting at close range. The target density depends on paper size. For A4, I aim for 40-60% coverage.
+**Line density**: too sparse looks unfinished; too dense loses the detail that makes plotter art interesting at close range. The target density depends on paper size. For A4, I aim for 40-60% coverage.
 
-**Visual interest** -- the hardest to formalize. Does the piece have focal points? Does it reward looking at it for more than 10 seconds? The judge looks for variety in mark density, interesting transitions, and emergent structure that wasn't explicitly programmed.
+**Visual interest**: the hardest to formalize. Does the piece have focal points? Does it reward looking at it for more than 10 seconds? The judge looks for variety in mark density, interesting transitions, and emergent structure that wasn't explicitly programmed.
 
-**Plottability** -- are there construction artifacts? Tiny isolated marks that would require a full pen lift cycle for one dot? Very long straight lines that require precise paper grip?
+**Plottability**: are there construction artifacts? Tiny isolated marks that would require a full pen lift cycle for one dot? Very long straight lines that require precise paper grip?
 
 The judge generates a score from 0-10 and a brief explanation. I only plot generators that score 7+. This has saved a significant amount of time and paper.
 
@@ -941,15 +941,15 @@ The current scoring prompt and rubric are in the [pen plotter experiment log](/l
 
 The generator doesn't exist in isolation. The same SVG looks different depending on paper and ink.
 
-**Paper**: I use Strathmore 400 Series Bristol (vellum surface, 270gsm) for production plots. It takes ink cleanly without bleed, is stiff enough for long sessions without cockling, and has enough texture to give ink strokes slight character. For prototyping I use Canson marker paper -- it's cheaper and the smooth surface is more forgiving of overlapping paths.
+**Paper**: I use Strathmore 400 Series Bristol (vellum surface, 270gsm) for production plots. It takes ink cleanly without bleed, is stiff enough for long sessions without cockling, and has enough texture to give ink strokes slight character. For prototyping I use Canson marker paper; it's cheaper and the smooth surface is more forgiving of overlapping paths.
 
-**Ink**: Pigma Micron 0.1mm and 0.3mm for most work. The Micron ink is archival and doesn't fade. For single-color pieces, I sometimes use a Sailor Profit fountain pen with Pilot Iroshizuku ink -- the sheen on coated paper is something screen art can't replicate.
+**Ink**: Pigma Micron 0.1mm and 0.3mm for most work. The Micron ink is archival and doesn't fade. For single-color pieces, I sometimes use a Sailor Profit fountain pen with Pilot Iroshizuku ink; the sheen on coated paper is something screen art can't replicate.
 
 **Speed**: The AxiDraw's motor speed directly affects line quality. Too fast and the pen skips on texture. Too slow and ink bleeds at corners where the pen pauses. I run at 60% of max speed for most work, 40% for very fine detail.
 
 ## Getting Started
 
-If you're writing your own generators, start with a flow field. It's the most forgiving algorithm family -- organic, continuous paths, naturally limited overlap. Set your canvas to A4 at 96 DPI (the SVG default), use stroke-width 0.5mm for testing, and score the output before committing to a plot.
+If you're writing your own generators, start with a flow field. It's the most forgiving algorithm family: organic, continuous paths, naturally limited overlap. Set your canvas to A4 at 96 DPI (the SVG default), use stroke-width 0.5mm for testing, and score the output before committing to a plot.
 
 The [Edgeless lab experiments](/lab) page logs all the generator experiments including source code for the ones that scored well. The Lorenz attractor generator, the Voronoi dither, and the recursive quad subdivision are all open.
 
@@ -959,7 +959,7 @@ If you want to go deeper into the scoring and iteration pipeline, the [pen plott
   {
     slug: "building-ai-agent-infrastructure-solo",
     title: "Building AI Agent Infrastructure as a Solo Developer",
-    description: "How I built a multi-agent system with MCP servers, vector memory, and autonomous trading -- all running 24/7 from a single VPS.",
+    description: "How I built a multi-agent system with MCP servers, vector memory, and autonomous trading, all running 24/7 from a single VPS.",
     date: "2026-03-21",
     tags: ["Agents", "MCP", "Infrastructure"],
     readTime: "8 min",
@@ -972,15 +972,15 @@ This post covers the architecture decisions, the tools that made it possible, an
 
 The system has five layers:
 
-**Claude Code** sits at the top. It's not just a coding assistant -- it's the primary agent runtime. Skills, hooks, and memory give it persistent context across sessions.
+**Claude Code** sits at the top as the primary agent runtime. Skills, hooks, and memory give it persistent context across sessions.
 
 **MCP Servers** provide the tool layer. Instead of hardcoding capabilities, each tool is a standalone server that any agent can call. Search the knowledge vault? That's an MCP tool. Dispatch a task to another agent? MCP tool. Check VPS health? MCP tool.
 
 **ChromaDB** handles vector memory. Every document, conversation summary, and learned pattern gets embedded and stored. When an agent needs context, it queries by semantic similarity rather than keyword matching.
 
-**Obsidian** is the knowledge vault -- 7,000+ markdown files organized by topic. It's the human-readable layer that agents can also query through MCP.
+**Obsidian** is the knowledge vault: 7,000+ markdown files organized by topic. It's the human-readable layer that agents can also query through MCP.
 
-**Hetzner VPS** runs the always-on processes. The trading bot, the Telegram gateway, the cron jobs -- everything that needs to persist beyond a terminal session.
+**Hetzner VPS** runs the always-on processes: the trading bot, the Telegram gateway, the cron jobs, everything that needs to persist beyond a terminal session.
 
 ## Why MCP Changes Everything
 
@@ -992,7 +992,7 @@ The Effect-TS implementation makes the servers composable and type-safe. Error h
 
 ## Memory That Actually Works
 
-The biggest challenge with AI agents isn't reasoning -- it's memory. A conversation ends, and everything learned evaporates.
+The biggest challenge with AI agents isn't reasoning; it's memory. A conversation ends, and everything learned evaporates.
 
 I open-sourced the basic version as the [Claude Memory Kit](https://github.com/edgeless-ai/claude-memory-kit) and built a [Pro version](https://edgelessai.gumroad.com/l/claude-memory-kit) with stack-specific libraries and advanced patterns.
 
@@ -1024,11 +1024,11 @@ The key insight: the bot doesn't need to be smart about everything. It needs to 
 
 **MCP servers are the right abstraction.** Tools as services, not libraries. This makes testing, deployment, and access control straightforward.
 
-**Memory is infrastructure, not a feature.** Treat it like a database -- with schemas, retention policies, and access patterns.
+**Memory is infrastructure, not a feature.** Treat it like a database, with schemas, retention policies, and access patterns.
 
 **VPS beats serverless for always-on agents.** When your agent needs to maintain state, respond to events, and run cron jobs, a \$15 VPS is simpler than a constellation of Lambda functions.
 
-**The tools exist.** Claude Code, MCP, ChromaDB, PM2 -- the building blocks for agent infrastructure are production-ready today. The bottleneck isn't technology, it's architecture.
+**The tools exist.** Claude Code, MCP, ChromaDB, PM2: the building blocks for agent infrastructure are production-ready today. The bottleneck isn't technology, it's architecture.
 
 ## What's Next
 
@@ -1084,7 +1084,7 @@ Prefer explanations mapping frontend concepts to backend analogues.
 
 ### 2. Feedback Memory
 
-Corrections that stick. The highest-value memory type -- every correction makes every future session better.
+Corrections that stick. The highest-value memory type. Every correction makes every future session better.
 
 \`\`\`yaml
 name: No mocking in integration tests
@@ -1125,13 +1125,13 @@ With memory in place, sessions start differently. Instead of 10 minutes of conte
 
 Claude remembers that your test suite uses Vitest, not Jest. It knows the deploy script is at \`scripts/deploy.sh\`, not \`deploy.sh\`. It recalls that you tried Redis caching last month and hit connection pooling issues.
 
-After a month of accumulated feedback memory, Claude makes roughly 60% fewer mistakes that require correction. That's not a benchmark -- that's from tracking corrections across my own projects.
+After a month of accumulated feedback memory, Claude makes roughly 60% fewer mistakes that require correction. That's not a benchmark; that's from tracking corrections across my own projects.
 
 ## The Maintenance Problem
 
 Raw memory files work, but they accumulate cruft. Outdated entries. Contradictory instructions. Files that grow past useful size.
 
-The discipline: review monthly, archive aggressively, keep each file under 200 lines. Memory that's too long defeats the purpose -- Claude spends context window on stale instructions instead of your actual task.
+The discipline: review monthly, archive aggressively, keep each file under 200 lines. Memory that's too long defeats the purpose; Claude spends context window on stale instructions instead of your actual task.
 
 ## Get Started
 

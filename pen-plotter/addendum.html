@@ -693,7 +693,7 @@ body {
       const n = manifest[idx + d];
       if (n) {
         const i = new Image();
-        i.src = `assets/mediums-all/${n.id}.webp`;
+        i.src = `${ASSET_BASE}assets/mediums-all/${n.id}.webp`;
       }
     });
   }

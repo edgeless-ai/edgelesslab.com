@@ -11,7 +11,7 @@
 <meta property="og:description" content="Sixteen thousand seven hundred and thirty-two specimens of generative line art, scored by an autonomous loop of seventeen procedural factories and five language-model judges. A field journal of what the algorithms loved — and what they got wrong.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://edgelesslab.com/pen-plotter/">
-<meta property="og:image" content="https://edgelesslab.com/pen-plotter/assets/og-image.png">
+<meta property="og:image" content="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:site_name" content="Edgeless Lab">
@@ -20,7 +20,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Pen Plotter Autoresearch">
 <meta name="twitter:description" content="An autonomous loop, 18 factories, 16,832 specimens. A field journal of what the algorithms loved — and what they got wrong.">
-<meta name="twitter:image" content="https://edgelesslab.com/pen-plotter/assets/og-image.png">
+<meta name="twitter:image" content="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/og-image.png">
 
 <!-- Display: Boska (Fontshare) -->
 <link rel="preconnect" href="https://api.fontshare.com">
@@ -2097,7 +2097,7 @@ body {
     if (idx < 0 || idx >= manifest.length) return;
     activeIndex = idx;
     const p = manifest[idx];
-    lbImg.src = ASSET_BASE + (p.medium || p.thumb);
+    lbImg.src = `${ASSET_BASE}assets/mediums-all/${p.id}.webp`;
     lbImg.alt = p.id;
     lbId.textContent = p.id;
     lbRank.textContent = `#${idx + 1} of ${manifest.length}`;
@@ -2112,7 +2112,7 @@ body {
       const n = manifest[idx + d];
       if (n && n.medium) {
         const i = new Image();
-        i.src = ASSET_BASE + n.medium;
+        i.src = `${ASSET_BASE}assets/mediums-all/${n.id}.webp`;
       }
     });
   }

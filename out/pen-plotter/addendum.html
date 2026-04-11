@@ -544,6 +544,8 @@ body {
 
 <script>
 (function () {
+  // R2 asset base URL (task-306). Set to '' for local/relative paths.
+  const ASSET_BASE = 'https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/';
   const gate = document.getElementById('gate');
   const full = document.getElementById('full');
   const grid = document.getElementById('full-grid');
@@ -613,7 +615,7 @@ body {
         const img = document.createElement('img');
         img.loading = 'lazy';
         img.decoding = 'async';
-        img.src = p.thumb;
+        img.src = ASSET_BASE + p.thumb;
         img.alt = p.id;
         tile.appendChild(img);
         tile.classList.remove('placeholder');
@@ -675,7 +677,7 @@ body {
     activeIndex = idx;
     const p = manifest[idx];
     // load 400px medium webp (deployable, no symlink)
-    lbImg.src = `assets/mediums-all/${p.id}.webp`;
+    lbImg.src = `${ASSET_BASE}assets/mediums-all/${p.id}.webp`;
     lbImg.alt = p.id;
     lbPlateId.textContent = p.id;
     lbPlateRank.textContent = `#${idx + 1} of ${manifest.length.toLocaleString()}`;

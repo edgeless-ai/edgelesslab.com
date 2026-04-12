@@ -76,19 +76,22 @@ class Orchestrator {
   }
 
   loadConfig(userConfig) {
-    // Deep clone default config
+    // Deep clone default config (JSON clone strips methods, re-attach below)
     const config = JSON.parse(JSON.stringify(CONFIG));
-    
+    config.validate = CONFIG.validate.bind(config);
+    config.merge = CONFIG.merge.bind(config);
+    config.loadEnvironment = CONFIG.loadEnvironment.bind(config);
+
     // Apply user overrides
     if (userConfig) {
       this.deepMerge(config, userConfig);
     }
-    
+
     // Load environment (URL params)
     if (typeof window !== 'undefined') {
       config.loadEnvironment();
     }
-    
+
     // Validate
     config.validate();
     

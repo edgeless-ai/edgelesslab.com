@@ -127,8 +127,9 @@ class GitHubAdapter extends DataSourceAdapter {
     // GitHub trending isn't in API, search for recently starred instead
     try {
       const headers = this.getHeaders();
+      const since = new Date(Date.now() - 90 * 86400000).toISOString().split('T')[0];
       const response = await fetch(
-        `${this.apiUrl}/search/repositories?q=stars:>1000+created:>2024-01-01&sort=stars&order=desc&per_page=${this.maxRepos}`,
+        `${this.apiUrl}/search/repositories?q=stars:>1000+created:>${since}&sort=stars&order=desc&per_page=${this.maxRepos}`,
         { headers }
       );
       

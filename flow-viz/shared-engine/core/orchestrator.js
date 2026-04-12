@@ -170,22 +170,26 @@ class Orchestrator {
 
   draw() {
     if (this.state !== 'running') return;
-    
+
     const now = millis();
     const deltaTime = now - (this.lastFrameTime || now - 16);
     this.lastFrameTime = now;
-    
-    // Update plugins
-    this.plugins.update(deltaTime, now);
-    
-    // Render layers
-    this.plugins.render('background');
-    this.plugins.render('trails');
-    this.plugins.render('particles');
-    this.plugins.render('markets');
-    this.plugins.render('overlay');
-    this.plugins.render('ui');
-    
+
+    try {
+      // Update plugins
+      this.plugins.update(deltaTime, now);
+
+      // Render layers
+      this.plugins.render('background');
+      this.plugins.render('trails');
+      this.plugins.render('particles');
+      this.plugins.render('markets');
+      this.plugins.render('overlay');
+      this.plugins.render('ui');
+    } catch (err) {
+      console.error('Render error:', err);
+    }
+
     Events.emit('ENGINE_TICK', { deltaTime, elapsed: now });
   }
 
@@ -268,7 +272,7 @@ class Orchestrator {
     Events.emit('ENGINE_PAUSE', { state: this.state });
   }
 
-  switchDataSource(type, options = {}) {
+  async switchDataSource(type, options = {}) {
     // Stop current
     if (this.dataSource) {
       this.dataSource.stopAutoRefresh();
@@ -288,17 +292,17 @@ class Orchestrator {
     
     this.dataSource = DataSourceFactory.create(this.config.dataSource);
     this.dataSource.eventBus = Events;
-    this.dataSource.init(this.config.dataSource, context);
-    
+    await this.dataSource.init(this.config.dataSource, context);
+
     context.dataSource = this.dataSource;
-    
+
     // Restart
     if (this.config.dataSource.refreshInterval > 0) {
       this.dataSource.startAutoRefresh(this.config.dataSource.refreshInterval);
     }
-    
-    this.dataSource.refresh();
-    
+
+    await this.dataSource.refresh();
+
     Events.emit('DATA_SOURCE_SWITCH', { type, options });
   }
 

@@ -271,8 +271,9 @@ class FluidEngine extends Plugin {
     // Reinitialize graphics
     if (this.trailLayer) {
       this.trailLayer = createGraphics(width, height);
+      const mode = this.config.engine.colorMode === 'HSB' ? HSB : RGB;
       this.trailLayer.colorMode(
-        this.config.engine.colorMode,
+        mode,
         this.config.engine.colorRanges.h,
         this.config.engine.colorRanges.s,
         this.config.engine.colorRanges.b,
@@ -453,7 +454,7 @@ class Market {
     const palette = this.config.colors.categories[this.category] || this.config.colors.categories.other;
     
     // Warmth based on yes price
-    const warmth = this.data.yesPrice || 0.5;
+    const warmth = this.data.yesPrice ?? 0.5;
     const h = this.lerp(palette.base[0], palette.accent[0], warmth);
     const s = this.lerp(palette.base[1], palette.accent[1], warmth);
     const b = this.lerp(palette.base[2], palette.accent[2], warmth);

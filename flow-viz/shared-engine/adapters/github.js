@@ -16,9 +16,15 @@ class GitHubAdapter extends DataSourceAdapter {
     this.org = config.org || null;
     this.repos = config.repos || null; // Specific repo list
     this.maxRepos = config.maxRepos || 10;
-    
+
     // Query strategies
     this.queryType = config.queryType || 'user'; // 'user' | 'org' | 'repos' | 'trending'
+
+    // Rate limit awareness
+    this.rateLimitRemaining = 60;
+    this.rateLimitReset = 0;
+    this.enrichmentCache = new Map(); // repo fullname -> { data, timestamp }
+    this.enrichmentCacheTTL = 600000; // 10 min cache for enrichment data
   }
 
   async fetch() {
@@ -60,13 +66,15 @@ class GitHubAdapter extends DataSourceAdapter {
         { headers }
       );
       
+      this.trackRateLimit(response);
       if (!response.ok) {
-        if (response.status === 403) {
-          throw new Error('Rate limited');
+        if (response.status === 403 || response.status === 429) {
+          console.warn(`GitHub rate limited. Remaining: ${this.rateLimitRemaining}`);
+          return this.generateMockRepos();
         }
         throw new Error(`HTTP ${response.status}`);
       }
-      
+
       return await response.json();
     } catch (err) {
       console.warn('GitHub fetch failed:', err);
@@ -134,22 +142,43 @@ class GitHubAdapter extends DataSourceAdapter {
   }
 
   async enrichRepos(repos) {
-    // Fetch recent activity for each repo
+    // Fetch recent activity for each repo, with caching to avoid rate limits
     const enriched = [];
-    
+    const now = Date.now();
+
     for (const repo of repos) {
+      // Check cache first
+      const cached = this.enrichmentCache.get(repo.full_name);
+      if (cached && (now - cached.timestamp) < this.enrichmentCacheTTL) {
+        enriched.push({ ...repo, ...cached.data });
+        continue;
+      }
+
+      // Skip enrichment if rate limit is low (save quota for base fetches)
+      if (this.rateLimitRemaining < 10) {
+        enriched.push({
+          ...repo,
+          recentEvents: cached?.data?.recentEvents || [],
+          contributors: cached?.data?.contributors || [],
+          activityScore: cached?.data?.activityScore || 0
+        });
+        continue;
+      }
+
       try {
-        const [events, contributors] = await Promise.all([
+        const [events, contributors] = await Promise.allSettled([
           this.fetchRepoEvents(repo.full_name),
           this.fetchRepoContributors(repo.full_name)
         ]);
-        
-        enriched.push({
-          ...repo,
-          recentEvents: events,
-          contributors: contributors,
-          activityScore: events.length
-        });
+
+        const data = {
+          recentEvents: events.status === 'fulfilled' ? events.value : [],
+          contributors: contributors.status === 'fulfilled' ? contributors.value : [],
+          activityScore: events.status === 'fulfilled' ? events.value.length : 0
+        };
+
+        this.enrichmentCache.set(repo.full_name, { data, timestamp: now });
+        enriched.push({ ...repo, ...data });
       } catch (err) {
         enriched.push({
           ...repo,
@@ -159,7 +188,7 @@ class GitHubAdapter extends DataSourceAdapter {
         });
       }
     }
-    
+
     return enriched;
   }
 
@@ -170,7 +199,7 @@ class GitHubAdapter extends DataSourceAdapter {
         `${this.apiUrl}/repos/${repoFullName}/events?per_page=30`,
         { headers }
       );
-      
+      this.trackRateLimit(response);
       if (!response.ok) return [];
       return await response.json();
     } catch (err) {
@@ -185,7 +214,7 @@ class GitHubAdapter extends DataSourceAdapter {
         `${this.apiUrl}/repos/${repoFullName}/contributors?per_page=10`,
         { headers }
       );
-      
+      this.trackRateLimit(response);
       if (!response.ok) return [];
       return await response.json();
     } catch (err) {
@@ -196,14 +225,21 @@ class GitHubAdapter extends DataSourceAdapter {
   getHeaders() {
     const headers = {
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'PolymarketFlowViz/1.0'
+      'User-Agent': 'FlowViz/1.0'
     };
-    
+
     if (this.token) {
       headers['Authorization'] = `token ${this.token}`;
     }
-    
+
     return headers;
+  }
+
+  trackRateLimit(response) {
+    const remaining = response.headers.get('X-RateLimit-Remaining');
+    const reset = response.headers.get('X-RateLimit-Reset');
+    if (remaining !== null) this.rateLimitRemaining = parseInt(remaining);
+    if (reset !== null) this.rateLimitReset = parseInt(reset) * 1000;
   }
 
   generateMockRepos() {

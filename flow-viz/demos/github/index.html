@@ -128,7 +128,7 @@ function setup() {
   CONFIG.dataSource.type = 'github';
   CONFIG.dataSource.username = ghUser;
   CONFIG.dataSource.maxRepos = 8;
-  CONFIG.dataSource.refreshInterval = 120000; // Refresh every 2min (rate limits)
+  CONFIG.dataSource.refreshInterval = 300000; // Refresh every 5min (60 req/hr unauthenticated)
   CONFIG.particles.count = 600;
   orchestrator.setup(this);
   document.querySelector('.subtitle').textContent =

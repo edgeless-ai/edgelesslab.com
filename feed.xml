@@ -30,7 +30,7 @@
     <item>
       <title>How I Run 5 AI Agents That Talk to Each Other</title>
       <link>https://edgelesslab.com/blog/agents-that-talk-to-each-other</link>
-      <description>A dispatch agent routes tasks to specialist workers. They communicate through a real-time bus and async inboxes. Here&apos;s the architecture, and why most multi-agent frameworks get it wrong.</description>
+      <description>A dispatch agent routes tasks to specialist workers. They communicate through a real-time bus and async inboxes. The architecture, and why most multi-agent frameworks get it wrong.</description>
       <pubDate>Tue, 07 Apr 2026 12:00:00 GMT</pubDate>
       <guid isPermaLink="true">https://edgelesslab.com/blog/agents-that-talk-to-each-other</guid>
     </item>
@@ -72,14 +72,14 @@
     <item>
       <title>Writing Prompts That Survive Production</title>
       <link>https://edgelesslab.com/blog/writing-prompts-that-survive-production</link>
-      <description>Most prompt guides optimize for demos. Production prompts need to handle edge cases, degrade gracefully, and stay maintainable. Here&apos;s the difference.</description>
+      <description>Most prompt guides optimize for demos. Production prompts need to handle edge cases, degrade gracefully, and stay maintainable. The difference matters.</description>
       <pubDate>Mon, 30 Mar 2026 12:00:00 GMT</pubDate>
       <guid isPermaLink="true">https://edgelesslab.com/blog/writing-prompts-that-survive-production</guid>
     </item>
     <item>
       <title>The One-File Memory System That Changed How I Use Claude</title>
       <link>https://edgelesslab.com/blog/one-file-memory-system</link>
-      <description>You shouldn&apos;t have to re-explain your stack every session. Here&apos;s the simplest possible setup to give Claude persistent memory -- and how to do it in 10 minutes.</description>
+      <description>You shouldn&apos;t have to re-explain your stack every session. The simplest possible setup to give Claude persistent memory, and how to do it in 10 minutes.</description>
       <pubDate>Thu, 26 Mar 2026 12:00:00 GMT</pubDate>
       <guid isPermaLink="true">https://edgelesslab.com/blog/one-file-memory-system</guid>
     </item>
@@ -100,7 +100,7 @@
     <item>
       <title>Building AI Agent Infrastructure as a Solo Developer</title>
       <link>https://edgelesslab.com/blog/building-ai-agent-infrastructure-solo</link>
-      <description>How I built a multi-agent system with MCP servers, vector memory, and autonomous trading -- all running 24/7 from a single VPS.</description>
+      <description>How I built a multi-agent system with MCP servers, vector memory, and autonomous trading, all running 24/7 from a single VPS.</description>
       <pubDate>Sat, 21 Mar 2026 12:00:00 GMT</pubDate>
       <guid isPermaLink="true">https://edgelesslab.com/blog/building-ai-agent-infrastructure-solo</guid>
     </item>

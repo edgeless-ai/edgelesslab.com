@@ -124,11 +124,14 @@ const params = new URLSearchParams(window.location.search);
 const ghUser = params.get('user') || 'edgeless-ai';
 
 function setup() {
+  randomSeed(42); noiseSeed(42);
+  createCanvas(windowWidth, windowHeight);
+  colorMode(HSB, 360, 100, 100, 100);
   CONFIG.engine.seed = 42;
   CONFIG.dataSource.type = 'github';
   CONFIG.dataSource.username = ghUser;
   CONFIG.dataSource.maxRepos = 8;
-  CONFIG.dataSource.refreshInterval = 300000; // Refresh every 5min (60 req/hr unauthenticated)
+  CONFIG.dataSource.refreshInterval = 120000; // Refresh every 2min (rate limits)
   CONFIG.particles.count = 600;
   orchestrator.setup(this);
   document.querySelector('.subtitle').textContent =

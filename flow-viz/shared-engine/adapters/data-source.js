@@ -58,7 +58,7 @@ class DataSourceAdapter extends Plugin {
   normalize(rawData) {
     // Default normalization - override for specific sources
     return {
-      markets: Array.isArray(rawData) ? rawData.map(m => this.normalizeMarket(m)) : [],
+      markets: Array.isArray(rawData) ? rawData.map(this.normalizeMarket) : [],
       timestamp: Date.now(),
       source: this.name
     };

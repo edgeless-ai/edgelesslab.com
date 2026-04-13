@@ -76,22 +76,19 @@ class Orchestrator {
   }
 
   loadConfig(userConfig) {
-    // Deep clone default config (JSON clone strips methods, re-attach below)
+    // Deep clone default config
     const config = JSON.parse(JSON.stringify(CONFIG));
-    config.validate = CONFIG.validate.bind(config);
-    config.merge = CONFIG.merge.bind(config);
-    config.loadEnvironment = CONFIG.loadEnvironment.bind(config);
-
+    
     // Apply user overrides
     if (userConfig) {
       this.deepMerge(config, userConfig);
     }
-
+    
     // Load environment (URL params)
     if (typeof window !== 'undefined') {
       config.loadEnvironment();
     }
-
+    
     // Validate
     config.validate();
     
@@ -134,9 +131,9 @@ class Orchestrator {
       if (sourceParam) {
         overrides.dataSource = { type: sourceParam };
       }
-      this.config = this.loadConfig(overrides);
+      this.loadConfig(overrides);
     }
-
+    
     const c = this.config.engine;
     
     // Apply p5 settings
@@ -152,9 +149,8 @@ class Orchestrator {
     const renderer = c.renderer === 'WEBGL' ? WEBGL : P2D;
     createCanvas(windowWidth, windowHeight, renderer);
     
-    // Set color mode (p5 expects the constant HSB/RGB, not the string)
-    const mode = c.colorMode === 'HSB' ? HSB : RGB;
-    colorMode(mode, c.colorRanges.h, c.colorRanges.s, c.colorRanges.b, c.colorRanges.a);
+    // Set color mode
+    colorMode(c.colorMode, c.colorRanges.h, c.colorRanges.s, c.colorRanges.b, c.colorRanges.a);
     
     // Set pixel density
     pixelDensity(c.pixelDensity);
@@ -170,26 +166,22 @@ class Orchestrator {
 
   draw() {
     if (this.state !== 'running') return;
-
+    
     const now = millis();
     const deltaTime = now - (this.lastFrameTime || now - 16);
     this.lastFrameTime = now;
-
-    try {
-      // Update plugins
-      this.plugins.update(deltaTime, now);
-
-      // Render layers
-      this.plugins.render('background');
-      this.plugins.render('trails');
-      this.plugins.render('particles');
-      this.plugins.render('markets');
-      this.plugins.render('overlay');
-      this.plugins.render('ui');
-    } catch (err) {
-      console.error('Render error:', err);
-    }
-
+    
+    // Update plugins
+    this.plugins.update(deltaTime, now);
+    
+    // Render layers
+    this.plugins.render('background');
+    this.plugins.render('trails');
+    this.plugins.render('particles');
+    this.plugins.render('markets');
+    this.plugins.render('overlay');
+    this.plugins.render('ui');
+    
     Events.emit('ENGINE_TICK', { deltaTime, elapsed: now });
   }
 
@@ -272,7 +264,7 @@ class Orchestrator {
     Events.emit('ENGINE_PAUSE', { state: this.state });
   }
 
-  async switchDataSource(type, options = {}) {
+  switchDataSource(type, options = {}) {
     // Stop current
     if (this.dataSource) {
       this.dataSource.stopAutoRefresh();
@@ -292,17 +284,17 @@ class Orchestrator {
     
     this.dataSource = DataSourceFactory.create(this.config.dataSource);
     this.dataSource.eventBus = Events;
-    await this.dataSource.init(this.config.dataSource, context);
-
+    this.dataSource.init(this.config.dataSource, context);
+    
     context.dataSource = this.dataSource;
-
+    
     // Restart
     if (this.config.dataSource.refreshInterval > 0) {
       this.dataSource.startAutoRefresh(this.config.dataSource.refreshInterval);
     }
-
-    await this.dataSource.refresh();
-
+    
+    this.dataSource.refresh();
+    
     Events.emit('DATA_SOURCE_SWITCH', { type, options });
   }
 

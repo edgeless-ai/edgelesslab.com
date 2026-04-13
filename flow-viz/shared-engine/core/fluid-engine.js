@@ -50,13 +50,12 @@ class FluidEngine extends Plugin {
 
   initGraphics() {
     const c = this.config;
-    const mode = c.engine.colorMode === 'HSB' ? HSB : RGB;
-
+    
     // Create trail layer
     if (c.trails.enabled) {
       this.trailLayer = createGraphics(width, height);
       this.trailLayer.colorMode(
-        mode,
+        c.engine.colorMode,
         c.engine.colorRanges.h,
         c.engine.colorRanges.s,
         c.engine.colorRanges.b,
@@ -64,10 +63,10 @@ class FluidEngine extends Plugin {
       );
       this.applyBackground(this.trailLayer);
     }
-
+    
     // Set main canvas color mode
     colorMode(
-      mode,
+      c.engine.colorMode,
       c.engine.colorRanges.h,
       c.engine.colorRanges.s,
       c.engine.colorRanges.b,
@@ -271,9 +270,8 @@ class FluidEngine extends Plugin {
     // Reinitialize graphics
     if (this.trailLayer) {
       this.trailLayer = createGraphics(width, height);
-      const mode = this.config.engine.colorMode === 'HSB' ? HSB : RGB;
       this.trailLayer.colorMode(
-        mode,
+        this.config.engine.colorMode,
         this.config.engine.colorRanges.h,
         this.config.engine.colorRanges.s,
         this.config.engine.colorRanges.b,
@@ -454,7 +452,7 @@ class Market {
     const palette = this.config.colors.categories[this.category] || this.config.colors.categories.other;
     
     // Warmth based on yes price
-    const warmth = this.data.yesPrice ?? 0.5;
+    const warmth = this.data.yesPrice || 0.5;
     const h = this.lerp(palette.base[0], palette.accent[0], warmth);
     const s = this.lerp(palette.base[1], palette.accent[1], warmth);
     const b = this.lerp(palette.base[2], palette.accent[2], warmth);

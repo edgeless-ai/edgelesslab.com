@@ -16,15 +16,9 @@ class GitHubAdapter extends DataSourceAdapter {
     this.org = config.org || null;
     this.repos = config.repos || null; // Specific repo list
     this.maxRepos = config.maxRepos || 10;
-
+    
     // Query strategies
     this.queryType = config.queryType || 'user'; // 'user' | 'org' | 'repos' | 'trending'
-
-    // Rate limit awareness
-    this.rateLimitRemaining = 60;
-    this.rateLimitReset = 0;
-    this.enrichmentCache = new Map(); // repo fullname -> { data, timestamp }
-    this.enrichmentCacheTTL = 600000; // 10 min cache for enrichment data
   }
 
   async fetch() {
@@ -66,15 +60,13 @@ class GitHubAdapter extends DataSourceAdapter {
         { headers }
       );
       
-      this.trackRateLimit(response);
       if (!response.ok) {
-        if (response.status === 403 || response.status === 429) {
-          console.warn(`GitHub rate limited. Remaining: ${this.rateLimitRemaining}`);
-          return this.generateMockRepos();
+        if (response.status === 403) {
+          throw new Error('Rate limited');
         }
         throw new Error(`HTTP ${response.status}`);
       }
-
+      
       return await response.json();
     } catch (err) {
       console.warn('GitHub fetch failed:', err);
@@ -127,9 +119,8 @@ class GitHubAdapter extends DataSourceAdapter {
     // GitHub trending isn't in API, search for recently starred instead
     try {
       const headers = this.getHeaders();
-      const since = new Date(Date.now() - 90 * 86400000).toISOString().split('T')[0];
       const response = await fetch(
-        `${this.apiUrl}/search/repositories?q=stars:>1000+created:>${since}&sort=stars&order=desc&per_page=${this.maxRepos}`,
+        `${this.apiUrl}/search/repositories?q=stars:>1000+created:>2024-01-01&sort=stars&order=desc&per_page=${this.maxRepos}`,
         { headers }
       );
       
@@ -143,43 +134,22 @@ class GitHubAdapter extends DataSourceAdapter {
   }
 
   async enrichRepos(repos) {
-    // Fetch recent activity for each repo, with caching to avoid rate limits
+    // Fetch recent activity for each repo
     const enriched = [];
-    const now = Date.now();
-
+    
     for (const repo of repos) {
-      // Check cache first
-      const cached = this.enrichmentCache.get(repo.full_name);
-      if (cached && (now - cached.timestamp) < this.enrichmentCacheTTL) {
-        enriched.push({ ...repo, ...cached.data });
-        continue;
-      }
-
-      // Skip enrichment if rate limit is low (save quota for base fetches)
-      if (this.rateLimitRemaining < 10) {
-        enriched.push({
-          ...repo,
-          recentEvents: cached?.data?.recentEvents || [],
-          contributors: cached?.data?.contributors || [],
-          activityScore: cached?.data?.activityScore || 0
-        });
-        continue;
-      }
-
       try {
-        const [events, contributors] = await Promise.allSettled([
+        const [events, contributors] = await Promise.all([
           this.fetchRepoEvents(repo.full_name),
           this.fetchRepoContributors(repo.full_name)
         ]);
-
-        const data = {
-          recentEvents: events.status === 'fulfilled' ? events.value : [],
-          contributors: contributors.status === 'fulfilled' ? contributors.value : [],
-          activityScore: events.status === 'fulfilled' ? events.value.length : 0
-        };
-
-        this.enrichmentCache.set(repo.full_name, { data, timestamp: now });
-        enriched.push({ ...repo, ...data });
+        
+        enriched.push({
+          ...repo,
+          recentEvents: events,
+          contributors: contributors,
+          activityScore: events.length
+        });
       } catch (err) {
         enriched.push({
           ...repo,
@@ -189,7 +159,7 @@ class GitHubAdapter extends DataSourceAdapter {
         });
       }
     }
-
+    
     return enriched;
   }
 
@@ -200,7 +170,7 @@ class GitHubAdapter extends DataSourceAdapter {
         `${this.apiUrl}/repos/${repoFullName}/events?per_page=30`,
         { headers }
       );
-      this.trackRateLimit(response);
+      
       if (!response.ok) return [];
       return await response.json();
     } catch (err) {
@@ -215,7 +185,7 @@ class GitHubAdapter extends DataSourceAdapter {
         `${this.apiUrl}/repos/${repoFullName}/contributors?per_page=10`,
         { headers }
       );
-      this.trackRateLimit(response);
+      
       if (!response.ok) return [];
       return await response.json();
     } catch (err) {
@@ -226,21 +196,14 @@ class GitHubAdapter extends DataSourceAdapter {
   getHeaders() {
     const headers = {
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'FlowViz/1.0'
+      'User-Agent': 'PolymarketFlowViz/1.0'
     };
-
+    
     if (this.token) {
       headers['Authorization'] = `token ${this.token}`;
     }
-
+    
     return headers;
-  }
-
-  trackRateLimit(response) {
-    const remaining = response.headers.get('X-RateLimit-Remaining');
-    const reset = response.headers.get('X-RateLimit-Reset');
-    if (remaining !== null) this.rateLimitRemaining = parseInt(remaining);
-    if (reset !== null) this.rateLimitReset = parseInt(reset) * 1000;
   }
 
   generateMockRepos() {

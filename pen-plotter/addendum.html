@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Full Catalog · Pen Plotter Autoresearch: Edgeless Lab</title>
+<title>The Full Catalog · Pen Plotter Autoresearch — Edgeless Lab</title>
 
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=boska@301,401,501,1701,1401&display=swap" rel="stylesheet">
@@ -457,11 +457,11 @@ body {
     <div class="gate__marker">addendum to §03</div>
     <h1 class="gate__hed">
       The full catalog.<br>
-      <em>All sixteen thousand<br>eight hundred and<br>thirty-two pieces.</em>
+      <em>All sixteen thousand<br>seven hundred and<br>thirty-two pieces.</em>
     </h1>
     <p class="gate__deck">
       Every kept specimen the autoresearch loop has produced, on a single page.
-      Loaded in viewport-only batches, but it is still, by any reasonable
+      Loaded in viewport-only batches — but it is still, by any reasonable
       measure, an enormous amount of data.
     </p>
 
@@ -472,7 +472,7 @@ body {
       </div>
       <div class="row">
         <span>plates</span>
-        <span><strong id="gate-count">16,832</strong></span>
+        <span><strong id="gate-count">15,833</strong></span>
       </div>
       <div class="row">
         <span>thumbnail size</span>
@@ -489,7 +489,7 @@ body {
     </div>
 
     <div class="gate__actions">
-      <button class="gate__btn" id="gate-continue">I understand · load all 16,832 plates</button>
+      <button class="gate__btn" id="gate-continue">I understand · load all 15,833 plates</button>
       <a class="gate__btn gate__btn--ghost" href="index.html">Take me back</a>
     </div>
   </div>
@@ -544,8 +544,6 @@ body {
 
 <script>
 (function () {
-  // R2 asset base URL (task-306). Set to '' for local/relative paths.
-  const ASSET_BASE = 'https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/';
   const gate = document.getElementById('gate');
   const full = document.getElementById('full');
   const grid = document.getElementById('full-grid');
@@ -615,7 +613,7 @@ body {
         const img = document.createElement('img');
         img.loading = 'lazy';
         img.decoding = 'async';
-        img.src = ASSET_BASE + p.thumb;
+        img.src = p.thumb;
         img.alt = p.id;
         tile.appendChild(img);
         tile.classList.remove('placeholder');
@@ -677,7 +675,7 @@ body {
     activeIndex = idx;
     const p = manifest[idx];
     // load 400px medium webp (deployable, no symlink)
-    lbImg.src = `${ASSET_BASE}assets/mediums-all/${p.id}.webp`;
+    lbImg.src = `assets/mediums-all/${p.id}.webp`;
     lbImg.alt = p.id;
     lbPlateId.textContent = p.id;
     lbPlateRank.textContent = `#${idx + 1} of ${manifest.length.toLocaleString()}`;
@@ -693,7 +691,7 @@ body {
       const n = manifest[idx + d];
       if (n) {
         const i = new Image();
-        i.src = `${ASSET_BASE}assets/mediums-all/${n.id}.webp`;
+        i.src = `assets/mediums-all/${n.id}.webp`;
       }
     });
   }

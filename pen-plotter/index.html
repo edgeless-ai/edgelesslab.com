@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pen Plotter Autoresearch: Edgeless Lab</title>
-<meta name="description" content="An editorial field journal for an autonomous loop running on 18 generative art factories, including the first 2-color risograph factory. 16,832 specimens, scored by six algorithmic signals and five vision-language judges. Set in Boska, printed on aged paper.">
+<title>Pen Plotter Autoresearch — Edgeless Lab</title>
+<meta name="description" content="An editorial field journal for an autonomous loop running on 22 generative art factories — including color halftone, pointillism, and circle-packing. 21,770 specimens, scored by six algorithmic signals and five vision-language judges. Set in Boska, printed on aged paper.">
 
 <!-- Open Graph -->
 <meta property="og:title" content="Pen Plotter Autoresearch">
-<meta property="og:description" content="Sixteen thousand seven hundred and thirty-two specimens of generative line art, scored by an autonomous loop of seventeen procedural factories and five language-model judges. A field journal of what the algorithms loved, and what they got wrong.">
+<meta property="og:description" content="Twenty-one thousand seven hundred and seventy specimens of generative line art, scored by an autonomous loop of twenty-two procedural factories and five language-model judges. A field journal of what the algorithms loved — and what they got wrong.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://edgelesslab.com/pen-plotter/">
-<meta property="og:image" content="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/og-image.png">
+<meta property="og:image" content="https://edgelesslab.com/pen-plotter/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:site_name" content="Edgeless Lab">
@@ -19,8 +19,8 @@
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Pen Plotter Autoresearch">
-<meta name="twitter:description" content="An autonomous loop, 18 factories, 16,832 specimens. A field journal of what the algorithms loved, and what they got wrong.">
-<meta name="twitter:image" content="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/og-image.png">
+<meta name="twitter:description" content="An autonomous loop, 22 factories, 21,770 specimens. A field journal of what the algorithms loved — and what they got wrong.">
+<meta name="twitter:image" content="https://edgelesslab.com/pen-plotter/assets/og-image.png">
 
 <!-- Display: Boska (Fontshare) -->
 <link rel="preconnect" href="https://api.fontshare.com">
@@ -711,89 +711,6 @@ body {
 }
 .cat-cta:hover .cat-cta__cta::after {
   transform: translateX(4px);
-}
-
-/* scroll prompts inserted into the grid at intervals */
-.cat-prompt {
-  grid-column: span 3;
-  grid-row: span 2;
-  background: var(--paper-deep);
-  border: 1px dashed var(--rule);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 200ms ease, border-color 200ms ease;
-  padding: 0.75rem;
-  gap: 0.35rem;
-}
-.cat-prompt:hover {
-  background: var(--paper);
-  border-color: var(--amber);
-}
-.cat-prompt__arrow {
-  font-size: 1.4rem;
-  color: var(--amber);
-  animation: promptBounce 2s ease-in-out infinite;
-}
-.cat-prompt__label {
-  font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  text-align: center;
-  line-height: 1.4;
-}
-@keyframes promptBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(4px); }
-}
-@media (max-width: 700px) {
-  .cat-prompt { grid-column: span 2; grid-row: span 2; }
-}
-
-/* skip-to-section floating button (appears after grid starts) */
-.skip-section {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  background: var(--ink);
-  color: var(--paper);
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.65rem 1.1rem;
-  border-radius: 2px;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  z-index: 800;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 300ms ease, transform 300ms ease;
-  transform: translateY(8px);
-  box-shadow: 0 4px 20px rgba(12,10,8,0.3);
-}
-.skip-section.is-visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-.skip-section:hover {
-  background: var(--amber);
-  color: var(--ink);
-}
-.skip-section__arrow {
-  font-size: 12px;
-  transition: transform 200ms ease;
-}
-.skip-section:hover .skip-section__arrow {
-  transform: translateY(-2px);
 }
 
 .cat-tile {
@@ -1507,9 +1424,9 @@ body {
 <section class="hero">
 
   <div class="hero__filing">
-    <span>RUN №&nbsp;<strong>14</strong></span>
-    <span>FACTORIES <strong>18</strong></span>
-    <span>PIECES <strong>16,832</strong></span>
+    <span>RUN №&nbsp;<strong>16</strong></span>
+    <span>FACTORIES <strong>22</strong></span>
+    <span>PIECES <strong>21,770</strong></span>
     <span>BEST <strong class="amber">89.1</strong></span>
     <span>STATUS <strong>ACTIVE</strong></span>
   </div>
@@ -1522,15 +1439,15 @@ body {
         <em>Autoresearch.</em>
       </h1>
       <p class="hero__deck">
-        Sixteen thousand seven hundred and thirty&#8209;two specimens of generative
-        line art, scored by an autonomous loop of seventeen procedural factories
+        Twenty&#8209;one thousand seven hundred and seventy specimens of generative
+        line art, scored by an autonomous loop of twenty&#8209;two procedural factories
         and five language&#8209;model judges. A field journal of what the algorithms
-        loved, and what they got wrong.
+        loved — and what they got wrong.
       </p>
     </div>
 
     <figure class="hero__plate">
-      <img src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/pieces/moire-0005.png" alt="moire-0005">
+      <img src="assets/pieces/moire-0005.png" alt="moire-0005">
       <figcaption class="hero__plate__caption">
         <span><strong>Plate&nbsp;I.</strong> moire&nbsp;·&nbsp;variant&nbsp;0005</span>
         <span>composite <strong>89.1</strong></span>
@@ -1570,14 +1487,15 @@ body {
       Each cycle, an autoresearch loop audits every factory, identifies the
       single weakest metric across the catalog, edits the corresponding generator,
       regenerates a thousand new variants, scores them on six algorithmic axes
-      and four vision&#8209;model judges, and either commits the change or reverts.
+      and five vision&#8209;model judges, and either commits the change or reverts.
     </p>
     <p>
       The loop has been running since the third week of <strong>March 2026</strong>.
-      Eighteen factories, sixteen thousand eight hundred and thirty&#8209;two
-      pieces, including the first 2&#8209;color risograph factory.
+      Twenty&#8209;two factories, twenty&#8209;one thousand seven hundred and seventy
+      pieces — including four new color dot factories and
+      five language&#8209;model judges.
       Most of them are forgettable. A few hundred are extraordinary.
-      And then there are the <strong>grey rectangles</strong>: pieces the
+      And then there are the <strong>grey rectangles</strong> — pieces the
       algorithms loved and the human eye refused.
     </p>
   </div>
@@ -1603,7 +1521,7 @@ body {
     <!-- LEFT — moire-0421, the grey rectangle -->
     <article class="specimen" id="grey-rectangle">
       <div class="specimen__card">
-        <img src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/pieces/moire-0421.png" alt="moire-0421">
+        <img src="assets/pieces/moire-0421.png" alt="moire-0421">
         <div class="specimen__label">
           <span><strong>Plate II.</strong></span>
           <span>moire · variant 0421</span>
@@ -1633,7 +1551,7 @@ body {
     <!-- RIGHT — moire-0062, the actually-good one -->
     <article class="specimen" id="real-art">
       <div class="specimen__card">
-        <img src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/pieces/moire-0062.png" alt="moire-0062">
+        <img src="assets/pieces/moire-0062.png" alt="moire-0062">
         <div class="specimen__label">
           <span><strong>Plate III.</strong></span>
           <span>moire · variant 0062</span>
@@ -1654,7 +1572,7 @@ body {
         </div>
         <p class="annotation">
           “Multiple radial interference lobes create a striking starburst with
-          exceptional depth and Op Art energy, reminiscent of Bridget Riley’s
+          exceptional depth and Op Art energy — reminiscent of Bridget Riley’s
           radial works. Gallery&#8209;ready.”
         </p>
       </div>
@@ -1696,16 +1614,10 @@ body {
        data-loading="initial 1296 plates · loading…"></div>
 
   <div class="catalog__addendum">
-    <span><strong>1,296</strong> shown · <strong>15,536</strong> withheld</span>
-    <span><span class="warn">⚠ very slow</span> · <a href="addendum.html">view all 16,832 plates</a></span>
+    <span><strong>1,296</strong> shown · <strong>19,549</strong> withheld</span>
+    <span><span class="warn">⚠ very slow</span> · <a href="addendum.html">view all 20,845 plates</a></span>
   </div>
 </section>
-
-<!-- skip-to-section floating button (shown when user is in the catalog grid) -->
-<a class="skip-section" id="skip-section" href="#best-of-run">
-  <span>Skip to §04: Best of Run</span>
-  <span class="skip-section__arrow">↓</span>
-</a>
 
 <!-- ─── §04 BEST OF RUN ─── -->
 <section class="gallery" id="best-of-run">
@@ -1725,7 +1637,7 @@ body {
   <!-- ── SPREAD I · full-bleed hero (the gallery champion) ── -->
   <div class="spread spread--full">
     <div class="spread__label"><span class="num">Spread&nbsp;I</span> · the gallery champion</div>
-    <img class="plate-img" src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/mediums-all/moire-0062.webp" alt="moire-0062">
+    <img class="plate-img" src="assets/mediums-all/moire-0062.webp" alt="moire-0062">
     <div class="plate-caption">
       <span><strong>Plate&nbsp;IV.</strong> moire&nbsp;·&nbsp;variant&nbsp;0062</span>
       <span>composite <strong>87.0</strong> &nbsp;/&nbsp; <span class="amber">claude 8.8</span></span>
@@ -1739,7 +1651,7 @@ body {
     </div>
     <figure class="plate">
       <div class="plate__img-wrap">
-        <img src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/mediums-all/heerich-0983.webp" alt="heerich-0983">
+        <img src="assets/mediums-all/heerich-0983.webp" alt="heerich-0983">
       </div>
       <figcaption class="plate__caption">
         <span><strong>Plate V.</strong> heerich · variant 0983</span>
@@ -1748,7 +1660,7 @@ body {
     </figure>
     <figure class="plate">
       <div class="plate__img-wrap">
-        <img src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/mediums-all/opart-0748.webp" alt="opart-0748">
+        <img src="assets/mediums-all/opart-0748.webp" alt="opart-0748">
       </div>
       <figcaption class="plate__caption">
         <span><strong>Plate VI.</strong> opart · variant 0748</span>
@@ -1759,9 +1671,12 @@ body {
 
   <!-- ── SPREAD III · singleton with margin annotation ── -->
   <div class="spread spread--singleton">
+    <div class="spread__label" style="grid-column:1/-1; padding:0;">
+      <span class="num">Spread&nbsp;III</span> · instruction &amp; execution
+    </div>
     <figure class="plate">
       <div class="plate__img-wrap">
-        <img src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/mediums-all/lewitt-0111.webp" alt="lewitt-0111">
+        <img src="assets/mediums-all/lewitt-0111.webp" alt="lewitt-0111">
       </div>
       <figcaption class="plate__caption">
         <span><strong>Plate VII.</strong> lewitt · variant 0111</span>
@@ -1770,21 +1685,21 @@ body {
     </figure>
     <aside class="marginalia">
       “Wall drawings, but the wall is paper and the assistant is a stepper
-      motor. The lewitt factory replays the conceptual instruction set,
-      "draw a series of lines from corner to corner," through fifty
+      motor. The lewitt factory replays the conceptual instruction set —
+      ‘draw a series of lines from corner to corner’ — through fifty
       variations on a theme.”
-      <span class="marginalia__attribution">Catalog notes, §04</span>
+      <span class="marginalia__attribution">— Catalog notes, §04</span>
     </aside>
   </div>
 
   <!-- ── SPREAD IV · 3-up cluster (line-based pieces) ── -->
   <div class="spread spread--three">
     <div class="spread__label" style="grid-column:1/-1; padding:0;">
-      <span class="num">Spread&nbsp;III</span> · three studies in line
+      <span class="num">Spread&nbsp;IV</span> · three studies in line
     </div>
     <figure class="plate">
       <div class="plate__img-wrap">
-        <img src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/mediums-all/topo-0970.webp" alt="topo-0970">
+        <img src="assets/mediums-all/topo-0970.webp" alt="topo-0970">
       </div>
       <figcaption class="plate__caption">
         <span><strong>Plate VIII.</strong> topo · 0970</span>
@@ -1793,7 +1708,7 @@ body {
     </figure>
     <figure class="plate">
       <div class="plate__img-wrap">
-        <img src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/mediums-all/ridgeline-0214.webp" alt="ridgeline-0214">
+        <img src="assets/mediums-all/ridgeline-0214.webp" alt="ridgeline-0214">
       </div>
       <figcaption class="plate__caption">
         <span><strong>Plate IX.</strong> ridgeline · 0214</span>
@@ -1802,7 +1717,7 @@ body {
     </figure>
     <figure class="plate">
       <div class="plate__img-wrap">
-        <img src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/mediums-all/hatching-0789.webp" alt="hatching-0789">
+        <img src="assets/mediums-all/hatching-0789.webp" alt="hatching-0789">
       </div>
       <figcaption class="plate__caption">
         <span><strong>Plate X.</strong> hatching · 0789</span>
@@ -1813,8 +1728,8 @@ body {
 
   <!-- ── SPREAD V · second full-bleed hero ── -->
   <div class="spread spread--full">
-    <div class="spread__label"><span class="num">Spread&nbsp;IV</span> · gestural</div>
-    <img class="plate-img" src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/mediums-all/squiggle-0581.webp" alt="squiggle-0581">
+    <div class="spread__label"><span class="num">Spread&nbsp;V</span> · gestural</div>
+    <img class="plate-img" src="assets/mediums-all/squiggle-0581.webp" alt="squiggle-0581">
     <div class="plate-caption">
       <span><strong>Plate XI.</strong> squiggle · variant 0581</span>
       <span>composite <strong>83.6</strong></span>
@@ -1824,11 +1739,11 @@ body {
   <!-- ── SPREAD VI · 2-up (science + guilloche) ── -->
   <div class="spread spread--two">
     <div class="spread__label" style="grid-column:1/-1; padding:0;">
-      <span class="num">Spread&nbsp;V</span> · two interferences
+      <span class="num">Spread&nbsp;VI</span> · two interferences
     </div>
     <figure class="plate">
       <div class="plate__img-wrap">
-        <img src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/mediums-all/science-0550.webp" alt="science-0550">
+        <img src="assets/mediums-all/science-0550.webp" alt="science-0550">
       </div>
       <figcaption class="plate__caption">
         <span><strong>Plate XII.</strong> science · variant 0550</span>
@@ -1837,7 +1752,7 @@ body {
     </figure>
     <figure class="plate">
       <div class="plate__img-wrap">
-        <img src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/mediums-all/guilloche-0530.webp" alt="guilloche-0530">
+        <img src="assets/mediums-all/guilloche-0530.webp" alt="guilloche-0530">
       </div>
       <figcaption class="plate__caption">
         <span><strong>Plate XIII.</strong> guilloche · variant 0530</span>
@@ -1849,11 +1764,11 @@ body {
   <!-- ── SPREAD VII · closing 2-up (molnar + flowfield) ── -->
   <div class="spread spread--two">
     <div class="spread__label" style="grid-column:1/-1; padding:0;">
-      <span class="num">Spread&nbsp;VI</span> · grids and fields
+      <span class="num">Spread&nbsp;VII</span> · grids and fields
     </div>
     <figure class="plate">
       <div class="plate__img-wrap">
-        <img src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/mediums-all/molnar-0844.webp" alt="molnar-0844">
+        <img src="assets/mediums-all/molnar-0844.webp" alt="molnar-0844">
       </div>
       <figcaption class="plate__caption">
         <span><strong>Plate XIV.</strong> molnar · variant 0844</span>
@@ -1862,7 +1777,7 @@ body {
     </figure>
     <figure class="plate">
       <div class="plate__img-wrap">
-        <img src="https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/assets/mediums-all/flowfield-0370.webp" alt="flowfield-0370">
+        <img src="assets/mediums-all/flowfield-0370.webp" alt="flowfield-0370">
       </div>
       <figcaption class="plate__caption">
         <span><strong>Plate XV.</strong> flowfield · variant 0370</span>
@@ -1911,7 +1826,7 @@ body {
       </div>
       <div class="row">
         <dt>Generators</dt>
-        <dd><strong>18 procedural factories</strong> in Python · seed-driven, deterministic per variant</dd>
+        <dd><strong>22 procedural factories</strong> in Python · seed-driven, deterministic per variant</dd>
       </div>
       <div class="row">
         <dt>Scoring</dt>
@@ -1923,7 +1838,7 @@ body {
       </div>
       <div class="row">
         <dt>Edition</dt>
-        <dd><strong class="amber">Run №15</strong> · April 2026 · 16,832 specimens</dd>
+        <dd><strong class="amber">Run №16</strong> · April 2026 · 21,770 specimens</dd>
       </div>
       <div class="row">
         <dt>Designed by</dt>
@@ -1936,11 +1851,11 @@ body {
       <div class="colophon__continue__grid">
         <a class="colophon__link" href="addendum.html">
           <strong>The full catalog</strong>
-          <span>all 16,832 specimens, on a single page</span>
+          <span>all 20,845 specimens, on a single page</span>
         </a>
-        <a class="colophon__link" href="http://localhost:2718" target="_blank" rel="noopener">
-          <strong>Live tuning playground</strong>
-          <span>open the marimo notebook (kernel required)</span>
+        <a class="colophon__link" href="https://edgelesslab.com/lab/pen-plotter-autoresearch" target="_blank" rel="noopener">
+          <strong>Live dashboards</strong>
+          <span>marimo notebooks — factory metrics, scoring, tuning</span>
         </a>
         <a class="colophon__link" href="https://github.com/qt-djm" target="_blank" rel="noopener">
           <strong>Source on GitHub</strong>
@@ -2086,8 +2001,6 @@ body {
 </script>
 <script>
 (async function () {
-  // R2 asset base URL (task-306). Set to '' for local/relative paths.
-  const ASSET_BASE = 'https://pub-bb7dda5df9fe4493a86f5ca35c42fb79.r2.dev/pen-plotter/';
   const grid = document.getElementById('catalog-grid');
   const caption = document.getElementById('cat-caption');
   const lightbox = document.getElementById('lightbox');
@@ -2120,8 +2033,6 @@ body {
   // CTA breaks the uniformity ~6 rows in (well within first long scroll)
   // and links out to the full 16,832 specimen addendum.
   const CTA_INDEX = 216; // 6 rows × 36 cols (desktop), still feels right at smaller widths
-  const PROMPT_INTERVAL = 180; // insert a scroll prompt every ~5 rows after the CTA
-  const remaining = manifest.length - CTA_INDEX;
 
   const frag = document.createDocumentFragment();
   manifest.forEach((p, i) => {
@@ -2132,36 +2043,15 @@ body {
       cta.innerHTML = `
         <div>
           <div class="cat-cta__marker">addendum to §03</div>
-          <div class="cat-cta__hed">There are <em>fifteen&nbsp;thousand five&nbsp;hundred and thirty&#8209;six</em> more specimens beyond this grid.</div>
-          <div class="cat-cta__count">15,536</div>
+          <div class="cat-cta__hed">There are <em>nineteen&nbsp;thousand five&nbsp;hundred and forty&#8209;nine</em> more specimens beyond this grid.</div>
+          <div class="cat-cta__count">15,436</div>
         </div>
         <div class="cat-cta__foot">
           <span>the full catalog</span>
-          <span class="cat-cta__cta">view all 16,832</span>
+          <span class="cat-cta__cta">view all</span>
         </div>
       `;
       frag.appendChild(cta);
-    }
-    // Insert scroll-prompt cards at intervals after the main CTA
-    if (i > CTA_INDEX && (i - CTA_INDEX) % PROMPT_INTERVAL === 0) {
-      const prompt = document.createElement('a');
-      prompt.className = 'cat-prompt';
-      const pct = Math.round((i / manifest.length) * 100);
-      const isLast = i + PROMPT_INTERVAL >= manifest.length;
-      if (isLast) {
-        prompt.href = '#best-of-run';
-        prompt.innerHTML = `
-          <span class="cat-prompt__arrow">↓</span>
-          <span class="cat-prompt__label">You've seen ${pct}%<br>Skip to §04: Best of Run</span>
-        `;
-      } else {
-        prompt.href = '#best-of-run';
-        prompt.innerHTML = `
-          <span class="cat-prompt__arrow">↓</span>
-          <span class="cat-prompt__label">${pct}% through<br>Keep scrolling or skip to §04</span>
-        `;
-      }
-      frag.appendChild(prompt);
     }
     const tile = document.createElement('div');
     tile.className = 'cat-tile';
@@ -2173,26 +2063,12 @@ body {
     const img = document.createElement('img');
     img.loading = 'lazy';
     img.decoding = 'async';
-    img.src = ASSET_BASE + p.thumb;
+    img.src = p.thumb;
     img.alt = p.id;
     tile.appendChild(img);
     frag.appendChild(tile);
   });
   grid.appendChild(frag);
-
-  // ── Floating "skip to §04" button visibility ────────────────
-  const skipBtn = document.getElementById('skip-section');
-  if (skipBtn) {
-    const catalog = document.getElementById('catalog');
-    const bestOf = document.getElementById('best-of-run');
-    const onScroll = () => {
-      const catRect = catalog.getBoundingClientRect();
-      const inCatalog = catRect.top < window.innerHeight * 0.3 && catRect.bottom > window.innerHeight * 0.5;
-      skipBtn.classList.toggle('is-visible', inCatalog);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    skipBtn.addEventListener('click', () => skipBtn.classList.remove('is-visible'));
-  }
 
   // ── Hover caption ribbon ─────────────────────────────────────
   let hoverFrame = null;
@@ -2223,7 +2099,7 @@ body {
     if (idx < 0 || idx >= manifest.length) return;
     activeIndex = idx;
     const p = manifest[idx];
-    lbImg.src = `${ASSET_BASE}assets/mediums-all/${p.id}.webp`;
+    lbImg.src = p.medium || p.thumb;
     lbImg.alt = p.id;
     lbId.textContent = p.id;
     lbRank.textContent = `#${idx + 1} of ${manifest.length}`;
@@ -2238,7 +2114,7 @@ body {
       const n = manifest[idx + d];
       if (n && n.medium) {
         const i = new Image();
-        i.src = `${ASSET_BASE}assets/mediums-all/${n.id}.webp`;
+        i.src = n.medium;
       }
     });
   }

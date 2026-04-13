@@ -10,7 +10,7 @@
 class BitcoinMempoolAdapter extends DataSourceAdapter {
   constructor(config = {}) {
     super('bitcoin-mempool');
-    this.apiUrl = config.apiUrl || 'https://mempool.space/api';
+    this.apiUrl = config.apiUrl || 'https://mempool.space/api/v1';
     this.feeBuckets = config.feeBuckets || [
       { min: 1, max: 5, label: '1-5 sat/vB' },
       { min: 5, max: 10, label: '5-10 sat/vB' },
@@ -24,22 +24,17 @@ class BitcoinMempoolAdapter extends DataSourceAdapter {
   }
 
   async fetch() {
-    // Parallel fetch - allSettled so one failure doesn't crash the others
-    const results = await Promise.allSettled([
+    // Parallel fetch for efficiency
+    const [mempool, fees, blocks] = await Promise.all([
       this.fetchMempool(),
       this.fetchFeeEstimates(),
       this.fetchRecentBlocks()
     ]);
 
     return {
-      mempool: results[0].status === 'fulfilled' ? results[0].value : {
-        count: 5000 + Math.floor(Math.random() * 5000),
-        vsize: 2000000 + Math.floor(Math.random() * 1000000),
-        total_fee: 0.5 + Math.random() * 0.5,
-        fee_histogram: this.generateMockHistogram()
-      },
-      fees: results[1].status === 'fulfilled' ? results[1].value : { fastestFee: 20, halfHourFee: 10, hourFee: 5, economyFee: 2 },
-      blocks: results[2].status === 'fulfilled' ? results[2].value : [],
+      mempool,
+      fees,
+      blocks,
       timestamp: Date.now()
     };
   }

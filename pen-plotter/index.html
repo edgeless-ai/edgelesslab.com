@@ -1411,6 +1411,7 @@ body {
 }
 
 </style>
+<script src="assets/stats.js"></script>
 </head>
 <body>
 
@@ -1424,10 +1425,10 @@ body {
 <section class="hero">
 
   <div class="hero__filing">
-    <span>RUN №&nbsp;<strong>16</strong></span>
-    <span>FACTORIES <strong>22</strong></span>
-    <span>PIECES <strong>21,770</strong></span>
-    <span>BEST <strong class="amber">89.1</strong></span>
+    <span>RUN №&nbsp;<strong data-stat="run">16</strong></span>
+    <span>FACTORIES <strong data-stat="factories">22</strong></span>
+    <span>PIECES <strong data-stat="pieces">21,770</strong></span>
+    <span>BEST <strong class="amber" data-stat="best">89.1</strong></span>
     <span>STATUS <strong>ACTIVE</strong></span>
   </div>
 
@@ -1439,8 +1440,8 @@ body {
         <em>Autoresearch.</em>
       </h1>
       <p class="hero__deck">
-        Twenty&#8209;one thousand seven hundred and seventy specimens of generative
-        line art, scored by an autonomous loop of twenty&#8209;two procedural factories
+        <span data-stat="pieces-words">Twenty&#8209;one thousand seven hundred and seventy</span> specimens of generative
+        line art, scored by an autonomous loop of <span data-stat="factories-words">twenty&#8209;two</span> procedural factories
         and five language&#8209;model judges. A field journal of what the algorithms
         loved — and what they got wrong.
       </p>
@@ -1491,7 +1492,7 @@ body {
     </p>
     <p>
       The loop has been running since the third week of <strong>March 2026</strong>.
-      Twenty&#8209;two factories, twenty&#8209;one thousand seven hundred and seventy
+      <span data-stat="factories-words">Twenty&#8209;two</span> factories, <span data-stat="pieces-words">twenty&#8209;one thousand seven hundred and seventy</span>
       pieces — including four new color dot factories and
       five language&#8209;model judges.
       Most of them are forgettable. A few hundred are extraordinary.
@@ -1534,7 +1535,7 @@ body {
         </div>
         <div class="row">
           <span>Rank in catalog</span>
-          <span>Top 5 of 16,832</span>
+          <span>Top 5 of <span data-stat="kept">20,845</span></span>
         </div>
         <div class="row judge" data-recalibrate>
           <span>Claude vision judge</span>
@@ -1564,7 +1565,7 @@ body {
         </div>
         <div class="row">
           <span>Rank in catalog</span>
-          <span>Top 12 of 16,832</span>
+          <span>Top 12 of <span data-stat="kept">20,845</span></span>
         </div>
         <div class="row judge" data-recalibrate>
           <span>Claude vision judge</span>
@@ -1614,8 +1615,8 @@ body {
        data-loading="initial 1296 plates · loading…"></div>
 
   <div class="catalog__addendum">
-    <span><strong>1,296</strong> shown · <strong>19,549</strong> withheld</span>
-    <span><span class="warn">⚠ very slow</span> · <a href="addendum.html">view all 20,845 plates</a></span>
+    <span><strong data-stat="curated">1,296</strong> shown · <strong data-stat="withheld">19,549</strong> withheld</span>
+    <span><span class="warn">⚠ very slow</span> · <a href="addendum.html">view all <span data-stat="kept">20,845</span> plates</a></span>
   </div>
 </section>
 
@@ -1826,7 +1827,7 @@ body {
       </div>
       <div class="row">
         <dt>Generators</dt>
-        <dd><strong>22 procedural factories</strong> in Python · seed-driven, deterministic per variant</dd>
+        <dd><strong><span data-stat="factories">22</span> procedural factories</strong> in Python · seed-driven, deterministic per variant</dd>
       </div>
       <div class="row">
         <dt>Scoring</dt>
@@ -1838,7 +1839,7 @@ body {
       </div>
       <div class="row">
         <dt>Edition</dt>
-        <dd><strong class="amber">Run №16</strong> · April 2026 · 21,770 specimens</dd>
+        <dd><strong class="amber">Run №<span data-stat="run">16</span></strong> · April 2026 · <span data-stat="pieces">21,770</span> specimens</dd>
       </div>
       <div class="row">
         <dt>Designed by</dt>
@@ -1851,7 +1852,7 @@ body {
       <div class="colophon__continue__grid">
         <a class="colophon__link" href="addendum.html">
           <strong>The full catalog</strong>
-          <span>all 20,845 specimens, on a single page</span>
+          <span>all <span data-stat="kept">20,845</span> specimens, on a single page</span>
         </a>
         <a class="colophon__link" href="https://edgelesslab.com/lab/pen-plotter-autoresearch" target="_blank" rel="noopener">
           <strong>Live dashboards</strong>
@@ -2031,7 +2032,7 @@ body {
 
   // ── Build grid tiles + inline CTA at row 6 ─────────────────────
   // CTA breaks the uniformity ~6 rows in (well within first long scroll)
-  // and links out to the full 16,832 specimen addendum.
+  // and links out to the full 20,845 specimen addendum.
   const CTA_INDEX = 216; // 6 rows × 36 cols (desktop), still feels right at smaller widths
 
   const frag = document.createDocumentFragment();
@@ -2043,8 +2044,8 @@ body {
       cta.innerHTML = `
         <div>
           <div class="cat-cta__marker">addendum to §03</div>
-          <div class="cat-cta__hed">There are <em>nineteen&nbsp;thousand five&nbsp;hundred and forty&#8209;nine</em> more specimens beyond this grid.</div>
-          <div class="cat-cta__count">15,436</div>
+          <div class="cat-cta__hed">There are <em data-stat="withheld-words">nineteen&nbsp;thousand five&nbsp;hundred and forty&#8209;nine</em> more specimens beyond this grid.</div>
+          <div class="cat-cta__count" data-stat="withheld">19,549</div>
         </div>
         <div class="cat-cta__foot">
           <span>the full catalog</span>

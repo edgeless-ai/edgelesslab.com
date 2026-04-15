@@ -1,0 +1,2145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tartanism: Edgeless Lab</title>
+<meta name="description" content="A field journal on generative tartan patterns. Six weave structures, 48 traditional colors, and one question: when does a generated pattern stop being plaid and become tartan? Built by D. Murray at Edgeless Lab.">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Tartanism">
+<meta property="og:description" content="Six weave structures, 48 traditional colors, and one question the Scottish Register cannot answer: when does a generated pattern stop being plaid and become tartan?">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://edgelesslab.com/tartanism/">
+<meta property="og:image" content="https://edgelesslab.com/tartanism/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Edgeless Lab">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tartanism">
+<meta name="twitter:description" content="Six weave structures, 48 traditional colors, and one question: when does generated plaid become tartan?">
+<meta name="twitter:image" content="https://edgelesslab.com/tartanism/assets/og-image.png">
+
+<!-- Display: Boska (Fontshare) -->
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=boska@301,401,501,701,1701,1401,1501,1301&display=swap" rel="stylesheet">
+
+<!-- Mono: JetBrains Mono -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ────────────────────────────────────────────────────────
+   TARTANISM — EDITORIAL FIELD JOURNAL
+   Aesthetic: warm specimen paper + deep ink + scholarly serif
+   Publication family: matches pen-plotter autoresearch
+   ──────────────────────────────────────────────────────── */
+
+:root {
+  /* paper & ink */
+  --paper:        #f3eddd;
+  --paper-deep:   #ebe3cf;
+  --ink:          #0c0a08;
+  --ink-soft:     #2a2520;
+  --ink-faint:    #6a6256;
+  --rule:         #d4cab4;
+
+  /* one accent — sodium-vapor amber */
+  --amber:        #c2410c;
+  --amber-deep:   #9a3412;
+
+  /* tartan-specific accent — deep indigo for warp threads */
+  --indigo:       #1e3a5f;
+  --indigo-soft:  #2c5282;
+
+  /* type */
+  --serif:  "Boska", "Times New Roman", Georgia, serif;
+  --mono:   "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* spacing */
+  --margin-x: clamp(1.25rem, 8vw, 9rem);
+}
+
+@media (max-width: 600px) {
+  :root {
+    --margin-x: 1.25rem;
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-feature-settings: "liga" on, "calt" on, "kern" on, "ss01" on;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+
+  /* subtle paper grain via SVG noise */
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(194,65,12,0.05), transparent 60%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+::selection { background: var(--amber); color: var(--paper); }
+
+/* ────────── persistent meta strip (top) ────────── */
+
+.meta-strip {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem var(--margin-x);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--paper);
+  border-bottom: 1px solid transparent;
+  z-index: 100;
+  pointer-events: none;
+  transition: border-color 250ms cubic-bezier(0.2,0.8,0.2,1),
+              backdrop-filter 250ms;
+}
+.meta-strip.is-scrolled {
+  border-bottom-color: var(--rule);
+  background: rgba(243, 237, 221, 0.92);
+  backdrop-filter: blur(8px) saturate(115%);
+  -webkit-backdrop-filter: blur(8px) saturate(115%);
+}
+.meta-strip .dot { color: var(--amber); }
+
+/* ────────── HERO ────────── */
+
+.hero {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  padding: 8rem var(--margin-x) 4rem;
+  position: relative;
+}
+
+.hero__filing {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: baseline;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 1rem;
+  margin-bottom: 4rem;
+  opacity: 0;
+  animation: fadeUp 800ms cubic-bezier(0.2, 0.8, 0.2, 1) 200ms forwards;
+}
+@media (max-width: 600px) {
+  .hero__filing { font-size: 10px; gap: 0.6rem 1.25rem; }
+}
+.hero__filing strong { color: var(--ink); font-weight: 500; }
+.hero__filing .amber { color: var(--amber); }
+
+.hero__main {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .hero__main { grid-template-columns: 1fr; }
+}
+
+.hero__title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(3.5rem, 9vw, 9.5rem);
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero__title {
+    opacity: 0;
+    animation: fadeUp 1200ms cubic-bezier(0.2, 0.8, 0.2, 1) 400ms forwards;
+  }
+}
+.hero__title em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--ink-soft);
+}
+
+.hero__deck {
+  font-family: var(--serif);
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 36ch;
+  margin-top: 2.5rem;
+  font-style: italic;
+  font-weight: 400;
+  text-wrap: pretty;
+  opacity: 0;
+  animation: fadeUp 1000ms cubic-bezier(0.2, 0.8, 0.2, 1) 700ms forwards;
+}
+.hero__deck::before {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 1px;
+  background: var(--amber);
+  margin-bottom: 1rem;
+}
+
+.hero__plate {
+  position: relative;
+  opacity: 0;
+  animation: fadeUp 1400ms cubic-bezier(0.2, 0.8, 0.2, 1) 900ms forwards;
+}
+.hero__plate-canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background: white;
+  box-shadow:
+    0 1px 0 rgba(12,10,8,0.08),
+    0 30px 60px -20px rgba(12,10,8,0.25),
+    0 60px 120px -40px rgba(194,65,12,0.08);
+}
+.hero__plate__caption {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--rule);
+  padding-top: 0.75rem;
+}
+.hero__plate__caption strong { color: var(--ink); font-weight: 500; }
+
+.hero__footer {
+  margin-top: 6rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.25rem;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  opacity: 0;
+  animation: fadeUp 800ms cubic-bezier(0.2, 0.8, 0.2, 1) 1100ms forwards;
+}
+@media (max-width: 600px) {
+  .hero__footer { margin-top: 3rem; font-size: 9px; }
+  .hero__footer .scroll-cue { order: -1; width: 100%; align-items: flex-start; }
+}
+
+.hero__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.85rem;
+  font-family: var(--mono);
+  font-size: inherit;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.hero__nav a {
+  color: var(--ink-faint);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: color 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              border-color 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.hero__nav a:hover,
+.hero__nav a:focus-visible {
+  color: var(--amber);
+  border-bottom-color: var(--amber);
+  outline: none;
+}
+.hero__nav span[aria-hidden] {
+  color: var(--rule);
+}
+@media (max-width: 600px) {
+  .hero__nav { gap: 0.4rem 0.6rem; }
+}
+
+/* Scroll anchors offset for the fixed meta-strip */
+.method,
+.weaves,
+.generator,
+.gallery,
+.colophon {
+  scroll-margin-top: 4rem;
+}
+.hero__footer .scroll-cue {
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+}
+.hero__footer .scroll-cue::after {
+  content: "\2193";
+  font-size: 14px;
+  color: var(--amber);
+  animation: bob 2.4s ease-in-out 3;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__filing,
+  .hero__title,
+  .hero__deck,
+  .hero__plate,
+  .hero__footer {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+  .hero__footer .scroll-cue::after {
+    animation: none !important;
+  }
+}
+
+/* ────────── §01 THE THREAD COUNT ────────── */
+
+.method {
+  padding: 8rem var(--margin-x);
+  border-top: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: clamp(2rem, 6vw, 6rem);
+}
+@media (max-width: 900px) { .method { grid-template-columns: 1fr; } }
+
+.section-marker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.section-marker .num {
+  font-size: 14px;
+  color: var(--amber);
+  font-weight: 700;
+}
+.section-marker .name { color: var(--ink); font-weight: 500; }
+
+.method__body {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 50ch;
+}
+.method__body p { margin-bottom: 1.5rem; text-wrap: pretty; }
+.method__body p:first-child::first-letter {
+  font-family: var(--serif);
+  float: left;
+  font-size: 5em;
+  line-height: 0.85;
+  padding-right: 0.1em;
+  padding-top: 0.05em;
+  font-weight: 400;
+  color: var(--ink);
+}
+.method__body strong {
+  font-weight: 500;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 65%, rgba(194,65,12,0.18) 65%);
+  padding: 0 0.1em;
+}
+
+/* thread count notation block */
+.thread-count-block {
+  margin: 2.5rem 0;
+  padding: 2rem 2.5rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+  position: relative;
+  box-shadow:
+    0 1px 0 rgba(12,10,8,0.08),
+    0 20px 50px -20px rgba(12,10,8,0.22);
+}
+.thread-count-block::before {
+  content: "+";
+  position: absolute;
+  top: 8px; left: 8px;
+  font-size: 10px;
+  color: rgba(243,237,221,0.3);
+}
+.thread-count-block::after {
+  content: "+";
+  position: absolute;
+  top: 8px; right: 8px;
+  font-size: 10px;
+  color: rgba(243,237,221,0.3);
+}
+.thread-count-block .tc-label {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(243,237,221,0.5);
+  margin-bottom: 0.75rem;
+  display: block;
+}
+.thread-count-block .tc-value {
+  font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+  color: var(--amber);
+  font-weight: 700;
+  word-break: break-all;
+}
+.thread-count-block .tc-name {
+  margin-top: 1rem;
+  font-size: 11px;
+  color: rgba(243,237,221,0.6);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ────────── §02 PALETTE ────────── */
+
+.palette-section {
+  padding: 8rem var(--margin-x);
+  border-top: 1px solid var(--rule);
+}
+
+.palette-section__intro {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: clamp(2rem, 6vw, 6rem);
+  margin-bottom: 4rem;
+}
+@media (max-width: 900px) { .palette-section__intro { grid-template-columns: 1fr; } }
+
+.palette-section__body {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 50ch;
+}
+.palette-section__body p { margin-bottom: 1.5rem; text-wrap: pretty; }
+.palette-section__body strong {
+  font-weight: 500;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 65%, rgba(194,65,12,0.18) 65%);
+  padding: 0 0.1em;
+}
+
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 2px;
+}
+@media (max-width: 600px) {
+  .palette-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+}
+
+.palette-swatch {
+  aspect-ratio: 1.2;
+  position: relative;
+  cursor: default;
+  transition: transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 250ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.palette-swatch:hover {
+  transform: scale(1.08);
+  z-index: 2;
+  box-shadow: 0 8px 24px -8px rgba(12,10,8,0.3);
+}
+.palette-swatch__label {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 6px 8px;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(12,10,8,0.6);
+  color: var(--paper);
+  opacity: 0;
+  transition: opacity 200ms;
+}
+.palette-swatch:hover .palette-swatch__label {
+  opacity: 1;
+}
+
+/* ────────── §03 THE WEAVES (reveal section) ────────── */
+
+.weaves {
+  padding: 10rem var(--margin-x) 8rem;
+  border-top: 1px solid var(--rule);
+}
+
+.weaves__intro {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: clamp(2rem, 6vw, 6rem);
+  margin-bottom: 6rem;
+}
+@media (max-width: 900px) { .weaves__intro { grid-template-columns: 1fr; } }
+
+.weaves__hed {
+  font-family: var(--serif);
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+  max-width: 14ch;
+  text-wrap: balance;
+}
+.weaves__hed em { font-style: italic; font-weight: 300; color: var(--ink-soft); }
+
+.weaves__body {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 50ch;
+  align-self: end;
+}
+.weaves__body p { margin-bottom: 1.5rem; text-wrap: pretty; }
+.weaves__body strong {
+  font-weight: 500;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 65%, rgba(194,65,12,0.18) 65%);
+  padding: 0 0.1em;
+}
+
+/* weave specimen grid */
+.weave-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1.5rem, 3vw, 3rem);
+}
+@media (max-width: 900px) { .weave-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .weave-grid { grid-template-columns: 1fr; } }
+
+.weave-specimen {
+  position: relative;
+}
+.weave-specimen__card {
+  background: white;
+  padding: 1rem 1rem 1.25rem;
+  box-shadow:
+    0 1px 0 rgba(12,10,8,0.08),
+    0 16px 40px -16px rgba(12,10,8,0.18);
+  position: relative;
+  transition: transform 350ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 350ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              opacity 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* entrance animation for weave specimens */
+.weave-specimen.is-hidden .weave-specimen__card {
+  opacity: 0;
+  transform: translateY(24px);
+}
+.weave-specimen.is-revealed .weave-specimen__card {
+  opacity: 1;
+  transform: translateY(0);
+}
+.weave-specimen:hover .weave-specimen__card {
+  transform: translateY(-3px);
+  box-shadow:
+    0 1px 0 rgba(12,10,8,0.08),
+    0 24px 60px -16px rgba(12,10,8,0.28),
+    0 60px 120px -40px rgba(194,65,12,0.06);
+}
+.weave-specimen__card::before {
+  content: "+";
+  position: absolute;
+  top: 5px; left: 5px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-faint);
+}
+.weave-specimen__card::after {
+  content: "+";
+  position: absolute;
+  top: 5px; right: 5px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-faint);
+}
+.weave-specimen__canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--paper-deep);
+}
+.weave-specimen__label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.85rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--rule);
+}
+.weave-specimen__label strong { color: var(--ink); font-weight: 500; }
+.weave-specimen__label .amber { color: var(--amber); font-weight: 500; }
+
+/* the kicker pull quote */
+.weaves__kicker {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  line-height: 1.35;
+  color: var(--ink);
+  max-width: 30ch;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  margin-top: 6rem;
+  margin-bottom: 0;
+  position: relative;
+  text-wrap: balance;
+}
+.weaves__kicker::before, .weaves__kicker::after {
+  content: "";
+  display: block;
+  width: 4rem;
+  height: 1px;
+  background: var(--amber);
+  margin: 1.5rem auto;
+}
+
+/* ────────── §04 THE GENERATOR ────────── */
+
+.generator {
+  padding: 10rem var(--margin-x) 8rem;
+  border-top: 1px solid var(--rule);
+}
+
+.generator__intro {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: clamp(2rem, 6vw, 6rem);
+  margin-bottom: 5rem;
+}
+@media (max-width: 900px) { .generator__intro { grid-template-columns: 1fr; } }
+
+.generator__hed {
+  font-family: var(--serif);
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+  max-width: 14ch;
+  text-wrap: balance;
+}
+.generator__hed em { font-style: italic; font-weight: 300; color: var(--ink-soft); }
+
+.generator__body {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 50ch;
+  align-self: end;
+}
+.generator__body p { margin-bottom: 1.5rem; text-wrap: pretty; }
+.generator__body strong {
+  font-weight: 500;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 65%, rgba(194,65,12,0.18) 65%);
+  padding: 0 0.1em;
+}
+
+/* the interactive tartan generator */
+.gen-stage {
+  background: white;
+  padding: clamp(1.5rem, 3vw, 3rem);
+  box-shadow:
+    0 1px 0 rgba(12,10,8,0.08),
+    0 30px 60px -20px rgba(12,10,8,0.22);
+  position: relative;
+}
+.gen-stage::before {
+  content: "+";
+  position: absolute;
+  top: 8px; left: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-faint);
+}
+.gen-stage::after {
+  content: "+";
+  position: absolute;
+  top: 8px; right: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-faint);
+}
+
+.gen-stage__layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .gen-stage__layout { grid-template-columns: 1fr; }
+}
+
+.gen-canvas-wrap {
+  position: relative;
+}
+#gen-canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--paper-deep);
+  cursor: crosshair;
+}
+
+.gen-controls {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+.gen-controls__section {
+  margin-bottom: 2rem;
+}
+.gen-controls__section-title {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.gen-controls label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--rule);
+  cursor: pointer;
+  transition: color 150ms;
+}
+.gen-controls label:hover {
+  color: var(--ink);
+}
+.gen-controls label span {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.gen-controls select,
+.gen-controls input[type="range"] {
+  font-family: var(--mono);
+  font-size: 11px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: border-color 150ms;
+}
+.gen-controls select:hover,
+.gen-controls input[type="range"]:hover {
+  border-color: var(--ink-faint);
+}
+.gen-controls select:focus,
+.gen-controls input[type="range"]:focus {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.gen-controls input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 120px;
+  height: 2px;
+  background: var(--rule);
+  border: none;
+  padding: 0;
+}
+.gen-controls input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--ink);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 150ms;
+}
+.gen-controls input[type="range"]::-webkit-slider-thumb:hover {
+  background: var(--amber);
+}
+
+.gen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+  transition: transform 150ms ease-out,
+              background 150ms,
+              box-shadow 250ms cubic-bezier(0.2,0.8,0.2,1);
+}
+.gen-btn:hover {
+  background: var(--amber);
+  border-color: var(--amber);
+  box-shadow: 0 8px 24px -8px rgba(194,65,12,0.3);
+}
+.gen-btn:active {
+  transform: scale(0.96);
+}
+
+.gen-btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--rule);
+}
+.gen-btn--ghost:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+  box-shadow: none;
+}
+
+.gen-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.gen-thread-count {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+}
+.gen-thread-count .tc-label {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(243,237,221,0.5);
+  margin-bottom: 0.4rem;
+  display: block;
+}
+.gen-thread-count .tc-value {
+  color: var(--amber);
+  font-weight: 700;
+  word-break: break-all;
+  font-size: 11px;
+}
+
+.gen-stage__caption {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--rule);
+}
+.gen-stage__caption strong { color: var(--ink); font-weight: 500; }
+.gen-stage__caption .amber { color: var(--amber); }
+
+/* ────────── §05 GALLERY ────────── */
+
+.gallery {
+  border-top: 1px solid var(--rule);
+  padding: 8rem 0 6rem;
+}
+
+.gallery__opening {
+  max-width: 36ch;
+  margin: 0 auto 8rem;
+  padding: 0 var(--margin-x);
+  text-align: center;
+}
+.gallery__opening__quote {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.gallery__opening__quote em { font-style: normal; color: var(--ink-soft); }
+.gallery__opening__rule {
+  display: block;
+  width: 3rem;
+  height: 1px;
+  background: var(--amber);
+  margin: 2rem auto 0;
+}
+.gallery__opening__marker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 1.5rem;
+}
+.gallery__opening__marker .num { color: var(--amber); font-weight: 700; }
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: clamp(1rem, 2vw, 2rem);
+  padding: 0 var(--margin-x);
+  max-width: 1600px;
+  margin: 0 auto;
+}
+@media (max-width: 600px) {
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+}
+
+.gallery-tile {
+  position: relative;
+}
+.gallery-tile__card {
+  background: white;
+  padding: 0.75rem 0.75rem 1rem;
+  box-shadow:
+    0 1px 0 rgba(12,10,8,0.06),
+    0 12px 30px -12px rgba(12,10,8,0.16);
+  position: relative;
+  transition: transform 350ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.gallery-tile:hover .gallery-tile__card {
+  transform: translateY(-3px);
+  box-shadow:
+    0 1px 0 rgba(12,10,8,0.08),
+    0 20px 50px -14px rgba(12,10,8,0.26),
+    0 50px 100px -35px rgba(194,65,12,0.08);
+}
+.gallery-tile__card::before {
+  content: "+";
+  position: absolute;
+  top: 4px; left: 4px;
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--ink-faint);
+}
+.gallery-tile__card::after {
+  content: "+";
+  position: absolute;
+  top: 4px; right: 4px;
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--ink-faint);
+}
+.gallery-tile__canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--paper-deep);
+}
+.gallery-tile__label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.6rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--rule);
+}
+.gallery-tile__label strong { color: var(--ink); font-weight: 500; }
+
+/* ────────── §06 COLOPHON ────────── */
+
+.colophon {
+  border-top: 1px solid var(--rule);
+  padding: 9rem var(--margin-x) 6rem;
+}
+.colophon__inner {
+  max-width: 56ch;
+  margin: 0 auto;
+}
+
+.colophon__coda {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 5rem;
+  text-wrap: balance;
+}
+.colophon__coda em { font-style: italic; color: var(--ink-soft); font-weight: 300; }
+.colophon__coda::before, .colophon__coda::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 1px;
+  background: var(--amber);
+  margin: 1.5rem auto;
+}
+
+.colophon__marker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.colophon__marker .num { color: var(--amber); font-weight: 700; }
+
+.colophon__title {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 3rem;
+  text-wrap: balance;
+}
+.colophon__title em { font-style: italic; color: var(--ink-soft); }
+
+.colophon__table {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  width: 100%;
+  border-top: 1px solid var(--rule);
+  margin-bottom: 4rem;
+}
+.colophon__table .row {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.colophon__table .row strong {
+  color: var(--ink);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.colophon__table .row .amber { color: var(--amber); }
+.colophon__table .row em {
+  font-family: var(--serif);
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.colophon__continue {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--rule);
+}
+.colophon__continue__head {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.colophon__continue__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+@media (max-width: 600px) {
+  .colophon__continue__grid { grid-template-columns: 1fr; }
+}
+.colophon__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.2rem 1.5rem;
+  border: 1px solid var(--rule);
+  text-decoration: none;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              background 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              border-color 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  box-shadow: 0 0 0 transparent;
+}
+.colophon__link strong {
+  color: var(--ink);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.colophon__link span {
+  font-size: 10px;
+  color: var(--ink-faint);
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--serif);
+  font-style: italic;
+}
+.colophon__link::after {
+  content: "\2192";
+  position: absolute;
+  top: 1.4rem;
+  right: 1.5rem;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 13px;
+  transition: transform 220ms, color 220ms;
+}
+.colophon__link:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px -12px rgba(12,10,8,0.35),
+              0 30px 60px -25px rgba(194,65,12,0.18);
+}
+.colophon__link:hover strong { color: var(--paper); }
+.colophon__link:hover span { color: rgba(243,237,221,0.7); }
+.colophon__link:hover::after {
+  color: var(--amber);
+  transform: translateX(4px);
+}
+
+.colophon__signoff {
+  margin-top: 5rem;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.colophon__signoff .dot { color: var(--amber); }
+
+/* ────────── footer ────────── */
+
+.footer {
+  padding: 4rem var(--margin-x);
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.footer a { color: var(--amber); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.footer a:hover { color: var(--amber-deep); border-color: var(--amber); }
+
+/* ────────── MOBILE COMPRESSION ────────── */
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 5rem var(--margin-x) 2rem;
+    min-height: auto;
+  }
+  .hero__main { gap: 2.5rem; }
+  .hero__deck { margin-top: 1.5rem; }
+  .method, .palette-section, .weaves, .generator, .gallery, .colophon {
+    padding-top: 5rem;
+    padding-bottom: 4rem;
+  }
+  .weaves__intro { margin-bottom: 3rem; }
+  .weaves__kicker { margin-top: 4rem; margin-bottom: 4rem; }
+  .colophon__inner { padding: 0; }
+  .colophon__table .row { grid-template-columns: 1fr; gap: 0.4rem; padding: 0.8rem 0; }
+  .colophon__table .row dt { font-size: 9px; }
+  .colophon__continue__grid { gap: 0.5rem; }
+  .colophon__link { padding: 1rem 1.2rem; }
+  .colophon__link::after { top: 1.2rem; right: 1.2rem; }
+  .thread-count-block { padding: 1.5rem; }
+  .gen-stage { padding: 1.25rem; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- persistent meta strip -->
+<header class="meta-strip">
+  <span><span class="dot">&#9679;</span> Edgeless Lab / Tartanism</span>
+  <span>FILED 2026&#183;04&#183;13</span>
+</header>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+
+  <div class="hero__filing">
+    <span>WEAVE STRUCTURES <strong>6</strong></span>
+    <span>PALETTE <strong>48 colors</strong></span>
+    <span>REGISTER TARTANS <strong>4,200+</strong></span>
+    <span>STATUS <strong class="amber">LIVE</strong></span>
+  </div>
+
+  <div class="hero__main">
+
+    <div>
+      <h1 class="hero__title">
+        Tartan<wbr>ism<em>.</em>
+      </h1>
+      <p class="hero__deck">
+        I built a tartan renderer to learn how cloth thinks.
+        Six weave structures, forty&#8209;eight dye colors, four thousand
+        registered patterns, each stored as a string shorter than a tweet.
+        Somewhere between the registered clans and the random generator,
+        the line between tartan and plaid disappeared.
+      </p>
+    </div>
+
+    <figure class="hero__plate">
+      <canvas class="hero__plate-canvas" id="hero-canvas" width="600" height="600"
+              aria-label="Generative tartan pattern rendered in real time"></canvas>
+      <figcaption class="hero__plate__caption">
+        <span><strong>Plate&nbsp;I.</strong> Black Watch, 2/2 twill</span>
+        <span>generated <strong class="amber">live</strong></span>
+      </figcaption>
+    </figure>
+
+  </div>
+
+  <div class="hero__footer">
+    <span>D.&nbsp;MURRAY &#183; APRIL 2026</span>
+    <div class="scroll-cue">
+      <span>continue</span>
+    </div>
+    <nav class="hero__nav" aria-label="Section navigation">
+      <a href="#thread-count">&#167;01 Thread Count</a>
+      <span aria-hidden="true">&#183;</span>
+      <a href="#palette">&#167;02 Palette</a>
+      <span aria-hidden="true">&#183;</span>
+      <a href="#weaves">&#167;03 The Weaves</a>
+      <span aria-hidden="true">&#183;</span>
+      <a href="#generator">&#167;04 Generator</a>
+      <span aria-hidden="true">&#183;</span>
+      <a href="#gallery">&#167;05 Gallery</a>
+      <span aria-hidden="true">&#183;</span>
+      <a href="#colophon">&#167;06 Colophon</a>
+    </nav>
+  </div>
+
+</section>
+
+<!-- ─── §01 THE THREAD COUNT ─── -->
+<section class="method" id="thread-count">
+  <aside class="section-marker">
+    <span class="num">&#167;01</span>
+    <span class="name">The Thread Count</span>
+  </aside>
+  <div class="method__body">
+    <p>
+      Every tartan in the Scottish Register is stored as seven words.
+      Not an image. Not a weave diagram. Not a swatch. <strong>B24 G4 B4
+      G4 B4 G24 R6</strong> is the Black Watch. Thirty&#8209;six characters
+      encode three centuries of military identity: the dark blues of a
+      government regiment, the greens of Highland forests, a single red
+      stripe for the blood that distinguishes an armed unit from a
+      civilian clan. That is the entire file format.
+    </p>
+    <p>
+      The trick is the <strong>pivot</strong>. The first and last threads
+      in the sequence are reflection points: the pattern reads forward,
+      hits the pivot, reads backward. This creates the bilateral symmetry
+      that distinguishes tartan from gingham. No one called it a compression
+      algorithm when they invented it. They called it a sett. But the
+      structure is identical: a minimal description that expands into a
+      full repeating tile. Thread count is source code. Everything else
+      is rendering.
+    </p>
+
+    <div class="thread-count-block">
+      <span class="tc-label">Thread count notation</span>
+      <span class="tc-value">B24 G4 B4 G4 B4 G24 R6</span>
+      <span class="tc-name">Black Watch &#183; Government No. 1</span>
+    </div>
+
+    <p>
+      This explorer parses that notation and renders the result at
+      pixel&#8209;level accuracy: each thread crossing, each warp&#8209;weft
+      intersection, each color blend computed from the weave structure.
+      The parser accepts all 4,200+ registered tartans in the Scottish Register
+      format. Paste a thread count, get a tartan.
+    </p>
+  </div>
+</section>
+
+<!-- ─── §02 THE PALETTE ─── -->
+<section class="palette-section" id="palette">
+  <div class="palette-section__intro">
+    <aside class="section-marker">
+      <span class="num">&#167;02</span>
+      <span class="name">The Palette</span>
+    </aside>
+    <div class="palette-section__body">
+      <p>
+        The register uses single&#8209;letter codes for color.
+        <strong>B</strong> is blue. <strong>R</strong> is red. <strong>K</strong> is black, because
+        B was taken. <strong>Forty&#8209;eight codes</strong> survive
+        in the modern register, and each one maps to a specific dye
+        that predates synthetic chemistry. Indigo came from woad.
+        Red came from madder root. The expensive reds came from
+        imported cochineal, which is why the most intricate red
+        tartans belong to the wealthiest clans.
+      </p>
+      <p>
+        When I rendered all forty&#8209;eight as a grid, something
+        obvious appeared: the palette has structure. Dark blues and
+        greens cluster together (government, hunting). Bright reds
+        and whites cluster together (dress, ceremonial). The palette
+        is not a box of crayons. It is a vocabulary with grammar.
+        A tartan that mixes hunting greens with dress whites reads
+        as wrong the same way a sentence with mismatched registers
+        reads as wrong. The eye knows before the mind catches up.
+      </p>
+    </div>
+  </div>
+
+  <div class="palette-grid" id="palette-grid"></div>
+</section>
+
+<!-- ─── §03 THE WEAVES ─── -->
+<section class="weaves" id="weaves">
+
+  <div class="weaves__intro">
+    <aside class="section-marker">
+      <span class="num">&#167;03</span>
+      <span class="name">The Weaves</span>
+    </aside>
+    <div>
+      <h2 class="weaves__hed">
+        Same threads.<br>
+        Six structures.<br>
+        <em>Six different tartans.</em>
+      </h2>
+    </div>
+  </div>
+
+  <div class="weaves__body" style="max-width: 50ch; margin: 0 auto 4rem; padding: 0 var(--margin-x);">
+    <p>
+      I assumed there was one way to weave a tartan.
+      <strong>2/2 twill</strong>: two&#8209;over, two&#8209;under,
+      offset by one thread per row. The diagonal rib. The thing
+      your brain files as "tartan." This is wrong. The Scottish
+      Register acknowledges six weave structures. I built all six.
+    </p>
+    <p>
+      <strong>Plain weave</strong> is one&#8209;over, one&#8209;under.
+      Flat, crisp, almost pixelated. <strong>Herringbone</strong>
+      reverses the twill diagonal every few threads: a zigzag that
+      creates more color blending at the reversal points.
+      <strong>Hopsack</strong> pairs threads together, making the
+      weave coarser. <strong>Satin</strong> floats one thread over four,
+      creating a sheen. <strong>Broken twill</strong> interrupts the
+      diagonal at irregular intervals. The result looks hand&#8209;woven
+      even on a screen.
+    </p>
+    <p>
+      The six specimens below all use the same thread count: Black Watch.
+      Same colors, same stripe widths, same pivot structure.
+      The only variable is the interlacing. Look at them and try to
+      pick the one you would call "the real Black Watch." There is no
+      correct answer. The register does not specify a weave.
+    </p>
+  </div>
+
+  <div class="weave-grid" id="weave-grid"></div>
+
+  <p class="weaves__kicker">
+    Six weaves, one thread count, six tartans.<br>
+    The pattern is not in the threads.<br>
+    <em>It is in the crossing.</em>
+  </p>
+
+</section>
+
+<!-- ─── §04 THE GENERATOR ─── -->
+<section class="generator" id="generator">
+  <div class="generator__intro">
+    <aside class="section-marker">
+      <span class="num">&#167;04</span>
+      <span class="name">The Generator</span>
+    </aside>
+    <div>
+      <h2 class="generator__hed">
+        Compose<br>a tartan<br>
+        <em>from nothing.</em>
+      </h2>
+      <div class="generator__body">
+        <p>
+          Hit generate. The engine picks colors from the forty&#8209;eight,
+          assigns thread counts with weighted randomness, applies pivot
+          symmetry, and renders the result through your chosen weave structure.
+          Every pattern is mathematically valid. A loom could weave it.
+          The Scottish Register could accept it, pending a clan petition
+          and a two&#8209;year review.
+        </p>
+        <p>
+          This is the question the tool eventually forces: at what point
+          does generated plaid become tartan? The thread count notation is
+          identical to a registered tartan's. The weave is authentic. The
+          dye colors are period&#8209;correct. Nothing is missing except
+          three hundred years of someone wearing it.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gen-stage">
+    <div class="gen-stage__layout">
+      <div class="gen-canvas-wrap">
+        <canvas id="gen-canvas" width="800" height="800"
+                aria-label="Interactive tartan generator canvas"></canvas>
+        <div class="gen-thread-count">
+          <span class="tc-label">Current thread count</span>
+          <span class="tc-value" id="gen-tc-display">B24 G4 B4 G4 B4 G24 R6</span>
+        </div>
+      </div>
+      <div class="gen-controls">
+        <div class="gen-controls__section">
+          <div class="gen-controls__section-title">Weave Structure</div>
+          <label>
+            <span>Structure</span>
+            <select id="gen-weave">
+              <option value="twill" selected>2/2 Twill</option>
+              <option value="plain">Plain Weave</option>
+              <option value="herringbone">Herringbone</option>
+              <option value="hopsack">Hopsack</option>
+              <option value="satin">Satin</option>
+              <option value="broken">Broken Twill</option>
+            </select>
+          </label>
+        </div>
+        <div class="gen-controls__section">
+          <div class="gen-controls__section-title">Thread Count</div>
+          <label>
+            <span>Complexity</span>
+            <input type="range" id="gen-complexity" min="3" max="12" value="6">
+          </label>
+          <label>
+            <span>Scale</span>
+            <input type="range" id="gen-scale" min="1" max="8" value="3">
+          </label>
+        </div>
+        <div class="gen-controls__section">
+          <div class="gen-controls__section-title">Palette</div>
+          <label>
+            <span>Family</span>
+            <select id="gen-palette">
+              <option value="hunting" selected>Hunting</option>
+              <option value="dress">Dress</option>
+              <option value="government">Government</option>
+              <option value="ancient">Ancient</option>
+              <option value="modern">Modern</option>
+              <option value="muted">Muted</option>
+            </select>
+          </label>
+        </div>
+        <div class="gen-actions">
+          <button class="gen-btn" id="gen-randomize">&#8635; Generate</button>
+          <button class="gen-btn gen-btn--ghost" id="gen-export">&#8615; Export SVG</button>
+        </div>
+      </div>
+    </div>
+    <div class="gen-stage__caption">
+      <span><strong>Plate&nbsp;VII.</strong> generative specimen</span>
+      <span>weave <strong id="gen-weave-label">2/2 twill</strong> &#183; <span class="amber" id="gen-thread-n">7 threads</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── §05 GALLERY ─── -->
+<section class="gallery" id="gallery">
+  <div class="gallery__opening">
+    <p class="gallery__opening__quote">
+      Twelve registered tartans, rendered from their thread counts.<br>
+      <em>The clans are gone. The notation survives.</em>
+    </p>
+    <span class="gallery__opening__rule"></span>
+    <div class="gallery__opening__marker">
+      <span class="num">&#167;05</span> &nbsp;&#183;&nbsp; Gallery
+    </div>
+  </div>
+
+  <div class="gallery-grid" id="gallery-grid"></div>
+</section>
+
+<!-- ─── §06 COLOPHON ─── -->
+<section class="colophon" id="colophon">
+  <div class="colophon__inner">
+
+    <p class="colophon__coda">
+      A tartan is thirty characters of notation<br>
+      and three centuries of someone wearing it.<br>
+      <em>The notation is the part a machine can learn.</em>
+    </p>
+
+    <div class="colophon__marker">
+      <span class="num">&#167;06</span> &nbsp;&#183;&nbsp; Colophon &amp; Continue
+    </div>
+
+    <h2 class="colophon__title">
+      Set in Boska &amp; JetBrains&nbsp;Mono.<br>
+      <em>Printed on aged paper.</em>
+    </h2>
+
+    <dl class="colophon__table">
+      <div class="row">
+        <dt>Display</dt>
+        <dd><strong>Boska</strong> &#183; Indian Type Foundry, distributed via Fontshare</dd>
+      </div>
+      <div class="row">
+        <dt>Body &amp; data</dt>
+        <dd><strong>JetBrains Mono</strong> &#183; ligatured monospace, OFL licensed</dd>
+      </div>
+      <div class="row">
+        <dt>Substrate</dt>
+        <dd><strong>Canvas API</strong> for the screen edition &#183; warm specimen paper aesthetic</dd>
+      </div>
+      <div class="row">
+        <dt>Weave engine</dt>
+        <dd><strong>JavaScript</strong> &#183; pixel-level warp/weft simulation with per-crossing color blend</dd>
+      </div>
+      <div class="row">
+        <dt>Palette source</dt>
+        <dd><strong>48 traditional dye colors</strong> from the Scottish Register of Tartans</dd>
+      </div>
+      <div class="row">
+        <dt>Structures</dt>
+        <dd><strong>6 weave types</strong> &#183; plain, 2/2 twill, herringbone, hopsack, satin, broken twill</dd>
+      </div>
+      <div class="row">
+        <dt>Register</dt>
+        <dd><strong>4,200+ tartans</strong> &#183; parsed from official thread count notation</dd>
+      </div>
+      <div class="row">
+        <dt>Edition</dt>
+        <dd><strong class="amber">v1.0</strong> &#183; April 2026 &#183; Edgeless Lab</dd>
+      </div>
+      <div class="row">
+        <dt>Designed by</dt>
+        <dd><strong>D. Murray</strong> &#183; <em>Edgeless Lab</em></dd>
+      </div>
+    </dl>
+
+    <div class="colophon__continue">
+      <div class="colophon__continue__head">Continue</div>
+      <div class="colophon__continue__grid">
+        <a class="colophon__link" href="/tartanism/app/" target="_blank" rel="noopener">
+          <strong>Tartanism App</strong>
+          <span>the full interactive tool with WIF export</span>
+        </a>
+        <a class="colophon__link" href="https://edgelesslab.com/pen-plotter/">
+          <strong>Pen Plotter Autoresearch</strong>
+          <span>21,770 specimens of generative line art</span>
+        </a>
+        <a class="colophon__link" href="https://github.com/qt-djm" target="_blank" rel="noopener">
+          <strong>Source on GitHub</strong>
+          <span>weave engine, palette data, generator</span>
+        </a>
+        <a class="colophon__link" href="https://edgelesslab.com">
+          <strong>Edgeless Lab</strong>
+          <span>more from the lab</span>
+        </a>
+      </div>
+    </div>
+
+    <p class="colophon__signoff">
+      <span class="dot">&#9679;</span> &nbsp; D. Murray &nbsp;&#183;&nbsp; April 2026 &nbsp;&#183;&nbsp; Edgeless Lab &nbsp; <span class="dot">&#9679;</span>
+    </p>
+
+  </div>
+</section>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  TARTANISM — WEAVE ENGINE & INTERACTIVE GENERATOR
+// ════════════════════════════════════════════════════════════
+
+// ── Traditional tartan palette (48 colors) ────────────────
+const PALETTE = {
+  // Blues
+  B:  '#1a3a5c', // Dark blue
+  LB: '#5b8fb9', // Light blue
+  RB: '#2c5282', // Royal blue
+  NB: '#0f2440', // Navy blue
+  // Greens
+  G:  '#355e3b', // Dark green
+  LG: '#6b9e6b', // Light green
+  DG: '#1a3c24', // Deep green
+  OG: '#4a6741', // Olive green
+  // Reds
+  R:  '#8b2332', // Dark red
+  LR: '#c94c4c', // Light red
+  DR: '#5c1a1a', // Deep red / maroon
+  CR: '#b22222', // Crimson
+  // Yellows
+  Y:  '#c4a932', // Gold
+  LY: '#e8d44d', // Light yellow
+  OY: '#b8860b', // Old yellow
+  // Whites & greys
+  W:  '#e8e4d8', // White (natural wool)
+  LW: '#f0ece0', // Light white
+  N:  '#404040', // Dark grey
+  LN: '#808080', // Light grey
+  // Browns
+  T:  '#6b4226', // Brown (tan)
+  LT: '#a0785a', // Light brown
+  DT: '#3e2723', // Dark brown
+  // Purples
+  P:  '#4a2545', // Purple
+  LP: '#7b4f7d', // Light purple
+  // Orange
+  O:  '#c46210', // Orange
+  LO: '#e8973f', // Light orange
+  // Black
+  K:  '#1a1a1a', // Black
+  // Additional register codes
+  A:  '#5b8fb9', // Azure
+  C:  '#b22222', // Crimson alias
+  E:  '#808080', // Grey alias
+  H:  '#e8d44d', // Light yellow alias
+  M:  '#8b2332', // Maroon alias
+  S:  '#c94c4c', // Scarlet alias
+  V:  '#4a2545', // Violet alias
+};
+
+// Named palette families for the generator
+const PALETTE_FAMILIES = {
+  hunting:    ['DG', 'G', 'K', 'B', 'T', 'Y', 'N'],
+  dress:      ['W', 'R', 'B', 'G', 'K', 'Y', 'LR'],
+  government: ['B', 'G', 'K', 'R', 'NB', 'DG'],
+  ancient:    ['LB', 'LG', 'LR', 'LY', 'LT', 'W', 'T'],
+  modern:     ['B', 'G', 'R', 'Y', 'K', 'W'],
+  muted:      ['OG', 'LN', 'T', 'OY', 'N', 'DT', 'LB'],
+};
+
+// Famous tartans (thread count notation)
+const FAMOUS_TARTANS = [
+  { name: 'Black Watch',        tc: 'B24 G4 B4 G4 B4 G24 R6' },
+  { name: 'Royal Stewart',      tc: 'R72 G4 B16 G16 K2 Y2 K2 W2 K24 W2 K2 Y2 K2 W2 R6' },
+  { name: 'MacLeod of Lewis',   tc: 'K4 Y32 K24 Y4 K4 Y4' },
+  { name: 'Campbell of Argyll', tc: 'B22 K2 G16 K2 B2 K2 G16 K2 B2 K2 Y2 K2 B2 K2 W2 K2' },
+  { name: 'Gordon',             tc: 'B6 K2 G24 K24 G24 K2 B6 Y6' },
+  { name: 'Lindsay',            tc: 'R2 DR24 R24 DR2 G4 DR2 Y2' },
+  { name: 'MacGregor',          tc: 'R32 DG4 R4 DG4 R4 DG32 Y4' },
+  { name: 'Douglas',            tc: 'G8 B2 G24 B24 G24 B2 G8 W4' },
+  { name: 'Graham of Montrose', tc: 'G16 W2 G2 K16 W2 K2 G16 R6' },
+  { name: 'Fraser of Lovat',    tc: 'R6 G2 R2 G28 K4 W4 K4 G28 B4' },
+  { name: 'Buchanan',           tc: 'Y4 DG2 Y4 DG24 W4 R4 W4 DG24 R20' },
+  { name: 'MacKenzie',          tc: 'B24 K2 G16 K16 G16 K2 B24 R8 W2 R2' },
+];
+
+const WEAVE_STRUCTURES = {
+  plain:       { name: 'Plain Weave',   label: '1/1 plain', fn: (r, c) => (r + c) % 2 === 0 },
+  twill:       { name: '2/2 Twill',     label: '2/2 twill', fn: (r, c) => ((r + c) % 4) < 2 },
+  herringbone: { name: 'Herringbone',   label: 'herringbone', fn: (r, c) => {
+    const period = 8;
+    const phase = r % period;
+    const offset = phase < period/2 ? phase : period - phase - 1;
+    return ((c + offset) % 4) < 2;
+  }},
+  hopsack:     { name: 'Hopsack',       label: 'hopsack', fn: (r, c) => {
+    return (Math.floor(r/2) + Math.floor(c/2)) % 2 === 0;
+  }},
+  satin:       { name: 'Satin',         label: 'satin', fn: (r, c) => ((r * 3 + c) % 5) === 0 },
+  broken:      { name: 'Broken Twill',  label: 'broken twill', fn: (r, c) => {
+    const shift = (r % 6 < 3) ? r : -r;
+    return ((shift + c) % 4) < 2;
+  }},
+};
+
+// ── Parse thread count notation ───────────────────────────
+function parseThreadCount(tc) {
+  const tokens = tc.trim().split(/\s+/);
+  const threads = [];
+  for (const token of tokens) {
+    const match = token.match(/^([A-Z]{1,2})(\d+)$/i);
+    if (!match) continue;
+    const colorCode = match[1].toUpperCase();
+    const count = parseInt(match[2], 10);
+    const color = PALETTE[colorCode] || '#888888';
+    threads.push({ code: colorCode, count, color });
+  }
+  return threads;
+}
+
+// Expand thread count to full thread array (with pivot mirror)
+function expandThreads(parsed) {
+  if (parsed.length === 0) return [];
+  const forward = [];
+  for (const t of parsed) {
+    for (let i = 0; i < t.count; i++) {
+      forward.push(t.color);
+    }
+  }
+  // Mirror (pivot: don't repeat first and last)
+  const mirrored = [...forward];
+  for (let i = forward.length - 2; i > 0; i--) {
+    mirrored.push(forward[i]);
+  }
+  return mirrored;
+}
+
+// ── Render tartan to canvas ───────────────────────────────
+function renderTartan(canvas, threadCount, weaveKey, scale) {
+  const ctx = canvas.getContext('2d');
+  const parsed = parseThreadCount(threadCount);
+  const threads = expandThreads(parsed);
+  if (threads.length === 0) return;
+
+  const weaveFn = WEAVE_STRUCTURES[weaveKey || 'twill'].fn;
+  const s = scale || 3;
+  const sett = threads.length;
+
+  const w = canvas.width;
+  const h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  // Create image data for pixel-level rendering
+  const imgData = ctx.createImageData(w, h);
+  const data = imgData.data;
+
+  for (let py = 0; py < h; py++) {
+    const threadY = Math.floor(py / s) % sett;
+    const warpColor = hexToRgb(threads[threadY]);
+
+    for (let px = 0; px < w; px++) {
+      const threadX = Math.floor(px / s) % sett;
+      const weftColor = hexToRgb(threads[threadX]);
+
+      // Determine if warp is on top
+      const warpOnTop = weaveFn(Math.floor(py / s), Math.floor(px / s));
+
+      // Blend colors at intersection (tartan color blending)
+      const idx = (py * w + px) * 4;
+      if (warpOnTop) {
+        // Warp dominant, slight weft influence
+        data[idx]     = Math.round(warpColor.r * 0.75 + weftColor.r * 0.25);
+        data[idx + 1] = Math.round(warpColor.g * 0.75 + weftColor.g * 0.25);
+        data[idx + 2] = Math.round(warpColor.b * 0.75 + weftColor.b * 0.25);
+      } else {
+        // Weft dominant, slight warp influence
+        data[idx]     = Math.round(weftColor.r * 0.75 + warpColor.r * 0.25);
+        data[idx + 1] = Math.round(weftColor.g * 0.75 + warpColor.g * 0.25);
+        data[idx + 2] = Math.round(weftColor.b * 0.75 + warpColor.b * 0.25);
+      }
+      data[idx + 3] = 255;
+    }
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return { r, g, b };
+}
+
+// ── Random thread count generator ─────────────────────────
+function generateRandomTC(complexity, paletteFamily) {
+  const colors = PALETTE_FAMILIES[paletteFamily] || PALETTE_FAMILIES.hunting;
+  const numStripes = Math.max(3, complexity || 6);
+  const parts = [];
+  for (let i = 0; i < numStripes; i++) {
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const count = Math.floor(Math.random() * 28) + 2;
+    parts.push(`${color}${count}`);
+  }
+  return parts.join(' ');
+}
+
+// ── Meta-strip scroll state ─────────────────────────────────
+(function () {
+  const strip = document.querySelector('.meta-strip');
+  if (!strip) return;
+  let ticking = false;
+  function update() {
+    strip.classList.toggle('is-scrolled', window.scrollY > 16);
+    ticking = false;
+  }
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(update);
+      ticking = true;
+    }
+  }, { passive: true });
+  update();
+})();
+
+// ── Hero canvas ─────────────────────────────────────────────
+(function () {
+  const canvas = document.getElementById('hero-canvas');
+  if (!canvas) return;
+  renderTartan(canvas, 'B24 G4 B4 G4 B4 G24 R6', 'twill', 4);
+})();
+
+// ── Palette grid ────────────────────────────────────────────
+(function () {
+  const grid = document.getElementById('palette-grid');
+  if (!grid) return;
+
+  const entries = Object.entries(PALETTE).filter(([code]) => code.length <= 2);
+  const frag = document.createDocumentFragment();
+
+  entries.forEach(([code, hex]) => {
+    const swatch = document.createElement('div');
+    swatch.className = 'palette-swatch';
+    swatch.style.background = hex;
+
+    const label = document.createElement('div');
+    label.className = 'palette-swatch__label';
+    label.textContent = `${code} ${hex}`;
+    swatch.appendChild(label);
+
+    frag.appendChild(swatch);
+  });
+
+  grid.appendChild(frag);
+})();
+
+// ── Weave specimens (§03) with staggered entrance ───────────
+(function () {
+  const grid = document.getElementById('weave-grid');
+  if (!grid) return;
+
+  const TC = 'B24 G4 B4 G4 B4 G24 R6'; // Black Watch for all
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const frag = document.createDocumentFragment();
+  const specimens = [];
+  let plateNum = 2;
+
+  Object.entries(WEAVE_STRUCTURES).forEach(([key, weave]) => {
+    const specimen = document.createElement('article');
+    specimen.className = reduceMotion ? 'weave-specimen' : 'weave-specimen is-hidden';
+
+    const card = document.createElement('div');
+    card.className = 'weave-specimen__card';
+
+    const canvas = document.createElement('canvas');
+    canvas.className = 'weave-specimen__canvas';
+    canvas.width = 400;
+    canvas.height = 400;
+    canvas.setAttribute('aria-label', `${weave.name} weave of Black Watch tartan`);
+    card.appendChild(canvas);
+    specimen.appendChild(card);
+
+    const label = document.createElement('div');
+    label.className = 'weave-specimen__label';
+    label.innerHTML = `<span><strong>Plate\u00a0${toRoman(plateNum)}.</strong> Black Watch</span><span class="amber">${weave.label}</span>`;
+    specimen.appendChild(label);
+
+    frag.appendChild(specimen);
+    specimens.push({ el: specimen, canvas, key });
+    plateNum++;
+  });
+
+  grid.appendChild(frag);
+
+  // Render all canvases
+  specimens.forEach(({ canvas, key }) => {
+    requestAnimationFrame(() => {
+      renderTartan(canvas, TC, key, 3);
+    });
+  });
+
+  // Staggered entrance animation via IntersectionObserver
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    let revealIndex = 0;
+    const observer = new IntersectionObserver((entries) => {
+      entries.filter(e => e.isIntersecting).forEach((entry) => {
+        const delay = revealIndex * 120;
+        setTimeout(() => {
+          entry.target.classList.remove('is-hidden');
+          entry.target.classList.add('is-revealed');
+        }, delay);
+        revealIndex++;
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.15 });
+    specimens.forEach(({ el }) => observer.observe(el));
+  }
+})();
+
+// ── Gallery (§05) ───────────────────────────────────────────
+(function () {
+  const grid = document.getElementById('gallery-grid');
+  if (!grid) return;
+
+  const frag = document.createDocumentFragment();
+
+  FAMOUS_TARTANS.forEach((tartan, i) => {
+    const tile = document.createElement('article');
+    tile.className = 'gallery-tile';
+
+    const card = document.createElement('div');
+    card.className = 'gallery-tile__card';
+
+    const canvas = document.createElement('canvas');
+    canvas.className = 'gallery-tile__canvas';
+    canvas.width = 300;
+    canvas.height = 300;
+    canvas.setAttribute('aria-label', `${tartan.name} tartan`);
+    card.appendChild(canvas);
+    tile.appendChild(card);
+
+    const label = document.createElement('div');
+    label.className = 'gallery-tile__label';
+    label.innerHTML = `<strong>${tartan.name}</strong><span>${tartan.tc.split(' ').length} threads</span>`;
+    tile.appendChild(label);
+
+    frag.appendChild(tile);
+
+    requestAnimationFrame(() => {
+      renderTartan(canvas, tartan.tc, 'twill', 2);
+    });
+  });
+
+  grid.appendChild(frag);
+})();
+
+// ── Interactive generator (§04) ─────────────────────────────
+(function () {
+  const canvas = document.getElementById('gen-canvas');
+  const weaveSelect = document.getElementById('gen-weave');
+  const complexitySlider = document.getElementById('gen-complexity');
+  const scaleSlider = document.getElementById('gen-scale');
+  const paletteSelect = document.getElementById('gen-palette');
+  const randomizeBtn = document.getElementById('gen-randomize');
+  const exportBtn = document.getElementById('gen-export');
+  const tcDisplay = document.getElementById('gen-tc-display');
+  const weaveLabel = document.getElementById('gen-weave-label');
+  const threadNLabel = document.getElementById('gen-thread-n');
+
+  if (!canvas) return;
+
+  let currentTC = 'B24 G4 B4 G4 B4 G24 R6';
+  let currentWeave = 'twill';
+  let currentScale = 3;
+
+  function render() {
+    renderTartan(canvas, currentTC, currentWeave, currentScale);
+    tcDisplay.textContent = currentTC;
+    weaveLabel.textContent = WEAVE_STRUCTURES[currentWeave].label;
+    const parsed = parseThreadCount(currentTC);
+    const totalThreads = parsed.reduce((sum, t) => sum + t.count, 0);
+    threadNLabel.textContent = `${parsed.length} colors, ${totalThreads} threads`;
+  }
+
+  // Animated "weaving" render: reveals tartan row by row
+  let weaveAnimFrame = null;
+  function animatedRender() {
+    if (weaveAnimFrame) cancelAnimationFrame(weaveAnimFrame);
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) { render(); return; }
+
+    const ctx = canvas.getContext('2d');
+    const parsed = parseThreadCount(currentTC);
+    const threads = expandThreads(parsed);
+    if (threads.length === 0) return;
+
+    const weaveFn = WEAVE_STRUCTURES[currentWeave].fn;
+    const s = currentScale;
+    const sett = threads.length;
+    const w = canvas.width;
+    const h = canvas.height;
+
+    ctx.clearRect(0, 0, w, h);
+    // Fill with paper color first
+    ctx.fillStyle = '#ebe3cf';
+    ctx.fillRect(0, 0, w, h);
+
+    const rowsPerFrame = 4;
+    let currentRow = 0;
+
+    function drawRows() {
+      const endRow = Math.min(currentRow + rowsPerFrame, h);
+      const imgData = ctx.createImageData(w, endRow - currentRow);
+      const data = imgData.data;
+
+      for (let py = currentRow; py < endRow; py++) {
+        const threadY = Math.floor(py / s) % sett;
+        const warpColor = hexToRgb(threads[threadY]);
+        for (let px = 0; px < w; px++) {
+          const threadX = Math.floor(px / s) % sett;
+          const weftColor = hexToRgb(threads[threadX]);
+          const warpOnTop = weaveFn(Math.floor(py / s), Math.floor(px / s));
+          const idx = ((py - currentRow) * w + px) * 4;
+          if (warpOnTop) {
+            data[idx]     = Math.round(warpColor.r * 0.75 + weftColor.r * 0.25);
+            data[idx + 1] = Math.round(warpColor.g * 0.75 + weftColor.g * 0.25);
+            data[idx + 2] = Math.round(warpColor.b * 0.75 + weftColor.b * 0.25);
+          } else {
+            data[idx]     = Math.round(weftColor.r * 0.75 + warpColor.r * 0.25);
+            data[idx + 1] = Math.round(weftColor.g * 0.75 + warpColor.g * 0.25);
+            data[idx + 2] = Math.round(weftColor.b * 0.75 + warpColor.b * 0.25);
+          }
+          data[idx + 3] = 255;
+        }
+      }
+
+      ctx.putImageData(imgData, 0, currentRow);
+      currentRow = endRow;
+
+      if (currentRow < h) {
+        weaveAnimFrame = requestAnimationFrame(drawRows);
+      }
+    }
+
+    weaveAnimFrame = requestAnimationFrame(drawRows);
+
+    // Update labels immediately
+    tcDisplay.textContent = currentTC;
+    weaveLabel.textContent = WEAVE_STRUCTURES[currentWeave].label;
+    const totalThreads = parsed.reduce((sum, t) => sum + t.count, 0);
+    threadNLabel.textContent = `${parsed.length} colors, ${totalThreads} threads`;
+  }
+
+  function randomize() {
+    const complexity = parseInt(complexitySlider.value, 10);
+    const family = paletteSelect.value;
+    currentTC = generateRandomTC(complexity, family);
+    currentWeave = weaveSelect.value;
+    currentScale = parseInt(scaleSlider.value, 10);
+    animatedRender();
+  }
+
+  weaveSelect.addEventListener('change', () => {
+    currentWeave = weaveSelect.value;
+    render();
+  });
+  scaleSlider.addEventListener('input', () => {
+    currentScale = parseInt(scaleSlider.value, 10);
+    render();
+  });
+  complexitySlider.addEventListener('input', () => randomize());
+  paletteSelect.addEventListener('change', () => randomize());
+  randomizeBtn.addEventListener('click', () => randomize());
+
+  // SVG Export
+  exportBtn.addEventListener('click', () => {
+    const parsed = parseThreadCount(currentTC);
+    const threads = expandThreads(parsed);
+    if (threads.length === 0) return;
+
+    const weaveFn = WEAVE_STRUCTURES[currentWeave].fn;
+    const s = currentScale * 2;
+    const sett = threads.length;
+    const size = sett * s;
+
+    let rects = '';
+    for (let r = 0; r < sett; r++) {
+      for (let c = 0; c < sett; c++) {
+        const warpOnTop = weaveFn(r, c);
+        const warp = hexToRgb(threads[r % sett]);
+        const weft = hexToRgb(threads[c % sett]);
+        let rgb;
+        if (warpOnTop) {
+          rgb = { r: Math.round(warp.r*0.75+weft.r*0.25), g: Math.round(warp.g*0.75+weft.g*0.25), b: Math.round(warp.b*0.75+weft.b*0.25) };
+        } else {
+          rgb = { r: Math.round(weft.r*0.75+warp.r*0.25), g: Math.round(weft.g*0.75+warp.g*0.25), b: Math.round(weft.b*0.75+warp.b*0.25) };
+        }
+        rects += `<rect x="${c*s}" y="${r*s}" width="${s}" height="${s}" fill="rgb(${rgb.r},${rgb.g},${rgb.b})"/>`;
+      }
+    }
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${rects}</svg>`;
+    const blob = new Blob([svg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tartan-${currentWeave}-${Date.now()}.svg`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // Initial render
+  render();
+})();
+
+// ── Roman numeral helper ────────────────────────────────────
+function toRoman(num) {
+  const vals = [1000,900,500,400,100,90,50,40,10,9,5,4,1];
+  const syms = ['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];
+  let result = '';
+  for (let i = 0; i < vals.length; i++) {
+    while (num >= vals[i]) {
+      result += syms[i];
+      num -= vals[i];
+    }
+  }
+  return result;
+}
+</script>
+
+</body>
+</html>

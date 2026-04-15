@@ -5,11 +5,3 @@ out/
 .DS_Store
 *.tsbuildinfo
 .env*.local
-
-# Pen-plotter image assets served from Cloudflare R2 (task-306)
-pen-plotter/assets/thumbs/
-pen-plotter/assets/thumbs-full/
-pen-plotter/assets/mediums-all/
-pen-plotter/assets/pieces/
-pen-plotter/assets/medium/
-pen-plotter/assets/og-image.png

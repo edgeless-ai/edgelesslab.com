@@ -1,0 +1,109 @@
+{
+  "name": "RSS Digest Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6,14,22 * * *"
+            }
+          ]
+        }
+      },
+      "id": "digest-trigger",
+      "name": "Digest Schedule (6am, 2pm, 10pm)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  aw.window_id,\n  aw.start_time,\n  aw.end_time,\n  aw.article_count,\n  aw.note_count,\n  COUNT(et.task_id) as task_count\nFROM aggregation_windows aw\nLEFT JOIN processed_articles pa ON pa.window_id = aw.window_id\nLEFT JOIN extracted_tasks et ON et.article_url = pa.url\nWHERE aw.end_time <= NOW() \n  AND aw.digest_sent = false\n  AND aw.article_count > 0\nGROUP BY aw.window_id\nORDER BY aw.start_time DESC\nLIMIT 1"
+      },
+      "id": "window-checker",
+      "name": "Get Completed Window",
+      "type": "n8n-nodes-base.postgres",
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Get top articles by score\nSELECT \n  pa.title,\n  pa.url,\n  pa.score,\n  pa.cluster,\n  pa.obsidian_note_path,\n  pa.summary\nFROM processed_articles pa\nWHERE pa.window_id = {{ $json.window_id }}\nORDER BY pa.score DESC\nLIMIT 20;\n\n-- Get cluster summary\nSELECT \n  cluster,\n  COUNT(*) as count,\n  AVG(score) as avg_score\nFROM processed_articles\nWHERE window_id = {{ $json.window_id }}\n  AND cluster IS NOT NULL\nGROUP BY cluster\nORDER BY count DESC;\n\n-- Get extracted tasks\nSELECT \n  et.task_description,\n  et.priority,\n  et.category,\n  pa.title as source_article\nFROM extracted_tasks et\nJOIN processed_articles pa ON et.article_url = pa.url\nWHERE pa.window_id = {{ $json.window_id }}\nORDER BY \n  CASE et.priority \n    WHEN 'critical' THEN 1\n    WHEN 'high' THEN 2\n    WHEN 'medium' THEN 3\n    ELSE 4\n  END\nLIMIT 15;"
+      },
+      "id": "aggregate-data",
+      "name": "Collect Window Data",
+      "type": "n8n-nodes-base.postgres",
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Format the digest content\nconst windowData = items[0].json;\nconst articles = items[1].json.results[0];\nconst clusters = items[1].json.results[1];\nconst tasks = items[1].json.results[2];\n\nconst formatTime = (date) => {\n  const d = new Date(date);\n  return d.toLocaleString('en-US', { \n    hour: 'numeric', \n    hour12: true \n  });\n};\n\nconst periodName = () => {\n  const hour = new Date(windowData.start_time).getHours();\n  if (hour === 22) return 'Evening';\n  if (hour === 6) return 'Morning';\n  return 'Afternoon';\n};\n\n// Build email content\nlet emailHtml = `\n<h1>RSS Intelligence Digest - ${periodName()}</h1>\n<p>${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>\n\n<h2>Executive Summary</h2>\n<ul>\n  <li>Articles analyzed: <strong>${windowData.article_count}</strong></li>\n  <li>Key insights extracted: <strong>${windowData.note_count}</strong></li>\n  <li>Actionable tasks identified: <strong>${windowData.task_count || 0}</strong></li>\n  <li>Time period: ${formatTime(windowData.start_time)} - ${formatTime(windowData.end_time)}</li>\n</ul>\n`;\n\n// Trending topics\nif (clusters && clusters.length > 0) {\n  emailHtml += '<h2>Trending Topics</h2>';\n  clusters.slice(0, 5).forEach(cluster => {\n    emailHtml += `<h3>${cluster.cluster} (${cluster.count} articles)</h3>`;\n    emailHtml += `<p>Average relevance score: ${cluster.avg_score.toFixed(1)}</p>`;\n  });\n}\n\n// Top articles\nemailHtml += '<h2>Key Insights</h2>';\narticles.slice(0, 10).forEach((article, i) => {\n  emailHtml += `\n    <div style=\"margin-bottom: 20px; padding: 15px; background: #f5f5f5; border-left: 4px solid #2196F3;\">\n      <h3>${i + 1}. ${article.title}</h3>\n      <p><strong>Score:</strong> ${article.score.toFixed(1)} | <strong>Topic:</strong> ${article.cluster || 'General'}</p>\n      ${article.summary ? `<p>${article.summary}</p>` : ''}\n      <p><a href=\"${article.url}\">Read more →</a></p>\n    </div>\n  `;\n});\n\n// Actionable tasks\nif (tasks && tasks.length > 0) {\n  emailHtml += '<h2>Actionable Tasks</h2>';\n  \n  const tasksByPriority = tasks.reduce((acc, task) => {\n    if (!acc[task.priority]) acc[task.priority] = [];\n    acc[task.priority].push(task);\n    return acc;\n  }, {});\n  \n  ['critical', 'high', 'medium', 'low'].forEach(priority => {\n    if (tasksByPriority[priority]) {\n      emailHtml += `<h3>Priority: ${priority.toUpperCase()}</h3><ul>`;\n      tasksByPriority[priority].forEach(task => {\n        emailHtml += `<li>${task.task_description} <em>(from: ${task.source_article})</em></li>`;\n      });\n      emailHtml += '</ul>';\n    }\n  });\n}\n\nemailHtml += `\n<hr>\n<p style=\"color: #666; font-size: 0.9em;\">\n  Next digest: ${formatTime(new Date(windowData.end_time).getTime() + 8 * 60 * 60 * 1000)}<br>\n  Powered by n8n RSS Intelligence System\n</p>\n`;\n\n// Also create markdown version\nlet markdown = `# RSS Intelligence Digest - ${periodName()}\\n\\n`;\nmarkdown += `Date: ${new Date().toLocaleDateString()}\\n\\n`;\nmarkdown += `## Summary\\n- Articles: ${windowData.article_count}\\n`;\nmarkdown += `- Insights: ${windowData.note_count}\\n`;\nmarkdown += `- Tasks: ${windowData.task_count || 0}\\n\\n`;\n\n// Add articles to markdown\nmarkdown += '## Key Articles\\n\\n';\narticles.slice(0, 10).forEach(article => {\n  markdown += `### ${article.title}\\n`;\n  markdown += `- Score: ${article.score.toFixed(1)}\\n`;\n  markdown += `- [Link](${article.url})\\n\\n`;\n});\n\nreturn [\n  {\n    json: {\n      emailHtml,\n      markdown,\n      subject: `RSS Digest: ${periodName()} - ${windowData.article_count} articles, ${windowData.task_count || 0} tasks`,\n      windowId: windowData.window_id\n    }\n  }\n];"
+      },
+      "id": "digest-composer",
+      "name": "Compose Digest",
+      "type": "n8n-nodes-base.function",
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "thedavidmurray@gmail.com",
+        "toEmail": "thedavidmurray@gmail.com",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.emailHtml }}",
+        "options": {}
+      },
+      "id": "email-sender",
+      "name": "Send Email Digest",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "path": "/data/claude-vault/13-Reports/Digests/{{ $now.format('YYYY-MM-DD-HHmm') }}-digest.md",
+        "content": "={{ $json.markdown }}"
+      },
+      "id": "obsidian-archiver",
+      "name": "Archive to Obsidian",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "position": [1050, 400]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": "aggregation_windows",
+        "updateKey": "window_id",
+        "columns": "digest_sent=true"
+      },
+      "id": "mark-sent",
+      "name": "Mark Digest Sent",
+      "type": "n8n-nodes-base.postgres",
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "digest-trigger": {
+      "main": [[{"node": "window-checker"}]]
+    },
+    "window-checker": {
+      "main": [[{"node": "aggregate-data"}]]
+    },
+    "aggregate-data": {
+      "main": [[{"node": "digest-composer"}]]
+    },
+    "digest-composer": {
+      "main": [[
+        {"node": "email-sender"},
+        {"node": "obsidian-archiver"}
+      ]]
+    },
+    "email-sender": {
+      "main": [[{"node": "mark-sent"}]]
+    },
+    "obsidian-archiver": {
+      "main": [[{"node": "mark-sent"}]]
+    }
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "name": "RSS Intelligent Ingestion v2",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Every 2 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "feedUrls",
+              "value": "https://hnrss.org/frontpage\nhttps://lobste.rs/rss\nhttps://arxiv.org/rss/cs.AI\nhttps://reddit.com/r/MachineLearning/.rss\nhttps://reddit.com/r/LocalLLaMA/.rss\nhttps://reddit.com/r/ClaudeAI/.rss\nhttps://reddit.com/r/ObsidianMD/.rss\nhttps://reddit.com/r/Python/.rss\nhttps://reddit.com/r/generativeart/.rss\nhttps://reddit.com/r/Polymarket/.rss\nhttps://www.anthropic.com/feed.xml\nhttps://openai.com/blog/rss/\nhttps://github.blog/feed/\nhttps://simonwillison.net/atom/everything/\nhttps://gwern.net/rss.xml\nhttps://feeds.feedburner.com/TheHackersNews\nhttps://cloudsquid.substack.com/feed\nhttps://blogsystem5.substack.com/feed\nhttps://community.n8n.io/latest.rss\nhttps://quotient.substack.com/feed\nhttps://harrycrane.substack.com/feed\nhttps://tezlee.substack.com/feed"
+            }
+          ]
+        }
+      },
+      "id": "feed-list",
+      "name": "RSS Feed List",
+      "type": "n8n-nodes-base.set",
+      "position": [450, 300],
+      "notes": "Updated 2026-03-10: 22 feeds across AI, security, dev tools, creative, markets, prediction markets (Quotient, Harry Crane, Terry's Takes). YouTube channels removed pending subscription sync."
+    },
+    {
+      "parameters": {
+        "jsCode": "const urls = $input.first().json.feedUrls.split('\\n').filter(u => u.trim());\nreturn urls.map(url => ({ json: { feedUrl: url.trim() } }));"
+      },
+      "id": "split-feeds",
+      "name": "Split Feed URLs",
+      "type": "n8n-nodes-base.code",
+      "position": [550, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.feedUrl }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "rss-reader",
+      "name": "RSS Feed Reader",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Enhanced scoring with updated patterns\nconst priorityPatterns = {\n  // High priority - AI/Claude focus\n  'claude|anthropic|opus': 4.0,\n  'claude.?code|mcp|tool.?use': 3.5,\n  'gpt.?5|openai|chatgpt': 3.0,\n  \n  // Security\n  'zero.?day|breach|exploit': 4.0,\n  'security|vulnerability|cve': 3.5,\n  \n  // AI/ML\n  'llm|agent|rag|embedding': 2.5,\n  'fine.?tun|train|model': 2.0,\n  'breakthrough|paper|research': 2.0,\n  \n  // Tools\n  'obsidian|notion|pkm': 2.0,\n  'python|rust|typescript': 1.5,\n  'release|update|new.?feature': 1.5,\n  \n  // Prediction markets\n  'polymarket|prediction.?market|forecast': 3.0,\n  'mispriced|edge|calibrat|superforecast': 3.5,\n  'quotient|polyglobe|trenchfu': 2.5\n};\n\nconst reputableSources = [\n  'arxiv.org', 'openai.com', 'anthropic.com',\n  'github.com', 'github.blog', 'hackerone.com',\n  'lobste.rs', 'substack.com', 'simonwillison.net',\n  'gwern.net', 'thehackernews.com'\n];\n\nreturn items.map(item => {\n  let score = 0;\n  let reasons = [];\n  const text = `${item.json.title} ${item.json.content || ''}`.toLowerCase();\n  \n  // Apply pattern scoring\n  for (const [pattern, weight] of Object.entries(priorityPatterns)) {\n    if (new RegExp(pattern, 'i').test(text)) {\n      score += weight;\n      reasons.push(`Matches: ${pattern}`);\n    }\n  }\n  \n  // Source reputation\n  const source = new URL(item.json.link).hostname;\n  if (reputableSources.some(s => source.includes(s))) {\n    score += 1.5;\n    reasons.push(`Trusted: ${source}`);\n  }\n  \n  // YouTube bonus (your liked channels)\n  if (source.includes('youtube.com')) {\n    score += 1.0;\n    reasons.push('YouTube channel');\n  }\n  \n  item.json.score = Math.min(score, 10.0);\n  item.json.scoreReasons = reasons;\n  item.json.needsDeepAnalysis = score >= 5.0;\n  \n  // Detect content type\n  if (source.includes('youtube.com')) {\n    item.json.contentType = 'video';\n  } else if (source.includes('arxiv.org')) {\n    item.json.contentType = 'paper';\n  } else if (source.includes('substack.com')) {\n    item.json.contentType = 'article';\n  } else {\n    item.json.contentType = 'article';\n  }\n  \n  return item;\n});"
+      },
+      "id": "article-scorer",
+      "name": "Score & Classify",
+      "type": "n8n-nodes-base.function",
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.score }}",
+              "operation": "largerEqual",
+              "value2": 3
+            }
+          ]
+        }
+      },
+      "id": "quality-filter",
+      "name": "Score >= 3?",
+      "type": "n8n-nodes-base.if",
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "path": "/data/claude-vault/00-Inbox/rss/{{ $now.format('YYYYMMDD-HHmmss') }}-{{ $json.title.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 50) }}.md",
+        "content": "---\ntype: {{ $json.contentType }}\ntitle: \"{{ $json.title.replace(/\"/g, \"'\") }}\"\nsource_url: {{ $json.link }}\ningested_at: {{ $now.format('YYYY-MM-DD') }}\ntags:\n  - content/{{ $json.contentType }}\n  - source/rss\nrelevance_score: {{ ($json.score / 10).toFixed(2) }}\nsummary: \"RSS item from {{ new URL($json.link).hostname }}\"\nprocessed_by: n8n-rss\n---\n\n# {{ $json.title }}\n\n## Summary\n{{ $json.content ? $json.content.substring(0, 500) + '...' : 'No content preview available.' }}\n\n## Source\n- **URL**: [{{ new URL($json.link).hostname }}]({{ $json.link }})\n- **Score**: {{ $json.score }}/10\n- **Reasons**: {{ $json.scoreReasons.join(', ') }}\n- **Ingested**: {{ $now.format('YYYY-MM-DD HH:mm') }}\n\n## Action Items\n- [ ] Review and process\n\n---\n*Ingested via n8n RSS workflow (schema v1.0)*"
+      },
+      "id": "obsidian-writer",
+      "name": "Create Obsidian Note",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "position": [1250, 200]
+    }
+  ],
+  "connections": {
+    "schedule-trigger": {
+      "main": [[{"node": "feed-list"}]]
+    },
+    "feed-list": {
+      "main": [[{"node": "Split Feed URLs"}]]
+    },
+    "Split Feed URLs": {
+      "main": [[{"node": "rss-reader"}]]
+    },
+    "rss-reader": {
+      "main": [[{"node": "article-scorer"}]]
+    },
+    "article-scorer": {
+      "main": [[{"node": "quality-filter"}]]
+    },
+    "quality-filter": {
+      "main": [
+        [{"node": "obsidian-writer"}],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  }
+}

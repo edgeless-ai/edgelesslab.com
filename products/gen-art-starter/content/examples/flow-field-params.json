@@ -1,0 +1,54 @@
+{
+  "presets": {
+    "calm": {
+      "description": "Long, smooth curves with low noise frequency. Good for meditative pieces.",
+      "width": 800,
+      "height": 800,
+      "noise_scale": 0.002,
+      "step_length": 3.0,
+      "num_steps": 120,
+      "num_lines": 600,
+      "line_width": 0.4
+    },
+    "turbulent": {
+      "description": "High-frequency noise with short, chaotic strokes. Dense and energetic.",
+      "width": 800,
+      "height": 800,
+      "noise_scale": 0.012,
+      "step_length": 2.0,
+      "num_steps": 40,
+      "num_lines": 2000,
+      "line_width": 0.3
+    },
+    "dense": {
+      "description": "Maximum line count, thin strokes. Creates a texture that reads almost solid from a distance.",
+      "width": 800,
+      "height": 800,
+      "noise_scale": 0.005,
+      "step_length": 2.5,
+      "num_steps": 80,
+      "num_lines": 4000,
+      "line_width": 0.2
+    },
+    "sparse": {
+      "description": "Minimal lines, wide spacing. Each curve is individually legible.",
+      "width": 800,
+      "height": 800,
+      "noise_scale": 0.004,
+      "step_length": 4.0,
+      "num_steps": 150,
+      "num_lines": 150,
+      "line_width": 0.6
+    },
+    "spiral": {
+      "description": "Low noise scale with high step count creates long spiraling paths. Hypnotic on paper.",
+      "width": 800,
+      "height": 800,
+      "noise_scale": 0.001,
+      "step_length": 2.0,
+      "num_steps": 300,
+      "num_lines": 400,
+      "line_width": 0.35
+    }
+  }
+}

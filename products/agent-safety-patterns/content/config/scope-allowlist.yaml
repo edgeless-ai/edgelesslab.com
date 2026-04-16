@@ -1,0 +1,80 @@
+# Scope Limiter Allowlist
+#
+# Only tools and commands listed here are permitted.
+# Everything else is blocked by default.
+#
+# Copy to your hooks directory. Set SAFETY_ALLOWLIST_PATH to override location.
+
+# Tools the agent is allowed to use.
+# Use exact tool names or regex patterns.
+# Remove tools the agent should not access.
+allowed_tools:
+  - "Read"
+  - "Glob"
+  - "Grep"
+  - "Bash"
+  - "Write"
+  - "Edit"
+  # Add MCP tools selectively:
+  # - "mcp__fetch__fetch"
+  # - "mcp__your-safe-tool__operation"
+
+# Bash commands allowed by exact prefix match.
+# The command must start with one of these strings.
+allowed_bash_commands:
+  - "ls"
+  - "cat"
+  - "head"
+  - "tail"
+  - "wc"
+  - "find"
+  - "grep"
+  - "rg"
+  - "git status"
+  - "git log"
+  - "git diff"
+  - "git branch"
+  - "git show"
+  - "python3"
+  - "python"
+  - "node"
+  - "npm test"
+  - "npm run lint"
+  - "npm run build"
+  - "pytest"
+  - "make test"
+  - "make lint"
+  - "echo"
+  - "pwd"
+  - "which"
+  - "env"
+  - "date"
+  - "whoami"
+  - "mkdir"
+  - "cp"
+  - "mv"
+  - "touch"
+
+# Bash commands allowed by regex pattern.
+# Use for more flexible matching when prefix is insufficient.
+allowed_bash_patterns:
+  # Git read operations
+  - "^git\\s+(status|log|diff|branch|show|tag|remote|stash list)"
+  # Git safe write operations (commit, add, checkout branch)
+  - "^git\\s+(add|commit|checkout\\s+-b|switch|stash\\s+(push|pop))"
+  # Python/Node execution
+  - "^python3?\\s+"
+  - "^node\\s+"
+  # Package manager read operations
+  - "^npm\\s+(test|run|list|outdated|audit)"
+  - "^pip\\s+(list|show|freeze)"
+  # Docker read operations
+  - "^docker\\s+(ps|images|logs|inspect)"
+  # Safe system commands
+  - "^(ls|cat|head|tail|wc|find|grep|rg|echo|pwd|which|env|date)\\b"
+
+# Tools to block even if they match allowed_tools patterns.
+# Use this for specific MCP tools that should never be called.
+blocked_tools:
+  # Example: block a dangerous MCP tool
+  # - "mcp__dangerous__delete_everything"

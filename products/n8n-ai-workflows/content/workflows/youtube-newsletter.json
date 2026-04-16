@@ -1,0 +1,290 @@
+{
+  "name": "YouTube Newsletter Reply Handler",
+  "nodes": [
+    {
+      "id": "gmail-trigger",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "position": [0, 0],
+      "parameters": {
+        "filters": {
+          "q": "subject:(YouTube Intelligence) OR subject:(Re: YouTube Intelligence)"
+        },
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "FGqEXDypEMIZpTfN",
+          "name": "Gmail account"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "get-full-email",
+      "name": "Get Full Email",
+      "type": "n8n-nodes-base.gmail",
+      "position": [220, 0],
+      "parameters": {
+        "simple": false,
+        "options": {},
+        "messageId": "={{ $json.id }}",
+        "operation": "get"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "FGqEXDypEMIZpTfN",
+          "name": "Gmail account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "filter-replies",
+      "name": "Filter Newsletter Replies",
+      "type": "n8n-nodes-base.if",
+      "position": [440, 0],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.subject }}",
+              "rightValue": "Re:",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            },
+            {
+              "leftValue": "={{ $json.subject.toLowerCase() }}",
+              "rightValue": "youtube intelligence",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "leftValue": "={{ $json.from.value[0].address }}",
+              "rightValue": "noreply@anthropic.com",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "load-newsletter-context",
+      "name": "Load Newsletter Context",
+      "type": "n8n-nodes-base.code",
+      "position": [660, -100],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Extract the date from the email to find the matching newsletter\nconst emailDate = new Date($input.item.json.internalDate);\nconst year = emailDate.getFullYear();\nconst month = String(emailDate.getMonth() + 1).padStart(2, '0');\nconst day = String(emailDate.getDate()).padStart(2, '0');\n\n// Try to find the newsletter archive file\n// Format: YYYY-MM-DD-evening.md\nconst fs = require('fs');\nconst path = '/data/claude-vault/13-Reports/YouTube-Newsletter';\n\nlet newsletterContent = '';\nlet foundFile = '';\n\n// Look for newsletter files from the past 3 days\nfor (let daysBack = 0; daysBack <= 3; daysBack++) {\n  const checkDate = new Date(emailDate);\n  checkDate.setDate(checkDate.getDate() - daysBack);\n  const checkYear = checkDate.getFullYear();\n  const checkMonth = String(checkDate.getMonth() + 1).padStart(2, '0');\n  const checkDay = String(checkDate.getDate()).padStart(2, '0');\n  \n  const eveningFile = `${path}/${checkYear}-${checkMonth}-${checkDay}-evening.md`;\n  const morningFile = `${path}/${checkYear}-${checkMonth}-${checkDay}-morning.md`;\n  \n  try {\n    if (fs.existsSync(eveningFile)) {\n      newsletterContent = fs.readFileSync(eveningFile, 'utf8');\n      foundFile = eveningFile;\n      break;\n    } else if (fs.existsSync(morningFile)) {\n      newsletterContent = fs.readFileSync(morningFile, 'utf8');\n      foundFile = morningFile;\n      break;\n    }\n  } catch (e) {\n    // Continue searching\n  }\n}\n\n// Extract key info from the email\nconst userReply = $input.item.json.text || $input.item.json.snippet || '';\nconst userEmail = $input.item.json.from.value[0].address;\nconst userName = $input.item.json.from.value[0].name || userEmail.split('@')[0];\nconst subject = $input.item.json.subject;\nconst threadId = $input.item.json.threadId;\nconst messageId = $input.item.json.id;\n\nreturn {\n  json: {\n    userReply,\n    userEmail,\n    userName,\n    subject,\n    threadId,\n    messageId,\n    newsletterContent: newsletterContent.substring(0, 8000), // Limit context size\n    foundFile,\n    originalEmail: $input.item.json\n  }\n};"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "gemini-model",
+      "name": "Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [660, 100],
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "maxOutputTokens": 2000,
+          "temperature": 0.7
+        }
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "80dD7T8fWRArKeo5",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "ai-agent",
+      "name": "Generate Reply",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [880, 0],
+      "parameters": {
+        "text": "={{ $json.userReply }}",
+        "options": {
+          "systemMessage": "You are David's AI assistant, helping him engage with replies to his YouTube Intelligence newsletter.\n\nCONTEXT:\nYou have access to the original newsletter that the user is replying to. Use this context to provide relevant, insightful responses.\n\nNEWSLETTER CONTENT:\n{{ $json.newsletterContent }}\n\nUSER INFO:\n- Name: {{ $json.userName }}\n- Email: {{ $json.userEmail }}\n\nGUIDELINES:\n1. Be conversational and helpful, as if David is personally responding\n2. Reference specific videos, insights, or themes from the newsletter when relevant\n3. If they ask for more details on a topic, provide deeper analysis\n4. If they share feedback, acknowledge it warmly\n5. If they ask about related topics, connect it to the newsletter's themes\n6. Keep responses concise but substantive (2-4 paragraphs)\n7. End with an invitation for further discussion if appropriate\n8. Sign off as \"David\" or \"- David\"\n9. If the user explicitly asks David to create, fix, review, install, investigate, or follow up on something, add one separate line exactly in the format `ACTION: <concise task request>`.\n\nIMPORTANT:\n- Never make up information about videos that weren't in the newsletter\n- If asked about something not covered, be honest and offer to explore it\n- Maintain a friendly, knowledgeable tone\n- The `ACTION:` line is internal automation metadata and will be stripped before the email reply is sent"
+        },
+        "promptType": "define"
+      },
+      "typeVersion": 1.9
+    },
+    {
+      "id": "action-detector",
+      "name": "Detect Actions",
+      "type": "n8n-nodes-base.code",
+      "position": [990, -100],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Detect and queue internal ACTION metadata, then strip it from the outgoing email.\nconst output = $input.item.json.output || '';\nconst actionMatch = output.match(/^ACTION:\\s*(.+)$/im);\nconst cleanOutput = output\n  .replace(/^ACTION:\\s*.+$/gim, '')\n  .replace(/\\n{3,}/g, '\\n\\n')\n  .trim();\n\nlet queuedAction = null;\nif (actionMatch) {\n  const fs = require('fs');\n  queuedAction = actionMatch[1].trim();\n  const action = {\n    type: 'newsletter-reply',\n    action: queuedAction,\n    from: $input.item.json.userEmail || $('Load Newsletter Context').item.json.userEmail || 'unknown',\n    subject: $('Load Newsletter Context').item.json.subject || '',\n    threadId: $('Load Newsletter Context').item.json.threadId || '',\n    timestamp: new Date().toISOString()\n  };\n\n  try {\n    fs.appendFileSync('/data/action-queue/actions.jsonl', JSON.stringify(action) + '\\n');\n  } catch (e) {\n    // Queue dir may not exist yet\n  }\n}\n\nreturn {\n  json: {\n    ...$input.item.json,\n    output: cleanOutput,\n    hasAction: queuedAction !== null,\n    queuedAction\n  }\n};"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "send-reply",
+      "name": "Send Reply",
+      "type": "n8n-nodes-base.gmail",
+      "position": [1100, 0],
+      "parameters": {
+        "sendTo": "={{ $('Load Newsletter Context').item.json.userEmail }}",
+        "subject": "={{ $('Load Newsletter Context').item.json.subject }}",
+        "message": "={{ $json.output }}",
+        "operation": "reply",
+        "messageId": "={{ $('Load Newsletter Context').item.json.messageId }}",
+        "options": {
+          "appendAttribution": false,
+          "replyToSenderOnly": true
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "FGqEXDypEMIZpTfN",
+          "name": "Gmail account"
+        }
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "mark-as-read",
+      "name": "Mark as Read",
+      "type": "n8n-nodes-base.gmail",
+      "position": [1320, 0],
+      "parameters": {
+        "messageId": "={{ $('Load Newsletter Context').item.json.messageId }}",
+        "operation": "markAsRead"
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "FGqEXDypEMIZpTfN",
+          "name": "Gmail account"
+        }
+      },
+      "typeVersion": 2.1
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Full Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Full Email": {
+      "main": [
+        [
+          {
+            "node": "Filter Newsletter Replies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Newsletter Replies": {
+      "main": [
+        [
+          {
+            "node": "Load Newsletter Context",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Load Newsletter Context": {
+      "main": [
+        [
+          {
+            "node": "Generate Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Reply",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Reply": {
+      "main": [
+        [
+          {
+            "node": "Detect Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Actions": {
+      "main": [
+        [
+          {
+            "node": "Send Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reply": {
+      "main": [
+        [
+          {
+            "node": "Mark as Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "YouTube Intelligence"
+    },
+    {
+      "name": "Email Automation"
+    }
+  ]
+}

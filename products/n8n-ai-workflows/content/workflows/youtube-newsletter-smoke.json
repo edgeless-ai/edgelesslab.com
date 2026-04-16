@@ -1,0 +1,133 @@
+{
+  "id": "7FELdHKdiwBmhvmB",
+  "name": "YouTube Newsletter Reply Handler Smoke",
+  "active": false,
+  "nodes": [
+    {
+      "id": "execute-trigger",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [0, 0],
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "build-sample-email",
+      "name": "Build Sample Email",
+      "type": "n8n-nodes-base.code",
+      "position": [220, 0],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return [{\n  json: {\n    id: 'smoke-message-20260310',\n    threadId: 'smoke-thread-20260310',\n    internalDate: '2026-02-18T18:30:00.000Z',\n    subject: 'Re: YouTube Intelligence smoke test',\n    snippet: 'Please create a backlog task to review this browser automation workflow and send me a short summary.',\n    text: 'Please create a backlog task to review this browser automation workflow and send me a short summary.',\n    from: {\n      value: [\n        {\n          address: 'thedavidmurray@gmail.com',\n          name: 'David James Murray'\n        }\n      ]\n    }\n  }\n}];"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "load-newsletter-context",
+      "name": "Load Newsletter Context",
+      "type": "n8n-nodes-base.code",
+      "position": [440, -100],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Extract the date from the email to find the matching newsletter\nconst emailDate = new Date($input.item.json.internalDate);\nconst year = emailDate.getFullYear();\nconst month = String(emailDate.getMonth() + 1).padStart(2, '0');\nconst day = String(emailDate.getDate()).padStart(2, '0');\n\n// Try to find the newsletter archive file\n// Format: YYYY-MM-DD-evening.md\nconst fs = require('fs');\nconst path = '/data/claude-vault/13-Reports/YouTube-Newsletter';\n\nlet newsletterContent = '';\nlet foundFile = '';\n\n// Look for newsletter files from the past 3 days\nfor (let daysBack = 0; daysBack <= 3; daysBack++) {\n  const checkDate = new Date(emailDate);\n  checkDate.setDate(checkDate.getDate() - daysBack);\n  const checkYear = checkDate.getFullYear();\n  const checkMonth = String(checkDate.getMonth() + 1).padStart(2, '0');\n  const checkDay = String(checkDate.getDate()).padStart(2, '0');\n  \n  const eveningFile = `${path}/${checkYear}-${checkMonth}-${checkDay}-evening.md`;\n  const morningFile = `${path}/${checkYear}-${checkMonth}-${checkDay}-morning.md`;\n  \n  try {\n    if (fs.existsSync(eveningFile)) {\n      newsletterContent = fs.readFileSync(eveningFile, 'utf8');\n      foundFile = eveningFile;\n      break;\n    } else if (fs.existsSync(morningFile)) {\n      newsletterContent = fs.readFileSync(morningFile, 'utf8');\n      foundFile = morningFile;\n      break;\n    }\n  } catch (e) {\n    // Continue searching\n  }\n}\n\n// Extract key info from the email\nconst userReply = $input.item.json.text || $input.item.json.snippet || '';\nconst userEmail = $input.item.json.from.value[0].address;\nconst userName = $input.item.json.from.value[0].name || userEmail.split('@')[0];\nconst subject = $input.item.json.subject;\nconst threadId = $input.item.json.threadId;\nconst messageId = $input.item.json.id;\n\nreturn {\n  json: {\n    userReply,\n    userEmail,\n    userName,\n    subject,\n    threadId,\n    messageId,\n    newsletterContent: newsletterContent.substring(0, 8000),\n    foundFile,\n    originalEmail: $input.item.json\n  }\n};"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "ai-agent",
+      "name": "Generate Reply",
+      "type": "n8n-nodes-base.code",
+      "position": [660, 0],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\n  json: {\n    ...$input.item.json,\n    output: `Thanks for the note. I reviewed the browser automation workflow and will summarize the CLI-first path for you shortly.\\n\\nACTION: Create a backlog task to review the browser automation workflow and send a short summary.\\n\\n- David`\n  }\n};"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "action-detector",
+      "name": "Detect Actions",
+      "type": "n8n-nodes-base.code",
+      "position": [880, 0],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Detect and queue internal ACTION metadata, then strip it from the outgoing email.\nconst output = $input.item.json.output || '';\nconst actionMatch = output.match(/^ACTION:\\s*(.+)$/im);\nconst cleanOutput = output\n  .replace(/^ACTION:\\s*.+$/gim, '')\n  .replace(/\\n{3,}/g, '\\n\\n')\n  .trim();\n\nlet queuedAction = null;\nif (actionMatch) {\n  const fs = require('fs');\n  queuedAction = actionMatch[1].trim();\n  const action = {\n    type: 'newsletter-reply',\n    action: queuedAction,\n    from: $input.item.json.userEmail || $('Load Newsletter Context').item.json.userEmail || 'unknown',\n    subject: $('Load Newsletter Context').item.json.subject || '',\n    threadId: $('Load Newsletter Context').item.json.threadId || '',\n    timestamp: new Date().toISOString()\n  };\n\n  try {\n    fs.appendFileSync('/data/action-queue/actions.jsonl', JSON.stringify(action) + '\\n');\n  } catch (e) {\n    // Queue dir may not exist yet\n  }\n}\n\nreturn {\n  json: {\n    ...$input.item.json,\n    output: cleanOutput,\n    hasAction: queuedAction !== null,\n    queuedAction\n  }\n};"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "prepare-result",
+      "name": "Prepare Result",
+      "type": "n8n-nodes-base.code",
+      "position": [1100, 0],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\n  json: {\n    output: $input.item.json.output,\n    hasAction: $input.item.json.hasAction,\n    queuedAction: $input.item.json.queuedAction,\n    foundFile: $('Load Newsletter Context').item.json.foundFile,\n    userEmail: $('Load Newsletter Context').item.json.userEmail,\n    subject: $('Load Newsletter Context').item.json.subject\n  }\n};"
+      },
+      "typeVersion": 2
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Build Sample Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Sample Email": {
+      "main": [
+        [
+          {
+            "node": "Load Newsletter Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Newsletter Context": {
+      "main": [
+        [
+          {
+            "node": "Generate Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Reply": {
+      "main": [
+        [
+          {
+            "node": "Detect Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Actions": {
+      "main": [
+        [
+          {
+            "node": "Prepare Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null
+}

@@ -1,0 +1,48 @@
+{
+  "presets": {
+    "coral": {
+      "description": "Branching coral-like structures. The classic reaction-diffusion look.",
+      "width": 200,
+      "height": 200,
+      "feed_rate": 0.055,
+      "kill_rate": 0.062,
+      "iterations": 8000,
+      "diffusion_a": 1.0,
+      "diffusion_b": 0.5,
+      "contour_levels": 8
+    },
+    "spots": {
+      "description": "Evenly spaced circular dots. Think leopard print or diatom patterns.",
+      "width": 200,
+      "height": 200,
+      "feed_rate": 0.035,
+      "kill_rate": 0.065,
+      "iterations": 6000,
+      "diffusion_a": 1.0,
+      "diffusion_b": 0.5,
+      "contour_levels": 6
+    },
+    "stripes": {
+      "description": "Parallel stripe patterns with gentle undulation. Zebra territory.",
+      "width": 200,
+      "height": 200,
+      "feed_rate": 0.025,
+      "kill_rate": 0.056,
+      "iterations": 10000,
+      "diffusion_a": 1.0,
+      "diffusion_b": 0.5,
+      "contour_levels": 5
+    },
+    "maze": {
+      "description": "Winding labyrinthine paths. High iteration count for full development.",
+      "width": 200,
+      "height": 200,
+      "feed_rate": 0.029,
+      "kill_rate": 0.057,
+      "iterations": 12000,
+      "diffusion_a": 1.0,
+      "diffusion_b": 0.5,
+      "contour_levels": 4
+    }
+  }
+}

@@ -1,0 +1,137 @@
+# Task Type Definitions
+# Maps task categories to agent configurations and routing rules.
+# The dispatcher uses these to decide which agent handles which task.
+
+task_types:
+  code-review:
+    description: "Review code changes for quality and correctness"
+    agent: "reviewer"
+    priority_default: 3
+    max_attempts: 2
+    timeout_ms: 120000
+    requires_files: true
+    output_format: "json"
+    tags: ["quality", "blocking"]
+
+  bug-fix:
+    description: "Investigate and fix a reported bug"
+    agent: "implementer"
+    priority_default: 2  # bugs are high priority
+    max_attempts: 3
+    timeout_ms: 300000
+    requires_files: true
+    # Bug fixes go through a pipeline
+    pipeline:
+      - agent: "researcher"
+        purpose: "Reproduce and understand the bug"
+      - agent: "implementer"
+        purpose: "Write the fix"
+      - agent: "tester"
+        purpose: "Verify the fix and add regression test"
+    output_format: "json"
+    tags: ["fix", "blocking"]
+
+  feature:
+    description: "Implement a new feature from a specification"
+    agent: "orchestrator"  # orchestrator manages the full flow
+    priority_default: 5
+    max_attempts: 2
+    timeout_ms: 600000
+    requires_files: false
+    pipeline:
+      - agent: "researcher"
+        purpose: "Understand requirements and existing patterns"
+      - agent: "implementer"
+        purpose: "Build the feature"
+      - agent: "tester"
+        purpose: "Write tests"
+      - agent: "reviewer"
+        purpose: "Final review"
+        parallel_with: ["tester"]
+    output_format: "json"
+    tags: ["feature"]
+
+  research:
+    description: "Investigate a technical question or gather context"
+    agent: "researcher"
+    priority_default: 7
+    max_attempts: 2
+    timeout_ms: 180000
+    requires_files: false
+    output_format: "json"
+    tags: ["research", "non-blocking"]
+
+  test-coverage:
+    description: "Improve test coverage for a module"
+    agent: "tester"
+    priority_default: 6
+    max_attempts: 3
+    timeout_ms: 240000
+    requires_files: true
+    output_format: "json"
+    tags: ["quality", "non-blocking"]
+
+  refactor:
+    description: "Refactor code for clarity or performance"
+    agent: "implementer"
+    priority_default: 8
+    max_attempts: 2
+    timeout_ms: 300000
+    requires_files: true
+    pipeline:
+      - agent: "researcher"
+        purpose: "Map dependencies and usage patterns"
+      - agent: "implementer"
+        purpose: "Execute the refactor"
+      - agent: "tester"
+        purpose: "Verify no regressions"
+    output_format: "json"
+    tags: ["refactor", "non-blocking"]
+
+  documentation:
+    description: "Write or update documentation"
+    agent: "researcher"  # researcher reads code, writes docs
+    priority_default: 9
+    max_attempts: 2
+    timeout_ms: 120000
+    requires_files: true
+    output_format: "markdown"
+    tags: ["docs", "non-blocking"]
+
+  security-audit:
+    description: "Security-focused review of a module or feature"
+    agent: "reviewer"
+    priority_default: 1  # security is highest priority
+    max_attempts: 1       # no retries, get it right
+    timeout_ms: 180000
+    requires_files: true
+    output_format: "json"
+    tags: ["security", "blocking"]
+
+# Routing rules for automatic task type detection
+# When a task doesn't specify its type, the dispatcher uses these patterns
+routing_rules:
+  - pattern: "review|audit|check"
+    maps_to: "code-review"
+  - pattern: "bug|fix|broken|error|crash"
+    maps_to: "bug-fix"
+  - pattern: "implement|build|create|add"
+    maps_to: "feature"
+  - pattern: "research|investigate|explore|understand"
+    maps_to: "research"
+  - pattern: "test|coverage|spec"
+    maps_to: "test-coverage"
+  - pattern: "refactor|clean|simplify|optimize"
+    maps_to: "refactor"
+  - pattern: "doc|readme|guide|explain"
+    maps_to: "documentation"
+  - pattern: "security|vulnerability|cve|injection"
+    maps_to: "security-audit"
+
+# Global queue settings
+queue:
+  max_concurrent: 4
+  lease_duration_ms: 300000
+  stale_lease_check_interval_ms: 60000
+  max_queue_depth: 100
+  priority_boost_after_ms: 300000  # boost priority by 1 after 5 min waiting

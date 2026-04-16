@@ -1,0 +1,13 @@
+{
+  "name": "message-bus-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "hub": "bun run hub.ts",
+    "start": "bun run index.ts",
+    "dev": "bun run --watch index.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0"
+  }
+}

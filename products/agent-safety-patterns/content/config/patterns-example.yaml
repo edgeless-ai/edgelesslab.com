@@ -1,0 +1,105 @@
+# Damage Control Patterns
+# PreToolUse hook configuration for blocking dangerous operations.
+#
+# Copy this file to your hooks directory and rename to patterns.yaml.
+# Customize the patterns for your environment.
+#
+# Set SAFETY_PATTERNS_PATH to override the default location.
+
+dangerous_commands:
+  bash:
+    # Patterns that will BLOCK execution (case-insensitive regex).
+    # Each pattern is tested against the full bash command string.
+    block_patterns:
+
+      # ---- Destructive file operations ----
+      - 'rm\s+-rf\s+/'
+      - 'rm\s+-rf\s+~'
+      - 'rm\s+-rf\s+\*'
+      - 'rm\s+-rf\s+\.\.'
+      - 'rm\s+-f\s+/'
+      - 'rmdir\s+/'
+      - '>\s*/dev/sda'
+      - 'mkfs\.'
+      - 'dd\s+if=.+of=/dev'
+
+      # ---- Git destructive operations ----
+      - 'git\s+reset\s+--hard'
+      - 'git\s+push\s+.*--force'
+      - 'git\s+push\s+-f'
+      - 'git\s+clean\s+-fd'
+      - 'git\s+checkout\s+--\s+\.'
+
+      # ---- Database destructive ----
+      - 'DROP\s+DATABASE'
+      - 'DROP\s+TABLE'
+      - 'TRUNCATE\s+TABLE'
+      - 'DELETE\s+FROM\s+\w+\s*;'
+
+      # ---- Cloud provider destructive ----
+      - 'aws\s+.*\s+delete'
+      - 'aws\s+s3\s+rm\s+.*--recursive'
+      - 'gcloud\s+.*\s+delete'
+      - 'firebase\s+.*\s+delete'
+      - 'kubectl\s+delete\s+namespace'
+
+      # ---- System destructive ----
+      - 'chmod\s+-R\s+777\s+/'
+      - 'chown\s+-R\s+.*\s+/'
+      - 'kill\s+-9\s+-1'
+      - 'pkill\s+-9'
+
+      # ---- Pipe to shell (remote code execution) ----
+      - 'curl.*\|\s*sh'
+      - 'curl.*\|\s*bash'
+      - 'wget.*\|\s*sh'
+
+      # ---- Add your own patterns below ----
+      # - 'your-pattern-here'
+
+paths:
+  # ZERO ACCESS: Cannot read or write. Credentials and secrets.
+  zero_access:
+    - '/etc/passwd'
+    - '/etc/shadow'
+    - '/etc/sudoers'
+    - '.ssh/id_'
+    - '.ssh/authorized_keys'
+    - '.aws/credentials'
+    - '.gnupg/'
+    - '.env.production'
+    - 'credentials.json'
+    - 'secrets.yaml'
+    - 'service-account.json'
+
+  # READ ONLY: Can read but never modify.
+  read_only:
+    - 'node_modules/'
+    - '.git/objects/'
+    - 'vendor/'
+    - '__pycache__/'
+    - '.venv/lib/'
+    - 'dist/'
+    - 'build/'
+
+  # NO DELETE: Can modify but never delete.
+  no_delete:
+    - 'src/'
+    - 'lib/'
+    - 'app/'
+    - 'package.json'
+    - 'package-lock.json'
+    - 'requirements.txt'
+    - 'Cargo.toml'
+    - 'go.mod'
+    - 'pyproject.toml'
+    - '.claude/'
+    - 'CLAUDE.md'
+
+# Allowlist: Paths that override blocks above. Use sparingly.
+allowlist:
+  - '/tmp/'
+  - '/var/tmp/'
+  - '.test.'
+  - '_test.'
+  - 'test_'

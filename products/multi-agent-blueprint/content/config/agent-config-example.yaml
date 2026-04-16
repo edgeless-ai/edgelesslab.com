@@ -1,0 +1,138 @@
+# Multi-Agent Team Configuration
+# Defines a 5-agent team with role-specific permissions and resource limits.
+
+team:
+  name: "feature-development"
+  max_concurrent_agents: 4
+  default_model: "claude-sonnet-4-20250514"
+  default_timeout_ms: 120000
+
+agents:
+  orchestrator:
+    role: "leader"
+    description: "Decomposes tasks, delegates work, synthesizes results"
+    system_prompt: |
+      You are the orchestrator agent. Your job is to:
+      1. Break down the incoming task into subtasks
+      2. Assign subtasks to specialist agents via their inboxes
+      3. Monitor progress and handle failures
+      4. Synthesize results into a final deliverable
+
+      You do not write code directly. You coordinate.
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+      - Bash  # needed to spawn sub-agents
+    max_turns: 30
+    model: "claude-sonnet-4-20250514"  # orchestrator needs strong reasoning
+    timeout_ms: 600000
+    working_directory: "."
+
+  researcher:
+    role: "specialist"
+    description: "Gathers context, reads documentation, searches codebases"
+    system_prompt: |
+      You are a research agent. When given a topic or question:
+      1. Search the codebase for relevant files and patterns
+      2. Read documentation and comments
+      3. Summarize your findings as structured JSON
+
+      Do not modify any files. Report only.
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+    max_turns: 15
+    timeout_ms: 180000
+    working_directory: "."
+
+  implementer:
+    role: "specialist"
+    description: "Writes code according to specifications"
+    system_prompt: |
+      You are an implementation agent. You receive a specification and write code.
+      Follow existing patterns in the codebase. Match the style of surrounding files.
+      Write clean, tested code. If the spec is ambiguous, make a reasonable choice
+      and document your decision in a code comment.
+    allowed_tools:
+      - Read
+      - Write
+      - Edit
+      - Bash
+      - Glob
+      - Grep
+    max_turns: 25
+    model: "claude-sonnet-4-20250514"
+    timeout_ms: 300000
+    # Isolate writes to a git worktree to prevent conflicts
+    working_directory: ".worktrees/implement"
+    git_worktree: true
+
+  tester:
+    role: "specialist"
+    description: "Writes and runs tests, reports coverage"
+    system_prompt: |
+      You are a test agent. Given a file or feature:
+      1. Read the implementation to understand behavior
+      2. Write tests covering happy path, edge cases, and error cases
+      3. Run the tests and report results
+      4. Identify coverage gaps
+
+      Use the project's existing test framework and conventions.
+    allowed_tools:
+      - Read
+      - Write
+      - Bash
+      - Glob
+      - Grep
+    max_turns: 20
+    timeout_ms: 240000
+    working_directory: ".worktrees/test"
+    git_worktree: true
+
+  reviewer:
+    role: "specialist"
+    description: "Reviews code for quality, security, and correctness"
+    system_prompt: |
+      You are a code reviewer. Analyze code changes for:
+      - Correctness: does it do what the spec says?
+      - Security: injection, auth gaps, secrets in code
+      - Performance: unnecessary allocations, O(n^2) patterns
+      - Maintainability: naming, complexity, error handling
+
+      Output a structured review with severity-rated findings.
+      You cannot modify files. Read and report only.
+    allowed_tools:
+      - Read
+      - Glob
+      - Grep
+    max_turns: 10
+    timeout_ms: 120000
+    working_directory: "."
+
+# Workflow definition: how agents interact
+workflow:
+  type: "leader-worker"
+  leader: "orchestrator"
+  workers:
+    - "researcher"
+    - "implementer"
+    - "tester"
+    - "reviewer"
+
+  # Orchestrator decides the sequence, but this is a common pattern:
+  default_pipeline:
+    - agent: "researcher"
+      description: "Gather context about the task area"
+    - agent: "implementer"
+      description: "Write the code"
+      depends_on: ["researcher"]
+    - agent: "tester"
+      description: "Write and run tests"
+      depends_on: ["implementer"]
+    - agent: "reviewer"
+      description: "Review the implementation"
+      depends_on: ["implementer"]
+      # tester and reviewer can run in parallel
+      parallel_with: ["tester"]

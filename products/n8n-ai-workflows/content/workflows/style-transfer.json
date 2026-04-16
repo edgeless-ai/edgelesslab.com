@@ -1,0 +1,298 @@
+{
+  "name": "Nano-Banana Style Transfer Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "list",
+        "folderId": "={{$json.folderId}}",
+        "returnAll": true,
+        "options": {
+          "fields": "files(id,name,mimeType,webViewLink,webContentLink)",
+          "q": "mimeType contains 'image/'"
+        }
+      },
+      "id": "google-drive-list",
+      "name": "List Images in Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [650, 300],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "1",
+          "name": "Google Drive Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": "={{$json.id}}",
+        "options": {
+          "fileName": "={{$json.name}}"
+        }
+      },
+      "id": "download-image",
+      "name": "Download Image",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [850, 300],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "1",
+          "name": "Google Drive Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleGeminiApi",
+        "method": "POST",
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "contents",
+              "value": "[{\"parts\":[{\"text\":\"Apply nano-banana style transfer to this image with style: {{$node['Style Config'].json.style}}\",\"inline_data\":{\"mime_type\":\"{{$binary.data.mimeType}}\",\"data\":\"{{$binary.data.data}}\"}}]}]"
+            },
+            {
+              "name": "generationConfig",
+              "value": "{\"temperature\":0.7,\"topK\":40,\"topP\":0.95,\"maxOutputTokens\":1024}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "gemini-style-transfer",
+      "name": "Apply Style Transfer (GEMINI)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 300],
+      "credentials": {
+        "googleGeminiApi": {
+          "id": "2",
+          "name": "Google Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Process the Gemini response and extract styled image\nconst response = $input.item.json;\nconst styleConfig = $node['Style Config'].json;\n\n// Extract the generated image from Gemini response\n// Note: Actual implementation depends on nano-banana API structure\nconst styledImageData = response.candidates?.[0]?.content?.parts?.[0]?.inline_data || null;\n\nif (styledImageData) {\n  return {\n    json: {\n      originalName: $node['Download Image'].json.name,\n      style: styleConfig.style,\n      styleFolder: styleConfig.outputFolder,\n      timestamp: new Date().toISOString(),\n      success: true\n    },\n    binary: {\n      data: {\n        data: styledImageData.data,\n        mimeType: styledImageData.mime_type || 'image/png',\n        fileName: `styled_${styleConfig.style}_${$node['Download Image'].json.name}`\n      }\n    }\n  };\n} else {\n  return {\n    json: {\n      error: 'Style transfer failed',\n      originalName: $node['Download Image'].json.name\n    }\n  };\n}"
+      },
+      "id": "process-response",
+      "name": "Process Style Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "folderId": "={{$json.styleFolder}}",
+        "binaryPropertyName": "data",
+        "options": {
+          "name": "={{$binary.data.fileName}}"
+        }
+      },
+      "id": "upload-styled",
+      "name": "Upload Styled Image",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [1450, 300],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "1",
+          "name": "Google Drive Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "style",
+              "value": "{{$json.style}}"
+            },
+            {
+              "name": "inputFolder",
+              "value": "{{$json.inputFolder}}"
+            },
+            {
+              "name": "outputFolder",
+              "value": "{{$json.outputFolder}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "style-config",
+      "name": "Style Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "split-batch",
+      "name": "Split Into Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [750, 450]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Configuration for multiple style folders\nconst styleConfigs = [\n  {\n    style: 'watercolor',\n    inputFolder: '1abc_watercolor_input_folder_id',\n    outputFolder: '1def_watercolor_output_folder_id'\n  },\n  {\n    style: 'oil_painting',\n    inputFolder: '2abc_oil_input_folder_id',\n    outputFolder: '2def_oil_output_folder_id'\n  },\n  {\n    style: 'pencil_sketch',\n    inputFolder: '3abc_pencil_input_folder_id',\n    outputFolder: '3def_pencil_output_folder_id'\n  },\n  {\n    style: 'pop_art',\n    inputFolder: '4abc_pop_input_folder_id',\n    outputFolder: '4def_pop_output_folder_id'\n  }\n];\n\nreturn styleConfigs.map(config => ({\n  json: config\n}));"
+      },
+      "id": "style-folders",
+      "name": "Define Style Folders",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [250, 450]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Group and summarize results by style\nconst items = $input.all();\nconst groupedResults = {};\n\nitems.forEach(item => {\n  const style = item.json.style;\n  if (!groupedResults[style]) {\n    groupedResults[style] = {\n      style: style,\n      totalProcessed: 0,\n      successful: 0,\n      failed: 0,\n      images: []\n    };\n  }\n  \n  groupedResults[style].totalProcessed++;\n  if (item.json.success) {\n    groupedResults[style].successful++;\n  } else {\n    groupedResults[style].failed++;\n  }\n  \n  groupedResults[style].images.push({\n    name: item.json.originalName,\n    status: item.json.success ? 'success' : 'failed',\n    timestamp: item.json.timestamp\n  });\n});\n\nreturn Object.values(groupedResults).map(group => ({\n  json: group\n}));"
+      },
+      "id": "group-results",
+      "name": "Group Results by Style",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "content": "## Nano-Banana Style Transfer Workflow\n\n### Configuration Required:\n1. Update folder IDs in \"Define Style Folders\" node\n2. Configure Google Drive OAuth credentials\n3. Configure Google Gemini API credentials\n4. Adjust style parameters as needed\n\n### Workflow Process:\n1. Reads style configurations (multiple folders)\n2. For each style folder:\n   - Lists all images\n   - Downloads each image\n   - Applies nano-banana style transfer via GEMINI\n   - Uploads styled images to output folder\n3. Groups and reports results by style\n\n### Notes:\n- Processes images in batches to avoid rate limits\n- Each style has separate input/output folders\n- Results are grouped for easy monitoring",
+        "height": 400,
+        "width": 400
+      },
+      "id": "sticky-note",
+      "name": "Workflow Documentation",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [100, 100]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Define Style Folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define Style Folders": {
+      "main": [
+        [
+          {
+            "node": "Style Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Style Config": {
+      "main": [
+        [
+          {
+            "node": "List Images in Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Images in Folder": {
+      "main": [
+        [
+          {
+            "node": "Split Into Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Into Items": {
+      "main": [
+        [
+          {
+            "node": "Download Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "Apply Style Transfer (GEMINI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply Style Transfer (GEMINI)": {
+      "main": [
+        [
+          {
+            "node": "Process Style Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Style Response": {
+      "main": [
+        [
+          {
+            "node": "Upload Styled Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Styled Image": {
+      "main": [
+        [
+          {
+            "node": "Group Results by Style",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "tags": [],
+  "updatedAt": "2024-09-29T00:00:00.000Z",
+  "versionId": "1"
+}

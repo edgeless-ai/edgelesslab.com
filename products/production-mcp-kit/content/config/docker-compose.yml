@@ -1,0 +1,44 @@
+# Docker Compose for message bus hub + knowledge base
+#
+# Start:  docker compose up -d
+# Logs:   docker compose logs -f
+# Stop:   docker compose down
+
+services:
+  message-bus-hub:
+    build:
+      context: ..
+      dockerfile: config/Dockerfile
+      args:
+        SERVER: message-bus
+    command: ["bun", "run", "hub.ts"]
+    ports:
+      - "9800:9800"
+    volumes:
+      - bus-data:/app/data
+    environment:
+      - AGENT_BUS_PORT=9800
+      - AGENT_BUS_DB=/app/data/message-bus.db
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:9800/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  knowledge-base:
+    build:
+      context: ..
+      dockerfile: config/Dockerfile
+      args:
+        SERVER: knowledge-base
+    volumes:
+      - kb-data:/app/chroma-data
+    environment:
+      - CHROMA_DATA_PATH=/app/chroma-data
+      - DEFAULT_COLLECTION=documents
+    # MCP servers use stdio, no port needed
+    stdin_open: true
+
+volumes:
+  bus-data:
+  kb-data:

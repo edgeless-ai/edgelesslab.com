@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "knowledge-base": {
+      "command": "npx",
+      "args": ["tsx", "servers/knowledge-base/index.ts"],
+      "env": {
+        "CHROMA_DATA_PATH": "./chroma-data",
+        "DEFAULT_COLLECTION": "my-docs"
+      }
+    },
+    "message-bus": {
+      "command": "bun",
+      "args": ["run", "servers/message-bus/index.ts"],
+      "env": {
+        "AGENT_BUS_NAME": "main-session",
+        "AGENT_BUS_HUB": "http://127.0.0.1:9800"
+      }
+    },
+    "my-server": {
+      "command": "npx",
+      "args": ["tsx", "servers/template/index.ts"]
+    }
+  }
+}

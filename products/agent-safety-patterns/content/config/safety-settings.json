@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.anthropic.com/claude-code/settings-schema.json",
+  "_comment": "Claude Code settings with safety hooks registered. Merge into your .claude/settings.json.",
+
+  "hooks": {
+    "PreToolUse": [
+      {
+        "_comment": "Damage control: blocks destructive commands and protects critical paths.",
+        "matcher": "Bash|Write|Edit|Read",
+        "hook": "python3 .claude/hooks/damage-control.py"
+      },
+      {
+        "_comment": "Financial guard: blocks all financial operations unless FINANCIAL_GUARD_CONFIRM=true.",
+        "matcher": "Bash",
+        "hook": "python3 .claude/hooks/financial-guard.py"
+      },
+      {
+        "_comment": "Scope limiter: only allows tools and commands on the allowlist.",
+        "matcher": "*",
+        "hook": "python3 .claude/hooks/scope-limiter.py"
+      }
+    ]
+  },
+
+  "permissions": {
+    "_comment": "Recommended restrictive permissions for autonomous agents.",
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(curl * | bash)",
+      "Bash(git push --force *)"
+    ]
+  },
+
+  "env": {
+    "FINANCIAL_GUARD_CONFIRM": "false",
+    "FINANCIAL_GUARD_MAX_AMOUNT": "100",
+    "SCOPE_LIMITER_STRICT": "false"
+  }
+}

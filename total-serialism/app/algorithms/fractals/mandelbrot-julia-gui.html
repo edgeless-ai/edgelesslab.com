@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <title>Mandelbrot & Julia Sets - Pen Plotter</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+  <script src="../../shared/canvas-layout.js"></script>
+  <script src="../../shared/canvas-controls.js"></script>
+  <script src="../../shared/path-optimizer.js"></script>
+  <script src="../../shared/export-utils.js"></script>
+  <script src="../../shared/panel-controller.js"></script>
+  <script src="../../shared/stats-display.js"></script>
+  <script src="../../shared/url-state.js"></script>
+
+  <!-- Total Serialism Design System -->
+  <link rel="stylesheet" href="../../shared/algorithm.css">
+  <style>
+    /* Algorithm-specific overrides */
+    .julia-params {
+      display: none;
+      padding: 12px;
+      background: var(--ts-bg-elevated, #1a1a2e);
+      border-radius: 6px;
+      margin-top: 8px;
+      border: 1px solid var(--ts-border, #2a2a38);
+    }
+    .julia-params.visible {
+      display: block;
+    }
+    .info-text {
+      font-size: 11px;
+      color: var(--ts-text-muted, #5a5a6e);
+      margin-top: 4px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .btn-row button {
+      flex: 1;
+    }
+    button.secondary {
+      background: var(--ts-bg-elevated, #1a1a2e);
+      color: var(--ts-text-primary, #e8e8ec);
+      border: 1px solid var(--ts-border, #2a2a38);
+    }
+    button.secondary:hover {
+      background: var(--ts-bg-control, #22222e);
+      border-color: var(--ts-accent-primary, #00d4aa);
+    }
+  </style>
+</head>
+<body>
+  <a href="../../index.html" class="back-link">&larr; Back to Index</a>
+
+  <div id="canvas-container"></div>
+  <div id="controls">
+    <h2>Mandelbrot & Julia</h2>
+
+    <div class="control-group">
+      <h3>Canvas Settings</h3>
+      <div class="control">
+        <label>Paper Size:</label>
+        <select id="paperSize">
+          <option value="square800" selected>Square (800x800)</option>
+          <option value="landscape800x600">Landscape (800x600)</option>
+          <option value="a4portrait">A4 Portrait</option>
+          <option value="a4landscape">A4 Landscape</option>
+          <option value="a3portrait">A3 Portrait</option>
+          <option value="a3landscape">A3 Landscape</option>
+          <option value="letterportrait">Letter Portrait</option>
+          <option value="letterlandscape">Letter Landscape</option>
+        </select>
+      </div>
+      <div class="control">
+        <label>Background Color:</label>
+        <input type="color" id="bgColor" value="#ffffff">
+      </div>
+      <div class="control">
+        <label>Stroke Color:</label>
+        <input type="color" id="strokeColor" value="#000000">
+      </div>
+      <div class="control">
+        <button id="randomizeAll" class="ts-btn">Randomize Colors</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>Fractal Type</h3>
+      <div class="control">
+        <label>Type:</label>
+        <select id="fractalType">
+          <option value="mandelbrot">Mandelbrot Set</option>
+          <option value="julia">Julia Set</option>
+        </select>
+      </div>
+      <p class="info-text" id="fractal-info">Classic escape-time fractal</p>
+    </div>
+
+    <div class="julia-params" id="juliaParams">
+      <div class="control">
+        <label>Julia C Real: <span class="value" id="juliaReal-val">-0.7</span></label>
+        <input type="range" id="juliaReal" min="-1.5" max="1.5" value="-0.7" step="0.01">
+      </div>
+      <div class="control">
+        <label>Julia C Imag: <span class="value" id="juliaImag-val">0.27</span></label>
+        <input type="range" id="juliaImag" min="-1.5" max="1.5" value="0.27" step="0.01">
+      </div>
+      <p class="info-text">Preset: Douady rabbit</p>
+    </div>
+
+    <div class="control-group">
+      <h3>Rendering</h3>
+      <div class="control">
+        <label>Max Iterations: <span class="value" id="maxIter-val">50</span></label>
+        <input type="range" id="maxIter" min="10" max="200" value="50">
+      </div>
+      <div class="control">
+        <label>Contour Levels: <span class="value" id="contourLevels-val">12</span></label>
+        <input type="range" id="contourLevels" min="3" max="30" value="12">
+      </div>
+      <div class="control">
+        <label>Stroke Weight: <span class="value" id="strokeWeight-val">0.5</span></label>
+        <input type="range" id="strokeWeight" min="0.2" max="2" value="0.5" step="0.1">
+      </div>
+      <div class="control">
+        <label>
+          <input type="checkbox" id="showBoundary" checked> Emphasize Boundary
+        </label>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>View</h3>
+      <div class="control">
+        <label>Zoom: <span class="value" id="zoom-val">1.0</span></label>
+        <input type="range" id="zoom" min="0.5" max="100" value="1" step="0.1">
+      </div>
+      <div class="control">
+        <label>Center X: <span class="value" id="centerX-val">0</span></label>
+        <input type="range" id="centerX" min="-2" max="2" value="0" step="0.01">
+      </div>
+      <div class="control">
+        <label>Center Y: <span class="value" id="centerY-val">0</span></label>
+        <input type="range" id="centerY" min="-2" max="2" value="0" step="0.01">
+      </div>
+      <div class="control">
+        <label>Rotation: <span class="value" id="rotation-val">0</span>&deg;</label>
+        <input type="range" id="rotation" min="-180" max="180" value="0" step="1">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>Actions</h3>
+      <div class="control">
+        <label>Seed: <span id="seed-display">-</span></label>
+        <input type="number" id="seed" min="1" max="999999" style="width:100%;padding:6px;background:var(--ts-bg-deep,#0a0a1a);border:1px solid var(--ts-border-default,#2a2a4a);border-radius:4px;color:var(--ts-text-primary,#e0e0e0);font-family:monospace;">
+      </div>
+      <button id="regenerateBtn">Regenerate</button>
+      <div class="btn-row">
+        <button class="secondary" id="randomMandelbrotBtn">Random Mandelbrot</button>
+        <button class="secondary" id="presetBtn">Random Julia</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h3>Export</h3>
+      <div class="control">
+        <label><input type="checkbox" id="optimizeForPlotter" checked> Optimize for Plotter</label>
+      </div>
+      <div class="btn-row">
+        <button id="exportSVG">Export SVG</button>
+        <button id="exportPNG">Export PNG</button>
+      </div>
+      <button onclick="copyShareUrl()">📋 Copy Share URL</button>
+      <span id="share-status" style="margin-left:8px;color:#4a9;font-size:12px;"></span>
+    </div>
+
+    <!-- Preset Container -->
+    <div id="preset-container"></div>
+  </div>
+
+  <script>
+    const params = {
+      paperSize: 'square800',
+      bgColor: '#ffffff',
+      strokeColor: '#000000',
+      fractalType: 'mandelbrot',
+      juliaReal: -0.7,
+      juliaImag: 0.27,
+      maxIter: 50,
+      contourLevels: 12,
+      zoom: 1,
+      centerX: 0,
+      centerY: 0,
+      strokeWeight: 0.5,
+      showBoundary: true,
+      rotation: 0,
+      seed: Math.floor(Math.random() * 1000000)
+    };
+
+    // Canvas controls for unified color handling
+    const canvasControls = new TSCanvasControls();
+    canvasControls.bind(params);
+
+    // URL State - compact shareable URLs
+    const urlState = new TSUrlState({
+      algorithmId: 'mandelbrot-julia',
+      schema: [
+        { key: 'seed', type: 'int', bytes: 4 },
+        { key: 'paperSize', type: 'enum', options: ['square800', 'landscape800x600', 'a4portrait', 'a4landscape', 'a3portrait', 'a3landscape', 'letterportrait', 'letterlandscape'], default: 'square800' },
+        { key: 'bgColor', type: 'color', default: '#ffffff' },
+        { key: 'strokeColor', type: 'color', default: '#000000' },
+        { key: 'fractalType', type: 'enum', options: ['mandelbrot', 'julia'], default: 'mandelbrot' },
+        { key: 'juliaReal', type: 'float', bytes: 2, min: -1.5, max: 1.5, default: -0.7 },
+        { key: 'juliaImag', type: 'float', bytes: 2, min: -1.5, max: 1.5, default: 0.27 },
+        { key: 'maxIter', type: 'int', bytes: 1, default: 50 },
+        { key: 'contourLevels', type: 'int', bytes: 1, default: 12 },
+        { key: 'zoom', type: 'float', bytes: 2, min: 0.5, max: 100, default: 1 },
+        { key: 'centerX', type: 'float', bytes: 2, min: -2, max: 2, default: 0 },
+        { key: 'centerY', type: 'float', bytes: 2, min: -2, max: 2, default: 0 },
+        { key: 'strokeWeight', type: 'float', bytes: 1, min: 0.2, max: 2, default: 0.5 },
+        { key: 'showBoundary', type: 'bool', default: true },
+        { key: 'rotation', type: 'int', bytes: 2, default: 0 }
+      ]
+    });
+
+    // Load params from URL if present
+    const urlParams = urlState.fromUrl();
+    if (window.location.search.includes('s=')) {
+      Object.assign(params, urlParams);
+    }
+
+    // Famous Julia set constants
+    const juliaPresets = [
+      { real: -0.7, imag: 0.27, name: 'Douady rabbit' },
+      { real: -0.8, imag: 0.156, name: 'San Marco dragon' },
+      { real: 0.285, imag: 0.01, name: 'Siegel disk' },
+      { real: -0.4, imag: 0.6, name: 'Spiral' },
+      { real: 0.37, imag: 0.1, name: 'Dendrite' },
+      { real: -0.12, imag: 0.74, name: 'Feather' },
+      { real: -1.476, imag: 0, name: 'Basilica' },
+      { real: 0, imag: 1, name: 'Dendrite i' }
+    ];
+
+    // Interesting Mandelbrot locations (boundary regions with structure)
+    const mandelbrotPresets = [
+      { x: -0.75, y: 0, zoom: 1.5, name: 'Main cardioid' },
+      { x: -1.25, y: 0, zoom: 4, name: 'Western bulb' },
+      { x: -0.16, y: 1.035, zoom: 6, name: 'Northern antenna' },
+      { x: -0.745, y: 0.113, zoom: 8, name: 'Seahorse valley' },
+      { x: -0.748, y: 0.1, zoom: 15, name: 'Deep seahorse' },
+      { x: 0.285, y: 0.01, zoom: 5, name: 'Eastern spiral' },
+      { x: -1.768, y: 0.001, zoom: 30, name: 'Mini Mandelbrot' },
+      { x: -0.1011, y: 0.9563, zoom: 20, name: 'Elephant valley' },
+      { x: -0.7435669, y: 0.1314023, zoom: 50, name: 'Spiral arm' },
+      { x: -1.94098, y: 0.00017, zoom: 100, name: 'Minibrot' }
+    ];
+
+    let canvas;
+    let contours = [];
+    let SIZE = 800;
+    let RESOLUTION = 400;
+
+    function calculateResolution(size) {
+      // ~2px per cell for good detail, capped for performance
+      return Math.max(200, Math.min(Math.floor(size / 2), 800));
+    }
+
+    // Global instances for panel and stats
+    let panelController;
+    let statsDisplay;
+
+    function setup() {
+      const size = CanvasLayout.getSize(params.paperSize);
+      SIZE = Math.min(size.width, size.height);
+      RESOLUTION = calculateResolution(SIZE);
+      canvas = createCanvas(size.width, size.height);
+      canvas.parent('canvas-container');
+
+      // Initialize panel controller with onToggle callback
+      panelController = new TSPanelController({
+        onToggle: (collapsed) => {
+          console.log('Panel toggled:', collapsed ? 'collapsed' : 'expanded');
+        }
+      });
+      panelController.attach();
+
+      // Initialize stats display
+      statsDisplay = new TSStatsDisplay();
+      statsDisplay.attach();
+
+      // Canvas settings handlers
+      document.getElementById('paperSize').addEventListener('change', (e) => {
+        params.paperSize = e.target.value;
+        resizeCanvasForPaperSize();
+      });
+      document.getElementById('bgColor').addEventListener('input', (e) => {
+        params.bgColor = e.target.value;
+        generateFractal();
+      });
+      document.getElementById('strokeColor').addEventListener('input', (e) => {
+        params.strokeColor = e.target.value;
+        generateFractal();
+      });
+
+      setupControls();
+      canvasControls.setupRandomizeButton();
+
+      // Sync UI controls with URL params
+      if (window.location.search.includes('s=')) {
+        document.getElementById('paperSize').value = params.paperSize;
+        document.getElementById('bgColor').value = params.bgColor;
+        document.getElementById('strokeColor').value = params.strokeColor;
+        document.getElementById('fractalType').value = params.fractalType;
+        document.getElementById('juliaReal').value = params.juliaReal;
+        document.getElementById('juliaReal-val').textContent = params.juliaReal;
+        document.getElementById('juliaImag').value = params.juliaImag;
+        document.getElementById('juliaImag-val').textContent = params.juliaImag;
+        document.getElementById('maxIter').value = params.maxIter;
+        document.getElementById('maxIter-val').textContent = params.maxIter;
+        document.getElementById('contourLevels').value = params.contourLevels;
+        document.getElementById('contourLevels-val').textContent = params.contourLevels;
+        document.getElementById('zoom').value = params.zoom;
+        document.getElementById('zoom-val').textContent = params.zoom;
+        document.getElementById('centerX').value = params.centerX;
+        document.getElementById('centerX-val').textContent = params.centerX;
+        document.getElementById('centerY').value = params.centerY;
+        document.getElementById('centerY-val').textContent = params.centerY;
+        document.getElementById('strokeWeight').value = params.strokeWeight;
+        document.getElementById('strokeWeight-val').textContent = params.strokeWeight;
+        document.getElementById('showBoundary').checked = params.showBoundary;
+        document.getElementById('rotation').value = params.rotation;
+        document.getElementById('rotation-val').textContent = params.rotation;
+        document.getElementById('seed').value = params.seed;
+        document.getElementById('juliaParams').classList.toggle('visible', params.fractalType === 'julia');
+      }
+
+      generateFractal();
+    }
+
+    function resizeCanvasForPaperSize() {
+      const size = CanvasLayout.getSize(params.paperSize);
+      SIZE = Math.min(size.width, size.height);
+      RESOLUTION = calculateResolution(SIZE);
+      resizeCanvas(size.width, size.height);
+      generateFractal();
+    }
+
+    function setupControls() {
+      const rangeControls = ['maxIter', 'contourLevels', 'zoom', 'centerX', 'centerY', 'rotation', 'strokeWeight', 'juliaReal', 'juliaImag'];
+      rangeControls.forEach(id => {
+        const el = document.getElementById(id);
+        const display = document.getElementById(`${id}-val`);
+        el.addEventListener('input', () => {
+          params[id] = parseFloat(el.value);
+          display.textContent = el.value;
+          generateFractal();
+        });
+      });
+
+      document.getElementById('fractalType').addEventListener('change', (e) => {
+        params.fractalType = e.target.value;
+        document.getElementById('juliaParams').classList.toggle('visible', params.fractalType === 'julia');
+        document.getElementById('fractal-info').textContent =
+          params.fractalType === 'mandelbrot' ? 'Classic escape-time fractal' : 'Connected/disconnected set visualization';
+
+        // Reset center for Mandelbrot
+        if (params.fractalType === 'mandelbrot') {
+          params.centerX = -0.5;
+          document.getElementById('centerX').value = -0.5;
+          document.getElementById('centerX-val').textContent = '-0.5';
+        } else {
+          params.centerX = 0;
+          document.getElementById('centerX').value = 0;
+          document.getElementById('centerX-val').textContent = '0';
+        }
+        generateFractal();
+      });
+
+      document.getElementById('showBoundary').addEventListener('change', (e) => {
+        params.showBoundary = e.target.checked;
+        drawFractal();
+      });
+
+      document.getElementById('seed').addEventListener('change', (e) => {
+        params.seed = parseInt(e.target.value);
+        generateFractal();
+      });
+
+      document.getElementById('regenerateBtn').addEventListener('click', () => {
+        // Randomize seed and view parameters
+        params.seed = Math.floor(Math.random() * 1000000);
+        params.zoom = 1 + Math.random() * 2;
+        params.rotation = Math.floor(Math.random() * 361) - 180;
+        document.getElementById('zoom').value = params.zoom;
+        document.getElementById('zoom-val').textContent = params.zoom.toFixed(1);
+        document.getElementById('rotation').value = params.rotation;
+        document.getElementById('rotation-val').textContent = params.rotation;
+        generateFractal();
+      });
+
+      document.getElementById('randomMandelbrotBtn').addEventListener('click', () => {
+        params.seed = Math.floor(Math.random() * 1000000);
+        let _s = params.seed;
+        const seededRandom = () => { _s |= 0; _s = _s + 0x6D2B79F5 | 0; let t = Math.imul(_s ^ _s >>> 15, 1 | _s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+        const preset = mandelbrotPresets[Math.floor(seededRandom() * mandelbrotPresets.length)];
+        params.fractalType = 'mandelbrot';
+        params.centerX = preset.x;
+        params.centerY = preset.y;
+        params.zoom = preset.zoom * (0.8 + seededRandom() * 0.4); // Add slight variation
+        params.rotation = Math.floor(seededRandom() * 61) - 30; // Subtle rotation for presets
+
+        document.getElementById('fractalType').value = 'mandelbrot';
+        document.getElementById('juliaParams').classList.remove('visible');
+        document.getElementById('centerX').value = params.centerX;
+        document.getElementById('centerY').value = params.centerY;
+        document.getElementById('zoom').value = params.zoom;
+        document.getElementById('rotation').value = params.rotation;
+        document.getElementById('centerX-val').textContent = params.centerX.toFixed(2);
+        document.getElementById('centerY-val').textContent = params.centerY.toFixed(2);
+        document.getElementById('zoom-val').textContent = params.zoom.toFixed(1);
+        document.getElementById('rotation-val').textContent = params.rotation;
+        document.getElementById('fractal-info').textContent = preset.name;
+
+        generateFractal();
+      });
+
+      document.getElementById('presetBtn').addEventListener('click', () => {
+        params.seed = Math.floor(Math.random() * 1000000);
+        let _s = params.seed;
+        const seededRandom = () => { _s |= 0; _s = _s + 0x6D2B79F5 | 0; let t = Math.imul(_s ^ _s >>> 15, 1 | _s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+        const preset = juliaPresets[Math.floor(seededRandom() * juliaPresets.length)];
+        params.juliaReal = preset.real;
+        params.juliaImag = preset.imag;
+        params.fractalType = 'julia';
+
+        document.getElementById('fractalType').value = 'julia';
+        document.getElementById('juliaParams').classList.add('visible');
+        document.getElementById('juliaReal').value = preset.real;
+        document.getElementById('juliaImag').value = preset.imag;
+        document.getElementById('juliaReal-val').textContent = preset.real;
+        document.getElementById('juliaImag-val').textContent = preset.imag;
+        document.getElementById('fractal-info').textContent = preset.name;
+
+        generateFractal();
+      });
+
+      document.getElementById('exportSVG').addEventListener('click', () => {
+        const optimize = document.getElementById('optimizeForPlotter').checked;
+        if (optimize) {
+          // Convert contour segments to paths for optimizer
+          const paths = contours.map(seg => [seg[0], seg[1]]);
+          const result = TSExport.createOptimizedSVG(paths, width, height, {
+            strokeColor: params.strokeColor,
+            strokeWidth: params.strokeWeight,
+            backgroundColor: params.bgColor,
+            optimize: true,
+            mergeThreshold: 3,
+            minPathLength: 2
+          });
+          TSExport.downloadSVG(result.svg, `${params.fractalType}-fractal-optimized`);
+        } else {
+          const svg = generateSVG();
+          TSExport.downloadSVG(svg, `${params.fractalType}-fractal`);
+        }
+      });
+
+      document.getElementById('exportPNG').addEventListener('click', () => {
+        TSExport.downloadPNG(canvas.canvas, `${params.fractalType}-fractal`);
+      });
+    }
+
+    function mandelbrot(x0, y0) {
+      let x = 0, y = 0;
+      let iter = 0;
+      while (x*x + y*y <= 4 && iter < params.maxIter) {
+        const xTemp = x*x - y*y + x0;
+        y = 2*x*y + y0;
+        x = xTemp;
+        iter++;
+      }
+      // Smooth iteration count
+      if (iter < params.maxIter) {
+        const log_zn = Math.log(x*x + y*y) / 2;
+        const nu = Math.log(log_zn / Math.log(2)) / Math.log(2);
+        return iter + 1 - nu;
+      }
+      return iter;
+    }
+
+    function julia(x0, y0) {
+      let x = x0, y = y0;
+      const cx = params.juliaReal;
+      const cy = params.juliaImag;
+      let iter = 0;
+      while (x*x + y*y <= 4 && iter < params.maxIter) {
+        const xTemp = x*x - y*y + cx;
+        y = 2*x*y + cy;
+        x = xTemp;
+        iter++;
+      }
+      if (iter < params.maxIter) {
+        const log_zn = Math.log(x*x + y*y) / 2;
+        const nu = Math.log(log_zn / Math.log(2)) / Math.log(2);
+        return iter + 1 - nu;
+      }
+      return iter;
+    }
+
+    function generateFractal() {
+      const startTime = performance.now();
+
+      // Compute iteration grid
+      const grid = [];
+      const scale = 3 / params.zoom;
+      const offsetX = params.fractalType === 'mandelbrot' ? -0.5 : 0;
+      const rotRad = params.rotation * Math.PI / 180;
+      const cosR = Math.cos(rotRad);
+      const sinR = Math.sin(rotRad);
+
+      for (let j = 0; j <= RESOLUTION; j++) {
+        const row = [];
+        for (let i = 0; i <= RESOLUTION; i++) {
+          const cx = (i / RESOLUTION - 0.5) * scale;
+          const cy = (j / RESOLUTION - 0.5) * scale;
+          const x = cx * cosR - cy * sinR + params.centerX + offsetX;
+          const y = cx * sinR + cy * cosR + params.centerY;
+
+          const iter = params.fractalType === 'mandelbrot' ? mandelbrot(x, y) : julia(x, y);
+          row.push(iter);
+        }
+        grid.push(row);
+      }
+
+      // Extract contours using marching squares
+      contours = [];
+      const levels = params.contourLevels;
+
+      for (let level = 1; level <= levels; level++) {
+        const threshold = (level / (levels + 1)) * params.maxIter;
+        const levelContours = marchingSquares(grid, threshold);
+        contours.push(...levelContours);
+      }
+
+      const endTime = performance.now();
+      const genTime = (endTime - startTime) / 1000;
+
+      // Update stats display
+      if (statsDisplay) {
+        const stats = {
+          type: { value: params.fractalType === 'mandelbrot' ? 'Mandelbrot' : 'Julia', label: 'Type' },
+          contours: { value: contours.length, label: 'Segments' },
+          levels: { value: params.contourLevels, label: 'Levels' },
+          iterations: { value: params.maxIter, label: 'Max Iter' },
+          zoom: { value: params.zoom.toFixed(1), label: 'Zoom' },
+          rotation: { value: `${params.rotation}°`, label: 'Rotation' },
+          center: { value: `(${params.centerX.toFixed(2)}, ${params.centerY.toFixed(2)})`, label: 'Center' },
+          genTime: { value: genTime, label: 'Gen Time', format: 'time' }
+        };
+
+        // Add Julia-specific parameter display
+        if (params.fractalType === 'julia') {
+          stats.juliaC = { value: `${params.juliaReal.toFixed(2)} + ${params.juliaImag.toFixed(2)}i`, label: 'Julia C' };
+        }
+
+        statsDisplay.update(stats);
+      }
+
+      // Update seed display
+      document.getElementById('seed-display').textContent = params.seed;
+      document.getElementById('seed').value = params.seed;
+
+      // Update URL state
+      urlState.replaceState(params);
+
+      drawFractal();
+    }
+
+    function marchingSquares(grid, threshold) {
+      const lines = [];
+      const cellW = SIZE / RESOLUTION;
+      const cellH = SIZE / RESOLUTION;
+
+      for (let j = 0; j < RESOLUTION; j++) {
+        for (let i = 0; i < RESOLUTION; i++) {
+          const a = grid[j][i] >= threshold ? 1 : 0;
+          const b = grid[j][i + 1] >= threshold ? 1 : 0;
+          const c = grid[j + 1][i + 1] >= threshold ? 1 : 0;
+          const d = grid[j + 1][i] >= threshold ? 1 : 0;
+
+          const caseIndex = a * 8 + b * 4 + c * 2 + d;
+
+          const x = i * cellW;
+          const y = j * cellH;
+
+          // Interpolation helpers
+          const lerp_ab = (grid[j][i] - threshold) / (grid[j][i] - grid[j][i + 1]) || 0.5;
+          const lerp_bc = (grid[j][i + 1] - threshold) / (grid[j][i + 1] - grid[j + 1][i + 1]) || 0.5;
+          const lerp_cd = (grid[j + 1][i] - threshold) / (grid[j + 1][i] - grid[j + 1][i + 1]) || 0.5;
+          const lerp_da = (grid[j][i] - threshold) / (grid[j][i] - grid[j + 1][i]) || 0.5;
+
+          const points = {
+            top: { x: x + lerp_ab * cellW, y: y },
+            right: { x: x + cellW, y: y + lerp_bc * cellH },
+            bottom: { x: x + lerp_cd * cellW, y: y + cellH },
+            left: { x: x, y: y + lerp_da * cellH }
+          };
+
+          // Marching squares cases
+          switch (caseIndex) {
+            case 1: case 14: lines.push([points.left, points.bottom]); break;
+            case 2: case 13: lines.push([points.bottom, points.right]); break;
+            case 3: case 12: lines.push([points.left, points.right]); break;
+            case 4: case 11: lines.push([points.top, points.right]); break;
+            case 5:
+              lines.push([points.left, points.top]);
+              lines.push([points.bottom, points.right]);
+              break;
+            case 6: case 9: lines.push([points.top, points.bottom]); break;
+            case 7: case 8: lines.push([points.left, points.top]); break;
+            case 10:
+              lines.push([points.top, points.right]);
+              lines.push([points.left, points.bottom]);
+              break;
+          }
+        }
+      }
+
+      return lines;
+    }
+
+    function drawFractal() {
+      background(params.bgColor);
+      stroke(params.strokeColor);
+      strokeWeight(params.strokeWeight);
+      noFill();
+
+      // Draw contours
+      for (const segment of contours) {
+        line(segment[0].x, segment[0].y, segment[1].x, segment[1].y);
+      }
+
+      // Add boundary emphasis
+      if (params.showBoundary) {
+        strokeWeight(params.strokeWeight * 1.5);
+        const boundaryLevel = params.maxIter * 0.9;
+        // This would be a thicker line at the escape boundary
+      }
+    }
+
+    function generateSVG() {
+      const paths = [];
+
+      // Convert line segments to SVG paths
+      for (const segment of contours) {
+        paths.push({
+          d: `M ${segment[0].x} ${segment[0].y} L ${segment[1].x} ${segment[1].y}`,
+          stroke: params.strokeColor
+        });
+      }
+
+      return TSExport.createSVG(paths, width, height, {
+        backgroundColor: params.bgColor,
+        strokeWidth: params.strokeWeight
+      });
+    }
+
+    function copyShareUrl() {
+      const shareUrl = urlState.getShareUrl(params);
+      const statusEl = document.getElementById('share-status');
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        statusEl.textContent = '✓ Copied!';
+        setTimeout(() => statusEl.textContent = '', 2000);
+      }).catch(() => {
+        statusEl.textContent = 'Copy failed';
+      });
+    }
+  </script>
+  <script src="../../shared/algorithm-page-chrome.js">
+  // Auto-injected by harmonize.py
+  function windowResized() {
+    // Preserve canvas aspect ratio on window resize
+    if (typeof resizeCanvas === 'function') {
+      const container = document.querySelector('canvas')?.parentElement;
+      if (container) {
+        const w = container.clientWidth;
+        resizeCanvas(w, w); // Square canvas default
+      }
+    }
+  }
+
+</script>
+</body>
+</html>

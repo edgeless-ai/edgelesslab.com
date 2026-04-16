@@ -1,0 +1,4994 @@
+{
+  "version": "2.1.0",
+  "lastUpdated": "2026-03-10",
+  "stats": {
+    "totalAlgorithms": 97,
+    "totalCategories": 20,
+    "featuredCount": 13,
+    "plotterSafeCount": 83,
+    "mediumCounts": {
+      "systems": 26,
+      "screen": 4,
+      "plotter": 56,
+      "tools": 7
+    },
+    "plotterReadinessCounts": {
+      "adaptable": 32,
+      "screen-first": 5,
+      "native": 49,
+      "tool": 7
+    }
+  },
+  "categories": {
+    "advanced": {
+      "name": "Advanced",
+      "shortLabel": "Adv",
+      "icon": "◇",
+      "description": "Dense scientific and mathematical systems for ambitious plots."
+    },
+    "ai": {
+      "name": "AI",
+      "shortLabel": "AI",
+      "icon": "◎",
+      "description": "Machine-learning assisted experiments and neural pattern studies."
+    },
+    "cellular-automata": {
+      "name": "Cellular Automata",
+      "shortLabel": "CA",
+      "icon": "▦",
+      "description": "Rule-driven systems where simple local logic creates emergent structure."
+    },
+    "chemical": {
+      "name": "Chemical",
+      "shortLabel": "Chem",
+      "icon": "◌",
+      "description": "Reaction, diffusion, and material-inspired studies with organic flow."
+    },
+    "curves": {
+      "name": "Curves",
+      "shortLabel": "Curves",
+      "icon": "∿",
+      "description": "Parametric, harmonic, and recursive line systems."
+    },
+    "flow-fields": {
+      "name": "Flow Fields",
+      "shortLabel": "Flow",
+      "icon": "↝",
+      "description": "Vector-field driven motion and contour-following trajectories."
+    },
+    "fluid-dynamics": {
+      "name": "Fluid Dynamics",
+      "shortLabel": "Fluid",
+      "icon": "≈",
+      "description": "Flow simulations and turbulence-inspired structures."
+    },
+    "fractals": {
+      "name": "Fractals",
+      "shortLabel": "Frac",
+      "icon": "✶",
+      "description": "Recursive and contour-derived forms with self-similar detail."
+    },
+    "geometric": {
+      "name": "Geometric",
+      "shortLabel": "Geo",
+      "icon": "◧",
+      "description": "Tilings, spirals, grids, and structured line compositions."
+    },
+    "hybrid": {
+      "name": "Hybrid",
+      "shortLabel": "Hybrid",
+      "icon": "⬡",
+      "description": "Composable systems that blend multiple algorithm families."
+    },
+    "image-processing": {
+      "name": "Image Processing",
+      "shortLabel": "Image",
+      "icon": "◫",
+      "description": "Raster-to-line workflows, hatching, halftones, and contour extraction."
+    },
+    "natural": {
+      "name": "Natural",
+      "shortLabel": "Nat",
+      "icon": "✿",
+      "description": "Growth, branching, weather, and organism-inspired forms."
+    },
+    "packing": {
+      "name": "Packing",
+      "shortLabel": "Pack",
+      "icon": "◍",
+      "description": "Motif placement, dense compositions, and collision-aware arrangement."
+    },
+    "physics": {
+      "name": "Physics",
+      "shortLabel": "Phys",
+      "icon": "⟲",
+      "description": "Particle, force, field, and interference-based systems."
+    },
+    "reaction-diffusion": {
+      "name": "Reaction Diffusion",
+      "shortLabel": "RD",
+      "icon": "◐",
+      "description": "Chemical pattern formation, thresholds, and contour-ready fields."
+    },
+    "symmetry": {
+      "name": "Symmetry",
+      "shortLabel": "Sym",
+      "icon": "✣",
+      "description": "Tessellations, ornamental systems, and repeating structure."
+    },
+    "textures": {
+      "name": "Textures",
+      "shortLabel": "Tex",
+      "icon": "▒",
+      "description": "Surface treatments, hatch structures, and repeatable fills."
+    },
+    "tools": {
+      "name": "Tools",
+      "shortLabel": "Tools",
+      "icon": "⚙",
+      "description": "Prep, optimization, preview, export, and validation utilities."
+    },
+    "trees-lsystems": {
+      "name": "Trees & L-Systems",
+      "shortLabel": "L-Sys",
+      "icon": "⟐",
+      "description": "Branching grammars, recursive trees, and botanical structures."
+    },
+    "voronoi": {
+      "name": "Voronoi",
+      "shortLabel": "Voro",
+      "icon": "⬢",
+      "description": "Cellular partitioning, stippling, and route optimization studies."
+    }
+  },
+  "algorithms": [
+    {
+      "id": "chladni-patterns",
+      "name": "Chladni Patterns",
+      "category": "advanced",
+      "path": "algorithms/advanced/chladni-patterns-gui.html",
+      "description": "Acoustic wave patterns inspired by Chladni plates and standing waves",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "acoustic",
+        "physics",
+        "waves",
+        "scientific"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "field",
+        "interference",
+        "simulation",
+        "wave"
+      ],
+      "visualTraits": [
+        "chaotic",
+        "dense",
+        "scientific"
+      ],
+      "relatedSeeds": [
+        "sound-waveform",
+        "strange-attractors",
+        "wave-interference"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "lorenz-attractor",
+      "name": "Lorenz Attractor",
+      "category": "advanced",
+      "path": "algorithms/advanced/lorenz-attractor-gui.html",
+      "description": "Lorenz Attractor explores dense scientific and mathematical systems for ambitious plots.",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "advanced",
+        "plotter"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "attractor",
+        "chaos",
+        "field",
+        "simulation",
+        "wave"
+      ],
+      "visualTraits": [
+        "chaotic",
+        "dense",
+        "scientific"
+      ],
+      "relatedSeeds": [
+        "parametric-surfaces",
+        "particle-system",
+        "strange-attractors"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "parametric-surfaces",
+      "name": "Parametric Surfaces",
+      "category": "advanced",
+      "path": "algorithms/advanced/parametric-surfaces-gui.html",
+      "description": "3D parametric surfaces rendered as 2D contour lines for plotting",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "3d",
+        "mathematical",
+        "surfaces",
+        "contours"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "field",
+        "projection",
+        "simulation",
+        "surfaces",
+        "wave"
+      ],
+      "visualTraits": [
+        "chaotic",
+        "dense",
+        "layered",
+        "mathematical",
+        "scientific"
+      ],
+      "relatedSeeds": [
+        "lorenz-attractor",
+        "mandelbrot-and-julia",
+        "topographic-contours"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "sound-waveform",
+      "name": "Sound Waveform",
+      "category": "advanced",
+      "path": "algorithms/advanced/sound-waveform-gui.html",
+      "description": "Audio waveform visualization and pattern generation",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "audio",
+        "waveform",
+        "visualization"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [
+        "audio"
+      ],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "audio",
+        "field",
+        "signal",
+        "simulation",
+        "wave"
+      ],
+      "visualTraits": [
+        "chaotic",
+        "dense",
+        "rhythmic",
+        "scientific"
+      ],
+      "relatedSeeds": [
+        "chladni-patterns",
+        "harmonograph",
+        "wave-interference"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "strange-attractors",
+      "name": "Strange Attractors",
+      "category": "advanced",
+      "path": "algorithms/advanced/strange-attractors-gui.html",
+      "description": "Strange Attractors explores dense scientific and mathematical systems for ambitious plots.",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": true,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "advanced",
+        "plotter"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "attractor",
+        "chaos",
+        "curves",
+        "field",
+        "simulation",
+        "wave"
+      ],
+      "visualTraits": [
+        "chaotic",
+        "continuous",
+        "dense",
+        "scientific"
+      ],
+      "relatedSeeds": [
+        "harmonograph",
+        "lorenz-attractor",
+        "spirotron"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "vortex-street",
+      "name": "Vortex Street",
+      "category": "advanced",
+      "path": "algorithms/advanced/vortex-street-gui.html",
+      "description": "Fluid dynamics vortex patterns (von Kármán vortex street)",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "fluid-dynamics",
+        "vortex",
+        "physics"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "field",
+        "fluid",
+        "particles",
+        "simulation",
+        "wave"
+      ],
+      "visualTraits": [
+        "chaotic",
+        "dense",
+        "directional",
+        "scientific",
+        "turbulent"
+      ],
+      "relatedSeeds": [
+        "fluid-dynamics",
+        "magnetic-fields",
+        "wave-interference"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "ml5-patterns",
+      "name": "ML5 Patterns",
+      "category": "ai",
+      "path": "algorithms/ai/ml5-patterns-gui.html",
+      "description": "Machine learning-generated patterns using ml5.js",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": false,
+      "requiresImage": false,
+      "tags": [
+        "machine-learning",
+        "ai",
+        "generative"
+      ],
+      "medium": "screen",
+      "engine": [
+        "ml5",
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [
+        "camera",
+        "image",
+        "ml"
+      ],
+      "plotterReadiness": "screen-first",
+      "colorDependency": "core",
+      "penCount": "variable",
+      "motifFamilies": [
+        "adaptive",
+        "image-derived",
+        "ml"
+      ],
+      "visualTraits": [
+        "experimental",
+        "layered",
+        "screen-based"
+      ],
+      "relatedSeeds": [
+        "ascii-art",
+        "image-to-ascii",
+        "neural-network-art"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "neural-network-art",
+      "name": "Neural Network Art",
+      "category": "ai",
+      "path": "algorithms/ai/neural-network-art-gui.html",
+      "description": "Neural Network Art explores machine-learning assisted experiments and neural pattern studies.",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": false,
+      "requiresImage": false,
+      "tags": [
+        "ai",
+        "plotter"
+      ],
+      "medium": "screen",
+      "engine": [
+        "ml5",
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "png",
+        "svg"
+      ],
+      "inputs": [
+        "camera",
+        "image",
+        "ml"
+      ],
+      "plotterReadiness": "screen-first",
+      "colorDependency": "core",
+      "penCount": "variable",
+      "motifFamilies": [
+        "adaptive",
+        "image-derived",
+        "ml"
+      ],
+      "visualTraits": [
+        "experimental",
+        "layered",
+        "screen-based"
+      ],
+      "relatedSeeds": [
+        "ascii-art",
+        "dithering",
+        "ml5-patterns"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "elementary-ca",
+      "name": "Elementary CA",
+      "category": "cellular-automata",
+      "path": "algorithms/cellular-automata/elementary-ca.html",
+      "description": "1D cellular automaton with 256 rule variants (Wolfram rules)",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "wolfram",
+        "1d-ca",
+        "rule-based"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "cellular",
+        "grid",
+        "rules"
+      ],
+      "visualTraits": [
+        "emergent",
+        "layered",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "elementary-ca-layers",
+        "game-of-life",
+        "reaction-diffusion-layers"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "elementary-ca-layers",
+      "name": "Elementary CA Layers",
+      "category": "cellular-automata",
+      "path": "algorithms/cellular-automata/elementary-ca-layers.html",
+      "description": "Layered elementary cellular automaton with multiple rule sets",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "wolfram",
+        "layered",
+        "rule-based"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "cellular",
+        "grid",
+        "rules"
+      ],
+      "visualTraits": [
+        "emergent",
+        "layered",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "elementary-ca",
+        "game-of-life-layers",
+        "reaction-diffusion-layers"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "game-of-life",
+      "name": "Game of Life",
+      "category": "cellular-automata",
+      "path": "algorithms/cellular-automata/game-of-life-gui.html",
+      "description": "Classic 2D cellular automaton with famous patterns like gliders and oscillators",
+      "complexity": "intermediate",
+      "hasPresets": true,
+      "hasExport": [
+        "svg",
+        "gif"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "conway",
+        "2d-ca",
+        "emergence",
+        "patterns"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "cellular",
+        "grid",
+        "rules"
+      ],
+      "visualTraits": [
+        "emergent",
+        "layered",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "elementary-ca",
+        "game-of-life-layers",
+        "reaction-diffusion"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "game-of-life-layers",
+      "name": "Game of Life Layers",
+      "category": "cellular-automata",
+      "path": "algorithms/cellular-automata/game-of-life-layers.html",
+      "description": "Multi-layered Game of Life with composite rendering",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "conway",
+        "layered",
+        "composite"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "cellular",
+        "grid",
+        "rules"
+      ],
+      "visualTraits": [
+        "emergent",
+        "layered",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "elementary-ca-layers",
+        "game-of-life",
+        "reaction-diffusion-layers"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "belousov-zhabotinsky",
+      "name": "Belousov-Zhabotinsky",
+      "category": "chemical",
+      "path": "algorithms/chemical/belousov-zhabotinsky-gui.html",
+      "description": "Chemical oscillating reaction producing spiral and target patterns",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "chemical",
+        "oscillating",
+        "spirals",
+        "bz-reaction"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "field",
+        "reaction"
+      ],
+      "visualTraits": [
+        "dense",
+        "diffusive",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "crystallization",
+        "liesegang-rings",
+        "reaction-diffusion"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "chromatography",
+      "name": "Chromatography",
+      "category": "chemical",
+      "path": "algorithms/chemical/chromatography-gui.html",
+      "description": "Separation patterns inspired by paper chromatography",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "chemical",
+        "separation",
+        "diffusion"
+      ],
+      "medium": "systems",
+      "engine": [
+        "vanilla"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "bands",
+        "contour",
+        "diffusion",
+        "field",
+        "reaction"
+      ],
+      "visualTraits": [
+        "dense",
+        "diffusive",
+        "layered",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "flow-hatching",
+        "liesegang-rings",
+        "mixing-patterns"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "convection-cells",
+      "name": "Convection Cells",
+      "category": "chemical",
+      "path": "algorithms/chemical/convection-cells-gui.html",
+      "description": "Thermal convection patterns (Rayleigh-Bénard convection)",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "convection",
+        "thermal",
+        "fluid-dynamics"
+      ],
+      "medium": "systems",
+      "engine": [
+        "vanilla"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "cells",
+        "contour",
+        "field",
+        "fluid",
+        "reaction"
+      ],
+      "visualTraits": [
+        "cellular",
+        "dense",
+        "diffusive",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "reaction-diffusion",
+        "voronoi-stippling",
+        "vortex-street"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "crystallization",
+      "name": "Crystallization",
+      "category": "chemical",
+      "path": "algorithms/chemical/crystallization-gui.html",
+      "description": "Crystal formation and growth patterns",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "crystals",
+        "growth",
+        "nucleation"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "branching",
+        "contour",
+        "crystal",
+        "field",
+        "growth",
+        "reaction"
+      ],
+      "visualTraits": [
+        "angular",
+        "dense",
+        "diffusive",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "belousov-zhabotinsky",
+        "crystal-growth",
+        "snowflakes"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "liesegang-rings",
+      "name": "Liesegang Rings",
+      "category": "chemical",
+      "path": "algorithms/chemical/liesegang-rings-gui.html",
+      "description": "Periodic precipitation patterns forming concentric rings",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "precipitation",
+        "rings",
+        "periodic"
+      ],
+      "medium": "systems",
+      "engine": [
+        "vanilla"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "diffusion",
+        "field",
+        "reaction",
+        "rings"
+      ],
+      "visualTraits": [
+        "dense",
+        "diffusive",
+        "layered",
+        "organic",
+        "radial"
+      ],
+      "relatedSeeds": [
+        "chromatography",
+        "circle-rays",
+        "reaction-diffusion"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "mixing-patterns",
+      "name": "Mixing Patterns",
+      "category": "chemical",
+      "path": "algorithms/chemical/mixing-patterns-gui.html",
+      "description": "Chemical mixing and diffusion patterns",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "mixing",
+        "diffusion",
+        "chemical"
+      ],
+      "medium": "systems",
+      "engine": [
+        "vanilla"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "diffusion",
+        "field",
+        "fluid",
+        "interference",
+        "reaction"
+      ],
+      "visualTraits": [
+        "dense",
+        "diffusive",
+        "layered",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "belousov-zhabotinsky",
+        "chromatography",
+        "fluid-dynamics"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "harmonograph",
+      "name": "Harmonograph",
+      "category": "curves",
+      "path": "algorithms/curves/harmonograph-gui.html",
+      "description": "Harmonograph explores harmonic and parametric curves with plotter-ready line output.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "curves",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "oscillation",
+        "parametric",
+        "recursion"
+      ],
+      "visualTraits": [
+        "continuous",
+        "geometric",
+        "rhythmic"
+      ],
+      "relatedSeeds": [
+        "lissajous-curves",
+        "rose-curves",
+        "spirotron"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "hilbert-curve",
+      "name": "Hilbert Curve",
+      "category": "curves",
+      "path": "algorithms/curves/hilbert-curve-gui.html",
+      "description": "Hilbert Curve explores harmonic and parametric curves with plotter-ready line output.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "curves",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "parametric",
+        "recursion",
+        "space-filling"
+      ],
+      "visualTraits": [
+        "continuous",
+        "geometric",
+        "rhythmic",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "maze-generator",
+        "space-filling-curves",
+        "space-filling-standard"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "lissajous-curves",
+      "name": "Lissajous Curves",
+      "category": "curves",
+      "path": "algorithms/curves/lissajous-gui.html",
+      "description": "Lissajous Curves explores harmonic and parametric curves with plotter-ready line output.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "curves",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "oscillation",
+        "parametric",
+        "recursion"
+      ],
+      "visualTraits": [
+        "continuous",
+        "geometric",
+        "rhythmic",
+        "symmetrical"
+      ],
+      "relatedSeeds": [
+        "harmonograph",
+        "rose-curves",
+        "spirotron"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "rose-curves",
+      "name": "Rose Curves",
+      "category": "curves",
+      "path": "algorithms/curves/rose-curves-gui.html",
+      "description": "Rose Curves explores harmonic and parametric curves with plotter-ready line output.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "curves",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "parametric",
+        "radial",
+        "recursion"
+      ],
+      "visualTraits": [
+        "continuous",
+        "geometric",
+        "radial",
+        "rhythmic",
+        "symmetrical"
+      ],
+      "relatedSeeds": [
+        "circle-rays",
+        "lissajous-curves",
+        "spirotron"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "space-filling-standard",
+      "name": "Space-Filling (Standard)",
+      "category": "curves",
+      "path": "algorithms/curves/space-filling-curves-gui.html",
+      "description": "Space-Filling (Standard) explores harmonic and parametric curves with plotter-ready line output.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "curves",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "parametric",
+        "recursion",
+        "space-filling"
+      ],
+      "visualTraits": [
+        "continuous",
+        "geometric",
+        "rhythmic",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "hilbert-curve",
+        "maze-generator",
+        "space-filling-curves"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "space-filling-curves",
+      "name": "Space-Filling Curves",
+      "category": "curves",
+      "path": "algorithms/curves/space-filling-expanded-gui.html",
+      "description": "Space-Filling Curves explores harmonic and parametric curves with plotter-ready line output.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "curves",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "parametric",
+        "recursion",
+        "space-filling"
+      ],
+      "visualTraits": [
+        "continuous",
+        "dense",
+        "geometric",
+        "rhythmic",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "hilbert-curve",
+        "maze-generator",
+        "space-filling-standard"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "flow-field-collision",
+      "name": "Flow Field Collision",
+      "category": "flow-fields",
+      "path": "algorithms/flow-fields/flow-field-collision.html",
+      "description": "Flow field with collision detection and particle interactions",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "flow-field",
+        "collision",
+        "particles"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "collision",
+        "field",
+        "particles",
+        "streamlines"
+      ],
+      "visualTraits": [
+        "continuous",
+        "dense",
+        "directional",
+        "flowing"
+      ],
+      "relatedSeeds": [
+        "arrows",
+        "boids-flocking",
+        "physarum-slime"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "flow-field-p5",
+      "name": "Flow Field P5",
+      "category": "flow-fields",
+      "path": "algorithms/flow-fields/flow-field-p5-gui.html",
+      "description": "Noise-based flow field with curl, perlin, and turbulent modes",
+      "complexity": "intermediate",
+      "hasPresets": true,
+      "hasExport": [
+        "svg",
+        "gif"
+      ],
+      "featured": true,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "flow-field",
+        "noise",
+        "curl",
+        "particles"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "field",
+        "particles",
+        "streamlines"
+      ],
+      "visualTraits": [
+        "continuous",
+        "directional",
+        "flowing"
+      ],
+      "relatedSeeds": [
+        "flow-field-collision",
+        "perlin-spiral",
+        "physarum-slime"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "fluid-dynamics",
+      "name": "Fluid Dynamics",
+      "category": "fluid-dynamics",
+      "path": "algorithms/fluid-dynamics/fluid-dynamics-gui.html",
+      "description": "Fluid Dynamics explores flow simulations and turbulence-inspired structures.",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "fluid-dynamics",
+        "plotter"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "core",
+      "penCount": "variable",
+      "motifFamilies": [
+        "field",
+        "fluid",
+        "particles"
+      ],
+      "visualTraits": [
+        "dynamic",
+        "layered",
+        "turbulent"
+      ],
+      "relatedSeeds": [],
+      "status": "experimental"
+    },
+    {
+      "id": "mandelbrot-and-julia",
+      "name": "Mandelbrot & Julia",
+      "category": "fractals",
+      "path": "algorithms/fractals/mandelbrot-julia-gui.html",
+      "description": "Mandelbrot & Julia explores recursive and contour-derived forms with self-similar detail.",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "fractals",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "contour",
+        "fractal",
+        "iteration",
+        "recursion"
+      ],
+      "visualTraits": [
+        "dense",
+        "mathematical",
+        "recursive"
+      ],
+      "relatedSeeds": [
+        "parametric-surfaces",
+        "strange-attractors",
+        "topographic-contours"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "10print",
+      "name": "10PRINT",
+      "category": "geometric",
+      "path": "algorithms/geometric/10print-gui.html",
+      "description": "Classic Commodore 64 one-liner maze pattern",
+      "complexity": "beginner",
+      "hasPresets": false,
+      "hasExport": [
+        "svg",
+        "gif"
+      ],
+      "featured": true,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "retro",
+        "maze",
+        "simple",
+        "classic"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "maze",
+        "texture",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "high-contrast",
+        "precise",
+        "repetitive",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "10print-simple",
+        "hash-tiles",
+        "truchet-tiles"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "10print-simple",
+      "name": "10PRINT Simple",
+      "category": "geometric",
+      "path": "algorithms/geometric/10print-simple.html",
+      "description": "10PRINT Simple builds structured geometric linework for pen plotting and iterative exploration.",
+      "complexity": "beginner",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "geometric",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "maze",
+        "texture",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "high-contrast",
+        "precise",
+        "repetitive",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "10print",
+        "hash-tiles",
+        "truchet-tiles"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "circle-rays",
+      "name": "Circle Rays",
+      "category": "geometric",
+      "path": "algorithms/geometric/circle-rays-gui.html",
+      "description": "Radial patterns with concentric circles and rays",
+      "complexity": "beginner",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "radial",
+        "circles",
+        "geometric"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "burst",
+        "circles",
+        "curves",
+        "grid",
+        "radial",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "high-contrast",
+        "precise",
+        "radial",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "perlin-circles",
+        "spirotron",
+        "string-art"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "circle-twist",
+      "name": "Circle Twist",
+      "category": "geometric",
+      "path": "algorithms/geometric/circle-twist-gui.html",
+      "description": "Twisted and warped circular patterns",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "circles",
+        "twist",
+        "geometric"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "circles",
+        "curves",
+        "grid",
+        "radial",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "precise",
+        "radial",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "circle-rays",
+        "perlin-circles",
+        "spirotron"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "circuit-pattern",
+      "name": "Circuit Pattern",
+      "category": "geometric",
+      "path": "algorithms/geometric/circuit-pattern-gui.html",
+      "description": "Circuit Pattern builds structured geometric linework for pen plotting and iterative exploration.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "geometric",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "lattice",
+        "routes",
+        "tiling"
+      ],
+      "visualTraits": [
+        "angular",
+        "geometric",
+        "precise",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "maze-generator",
+        "string-art",
+        "topographic-contours"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "grid-landscape",
+      "name": "Grid Landscape",
+      "category": "geometric",
+      "path": "algorithms/geometric/grid-landscape-gui.html",
+      "description": "3D landscape rendered as grid wireframe",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "3d",
+        "landscape",
+        "grid",
+        "wireframe"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "tiling",
+        "topography",
+        "waves"
+      ],
+      "visualTraits": [
+        "geometric",
+        "layered",
+        "precise",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "perlin-landscape",
+        "spiral-fill",
+        "topographic-contours"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "hash-tiles",
+      "name": "Hash Tiles",
+      "category": "geometric",
+      "path": "algorithms/geometric/hash-tiles-gui.html",
+      "description": "Tiling patterns based on hash functions",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "tiles",
+        "hash",
+        "procedural"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "texture",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "high-contrast",
+        "modular",
+        "precise",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "10print",
+        "aperiodic-tilings",
+        "truchet-tiles"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "islamic-patterns",
+      "name": "Islamic Patterns",
+      "category": "geometric",
+      "path": "algorithms/geometric/islamic-patterns-gui.html",
+      "description": "Islamic Patterns builds structured geometric linework for pen plotting and iterative exploration.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": true,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "geometric",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "lattice",
+        "ornament",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "precise",
+        "structured",
+        "symmetrical"
+      ],
+      "relatedSeeds": [
+        "kumiko-pattern",
+        "penrose-tiling",
+        "zellige-pattern"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "maze-generator",
+      "name": "Maze Generator",
+      "category": "geometric",
+      "path": "algorithms/geometric/maze-generator-gui.html",
+      "description": "Maze Generator builds structured geometric linework for pen plotting and iterative exploration.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": true,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "geometric",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "maze",
+        "routes",
+        "tiling"
+      ],
+      "visualTraits": [
+        "continuous",
+        "geometric",
+        "precise",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "10print",
+        "circuit-pattern",
+        "space-filling-curves"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "moir-patterns",
+      "name": "Moiré Patterns",
+      "category": "geometric",
+      "path": "algorithms/geometric/moire-patterns-gui.html",
+      "description": "Moiré Patterns builds structured geometric linework for pen plotting and iterative exploration.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "geometric",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "interference",
+        "lines",
+        "tiling",
+        "wave"
+      ],
+      "visualTraits": [
+        "geometric",
+        "high-contrast",
+        "layered",
+        "precise",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "circle-rays",
+        "string-art",
+        "wave-interference"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "penrose-tiling",
+      "name": "Penrose Tiling",
+      "category": "geometric",
+      "path": "algorithms/geometric/penrose-tiling-gui.html",
+      "description": "Penrose Tiling builds structured geometric linework for pen plotting and iterative exploration.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "geometric",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "aperiodic",
+        "curves",
+        "grid",
+        "lattice",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "precise",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "aperiodic-tilings",
+        "islamic-patterns",
+        "zellige-pattern"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "perlin-circles",
+      "name": "Perlin Circles",
+      "category": "geometric",
+      "path": "algorithms/geometric/perlin-circles-gui.html",
+      "description": "Concentric circles modulated by Perlin noise",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "perlin",
+        "circles",
+        "noise"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "circles",
+        "curves",
+        "grid",
+        "noise",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "organic",
+        "precise",
+        "radial",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "circle-rays",
+        "circle-twist",
+        "perlin-spiral"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "perlin-landscape",
+      "name": "Perlin Landscape",
+      "category": "geometric",
+      "path": "algorithms/geometric/perlin-landscape-gui.html",
+      "description": "Terrain-like patterns using Perlin noise elevation",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "perlin",
+        "landscape",
+        "terrain",
+        "noise"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "field",
+        "grid",
+        "noise",
+        "tiling",
+        "topography"
+      ],
+      "visualTraits": [
+        "geometric",
+        "layered",
+        "organic",
+        "precise",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "flow-field-p5",
+        "grid-landscape",
+        "topographic-contours"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "perlin-spiral",
+      "name": "Perlin Spiral",
+      "category": "geometric",
+      "path": "algorithms/geometric/perlin-spiral-gui.html",
+      "description": "Mathematical spirals (Archimedean, logarithmic, Fermat) with noise modulation",
+      "complexity": "intermediate",
+      "hasPresets": true,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "spiral",
+        "perlin",
+        "mathematical",
+        "noise"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "noise",
+        "spiral",
+        "tiling"
+      ],
+      "visualTraits": [
+        "continuous",
+        "geometric",
+        "organic",
+        "precise",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "flow-field-p5",
+        "perlin-circles",
+        "spiral-burst"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "snowflakes",
+      "name": "Snowflakes",
+      "category": "geometric",
+      "path": "algorithms/geometric/snowflakes-gui.html",
+      "description": "Procedural snowflake patterns with 6-fold symmetry",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "snowflake",
+        "symmetry",
+        "fractal"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "branching",
+        "curves",
+        "grid",
+        "radial",
+        "symmetry",
+        "tiling"
+      ],
+      "visualTraits": [
+        "delicate",
+        "geometric",
+        "precise",
+        "structured",
+        "symmetrical"
+      ],
+      "relatedSeeds": [
+        "crystallization",
+        "phyllotaxis",
+        "zellige-pattern"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "spiral-burst",
+      "name": "Spiral Burst",
+      "category": "geometric",
+      "path": "algorithms/geometric/spiral-burst-gui.html",
+      "description": "Spiral Burst builds structured geometric linework for pen plotting and iterative exploration.",
+      "complexity": "intermediate",
+      "hasPresets": true,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": true,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "geometric",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "burst",
+        "curves",
+        "grid",
+        "radial",
+        "spiral",
+        "tiling"
+      ],
+      "visualTraits": [
+        "energetic",
+        "geometric",
+        "precise",
+        "radial",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "circle-rays",
+        "perlin-spiral",
+        "spirotron"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "spiral-fill",
+      "name": "Spiral Fill",
+      "category": "geometric",
+      "path": "algorithms/geometric/spiral-fill.html",
+      "description": "Space-filling spiral patterns",
+      "complexity": "beginner",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "spiral",
+        "fill",
+        "simple"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "contour",
+        "curves",
+        "fill",
+        "grid",
+        "spiral",
+        "tiling"
+      ],
+      "visualTraits": [
+        "continuous",
+        "dense",
+        "geometric",
+        "precise",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "grid-landscape",
+        "spiral-burst",
+        "topographic-contours"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "spirotron",
+      "name": "Spirotron",
+      "category": "geometric",
+      "path": "algorithms/geometric/spirotron-gui.html",
+      "description": "Spirograph-like patterns with multiple rotating arms",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "spirograph",
+        "rotation",
+        "harmonic"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "parametric",
+        "radial",
+        "tiling"
+      ],
+      "visualTraits": [
+        "continuous",
+        "geometric",
+        "layered",
+        "precise",
+        "radial",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "circle-rays",
+        "harmonograph",
+        "lissajous-curves"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "string-art",
+      "name": "String Art",
+      "category": "geometric",
+      "path": "algorithms/geometric/string-art-gui.html",
+      "description": "String Art builds structured geometric linework for pen plotting and iterative exploration.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": true,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "geometric",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "grid",
+        "interference",
+        "lines",
+        "routes",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "high-contrast",
+        "precise",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "arrows",
+        "circle-rays",
+        "moir-patterns"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "topographic-contours",
+      "name": "Topographic Contours",
+      "category": "geometric",
+      "path": "algorithms/geometric/topographic-contours-gui.html",
+      "description": "Topographic Contours builds structured geometric linework for pen plotting and iterative exploration.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": true,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "geometric",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "contour",
+        "curves",
+        "field",
+        "grid",
+        "tiling",
+        "topography"
+      ],
+      "visualTraits": [
+        "dense",
+        "geometric",
+        "layered",
+        "precise",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "grid-landscape",
+        "parametric-surfaces",
+        "perlin-landscape"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "hybrid-composer",
+      "name": "Hybrid Composer",
+      "category": "hybrid",
+      "path": "algorithms/hybrid/hybrid-composer-gui.html",
+      "description": "Combine multiple algorithms into layered compositions",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "composite",
+        "layers",
+        "meta"
+      ],
+      "medium": "systems",
+      "engine": [
+        "vanilla"
+      ],
+      "outputs": [
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "composition",
+        "layers",
+        "system-mix"
+      ],
+      "visualTraits": [
+        "configurable",
+        "hybrid",
+        "layered"
+      ],
+      "relatedSeeds": [
+        "flow-field-collision",
+        "path-optimizer",
+        "plotter-prep"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "ascii-art",
+      "name": "ASCII Art",
+      "category": "image-processing",
+      "path": "algorithms/image-processing/ascii-art-gui.html",
+      "description": "ASCII Art converts source imagery into plotter-friendly line and tone structures.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": false,
+      "requiresImage": true,
+      "tags": [
+        "image-processing",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "svg"
+      ],
+      "inputs": [
+        "image"
+      ],
+      "plotterReadiness": "screen-first",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "hatching",
+        "image-derived"
+      ],
+      "visualTraits": [
+        "high-contrast",
+        "layered",
+        "textural"
+      ],
+      "relatedSeeds": [
+        "dithering",
+        "image-to-ascii",
+        "neural-network-art"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "contour-lines",
+      "name": "Contour Lines",
+      "category": "image-processing",
+      "path": "algorithms/image-processing/contour-lines-gui.html",
+      "description": "Contour Lines converts source imagery into plotter-friendly line and tone structures.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": false,
+      "requiresImage": true,
+      "tags": [
+        "image-processing",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [
+        "image"
+      ],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "hatching",
+        "image-derived"
+      ],
+      "visualTraits": [
+        "high-contrast",
+        "layered",
+        "textural"
+      ],
+      "relatedSeeds": [
+        "flow-hatching",
+        "halftone",
+        "topographic-contours"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "dithering",
+      "name": "Dithering",
+      "category": "image-processing",
+      "path": "algorithms/image-processing/dithering-gui.html",
+      "description": "Dithering converts source imagery into plotter-friendly line and tone structures.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": false,
+      "requiresImage": true,
+      "tags": [
+        "image-processing",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "svg"
+      ],
+      "inputs": [
+        "image"
+      ],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "hatching",
+        "image-derived"
+      ],
+      "visualTraits": [
+        "high-contrast",
+        "layered",
+        "textural"
+      ],
+      "relatedSeeds": [
+        "ascii-art",
+        "halftone",
+        "image-to-ascii"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "flow-hatching",
+      "name": "Flow Hatching",
+      "category": "image-processing",
+      "path": "algorithms/image-processing/flow-hatching-gui.html",
+      "description": "Flow Hatching converts source imagery into plotter-friendly line and tone structures.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": false,
+      "requiresImage": true,
+      "tags": [
+        "image-processing",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [
+        "image"
+      ],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "hatching",
+        "image-derived"
+      ],
+      "visualTraits": [
+        "high-contrast",
+        "layered",
+        "textural"
+      ],
+      "relatedSeeds": [
+        "contour-lines",
+        "hatching",
+        "topographic-contours"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "halftone",
+      "name": "Halftone",
+      "category": "image-processing",
+      "path": "algorithms/image-processing/halftone.html",
+      "description": "Convert images to halftone dot patterns",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": false,
+      "requiresImage": true,
+      "tags": [
+        "image",
+        "halftone",
+        "dots"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [
+        "image"
+      ],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "hatching",
+        "image-derived"
+      ],
+      "visualTraits": [
+        "high-contrast",
+        "layered",
+        "textural"
+      ],
+      "relatedSeeds": [
+        "contour-lines",
+        "dithering",
+        "hatching"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "hatching",
+      "name": "Hatching",
+      "category": "image-processing",
+      "path": "algorithms/image-processing/hatching.html",
+      "description": "Convert images to crosshatch patterns",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": false,
+      "requiresImage": true,
+      "tags": [
+        "image",
+        "hatching",
+        "crosshatch"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [
+        "image"
+      ],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "hatching",
+        "image-derived"
+      ],
+      "visualTraits": [
+        "high-contrast",
+        "layered",
+        "textural"
+      ],
+      "relatedSeeds": [
+        "contour-lines",
+        "flow-hatching",
+        "halftone"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "image-to-ascii",
+      "name": "Image to ASCII",
+      "category": "image-processing",
+      "path": "algorithms/image-processing/image-to-ascii-gui.html",
+      "description": "Image to ASCII converts source imagery into plotter-friendly line and tone structures.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": false,
+      "requiresImage": true,
+      "tags": [
+        "image-processing",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [
+        "image"
+      ],
+      "plotterReadiness": "screen-first",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "hatching",
+        "image-derived"
+      ],
+      "visualTraits": [
+        "high-contrast",
+        "layered",
+        "textural"
+      ],
+      "relatedSeeds": [
+        "ascii-art",
+        "dithering",
+        "neural-network-art"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "squigglecam",
+      "name": "SquiggleCam",
+      "category": "image-processing",
+      "path": "algorithms/image-processing/squigglecam.html",
+      "description": "Convert images to squiggly line art",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": false,
+      "requiresImage": true,
+      "tags": [
+        "image",
+        "squiggle",
+        "line-art"
+      ],
+      "medium": "screen",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [
+        "camera",
+        "image"
+      ],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "core",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "hatching",
+        "image-derived"
+      ],
+      "visualTraits": [
+        "high-contrast",
+        "layered",
+        "textural"
+      ],
+      "relatedSeeds": [
+        "contour-lines",
+        "flow-hatching",
+        "ml5-patterns"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "astronomy",
+      "name": "Astronomy",
+      "category": "natural",
+      "path": "algorithms/natural/astronomy-gui.html",
+      "description": "Celestial patterns, star fields, and orbital mechanics",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "astronomy",
+        "stars",
+        "celestial"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "vanilla"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "branching",
+        "fields",
+        "growth",
+        "orbits",
+        "particles",
+        "radial"
+      ],
+      "visualTraits": [
+        "delicate",
+        "emergent",
+        "flowing",
+        "layered",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "circle-rays",
+        "phyllotaxis",
+        "strange-attractors"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "coral-growth",
+      "name": "Coral Growth",
+      "category": "natural",
+      "path": "algorithms/natural/coral-growth-gui.html",
+      "description": "Branching coral-like growth patterns",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "coral",
+        "growth",
+        "organic",
+        "branching"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "vanilla"
+      ],
+      "outputs": [
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "branching",
+        "cells",
+        "growth",
+        "particles"
+      ],
+      "visualTraits": [
+        "dense",
+        "emergent",
+        "flowing",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "crystal-growth",
+        "differential-growth",
+        "space-colonization"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "crystal-growth",
+      "name": "Crystal Growth",
+      "category": "natural",
+      "path": "algorithms/natural/crystal-growth-gui.html",
+      "description": "Crystalline structure formation and growth",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "crystal",
+        "growth",
+        "geometric"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "vanilla"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "branching",
+        "crystal",
+        "growth",
+        "particles"
+      ],
+      "visualTraits": [
+        "angular",
+        "emergent",
+        "flowing",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "coral-growth",
+        "crystallization",
+        "snowflakes"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "differential-growth",
+      "name": "Differential Growth",
+      "category": "natural",
+      "path": "algorithms/natural/differential-growth-gui.html",
+      "description": "Differential Growth explores growth, branching, weather, and organism-inspired forms.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "natural",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "branching",
+        "collision",
+        "curves",
+        "growth",
+        "particles"
+      ],
+      "visualTraits": [
+        "dense",
+        "emergent",
+        "flowing",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "arrows",
+        "coral-growth",
+        "physarum-slime"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "dla-growth",
+      "name": "DLA Growth",
+      "category": "natural",
+      "path": "algorithms/natural/dla-gui.html",
+      "description": "DLA Growth explores growth, branching, weather, and organism-inspired forms.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "natural",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "aggregation",
+        "branching",
+        "growth",
+        "particles"
+      ],
+      "visualTraits": [
+        "branching",
+        "emergent",
+        "flowing",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "crystal-growth",
+        "physarum-slime",
+        "reaction-diffusion"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "lightning",
+      "name": "Lightning",
+      "category": "natural",
+      "path": "algorithms/natural/lightning-gui.html",
+      "description": "Electric discharge patterns resembling lightning bolts",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "lightning",
+        "electric",
+        "branching"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "vanilla"
+      ],
+      "outputs": [
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "branching",
+        "field",
+        "growth",
+        "particles",
+        "routes"
+      ],
+      "visualTraits": [
+        "directional",
+        "emergent",
+        "flowing",
+        "high-contrast",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "magnetic-fields",
+        "space-colonization",
+        "tree-gui"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "phyllotaxis",
+      "name": "Phyllotaxis",
+      "category": "natural",
+      "path": "algorithms/natural/phyllotaxis-gui.html",
+      "description": "Phyllotaxis explores growth, branching, weather, and organism-inspired forms.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "natural",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [
+        "image"
+      ],
+      "plotterReadiness": "native",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "branching",
+        "growth",
+        "packing",
+        "particles",
+        "radial",
+        "spiral"
+      ],
+      "visualTraits": [
+        "emergent",
+        "flowing",
+        "organic",
+        "radial"
+      ],
+      "relatedSeeds": [
+        "astronomy",
+        "circle-packing",
+        "perlin-circles"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "physarum-slime",
+      "name": "Physarum Slime",
+      "category": "natural",
+      "path": "algorithms/natural/physarum-gui.html",
+      "description": "Physarum Slime explores growth, branching, weather, and organism-inspired forms.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "natural",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "branching",
+        "field",
+        "growth",
+        "network",
+        "particles"
+      ],
+      "visualTraits": [
+        "emergent",
+        "flowing",
+        "organic",
+        "web-like"
+      ],
+      "relatedSeeds": [
+        "boids-flocking",
+        "differential-growth",
+        "flow-field-collision"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "space-colonization",
+      "name": "Space Colonization",
+      "category": "natural",
+      "path": "algorithms/natural/space-colonization-gui.html",
+      "description": "Space Colonization explores growth, branching, weather, and organism-inspired forms.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "natural",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "optional",
+      "penCount": "single",
+      "motifFamilies": [
+        "branching",
+        "growth",
+        "network",
+        "particles"
+      ],
+      "visualTraits": [
+        "botanical",
+        "emergent",
+        "flowing",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "lightning",
+        "physarum-slime",
+        "tree-gui"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "arrows",
+      "name": "Arrows",
+      "category": "packing",
+      "path": "algorithms/packing/arrows-gui.html",
+      "description": "Arrows packs repeated motifs into dense, plotter-friendly compositions with adjustable spacing and overlap.",
+      "complexity": "beginner",
+      "hasPresets": true,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": true,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "packing",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "collision",
+        "crossing-aware",
+        "directional",
+        "field",
+        "motif-placement",
+        "packing"
+      ],
+      "visualTraits": [
+        "braided",
+        "dense",
+        "directional",
+        "modular"
+      ],
+      "relatedSeeds": [
+        "circle-packing",
+        "flow-field-collision",
+        "moir-patterns",
+        "string-art"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "circle-packing",
+      "name": "Circle Packing",
+      "category": "packing",
+      "path": "algorithms/packing/circle-packing-gui.html",
+      "description": "Circle Packing packs repeated motifs into dense, plotter-friendly compositions with adjustable spacing and overlap.",
+      "complexity": "beginner",
+      "hasPresets": true,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": true,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "packing",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "png",
+        "svg"
+      ],
+      "inputs": [
+        "image"
+      ],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "circles",
+        "collision",
+        "motif-placement",
+        "packing"
+      ],
+      "visualTraits": [
+        "dense",
+        "directional",
+        "modular",
+        "radial"
+      ],
+      "relatedSeeds": [
+        "arrows",
+        "phyllotaxis",
+        "voronoi-stippling"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "boids-flocking",
+      "name": "Boids Flocking",
+      "category": "physics",
+      "path": "algorithms/physics/boids-flocking-gui.html",
+      "description": "Boids Flocking explores particle, force, field, and interference-based systems.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "physics",
+        "plotter"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "field",
+        "forces",
+        "interference",
+        "particles",
+        "swarm"
+      ],
+      "visualTraits": [
+        "directional",
+        "dynamic",
+        "field-driven",
+        "layered"
+      ],
+      "relatedSeeds": [
+        "flow-field-collision",
+        "particle-system",
+        "physarum-slime"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "cloth-simulation",
+      "name": "Cloth Simulation",
+      "category": "physics",
+      "path": "algorithms/physics/cloth-simulation-gui.html",
+      "description": "Cloth Simulation explores particle, force, field, and interference-based systems.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "physics",
+        "plotter"
+      ],
+      "medium": "screen",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "screen-first",
+      "colorDependency": "core",
+      "penCount": "variable",
+      "motifFamilies": [
+        "fabric",
+        "forces",
+        "interference",
+        "mesh",
+        "particles",
+        "simulation"
+      ],
+      "visualTraits": [
+        "dynamic",
+        "field-driven",
+        "layered"
+      ],
+      "relatedSeeds": [
+        "fluid-dynamics",
+        "particle-system",
+        "wave-interference"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "magnetic-fields",
+      "name": "Magnetic Fields",
+      "category": "physics",
+      "path": "algorithms/physics/magnetic-field-gui.html",
+      "description": "Magnetic Fields explores particle, force, field, and interference-based systems.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "physics",
+        "plotter"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "field",
+        "forces",
+        "interference",
+        "lines",
+        "particles"
+      ],
+      "visualTraits": [
+        "directional",
+        "dynamic",
+        "field-driven",
+        "layered"
+      ],
+      "relatedSeeds": [
+        "flow-field-collision",
+        "lightning",
+        "wave-interference"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "particle-system",
+      "name": "Particle System",
+      "category": "physics",
+      "path": "algorithms/physics/particle-system-gui.html",
+      "description": "Physics-based particle simulation with forces and collisions",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "particles",
+        "physics",
+        "simulation"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "field",
+        "forces",
+        "interference",
+        "particles",
+        "swarm"
+      ],
+      "visualTraits": [
+        "dynamic",
+        "field-driven",
+        "layered"
+      ],
+      "relatedSeeds": [
+        "boids-flocking",
+        "cloth-simulation",
+        "magnetic-fields"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "wave-interference",
+      "name": "Wave Interference",
+      "category": "physics",
+      "path": "algorithms/physics/wave-interference-gui.html",
+      "description": "Wave Interference explores particle, force, field, and interference-based systems.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": true,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "physics",
+        "plotter"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "contour",
+        "forces",
+        "interference",
+        "particles",
+        "wave"
+      ],
+      "visualTraits": [
+        "dynamic",
+        "field-driven",
+        "layered",
+        "scientific"
+      ],
+      "relatedSeeds": [
+        "chladni-patterns",
+        "moir-patterns",
+        "sound-waveform"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "reaction-diffusion",
+      "name": "Reaction-Diffusion",
+      "category": "reaction-diffusion",
+      "path": "algorithms/reaction-diffusion/reaction-diffusion-gui.html",
+      "description": "Gray-Scott reaction-diffusion system creating organic patterns",
+      "complexity": "advanced",
+      "hasPresets": true,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "reaction-diffusion",
+        "gray-scott",
+        "patterns",
+        "organic"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "cells",
+        "contour",
+        "reaction"
+      ],
+      "visualTraits": [
+        "cellular",
+        "dense",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "belousov-zhabotinsky",
+        "reaction-diffusion-enhanced",
+        "reaction-diffusion-layers"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "reaction-diffusion-enhanced",
+      "name": "Reaction-Diffusion Enhanced",
+      "category": "reaction-diffusion",
+      "path": "algorithms/reaction-diffusion/reaction-diffusion-enhanced.html",
+      "description": "Enhanced Gray-Scott reaction-diffusion with additional features",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "reaction-diffusion",
+        "gray-scott",
+        "chemical"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "cells",
+        "contour",
+        "reaction"
+      ],
+      "visualTraits": [
+        "cellular",
+        "dense",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "belousov-zhabotinsky",
+        "reaction-diffusion",
+        "reaction-diffusion-layers"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "reaction-diffusion-layers",
+      "name": "Reaction-Diffusion Layers",
+      "category": "reaction-diffusion",
+      "path": "algorithms/reaction-diffusion/reaction-diffusion-layers.html",
+      "description": "Multi-layer reaction-diffusion with composite rendering",
+      "complexity": "advanced",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "reaction-diffusion",
+        "layered",
+        "composite"
+      ],
+      "medium": "systems",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "adaptable",
+      "colorDependency": "optional",
+      "penCount": "variable",
+      "motifFamilies": [
+        "cells",
+        "contour",
+        "reaction"
+      ],
+      "visualTraits": [
+        "cellular",
+        "dense",
+        "organic"
+      ],
+      "relatedSeeds": [
+        "game-of-life-layers",
+        "reaction-diffusion",
+        "reaction-diffusion-enhanced"
+      ],
+      "status": "experimental"
+    },
+    {
+      "id": "aperiodic-tilings",
+      "name": "Aperiodic Tilings",
+      "category": "symmetry",
+      "path": "algorithms/symmetry/aperiodic-tilings-gui.html",
+      "description": "Aperiodic Tilings explores tessellations, ornamental systems, and repeating structure.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg",
+        "gif"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "symmetry",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "lattice",
+        "ornament",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "modular",
+        "symmetrical"
+      ],
+      "relatedSeeds": [
+        "hash-tiles",
+        "penrose-tiling",
+        "truchet-tiles"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "kumiko-pattern",
+      "name": "Kumiko Pattern",
+      "category": "symmetry",
+      "path": "algorithms/symmetry/kumiko-pattern.html",
+      "description": "Japanese kumiko woodworking patterns with geometric precision",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "kumiko",
+        "japanese",
+        "geometric",
+        "woodwork"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "lattice",
+        "ornament",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "modular",
+        "symmetrical"
+      ],
+      "relatedSeeds": [
+        "islamic-patterns",
+        "quilting-patterns",
+        "zellige-pattern"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "quilting-patterns",
+      "name": "Quilting Patterns",
+      "category": "symmetry",
+      "path": "algorithms/symmetry/quilting-patterns-gui.html",
+      "description": "Quilting Patterns explores tessellations, ornamental systems, and repeating structure.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": true,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "symmetry",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "lattice",
+        "ornament",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "modular",
+        "symmetrical"
+      ],
+      "relatedSeeds": [
+        "hash-tiles",
+        "kumiko-pattern",
+        "truchet-tiles"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "truchet-tiles",
+      "name": "Truchet Tiles",
+      "category": "symmetry",
+      "path": "algorithms/symmetry/truchet-tiles-gui.html",
+      "description": "Truchet Tiles explores tessellations, ornamental systems, and repeating structure.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "symmetry",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "png",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "lattice",
+        "ornament",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "modular",
+        "symmetrical"
+      ],
+      "relatedSeeds": [
+        "10print",
+        "aperiodic-tilings",
+        "hash-tiles"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "zellige-pattern",
+      "name": "Zellige Pattern",
+      "category": "symmetry",
+      "path": "algorithms/symmetry/zellige-pattern.html",
+      "description": "Moroccan zellige tile patterns with Islamic geometric design",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "zellige",
+        "islamic",
+        "tiles",
+        "geometric"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "lattice",
+        "ornament",
+        "tiling"
+      ],
+      "visualTraits": [
+        "geometric",
+        "modular",
+        "symmetrical"
+      ],
+      "relatedSeeds": [
+        "islamic-patterns",
+        "kumiko-pattern",
+        "penrose-tiling"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "canvas-runner",
+      "name": "Canvas Runner",
+      "category": "tools",
+      "path": "algorithms/tools/canvas-runner.html",
+      "description": "Canvas Runner utility for preparing, previewing, or exporting plotter-ready artwork.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "tools",
+        "plotter"
+      ],
+      "medium": "tools",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "png",
+        "svg"
+      ],
+      "inputs": [
+        "canvas"
+      ],
+      "plotterReadiness": "tool",
+      "colorDependency": "none",
+      "penCount": "n/a",
+      "motifFamilies": [
+        "utility"
+      ],
+      "visualTraits": [
+        "functional"
+      ],
+      "relatedSeeds": [],
+      "status": "stable"
+    },
+    {
+      "id": "debug-preview",
+      "name": "Debug Preview",
+      "category": "tools",
+      "path": "algorithms/tools/debug-preview-gui.html",
+      "description": "Debug Preview utility for preparing, previewing, or exporting plotter-ready artwork.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "tools",
+        "plotter"
+      ],
+      "medium": "tools",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "png",
+        "svg"
+      ],
+      "inputs": [
+        "image"
+      ],
+      "plotterReadiness": "tool",
+      "colorDependency": "none",
+      "penCount": "n/a",
+      "motifFamilies": [
+        "utility"
+      ],
+      "visualTraits": [
+        "functional"
+      ],
+      "relatedSeeds": [],
+      "status": "stable"
+    },
+    {
+      "id": "path-optimizer",
+      "name": "Path Optimizer",
+      "category": "tools",
+      "path": "algorithms/tools/path-optimizer-gui.html",
+      "description": "Path Optimizer utility for preparing, previewing, or exporting plotter-ready artwork.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "tools",
+        "tool"
+      ],
+      "medium": "tools",
+      "engine": [
+        "vanilla"
+      ],
+      "outputs": [
+        "svg"
+      ],
+      "inputs": [
+        "image",
+        "svg"
+      ],
+      "plotterReadiness": "tool",
+      "colorDependency": "none",
+      "penCount": "n/a",
+      "motifFamilies": [
+        "utility"
+      ],
+      "visualTraits": [
+        "functional"
+      ],
+      "relatedSeeds": [],
+      "status": "stable"
+    },
+    {
+      "id": "plot-simulator",
+      "name": "Plot Simulator",
+      "category": "tools",
+      "path": "algorithms/tools/plot-simulator.html",
+      "description": "Plot Simulator utility for preparing, previewing, or exporting plotter-ready artwork.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "tools",
+        "tool"
+      ],
+      "medium": "tools",
+      "engine": [
+        "vanilla"
+      ],
+      "outputs": [
+        "canvas",
+        "preview",
+        "svg"
+      ],
+      "inputs": [
+        "image",
+        "svg"
+      ],
+      "plotterReadiness": "tool",
+      "colorDependency": "none",
+      "penCount": "n/a",
+      "motifFamilies": [
+        "utility"
+      ],
+      "visualTraits": [
+        "functional"
+      ],
+      "relatedSeeds": [],
+      "status": "stable"
+    },
+    {
+      "id": "plotter-export",
+      "name": "Plotter Export",
+      "category": "tools",
+      "path": "algorithms/tools/plotter-export-gui.html",
+      "description": "Plotter Export utility for preparing, previewing, or exporting plotter-ready artwork.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg",
+        "gcode",
+        "hpgl"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "tools",
+        "tool"
+      ],
+      "medium": "tools",
+      "engine": [
+        "vanilla"
+      ],
+      "outputs": [
+        "gcode",
+        "hpgl",
+        "plotter",
+        "png",
+        "svg"
+      ],
+      "inputs": [
+        "image",
+        "svg"
+      ],
+      "plotterReadiness": "tool",
+      "colorDependency": "none",
+      "penCount": "n/a",
+      "motifFamilies": [
+        "utility"
+      ],
+      "visualTraits": [
+        "functional"
+      ],
+      "relatedSeeds": [],
+      "status": "stable"
+    },
+    {
+      "id": "plotter-prep",
+      "name": "Plotter Prep",
+      "category": "tools",
+      "path": "algorithms/tools/plotter-prep.html",
+      "description": "Plotter Prep utility for preparing, previewing, or exporting plotter-ready artwork.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "tools",
+        "tool"
+      ],
+      "medium": "tools",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "plotter",
+        "svg"
+      ],
+      "inputs": [
+        "image",
+        "svg"
+      ],
+      "plotterReadiness": "tool",
+      "colorDependency": "none",
+      "penCount": "n/a",
+      "motifFamilies": [
+        "utility"
+      ],
+      "visualTraits": [
+        "functional"
+      ],
+      "relatedSeeds": [],
+      "status": "stable"
+    },
+    {
+      "id": "plotter-preview",
+      "name": "Plotter Preview",
+      "category": "tools",
+      "path": "tools/plotter-preview-gui.html",
+      "description": "Plotter Preview utility for preparing, previewing, or exporting plotter-ready artwork.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "tools",
+        "tool"
+      ],
+      "medium": "tools",
+      "engine": [
+        "vanilla"
+      ],
+      "outputs": [
+        "canvas",
+        "preview",
+        "svg"
+      ],
+      "inputs": [
+        "image",
+        "svg"
+      ],
+      "plotterReadiness": "tool",
+      "colorDependency": "none",
+      "penCount": "n/a",
+      "motifFamilies": [
+        "utility"
+      ],
+      "visualTraits": [
+        "functional"
+      ],
+      "relatedSeeds": [],
+      "status": "stable"
+    },
+    {
+      "id": "lsystem-simple",
+      "name": "L-System Simple",
+      "category": "trees-lsystems",
+      "path": "algorithms/trees-lsystems/lsystem-simple.html",
+      "description": "Basic Lindenmayer system for creating plant-like structures",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "lsystem",
+        "fractal",
+        "plants"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "branching",
+        "grammar",
+        "growth"
+      ],
+      "visualTraits": [
+        "botanical",
+        "organic",
+        "recursive"
+      ],
+      "relatedSeeds": [
+        "space-colonization",
+        "tree-gui",
+        "tree-working"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "tree-gui",
+      "name": "Tree",
+      "category": "trees-lsystems",
+      "path": "algorithms/trees-lsystems/tree-gui.html",
+      "description": "Procedural tree generation with branching control",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "tree",
+        "branching",
+        "organic"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "gif",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "branching",
+        "grammar",
+        "growth"
+      ],
+      "visualTraits": [
+        "botanical",
+        "organic",
+        "recursive"
+      ],
+      "relatedSeeds": [
+        "lsystem-simple",
+        "space-colonization",
+        "tree-working"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "tree-working",
+      "name": "Tree Working",
+      "category": "trees-lsystems",
+      "path": "algorithms/trees-lsystems/tree-working.html",
+      "description": "Enhanced tree generator with additional parameters",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "tree",
+        "enhanced",
+        "organic"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "branching",
+        "grammar",
+        "growth"
+      ],
+      "visualTraits": [
+        "botanical",
+        "organic",
+        "recursive"
+      ],
+      "relatedSeeds": [
+        "lightning",
+        "lsystem-simple",
+        "tree-gui"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "tsp-art",
+      "name": "TSP Art",
+      "category": "voronoi",
+      "path": "algorithms/voronoi/tsp-art-gui.html",
+      "description": "TSP Art explores cellular partitioning, stippling, and route optimization studies.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "voronoi",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "png",
+        "svg"
+      ],
+      "inputs": [
+        "image"
+      ],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "cells",
+        "routes",
+        "stippling"
+      ],
+      "visualTraits": [
+        "cellular",
+        "dense",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "circle-packing",
+        "string-art",
+        "voronoi-stippling"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "voronoi-stippling",
+      "name": "Voronoi Stippling",
+      "category": "voronoi",
+      "path": "algorithms/voronoi/voronoi-stippling-gui.html",
+      "description": "Voronoi Stippling explores cellular partitioning, stippling, and route optimization studies.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": true,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "voronoi",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [
+        "image"
+      ],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "cells",
+        "routes",
+        "stippling"
+      ],
+      "visualTraits": [
+        "cellular",
+        "dense",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "circle-packing",
+        "flow-hatching",
+        "tsp-art"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "harmonograph-datgui",
+      "name": "Harmonograph (dat.gui)",
+      "category": "curves",
+      "path": "algorithms/curves/harmonograph-datgui.html",
+      "description": "Alternate harmonograph implementation using dat.gui controls for parametric curve exploration.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "curves",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "curves",
+        "oscillation",
+        "parametric"
+      ],
+      "visualTraits": [
+        "continuous",
+        "geometric",
+        "rhythmic"
+      ],
+      "relatedSeeds": [
+        "harmonograph",
+        "lissajous-curves",
+        "spirotron"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "hatching-demo",
+      "name": "Hatching & Texture Library Demo",
+      "category": "textures",
+      "path": "algorithms/textures/hatching-demo.html",
+      "description": "Interactive hatching and texture library demo showcasing various surface fill techniques for pen plotters.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [
+        "svg"
+      ],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "textures",
+        "plotter"
+      ],
+      "medium": "plotter",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas",
+        "svg"
+      ],
+      "inputs": [],
+      "plotterReadiness": "native",
+      "colorDependency": "none",
+      "penCount": "single",
+      "motifFamilies": [
+        "hatching",
+        "fills",
+        "textures"
+      ],
+      "visualTraits": [
+        "linear",
+        "dense",
+        "structured"
+      ],
+      "relatedSeeds": [
+        "flow-hatching",
+        "dithering"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "algorithm-validator",
+      "name": "Algorithm Validator",
+      "category": "tools",
+      "path": "algorithms/tools/algorithm-validator.html",
+      "description": "Validation tool for checking algorithm pages against design system and export requirements.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "tools",
+        "validation"
+      ],
+      "medium": "tools",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas"
+      ],
+      "inputs": [],
+      "plotterReadiness": "tool",
+      "colorDependency": "none",
+      "penCount": "n/a",
+      "motifFamilies": [
+        "utility"
+      ],
+      "visualTraits": [
+        "functional"
+      ],
+      "relatedSeeds": [
+        "functional-validator"
+      ],
+      "status": "stable"
+    },
+    {
+      "id": "functional-validator",
+      "name": "Functional Validator",
+      "category": "tools",
+      "path": "algorithms/tools/functional-validator.html",
+      "description": "Functional testing tool for verifying algorithm behavior and output correctness.",
+      "complexity": "intermediate",
+      "hasPresets": false,
+      "hasExport": [],
+      "featured": false,
+      "plotterSafe": true,
+      "requiresImage": false,
+      "tags": [
+        "tools",
+        "validation"
+      ],
+      "medium": "tools",
+      "engine": [
+        "p5"
+      ],
+      "outputs": [
+        "canvas"
+      ],
+      "inputs": [],
+      "plotterReadiness": "tool",
+      "colorDependency": "none",
+      "penCount": "n/a",
+      "motifFamilies": [
+        "utility"
+      ],
+      "visualTraits": [
+        "functional"
+      ],
+      "relatedSeeds": [
+        "algorithm-validator"
+      ],
+      "status": "stable"
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
+import { BlogArticle } from "@/components/blog-article";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -88,9 +89,9 @@ export default async function BlogPostPage({
       />
 
       <article className="pt-28 pb-20 px-6">
-        <div className="max-w-[680px] mx-auto">
+        <div className={post.editorial ? "max-w-[960px] mx-auto" : "max-w-[680px] mx-auto"}>
           {/* Header */}
-          <div className="mb-12">
+          <div className="mb-12 max-w-[680px]">
             <div className="flex items-center gap-3 mb-4">
               <time
                 className="text-xs font-mono"
@@ -139,13 +140,54 @@ export default async function BlogPostPage({
           </div>
 
           {/* Content */}
-          <div
-            className="prose-custom"
-            dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }}
+          <BlogArticle
+            html={renderMarkdown(post.content)}
+            editorial={post.editorial}
+            sidebar={
+              post.productSlug ? (() => {
+                const product = products.find((p) => p.href.includes(`/l/${post.productSlug}`));
+                if (!product || product.comingSoon) return null;
+                return (
+                  <a
+                    href={product.href}
+                    className="block p-4 rounded-lg border transition-colors hover:border-white/20"
+                    style={{
+                      background: "var(--bg-surface)",
+                      borderColor: "var(--border-subtle)",
+                    }}
+                  >
+                    <div
+                      className="text-[10px] font-mono uppercase tracking-[0.12em] mb-2"
+                      style={{ color: "var(--accent)" }}
+                    >
+                      Companion
+                    </div>
+                    <div
+                      className="text-sm font-semibold mb-1"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      {product.name}
+                    </div>
+                    <div
+                      className="text-xs font-mono mb-2"
+                      style={{ color: "var(--text-tertiary)" }}
+                    >
+                      {product.price}
+                    </div>
+                    <p
+                      className="text-xs"
+                      style={{ color: "var(--text-tertiary)", lineHeight: 1.5 }}
+                    >
+                      Full implementation, code, and templates.
+                    </p>
+                  </a>
+                );
+              })() : undefined
+            }
           />
 
-          {/* Companion product CTA */}
-          {post.productSlug && (() => {
+          {/* Inline product CTA for non-editorial posts (below content) */}
+          {!post.editorial && post.productSlug && (() => {
             const product = products.find((p) => p.href.includes(`/l/${post.productSlug}`));
             if (!product || product.comingSoon) return null;
             return (
@@ -232,7 +274,9 @@ function renderMarkdown(content: string): string {
       continue;
     }
     if (line.startsWith("## ")) {
-      blocks.push(`<h2>${inlineFormat(line.slice(3))}</h2>`);
+      const text = line.slice(3);
+      const id = slugify(text);
+      blocks.push(`<h2 id="${id}">${inlineFormat(text)}</h2>`);
       i++;
       continue;
     }
@@ -269,6 +313,13 @@ function renderMarkdown(content: string): string {
   }
 
   return blocks.join("\n");
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 function escapeHtml(text: string): string {

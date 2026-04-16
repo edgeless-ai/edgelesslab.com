@@ -9,6 +9,8 @@ export interface BlogPost {
   productSlug?: string;
   /** True only for posts that announce a product launch (not editorial posts that happen to link a product). */
   isLaunch?: boolean;
+  /** Two-column layout with sticky TOC sidebar. For longer, narrative posts. */
+  editorial?: boolean;
 }
 
 export const posts: BlogPost[] = [
@@ -19,6 +21,7 @@ export const posts: BlogPost[] = [
     date: "2026-04-10",
     tags: ["Prompt Engineering", "AI Agents", "System Prompts"],
     readTime: "8 min",
+    editorial: true,
     productSlug: "prompt-engineering-os",
     content: `
 Someone leaked Meta AI's production system prompt. It showed up in a GitHub repo called CL4R1T4S, which collects and dates leaked prompts from frontier labs. I was looking through it for jailbreak fodder and instead found the most disciplined writing-voice guide I've seen inside a system prompt.
@@ -128,6 +131,7 @@ Whatever shows up next in that repo, I'll approach it the same way: read it, ste
     slug: "shipped-7-products-in-7-days",
     productSlug: "launch-toolkit",
     isLaunch: true,
+    editorial: true,
     title: "I Shipped 7 Digital Products in 7 Days. Here's Exactly How.",
     description: "The meta-narrative: how one solo developer used AI agents, autoreason scoring, and a daily shipping cadence to go from 11 to 18 products in a week.",
     date: "2026-04-09",
@@ -244,6 +248,7 @@ The best generative art doesn't look generative. It looks like someone made a de
     slug: "agents-that-talk-to-each-other",
     productSlug: "multi-agent-blueprint",
     isLaunch: true,
+    editorial: true,
     title: "How I Run 5 AI Agents That Talk to Each Other",
     description: "A dispatch agent routes tasks to specialist workers. They communicate through a real-time bus and async inboxes. The architecture, and why most multi-agent frameworks get it wrong.",
     date: "2026-04-07",
@@ -311,6 +316,7 @@ The value isn't in the architecture diagram. It's in knowing which shortcuts wor
     slug: "n8n-workflows-ai-business",
     productSlug: "n8n-ai-workflows",
     isLaunch: true,
+    editorial: true,
     title: "5 n8n Workflows That Run My AI Business",
     description: "Visual automation for solo developers. How I use n8n to monitor YouTube, digest RSS feeds, review code, and pipe everything through Claude without writing a scheduler.",
     date: "2026-04-06",
@@ -381,6 +387,7 @@ The full workflow JSON files, setup guides, and customization instructions are i
     slug: "mcp-servers-break-in-production",
     productSlug: "production-mcp-kit",
     isLaunch: true,
+    editorial: true,
     title: "Most MCP Servers Break in Production. Here's Why.",
     description: "400+ MCP servers exist. Most work in demos and fail under real load. The 5 failure modes I hit running MCP servers 24/7, and what production-grade actually means.",
     date: "2026-04-05",
@@ -536,6 +543,7 @@ The hooks that matter most aren't the clever ones. They're the boring ones that 
   },
   {
     slug: "pretext-typography-that-thinks",
+    editorial: true,
     title: "PreText: Typography That Thinks",
     description: "Most web text is a dumb rectangle. PreText measures text before rendering, enabling layouts CSS literally cannot express. Here's how we use it.",
     date: "2026-04-02",
@@ -615,6 +623,7 @@ Every technique on this site is built from those six functions. The [source is o
   },
   {
     slug: "writing-prompts-that-survive-production",
+    editorial: true,
     title: "Writing Prompts That Survive Production",
     description: "Most prompt guides optimize for demos. Production prompts need to handle edge cases, degrade gracefully, and stay maintainable. The difference matters.",
     date: "2026-03-30",
@@ -703,6 +712,7 @@ The [Prompt Engineering OS](/products) covers 30 chapters of patterns like these
   },
   {
     slug: "one-file-memory-system",
+    editorial: true,
     title: "The One-File Memory System That Changed How I Use Claude",
     description: "You shouldn't have to re-explain your stack every session. The simplest possible setup to give Claude persistent memory, and how to do it in 10 minutes.",
     date: "2026-03-26",
@@ -804,6 +814,7 @@ Read the longer technical version in [How Claude Code Memory Actually Works](/bl
   },
   {
     slug: "mcp-servers-unix-pipes-of-ai",
+    editorial: true,
     title: "Why MCP Servers Are the Unix Pipes of AI",
     description: "The Unix philosophy changed software forever: small tools, composable via pipes. MCP does the same thing for AI agents. Here's why that matters.",
     date: "2026-03-24",
@@ -882,6 +893,7 @@ See the [lab experiments page](/lab) for the MCP servers running in this system,
   },
   {
     slug: "generative-art-pen-plotters",
+    editorial: true,
     title: "Generative Art for Pen Plotters: A Technical Primer",
     description: "Pen plotter art isn't screen art printed on paper. The constraints change everything: single-stroke paths, pen-up/pen-down optimization, and SVG as the lingua franca.",
     date: "2026-03-23",
@@ -972,6 +984,7 @@ If you want to go deeper into the scoring and iteration pipeline, the [pen plott
   },
   {
     slug: "building-ai-agent-infrastructure-solo",
+    editorial: true,
     title: "Building AI Agent Infrastructure as a Solo Developer",
     description: "How I built a multi-agent system with MCP servers, vector memory, and autonomous trading, all running 24/7 from a single VPS.",
     date: "2026-03-21",
@@ -1054,6 +1067,7 @@ The goal isn't to build the most complex system. It's to build the most useful o
   },
   {
     slug: "how-claude-code-memory-works",
+    editorial: true,
     title: "How Claude Code Memory Actually Works",
     description: "Claude forgets everything between sessions. Here's how file-based memory fixes that, and why it changes how you work with AI.",
     date: "2026-03-21",

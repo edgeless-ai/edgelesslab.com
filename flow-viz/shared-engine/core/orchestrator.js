@@ -85,9 +85,11 @@ class Orchestrator {
     // Deep clone default config (functions are lost by JSON round-trip;
     // re-attach the couple we need below).
     const config = JSON.parse(JSON.stringify(CONFIG));
-    config.validate = CONFIG.validate;
-    config.merge = CONFIG.merge;
-    config.loadEnvironment = CONFIG.loadEnvironment;
+    // Bind to config (not CONFIG) so `this` inside these methods
+    // references the cloned object, not the original.
+    if (typeof CONFIG.validate === 'function') config.validate = CONFIG.validate.bind(config);
+    if (typeof CONFIG.loadEnvironment === 'function') config.loadEnvironment = CONFIG.loadEnvironment.bind(config);
+    if (typeof CONFIG.merge === 'function') config.merge = CONFIG.merge.bind(config);
 
     // Apply user overrides
     if (userConfig) {
@@ -216,6 +218,7 @@ class Orchestrator {
   }
 
   handleKeyPress(key) {
+    if (!this.config || !this.config.interaction) return;
     const cfg = this.config.interaction.keyboard;
     
     if (key === cfg.saveKey) {

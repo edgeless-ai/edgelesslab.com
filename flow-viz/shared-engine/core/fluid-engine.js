@@ -407,7 +407,19 @@ class FluidEngine extends Plugin {
   }
 
   regenerate() {
-    if (this.context.dataSource) {
+    // Clear trail layer completely (wipes accumulated color)
+    if (this.trailLayer) {
+      this.trailLayer.clear();
+      const c = this.config.colors.background;
+      this.trailLayer.background(c.h, c.s, c.b);
+    }
+
+    // Kill and respawn all particles with fresh config
+    this.particles = [];
+    this.spawnParticles();
+
+    // Re-place markets
+    if (this.context && this.context.dataSource) {
       const markets = this.context.dataSource.getMarkets();
       this.updateMarkets(markets);
     }

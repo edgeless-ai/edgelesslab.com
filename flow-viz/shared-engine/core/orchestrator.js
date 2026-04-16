@@ -246,41 +246,56 @@ class Orchestrator {
     randomSeed(seed);
     noiseSeed(seed);
 
-    // Randomize aesthetic parameters
+    // Randomize aesthetics: the palette IS the visual identity
     const r = () => Math.random();
     const rr = (min, max) => min + r() * (max - min);
+    const ri = (min, max) => Math.floor(rr(min, max));
 
-    // Background hue shift (keep dark, vary the tone)
-    this.config.colors.background.h = Math.floor(rr(0, 360));
-    this.config.colors.background.s = Math.floor(rr(15, 50));
-    this.config.colors.background.b = Math.floor(rr(3, 10));
+    // Pick a random hue anchor for the whole palette
+    const hueAnchor = ri(0, 360);
 
-    // Particle flow aesthetics
+    // Background: dark, tinted toward the anchor hue
+    this.config.colors.background.h = hueAnchor;
+    this.config.colors.background.s = ri(10, 40);
+    this.config.colors.background.b = ri(3, 12);
+
+    // Randomize ALL category colors around the anchor
+    // Each category gets a hue offset from the anchor, with random saturation/brightness
+    const categories = this.config.colors.categories;
+    const catNames = Object.keys(categories);
+    catNames.forEach((cat, i) => {
+      const hueOffset = (i * (360 / catNames.length)) + ri(-30, 30);
+      const hue = (hueAnchor + hueOffset) % 360;
+      categories[cat].base = [hue, ri(50, 90), ri(70, 95)];
+      categories[cat].accent = [(hue + ri(-15, 15) + 360) % 360, ri(70, 100), ri(85, 100)];
+    });
+
+    // Flow dynamics
     this.config.particles.flow.noiseScale = rr(0.001, 0.008);
     this.config.particles.flow.speed = rr(0.3, 1.5);
     this.config.particles.flow.attractionStrength = rr(0.1, 0.6);
     this.config.particles.flow.damping = rr(0.94, 0.99);
 
     // Particle visuals
-    this.config.particles.size.min = Math.floor(rr(1, 3));
-    this.config.particles.size.max = Math.floor(rr(3, 8));
+    this.config.particles.size.min = ri(1, 3);
+    this.config.particles.size.max = ri(3, 8);
     this.config.particles.visual.opacity = rr(0.15, 0.5);
 
-    // Trails
-    this.config.trails.fadeRate = Math.floor(rr(1, 8));
-    this.config.trails.opacity = Math.floor(rr(5, 30));
+    // Trails (these dominate the visual feel)
+    this.config.trails.fadeRate = ri(2, 12);
+    this.config.trails.opacity = ri(5, 30);
 
     // Market visuals
     this.config.markets.visual.pulseSpeed = rr(0.01, 0.05);
-    this.config.markets.visual.glowLayers = Math.floor(rr(2, 6));
-    this.config.markets.visual.glowSpread = Math.floor(rr(10, 40));
+    this.config.markets.visual.glowLayers = ri(2, 6);
+    this.config.markets.visual.glowSpread = ri(10, 40);
 
     // Connections
     this.config.connections.visual.strokeWeight = rr(0.5, 3);
-    this.config.connections.visual.maxAlpha = Math.floor(rr(15, 60));
+    this.config.connections.visual.maxAlpha = ri(15, 60);
 
-    // Placement (re-scatter)
-    this.config.markets.placement.minDistance = Math.floor(rr(60, 180));
+    // Re-scatter market positions
+    this.config.markets.placement.minDistance = ri(60, 180);
 
     // Propagate config changes to the engine and its entities
     if (this.engine) {

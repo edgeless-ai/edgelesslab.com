@@ -156,16 +156,17 @@ class FluidEngine extends Plugin {
 
   poissonDiskPlacement(marketData, marketSizes, canvasWidth, canvasHeight, cfg) {
     const placed = [];
-    
+    const rnd = this._rand();
+
     for (let i = 0; i < marketData.length; i++) {
       let attempts = 0;
       let x, y;
       let market = marketSizes[i];
       const minDist = market.radius + cfg.minDistance;
-      
+
       do {
-        x = cfg.padding + market.radius + Math.random() * (canvasWidth - cfg.padding * 2 - market.radius * 2);
-        y = cfg.padding + market.radius + Math.random() * (canvasHeight - cfg.padding * 2 - market.radius * 2);
+        x = cfg.padding + market.radius + rnd() * (canvasWidth - cfg.padding * 2 - market.radius * 2);
+        y = cfg.padding + market.radius + rnd() * (canvasHeight - cfg.padding * 2 - market.radius * 2);
         attempts++;
       } while (
         attempts < cfg.attempts &&
@@ -200,13 +201,20 @@ class FluidEngine extends Plugin {
   }
 
   randomPlacement(marketData, marketSizes, canvasWidth, canvasHeight, cfg) {
+    const rnd = this._rand();
     for (let i = 0; i < marketData.length; i++) {
       const radius = marketSizes[i].radius;
-      const x = cfg.padding + radius + Math.random() * (canvasWidth - cfg.padding * 2 - radius * 2);
-      const y = cfg.padding + radius + Math.random() * (canvasHeight - cfg.padding * 2 - radius * 2);
-      
+      const x = cfg.padding + radius + rnd() * (canvasWidth - cfg.padding * 2 - radius * 2);
+      const y = cfg.padding + radius + rnd() * (canvasHeight - cfg.padding * 2 - radius * 2);
+
       this.markets.push(new Market(marketSizes[i], x, y, this.config, this.context.events));
     }
+  }
+
+  // Engine random: prefer p5's seeded random() so everything follows the
+  // global seed; fall back to Math.random() for headless/test paths.
+  _rand() {
+    return typeof random === 'function' ? random : Math.random;
   }
 
   computeConnections() {
@@ -407,21 +415,21 @@ class FluidEngine extends Plugin {
   }
 
   regenerate() {
-    // Clear trail layer completely (wipes accumulated color)
+    // Wipe accumulated trail colour so the new palette isn't muddled with the old.
     if (this.trailLayer) {
       this.trailLayer.clear();
       const c = this.config.colors.background;
       this.trailLayer.background(c.h, c.s, c.b);
     }
 
-    // Kill and respawn all particles with fresh config
-    this.particles = [];
-    this.spawnParticles();
-
-    // Re-place markets
+    // updateMarkets() rebuilds placement and re-inits particles with the
+    // new palette + flow config, so we don't need a separate reset here.
     if (this.context && this.context.dataSource) {
       const markets = this.context.dataSource.getMarkets();
       this.updateMarkets(markets);
+    } else {
+      this.particles = [];
+      this.initParticles();
     }
   }
 
@@ -448,9 +456,17 @@ class Market {
     
     this.radius = data.radius || 60;
     this.category = data.category || 'other';
-    this.pulsePhase = Math.random() * Math.PI * 2;
+    const rnd = typeof random === 'function' ? random : Math.random;
+    this.pulsePhase = rnd() * Math.PI * 2;
     this.hovered = false;
     this.selected = false;
+  }
+
+  // Access seeded random when available (set in Particle.reset / placement
+  // by p5's randomSeed). Kept out of the constructor because Markets are
+  // created both before and after the first particle spawn.
+  _rnd() {
+    return typeof random === 'function' ? random : Math.random;
   }
 
   update(deltaTime, elapsedTime) {
@@ -544,36 +560,41 @@ class Particle {
 
   reset() {
     if (this.markets.length === 0) return;
-    
+
+    // Use p5's seeded random() when available so a given seed reproduces
+    // every spawn position, lifetime, and hue choice.
+    const rnd = typeof random === 'function' ? random : Math.random;
+
     // Spawn at random market
-    const market = this.markets[Math.floor(Math.random() * this.markets.length)];
-    const angle = Math.random() * Math.PI * 2;
-    const r = Math.random() * market.radius * 0.8;
-    
+    const market = this.markets[Math.floor(rnd() * this.markets.length)];
+    const angle = rnd() * Math.PI * 2;
+    const r = rnd() * market.radius * 0.8;
+
     this.x = market.x + Math.cos(angle) * r;
     this.y = market.y + Math.sin(angle) * r;
     this.origin = market;
     this.target = null;
-    
+
     this.vx = 0;
     this.vy = 0;
-    
+
     const cfg = this.config.particles.life;
-    this.life = cfg.min + Math.random() * (cfg.max - cfg.min);
-    this.decay = cfg.decay.min + Math.random() * (cfg.decay.max - cfg.decay.min);
-    
+    this.life = cfg.min + rnd() * (cfg.max - cfg.min);
+    this.decay = cfg.decay.min + rnd() * (cfg.decay.max - cfg.decay.min);
+
     const sizeCfg = this.config.particles.size;
-    this.size = sizeCfg.min + Math.random() * (sizeCfg.max - sizeCfg.min);
-    
+    this.size = sizeCfg.min + rnd() * (sizeCfg.max - sizeCfg.min);
+
     // Color based on origin
     const palette = this.config.colors.categories[market.category] || this.config.colors.categories.other;
-    this.hue = Math.random() > 0.5 ? palette.base[0] : palette.accent[0];
-    
+    this.hue = rnd() > 0.5 ? palette.base[0] : palette.accent[0];
+
     this.eventBus?.emit('PARTICLE_SPAWN', { particle: this, origin: market });
   }
 
   update(deltaTime, elapsedTime, markets, noiseTime) {
-    if (!this.target || Math.random() < 0.01) {
+    const rnd = typeof random === 'function' ? random : Math.random;
+    if (!this.target || rnd() < 0.01) {
       this.findTarget(markets);
     }
 

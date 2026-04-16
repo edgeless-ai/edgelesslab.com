@@ -23,8 +23,14 @@ class Orchestrator {
     this.state = 'initializing';
     
     try {
-      // Load and validate configuration
-      this.config = this.loadConfig(userConfig);
+      // Load config only if setup() hasn't already (the p5 path pre-loads
+      // so URL params and the seeded aesthetic variation land before any
+      // data source or plugin reads the config).
+      if (!this.config) {
+        this.config = this.loadConfig(userConfig);
+      } else if (userConfig && Object.keys(userConfig).length) {
+        this.deepMerge(this.config, userConfig);
+      }
       
       // Initialize event bus
       const context = {
@@ -76,27 +82,44 @@ class Orchestrator {
   }
 
   loadConfig(userConfig) {
-    // Deep clone default config
+    // Deep clone default config (functions are lost by JSON round-trip;
+    // re-attach the couple we need below).
     const config = JSON.parse(JSON.stringify(CONFIG));
-    
+    config.validate = CONFIG.validate;
+    config.merge = CONFIG.merge;
+    config.loadEnvironment = CONFIG.loadEnvironment;
+
     // Apply user overrides
     if (userConfig) {
       this.deepMerge(config, userConfig);
     }
-    
+
     // Load environment (URL params)
     if (typeof window !== 'undefined') {
       config.loadEnvironment();
     }
-    
+
     // Validate
     config.validate();
-    
-    // Resolve seed
-    if (config.engine.seed === null) {
+
+    // Resolve seed: explicit ?seed=X is reproducible, otherwise fresh every
+    // page load. This is what drives per-refresh variation.
+    if (config.engine.seed === null || config.engine.seed === undefined) {
       config.engine.seed = Math.floor(Math.random() * 999999);
     }
-    
+
+    // Randomise palette and flow feel from the seed, unless the caller
+    // opted out via ?preset=default.
+    const params = typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search)
+      : null;
+    const preset = params?.get('preset');
+    if (preset !== 'default' && typeof applyAestheticVariation === 'function') {
+      const rng = makeRng(config.engine.seed);
+      applyAestheticVariation(config, rng);
+      config._rng = rng;
+    }
+
     return config;
   }
 
@@ -131,7 +154,9 @@ class Orchestrator {
       if (sourceParam) {
         overrides.dataSource = { type: sourceParam };
       }
-      this.loadConfig(overrides);
+      // Actually assign — without this, later initialize() re-loads config
+      // from scratch and loses the URL overrides.
+      this.config = this.loadConfig(overrides);
     }
     
     const c = this.config.engine;
@@ -243,64 +268,19 @@ class Orchestrator {
   regenerate() {
     const seed = Math.floor(Math.random() * 999999);
     this.config.engine.seed = seed;
-    randomSeed(seed);
-    noiseSeed(seed);
 
-    // Randomize aesthetics: the palette IS the visual identity
-    const r = () => Math.random();
-    const rr = (min, max) => min + r() * (max - min);
-    const ri = (min, max) => Math.floor(rr(min, max));
+    // Re-seed p5 so placement / particle spawns are reproducible for this seed.
+    if (typeof randomSeed === 'function') randomSeed(seed);
+    if (typeof noiseSeed === 'function') noiseSeed(seed);
 
-    // Pick a random hue anchor for the whole palette
-    const hueAnchor = ri(0, 360);
-
-    // Background: dark, tinted toward the anchor hue
-    this.config.colors.background.h = hueAnchor;
-    this.config.colors.background.s = ri(10, 40);
-    this.config.colors.background.b = ri(3, 12);
-
-    // Randomize ALL category colors around the anchor
-    // Each category gets a hue offset from the anchor, with random saturation/brightness
-    const categories = this.config.colors.categories;
-    const catNames = Object.keys(categories);
-    catNames.forEach((cat, i) => {
-      const hueOffset = (i * (360 / catNames.length)) + ri(-30, 30);
-      const hue = (hueAnchor + hueOffset) % 360;
-      categories[cat].base = [hue, ri(50, 90), ri(70, 95)];
-      categories[cat].accent = [(hue + ri(-15, 15) + 360) % 360, ri(70, 100), ri(85, 100)];
-    });
-
-    // Flow dynamics
-    this.config.particles.flow.noiseScale = rr(0.001, 0.008);
-    this.config.particles.flow.speed = rr(0.3, 1.5);
-    this.config.particles.flow.attractionStrength = rr(0.1, 0.6);
-    this.config.particles.flow.damping = rr(0.94, 0.99);
-
-    // Particle visuals
-    this.config.particles.size.min = ri(1, 3);
-    this.config.particles.size.max = ri(3, 8);
-    this.config.particles.visual.opacity = rr(0.15, 0.5);
-
-    // Trails (these dominate the visual feel)
-    this.config.trails.fadeRate = ri(2, 12);
-    this.config.trails.opacity = ri(5, 30);
-
-    // Market visuals
-    this.config.markets.visual.pulseSpeed = rr(0.01, 0.05);
-    this.config.markets.visual.glowLayers = ri(2, 6);
-    this.config.markets.visual.glowSpread = ri(10, 40);
-
-    // Connections
-    this.config.connections.visual.strokeWeight = rr(0.5, 3);
-    this.config.connections.visual.maxAlpha = ri(15, 60);
-
-    // Re-scatter market positions
-    this.config.markets.placement.minDistance = ri(60, 180);
+    // Same aesthetic randomizer used at init — one code path, one source of truth.
+    const rng = makeRng(seed);
+    applyAestheticVariation(this.config, rng);
+    this.config._rng = rng;
 
     // Propagate config changes to the engine and its entities
     if (this.engine) {
       this.engine.config = this.config;
-      // Update existing markets with new config
       if (this.engine.markets) {
         this.engine.markets.forEach(m => { m.config = this.config; });
       }

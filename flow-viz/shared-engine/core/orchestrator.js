@@ -248,15 +248,52 @@ class Orchestrator {
   }
 
   regenerate() {
-    this.config.engine.seed = Math.floor(Math.random() * 999999);
-    randomSeed(this.config.engine.seed);
-    noiseSeed(this.config.engine.seed);
-    
+    const seed = Math.floor(Math.random() * 999999);
+    this.config.engine.seed = seed;
+    randomSeed(seed);
+    noiseSeed(seed);
+
+    // Randomize aesthetic parameters
+    const r = () => Math.random();
+    const rRange = (min, max) => min + r() * (max - min);
+
+    // Background hue shift (keep dark, vary the tone)
+    this.config.colors.background.h = Math.floor(rRange(0, 360));
+    this.config.colors.background.s = Math.floor(rRange(15, 50));
+    this.config.colors.background.b = Math.floor(rRange(3, 10));
+
+    // Particle flow aesthetics
+    this.config.particles.flow.noiseScale = rRange(0.001, 0.008);
+    this.config.particles.flow.speed = rRange(0.3, 1.5);
+    this.config.particles.flow.attractionStrength = rRange(0.1, 0.6);
+    this.config.particles.flow.damping = rRange(0.94, 0.99);
+
+    // Particle visuals
+    this.config.particles.size.min = Math.floor(rRange(1, 3));
+    this.config.particles.size.max = Math.floor(rRange(3, 8));
+    this.config.particles.visual.opacity = rRange(0.15, 0.5);
+
+    // Trails
+    this.config.trails.fadeRate = Math.floor(rRange(1, 8));
+    this.config.trails.opacity = Math.floor(rRange(5, 30));
+
+    // Market visuals
+    this.config.markets.visual.pulseSpeed = rRange(0.01, 0.05);
+    this.config.markets.visual.glowLayers = Math.floor(rRange(2, 6));
+    this.config.markets.visual.glowSpread = Math.floor(rRange(10, 40));
+
+    // Connections
+    this.config.connections.visual.strokeWeight = rRange(0.5, 3);
+    this.config.connections.visual.maxAlpha = Math.floor(rRange(15, 60));
+
+    // Placement (re-scatter the markets)
+    this.config.markets.placement.minDistance = Math.floor(rRange(60, 180));
+
     if (this.engine) {
       this.engine.regenerate();
     }
-    
-    Events.emit('ENGINE_REGENERATE', { seed: this.config.engine.seed });
+
+    Events.emit('ENGINE_REGENERATE', { seed });
   }
 
   togglePause() {

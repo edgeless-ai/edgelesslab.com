@@ -4,10 +4,10 @@
  */
 export const PLOTTER = {
   run:        16,
-  factories:  17,
-  pieces:     "13,985",
-  kept:       "13,873",
+  factories:  20,
+  pieces:     "24,973",
+  kept:       "24,860",
   curated:    "1,296",
   best:       "89.1",
-  withheld:   "12,577",
+  withheld:   "23,564",
 } as const;

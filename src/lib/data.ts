@@ -498,14 +498,14 @@ export const experiments = [
     title: "Pen Plotter Pipeline",
     description: `Generative SVG art pipeline with AI scoring. ${PLOTTER.factories} procedural factories producing work across moire interference, op-art, voxel sculpture, halftone, pointillism, circle packing, hatching, ridgelines, calligraphic gestures, and more.`,
     longDescription: [
-      `A Python pipeline that runs ${PLOTTER.factories} independent factory generators, feeds each output through a scoring engine combining six algorithmic signals and five vision-language judges, and routes high-scoring pieces to the physical plotter. Factories span the full visual range: moire interference (highest avg), op-art warps, isometric voxel sculpture, density hatching, topographic line work, ridgeline waveforms, calligraphic gestures, generative grids, L-systems, stippling, wireframes, and more.`,
-      "The scoring stack: ink coverage, line complexity, composition (rule-of-thirds focal density), entropy (edge + local variance), uniqueness (perceptual hash), and feasibility (estimated plot time). On top of those, five vision-language judges score the top pieces: Claude via subagents, Gemini twice (aesthetic + adversarial), Qwen via OpenRouter, and Cerebras. The full composite is 55% algorithmic + 45% judge.",
+      `A Python pipeline that runs ${PLOTTER.factories} independent factory generators, feeds each output through a scoring engine combining seven algorithmic signals (including a CLIP aesthetic predictor trained on 250K artworks), five vision-language judges, and routes high-scoring pieces to the physical plotter. Factories span the full visual range: sports field geometry, 3D rayhatched landscapes, colour cross-hatching, CMY halftone dots, moire interference, recursive territory maps, woven textile patterns, op-art, wavy engraving, and more.`,
+      "The scoring stack (v3): ink coverage, line complexity, multi-scale composition, visual entropy, CLIP aesthetic score, uniqueness (perceptual hash), and feasibility. On top of those, five vision-language judges score the top pieces: Claude via subagents, Gemini twice (aesthetic + adversarial), Qwen via OpenRouter, and Cerebras. CLIP also provides zero-shot art movement classification — tagging each piece as Op Art, Constructivism, Minimalism, Engraving, etc.",
       "Physical output goes through iDraw 2.0 with archival-quality pigment ink on A3 cotton paper. Pen speed, acceleration, and lift height are tuned per factory. Path optimization via vpype reduces pen-up travel by 93 to 96% before every plot.",
       `${PLOTTER.pieces} specimens have been scored to date. The full editorial field journal, including the discovery that 26% of the algorithmic top-50 are 'grey rectangles' the algorithms loved but Claude rated 1.8/10, is published as a separate artifact.`,
     ],
     highlights: [
       `${PLOTTER.factories} procedural factories · ${PLOTTER.pieces} scored specimens · top score ${PLOTTER.best}`,
-      "10-signal scoring: 6 algorithmic + 5 vision-language judges (Claude, Gemini, Qwen, Cerebras)",
+      "Scoring v3: 7 algorithmic signals (incl. CLIP aesthetic) + 5 vision-language judges + art movement tagger",
       "iDraw 2.0 output with pigment ink on A3 cotton, vpype path optimization",
       "Best pieces visible in the gallery below; the full field journal is one click away",
     ],
@@ -527,8 +527,8 @@ export const experiments = [
     ],
     highlights: [
       `${PLOTTER.factories} procedural factories · ${PLOTTER.pieces} scored specimens · top score ${PLOTTER.best}`,
-      "Six algorithmic signals + five vision-language judges (Claude · Gemini · Qwen · Cerebras)",
-      "Five-section editorial: method · anomaly · catalog · best of run · colophon",
+      "Scoring v3: CLIP aesthetic predictor + six algorithmic signals + five vision-language judges",
+      "Ten-spread editorial: method · anomaly · catalog · best of run (incl. new colour factories) · colophon",
       `Full addendum page with all ${PLOTTER.kept} specimens, click-to-zoom`,
       "Set in Boska + JetBrains Mono, served on warm specimen paper",
     ],

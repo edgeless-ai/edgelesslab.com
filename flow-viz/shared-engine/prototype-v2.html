@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Polymarket Flow Viz - Modular Prototype V2</title>
+  <script>
+    // Disable FES before p5 loads
+    p5 = { disableFriendlyErrors: true };
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #0a0a0f; }
+    canvas { display: block; }
+    #ui {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      color: #e8d5b7;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      z-index: 100;
+      line-height: 1.5;
+    }
+    #ui .key { color: #73c99c; }
+    #ui .muted { color: #666; }
+    #status {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      color: #666;
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      text-align: right;
+    }
+    #debug {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      color: #444;
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      max-width: 400px;
+    }
+    #debug.visible { display: block; }
+  </style>
+</head>
+<body>
+<div id="ui">
+  <span class="key">[s]</span> save PNG<br>
+  <span class="key">[r]</span> regenerate layout<br>
+  <span class="key">[space]</span> pause/resume<br>
+  <span class="muted">Mode: <span id="mode">mock</span></span>
+</div>
+<div id="status">
+  Markets: <span id="market-count">-</span><br>
+  Particles: <span id="particle-count">-</span><br>
+  Seed: <span id="seed">-</span>
+</div>
+<div id="debug">
+  <pre id="debug-content"></pre>
+</div>
+
+<!-- Load modules in dependency order -->
+<script src="config/default.js"></script>
+<script src="core/event-bus.js"></script>
+<script src="core/plugin.js"></script>
+<script src="adapters/data-source.js"></script>
+<script src="core/fluid-engine.js"></script>
+<script src="core/orchestrator.js"></script>
+
+<script>
+// === P5.js Sketch using Orchestrator ===
+
+// Configuration overrides from URL
+const urlParams = new URLSearchParams(window.location.search);
+
+const userConfig = {
+  engine: {
+    seed: urlParams.has('seed') ? parseInt(urlParams.get('seed')) : null
+  },
+  dataSource: {
+    type: urlParams.get('source') || 'mock',
+    mockDataSet: urlParams.get('dataset') || 'default',
+    refreshInterval: 60000
+  },
+  particles: {
+    count: urlParams.has('particles') ? parseInt(urlParams.get('particles')) : 800
+  },
+  debug: {
+    enabled: urlParams.get('debug') === 'true',
+    showFps: true
+  }
+};
+
+// UI update
+function updateUI() {
+  const status = orchestrator.getStatus();
+  
+  document.getElementById('mode').textContent = status.config.dataSource;
+  document.getElementById('market-count').textContent = status.markets;
+  document.getElementById('particle-count').textContent = status.particles;
+  document.getElementById('seed').textContent = status.config.seed || '-';
+  
+  if (orchestrator.config.debug.enabled) {
+    document.getElementById('debug').classList.add('visible');
+    document.getElementById('debug-content').textContent = 
+      JSON.stringify(status, null, 2);
+  }
+}
+
+// Subscribe to status updates
+Events.on('ENGINE_TICK', () => {
+  // Throttle UI updates
+  if (frameCount % 30 === 0) {
+    updateUI();
+  }
+});
+
+Events.on('DATA_LOADED', (data) => {
+  console.log('Data loaded:', data.markets, 'markets from', data.source);
+  updateUI();
+});
+
+Events.on('DATA_ERROR', (err) => {
+  console.error('Data error:', err.error);
+});
+
+Events.on('MARKET_HOVER', ({ market }) => {
+  if (orchestrator.config.debug.enabled) {
+    console.log('Hover:', market.data.question);
+  }
+});
+
+Events.on('MARKET_SELECTED', ({ market }) => {
+  console.log('Selected:', market.data.question, 
+    '| Price:', (market.data.yesPrice * 100).toFixed(0) + '%',
+    '| Volume: $' + (market.data.volume24h / 1000000).toFixed(1) + 'M');
+});
+
+// P5.js hooks
+function setup() {
+  // Set seed early for p5 random functions
+  if (userConfig.engine.seed) {
+    randomSeed(userConfig.engine.seed);
+    noiseSeed(userConfig.engine.seed);
+  }
+  
+  // Call orchestrator setup
+  orchestrator.setup(this);
+}
+
+function draw() {
+  orchestrator.draw();
+}
+
+function windowResized() {
+  orchestrator.handleResize();
+}
+
+function keyPressed() {
+  orchestrator.handleKeyPress(key);
+  
+  // Extra debugging keys
+  if (key === 'd' || key === 'D') {
+    orchestrator.config.debug.enabled = !orchestrator.config.debug.enabled;
+    updateUI();
+  }
+  
+  if (key === '1') {
+    orchestrator.switchDataSource('mock', { mockDataSet: 'default' });
+  }
+  if (key === '2') {
+    orchestrator.switchDataSource('mock', { mockDataSet: 'stress-test' });
+  }
+  if (key === '3') {
+    orchestrator.switchDataSource('mock', { mockDataSet: 'minimal' });
+  }
+}
+
+function mouseMoved() {
+  orchestrator.handleMouseMove(mouseX, mouseY);
+}
+
+function mouseClicked() {
+  orchestrator.handleMouseClick(mouseX, mouseY);
+}
+
+// Initial UI update
+events = Events; // Make available globally for debugging
+updateUI();
+
+console.log('Polymarket Flow Viz V2 loaded');
+console.log('Configuration:', userConfig);
+console.log('Available key bindings:');
+console.log('  s = save PNG');
+console.log('  r = regenerate layout');
+console.log('  space = pause/resume');
+console.log('  d = toggle debug');
+console.log('  1/2/3 = switch mock dataset');
+</script>
+</body>
+</html>

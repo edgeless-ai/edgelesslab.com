@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow Viz — GitHub Ecosystem</title>
+  <meta name="description" content="Visualize repository attention as fluid dynamics. Stars, forks, and PRs flow between repos.">
+  <meta property="og:title" content="Flow Viz — GitHub Ecosystem">
+  <meta property="og:description" content="Watch systems breathe. Repository attention economy as particle flow.">
+  <script>p5 = { disableFriendlyErrors: true };</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #0a0a0f; }
+    canvas { display: block; }
+    #ui {
+      position: fixed; top: 20px; left: 20px;
+      color: #e8d5b7; font-family: 'Courier New', monospace; font-size: 11px;
+      z-index: 100; line-height: 1.6;
+      background: rgba(10, 10, 15, 0.85); padding: 15px; border-radius: 8px;
+      border: 1px solid rgba(232, 213, 183, 0.15);
+    }
+    #ui .title { color: #fff; font-weight: bold; font-size: 14px; margin-bottom: 4px; }
+    #ui .subtitle { color: #73c99c; font-size: 10px; margin-bottom: 10px; }
+    #ui .key { color: #73c99c; }
+    #ui .muted { color: #555; }
+    .metric { display: inline-block; margin-right: 14px; }
+    #status {
+      position: fixed; top: 20px; right: 20px;
+      color: #666; font-family: 'Courier New', monospace; font-size: 10px;
+      text-align: right; background: rgba(10, 10, 15, 0.85); padding: 10px; border-radius: 8px;
+    }
+    #info-panel {
+      position: fixed; bottom: 20px; left: 20px; right: 20px;
+      color: #e8d5b7; font-family: 'Courier New', monospace; font-size: 10px;
+      z-index: 100; background: rgba(10, 10, 15, 0.92); padding: 12px; border-radius: 8px;
+      border: 1px solid rgba(232, 213, 183, 0.15); display: none;
+    }
+    #info-panel.visible { display: block; }
+    #brand {
+      position: fixed; bottom: 20px; right: 20px;
+      color: #444; font-family: 'Courier New', monospace; font-size: 9px;
+    }
+    #brand a { color: #555; text-decoration: none; }
+    #brand a:hover { color: #73c99c; }
+  </style>
+</head>
+<body>
+<div id="ui">
+  <div class="title">FLOW VIZ <span class="muted">—</span> GITHUB</div>
+  <div class="subtitle">Repository attention economy — stars, forks, and PRs as flow</div>
+  <span class="key">[s]</span> Save PNG <span class="muted">|</span>
+  <span class="key">[r]</span> Regenerate <span class="muted">|</span>
+  <span class="key">[space]</span> Pause <span class="muted">|</span>
+  <span class="key">[d]</span> Debug<br>
+  <div id="metrics" class="muted" style="margin-top: 8px;">
+    <span class="metric">Repos: <span id="market-count">-</span></span>
+    <span class="metric">Particles: <span id="particle-count">-</span></span>
+    <span class="metric">FPS: <span id="fps">-</span></span>
+  </div>
+</div>
+<div id="status">
+  <span id="data-status">Fetching repos...</span>
+</div>
+<div id="info-panel"><span id="hover-info"></span></div>
+<div id="brand"><a href="https://edgelesslab.com">edgeless lab</a> — watch systems breathe</div>
+
+<script src="../../shared-engine/config/default.js"></script>
+<script src="../../shared-engine/core/event-bus.js"></script>
+<script src="../../shared-engine/core/plugin.js"></script>
+<script src="../../shared-engine/core/random.js"></script>
+<script src="../../shared-engine/adapters/data-source.js"></script>
+<script src="../../shared-engine/adapters/github.js"></script>
+<script src="../../shared-engine/core/fluid-engine.js"></script>
+<script src="../../shared-engine/core/orchestrator.js"></script>
+
+<script>
+const originalCreate = DataSourceFactory.create;
+DataSourceFactory.create = function(config) {
+  if (config.type === 'github') return new GitHubAdapter(config);
+  return originalCreate(config);
+};
+
+let frameCount = 0, lastFpsTime = 0, fps = 60;
+function updateFPS() {
+  frameCount++;
+  const now = performance.now();
+  if (now - lastFpsTime >= 1000) {
+    fps = frameCount; frameCount = 0; lastFpsTime = now;
+    document.getElementById('fps').textContent = fps;
+  }
+}
+
+Events.on('ENGINE_TICK', () => {
+  updateFPS();
+  if (frameCount % 30 === 0) {
+    const s = orchestrator.getStatus();
+    document.getElementById('market-count').textContent = s.markets;
+    document.getElementById('particle-count').textContent = s.particles;
+  }
+});
+
+Events.on('DATA_LOADED', (data) => {
+  document.getElementById('data-status').textContent = `LIVE | ${data.markets} repos`;
+});
+
+Events.on('MARKET_HOVER', ({ market }) => {
+  const panel = document.getElementById('info-panel');
+  const info = document.getElementById('hover-info');
+  const m = market.data.metadata || {};
+  let d = `<strong>${market.data.question}</strong>`;
+  if (m.language) d += ` | ${m.language}`;
+  if (m.stars !== undefined) d += ` | Stars: ${m.stars}`;
+  if (m.forks !== undefined) d += ` | Forks: ${m.forks}`;
+  if (m.description) d += `<br>${m.description}`;
+  info.innerHTML = d;
+  panel.classList.add('visible');
+});
+
+Events.on('MARKET_LEAVE', () => {
+  document.getElementById('info-panel').classList.remove('visible');
+});
+
+// Read username from URL params or default
+const params = new URLSearchParams(window.location.search);
+const ghUser = params.get('user') || 'edgeless-ai';
+
+function setup() {
+  // Seed is resolved by the orchestrator from ?seed= or picked fresh on load.
+  createCanvas(windowWidth, windowHeight);
+  colorMode(HSB, 360, 100, 100, 100);
+  CONFIG.dataSource.type = 'github';
+  CONFIG.dataSource.username = ghUser;
+  CONFIG.dataSource.maxRepos = 8;
+  CONFIG.dataSource.refreshInterval = 120000; // Refresh every 2min (rate limits)
+  CONFIG.particles.count = 600;
+  orchestrator.setup(this);
+  document.querySelector('.subtitle').textContent =
+    `Repository attention economy — ${ghUser}`;
+}
+
+function draw() { orchestrator.draw(); }
+function windowResized() { orchestrator.handleResize(); }
+function keyPressed() {
+  orchestrator.handleKeyPress(key);
+  if (key === 'd' || key === 'D') orchestrator.config.debug.enabled = !orchestrator.config.debug.enabled;
+}
+function mouseMoved() { orchestrator.handleMouseMove(mouseX, mouseY); }
+function mouseClicked() { orchestrator.handleMouseClick(mouseX, mouseY); }
+</script>
+</body>
+</html>

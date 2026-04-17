@@ -1,0 +1,11 @@
+name = "flow-api"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Deploy to flow-api.edgelesslab.com
+# After first deploy, add a custom domain in Cloudflare dashboard:
+# Workers & Pages → flow-api → Settings → Domains & Routes → Add Custom Domain
+# Enter: flow-api.edgelesslab.com
+
+[observability]
+enabled = true

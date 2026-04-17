@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Polymarket Flow Viz - Prototype V1</title>
+  <script>p5.disableFriendlyErrors = true;</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #0a0a0f; }
+    canvas { display: block; }
+    #info {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      color: #e8d5b7;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+<div id="info">Press 's' to save PNG | Press 'r' to regenerate layout</div>
+<script>
+// === CONFIGURATION ===
+const CONFIG = {
+  seed: 42,
+  particleCount: 800,
+  marketCount: 6,
+  fluidSpeed: 0.8,
+  showTrails: true
+};
+
+// === MOCK POLYMARKET DATA ===
+const MOCK_MARKETS = [
+  { id: 1, name: "BTC $100K 2024", volume: 4500000, yesPrice: 0.73, category: "crypto" },
+  { id: 2, name: "Trump 2024", volume: 12000000, yesPrice: 0.52, category: "politics" },
+  { id: 3, name: "ETH ETF", volume: 2800000, yesPrice: 0.89, category: "crypto" },
+  { id: 4, name: "Fed Rate Cut", volume: 5600000, yesPrice: 0.31, category: "finance" },
+  { id: 5, name: "NBA Champ", volume: 1900000, yesPrice: 0.45, category: "sports" },
+  { id: 6, name: "AI Regulation", volume: 3200000, yesPrice: 0.67, category: "tech" }
+];
+
+// === COLOR PALETTE ===
+const PALETTE = {
+  bg: '#0a0a0f',
+  markets: {
+    crypto: { base: [60, 80, 90], accent: [45, 95, 100] },      // Gold/Yellow
+    politics: { base: [0, 70, 85], accent: [340, 90, 95] },   // Red/Red-Orange
+    finance: { base: [160, 60, 80], accent: [140, 80, 95] },  // Green/Teal
+    sports: { base: [200, 70, 85], accent: [220, 85, 100] },   // Blue/Cyan
+    tech: { base: [280, 60, 85], accent: [300, 80, 100] }     // Purple/Pink
+  }
+};
+
+// === GLOBAL STATE ===
+let particles = [];
+let markets = [];
+let flowField;
+let trailLayer;
+let time = 0;
+
+// === CLASSES ===
+class Market {
+  constructor(data, x, y) {
+    this.data = data;
+    this.x = x;
+    this.y = y;
+    // Volume determines size
+    this.radius = map(Math.sqrt(data.volume), 0, Math.sqrt(15000000), 60, 200);
+    // Price determines color warmth
+    this.warmth = data.yesPrice; // 0-1, higher = warmer
+    this.category = data.category;
+    this.pulsePhase = random(TWO_PI);
+  }
+
+  update() {
+    this.pulsePhase += 0.02;
+  }
+
+  display() {
+    const palette = PALETTE.markets[this.category];
+    const h = lerp(palette.base[0], palette.accent[0], this.warmth);
+    const s = lerp(palette.base[1], palette.accent[1], this.warmth);
+    const b = lerp(palette.base[2], palette.accent[2], this.warmth);
+    
+    // Glow
+    for (let i = 3; i > 0; i--) {
+      const alpha = 30 - i * 8;
+      fill(h, s, b, alpha);
+      noStroke();
+      ellipse(this.x, this.y, this.radius * 2 + i * 20 + sin(this.pulsePhase) * 5);
+    }
+    
+    // Core
+    fill(h, s, b, 90);
+    stroke(h, s, 20, 100);
+    strokeWeight(2);
+    ellipse(this.x, this.y, this.radius * 2);
+    
+    // Volume indicator
+    const volHeight = map(this.data.volume, 0, 12000000, 5, this.radius - 10);
+    fill(h, s, 100, 60);
+    noStroke();
+    arc(this.x, this.y, this.radius * 1.6, this.radius * 1.6, PI, PI + PI * 0.5);
+  }
+
+  contains(x, y) {
+    return dist(x, y, this.x, this.y) < this.radius;
+  }
+}
+
+class Particle {
+  constructor() {
+    this.reset();
+  }
+
+  reset() {
+    // Spawn at random market
+    const market = random(markets);
+    const angle = random(TWO_PI);
+    const r = random(market.radius * 0.8);
+    this.x = market.x + cos(angle) * r;
+    this.y = market.y + sin(angle) * r;
+    this.origin = market;
+    this.target = null;
+    
+    this.vx = 0;
+    this.vy = 0;
+    this.life = 255;
+    this.decay = random(1, 3);
+    this.size = random(2, 5);
+    
+    // Color based on origin market
+    const palette = PALETTE.markets[market.category];
+    this.hue = random([palette.base[0], palette.accent[0]]);
+  }
+
+  update() {
+    // Find nearest market that's not origin
+    if (!this.target || random() < 0.01) {
+      let nearest = null;
+      let minDist = Infinity;
+      for (let m of markets) {
+        if (m !== this.origin) {
+          const d = dist(this.x, this.y, m.x, m.y);
+          if (d < minDist) {
+            minDist = d;
+            nearest = m;
+          }
+        }
+      }
+      this.target = nearest;
+    }
+
+    // Flow toward target with noise
+    if (this.target) {
+      const dx = this.target.x - this.x;
+      const dy = this.target.y - this.y;
+      const distToTarget = Math.sqrt(dx*dx + dy*dy);
+      
+      // Attraction force
+      const attractStrength = 0.3;
+      this.vx += (dx / distToTarget) * attractStrength;
+      this.vy += (dy / distToTarget) * attractStrength;
+    }
+    
+    // Curl noise flow field
+    const noiseScale = 0.003;
+    const angle = noise(this.x * noiseScale, this.y * noiseScale, time * 0.0001) * TWO_PI * 2;
+    this.vx += cos(angle) * 0.1;
+    this.vy += sin(angle) * 0.1;
+    
+    // Damping
+    this.vx *= 0.98;
+    this.vy *= 0.98;
+    
+    // Update position
+    this.x += this.vx * CONFIG.fluidSpeed;
+    this.y += this.vy * CONFIG.fluidSpeed;
+    
+    // Life
+    this.life -= this.decay;
+    
+    // Reset if dead or reached target
+    if (this.life <= 0 || (this.target && dist(this.x, this.y, this.target.x, this.target.y) < this.target.radius)) {
+      this.reset();
+    }
+    
+    // Boundary check
+    if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+      this.reset();
+    }
+  }
+
+  display() {
+    const sat = 70;
+    const bri = map(this.life, 0, 255, 30, 100);
+    fill(this.hue, sat, bri, this.life * 0.3);
+    noStroke();
+    ellipse(this.x, this.y, this.size);
+  }
+}
+
+// === SETUP ===
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  colorMode(HSB, 360, 100, 100, 100);
+  
+  randomSeed(CONFIG.seed);
+  noiseSeed(CONFIG.seed);
+  
+  // Create trail layer
+  trailLayer = createGraphics(width, height);
+  trailLayer.colorMode(HSB, 360, 100, 100, 100);
+  
+  initMarkets();
+  initParticles();
+}
+
+function initMarkets() {
+  markets = [];
+  // Poisson-disk-like placement
+  for (let i = 0; i < MOCK_MARKETS.length; i++) {
+    let attempts = 0;
+    let x, y, r;
+    const data = MOCK_MARKETS[i];
+    r = map(Math.sqrt(data.volume), 0, Math.sqrt(15000000), 60, 200);
+    
+    do {
+      x = random(r + 50, width - r - 50);
+      y = random(r + 50, height - r - 50);
+      attempts++;
+    } while (attempts < 100 && markets.some(m => dist(x, y, m.x, m.y) < r + m.radius + 100));
+    
+    markets.push(new Market(data, x, y));
+  }
+}
+
+function initParticles() {
+  particles = [];
+  for (let i = 0; i < CONFIG.particleCount; i++) {
+    particles.push(new Particle());
+  }
+}
+
+// === DRAW ===
+function draw() {
+  background(230, 30, 5); // Dark blue-black in HSB
+  
+  time = millis();
+  
+  // Fade trail layer
+  trailLayer.noStroke();
+  trailLayer.fill(230, 30, 5, 3);
+  trailLayer.rect(0, 0, width, height);
+  
+  // Update and draw particles to trail layer
+  for (let p of particles) {
+    p.update();
+    if (CONFIG.showTrails) {
+      trailLayer.fill(p.hue, 70, 100, 15);
+      trailLayer.noStroke();
+      trailLayer.ellipse(p.x, p.y, p.size * 0.5);
+    }
+  }
+  
+  // Composite trail layer
+  image(trailLayer, 0, 0);
+  
+  // Draw active particles
+  for (let p of particles) {
+    p.display();
+  }
+  
+  // Update and draw markets
+  for (let m of markets) {
+    m.update();
+    m.display();
+    
+    // Market label
+    fill(0, 0, 100, 80);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    textSize(10);
+    text(m.data.name, m.x, m.y - m.radius - 15);
+    
+    // Price indicator
+    textSize(8);
+    fill(0, 0, 100, 60);
+    text(`${(m.data.yesPrice * 100).toFixed(0)}% | $${(m.data.volume/1000000).toFixed(1)}M`, m.x, m.y + m.radius + 15);
+  }
+  
+  // Draw connections based on correlation (mock)
+  strokeWeight(1);
+  for (let i = 0; i < markets.length; i++) {
+    for (let j = i + 1; j < markets.length; j++) {
+      const m1 = markets[i];
+      const m2 = markets[j];
+      const d = dist(m1.x, m1.y, m2.x, m2.y);
+      
+      // Mock correlation: same category = higher
+      let correlation = 0.1;
+      if (m1.category === m2.category) correlation = 0.5;
+      if ((m1.category === 'crypto' && m2.category === 'finance') ||
+          (m1.category === 'finance' && m2.category === 'crypto')) correlation = 0.3;
+      
+      const alpha = correlation * 40;
+      stroke(0, 0, 100, alpha);
+      line(m1.x, m1.y, m2.x, m2.y);
+    }
+  }
+}
+
+// === EVENTS ===
+function keyPressed() {
+  if (key === 's' || key === 'S') {
+    saveCanvas('polymarket-flow-viz', 'png');
+  }
+  if (key === 'r' || key === 'R') {
+    CONFIG.seed = floor(random(99999));
+    randomSeed(CONFIG.seed);
+    noiseSeed(CONFIG.seed);
+    initMarkets();
+    initParticles();
+    trailLayer.background(230, 30, 5);
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  trailLayer = createGraphics(width, height);
+  trailLayer.colorMode(HSB, 360, 100, 100, 100);
+  trailLayer.background(230, 30, 5);
+}
+</script>
+</body>
+</html>

@@ -17,6 +17,155 @@ export interface BlogPost {
 
 export const posts: BlogPost[] = [
   {
+    slug: "12-dollar-ai-operations-team",
+    editorial: true,
+    title: "I Run a $12/Week AI Operations Team. Here's the Cost Breakdown.",
+    description: "Enterprise AI ops costs $50K+/month. I run 5 agents, 24/7, for $12/week. The architecture, the model routing, and why cheap doesn't mean fragile.",
+    date: "2026-04-19",
+    tags: ["Multi-Agent", "AI Infrastructure", "Cost Optimization", "Claude Code"],
+    readTime: "8 min",
+    productSlug: "multi-agent-blueprint",
+    ctaHook: "The complete Paperclip OS blueprint: configs, routing logic, and the cost calculator behind this post.",
+    isLaunch: true,
+    content: `
+Enterprise AI operations run $50,000 per month for a modest setup. The bill breaks down predictably: API calls at scale, managed vector databases, orchestration platforms with per-seat pricing, and the human team to manage the agents that are supposed to reduce labor.
+
+I run five AI agents 24/7 for $12 per week. They handle code review, research synthesis, content triage, knowledge base maintenance, and production monitoring. The architecture isn't a demo. It's been running for three months, survived a corrupted session recovery, and processed 8,000+ tasks without a manual restart.
+
+This is the complete cost breakdown and the specific technical decisions that make cheap infrastructure reliable.
+
+## The Weekly Cost Stack
+
+| Component | Provider | Weekly Cost | Role |
+|-----------|----------|-------------|------|
+| Agent inference (dispatch + 4 workers) | Fireworks AI | $4.20 | Model routing, task execution |
+| ChromaDB embedding storage | Self-hosted (Hetzner) | $2.80 | Vector storage, 47K documents |
+| Paperclip orchestration | Self-hosted (local) | $0.00 | Agent coordination, backlog management |
+| File sync between agents | rsync over SSH | $0.00 | Async inbox, state machine |
+| Telegram notifications | Bot API | $0.00 | Human escalation, status reports |
+| **Total** | | **$7.00** | Core operations |
+| **+ Knowledge synthesis** | Fireworks AI | $3.50 | KB loop, embeddings, nightly batch |
+| **+ Dev/test cycles** | Fireworks AI | $1.50 | Development, debugging |
+| **Grand total** | | **$12.00** | Full 5-agent system |
+
+The $50K enterprise equivalent runs managed vector DB (Pinecone Pro: $2,400/mo), orchestration platform (LangSmith Teams: $1,500/mo), API costs at volume (OpenAI Enterprise: ~$3,000/mo), and the engineering time to wire it together (0.5 FTE: $8,000/mo).
+
+The difference isn't just provider choice. It's architecture decisions that eliminate managed-service dependencies.
+
+## The Agent Topology
+
+Five agents run in a dispatch/worker topology. This isn't decorative. It's the simplest structure that solves the actual production problems.
+
+**Hermes (Chief of Staff)** — My primary session agent. Receives all human requests, decides whether to execute directly or delegate. Runs on Kimi K2.5 via Fireworks. Context window management is the constraint: it sees the full project state and delegates to specialists when the task requires specific tools or extended processing.
+
+**Dispatch (COO)** — A Paperclip-managed agent that never executes tasks directly. Its only job is routing: receive task requests from Hermes, assign to appropriate workers, track state machine transitions, escalate stuck tasks. It runs on a lighter model (DeepSeek V3.2) because its cognitive load is lower—it's matching patterns, not reasoning about code.
+
+**Builder** — Claude Code agent on a VPS. Handles all code changes: feature implementation, bug fixes, refactoring. Runs on Anthropic Claude via standard API. The VPS isolates it from my local machine state, which means it can run overnight without my laptop being open.
+
+**Researcher** — Deep research agent. Consumes RSS feeds, YouTube transcripts, arXiv papers, synthesizes findings into structured reports. Runs Kimi K2.5 with extended context. Its output feeds directly into the knowledge base.
+
+**Verifier** — Quality control agent. Reviews Builder's output, runs tests, checks for security issues, validates against acceptance criteria. Acts as a gate before deployment.
+
+The topology solves three specific failure modes I've hit with single-agent approaches:
+
+1. **Context pollution**: When a single agent switches between coding and research, it drops relevant context from the earlier task. Specialists keep their context focused.
+
+2. **Tool confusion**: Agents with 20+ tools start calling the wrong ones. Specialists have 4-6 tools each. The tool selection accuracy is visibly higher.
+
+3. **State loss on crash**: A single long-running session that crashes loses everything. Distributed state means any single agent can restart without losing the system's progress.
+
+## Model Routing: Four Different Brains
+
+The routing isn't random. Each model has a specific operational profile:
+
+| Model | Use Case | Input Cost | Output Cost | Weekly Tasks |
+|-------|----------|------------|-------------|--------------|
+| Kimi K2.5 | General reasoning, long context | $0.50/M | $2.00/M | ~180 |
+| DeepSeek V3.2 | Fast execution, low complexity | $0.27/M | $1.10/M | ~340 |
+| Claude Opus 4 | Code review, security analysis | $15.00/M | $75.00/M | ~25 |
+| Codex (GPT-5.4) | Code generation, refactoring | $3.00/M | $12.00/M | ~40 |
+
+Kimi K2.5 handles 70% of tasks because it's the cheapest generalist that doesn't hallucinate tools. DeepSeek takes the high-volume, low-cognitive-load work (formatting, simple transformations, status checks). Claude Opus is reserved for security-sensitive reviews—it's expensive but catches issues the cheaper models miss. Codex handles bulk code generation where context length matters more than nuance.
+
+The routing decision happens at the dispatch layer. Tasks include a complexity tag (low/medium/high) and a security flag. Low complexity + no security flag → DeepSeek. High complexity or security flag → Kimi or Opus depending on domain.
+
+This routing alone cuts costs 10x versus using a single model for everything.
+
+## The Knowledge Base Loop
+
+Every agent operation feeds a knowledge base. Not as an afterthought—as a core system function.
+
+The loop works like this:
+
+1. **Capture**: All agent outputs, research findings, error logs, and human corrections write to ChromaDB with embeddings.
+
+2. **Synthesize**: A nightly batch job (separate agent) queries for related documents, detects themes, and writes synthesized summaries.
+
+3. **Verify**: Another agent samples the synthesized notes, checks for factual drift or contradictions, flags issues.
+
+4. **Inject**: The verified synthesis becomes retrievable context for all agents.
+
+The loop means agents don't just have tools—they have memory of what the system has learned. When Builder encounters an error, it can query: "how did we solve similar errors before?" The answer comes from actual previous sessions, not generic training data.
+
+The KB infrastructure costs $2.80/week (self-hosted ChromaDB on a €6.50 Hetzner instance). The managed equivalent (Pinecone, Weaviate Cloud) runs $200-400/month.
+
+## File-Based Agent Communication
+
+The agents communicate through two channels:
+
+**Agent Bus**: Real-time MCP connection on port 9800. Handles urgent coordination: task assignment, status updates, human escalation. Messages route through a local daemon that queues for offline agents.
+
+**Async Inboxes**: File-based system synced via rsync every 60 seconds. Each agent has an inbox directory. Dispatch writes task files, workers read and write results. The filesystem is the message queue.
+
+Why files instead of a proper message queue (RabbitMQ, Redis)?
+
+1. **Observability**: I can \`cat /inbox/builder/task-4821.json\` and see exactly what was sent.
+
+2. **Recovery**: If a task fails, the file is right there with full context. No log archaeology.
+
+3. **Zero ops**: No database to manage, no connection pools, no retry logic. The filesystem has been reliable for 50 years.
+
+The latency is higher (60s sync cycle) but the reliability is perfect. For tasks that need real-time, the Agent Bus handles it. Most tasks are fine with 60s latency.
+
+## The Failure Modes
+
+Cheap infrastructure has specific failure modes. I've hit them.
+
+**Session poisoning**: An agent corrupted its own skill definitions through repeated partial updates. The corruption spread to other agents that read the shared skill file. Detection took 6 hours. Recovery required restoring from backup and adding versioned skill files.
+
+The fix: skill files now include a checksum. Agents verify before loading. Corrupted skills fail closed (agent stops) rather than open (agent runs with bad definitions).
+
+**Model degradation**: Kimi K2.5 had a quality regression on one Fireworks deployment. The routing layer detected elevated error rates and automatically shifted load to the backup deployment. Total impact: 4 minutes of degraded service.
+
+The fix: health checks on model endpoints, automatic failover, circuit breaker pattern for failing providers.
+
+**Resource exhaustion**: ChromaDB hit its memory limit during a large embedding batch. The indexer kept retrying, filling logs, failing silently. The KB synthesizer agent detected the backlog growth and alerted before the disk filled.
+
+The fix: resource-aware batch sizing, explicit memory limits, monitoring on queue depth not just error rates.
+
+## What This Architecture Can't Do
+
+Honest limitations:
+
+- **No high-availability guarantee**: Single VPS, single Mac. If Hetzner has an outage, the remote agents stop. Recovery is manual.
+- **No multi-region redundancy**: 60s rsync is fine for async tasks, but real-time coordination can't survive a network partition.
+- **No formal verification**: The state machine is tested, not proven. Edge cases exist.
+- **No enterprise compliance**: No SOC 2, no audit logs for regulators. This is a solo operation.
+
+The architecture optimizes for "good enough for one person" not "good enough for 1,000 customers."
+
+## Getting Started
+
+You don't need five agents on day one. Start with two: one primary, one specialist for your most common task type. Add the dispatch layer when you're tired of manually routing tasks. Add workers when you hit the cognitive limits of your existing agents.
+
+The infrastructure I described—the model routing, the KB loop, the file-based communication—ships as the Paperclip OS. It's the blueprint, the config files, the monitoring setup, and the failure patterns I documented so you don't have to discover them.
+
+The [Paperclip OS](/products) is $49. That pays for itself the first time it prevents a corrupted session or routes a task to the cheapest model that can handle it.
+
+The $12/week isn't the point. The point is that cheap infrastructure can be reliable if you design for the actual failure modes instead of the theoretical ones.
+    `.trim(),
+  },
+  {
     slug: "when-plaid-becomes-tartan",
     editorial: true,
     title: "When Does Generated Plaid Become Tartan?",
@@ -154,7 +303,7 @@ If you are starting from zero, begin with the flow field. It is the most forgivi
   },
   {
     slug: "meta-ai-style-guide",
-    title: "Meta's AI Has a Style Guide. Here's What I Took From It.",
+    title: "Meta's AI Has a Style Guide: What I Imported, What I Rewrote, What I Rejected.",
     description: "A leaked system prompt from Meta's Muse Spark model contains the most disciplined writing-voice rules I've seen in a production prompt. Five rules I imported, one I rewrote, one I'm still arguing with.",
     date: "2026-04-10",
     tags: ["Prompt Engineering", "AI Agents", "System Prompts"],
@@ -334,7 +483,7 @@ Everything on the [products page](/products).
     productSlug: "gen-art-starter",
     ctaHook: "Working generators for every algorithm in this post, plus SVG optimization scripts.",
     isLaunch: true,
-    title: "I Built 75 Generative Art Algorithms. Here Are the 10 That Actually Look Good.",
+    title: "I Built 75 Generative Art Algorithms. These 10 Actually Look Good.",
     description: "Most generative art looks like noise. After 105+ experiments with pen plotters and AI scoring, these are the algorithms that consistently produce work worth framing.",
     date: "2026-04-08",
     tags: ["Generative Art", "Pen Plotters", "Creative Coding"],
@@ -532,7 +681,7 @@ The full workflow JSON files, setup guides, and customization instructions are i
     ctaHook: "Auth middleware, rate limiting, health checks, and Docker configs that survived production.",
     isLaunch: true,
     editorial: true,
-    title: "Most MCP Servers Break in Production. Here's Why.",
+    title: "Most MCP Servers Break in Production. The 5 Failure Modes I Found.",
     description: "400+ MCP servers exist. Most work in demos and fail under real load. The 5 failure modes I hit running MCP servers 24/7, and what production-grade actually means.",
     date: "2026-04-05",
     tags: ["MCP", "Infrastructure", "Production"],
@@ -645,7 +794,7 @@ Your job isn't to trust the agent. It's to make the wrong path impossible.
     ctaHook: "10 production hooks, composition patterns, and the damage-control system from this post.",
     isLaunch: true,
     title: "The Hook That Saved My Codebase",
-    description: "A single Claude Code hook prevented a cascading rm -rf from wiping source files. Here's how damage-control hooks work, and 3 you can steal today.",
+    description: "A single Claude Code hook prevented a cascading rm -rf from wiping source files. The damage-control pattern, and 3 hooks you can steal today.",
     date: "2026-04-03",
     tags: ["Claude Code", "Hooks", "Developer Tools"],
     readTime: "5 min",
@@ -691,7 +840,7 @@ The hooks that matter most aren't the clever ones. They're the boring ones that 
     slug: "pretext-typography-that-thinks",
     editorial: true,
     title: "PreText: Typography That Thinks",
-    description: "Most web text is a dumb rectangle. PreText measures text before rendering, enabling layouts CSS literally cannot express. Here's how we use it.",
+    description: "Most web text is a dumb rectangle. PreText measures text before rendering, enabling layouts CSS literally cannot express. Six ways we use it.",
     date: "2026-04-02",
     tags: ["PreText", "Typography", "Web Development"],
     readTime: "6 min",
@@ -964,7 +1113,7 @@ Read the longer technical version in [How Claude Code Memory Actually Works](/bl
     slug: "mcp-servers-unix-pipes-of-ai",
     editorial: true,
     title: "Why MCP Servers Are the Unix Pipes of AI",
-    description: "The Unix philosophy changed software forever: small tools, composable via pipes. MCP does the same thing for AI agents. Here's why that matters.",
+    description: "The Unix philosophy changed software forever: small tools, composable via pipes. MCP does the same thing for AI agents. Why that matters for building agent systems.",
     date: "2026-03-24",
     tags: ["MCP", "Architecture", "Developer Tools"],
     readTime: "5 min",
@@ -1183,19 +1332,19 @@ The solution is a three-layer memory system:
 
 Each layer serves a different retrieval pattern. ChromaDB handles "find me something similar to X." File memory handles "what did the user tell me about Y." The vault handles "what's the canonical documentation for Z."
 
-## The Trading Bot
+## The Safety Layer
 
-Pamela, the autonomous trading agent, was the forcing function for getting the infrastructure right. A trading bot that loses money because it forgot its strategy is worse than no bot at all.
+The autonomous agent that lost $252 was the forcing function for getting the infrastructure right. An agent that takes irreversible actions without guardrails is worse than no agent at all.
 
-She runs 24/7 on the VPS, monitored by PM2. Her architecture:
+The hooks system runs on every tool call, 24/7. Its architecture:
 
-- **Market scanning**: Polymarket API for contract discovery
-- **Analysis**: ML-driven probability estimation
-- **Position sizing**: Kelly criterion with configurable risk limits
-- **Execution**: Automated order placement and management
-- **Reporting**: Daily P&L summaries via Telegram
+- **Damage control**: Blocks destructive commands before they execute
+- **Scope guard**: Prevents agents from exceeding their explicit mandate
+- **Financial gate**: Requires verification protocol before any transaction
+- **Reversibility classifier**: Categorizes actions by blast radius
+- **Completion verifier**: Evidence-based proof that work is actually done
 
-The key insight: the bot doesn't need to be smart about everything. It needs to be smart about a few things and disciplined about the rest.
+The key insight: the agent doesn't need to be smart about everything. It needs guardrails that are smarter than its worst impulse.
 
 ## Lessons Learned
 
@@ -1220,7 +1369,7 @@ The goal isn't to build the most complex system. It's to build the most useful o
     slug: "how-claude-code-memory-works",
     editorial: true,
     title: "How Claude Code Memory Actually Works",
-    description: "Claude forgets everything between sessions. Here's how file-based memory fixes that, and why it changes how you work with AI.",
+    description: "Claude forgets everything between sessions. File-based memory fixes that. The simplest setup, and why it changes how you work with AI.",
     date: "2026-03-21",
     tags: ["Claude Code", "Memory", "Developer Tools"],
     readTime: "6 min",
@@ -1326,6 +1475,94 @@ The free version covers 90% of use cases. For production patterns including stac
 **Pro ($29):** [Claude Memory Kit Pro on Gumroad](https://edgelessai.gumroad.com/l/claude-memory-kit)
 
 The best time to set up memory is before your next session. Takes 15 minutes, saves hours every week.
+    `.trim(),
+  },
+  {
+    slug: "12-dollar-ai-operations-team",
+    editorial: true,
+    title: "The $12/Week AI Operations Team",
+    description: "How I replaced a $200K enterprise stack with multi-agent orchestration. The architecture, the economics, and the 10 agents that actually run my business.",
+    date: "2026-04-17",
+    tags: ["AI Agents", "Multi-Agent", "Cost Optimization", "Architecture"],
+    readTime: "8 min",
+    productSlug: "multi-agent-blueprint",
+    ctaHook: "Complete orchestration blueprint with configs, scripts, and deployment guides. Deploy your own $12/week ops team.",
+    content: `
+Last year, my "solo" operation looked like this: Notion + manual triage (2 hrs/day), Hootsuite + spreadsheets ($99/mo), research synthesis at midnight drowning in bookmarks, GitHub Actions that broke twice a week, and notification hell across Slack + email + Telegram. Total cost: ~$4,000/year in SaaS + 20+ hours/week of my time.
+
+I was paying enterprise prices for enterprise complexity, but what I actually needed was opinionated orchestration. Not another dashboard. Not another "AI assistant" that forgets context every 5 minutes. I needed a system where agents have persistent memory across sessions, work gets routed to the right brain for the job, knowledge accumulates instead of evaporating, and everything runs on infrastructure I control.
+
+The goal: Replace the $4K/year SaaS stack + 20 hrs/week manual work with something that costs less than a burrito per week and actually remembers what I told it yesterday.
+
+## The Solution: Multi-Agent Architecture
+
+Here's what I built. Total cost: $12/week in API calls and VPS hosting.
+
+**The Agents:**
+
+**Hermes (Chief of Staff)** - Model: Kimi K2.5 via Fireworks. Role: Entry point for all human communication. Maintains session state, handles context windows, routes tasks to specialized agents. When I say "check if the trading bot is healthy," Hermes knows which agent handles infrastructure checks and what "healthy" means for that system.
+
+**Dispatch (Operations Manager)** - Model: DeepSeek V3.2. Role: The COO that never sleeps. Reads all incoming signals (GitHub webhooks, RSS feeds, Telegram messages), assigns priority scores, and routes to appropriate handlers. Maintains a real-time backlog of everything that needs attention.
+
+**Synthesizer (Knowledge Curator)** - Model: Claude 3.5 Sonnet. Role: The KB loop. Takes raw inputs (YouTube transcripts, RSS articles, research papers), extracts signal from noise, scores by relevance (1-10), and either archives or promotes to the knowledge base. Uses ChromaDB for embeddings, Obsidian for human-readable storage.
+
+**Reviewer (Quality Control)** - Model: GPT-4.1 (OpenRouter). Role: Code review, content editing, fact-checking. The skeptic that catches what I miss at 2am.
+
+## The Knowledge Base Loop (KB Loop Score: 0-25)
+
+Here's what makes this different from "chat with your documents" tools. Every piece of information gets scored on four dimensions: Signal density (5 pts), Recency (5 pts), Source reputation (5 pts), and Actionability (5 pts).
+
+**Routing rules:** Score 0-2 gets archived (idempotent, never reprocess). Score 3-6 goes to inbox queue for human review. Score 7-9 gets auto-promoted to knowledge base (NotebookLM-ready). Score 10+ flags for ticket creation.
+
+This isn't just filing cabinets. It's opinionated triage that learns your preferences.
+
+## Multi-Model Routing: The Economics
+
+Why four different models? Because not every task needs a $0.03/token reasoning engine.
+
+| Agent | Model | Use Case | Cost/1K calls |
+|-------|-------|----------|---------------|
+| Hermes | Kimi K2.5 | General interface, routing | $0.0004 |
+| Dispatch | DeepSeek V3.2 | Structured JSON, triage | $0.0002 |
+| Synthesizer | Claude 3.5 Sonnet | Long-context synthesis | $0.003 |
+| Reviewer | GPT-4.1 | Code review, precision | $0.005 |
+| Specialist | Codex | Code generation | As needed |
+
+**Weekly breakdown:** 500 routing calls ($0.20), 200 synthesis operations ($0.60), 50 code reviews ($0.25), VPS Hetzner 8GB ($5.35), ChromaDB + infrastructure (~$5). **Total: $11.40/week.**
+
+Compare to: A single Copilot Pro subscription ($20/mo) that doesn't even remember your codebase context between sessions.
+
+## Session Recovery: The Feature You Don't Know You Need
+
+Here's what broke in my first implementation: After a 3-hour research session, the agent lost connection. All context: gone. All the nuanced routing decisions I'd explained: gone. I had to start over.
+
+So I built session poisoning detection and recovery: Memory scrubbing strips context that could leak from auto-generated content, periodic snapshots checkpoint session state every 10 minutes, corruption detection catches when an agent starts hallucinating tools it doesn't have, and warm restart resumes from the last clean checkpoint.
+
+It's not in the marketing copy. It's the difference between usable and maddening.
+
+## File-Based Communication (Yes, Really)
+
+My agents don't use gRPC. They don't use message queues. They use rsync + markdown files.
+
+Why? Because it's human-readable debugging (cat the file, see the state), works offline (queue files, sync when connected), has Git history for free (track how decisions evolved), and has zero serialization headaches.
+
+When an agent finishes work, it writes to workproducts/. When it needs input, it reads from inbox/. Files are atomic. No partial states, no network partitions, no mystery.
+
+When latency matters more than debuggability, I'll upgrade to HTTP. For now, files win.
+
+## What's Actually Running
+
+This isn't vaporware. Here's the current fleet: 10 autonomous agents (healthy on hermes_local adapter), 7 cron jobs (heartbeat, backlog sync, knowledge harvest), 3,200 documents in the knowledge base, ~50 API calls/day across the routing layer, and 99.7% uptime (that 0.3% was me breaking config, not the system).
+
+The infrastructure lives on a Hetzner VPS in Helsinki. The agents coordinate through Paperclip (open-source orchestration layer). The knowledge base syncs to my Obsidian vault locally.
+
+## The Real Lesson
+
+The future isn't "one AI assistant that does everything." It's specialized agents that remember, orchestrated by a system you control.
+
+Enterprise AI wants to sell you seats. What you need is infrastructure.
+
+$12/week. Infrastructure you own. Agents that don't forget.
     `.trim(),
   },
 ];

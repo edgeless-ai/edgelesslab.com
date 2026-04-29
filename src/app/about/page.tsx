@@ -35,7 +35,7 @@ const timeline = [
     period: "2025",
     title: "Agent infrastructure",
     description:
-      "Built Pamela (autonomous Polymarket trader), the 3-layer memory system (ChromaDB + PyTorch + Obsidian vault), and the unified LLM client with automatic provider fallback.",
+      "Built the agent safety hook system, the 3-layer memory system (ChromaDB + PyTorch + Obsidian vault), and the unified LLM client with automatic provider fallback.",
   },
   {
     period: "2024",

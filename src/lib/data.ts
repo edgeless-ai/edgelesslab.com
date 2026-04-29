@@ -291,17 +291,17 @@ export const products: Product[] = [
 
 export const projects = [
   {
-    slug: "pamela",
-    title: "Pamela",
-    description: "Autonomous prediction market agent. ML-driven position sizing, live on Polymarket 24/7.",
-    longDescription: "Pamela is an autonomous trading agent that monitors prediction markets on Polymarket, identifies mispriced contracts using ML-driven sentiment analysis and probability estimation, and executes trades with intelligent position sizing. Built in TypeScript, deployed on a Hetzner VPS, managed by PM2 for 24/7 uptime.",
-    tags: ["TypeScript", "ML", "Polymarket", "PM2"],
-    category: "Agents",
-    snippet: `$ pm2 status pamela\n│ online │ 0 restarts\n\n24/7 autonomous execution`,
-    stack: ["TypeScript", "Node.js", "PM2", "Hetzner VPS", "Polymarket API"],
+    slug: "safety-hooks",
+    title: "Safety Hooks",
+    description: "Production guardrails for autonomous agents. Damage control, scope guards, financial gates.",
+    longDescription: "A battle-tested hook system that prevents autonomous agents from taking destructive actions. Includes damage control (blocks dangerous commands), scope guard (prevents mandate creep), financial gate (requires verification before transactions), and reversibility classifier (categorizes actions by blast radius). Born from a real $252 loss incident.",
+    tags: ["Python", "Hooks", "Safety", "Claude Code"],
+    category: "Infrastructure",
+    snippet: `$ hook: damage-control\n  blocked: rm -rf /\n  reason: destructive operation\n\n✓ 0 incidents this week`,
+    stack: ["Python", "SQLite", "YAML", "Claude Code Hooks API"],
     status: "Live",
     related: [
-      { title: "Mastra Orchestrator", href: "/projects/mastra-orchestrator" },
+      { title: "MCP Servers", href: "/projects/mcp-servers" },
     ],
   },
   {
@@ -343,7 +343,7 @@ export const projects = [
     stack: ["TypeScript", "Mastra", "OpenRouter", "PM2"],
     status: "Live",
     related: [
-      { title: "Pamela", href: "/projects/pamela" },
+      { title: "Safety Hooks", href: "/projects/safety-hooks" },
     ],
   },
   {

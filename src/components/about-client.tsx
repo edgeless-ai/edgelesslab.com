@@ -105,9 +105,9 @@ export function StatsGrid({ stats }: { stats: Stat[] }) {
 }
 
 const philosophyParagraphs = [
-  "Most AI companies are building demos. This lab builds infrastructure that runs 24/7. Pamela trades autonomously. The knowledge pipeline indexes thousands of documents. The MCP servers handle real queries from real agents.",
+  "Most AI companies are building demos. This lab builds infrastructure that runs 24/7. The knowledge pipeline indexes thousands of documents. The MCP servers handle real queries from real agents. The hooks catch mistakes before they cost real money.",
   "The lab exists at the intersection of AI, craft, and systems thinking. Every project ships. Every tool gets used. If it doesn\u2019t work in production, it doesn\u2019t exist.",
-  "The best AI tools are built by people who use them every day. Everything here is dogfooded. The orchestration layer routes my own work. The memory system stores my own knowledge. The agents manage my own portfolio.",
+  "The best AI tools are built by people who use them every day. Everything here is dogfooded. The orchestration layer routes my own work. The memory system stores my own knowledge. The hooks guard my own agents.",
 ];
 
 const philosophyPullQuotes = [

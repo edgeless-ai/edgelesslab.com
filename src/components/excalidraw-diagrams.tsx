@@ -45,7 +45,7 @@ const DIAGRAMS: Diagram[] = [
   { slug: "key-development-patterns-2026-03-10", title: "Key Development Patterns" },
   { slug: "langfuse-observability-2026-03-10", title: "Langfuse Observability" },
   { slug: "hummingbot-sentiment-integration-2026-03-10", title: "Hummingbot Sentiment Integration" },
-  { slug: "pamela-proxy-wallet-architecture", title: "Pamela Proxy Wallet Architecture" },
+  { slug: "hook-safety-architecture", title: "Hook Safety Architecture" },
   { slug: "pen-plotter-art-system-2026-03-10", title: "Pen Plotter Art System" },
   { slug: "hub-spoke-memory", title: "Hub Spoke Memory" },
   { slug: "mind-map", title: "Mind Map" },

@@ -17,7 +17,7 @@ import { Footer } from "@/components/footer";
 import { experiments, projects } from "@/lib/data";
 
 const featured = [
-  { slug: "pamela", span: "md:col-span-2 md:row-span-2" },
+  { slug: "safety-hooks", span: "md:col-span-2 md:row-span-2" },
   { slug: "mcp-servers", span: "" },
   { slug: "pen-plotter-art", span: "" },
 ].map(({ slug, span }) => {
@@ -51,10 +51,11 @@ const capabilities = [
 })`,
   },
   {
-    label: "Autonomous Trading",
-    snippet: `$ pm2 status pamela
-│ pamela │ online │ 0 restarts │
-│ 24/7 autonomous execution     │`,
+    label: "Agent Safety Hooks",
+    snippet: `$ hook: damage-control
+  blocked: rm -rf /
+  reason: destructive operation
+✓ 0 incidents this week`,
   },
   {
     label: "Knowledge Pipelines",

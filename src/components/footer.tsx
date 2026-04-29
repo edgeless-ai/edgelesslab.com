@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 const toolLinks = [
-  { label: "Pamela", href: "/projects/pamela" },
+  { label: "Safety Hooks", href: "/projects/safety-hooks" },
   { label: "MCP Servers", href: "/projects/mcp-servers" },
   { label: "Knowledge API", href: "/projects/knowledge-api" },
   { label: "LLM Client", href: "/projects/llm-client" },

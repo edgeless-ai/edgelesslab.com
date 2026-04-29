@@ -57,7 +57,7 @@ export function ProjectsHeader() {
           animation: "fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.18s both",
         }}
       >
-        Four always-on services on one Hetzner box. Pamela trades, Hermes assists, pm2 managed, zero restarts.
+        Four always-on services on one Hetzner box. Hooks guard, Hermes assists, pm2 managed, zero restarts.
       </p>
     </>
   );

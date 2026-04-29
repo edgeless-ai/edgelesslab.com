@@ -88,7 +88,7 @@
 // Check for proxy URL
 const params = new URLSearchParams(window.location.search);
 const proxyUrl = params.get('proxy') || null;
-const PROXY_BASE = proxyUrl || 'https://flow-api.djm-claude-assistant.workers.dev';
+const PROXY_BASE = proxyUrl || 'https://flow-api.edgelesslab.com';
 
 let useMock = false;
 
@@ -141,42 +141,40 @@ Events.on('MARKET_LEAVE', () => {
   document.getElementById('info-panel').classList.remove('visible');
 });
 
-// p5 setup() is synchronous so we check the proxy first, then start p5.
-checkProxy().then(proxyAvailable => {
+async function setup() {
+  randomSeed(42); noiseSeed(42);
+  createCanvas(windowWidth, windowHeight);
+  colorMode(HSB, 360, 100, 100, 100);
+  CONFIG.engine.seed = 42;
+
+  const proxyAvailable = await checkProxy();
+
   if (proxyAvailable) {
     CONFIG.dataSource.type = 'rest';
     CONFIG.dataSource.api.proxyUrl = PROXY_BASE;
     CONFIG.dataSource.refreshInterval = 60000;
   } else {
+    useMock = true;
     CONFIG.dataSource.type = 'mock';
     CONFIG.dataSource.mockDataSet = 'default';
-    CONFIG.dataSource.refreshInterval = 5000;
+    CONFIG.dataSource.refreshInterval = 5000; // Fast refresh for mock
+    // Flash notice briefly
     document.getElementById('proxy-notice').classList.add('visible');
-    setTimeout(() => document.getElementById('proxy-notice').classList.remove('visible'), 6000);
+    setTimeout(() => document.getElementById('proxy-notice').classList.remove('visible'), 4000);
   }
-  CONFIG.particles.count = 1200;
 
-  new p5(function(p) {
-    p.setup = function() {
-      p.createCanvas(p.windowWidth, p.windowHeight);
-      p.colorMode(p.HSB, 360, 100, 100, 100);
-      orchestrator.setup(p);
-    };
-    p.draw = function() { orchestrator.draw(); };
-    p.windowResized = function() { orchestrator.handleResize(); };
-    p.keyPressed = function() {
-      orchestrator.handleKeyPress(p.key);
-      if (orchestrator.config && (p.key === 'd' || p.key === 'D'))
-        orchestrator.config.debug.enabled = !orchestrator.config.debug.enabled;
-    };
-    p.mouseMoved = function() { orchestrator.handleMouseMove(p.mouseX, p.mouseY); };
-    p.mouseClicked = function() { orchestrator.handleMouseClick(p.mouseX, p.mouseY); };
-  });
-});
+  CONFIG.particles.count = 800;
+  orchestrator.setup(this);
+}
 
-// Prevent p5 global auto-start
-function setup() { noLoop(); }
-function draw() {}
+function draw() { orchestrator.draw(); }
+function windowResized() { orchestrator.handleResize(); }
+function keyPressed() {
+  orchestrator.handleKeyPress(key);
+  if (key === 'd' || key === 'D') orchestrator.config.debug.enabled = !orchestrator.config.debug.enabled;
+}
+function mouseMoved() { orchestrator.handleMouseMove(mouseX, mouseY); }
+function mouseClicked() { orchestrator.handleMouseClick(mouseX, mouseY); }
 </script>
 </body>
 </html>

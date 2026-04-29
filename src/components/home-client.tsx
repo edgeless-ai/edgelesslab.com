@@ -169,7 +169,7 @@ export function HeroSection() {
               style={{ color: "var(--text-secondary)" }}
             >
               <span style={{ color: "var(--text-tertiary)" }}>{"$ pm2 status\n"}</span>
-              {"pamela       "}<span style={{ color: "var(--green)" }}>online</span>{"   trading bot\n"}
+              {"hooks        "}<span style={{ color: "var(--green)" }}>online</span>{"   safety layer\n"}
               {"hermes       "}<span style={{ color: "var(--green)" }}>online</span>{"   assistant\n"}
               {"ml-server    "}<span style={{ color: "var(--green)" }}>online</span>{"   pytorch\n"}
               {"mcp-bridge   "}<span style={{ color: "var(--green)" }}>online</span>{"   tools\n\n"}

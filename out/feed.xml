@@ -7,6 +7,20 @@
     <language>en-us</language>
     <atom:link href="https://edgelesslab.com/feed.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>The AI Agent That Never Sleeps: Running Hermes 24/7 on a $5 VPS</title>
+      <link>https://edgelesslab.com/blog/ai-agent-never-sleeps-hermes-vps</link>
+      <description>Most AI agents die when you close the laptop. Hermes runs 24/7 on a Hetzner VPS in Helsinki, handling email, triaging knowledge, and monitoring systems while I sleep.</description>
+      <pubDate>Wed, 29 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/ai-agent-never-sleeps-hermes-vps</guid>
+    </item>
+    <item>
+      <title>The Agent Grounding Problem: How Hermes Knows What&apos;s Real</title>
+      <link>https://edgelesslab.com/blog/agent-grounding-problem-hermes</link>
+      <description>AI agents confabulate. They claim files exist that don&apos;t. They report tasks complete that aren&apos;t. The grounding problem isn&apos;t philosophical -- it&apos;s operational.</description>
+      <pubDate>Wed, 29 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/agent-grounding-problem-hermes</guid>
+    </item>
+    <item>
       <title>Claude Code Hooks: The Harness Engineering That Actually Matters</title>
       <link>https://edgelesslab.com/blog/claude-code-hooks-harness-engineering</link>
       <description>Everyone&apos;s optimizing their prompts. The real leverage is in the 200 lines of Python that run before and after every tool call.</description>

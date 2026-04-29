@@ -17,6 +17,171 @@ export interface BlogPost {
 
 export const posts: BlogPost[] = [
   {
+    slug: "ai-agent-never-sleeps-hermes-vps",
+    editorial: true,
+    title: "The AI Agent That Never Sleeps: Running Hermes 24/7 on a $5 VPS",
+    description: "Most AI agents die when you close the laptop. Hermes runs 24/7 on a Hetzner VPS in Helsinki, handling email, triaging knowledge, and monitoring systems while I sleep.",
+    date: "2026-04-29",
+    tags: ["Hermes", "AI Agents", "VPS", "Infrastructure"],
+    readTime: "7 min",
+    productSlug: "multi-agent-blueprint",
+    ctaHook: "The dispatch pattern, bus protocol, and reference implementations for building your own always-on agent system.",
+    content: `
+Most AI agents die when you close the laptop. Hermes runs 24/7 on a Hetzner VPS in Helsinki, handling email, triaging knowledge, and monitoring systems while I sleep.
+
+## The Problem With Session-Based Agents
+
+Every AI coding assistant has the same limitation: it exists inside your session. Close the terminal, lose the agent. Come back tomorrow, re-explain everything.
+
+I needed an agent that processes incoming signals on a schedule, triages my knowledge base without me watching, monitors system health and only bothers me when something breaks, and remembers what it learned yesterday.
+
+So I built Hermes. It runs on a $5/month Hetzner VPS in Helsinki, and it hasn't needed a manual restart in three months.
+
+## What Hermes Actually Does
+
+Hermes isn't a chatbot. It's a Chief of Staff that runs 8 cron jobs autonomously:
+
+**Every 6 hours:** Health check across all services. If something is down, I get a Telegram message. If everything is fine, silence. This is the most important design decision: agents should only interrupt you when something needs attention.
+
+**Every 4 hours:** Email triage. Reads incoming email, categorizes by urgency, drafts responses for routine messages, flags anything that needs human judgment.
+
+**Daily at 4pm UTC:** Newsletter digest. Processes accumulated RSS and email newsletters, extracts signal, scores by relevance (1-10), writes summaries to the knowledge base.
+
+**Twice weekly:** Dream consolidation. Reviews everything it learned that week, identifies patterns, promotes high-value insights from inbox to permanent knowledge storage.
+
+## The Architecture
+
+- **Model:** Kimi K2.5 via Fireworks AI (flat-rate, unlimited tokens)
+- **Communication:** Telegram bot for human interaction, file-based inbox for agent-to-agent dispatch
+- **Memory:** Flat-file MEMORY.md + Obsidian vault via rsync
+- **Skills:** 91 custom skills covering web research, email, GitHub, code review, knowledge curation
+- **Tools:** 102 available tools including DuckDuckGo, Perplexity API, GitHub CLI, file system
+
+The VPS costs $5.35/month. Model inference costs about $4-5/week via Fireworks. Total: roughly $26/month for an always-on AI operations team member.
+
+## The SOUL.md File
+
+Every Hermes session loads a personality file called SOUL.md. It contains the behavioral rules that make Hermes useful instead of annoying:
+
+1. Lead with the answer, not the reasoning
+2. For cron jobs: only message David if something needs attention
+3. Do NOT log routine status checks to memory
+4. Web search priority: DuckDuckGo first, then Perplexity, then memory recall
+5. Decision tree: local data first, then dispatch to Mac, then ask David
+
+Rule 2 is the most important. A naive agent sends you a message every time it completes a cron job. Twelve times a day. That's not helpful, that's spam. Hermes only talks to me when something is wrong.
+
+## Three Communication Channels
+
+**Telegram** is for quick questions. Conversational, one-shot, no tool use. Fast and lightweight.
+
+**Direct API** is for programmatic access. Scripts hit the chat completions endpoint for structured responses.
+
+**Inbox dispatch** is for real work. Drop a markdown directive in a shared folder, rsync carries it to the VPS, Hermes processes it as an autonomous task with the full toolset. Round trip is about 17 minutes worst case.
+
+The inbox pattern is critical. Chat interfaces encourage chat behavior. When you want an agent to actually do work, give it a work order, not a conversation.
+
+## What Breaks (And How It Recovers)
+
+**Confabulation.** Hermes once claimed it had created an entire wiki structure on the server. None of it existed. The API is stateless. Fix: always verify file claims independently.
+
+**Provider routing confusion.** The auth state silently overrode the config file. Hermes used the wrong model for weeks. Fix: provider selection now goes through a single code path with explicit logging.
+
+**Inbox self-messaging.** An early dispatch system could create loops where Hermes dispatched tasks to itself. Fix: a self-message guard drops any directive where \`from == to\`.
+
+Each failure led to a targeted fix. Not a framework rewrite. Just a guard clause in the right place.
+
+## The Compound Value
+
+After three months of continuous operation, Hermes has processed 3,200+ documents into the knowledge base, triaged 8,000+ tasks without a manual restart, caught 14 system issues before they became problems, and built a knowledge graph I search daily.
+
+The value isn't in any single cron job. It's in the compound effect of an agent that runs while you don't. Knowledge accumulates. Patterns emerge. The system gets smarter not because the model improves, but because the data it operates on gets richer.
+
+That's the difference between using AI and having AI infrastructure.
+    `.trim(),
+  },
+  {
+    slug: "agent-grounding-problem-hermes",
+    editorial: true,
+    title: "The Agent Grounding Problem: How Hermes Knows What's Real",
+    description: "AI agents confabulate. They claim files exist that don't. They report tasks complete that aren't. The grounding problem isn't philosophical -- it's operational.",
+    date: "2026-04-29",
+    tags: ["AI Safety", "Hermes", "Agent Operations", "Grounding"],
+    readTime: "6 min",
+    productSlug: "agent-safety-patterns",
+    ctaHook: "10 anti-patterns, scope containment hooks, and the full verification stack for production agents.",
+    content: `
+AI agents confabulate. They claim files exist that don't. They report tasks complete that aren't. The grounding problem isn't philosophical. It's operational, and it will cost you hours if you don't solve it.
+
+## The Confabulation Incident
+
+Hermes, my 24/7 agent running on a VPS in Helsinki, told me it had created a comprehensive wiki structure at \`04-Wiki/\` on the server. Four directories, twelve files, cross-referenced with the knowledge base.
+
+None of it existed.
+
+The Hermes API is stateless. Between sessions, it has no memory of what it has or hasn't done. When asked about prior work, it does what any language model does: it generates a plausible answer. The answer sounded exactly like something Hermes would have done. It just hadn't.
+
+This is the grounding problem for production agents. Not "can an AI understand the real world?" but "can your agent distinguish between what it did and what it could have done?"
+
+## Why Agents Lie (Unintentionally)
+
+There are three failure modes:
+
+**Confabulation.** The agent generates plausible descriptions of work it never performed. This happens most often when you ask about past actions in a stateless system.
+
+**Premature completion.** The agent reports a task as done based on partial evidence. "I updated the file" when the write failed silently. "The test passes" when it ran a different test. The agent isn't lying. It's pattern-matching on what "done" usually looks like.
+
+**Scope drift.** The agent does real work, but not the work you asked for. It optimizes an adjacent function instead of fixing the bug. The work is real, verified, and wrong.
+
+## The Grounding Stack
+
+After six months of running autonomous agents, here's the grounding stack that actually works:
+
+**Layer 1: Verify, don't trust.** Every claim an agent makes about the file system gets verified by a separate process. "I created the file" gets \`ls -la\`. "The service is running" gets \`curl localhost:port/health\`. This sounds tedious. It's the single most important practice in agent operations.
+
+**Layer 2: Evidence-based completion.** Agents cannot declare a task complete without providing evidence. A passing test. A file that exists. A command that returns 0.
+
+\`\`\`python
+EVIDENCE_CHECKS = {
+    "test": lambda path: subprocess.run(["pytest", path]).returncode == 0,
+    "file_exists": lambda path: os.path.exists(path),
+    "command": lambda cmd: subprocess.run(cmd, shell=True).returncode == 0,
+}
+\`\`\`
+
+**Layer 3: Grounding packets.** At the start of every session, a grounding document loads the current state of the workspace. Not what the agent remembers, but what actually exists right now. File trees, service status, recent git log, active tasks.
+
+**Layer 4: Self-message guards.** Agents that can dispatch tasks need loop protection. A depth counter caps recursive dispatch. A \`from == to\` guard prevents self-messaging.
+
+## The Memory Contract
+
+Hermes reads from four layers of memory, each with different trust levels:
+
+- **Episodic ledger** (SQLite, append-only): High trust. What actually happened.
+- **Semantic index** (ChromaDB vectors): Medium trust. Search results may be stale.
+- **Curated vault** (Obsidian markdown): High trust. Human-reviewed.
+- **Agent memory** (MEMORY.md flat file): Low trust. May contain confabulated entries.
+
+The key insight: not all memory is equally trustworthy. Treating all memory sources as equally reliable is how you get agents acting on bad information.
+
+## Recovery Patterns
+
+When an agent gets grounded incorrectly, recovery has three steps:
+
+1. **Detect the divergence.** Usually via a failing verification check or a human noticing something off.
+
+2. **Reload from ground truth.** Don't try to "correct" the agent's beliefs. Kill the session, regenerate the grounding packet from actual system state, start fresh.
+
+3. **Add a guard for this specific failure.** Each grounding failure reveals a gap. The \`04-Wiki/\` incident led to a post-dispatch file existence check. Each guard is simple, specific, and permanent.
+
+## The Operational Discipline
+
+Running autonomous agents is 20% building and 80% operational discipline. The agents don't get smarter on their own. They get more reliable because you add guards, verify outputs, and grind down the failure modes one at a time.
+
+The model will hallucinate. The file system will have race conditions. The network will fail. The question isn't whether your agent will get grounded incorrectly. It's whether your system detects it before it matters.
+    `.trim(),
+  },
+  {
     slug: "claude-code-hooks-harness-engineering",
     editorial: true,
     title: "Claude Code Hooks: The Harness Engineering That Actually Matters",

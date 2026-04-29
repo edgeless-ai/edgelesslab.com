@@ -273,6 +273,20 @@ export const products: Product[] = [
     badge: null,
   },
   {
+    name: "Claude Code Cheat Sheet",
+    price: "Free",
+    description:
+      "Quick-start reference for Claude Code. Commands, shortcuts, hook patterns, and MCP setup in one printable sheet.",
+    features: [
+      "All slash commands and keyboard shortcuts",
+      "Hook configuration patterns with examples",
+      "MCP server setup cheatsheet",
+      "CLAUDE.md template and memory system quick-start",
+    ],
+    href: `https://edgelessai.gumroad.com/l/claude-code-cheat-sheet?${UTM}`,
+    badge: "Free",
+  },
+  {
     name: "Claude Memory Kit",
     price: "Free",
     description:
@@ -284,7 +298,7 @@ export const products: Product[] = [
       "Real-world examples included",
     ],
     href: "https://github.com/edgeless-ai/claude-memory-kit?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
-    badge: "Open Source",
+    badge: "Free",
     repoUrl: "https://github.com/edgeless-ai/claude-memory-kit",
   },
 ];

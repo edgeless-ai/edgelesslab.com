@@ -79,6 +79,21 @@ export const products: Product[] = [
     repoUrl: "https://github.com/edgeless-ai/claude-memory-kit",
   },
   {
+    name: "Edgeless Stack",
+    price: "Free",
+    description:
+      "The complete AI agent infrastructure. Memory that persists, hooks that protect, skills that compound, and agents that run while you sleep. Extracted from 3+ months of production use.",
+    features: [
+      "3-layer memory: SQLite ledger + ChromaDB vectors + Obsidian vault",
+      "6 safety hooks: damage control, completion verification, taxonomy guard",
+      "9 skills with tiered loading (5 core + 4 domain)",
+      "Cron patterns, Agent Bus, Docker compose, install.sh",
+    ],
+    href: "https://github.com/edgeless-ai/edgeless-stack?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
+    badge: "Free",
+    repoUrl: "https://github.com/edgeless-ai/edgeless-stack",
+  },
+  {
     name: "Multi-Agent Orchestration Blueprint",
     price: "$39",
     description:

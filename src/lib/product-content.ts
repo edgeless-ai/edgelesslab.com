@@ -417,4 +417,60 @@ The repeatable system, pipeline maintenance, when to bundle, and a direct compar
 No dependencies. Templates are Markdown. Script is Bash.`,
     callToAction: "Stop winging launches. Ship them like a system.",
   },
+
+  "claude-code-cheat-sheet": {
+    longTitle: "Claude Code Cheat Sheet: Essential Commands & Patterns at a Glance",
+    shortDescription:
+      "The printable quick-reference for Claude Code. All slash commands, keyboard shortcuts, MCP setup patterns, hook configurations, and memory system commands on one page.",
+    body: `Claude Code ships with hundreds of commands, shortcuts, and configuration patterns. You can hunt through docs, or you can print this one-page reference and pin it next to your monitor.
+
+**What you get:**
+
+A single printable PDF cheat sheet covering:
+
+**Slash Commands**
+- @ commands: @codebase, @docs, @git, @problems, @terminal
+- / commands: /fix, /explain, /memory, /help, /compact
+- Search and navigation shortcuts
+
+**Keyboard Shortcuts**
+- Navigation: prev/next edit, accept/reject, interrupt
+- Context management: clear, compact, copy
+- Multi-line and special input patterns
+
+**Hook Configuration Patterns**
+- damage-control.py: blocking destructive commands
+- verify-completion.py: evidence-based task verification
+- Session initialization and memory flush hooks
+- Installation paths and activation triggers
+
+**MCP Server Setup**
+- Server configuration syntax (stdio vs HTTP)
+- Tool naming and schema definition
+- Error handling patterns
+- Health check commands
+
+**Memory System Quick-Start**
+- MEMORY.md structure and indexing
+- CLAUDE.md integration
+- 4 memory types: user, feedback, project, reference
+- Auto-load mechanisms
+
+**Format:**
+Single-page PDF, designed for printing (US Letter and A4). High contrast, monospace fonts, clear section headers. Pin it, tape it, keep it reachable.
+
+**Who this is for:**
+- New Claude Code users who want a reference while learning
+- Power users who need command reminders without breaking flow
+- Team leads distributing onboarding materials
+- Anyone who prefers physical reference over tab-switching
+
+**Who this is NOT for:**
+- If you already have every command memorized, you don't need this
+- This is a reference, not a tutorial (see the CLAUDE.md Template Pack for walkthroughs)
+- No interactive elements, no videos, just text you can print
+
+Free. No email required. Download and print.`,
+    callToAction: "Print it. Pin it. Code faster.",
+  },
 };

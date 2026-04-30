@@ -85,6 +85,19 @@ export default async function BlogPostPage({
             url: "https://edgelesslab.com",
           },
           url: `https://edgelesslab.com/blog/${post.slug}`,
+          keywords: post.tags,
+        }}
+      />
+
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://edgelesslab.com" },
+            { "@type": "ListItem", position: 2, name: "Blog", item: "https://edgelesslab.com/blog" },
+            { "@type": "ListItem", position: 3, name: post.title, item: `https://edgelesslab.com/blog/${post.slug}` },
+          ],
         }}
       />
 

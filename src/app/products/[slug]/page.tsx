@@ -99,6 +99,18 @@ export default async function ProductDetailPage({
         }}
       />
 
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", position: 1, name: "Home", item: SITE },
+            { "@type": "ListItem", position: 2, name: "Products", item: `${SITE}/products` },
+            { "@type": "ListItem", position: 3, name: product.name, item: `${SITE}/products/${slug}` },
+          ],
+        }}
+      />
+
       <article className="pt-28 pb-20 px-6">
         <div className="max-w-[1080px] mx-auto">
           <Link

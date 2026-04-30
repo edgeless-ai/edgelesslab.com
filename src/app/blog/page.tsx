@@ -3,6 +3,7 @@ import { posts } from "@/lib/blog";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { BlogPostCard } from "@/components/blog-client";
+import { JsonLd } from "@/components/json-ld";
 import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
@@ -16,6 +17,20 @@ export default function BlogPage() {
   return (
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
       <Nav />
+
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "Edgeless Lab Blog",
+        "description": "Field notes from one developer running AI agents, MCP servers, and generative art pipelines in production.",
+        "numberOfItems": posts.length,
+        "itemListElement": posts.map((post, i) => ({
+          "@type": "ListItem",
+          "position": i + 1,
+          "url": `https://edgelesslab.com/blog/${post.slug}`,
+          "name": post.title,
+        })),
+      }} />
 
       <main className="pt-32 pb-20 px-6">
         <div className="max-w-[800px] mx-auto">

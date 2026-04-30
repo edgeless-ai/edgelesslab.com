@@ -1,5 +1,6 @@
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
+import { JsonLd } from "@/components/json-ld";
 import { createPageMetadata } from "@/lib/metadata";
 import { ProductsGrid } from "@/components/products-grid";
 import { ProductsSubtitle } from "@/components/products-subtitle";
@@ -20,6 +21,20 @@ export default function ProductsPage() {
       style={{ background: "var(--bg-base)" }}
     >
       <Nav />
+
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "Edgeless Lab Products",
+        "description": "Developer tools and templates for AI agent infrastructure.",
+        "numberOfItems": products.filter(p => !p.comingSoon).length,
+        "itemListElement": products.filter(p => !p.comingSoon).map((p, i) => ({
+          "@type": "ListItem",
+          "position": i + 1,
+          "url": p.slug ? `https://edgelesslab.com/products/${p.slug}` : p.href,
+          "name": p.name,
+        })),
+      }} />
 
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-[1080px] mx-auto">

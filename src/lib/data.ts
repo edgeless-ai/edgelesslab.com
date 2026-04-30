@@ -21,6 +21,64 @@ const UTM = "utm_source=edgelesslab&utm_medium=website&utm_campaign=products";
 
 export const products: Product[] = [
   {
+    name: "CLAUDE.md Template Pack",
+    price: "Free",
+    description:
+      "14 battle-tested CLAUDE.md templates for every project type. Drop one into your repo and start building.",
+    features: [
+      "14 templates: iOS, Android, ML, API, DevOps, Next.js, and more",
+      "CLI Tools, Monorepos, and Game Dev configurations",
+      "Embedded/IoT, Security Audits, and Open Source templates",
+      "Startup MVP and Technical Writing presets",
+    ],
+    href: `https://edgelessai.gumroad.com/l/kszapk?${UTM}`,
+    badge: "Free",
+  },
+  {
+    name: "Quick Reference Cards",
+    price: "Free",
+    description:
+      "Printable cheat sheets for prompt patterns, Claude Code shortcuts, MCP tool reference, and common workflows.",
+    features: [
+      "Prompt pattern and system prompt reference cards",
+      "Claude Code shortcuts and slash commands",
+      "Token optimization and temperature settings guide",
+      "PDF and markdown formats, pin-next-to-monitor ready",
+    ],
+    href: `https://edgelessai.gumroad.com/l/dihxts?${UTM}`,
+    badge: "Free",
+  },
+  {
+    name: "Claude Code Cheat Sheet",
+    price: "Free",
+    description:
+      "Quick-start reference for Claude Code. Commands, shortcuts, hook patterns, and MCP setup in one printable sheet.",
+    features: [
+      "All slash commands and keyboard shortcuts",
+      "Hook configuration patterns with examples",
+      "MCP server setup cheatsheet",
+      "CLAUDE.md template and memory system quick-start",
+    ],
+    href: `https://edgelessai.gumroad.com/l/claude-code-cheat-sheet?${UTM}`,
+    badge: "Free",
+    slug: "claude-code-cheat-sheet",
+  },
+  {
+    name: "Claude Memory Kit",
+    price: "Free",
+    description:
+      "Start here. Drop-in memory template for Claude Code. Persists context, feedback, and project knowledge across conversations.",
+    features: [
+      "4 memory types: user, feedback, project, reference",
+      "MEMORY.md index auto-loaded each session",
+      "CLAUDE.md snippet for instant setup",
+      "Real-world examples included",
+    ],
+    href: "https://github.com/edgeless-ai/claude-memory-kit?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
+    badge: "Free",
+    repoUrl: "https://github.com/edgeless-ai/claude-memory-kit",
+  },
+  {
     name: "Multi-Agent Orchestration Blueprint",
     price: "$39",
     description:
@@ -231,20 +289,6 @@ export const products: Product[] = [
     slug: "hooks-deep-dive",
   },
   {
-    name: "CLAUDE.md Template Pack",
-    price: "$14",
-    description:
-      "14 battle-tested CLAUDE.md templates for every project type. Drop one into your repo and start building.",
-    features: [
-      "14 templates: iOS, Android, ML, API, DevOps, Next.js, and more",
-      "CLI Tools, Monorepos, and Game Dev configurations",
-      "Embedded/IoT, Security Audits, and Open Source templates",
-      "Startup MVP and Technical Writing presets",
-    ],
-    href: `https://edgelessai.gumroad.com/l/kszapk?${UTM}`,
-    badge: null,
-  },
-  {
     name: "Hooks Library",
     price: "$14",
     description:
@@ -257,49 +301,6 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/ztaflt?${UTM}`,
     badge: null,
-  },
-  {
-    name: "Quick Reference Cards",
-    price: "$9",
-    description:
-      "Printable cheat sheets for prompt patterns, Claude Code shortcuts, MCP tool reference, and common workflows.",
-    features: [
-      "Prompt pattern and system prompt reference cards",
-      "Claude Code shortcuts and slash commands",
-      "Token optimization and temperature settings guide",
-      "PDF and markdown formats, pin-next-to-monitor ready",
-    ],
-    href: `https://edgelessai.gumroad.com/l/dihxts?${UTM}`,
-    badge: null,
-  },
-  {
-    name: "Claude Code Cheat Sheet",
-    price: "Free",
-    description:
-      "Quick-start reference for Claude Code. Commands, shortcuts, hook patterns, and MCP setup in one printable sheet.",
-    features: [
-      "All slash commands and keyboard shortcuts",
-      "Hook configuration patterns with examples",
-      "MCP server setup cheatsheet",
-      "CLAUDE.md template and memory system quick-start",
-    ],
-    href: `https://edgelessai.gumroad.com/l/claude-code-cheat-sheet?${UTM}`,
-    badge: "Free",
-  },
-  {
-    name: "Claude Memory Kit",
-    price: "Free",
-    description:
-      "Start here. Drop-in memory template for Claude Code. Persists context, feedback, and project knowledge across conversations.",
-    features: [
-      "4 memory types: user, feedback, project, reference",
-      "MEMORY.md index auto-loaded each session",
-      "CLAUDE.md snippet for instant setup",
-      "Real-world examples included",
-    ],
-    href: "https://github.com/edgeless-ai/claude-memory-kit?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
-    badge: "Free",
-    repoUrl: "https://github.com/edgeless-ai/claude-memory-kit",
   },
 ];
 

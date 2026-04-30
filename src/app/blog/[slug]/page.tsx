@@ -75,9 +75,12 @@ export default async function BlogPostPage({
           headline: post.title,
           description: post.description,
           datePublished: post.date,
+          dateModified: post.date,
+          wordCount: parseInt(post.readTime) * 250,
           author: {
             "@type": "Person",
             name: "David Murray",
+            url: "https://edgelesslab.com/about",
           },
           publisher: {
             "@type": "Organization",
@@ -86,6 +89,10 @@ export default async function BlogPostPage({
           },
           url: `https://edgelesslab.com/blog/${post.slug}`,
           keywords: post.tags,
+          mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": `https://edgelesslab.com/blog/${post.slug}`,
+          },
         }}
       />
 

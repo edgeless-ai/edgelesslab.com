@@ -3,11 +3,11 @@
  * Import these in data.ts instead of hardcoding counts.
  */
 export const PLOTTER = {
-  run:        16,
-  factories:  22,
-  pieces:     "25,040",
-  kept:       "24,927",
+  run:        18,
+  factories:  40,
+  pieces:     "37,571",
+  kept:       "35,849",
   curated:    "1,296",
   best:       "89.1",
-  withheld:   "23,631",
+  withheld:   "34,553",
 } as const;

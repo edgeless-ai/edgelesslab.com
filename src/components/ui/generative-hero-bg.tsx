@@ -1,27 +1,27 @@
 "use client";
 
-import { useRef, useEffect, useCallback, useState } from "react";
+import { useRef, useEffect, useCallback } from "react";
 
 /**
- * Hero background combining looping ASCII demo videos with
- * real-time particle attractor canvas overlay.
- * Randomly picks a video clip each visit. Particles add live dynamism.
+ * Fully procedural hero background — unique every visit.
+ *
+ * 600 particles flow through one of 4 attractor algorithms (Lorenz, Rossler,
+ * Spiral, Flow) with randomized parameters. Rendered as connected trail lines
+ * with soft glow, producing organic flowing structures. Zero network cost.
  */
-
-const VIDEO_CLIPS = [
-  "/video/ascii-emergence.mp4",
-  "/video/ascii-vortex.mp4",
-];
 
 type AttractorType = "lorenz" | "rossler" | "spiral" | "flow";
 
 interface Particle {
   x: number;
   y: number;
+  prevX: number;
+  prevY: number;
   vx: number;
   vy: number;
   life: number;
   maxLife: number;
+  hueOffset: number;
 }
 
 function mulberry32(a: number) {
@@ -36,37 +36,70 @@ function mulberry32(a: number) {
 
 const ATTRACTOR_TYPES: AttractorType[] = ["lorenz", "rossler", "spiral", "flow"];
 
+// Color palettes — each is [hue, saturation] pairs that blend well
+const PALETTES: [number, number][] = [
+  [235, 85],  // indigo
+  [160, 70],  // green/teal
+  [270, 75],  // purple
+  [210, 80],  // blue
+  [330, 65],  // rose
+  [180, 60],  // cyan
+];
+
+interface SimState {
+  particles: Particle[];
+  type: AttractorType;
+  seed: number;
+  rng: () => number;
+  cx1: number;
+  cy1: number;
+  cx2: number;
+  cy2: number;
+  cx3: number;
+  cy3: number;
+  strength: number;
+  baseHue: number;
+  baseSat: number;
+  hueRange: number;
+  trailFade: number;
+  time: number;
+}
+
 function createParticles(
   count: number,
   width: number,
   height: number,
   rng: () => number
 ): Particle[] {
-  return Array.from({ length: count }, () => ({
-    x: rng() * width,
-    y: rng() * height,
-    vx: (rng() - 0.5) * 1.5,
-    vy: (rng() - 0.5) * 1.5,
-    life: Math.floor(rng() * 200) + 100,
-    maxLife: 300,
-  }));
+  return Array.from({ length: count }, () => {
+    const x = rng() * width;
+    const y = rng() * height;
+    return {
+      x,
+      y,
+      prevX: x,
+      prevY: y,
+      vx: (rng() - 0.5) * 2,
+      vy: (rng() - 0.5) * 2,
+      life: Math.floor(rng() * 250) + 80,
+      maxLife: 330,
+      hueOffset: (rng() - 0.5) * 40,
+    };
+  });
 }
 
 function stepParticle(
   p: Particle,
-  type: AttractorType,
-  cx1: number,
-  cy1: number,
-  cx2: number,
-  cy2: number,
-  strength: number,
-  seed: number,
+  state: SimState,
   width: number,
-  height: number,
-  rng: () => number
+  height: number
 ) {
+  p.prevX = p.x;
+  p.prevY = p.y;
+
   let ax = 0,
     ay = 0;
+  const { type, cx1, cy1, cx2, cy2, cx3, cy3, strength, time } = state;
 
   switch (type) {
     case "lorenz": {
@@ -74,93 +107,112 @@ function stepParticle(
       const dx2 = cx2 - p.x, dy2 = cy2 - p.y;
       const d1 = Math.sqrt(dx1 * dx1 + dy1 * dy1) + 1;
       const d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2) + 1;
-      ax = (dx1 / d1 - dy2 / d2) * strength;
-      ay = (dy1 / d1 + dx2 / d2) * strength;
+      // Third attractor adds asymmetry
+      const dx3 = cx3 - p.x, dy3 = cy3 - p.y;
+      const d3 = Math.sqrt(dx3 * dx3 + dy3 * dy3) + 1;
+      ax = (dx1 / d1 - dy2 / d2 + dx3 / d3 * 0.3) * strength;
+      ay = (dy1 / d1 + dx2 / d2 - dy3 / d3 * 0.3) * strength;
       break;
     }
     case "rossler": {
       const dx = cx1 - p.x, dy = cy1 - p.y;
       const d = Math.sqrt(dx * dx + dy * dy) + 1;
-      ax = (-dy / d + dx * 0.008) * strength;
-      ay = (dx / d + dy * 0.008) * strength;
+      const drift = Math.sin(time * 0.002) * 0.005;
+      ax = (-dy / d + dx * (0.008 + drift)) * strength;
+      ay = (dx / d + dy * (0.008 + drift)) * strength;
+      // Perturb with second center
+      const dx2 = cx2 - p.x, dy2 = cy2 - p.y;
+      const d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2) + 1;
+      ax += (dy2 / d2) * strength * 0.2;
+      ay -= (dx2 / d2) * strength * 0.2;
       break;
     }
     case "spiral": {
       const dx = cx1 - p.x, dy = cy1 - p.y;
       const d = Math.sqrt(dx * dx + dy * dy) + 1;
-      const angle = Math.atan2(dy, dx) + 0.4;
-      ax = ((Math.cos(angle) / d) * strength * 8);
-      ay = ((Math.sin(angle) / d) * strength * 8);
+      const angle = Math.atan2(dy, dx) + 0.3 + Math.sin(time * 0.001) * 0.2;
+      ax = (Math.cos(angle) / d) * strength * 8;
+      ay = (Math.sin(angle) / d) * strength * 8;
+      // Second spiral center creates interference
+      const dx2 = cx2 - p.x, dy2 = cy2 - p.y;
+      const d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2) + 1;
+      const angle2 = Math.atan2(dy2, dx2) - 0.5;
+      ax += (Math.cos(angle2) / d2) * strength * 3;
+      ay += (Math.sin(angle2) / d2) * strength * 3;
       break;
     }
     case "flow": {
-      ax = Math.sin(p.y * 0.003 + seed * 0.01) * strength * 0.8;
-      ay = Math.cos(p.x * 0.003 + seed * 0.01) * strength * 0.8;
+      // Perlin-like flow field with time evolution
+      const scale = 0.002 + Math.sin(time * 0.0005) * 0.0005;
+      const n1 = Math.sin(p.x * scale + time * 0.001) * Math.cos(p.y * scale * 0.7);
+      const n2 = Math.cos(p.x * scale * 0.8 - time * 0.0008) * Math.sin(p.y * scale);
+      ax = n1 * strength * 1.5;
+      ay = n2 * strength * 1.5;
+      // Gentle pull toward center to prevent drift
+      ax += (width * 0.5 - p.x) * 0.00001;
+      ay += (height * 0.5 - p.y) * 0.00001;
       break;
     }
   }
 
   p.vx += ax;
   p.vy += ay;
-  p.vx *= 0.985;
-  p.vy *= 0.985;
+  p.vx *= 0.982;
+  p.vy *= 0.982;
   p.x += p.vx;
   p.y += p.vy;
   p.life--;
 
+  // Respawn
   if (p.life <= 0) {
-    p.x = rng() * width;
-    p.y = rng() * height;
-    p.vx = (rng() - 0.5) * 1.5;
-    p.vy = (rng() - 0.5) * 1.5;
-    p.life = Math.floor(rng() * 200) + 100;
+    p.x = state.rng() * width;
+    p.y = state.rng() * height;
+    p.prevX = p.x;
+    p.prevY = p.y;
+    p.vx = (state.rng() - 0.5) * 2;
+    p.vy = (state.rng() - 0.5) * 2;
+    p.life = Math.floor(state.rng() * 250) + 80;
+    p.hueOffset = (state.rng() - 0.5) * 40;
   }
 
-  if (p.x < 0) p.x += width;
-  if (p.x >= width) p.x -= width;
-  if (p.y < 0) p.y += height;
-  if (p.y >= height) p.y -= height;
+  // Soft boundary — bounce with damping instead of hard wrap
+  const margin = 20;
+  if (p.x < -margin) { p.x = -margin; p.vx *= -0.5; }
+  if (p.x > width + margin) { p.x = width + margin; p.vx *= -0.5; }
+  if (p.y < -margin) { p.y = -margin; p.vy *= -0.5; }
+  if (p.y > height + margin) { p.y = height + margin; p.vy *= -0.5; }
 }
-
-const COLORS: Record<AttractorType, [number, number, number]> = {
-  lorenz: [129, 140, 248],
-  rossler: [52, 211, 153],
-  spiral: [167, 139, 250],
-  flow: [96, 165, 250],
-};
 
 export function GenerativeHeroBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
-  const stateRef = useRef<{
-    particles: Particle[];
-    type: AttractorType;
-    seed: number;
-    rng: () => number;
-    cx1: number; cy1: number; cx2: number; cy2: number;
-    strength: number;
-  } | null>(null);
-
-  // Pick a random clip on mount
-  const [clipSrc] = useState(
-    () => VIDEO_CLIPS[Math.floor(Math.random() * VIDEO_CLIPS.length)]
-  );
+  const stateRef = useRef<SimState | null>(null);
 
   const init = useCallback((canvas: HTMLCanvasElement) => {
     const seed = (Date.now() ^ (Math.random() * 0xffffffff)) >>> 0;
     const rng = mulberry32(seed);
     const type = ATTRACTOR_TYPES[Math.floor(rng() * ATTRACTOR_TYPES.length)];
+    const palette = PALETTES[Math.floor(rng() * PALETTES.length)];
     const w = canvas.width;
     const h = canvas.height;
 
     stateRef.current = {
-      particles: createParticles(150, w, h, rng),
-      type, seed, rng,
-      cx1: w * (0.3 + rng() * 0.4),
-      cy1: h * (0.3 + rng() * 0.4),
-      cx2: w * (0.3 + rng() * 0.4),
-      cy2: h * (0.3 + rng() * 0.4),
-      strength: 0.015 + rng() * 0.02,
+      particles: createParticles(600, w, h, rng),
+      type,
+      seed,
+      rng,
+      cx1: w * (0.2 + rng() * 0.6),
+      cy1: h * (0.2 + rng() * 0.6),
+      cx2: w * (0.2 + rng() * 0.6),
+      cy2: h * (0.2 + rng() * 0.6),
+      cx3: w * (0.2 + rng() * 0.6),
+      cy3: h * (0.2 + rng() * 0.6),
+      strength: 0.012 + rng() * 0.025,
+      baseHue: palette[0] + (rng() - 0.5) * 30,
+      baseSat: palette[1],
+      hueRange: 20 + rng() * 40,
+      trailFade: 0.03 + rng() * 0.03,
+      time: 0,
     };
   }, []);
 
@@ -171,9 +223,14 @@ export function GenerativeHeroBackground() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    let cssW = 0;
+    let cssH = 0;
+
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const rect = canvas.getBoundingClientRect();
+      cssW = rect.width;
+      cssH = rect.height;
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       ctx.scale(dpr, dpr);
@@ -184,35 +241,59 @@ export function GenerativeHeroBackground() {
 
     const draw = () => {
       const state = stateRef.current;
-      if (!state || !canvas) return;
+      if (!state) return;
 
-      const w = canvas.getBoundingClientRect().width;
-      const h = canvas.getBoundingClientRect().height;
-      const color = COLORS[state.type];
+      state.time++;
 
-      ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
-      ctx.fillRect(0, 0, w, h);
+      // Trail fade — lower = longer trails
+      ctx.fillStyle = `rgba(0, 0, 0, ${state.trailFade})`;
+      ctx.fillRect(0, 0, cssW, cssH);
 
+      const scaleX = cssW / canvas.width;
+      const scaleY = cssH / canvas.height;
+
+      // Draw particles as lines from prev to current position
       for (const p of state.particles) {
-        stepParticle(
-          p, state.type,
-          state.cx1, state.cy1, state.cx2, state.cy2,
-          state.strength, state.seed,
-          canvas.width, canvas.height, state.rng
-        );
+        stepParticle(p, state, canvas.width, canvas.height);
 
-        const alpha = (p.life / p.maxLife) * 0.4;
+        const lifeRatio = p.life / p.maxLife;
+        // Fade in and out
+        const fade = lifeRatio > 0.9
+          ? (1 - lifeRatio) * 10
+          : lifeRatio < 0.2
+          ? lifeRatio * 5
+          : 1;
+
         const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-        const size = 1 + speed * 0.3;
+        const alpha = fade * Math.min(0.8, 0.2 + speed * 0.15);
+        const lineWidth = 0.5 + speed * 0.4;
+        const hue = state.baseHue + p.hueOffset + Math.sin(state.time * 0.003 + p.hueOffset) * state.hueRange * 0.3;
+
+        const x1 = p.prevX * scaleX;
+        const y1 = p.prevY * scaleY;
+        const x2 = p.x * scaleX;
+        const y2 = p.y * scaleY;
+
+        // Skip if wrapped (would draw lines across screen)
+        const dx = Math.abs(x2 - x1);
+        const dy = Math.abs(y2 - y1);
+        if (dx > cssW * 0.3 || dy > cssH * 0.3) continue;
 
         ctx.beginPath();
-        ctx.arc(
-          (p.x / canvas.width) * w,
-          (p.y / canvas.height) * h,
-          size, 0, Math.PI * 2
-        );
-        ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
-        ctx.fill();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = `hsla(${hue}, ${state.baseSat}%, 65%, ${alpha})`;
+        ctx.lineWidth = lineWidth;
+        ctx.lineCap = "round";
+        ctx.stroke();
+
+        // Glow for fast particles
+        if (speed > 2.5) {
+          ctx.beginPath();
+          ctx.arc(x2, y2, lineWidth + 2, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${hue}, ${state.baseSat}%, 70%, ${alpha * 0.3})`;
+          ctx.fill();
+        }
       }
 
       animRef.current = requestAnimationFrame(draw);
@@ -238,28 +319,18 @@ export function GenerativeHeroBackground() {
           backgroundSize: "64px 64px",
         }}
       />
-      {/* ASCII demo video -- looping, muted, covers full hero */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover opacity-30"
-        style={{ mixBlendMode: "screen" }}
-        src={clipSrc}
-      />
-      {/* Particle canvas overlay -- subtle live layer on top of video */}
+      {/* Particle canvas — full procedural, unique every visit */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full opacity-30"
-        style={{ mixBlendMode: "screen" }}
+        className="absolute inset-0 w-full h-full"
+        style={{ opacity: 0.55 }}
       />
       {/* Vignette for text readability */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, rgba(0,0,0,0.7) 100%)",
+            "radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, rgba(0,0,0,0.65) 100%)",
         }}
       />
     </div>

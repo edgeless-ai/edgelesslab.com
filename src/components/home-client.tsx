@@ -6,7 +6,8 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import { AnimatedText, AnimatedFadeIn } from "@/components/ui/animated-text";
 import { GlowingCard } from "@/components/ui/glowing-card";
-import { DotBackground } from "@/components/ui/dot-background";
+import { GenerativeHeroBackground } from "@/components/ui/generative-hero-bg";
+import { GenerativeAscii } from "@/components/generative-ascii";
 import { KineticPreText } from "@/components/ui/kinetic-pretext";
 import { StaggerReveal } from "@/components/ui/pretext-stagger-reveal";
 import { PreTextRichFlow, type RichFlowSegment } from "@/components/ui/pretext-rich-flow";
@@ -16,14 +17,14 @@ import { products } from "@/lib/data";
 import { posts } from "@/lib/blog";
 
 const HERO_SUBTITLE =
-  "One developer shipping autonomous agents, MCP servers, and generative art. 18 products live, 4 services running 24/7 on a single VPS. Source on GitHub.";
+  "One developer shipping autonomous agents, MCP servers, and generative art. 18 products live. Everything open source.";
 
 /* ── Hero ────────────────────────────────────────────────── */
 
 export function HeroSection() {
   return (
     <section className="relative flex min-h-[92svh] items-center px-6 pb-16 pt-28 md:min-h-screen md:items-end md:pb-24 md:pt-32">
-      <DotBackground />
+      <GenerativeHeroBackground />
       <div className="relative max-w-[1280px] w-full mx-auto grid grid-cols-1 gap-12 lg:grid-cols-[1.25fr_1fr] lg:items-end">
         {/* Left column: headline + supporting copy */}
         <div className="min-w-0">
@@ -140,44 +141,10 @@ export function HeroSection() {
           </AnimatedFadeIn>
         </div>
 
-        {/* Right column: live system panel, fills the right side and balances composition */}
+        {/* Right column: generative ASCII art piece — unique each visit */}
         <AnimatedFadeIn delay={0.5}>
-          <div
-            className="hidden lg:block rounded-xl border overflow-hidden shadow-2xl"
-            style={{
-              background: "rgba(0, 0, 0, 0.45)",
-              borderColor: "var(--border-subtle)",
-              backdropFilter: "blur(8px)",
-            }}
-          >
-            <div
-              className="flex items-center gap-1.5 px-3 py-2.5 border-b"
-              style={{ borderColor: "var(--border-subtle)" }}
-            >
-              <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.12)" }} />
-              <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.12)" }} />
-              <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.12)" }} />
-              <span
-                className="ml-2 text-[11px] font-mono"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                edgeless@vps ~ status
-              </span>
-            </div>
-            <pre
-              className="px-4 py-4 text-[12px] leading-[1.85] font-mono whitespace-pre"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              <span style={{ color: "var(--text-tertiary)" }}>{"$ pm2 status\n"}</span>
-              {"hooks        "}<span style={{ color: "var(--green)" }}>online</span>{"   safety layer\n"}
-              {"hermes       "}<span style={{ color: "var(--green)" }}>online</span>{"   assistant\n"}
-              {"ml-server    "}<span style={{ color: "var(--green)" }}>online</span>{"   pytorch\n"}
-              {"mcp-bridge   "}<span style={{ color: "var(--green)" }}>online</span>{"   tools\n\n"}
-              <span style={{ color: "var(--text-tertiary)" }}>{"$ ls products/ | wc -l\n"}</span>
-              <span style={{ color: "var(--accent)" }}>{"18"}</span>{" products live\n\n"}
-              <span style={{ color: "var(--text-tertiary)" }}>{"$ uptime\n"}</span>
-              <span style={{ color: "var(--green)" }}>{"4 services up, 0 restarts"}</span>
-            </pre>
+          <div className="hidden lg:block">
+            <GenerativeAscii />
           </div>
         </AnimatedFadeIn>
       </div>

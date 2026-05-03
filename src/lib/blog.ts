@@ -1674,7 +1674,7 @@ The system has five layers:
 
 **Obsidian** is the knowledge vault: 7,000+ markdown files organized by topic. It's the human-readable layer that agents can also query through MCP.
 
-**Hetzner VPS** runs the always-on processes: the trading bot, the Telegram gateway, the cron jobs, everything that needs to persist beyond a terminal session.
+**Hetzner VPS** runs the always-on processes: the Telegram gateway, the cron jobs, everything that needs to persist beyond a terminal session.
 
 ## Why MCP Changes Everything
 

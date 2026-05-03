@@ -6,10 +6,10 @@
  *        <span data-stat="pieces-words">—</span>
  */
 const STATS = {
-  run:        16,
-  factories:  22,
-  pieces:     25040,
-  kept:       24927,
+  run:        18,
+  factories:  40,
+  pieces:     37571,
+  kept:       35849,
   curated:    1296,
   best:       89.1,
 };
@@ -17,10 +17,10 @@ STATS.withheld = STATS.kept - STATS.curated;
 
 const fmt = n => n.toLocaleString("en-US");
 const WORDS = {
-  pieces:    "twenty‑five thousand forty",
-  kept:      "twenty‑four thousand nine hundred and twenty‑seven",
-  withheld:  "twenty‑three thousand six hundred and thirty‑one",
-  factories: "twenty‑two",
+  pieces:    "thirty‑seven thousand five hundred and seventy‑one",
+  kept:      "thirty‑five thousand eight hundred and forty‑nine",
+  withheld:  "thirty‑four thousand five hundred and fifty‑three",
+  factories: "forty",
   curated:   "one thousand two hundred and ninety‑six",
 };
 

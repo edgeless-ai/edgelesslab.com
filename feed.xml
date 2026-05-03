@@ -7,6 +7,13 @@
     <language>en-us</language>
     <atom:link href="https://edgelesslab.com/feed.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>Hermes Curator: The Agent That Cleans Up After Your Agents</title>
+      <link>https://edgelesslab.com/blog/hermes-curator-skill-lifecycle</link>
+      <description>Nous Research shipped Hermes v0.12.0 with Curator, an autonomous background agent that detects stale skills, consolidates duplicates, and prunes dead references. Here&apos;s why it matters for multi-agent systems.</description>
+      <pubDate>Fri, 01 May 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/hermes-curator-skill-lifecycle</guid>
+    </item>
+    <item>
       <title>The AI Agent That Never Sleeps: Running Hermes 24/7 on a $5 VPS</title>
       <link>https://edgelesslab.com/blog/ai-agent-never-sleeps-hermes-vps</link>
       <description>Most AI agents die when you close the laptop. Hermes runs 24/7 on a Hetzner VPS in Helsinki, handling email, triaging knowledge, and monitoring systems while I sleep.</description>

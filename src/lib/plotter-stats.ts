@@ -5,9 +5,9 @@
 export const PLOTTER = {
   run:        18,
   factories:  40,
-  pieces:     "37,571",
-  kept:       "35,849",
+  pieces:     "41,572",
+  kept:       "39,414",
   curated:    "1,296",
   best:       "89.1",
-  withheld:   "34,553",
+  withheld:   "38,118",
 } as const;

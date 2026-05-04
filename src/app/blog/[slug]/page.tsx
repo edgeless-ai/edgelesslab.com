@@ -381,10 +381,18 @@ function renderMarkdown(content: string): string {
       const isOrdered = /^\d+\.\s/.test(line.trimStart());
       const tag = isOrdered ? "ol" : "ul";
       const items: string[] = [];
-      while (i < lines.length && (lines[i].trimStart().startsWith("- ") || /^\d+\.\s/.test(lines[i].trimStart()))) {
-        const text = lines[i].trimStart().replace(/^\d+\.\s+/, "").replace(/^-\s+/, "");
-        items.push(`<li>${inlineFormat(text)}</li>`);
-        i++;
+      while (i < lines.length) {
+        const cur = lines[i].trimStart();
+        if (cur.startsWith("- ") || /^\d+\.\s/.test(cur)) {
+          const text = cur.replace(/^\d+\.\s+/, "").replace(/^-\s+/, "");
+          items.push(`<li>${inlineFormat(text)}</li>`);
+          i++;
+        } else if (!cur && i + 1 < lines.length && (lines[i + 1].trimStart().startsWith("- ") || /^\d+\.\s/.test(lines[i + 1].trimStart()))) {
+          // Skip blank lines between list items
+          i++;
+        } else {
+          break;
+        }
       }
       blocks.push(`<${tag}>${items.join("")}</${tag}>`);
       continue;

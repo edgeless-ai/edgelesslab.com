@@ -22,71 +22,81 @@ function useScrollReveal(containerRef: React.RefObject<HTMLDivElement | null>) {
     const el = containerRef.current;
     if (!el) return;
 
-    // Respect reduced motion
-    const prefersReduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    let observer: IntersectionObserver | null = null;
 
-    // Wrap content between h2s into reveal sections
-    const children = Array.from(el.children) as HTMLElement[];
-    const sections: HTMLElement[][] = [[]];
+    // Defer to next tick so dangerouslySetInnerHTML content is in the DOM
+    const timer = setTimeout(() => {
+      const prefersReduced = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
 
-    for (const child of children) {
-      if (child.tagName === "H2") {
-        sections.push([child]);
-      } else {
-        sections[sections.length - 1].push(child);
-      }
-    }
+      // Check if already wrapped (React strict mode double-run)
+      let wrappers = Array.from(
+        el.querySelectorAll<HTMLDivElement>(".blog-section")
+      );
 
-    // Wrap each section group in a div
-    const wrappers: HTMLDivElement[] = [];
-    for (const group of sections) {
-      if (group.length === 0) continue;
-      const wrapper = document.createElement("div");
-      wrapper.className = "blog-section";
-      if (!prefersReduced) {
-        wrapper.style.opacity = "0";
-        wrapper.style.transform = "translateY(20px)";
-        wrapper.style.transition =
-          "opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)";
-      }
-      // Insert wrapper before the first element in this group
-      group[0].parentNode?.insertBefore(wrapper, group[0]);
-      for (const node of group) {
-        wrapper.appendChild(node);
-      }
-      wrappers.push(wrapper);
-    }
+      if (wrappers.length === 0) {
+        const children = Array.from(el.children) as HTMLElement[];
+        const sections: HTMLElement[][] = [[]];
 
-    // Reveal first section immediately
-    if (wrappers[0]) {
-      wrappers[0].style.opacity = "1";
-      wrappers[0].style.transform = "translateY(0)";
-    }
-
-    if (prefersReduced) return;
-
-    // Observe the rest
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const target = entry.target as HTMLElement;
-            target.style.opacity = "1";
-            target.style.transform = "translateY(0)";
-            observer.unobserve(target);
+        for (const child of children) {
+          if (child.tagName === "H2") {
+            sections.push([child]);
+          } else {
+            sections[sections.length - 1].push(child);
           }
         }
-      },
-      { rootMargin: "0px 0px -60px 0px", threshold: 0.1 }
-    );
 
-    for (let i = 1; i < wrappers.length; i++) {
-      observer.observe(wrappers[i]);
-    }
+        for (const group of sections) {
+          if (group.length === 0) continue;
+          const wrapper = document.createElement("div");
+          wrapper.className = "blog-section";
+          if (!prefersReduced) {
+            wrapper.style.opacity = "0";
+            wrapper.style.transform = "translateY(20px)";
+            wrapper.style.transition =
+              "opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)";
+          }
+          group[0].parentNode?.insertBefore(wrapper, group[0]);
+          for (const node of group) {
+            wrapper.appendChild(node);
+          }
+          wrappers.push(wrapper);
+        }
+      }
 
-    return () => observer.disconnect();
+      // Reveal first section immediately
+      if (wrappers[0]) {
+        wrappers[0].style.opacity = "1";
+        wrappers[0].style.transform = "translateY(0)";
+      }
+
+      if (prefersReduced || wrappers.length <= 1) return;
+
+      // Observe the rest for scroll-triggered reveal
+      observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              const target = entry.target as HTMLElement;
+              target.style.opacity = "1";
+              target.style.transform = "translateY(0)";
+              observer?.unobserve(target);
+            }
+          }
+        },
+        { rootMargin: "0px 0px -60px 0px", threshold: 0.1 }
+      );
+
+      for (let i = 1; i < wrappers.length; i++) {
+        observer.observe(wrappers[i]);
+      }
+    });
+
+    return () => {
+      clearTimeout(timer);
+      observer?.disconnect();
+    };
   }, [containerRef]);
 }
 

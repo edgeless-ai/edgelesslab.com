@@ -443,6 +443,7 @@ body {
 }
 .perfmeter .amber { color: var(--amber); font-weight: 700; }
 </style>
+<script src="assets/stats.js"></script>
 </head>
 <body>
 
@@ -457,7 +458,7 @@ body {
     <div class="gate__marker">addendum to §03</div>
     <h1 class="gate__hed">
       The full catalog.<br>
-      <em>All sixteen thousand<br>seven hundred and<br>thirty-two pieces.</em>
+      <em>All <span data-stat="kept-words">twenty thousand eight hundred and forty&#8209;five</span><br>pieces.</em>
     </h1>
     <p class="gate__deck">
       Every kept specimen the autoresearch loop has produced, on a single page.
@@ -472,7 +473,7 @@ body {
       </div>
       <div class="row">
         <span>plates</span>
-        <span><strong id="gate-count">15,833</strong></span>
+        <span><strong id="gate-count" data-stat="kept">20,845</strong></span>
       </div>
       <div class="row">
         <span>thumbnail size</span>
@@ -489,7 +490,7 @@ body {
     </div>
 
     <div class="gate__actions">
-      <button class="gate__btn" id="gate-continue">I understand · load all 15,833 plates</button>
+      <button class="gate__btn" id="gate-continue">I understand · load all <span data-stat="kept">20,845</span> plates</button>
       <a class="gate__btn gate__btn--ghost" href="index.html">Take me back</a>
     </div>
   </div>

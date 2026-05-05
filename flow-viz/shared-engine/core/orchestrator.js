@@ -23,14 +23,8 @@ class Orchestrator {
     this.state = 'initializing';
     
     try {
-      // Load config only if setup() hasn't already (the p5 path pre-loads
-      // so URL params and the seeded aesthetic variation land before any
-      // data source or plugin reads the config).
-      if (!this.config) {
-        this.config = this.loadConfig(userConfig);
-      } else if (userConfig && Object.keys(userConfig).length) {
-        this.deepMerge(this.config, userConfig);
-      }
+      // Load and validate configuration
+      this.config = this.loadConfig(userConfig);
       
       // Initialize event bus
       const context = {
@@ -82,46 +76,27 @@ class Orchestrator {
   }
 
   loadConfig(userConfig) {
-    // Deep clone default config (functions are lost by JSON round-trip;
-    // re-attach the couple we need below).
+    // Deep clone default config
     const config = JSON.parse(JSON.stringify(CONFIG));
-    // Bind to config (not CONFIG) so `this` inside these methods
-    // references the cloned object, not the original.
-    if (typeof CONFIG.validate === 'function') config.validate = CONFIG.validate.bind(config);
-    if (typeof CONFIG.loadEnvironment === 'function') config.loadEnvironment = CONFIG.loadEnvironment.bind(config);
-    if (typeof CONFIG.merge === 'function') config.merge = CONFIG.merge.bind(config);
-
+    
     // Apply user overrides
     if (userConfig) {
       this.deepMerge(config, userConfig);
     }
-
+    
     // Load environment (URL params)
     if (typeof window !== 'undefined') {
       config.loadEnvironment();
     }
-
+    
     // Validate
     config.validate();
-
-    // Resolve seed: explicit ?seed=X is reproducible, otherwise fresh every
-    // page load. This is what drives per-refresh variation.
-    if (config.engine.seed === null || config.engine.seed === undefined) {
+    
+    // Resolve seed
+    if (config.engine.seed === null) {
       config.engine.seed = Math.floor(Math.random() * 999999);
     }
-
-    // Randomise palette and flow feel from the seed, unless the caller
-    // opted out via ?preset=default.
-    const params = typeof window !== 'undefined'
-      ? new URLSearchParams(window.location.search)
-      : null;
-    const preset = params?.get('preset');
-    if (preset !== 'default' && typeof applyAestheticVariation === 'function') {
-      const rng = makeRng(config.engine.seed);
-      applyAestheticVariation(config, rng);
-      config._rng = rng;
-    }
-
+    
     return config;
   }
 
@@ -156,9 +131,7 @@ class Orchestrator {
       if (sourceParam) {
         overrides.dataSource = { type: sourceParam };
       }
-      // Actually assign — without this, later initialize() re-loads config
-      // from scratch and loses the URL overrides.
-      this.config = this.loadConfig(overrides);
+      this.loadConfig(overrides);
     }
     
     const c = this.config.engine;
@@ -218,7 +191,6 @@ class Orchestrator {
   }
 
   handleKeyPress(key) {
-    if (!this.config || !this.config.interaction) return;
     const cfg = this.config.interaction.keyboard;
     
     if (key === cfg.saveKey) {
@@ -269,28 +241,15 @@ class Orchestrator {
   }
 
   regenerate() {
-    const seed = Math.floor(Math.random() * 999999);
-    this.config.engine.seed = seed;
-
-    // Re-seed p5 so placement / particle spawns are reproducible for this seed.
-    if (typeof randomSeed === 'function') randomSeed(seed);
-    if (typeof noiseSeed === 'function') noiseSeed(seed);
-
-    // Same aesthetic randomizer used at init — one code path, one source of truth.
-    const rng = makeRng(seed);
-    applyAestheticVariation(this.config, rng);
-    this.config._rng = rng;
-
-    // Propagate config changes to the engine and its entities
+    this.config.engine.seed = Math.floor(Math.random() * 999999);
+    randomSeed(this.config.engine.seed);
+    noiseSeed(this.config.engine.seed);
+    
     if (this.engine) {
-      this.engine.config = this.config;
-      if (this.engine.markets) {
-        this.engine.markets.forEach(m => { m.config = this.config; });
-      }
       this.engine.regenerate();
     }
-
-    Events.emit('ENGINE_REGENERATE', { seed });
+    
+    Events.emit('ENGINE_REGENERATE', { seed: this.config.engine.seed });
   }
 
   togglePause() {

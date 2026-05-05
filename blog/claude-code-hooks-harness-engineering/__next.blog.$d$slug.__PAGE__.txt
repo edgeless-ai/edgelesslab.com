@@ -1,0 +1,76 @@
+1:"$Sreact.fragment"
+2:I[82591,["/_next/static/chunks/0.uls-ob~zfqp.js","/_next/static/chunks/0yf~h7j8iiy~n.js","/_next/static/chunks/0.y-6rdfb1fek.js","/_next/static/chunks/0yn3_5hzrw~~t.js"],"Nav"]
+3:I[18800,["/_next/static/chunks/0.uls-ob~zfqp.js","/_next/static/chunks/0yf~h7j8iiy~n.js","/_next/static/chunks/0.y-6rdfb1fek.js","/_next/static/chunks/0yn3_5hzrw~~t.js"],"BlogArticle"]
+a:I[63560,["/_next/static/chunks/0.uls-ob~zfqp.js","/_next/static/chunks/0yf~h7j8iiy~n.js","/_next/static/chunks/0.y-6rdfb1fek.js","/_next/static/chunks/0yn3_5hzrw~~t.js"],""]
+b:I[52150,["/_next/static/chunks/0.uls-ob~zfqp.js","/_next/static/chunks/0yf~h7j8iiy~n.js","/_next/static/chunks/0.y-6rdfb1fek.js","/_next/static/chunks/0yn3_5hzrw~~t.js"],"Footer"]
+c:I[2579,["/_next/static/chunks/0.uls-ob~zfqp.js","/_next/static/chunks/0yf~h7j8iiy~n.js","/_next/static/chunks/0.y-6rdfb1fek.js"],"OutletBoundary"]
+d:"$Sreact.suspense"
+4:T149d,<p>Everyone's optimizing their prompts. The real leverage is in the 200 lines of Python that run before and after every tool call.</p>
+<h2 id="the-model-isn-t-the-bottleneck">The Model Isn't the Bottleneck</h2>
+<p>There's a concept gaining traction called "harness engineering" — the idea that the infrastructure around your AI model matters more than the model itself. The pattern is consistent across teams shipping real agent systems: simpler harness, better outcomes.</p>
+<p>I found it when an agent lost $252 of real money.</p>
+<p>The agent was asked to check a wallet balance. It decided to also deposit funds into a smart contract with no withdrawal function. No guardrail stopped it. No hook flagged the scope creep. The model was fine — GPT-4 class, perfectly capable. The harness was missing.</p>
+<h2 id="what-a-harness-actually-looks-like">What a Harness Actually Looks Like</h2>
+<p>Forget agent frameworks with 47 tools and recursive planning loops. A production harness is four things:</p>
+<ol><li><strong>Pre-execution hooks</strong> — code that runs before every tool call, checking if the action should be allowed</li><li><strong>Post-execution hooks</strong> — code that runs after every tool call, logging what happened</li><li><strong>File-system memory</strong> — structured state on disk, not in the context window</li><li><strong>Progress tracking</strong> — a simple file the agent updates so it doesn't lose its place</li></ol>
+<p>That's it. Claude Code ships with exactly this architecture: PreToolUse, PostToolUse, and a file system the agent can read and write. The hook system is the harness.</p>
+<h2 id="the-hooks-that-earn-their-keep">The Hooks That Earn Their Keep</h2>
+<p>After running 5+ agents for months, here are the hooks that survived natural selection — the ones that prevented real incidents:</p>
+<p><strong>Damage Control</strong> blocks destructive commands before they execute. It's a 200-line Python script with regex patterns for things like <code>rm -rf</code>, <code>git push --force</code>, and writes to critical paths. Sounds simple. It is. It's also caught 3 potential disasters.</p>
+<pre><code># The pattern that matters most
+DANGEROUS_PATTERNS = [
+    r"rm\s+-rf\s+[/~]",
+    r"git\s+push\s+--force",
+    r"DROP\s+TABLE",
+    r"chmod\s+777",
+]</code></pre>
+<p><strong>Scope Guard</strong> prevents the mandate-creep that caused the $252 loss. It detects when an agent starts doing things it wasn't asked to do — sends, transfers, deletes, deploys — and blocks them unless explicitly authorized.</p>
+<p><strong>Completion Verifier</strong> is the "lie detector." Agents will cheerfully tell you a task is done when it isn't. This hook requires evidence: a passing test, a file that exists, a command that succeeds. No evidence, no completion.</p>
+<pre><code># Completion requires proof, not just the agent's word
+EVIDENCE_CHECKS = {
+    "test": lambda path: subprocess.run(["pytest", path]).returncode == 0,
+    "file_exists": lambda path: os.path.exists(path),
+    "command": lambda cmd: subprocess.run(cmd, shell=True).returncode == 0,
+}</code></pre>
+<h2 id="why-simpler-wins">Why Simpler Wins</h2>
+<p>The temptation is to build sophisticated multi-step verification, LLM-in-the-loop review chains, consensus mechanisms. Don't.</p>
+<p>A regex that blocks <code>rm -rf /</code> will save you more often than a 3-agent review panel that "reasons about" whether the command is safe. The regex runs in 2ms. The review panel burns tokens, adds latency, and can be talked out of its objection by a sufficiently persuasive agent.</p>
+<p>The bitter lesson applies to harnesses too: simple, scalable approaches beat clever ones. A hook that always runs is worth more than a guardrail that sometimes thinks.</p>
+<h2 id="building-your-first-hook">Building Your First Hook</h2>
+<p>A Claude Code hook is a script that receives JSON on stdin and outputs JSON on stdout. That's the entire interface.</p>
+<pre><code>#!/usr/bin/env python3
+import json, sys, re
+
+hook_input = json.loads(sys.stdin.read())
+tool = hook_input.get("tool", "")
+content = json.dumps(hook_input.get("input", {}))
+
+# Block anything that smells like scope creep
+SCOPE_CREEP = [r"transfer", r"send.*email", r"deploy", r"publish"]
+for pattern in SCOPE_CREEP:
+    if re.search(pattern, content, re.IGNORECASE):
+        print(json.dumps({
+            "continue": False,
+            "error": f"Blocked: matches scope-creep pattern '{pattern}'"
+        }))
+        sys.exit(0)
+
+print(json.dumps({"continue": True}))</code></pre>
+<p>Wire it in <code>.claude/settings.json</code>:</p>
+<pre><code>{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Bash",
+      "hooks": [{"type": "command", "command": "./hooks/scope-guard.py"}]
+    }]
+  }
+}</code></pre>
+<p>Now every Bash command your agent runs goes through the guard first. No tokens burned, no latency added, no model needed. Just Python and pattern matching.</p>
+<h2 id="the-compound-effect">The Compound Effect</h2>
+<p>Each hook makes the system slightly more trustworthy. More trust means more autonomy. More autonomy means more real-world exposure, which reveals more failure modes, which means more hooks. The model keeps getting better on its own. The harness is the part only you can build.</p>0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"flex flex-col min-h-full","style":{"background":"var(--bg-base)"},"children":[["$","$L2",null,{}],["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"{\"@context\":\"https://schema.org\",\"@type\":\"BlogPosting\",\"headline\":\"Claude Code Hooks: The Harness Engineering That Actually Matters\",\"description\":\"Everyone's optimizing their prompts. The real leverage is in the 200 lines of Python that run before and after every tool call.\",\"datePublished\":\"2026-04-29\",\"dateModified\":\"2026-04-29\",\"wordCount\":1500,\"author\":{\"@type\":\"Person\",\"name\":\"David Murray\",\"url\":\"https://edgelesslab.com/about\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"Edgeless Lab\",\"url\":\"https://edgelesslab.com\"},\"url\":\"https://edgelesslab.com/blog/claude-code-hooks-harness-engineering\",\"keywords\":[\"Claude Code\",\"Hooks\",\"Agent Safety\",\"Python\"],\"mainEntityOfPage\":{\"@type\":\"WebPage\",\"@id\":\"https://edgelesslab.com/blog/claude-code-hooks-harness-engineering\"}}"}}],["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"{\"@context\":\"https://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://edgelesslab.com\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Blog\",\"item\":\"https://edgelesslab.com/blog\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Claude Code Hooks: The Harness Engineering That Actually Matters\",\"item\":\"https://edgelesslab.com/blog/claude-code-hooks-harness-engineering\"}]}"}}],["$","article",null,{"className":"pt-28 pb-20 px-6","children":["$","div",null,{"className":"max-w-[960px] mx-auto","children":[["$","div",null,{"className":"mb-12 max-w-[680px]","children":[["$","div",null,{"className":"flex items-center gap-3 mb-4","children":[["$","time",null,{"className":"text-xs font-mono","style":{"color":"var(--text-tertiary)"},"dateTime":"2026-04-29","children":"April 29, 2026"}],["$","span",null,{"className":"text-xs font-mono","style":{"color":"var(--text-tertiary)"},"children":"6 min"}]]}],["$","h1",null,{"className":"text-3xl sm:text-4xl font-bold tracking-tight leading-[1.2] mb-4","style":{"color":"var(--text-primary)"},"children":"Claude Code Hooks: The Harness Engineering That Actually Matters"}],["$","p",null,{"className":"text-lg font-light","style":{"color":"var(--text-secondary)","lineHeight":1.7},"children":"Everyone's optimizing their prompts. The real leverage is in the 200 lines of Python that run before and after every tool call."}],["$","div",null,{"className":"flex flex-wrap gap-2 mt-4","children":[["$","span","Claude Code",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Claude Code"}],["$","span","Hooks",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Hooks"}],["$","span","Agent Safety",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Agent Safety"}],["$","span","Python",{"className":"px-2.5 py-1 text-xs font-mono rounded-md","style":{"background":"var(--accent-muted)","color":"var(--accent)"},"children":"Python"}]]}]]}],["$","$L3",null,{"html":"$4","editorial":true,"sidebar":"$L5"}],false,"$L6"]}]}],"$L7"]}],["$L8"],"$L9"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"A35REPoRJVu8JBkKqV0HV"}
+5:["$","a",null,{"href":"https://edgelessai.gumroad.com/l/hooks-deep-dive?utm_source=edgelesslab&utm_medium=website&utm_campaign=products","className":"block p-4 rounded-lg border transition-colors hover:border-white/20","style":{"background":"var(--bg-surface)","borderColor":"var(--border-subtle)"},"children":[["$","div",null,{"className":"text-[10px] font-mono uppercase tracking-[0.12em] mb-2","style":{"color":"var(--accent)"},"children":"Companion"}],["$","div",null,{"className":"text-sm font-semibold mb-1","style":{"color":"var(--text-primary)"},"children":"Claude Code Hooks Deep Dive"}],["$","div",null,{"className":"text-xs font-mono mb-2","style":{"color":"var(--text-tertiary)"},"children":"$$19"}],["$","p",null,{"className":"text-xs","style":{"color":"var(--text-tertiary)","lineHeight":1.5},"children":"11 production hook implementations, shared libraries, and configuration templates you can drop into any Claude Code project."}]]}]
+6:["$","div",null,{"className":"mt-16 pt-8 border-t","style":{"borderColor":"var(--border-subtle)"},"children":["$","$La",null,{"href":"/blog","className":"text-sm font-medium transition-colors hover:text-white","style":{"color":"var(--text-secondary)"},"children":"← All posts"}]}]
+7:["$","$Lb",null,{}]
+8:["$","script","script-0",{"src":"/_next/static/chunks/0yn3_5hzrw~~t.js","async":true}]
+9:["$","$Lc",null,{"children":["$","$d",null,{"name":"Next.MetadataOutlet","children":"$@e"}]}]
+e:null

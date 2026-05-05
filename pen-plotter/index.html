@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pen Plotter Autoresearch — Edgeless Lab</title>
-<meta name="description" content="An editorial field journal for an autonomous loop running on 18 generative art factories — including the first 2-color risograph factory. 16,832 specimens, scored by six algorithmic signals and five vision-language judges. Set in Boska, printed on aged paper.">
+<meta name="description" content="An editorial field journal for an autonomous loop running on 40 generative art factories — including color halftone, pointillism, botanical, watercolor, and Islamic knotwork. 37,571 specimens, scored by six algorithmic signals and five vision-language judges. Set in Boska, printed on aged paper.">
 
 <!-- Open Graph -->
 <meta property="og:title" content="Pen Plotter Autoresearch">
-<meta property="og:description" content="Sixteen thousand seven hundred and thirty-two specimens of generative line art, scored by an autonomous loop of seventeen procedural factories and five language-model judges. A field journal of what the algorithms loved — and what they got wrong.">
+<meta property="og:description" content="Thirty-seven thousand five hundred and seventy-one specimens of generative line art, scored by an autonomous loop of forty procedural factories and five language-model judges. A field journal of what the algorithms loved — and what they got wrong.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://edgelesslab.com/pen-plotter/">
 <meta property="og:image" content="https://edgelesslab.com/pen-plotter/assets/og-image.png">
@@ -19,7 +19,7 @@
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Pen Plotter Autoresearch">
-<meta name="twitter:description" content="An autonomous loop, 18 factories, 16,832 specimens. A field journal of what the algorithms loved — and what they got wrong.">
+<meta name="twitter:description" content="An autonomous loop, 40 factories, 37,571 specimens. A field journal of what the algorithms loved — and what they got wrong.">
 <meta name="twitter:image" content="https://edgelesslab.com/pen-plotter/assets/og-image.png">
 
 <!-- Display: Boska (Fontshare) -->
@@ -712,6 +712,48 @@ body {
 .cat-cta:hover .cat-cta__cta::after {
   transform: translateX(4px);
 }
+
+/* "Skip to best of run" shortcut cards embedded in grid */
+.cat-skip {
+  grid-column: span 3;
+  grid-row: span 2;
+  background: var(--paper-deep);
+  border: 1px solid var(--rule);
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3rem;
+  text-decoration: none;
+  transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              background 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              border-color 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@media (max-width: 700px) {
+  .cat-skip { grid-column: span 3; grid-row: span 2; padding: 0.6rem 0.8rem; }
+}
+.cat-skip:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  transform: translateY(-2px);
+}
+.cat-skip__label {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  transition: color 200ms;
+}
+.cat-skip__arrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--amber);
+  transition: transform 200ms;
+}
+.cat-skip:hover .cat-skip__label { color: var(--paper); }
+.cat-skip:hover .cat-skip__arrow { transform: translateY(2px); }
 
 .cat-tile {
   position: relative;
@@ -1411,6 +1453,7 @@ body {
 }
 
 </style>
+<script src="assets/stats.js"></script>
 </head>
 <body>
 
@@ -1424,10 +1467,10 @@ body {
 <section class="hero">
 
   <div class="hero__filing">
-    <span>RUN №&nbsp;<strong>14</strong></span>
-    <span>FACTORIES <strong>18</strong></span>
-    <span>PIECES <strong>16,832</strong></span>
-    <span>BEST <strong class="amber">89.1</strong></span>
+    <span>RUN №&nbsp;<strong data-stat="run">18</strong></span>
+    <span>FACTORIES <strong data-stat="factories">40</strong></span>
+    <span>PIECES <strong data-stat="pieces">37,571</strong></span>
+    <span>BEST <strong class="amber" data-stat="best">89.1</strong></span>
     <span>STATUS <strong>ACTIVE</strong></span>
   </div>
 
@@ -1439,8 +1482,8 @@ body {
         <em>Autoresearch.</em>
       </h1>
       <p class="hero__deck">
-        Sixteen thousand seven hundred and thirty&#8209;two specimens of generative
-        line art, scored by an autonomous loop of seventeen procedural factories
+        <span data-stat="pieces-words">Thirty&#8209;seven thousand five hundred and seventy&#8209;one</span> specimens of generative
+        line art, scored by an autonomous loop of <span data-stat="factories-words">forty</span> procedural factories
         and five language&#8209;model judges. A field journal of what the algorithms
         loved — and what they got wrong.
       </p>
@@ -1487,15 +1530,25 @@ body {
       Each cycle, an autoresearch loop audits every factory, identifies the
       single weakest metric across the catalog, edits the corresponding generator,
       regenerates a thousand new variants, scores them on six algorithmic axes
-      and four vision&#8209;model judges, and either commits the change or reverts.
+      and five vision&#8209;model judges, and either commits the change or reverts.
     </p>
     <p>
       The loop has been running since the third week of <strong>March 2026</strong>.
-      Eighteen factories, sixteen thousand eight hundred and thirty&#8209;two
-      pieces — including the first 2&#8209;color risograph factory.
+      <span data-stat="factories-words">Forty</span> factories, <span data-stat="pieces-words">thirty&#8209;seven thousand five hundred and seventy&#8209;one</span>
+      pieces — spanning color dot factories, botanical gardens after Zancan,
+      watercolor polygon deformation after Tyler Hobbs, Fidenza&#8209;style hatched
+      softshapes, and Owen Jones Islamic geometric knotwork.
       Most of them are forgettable. A few hundred are extraordinary.
       And then there are the <strong>grey rectangles</strong> — pieces the
       algorithms loved and the human eye refused.
+    </p>
+    <p>
+      Scoring moved to <strong>v3</strong> midway through Run&nbsp;17. The new
+      system applies Galanter's complexity theory — rewarding the complex middle
+      of the entropy spectrum rather than raw density. Vision&#8209;language judges
+      now follow Feldman's four&#8209;step art criticism protocol (describe,
+      analyze, interpret, judge), and an intra&#8209;factory uniqueness penalty
+      prevents any single factory from concentrating the leaderboard.
     </p>
   </div>
 </section>
@@ -1533,7 +1586,7 @@ body {
         </div>
         <div class="row">
           <span>Rank in catalog</span>
-          <span>Top 5 of 16,832</span>
+          <span>Top 5 of <span data-stat="kept">35,849</span></span>
         </div>
         <div class="row judge" data-recalibrate>
           <span>Claude vision judge</span>
@@ -1563,7 +1616,7 @@ body {
         </div>
         <div class="row">
           <span>Rank in catalog</span>
-          <span>Top 12 of 16,832</span>
+          <span>Top 12 of <span data-stat="kept">35,849</span></span>
         </div>
         <div class="row judge" data-recalibrate>
           <span>Claude vision judge</span>
@@ -1613,8 +1666,8 @@ body {
        data-loading="initial 1296 plates · loading…"></div>
 
   <div class="catalog__addendum">
-    <span><strong>1,296</strong> shown · <strong>15,436</strong> withheld</span>
-    <span><span class="warn">⚠ very slow</span> · <a href="addendum.html">view all 16,832 plates</a></span>
+    <span><strong data-stat="curated">1,296</strong> shown · <strong data-stat="withheld">34,553</strong> withheld</span>
+    <span><span class="warn">⚠ very slow</span> · <a href="addendum.html">view all <span data-stat="kept">35,849</span> plates</a></span>
   </div>
 </section>
 
@@ -1624,7 +1677,7 @@ body {
   <!-- opening pull quote (no header) -->
   <div class="gallery__opening">
     <p class="gallery__opening__quote">
-      Twelve specimens, twelve factories.<br>
+      Forty specimens, forty factories.<br>
       <em>The shortest possible story of what the loop is for.</em>
     </p>
     <span class="gallery__opening__rule"></span>
@@ -1670,6 +1723,9 @@ body {
 
   <!-- ── SPREAD III · singleton with margin annotation ── -->
   <div class="spread spread--singleton">
+    <div class="spread__label" style="grid-column:1/-1; padding:0;">
+      <span class="num">Spread&nbsp;III</span> · instruction &amp; execution
+    </div>
     <figure class="plate">
       <div class="plate__img-wrap">
         <img src="assets/mediums-all/lewitt-0111.webp" alt="lewitt-0111">
@@ -1691,7 +1747,7 @@ body {
   <!-- ── SPREAD IV · 3-up cluster (line-based pieces) ── -->
   <div class="spread spread--three">
     <div class="spread__label" style="grid-column:1/-1; padding:0;">
-      <span class="num">Spread&nbsp;III</span> · three studies in line
+      <span class="num">Spread&nbsp;IV</span> · three studies in line
     </div>
     <figure class="plate">
       <div class="plate__img-wrap">
@@ -1724,7 +1780,7 @@ body {
 
   <!-- ── SPREAD V · second full-bleed hero ── -->
   <div class="spread spread--full">
-    <div class="spread__label"><span class="num">Spread&nbsp;IV</span> · gestural</div>
+    <div class="spread__label"><span class="num">Spread&nbsp;V</span> · gestural</div>
     <img class="plate-img" src="assets/mediums-all/squiggle-0581.webp" alt="squiggle-0581">
     <div class="plate-caption">
       <span><strong>Plate XI.</strong> squiggle · variant 0581</span>
@@ -1735,7 +1791,7 @@ body {
   <!-- ── SPREAD VI · 2-up (science + guilloche) ── -->
   <div class="spread spread--two">
     <div class="spread__label" style="grid-column:1/-1; padding:0;">
-      <span class="num">Spread&nbsp;V</span> · two interferences
+      <span class="num">Spread&nbsp;VI</span> · two interferences
     </div>
     <figure class="plate">
       <div class="plate__img-wrap">
@@ -1760,7 +1816,7 @@ body {
   <!-- ── SPREAD VII · closing 2-up (molnar + flowfield) ── -->
   <div class="spread spread--two">
     <div class="spread__label" style="grid-column:1/-1; padding:0;">
-      <span class="num">Spread&nbsp;VI</span> · grids and fields
+      <span class="num">Spread&nbsp;VII</span> · grids and fields
     </div>
     <figure class="plate">
       <div class="plate__img-wrap">
@@ -1778,6 +1834,75 @@ body {
       <figcaption class="plate__caption">
         <span><strong>Plate XV.</strong> flowfield · variant 0370</span>
         <span>composite <strong>74.1</strong></span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <!-- ── SPREAD VIII · full-bleed (hatchcolor champion) ── -->
+  <div class="spread spread--full">
+    <div class="spread__label"><span class="num">Spread&nbsp;VIII</span> · the engraver's plate</div>
+    <img class="plate-img" src="assets/mediums-all/hatchcolor-0507.webp" alt="hatchcolor-0507">
+    <div class="plate-caption">
+      <span><strong>Plate&nbsp;XVI.</strong> hatchcolor&nbsp;·&nbsp;variant&nbsp;0507</span>
+      <span>composite&nbsp;<strong>86.2</strong>&nbsp;·&nbsp;colour cross&#8209;hatch in two directions, Phong&#8209;lit sphere</span>
+    </div>
+  </div>
+
+  <!-- ── SPREAD IX · 3-up (rayscape + sports + subdivide) ── -->
+  <div class="spread spread--three">
+    <div class="spread__label" style="grid-column:1/-1; padding:0;">
+      <span class="num">Spread&nbsp;IX</span> · three new voices
+    </div>
+    <figure class="plate">
+      <div class="plate__img-wrap">
+        <img src="assets/mediums-all/rayscape-0170.webp" alt="rayscape-0170">
+      </div>
+      <figcaption class="plate__caption">
+        <span><strong>Plate XVII.</strong> rayscape · variant 0170</span>
+        <span>composite <strong>84.6</strong></span>
+      </figcaption>
+    </figure>
+    <figure class="plate">
+      <div class="plate__img-wrap">
+        <img src="assets/mediums-all/sports-0000.webp" alt="sports-0000">
+      </div>
+      <figcaption class="plate__caption">
+        <span><strong>Plate XVIII.</strong> sports · variant 0000</span>
+        <span>composite <strong>78.1</strong></span>
+      </figcaption>
+    </figure>
+    <figure class="plate">
+      <div class="plate__img-wrap">
+        <img src="assets/mediums-all/subdivide-0601.webp" alt="subdivide-0601">
+      </div>
+      <figcaption class="plate__caption">
+        <span><strong>Plate XIX.</strong> subdivide · variant 0601</span>
+        <span>composite <strong>78.7</strong></span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <!-- ── SPREAD X · closing 2-up (halftone CMY + weave textile) ── -->
+  <div class="spread spread--two">
+    <div class="spread__label" style="grid-column:1/-1; padding:0;">
+      <span class="num">Spread&nbsp;X</span> · print and textile
+    </div>
+    <figure class="plate">
+      <div class="plate__img-wrap">
+        <img src="assets/mediums-all/halftone-0007.webp" alt="halftone-0007">
+      </div>
+      <figcaption class="plate__caption">
+        <span><strong>Plate XX.</strong> halftone · variant 0007</span>
+        <span>composite <strong>77.4</strong> · CMY pop art rosettes</span>
+      </figcaption>
+    </figure>
+    <figure class="plate">
+      <div class="plate__img-wrap">
+        <img src="assets/mediums-all/weave-0004.webp" alt="weave-0004">
+      </div>
+      <figcaption class="plate__caption">
+        <span><strong>Plate XXI.</strong> weave · variant 0004</span>
+        <span>composite <strong>68.0</strong> · herringbone interlocking</span>
       </figcaption>
     </figure>
   </div>
@@ -1822,7 +1947,7 @@ body {
       </div>
       <div class="row">
         <dt>Generators</dt>
-        <dd><strong>18 procedural factories</strong> in Python · seed-driven, deterministic per variant</dd>
+        <dd><strong><span data-stat="factories">40</span> procedural factories</strong> in Python · seed-driven, deterministic per variant</dd>
       </div>
       <div class="row">
         <dt>Scoring</dt>
@@ -1834,7 +1959,7 @@ body {
       </div>
       <div class="row">
         <dt>Edition</dt>
-        <dd><strong class="amber">Run №15</strong> · April 2026 · 16,832 specimens</dd>
+        <dd><strong class="amber">Run №<span data-stat="run">18</span></strong> · April 2026 · <span data-stat="pieces">37,571</span> specimens</dd>
       </div>
       <div class="row">
         <dt>Designed by</dt>
@@ -1847,11 +1972,11 @@ body {
       <div class="colophon__continue__grid">
         <a class="colophon__link" href="addendum.html">
           <strong>The full catalog</strong>
-          <span>all 16,832 specimens, on a single page</span>
+          <span>all <span data-stat="kept">35,849</span> specimens, on a single page</span>
         </a>
-        <a class="colophon__link" href="http://localhost:2718" target="_blank" rel="noopener">
-          <strong>Live tuning playground</strong>
-          <span>open the marimo notebook (kernel required)</span>
+        <a class="colophon__link" href="https://edgelesslab.com/lab/pen-plotter-autoresearch" target="_blank" rel="noopener">
+          <strong>Live dashboards</strong>
+          <span>marimo notebooks — factory metrics, scoring, tuning</span>
         </a>
         <a class="colophon__link" href="https://github.com/qt-djm" target="_blank" rel="noopener">
           <strong>Source on GitHub</strong>
@@ -2025,10 +2150,27 @@ body {
 
   grid.dataset.loading = '';
 
-  // ── Build grid tiles + inline CTA at row 6 ─────────────────────
-  // CTA breaks the uniformity ~6 rows in (well within first long scroll)
-  // and links out to the full 16,832 specimen addendum.
-  const CTA_INDEX = 216; // 6 rows × 36 cols (desktop), still feels right at smaller widths
+  // ── Build grid tiles + inline cards ─────────────────────────────
+  // CTA at row 6 links to the full addendum.
+  // Skip cards at ~30%, ~55%, ~80% let you jump to §04 Best of Run.
+  const CTA_INDEX = 216;
+  const SKIP_INDICES = [
+    Math.round(manifest.length * 0.30),
+    Math.round(manifest.length * 0.55),
+    Math.round(manifest.length * 0.80),
+  ];
+
+  function makeSkip() {
+    const skip = document.createElement('a');
+    skip.className = 'cat-skip';
+    skip.href = '#best-of-run';
+    skip.innerHTML = `
+      <span class="cat-skip__label">skip to §04</span>
+      <span class="cat-skip__arrow">↓</span>
+      <span class="cat-skip__label">best of run</span>
+    `;
+    return skip;
+  }
 
   const frag = document.createDocumentFragment();
   manifest.forEach((p, i) => {
@@ -2039,15 +2181,18 @@ body {
       cta.innerHTML = `
         <div>
           <div class="cat-cta__marker">addendum to §03</div>
-          <div class="cat-cta__hed">There are <em>fifteen&nbsp;thousand four&nbsp;hundred and thirty&#8209;six</em> more specimens beyond this grid.</div>
-          <div class="cat-cta__count">15,436</div>
+          <div class="cat-cta__hed">There are <em data-stat="withheld-words">thirty&#8209;four&nbsp;thousand five&nbsp;hundred and fifty&#8209;three</em> more specimens beyond this grid.</div>
+          <div class="cat-cta__count" data-stat="withheld">34,553</div>
         </div>
         <div class="cat-cta__foot">
           <span>the full catalog</span>
-          <span class="cat-cta__cta">view all 16,832</span>
+          <span class="cat-cta__cta">view all</span>
         </div>
       `;
       frag.appendChild(cta);
+    }
+    if (SKIP_INDICES.includes(i)) {
+      frag.appendChild(makeSkip());
     }
     const tile = document.createElement('div');
     tile.className = 'cat-tile';

@@ -7,6 +7,13 @@
     <language>en-us</language>
     <atom:link href="https://edgelesslab.com/feed.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>Half My AI Agents Were Dead. I Didn&apos;t Know for a Week.</title>
+      <link>https://edgelesslab.com/blog/self-healing-ai-infrastructure</link>
+      <description>I discovered 10 of my 20 agents were ghosts — registered, visible in dashboards, producing nothing. Here&apos;s the five-layer self-healing system I built so it never happens again.</description>
+      <pubDate>Tue, 05 May 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/self-healing-ai-infrastructure</guid>
+    </item>
+    <item>
       <title>Hermes Curator: The Agent That Cleans Up After Your Agents</title>
       <link>https://edgelesslab.com/blog/hermes-curator-skill-lifecycle</link>
       <description>Nous Research shipped Hermes v0.12.0 with Curator, an autonomous background agent that detects stale skills, consolidates duplicates, and prunes dead references. Here&apos;s why it matters for multi-agent systems.</description>

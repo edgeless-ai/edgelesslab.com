@@ -17,6 +17,161 @@ export interface BlogPost {
 
 export const posts: BlogPost[] = [
   {
+    slug: "self-healing-ai-infrastructure",
+    editorial: true,
+    title: "Half My AI Agents Were Dead. I Didn't Know for a Week.",
+    description: "I discovered 10 of my 20 agents were ghosts \u2014 registered, visible in dashboards, producing nothing. Here's the five-layer self-healing system I built so it never happens again.",
+    date: "2026-05-05",
+    tags: ["Multi-Agent", "Infrastructure", "Self-Healing", "Monitoring"],
+    readTime: "7 min",
+    productSlug: "multi-agent-blueprint",
+    ctaHook: "The monitoring scripts, escalation protocol, and healing patterns behind this post \u2014 ready to drop into your own agent infrastructure.",
+    content: `
+I discovered something alarming last month: **10 of my 20 AI agents were ghosts.**
+
+They were registered in Paperclip. They had agent IDs. They appeared in the fleet dashboard. But they had no activation schedules, no work profiles, no cron jobs waking them up, no monitoring to tell me they were dead.
+
+They were zombies. Undead agents consuming mental overhead without producing work.
+
+And I didn't know. For a week.
+
+This is the silent killer of multi-agent systems: **failures that don't fail loudly.** A cron job that stops running doesn't send a notification. An agent that can't reach an API just... stops. A backlog that grows by 500 items over a week looks like "business as usual" until you actually count it.
+
+## Why Silent Failures Are Worse Than Crashes
+
+A crash is a gift. It gives you a stack trace, a timestamp, and a clear signal that something broke. You fix it and move on.
+
+Ghost agents give you nothing. The dashboard shows 20 agents. You assume 20 agents are working. Your backlog grows. Your knowledge base goes stale. Your RSS triage falls behind. And you blame the system's throughput when the real problem is that half your fleet is parked.
+
+I only caught it because I ran a manual audit of cron schedules against agent registrations. That audit should have been automated from day one.
+
+## The Fix: Five Layers of Self-Healing
+
+I built a system that knows what "healthy" looks like, detects deviations, takes corrective action, and escalates what it can't fix. Five layers, each targeting a different failure mode.
+
+### Layer 1: Agent Activation
+
+:::metric
+10 | Ghost agents found
+19/20 | Active after fix
+<5 min | Detection time
+0 | Human restarts needed
+:::
+
+**Problem:** Agents exist but never run.
+
+**Detection:** A profile gap analyzer runs daily at 2am. It cross-references every registered agent against its activation schedule. If an agent has no cron, no trigger, and no recent activity \u2014 it's a ghost.
+
+**Healing:** Auto-deploy activation crons with appropriate schedules based on the agent's role.
+
+**Escalation:** If an agent still has no profile after 24 hours, alert the humans. Something structural is wrong.
+
+### Layer 2: Cron Execution
+
+**Problem:** Cron jobs hang, timeout, or silently stop.
+
+**Detection:** A self-healing monitor runs every 5 minutes. It parses the cron scheduler's output, looking for timeout errors, stale jobs, and missing heartbeats.
+
+**Healing:** Auto-restart stale jobs with exponential backoff. First restart is immediate. Second waits 2 seconds. Third waits 4. If all three fail, stop trying and escalate.
+
+**Escalation:** Post to the alerts channel with full error context \u2014 not just "cron failed" but which job, what error, what it was processing when it died.
+
+### Layer 3: Backlog Processing
+
+**Problem:** Work piles up faster than agents process it.
+
+:::bar-chart Backlog Reduction (24 hours)
+RSS items | 500
+YouTube items | 42
+Stale items archived | 550
+:::
+
+**Detection:** Daily backlog delta tracking. If the backlog is growing instead of shrinking, something is wrong \u2014 either agents are too slow, or they're not running at all.
+
+**Healing:** Auto-scale parallel workers when thresholds are exceeded. Archive items older than 30 days that haven't been touched.
+
+**Escalation:** Dashboard warnings when more than 7 days of work has accumulated.
+
+### Layer 4: API Dependencies
+
+**Problem:** External APIs go down and agents silently queue failures.
+
+**Detection:** 30-minute health probes against every external dependency.
+
+**Healing:** Circuit breaker pattern. When an API is down, queue the work for retry instead of dropping it. When it comes back, drain the queue.
+
+**Escalation:** Daily 9am blocker digest listing every blocked task and which API is responsible.
+
+### Layer 5: Resource Consumption
+
+**Problem:** Disk fills up, memory leaks, runaway processes.
+
+**Detection:** Daily 2am resource scan. Track vault size, log growth rate, flag unusual spikes.
+
+**Healing:** Auto-archive old content. Warn at 80% capacity.
+
+**Escalation:** Urgent alert at 90% capacity.
+
+## What a Self-Healing Day Looks Like
+
+:::flow Self-Healing Loop
+Detect -> Classify -> Heal -> Verify -> Report
+:::
+
+Here's what happened last Tuesday with zero human intervention:
+
+**09:00** \u2014 Daily dashboard posts to the general channel. 49 crons active, 0 errors, 19/20 agents healthy.
+
+**09:30** \u2014 The YouTube likes heartbeat cron times out after 600 seconds.
+
+**09:35** \u2014 Self-healing monitor detects the timeout. Auto-restart triggered.
+
+**09:36** \u2014 Job resumes successfully.
+
+**09:40** \u2014 Next monitoring cycle confirms the job is healthy. Recovery logged.
+
+No pages. No Slack messages. No "can someone check if the YouTube thing is running?"
+
+## When to Escalate, Not Heal
+
+Self-healing doesn't mean "ignore everything." It means "handle the routine so humans handle the exceptional."
+
+The system escalates when:
+- Auto-restart fails twice (persistent failure, not a fluke)
+- A blocker exists for more than 24 hours (external dependency is truly down)
+- 3 or more agents go unhealthy simultaneously (systemic issue, not isolated)
+- Vault growth exceeds 500 MB/day (runaway process suspected)
+- API latency exceeds 5 seconds consistently (degraded service)
+
+The escalation includes full context. Not "something broke" but "the YouTube heartbeat cron failed 3 times in 2 hours, last error was a timeout connecting to the YouTube API, here's the relevant log."
+
+## Results After 30 Days
+
+:::bar-chart Before vs After
+Ghost agents (before) | 10
+Ghost agents (after) | 1
+Undetected errors/day (before) | 5
+Undetected errors/day (after) | 0
+Human fire-drills/week (before) | 4
+Human fire-drills/week (after) | 1
+:::
+
+Mean time to detect a failure went from "hours, maybe days" to under 5 minutes. Mean time to recovery went from "whenever I notice" to under 10 minutes, automated.
+
+Fleet uptime went from roughly 85% to 98%. The remaining 2% is genuine novel failures \u2014 things the system correctly escalates because it doesn't know how to fix them.
+
+## The Philosophy
+
+Good infrastructure is boring infrastructure.
+
+If you're woken up at 3 AM because a cron job died, your system isn't self-healing. If you're manually checking whether agents are running, your system isn't self-monitoring. If you're archiving old files to free up disk space, your system isn't self-managing.
+
+The goal isn't to eliminate humans. It's to eliminate **routine** human intervention. Humans should handle novel failures, strategic decisions, and system evolution. Not restarting stuck processes.
+
+Start with one layer. Cron health is the easiest. Parse your scheduler's output, detect stale jobs, restart them, verify the fix. Once that's working, add the next layer. Within a week you'll wonder how you ever ran agents without it.
+    `.trim(),
+  },
+  {
     slug: "hermes-curator-skill-lifecycle",
     editorial: true,
     title: "Hermes Curator: The Agent That Cleans Up After Your Agents",

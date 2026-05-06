@@ -8,15 +8,29 @@ Maintains compatibility with existing scripts
 import os
 import sys
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 # Add the path to find the unified service
 sys.path.insert(0, str(Path(__file__).parent))
 
 from unified_email_service import UnifiedEmailService, EmailConfig
 
+# Import inbound email fetcher (EDGA-26)
+try:
+    from inbound_email_fetcher import (
+        InboundEmailFetcher,
+        FetchedEmail,
+        fetch_recent_emails,
+        fetch_all_unread,
+        mark_processed,
+    )
+    INBOUND_AVAILABLE = True
+except ImportError:
+    INBOUND_AVAILABLE = False
+
 # Create global service instance
 _service = None
+_fetcher = None
 
 
 def get_service():
@@ -27,7 +41,15 @@ def get_service():
     return _service
 
 
-# Main API functions for backward compatibility
+def get_fetcher():
+    """Get or create the global inbound email fetcher"""
+    global _fetcher
+    if _fetcher is None and INBOUND_AVAILABLE:
+        _fetcher = InboundEmailFetcher()
+    return _fetcher
+
+
+# ==================== OUTBOUND EMAIL (Sending) ====================
 def send_email_to_david(
     subject: str, body: str, use_html: bool = True
 ) -> Optional[str]:
@@ -124,6 +146,88 @@ def send_analysis(
     return get_service().send_analysis(
         title=title, topic=topic, content=content, greeting=greeting, closing=closing
     )
+
+
+# ==================== INBOUND EMAIL (Fetching) ====================
+# EDGA-26: Enable inbound email ingestion
+
+def fetch_inbound_emails(
+    max_results: int = 10,
+    since_hours: int = 24,
+    unread_only: bool = True,
+    query: Optional[str] = None,
+) -> List:
+    """
+    Fetch inbound emails from djm.claude.assistant@gmail.com
+    
+    Args:
+        max_results: Maximum emails to fetch (1-500)
+        since_hours: Only fetch emails newer than this many hours
+        unread_only: Only fetch unread emails
+        query: Custom Gmail search query (e.g., 'from:someone@example.com subject:test')
+        
+    Returns:
+        List of FetchedEmail objects with full metadata
+        
+    Example:
+        emails = fetch_inbound_emails(max_results=5)
+        for email in emails:
+            print(f"From: {email.sender}")
+            print(f"Subject: {email.subject}")
+            print(f"Body: {email.body_text[:200]}")
+    """
+    if not INBOUND_AVAILABLE:
+        raise RuntimeError("Inbound email fetcher not available. Check dependencies.")
+    
+    return get_fetcher().fetch_emails(
+        max_results=max_results,
+        since_hours=since_hours,
+        unread_only=unread_only,
+        query=query,
+    )
+
+
+def fetch_unread_inbox(max_results: int = 50) -> List:
+    """
+    Fetch all unread emails from inbox
+    
+    Useful for processing task requests, forwarded content, etc.
+    """
+    if not INBOUND_AVAILABLE:
+        raise RuntimeError("Inbound email fetcher not available")
+    
+    return get_fetcher().fetch_emails(
+        max_results=max_results,
+        unread_only=True,
+        since_hours=None,  # All time
+    )
+
+
+def mark_email_processed(message_id: str, archive: bool = True) -> bool:
+    """
+    Mark an inbound email as processed (read + optionally archive)
+    
+    Args:
+        message_id: The Gmail message ID
+        archive: If True, also remove from inbox (archive)
+        
+    Returns:
+        True if successful
+    """
+    if not INBOUND_AVAILABLE:
+        raise RuntimeError("Inbound email fetcher not available")
+    
+    return get_fetcher().mark_as_read(message_id) and (
+        not archive or get_fetcher().archive(message_id)
+    )
+
+
+def get_gmail_labels() -> List[Dict]:
+    """Get all available Gmail labels"""
+    if not INBOUND_AVAILABLE:
+        raise RuntimeError("Inbound email fetcher not available")
+    
+    return get_fetcher().get_labels()
 
 
 # Command line interface

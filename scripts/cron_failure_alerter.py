@@ -62,59 +62,50 @@ MONITORED_JOBS = {
     },
     # REMOVED 2026-03-15: gmail_token_refresh — cron disabled, token file missing since 2026-03-11.
     # Re-add after manual Gmail OAuth reauth.
-    'youtube_intelligence': {
-        # Uses timestamped logs: logs/youtube_intelligence/unified_pipeline_*.log
-        'log_dir': LOGS_DIR / 'youtube_intelligence',
-        'log_pattern': '*pipeline*.log',
-        'schedule': 'weekly',  # Sundays at 8 AM
-        'max_age_hours': 168 + 24,
-    },
+    # REMOVED 2026-04-21: youtube_intelligence — "unified_pipeline" cron no longer in crontab
+    # (last pipeline log Apr 5). Active YouTube jobs are youtube_likes + youtube_knowledge_scanner.
+    # If a weekly pipeline is restored, re-enable this monitor.
     'youtube_likes': {
         # Uses timestamped logs: logs/youtube_intelligence/likes_heartbeat_*.log
         'log_dir': LOGS_DIR / 'youtube_intelligence',
         'log_pattern': 'likes_heartbeat_*.log',
-        'schedule': '4x daily',  # 8am, 12pm, 4pm, 8pm
-        'max_age_hours': 8,
+        'schedule': '2x daily',  # 7am, 2pm (updated 2026-04-13, was 4x)
+        'max_age_hours': 24,  # Widened 2026-04-21 — 18h was tight for Mac-sleep overnight
     },
-    'youtube_newsletter_evening': {
-        # Uses timestamped logs: logs/youtube_intelligence/newsletter_*.log
-        'log_dir': LOGS_DIR / 'youtube_intelligence',
-        'log_pattern': 'newsletter_*.log',
-        'schedule': 'daily 8pm',
-        'max_age_hours': 26,
-    },
-    'youtube_newsletter_morning': {
-        # Shares log dir with evening newsletter
-        'log_dir': LOGS_DIR / 'youtube_intelligence',
-        'log_pattern': 'newsletter_*.log',
-        'schedule': 'daily 7am',
-        'max_age_hours': 26,
-    },
+    # REMOVED 2026-04-10: youtube_newsletter_evening — cron entry never existed,
+    # was generating false-positive alerts every 26h. Morning newsletter is the
+    # only active newsletter cron.
+    # REMOVED 2026-04-21: youtube_newsletter_morning — no crontab entry for newsletter generator.
+    # Last newsletter log Apr 16. If restored, re-enable with correct log_pattern.
     # REMOVED 2026-03-15: slo_check and dashboard_update — scripts never existed,
     # cron entries disabled 2026-03-14 (task-129 audit). Were generating stale-log alerts.
     'memory_maintenance': {
         # Uses timestamped logs: .claude/memory/logs/cron_*.log
+        # EDGA-957: Fixed — cron runs at 11 PM, alerter path was correct, crontab was stale (had 2 AM)
         'log_dir': CLAUDE_PROJECTS_ROOT / '.claude' / 'memory' / 'logs',
         'log_pattern': 'cron_*.log',
-        'schedule': 'daily',  # 2 AM daily
-        'max_age_hours': 26,
+        'schedule': 'daily',  # 11 PM daily (was 2 AM, moved 2026-05-04 to avoid Mac sleep)
+        'max_age_hours': 50,  # EDGA-957: 30h -> 50h — tolerate Mac sleep/wake cycles
     },
-    'rss_ingest': {
-        'log': LOGS_DIR / 'rss_ingest.log',
+    'rss_triage': {
+        # Updated 2026-05-04: rss_ingest retired, rss-triage is canonical
+        'log_dir': LOGS_DIR / 'rss-triage',
+        'log_pattern': '*.log',
         'schedule': 'every 2 hours',
-        'max_age_hours': 4,
+        'max_age_hours': 10,  # Mac sleep causes 6-8h gaps overnight; tolerate gracefully
     },
-    'tartanism_keepalive': {
-        # Note: script uses hyphen, not underscore
-        'log': LOGS_DIR / 'tartanism-keepalive.log',
-        'schedule': 'every 5 days',
-        'max_age_hours': 5 * 24 + 24,
-    },
+    # REMOVED 2026-05-01: tartanism_keepalive — Supabase keepalive retired after
+    # Tartanism migrated to self-hosted PostgreSQL. Crontab entry is commented out
+    # (REF: EDGA-760); keeping this monitor enabled creates false-positive stale/failure alerts.
     'cleanup_quarantine': {
         # Weekly quarantine of stale files
+        # EDGA-957: check_log_content enabled — parses timestamps inside log, not just file mtime
+        # EDGA-957: Moved cron from 3 AM to 9 PM Sunday (Mac sleeps through 3 AM window)
         'log': LOGS_DIR / 'safe_cleanup.log',
-        'schedule': 'weekly',  # Sundays 3 AM
-        'max_age_hours': 168 + 24,  # 1 week + 1 day grace
+        'log_pattern': r'\[\d{4}-\d{2}-\d{2}',  # Regex to find timestamps like [2026-04-19
+        'check_log_content': True,  # Parse timestamps inside log, not file mtime
+        'schedule': 'weekly',  # Sunday 9 PM (was 3 AM, moved 2026-05-04 to avoid Mac sleep)
+        'max_age_hours': 168 + 72,  # EDGA-957: 1 week + 72h grace — tolerate missed windows
     },
     'cleanup_purge': {
         # Monthly purge of old quarantine
@@ -484,7 +475,8 @@ class CronFailureAlerter:
                 except Exception as e:
                     print(f"Warning: Failed to write to log file: {e}")
 
-            # Alert on failure
+            # Log outcome to vault
+            vault_dir = CLAUDE_PROJECTS_ROOT / 'claude-vault' / '13-Reports' / 'Emails' / 'Sent'
             if exit_code != 0:
                 error = f"Command exited with code {exit_code}"
                 log_tail = self._get_log_tail(log_file) if log_file else None
@@ -499,6 +491,22 @@ class CronFailureAlerter:
                     exit_code=exit_code,
                     log_tail=log_tail,
                 )
+            else:
+                # Log success to vault and stdout
+                print(f"Cron job '{job_name}' completed successfully (exit 0)")
+                try:
+                    vault_dir.mkdir(parents=True, exist_ok=True)
+                    date_str = datetime.now().strftime('%Y-%m-%d')
+                    success_file = vault_dir / f"{date_str}-cron-success-{job_name}.md"
+                    stdout_preview = (result.stdout or "")[:500].strip()
+                    success_file.write_text(
+                        f"# Cron Success: {job_name}\n\n"
+                        f"- **Time**: {datetime.now().isoformat()}\n"
+                        f"- **Exit code**: 0\n"
+                        f"- **Output preview**: {stdout_preview[:200] if stdout_preview else '(no output)'}\n"
+                    )
+                except Exception:
+                    pass  # Don't fail the job over logging
 
             return exit_code
 
@@ -594,15 +602,51 @@ class CronFailureAlerter:
 
             # Check log file age
             try:
-                mtime = datetime.fromtimestamp(log_file.stat().st_mtime)
-                age_hours = (datetime.now() - mtime).total_seconds() / 3600
+                # EDGA-957: Support checking log content timestamps instead of file mtime
+                # This handles jobs that run but produce no work (file not modified,
+                # but log entries still written)
+                if config.get('check_log_content') and 'log_pattern' in config:
+                    import re
+                    log_pattern = re.compile(config['log_pattern'])
+                    cutoff = datetime.now() - timedelta(hours=max_age_hours)
+                    most_recent_entry = None
+                    
+                    with open(log_file, 'r') as f:
+                        for line in f:
+                            match = log_pattern.search(line)
+                            if match:
+                                try:
+                                    # Parse timestamp like [2026-04-19 13:00:04]
+                                    ts_str = match.group(0).strip('[]')
+                                    ts = datetime.strptime(ts_str, '%Y-%m-%d')
+                                    if most_recent_entry is None or ts > most_recent_entry:
+                                        most_recent_entry = ts
+                                except ValueError:
+                                    continue
+                    
+                    if most_recent_entry is None:
+                        reason = f"No timestamped entries found in log file: {log_file}"
+                        stale_jobs.append((job_name, reason))
+                        continue
+                    
+                    age_hours = (datetime.now() - most_recent_entry).total_seconds() / 3600
+                    if age_hours > max_age_hours:
+                        reason = (
+                            f"No log entries in {age_hours:.1f} hours "
+                            f"(expected: {config['schedule']})"
+                        )
+                        stale_jobs.append((job_name, reason))
+                else:
+                    # Original behavior: check file mtime
+                    mtime = datetime.fromtimestamp(log_file.stat().st_mtime)
+                    age_hours = (datetime.now() - mtime).total_seconds() / 3600
 
-                if age_hours > max_age_hours:
-                    reason = (
-                        f"Log file not updated in {age_hours:.1f} hours "
-                        f"(expected: {config['schedule']})"
-                    )
-                    stale_jobs.append((job_name, reason))
+                    if age_hours > max_age_hours:
+                        reason = (
+                            f"Log file not updated in {age_hours:.1f} hours "
+                            f"(expected: {config['schedule']})"
+                        )
+                        stale_jobs.append((job_name, reason))
             except Exception as e:
                 reason = f"Error checking log file: {e}"
                 stale_jobs.append((job_name, reason))
@@ -677,7 +721,7 @@ class CronFailureAlerter:
         alerts_sent = 0
 
         # Check for systemic anomaly first - send ONE escalation instead of per-job spam
-        if anomaly and self._should_alert('system_anomaly', cooldown_hours=6):
+        if anomaly and self._should_alert('system_anomaly', cooldown_hours=12):
             self._send_escalation_alert(anomaly, stale_jobs)
             alerts_sent += 1
             print(f"🚨 ESCALATION: {anomaly}")

@@ -147,6 +147,18 @@ class ChromaCollectionManager:
             else:
                 metadata_dict = {}
             
+            # Wing/room/type taxonomy (task: chroma metadata trio)
+            try:
+                import sys as _sys
+                _wc_path = "/Users/djm/claude-projects/.claude/memory"
+                if _wc_path not in _sys.path:
+                    _sys.path.insert(0, _wc_path)
+                from wing_classifier import classify_for_chroma as _c4c
+                metadata_dict = {**_c4c(collection_name,
+                                        filename=pattern_data.get("id")), **metadata_dict}
+            except Exception:
+                pass
+
             # Check if pattern exists
             pattern_id = pattern_data.get("id")
             updated = False
@@ -259,9 +271,20 @@ class ChromaCollectionManager:
                     metadata_dict = {k: v for k, v in metadata_dict.items() if v is not None}
                 else:
                     metadata_dict = {}
+                # Wing/room/type taxonomy (task: chroma metadata trio)
+                try:
+                    import sys as _sys
+                    _wc_path = "/Users/djm/claude-projects/.claude/memory"
+                    if _wc_path not in _sys.path:
+                        _sys.path.insert(0, _wc_path)
+                    from wing_classifier import classify_for_chroma as _c4c
+                    metadata_dict = {**_c4c(collection_name,
+                                            filename=pattern.get("id")), **metadata_dict}
+                except Exception:
+                    pass
                 metadatas.append(metadata_dict)
                 ids.append(pattern.get("id"))
-            
+
             # Add all patterns in batch
             collection.add(
                 documents=documents,

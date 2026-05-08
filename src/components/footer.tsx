@@ -13,7 +13,7 @@ const toolLinks = [
 const labLinks = [
   { label: "Pen Plotter Art", href: "/lab/pen-plotter-art", external: false },
   { label: "Strange Attractors", href: "/lab/strange-attractors", external: false },
-  { label: "Total Serialism", href: "https://djmclaudeassistant-web.github.io/total-serialism/", external: true },
+  { label: "Total Serialism", href: "/total-serialism/app/", external: false },
   { label: "Excalidraw Diagrams", href: "/lab/excalidraw-diagrams", external: false },
 ];
 

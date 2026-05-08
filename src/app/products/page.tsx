@@ -87,7 +87,7 @@ export default function ProductsPage() {
               className="text-[11px] font-mono"
               style={{ color: "var(--text-tertiary)" }}
             >
-              30-day refund &middot; instant download
+              all free &middot; instant download
             </span>
           </div>
 

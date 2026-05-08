@@ -95,7 +95,7 @@ export const products: Product[] = [
   },
   {
     name: "Multi-Agent Orchestration Blueprint",
-    price: "$39",
+    price: "Free",
     description:
       "The dispatch/worker architecture for coordinating multiple AI agents. Agent Bus messaging, async inboxes, state machines, and 3 reference implementations from a system that runs 5 agents 24/7.",
     features: [
@@ -111,7 +111,7 @@ export const products: Product[] = [
   },
   {
     name: "The Agent Cookbook",
-    price: "$39",
+    price: "Free",
     description:
       "Build AI agents that actually work. 15 production-ready agent patterns with complete implementations for Claude, GPT, and open-source models.",
     features: [
@@ -125,7 +125,7 @@ export const products: Product[] = [
   },
   {
     name: "Claude Memory Kit Pro",
-    price: "$29",
+    price: "Free",
     description:
       "The complete memory system for Claude Code power users. 12 templates, 5 stack libraries, advanced patterns guide, and CLAUDE.md templates.",
     features: [
@@ -139,7 +139,7 @@ export const products: Product[] = [
   },
   {
     name: "The Prompt Engineering OS",
-    price: "$29",
+    price: "Free",
     description:
       "The complete system for writing AI prompts that work in production. 30 chapters, 8 template schemas, 100+ templates.",
     features: [
@@ -153,7 +153,7 @@ export const products: Product[] = [
   },
   {
     name: "Generative Art Starter Kit",
-    price: "$29",
+    price: "Free",
     description:
       "10 Python generators for pen plotters: flow fields, L-systems, Voronoi, spirals, reaction-diffusion. Each with parameter guides, example SVGs, and AI scoring rubrics from 105+ experiments.",
     features: [
@@ -169,7 +169,7 @@ export const products: Product[] = [
   },
   {
     name: "Always-On Agent Deployment Kit",
-    price: "$29",
+    price: "Free",
     description:
       "Deploy an AI agent that runs 24/7 on a $5 VPS. Cron scheduling, grounding packets, memory contracts, Telegram alerting, and the recovery patterns from 3 months of unattended operation.",
     features: [
@@ -185,7 +185,7 @@ export const products: Product[] = [
   },
   {
     name: "Production MCP Server Kit",
-    price: "$29",
+    price: "Free",
     description:
       "Take MCP servers past the tutorial stage. Auth middleware, rate limiting, Docker deployment, health checks, and error handling patterns from running 4+ MCP servers in production.",
     features: [
@@ -201,7 +201,7 @@ export const products: Product[] = [
   },
   {
     name: "AI Code Review Playbook",
-    price: "$24",
+    price: "Free",
     description:
       "Systematic AI-powered code review that catches security vulnerabilities, performance issues, and logic errors before they ship.",
     features: [
@@ -215,7 +215,7 @@ export const products: Product[] = [
   },
   {
     name: "Digital Product Launch Toolkit",
-    price: "$24",
+    price: "Free",
     description:
       "The exact process used to ship 18 digital products as a solo developer. Gumroad page templates, pricing strategy, launch checklists, and the daily shipping workflow.",
     features: [
@@ -231,7 +231,7 @@ export const products: Product[] = [
   },
   {
     name: "n8n AI Workflow Templates",
-    price: "$24",
+    price: "Free",
     description:
       "5 importable n8n workflows that connect AI to real business processes. YouTube monitoring, RSS intelligence, AI code review, content embedding, and scheduled health checks.",
     features: [
@@ -247,7 +247,7 @@ export const products: Product[] = [
   },
   {
     name: "MCP Server Starter Kit",
-    price: "$24",
+    price: "Free",
     description:
       "TypeScript and Python templates for building MCP servers. Go from zero to a running server in under an hour.",
     features: [
@@ -261,7 +261,7 @@ export const products: Product[] = [
   },
   {
     name: "Obsidian + Claude Code Setup Kit",
-    price: "$19",
+    price: "Free",
     description:
       "Turn Obsidian into an AI-powered development environment with pre-configured vault, Claude Code integration, and workflow automations.",
     features: [
@@ -275,7 +275,7 @@ export const products: Product[] = [
   },
   {
     name: "Prompt Testing Framework",
-    price: "$19",
+    price: "Free",
     description:
       "Regression testing, A/B comparison templates, and quality scoring rubrics for AI prompts. Built for teams shipping AI features.",
     features: [
@@ -289,7 +289,7 @@ export const products: Product[] = [
   },
   {
     name: "Autonomous Agent Safety Patterns",
-    price: "$19",
+    price: "Free",
     description:
       "Hard-won guardrails from an agent that lost $252 of real money. Financial verification protocols, destructive operation prevention, scope containment, and the incident response playbook.",
     features: [
@@ -305,7 +305,7 @@ export const products: Product[] = [
   },
   {
     name: "Claude Code Hooks Deep Dive",
-    price: "$19",
+    price: "Free",
     description:
       "15 production hooks beyond the basics. The damage-control hook that blocks destructive commands. The verify-completion hook that won't let you lie about finishing. Session init, memory flush, pre-commit guards.",
     features: [
@@ -321,7 +321,7 @@ export const products: Product[] = [
   },
   {
     name: "Hooks Library",
-    price: "$14",
+    price: "Free",
     description:
       "24 production-ready hooks across 6 categories. Drop in, configure, ship.",
     features: [

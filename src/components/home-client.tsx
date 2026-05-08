@@ -17,7 +17,7 @@ import { products } from "@/lib/data";
 import { posts } from "@/lib/blog";
 
 const HERO_SUBTITLE =
-  "One developer shipping autonomous agents, MCP servers, and generative art. 18 products live. Everything open source.";
+  "One developer shipping autonomous agents, MCP servers, and generative art. 18 products, all free. Everything open source.";
 
 /* ── Hero ────────────────────────────────────────────────── */
 
@@ -117,7 +117,7 @@ export function HeroSection() {
                 style={{ background: "var(--accent)" }}
                 onClick={() => trackCTA("hero_view_products", "/products")}
               >
-                Browse 18 products <ArrowRight size={15} />
+                18 free products <ArrowRight size={15} />
               </Link>
               <Link
                 href="/projects"
@@ -572,8 +572,8 @@ export function ProductHighlight() {
         </a>
       ))}
       {free && (
-        <a
-          href="/products"
+        <Link
+          href="/products/"
           className="group block rounded-xl border p-5 transition-all hover:scale-[1.01] hover:border-white/20"
           style={{
             background: "var(--bg-surface)",
@@ -607,7 +607,7 @@ export function ProductHighlight() {
           >
             +{remaining} more products <ArrowRight size={12} />
           </span>
-        </a>
+        </Link>
       )}
     </div>
   );

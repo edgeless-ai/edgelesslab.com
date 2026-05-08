@@ -3,7 +3,7 @@
 import { StaggerReveal } from "@/components/ui/pretext-stagger-reveal";
 
 const SUBTITLE =
-  "18 small tools between $9 and $59. Claude Code skills, MCP kits, agent blueprints, and n8n workflows I use daily.";
+  "18 tools, all free. Claude Code skills, MCP kits, agent blueprints, and n8n workflows I use daily.";
 
 export function ProductsSubtitle() {
   return (

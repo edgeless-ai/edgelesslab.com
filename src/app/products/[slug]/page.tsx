@@ -173,13 +173,13 @@ export default async function ProductDetailPage({
                   className="inline-flex items-center gap-2 px-5 py-3 rounded-md font-medium transition-colors hover:opacity-90"
                   style={{ background: "var(--accent)", color: "var(--bg-base)" }}
                 >
-                  Buy on Gumroad <ArrowUpRight size={16} />
+                  Get it free on Gumroad <ArrowUpRight size={16} />
                 </a>
                 <span
                   className="ml-3 text-xs font-mono"
                   style={{ color: "var(--text-tertiary)" }}
                 >
-                  {product.price} &middot; instant download
+                  Free &middot; instant download
                 </span>
               </div>
             </div>
@@ -208,7 +208,7 @@ export default async function ProductDetailPage({
                   className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
                   style={{ color: "var(--text-tertiary)" }}
                 >
-                  What's inside
+                  What&apos;s inside
                 </h2>
                 <ul className="space-y-2.5">
                   {product.features.map((feature) => (

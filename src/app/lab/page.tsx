@@ -1,8 +1,7 @@
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { LabHeader, LabGrid } from "@/components/lab-client";
-import { LabPlayground } from "@/components/lab-playground";
-import { AttractorPlayground } from "@/components/attractor-playground";
+import { LazyLabPlayground, LazyAttractorPlayground } from "@/components/lazy-playground-wrapper";
 import { experiments } from "@/lib/data";
 import { createPageMetadata } from "@/lib/metadata";
 
@@ -39,8 +38,8 @@ export default function LabPage() {
             </h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <LabPlayground />
-            <AttractorPlayground />
+            <LazyLabPlayground />
+            <LazyAttractorPlayground />
           </div>
         </div>
       </section>

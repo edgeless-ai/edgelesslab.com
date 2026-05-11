@@ -1,6 +1,7 @@
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { LabHeader, LabGrid } from "@/components/lab-client";
+import { LabPlayground } from "@/components/lab-playground";
 import { experiments } from "@/lib/data";
 import { createPageMetadata } from "@/lib/metadata";
 
@@ -19,6 +20,24 @@ export default function LabPage() {
       <section className="px-6 pt-40 pb-16">
         <div className="max-w-[1280px] mx-auto">
           <LabHeader />
+        </div>
+      </section>
+
+      {/* Interactive Playground */}
+      <section className="px-6 pb-12">
+        <div className="max-w-[1280px] mx-auto">
+          <div className="mb-6">
+            <span
+              className="text-xs font-mono uppercase tracking-[0.14em] block mb-2"
+              style={{ color: "var(--accent)" }}
+            >
+              Interactive
+            </span>
+            <h2 className="text-xl font-semibold" style={{ color: "var(--text-primary)" }}>
+              Try It Live
+            </h2>
+          </div>
+          <LabPlayground />
         </div>
       </section>
 

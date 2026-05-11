@@ -1,0 +1,2173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tartanism: Field Notes on Generative Plaid. Edgeless Lab</title>
+<meta name="description" content="Field notes from a generative tartan explorer. Six weave structures, 48 period-correct dye colors, and a mutation engine that walks the line between generated plaid and authentic Scottish tartan.">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Tartanism: Field Notes on Generative Plaid">
+<meta property="og:description" content="Six weave structures, 48 historical dye colors, and a formal grammar for Scottish tartan. Field notes from a generative tartan explorer by Edgeless Lab.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://edgelesslab.com/tartanism/">
+<meta property="og:site_name" content="Edgeless Lab">
+<meta property="og:image" content="https://edgelesslab.com/tartanism/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tartanism: Field Notes on Generative Plaid">
+<meta name="twitter:description" content="Six weave structures, 48 historical dye colors, and a formal grammar for Scottish tartan. A generative explorer by Edgeless Lab.">
+
+<!-- Display: Boska (Fontshare) -->
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=boska@300,301,400,401,500,501&display=swap" rel="stylesheet">
+
+<!-- Mono: JetBrains Mono -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ────────────────────────────────────────────────────────
+   TARTANISM / FIELD NOTES ON GENERATIVE PLAID
+   Aesthetic: warm specimen paper + deep ink + scholarly serif
+   Accent: woad blue (historical Scottish dye)
+   ──────────────────────────────────────────────────────── */
+
+:root {
+  /* paper & ink */
+  --paper:        #f3eddd;        /* warm off-white, aged */
+  --paper-deep:   #ebe3cf;        /* shadow */
+  --ink:          #0c0a08;        /* deep cold black */
+  --ink-soft:     #2a2520;        /* secondary text */
+  --ink-faint:    #56524a;        /* tertiary, mono captions (5.5:1 on paper) */
+  --rule:         #d4cab4;        /* hairlines */
+
+  /* one accent: woad blue (historical Scottish dye) */
+  --woad:         #2d4a7a;        /* Isatis tinctoria */
+  --woad-deep:    #1e3459;
+
+  /* type */
+  --serif:  "Boska", "Times New Roman", Georgia, serif;
+  --mono:   "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* spacing */
+  --margin-x: clamp(1.25rem, 8vw, 9rem);
+}
+
+@media (max-width: 600px) {
+  :root {
+    --margin-x: 1.25rem;
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-feature-settings: "liga" on, "calt" on, "kern" on, "ss01" on;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+
+  /* subtle paper grain via SVG noise */
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(45,74,122,0.05), transparent 60%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+::selection { background: var(--woad); color: var(--paper); }
+
+/* ────────── persistent meta strip (top) ────────── */
+
+.meta-strip {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem var(--margin-x);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--paper);
+  border-bottom: 1px solid transparent;
+  z-index: 100;
+  pointer-events: none;
+  transition: border-color 250ms cubic-bezier(0.2,0.8,0.2,1),
+              backdrop-filter 250ms;
+}
+.meta-strip.is-scrolled {
+  border-bottom-color: var(--rule);
+  background: rgba(243, 237, 221, 0.92);
+  backdrop-filter: blur(8px) saturate(115%);
+  -webkit-backdrop-filter: blur(8px) saturate(115%);
+}
+.meta-strip .dot { color: var(--woad); }
+
+/* ────────── HERO ────────── */
+
+.hero {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  padding: 8rem var(--margin-x) 4rem;
+  position: relative;
+}
+
+.hero__filing {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: baseline;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 1rem;
+  margin-bottom: 4rem;
+  opacity: 0;
+  animation: fadeUp 800ms cubic-bezier(0.2, 0.8, 0.2, 1) 200ms forwards;
+}
+@media (max-width: 600px) {
+  .hero__filing { font-size: 10px; gap: 0.6rem 1.25rem; }
+}
+.hero__filing strong { color: var(--ink); font-weight: 500; }
+.hero__filing .woad { color: var(--woad); }
+
+.hero__main {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: center;
+}
+@media (max-width: 900px) {
+  .hero__main { grid-template-columns: 1fr; }
+}
+
+.hero__title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(3.5rem, 9vw, 9.5rem);
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero__title {
+    opacity: 0;
+    animation: fadeUp 1200ms cubic-bezier(0.2, 0.8, 0.2, 1) 400ms forwards;
+  }
+}
+.hero__title em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--ink-soft);
+}
+
+.hero__deck {
+  font-family: var(--serif);
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 36ch;
+  margin-top: 2.5rem;
+  font-style: italic;
+  font-weight: 400;
+  opacity: 0;
+  animation: fadeUp 1000ms cubic-bezier(0.2, 0.8, 0.2, 1) 700ms forwards;
+}
+.hero__deck::before {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 1px;
+  background: var(--woad);
+  margin-bottom: 1rem;
+}
+
+.hero__plate {
+  position: relative;
+  opacity: 0;
+  animation: fadeUp 1400ms cubic-bezier(0.2, 0.8, 0.2, 1) 900ms forwards;
+}
+.hero__plate-placeholder {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background: white;
+  box-shadow:
+    0 1px 0 rgba(12,10,8,0.08),
+    0 30px 60px -20px rgba(12,10,8,0.25),
+    0 60px 120px -40px rgba(45,74,122,0.08);
+  position: relative;
+  overflow: hidden;
+}
+/* hero plate pseudo-elements removed: real image in use */
+.hero__plate__caption {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--rule);
+  padding-top: 0.75rem;
+}
+.hero__plate__caption strong { color: var(--ink); font-weight: 500; }
+
+.hero__footer {
+  margin-top: 6rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.25rem;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  opacity: 0;
+  animation: fadeUp 800ms cubic-bezier(0.2, 0.8, 0.2, 1) 1100ms forwards;
+}
+@media (max-width: 600px) {
+  .hero__footer { margin-top: 3rem; font-size: 9px; }
+  .hero__footer .scroll-cue { order: -1; width: 100%; align-items: flex-start; }
+}
+
+.hero__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.85rem;
+  font-family: var(--mono);
+  font-size: inherit;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.hero__nav a {
+  color: var(--ink-faint);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: color 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              border-color 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.hero__nav a:hover,
+.hero__nav a:focus-visible {
+  color: var(--woad);
+  border-bottom-color: var(--woad);
+  outline: none;
+}
+.hero__nav span[aria-hidden] {
+  color: var(--rule);
+}
+@media (max-width: 600px) {
+  .hero__nav { gap: 0.4rem 0.6rem; }
+}
+
+/* Scroll anchors offset for the fixed meta-strip */
+.method,
+.catalog,
+.gallery,
+.colophon {
+  scroll-margin-top: 4rem;
+}
+.hero__footer .scroll-cue {
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+}
+.hero__footer .scroll-cue::after {
+  content: "\2193";
+  font-size: 14px;
+  color: var(--woad);
+  animation: bob 2.4s ease-in-out 3;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__filing,
+  .hero__title,
+  .hero__deck,
+  .hero__plate,
+  .hero__footer {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+  .hero__footer .scroll-cue::after {
+    animation: none !important;
+  }
+}
+
+/* ────────── §01 METHOD ────────── */
+
+.method {
+  padding: 8rem var(--margin-x);
+  border-top: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: clamp(2rem, 6vw, 6rem);
+}
+@media (max-width: 900px) { .method { grid-template-columns: 1fr; } }
+
+.section-marker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.section-marker .num {
+  font-size: 14px;
+  color: var(--woad);
+  font-weight: 700;
+}
+.section-marker .name {
+  color: var(--ink);
+  font-weight: 500;
+  font-size: inherit;
+  font-family: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.method__body {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 50ch;
+  font-style: normal;
+}
+.method__body p { margin-bottom: 1.5rem; font-style: normal; }
+.method__body p:first-child::first-letter {
+  font-family: var(--serif);
+  float: left;
+  font-size: 5em;
+  line-height: 0.85;
+  padding-right: 0.1em;
+  padding-top: 0.05em;
+  font-weight: 400;
+  color: var(--ink);
+}
+.method__body strong {
+  font-weight: 500;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 65%, rgba(45,74,122,0.18) 65%);
+  padding: 0 0.1em;
+}
+
+/* method sub-sections */
+.method__sub {
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--rule);
+}
+.method__sub-head {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--woad);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+/* weave diagram grid */
+.weave-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+@media (max-width: 700px) {
+  .weave-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.weave-card {
+  background: white;
+  border: 1px solid var(--rule);
+  padding: 1rem;
+  text-align: center;
+}
+.weave-card__diagram {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--paper-deep);
+  margin-bottom: 0.75rem;
+  position: relative;
+  overflow: hidden;
+}
+/* CSS-only weave pattern previews */
+.weave-card__diagram--plain {
+  background:
+    repeating-linear-gradient(0deg, var(--ink) 0px, var(--ink) 2px, transparent 2px, transparent 4px),
+    repeating-linear-gradient(90deg, var(--ink) 0px, var(--ink) 2px, transparent 2px, transparent 4px);
+  background-color: var(--paper-deep);
+  opacity: 0.15;
+}
+.weave-card__diagram--twill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--ink) 0px, var(--ink) 2px,
+    transparent 2px, transparent 6px
+  );
+  opacity: 0.2;
+}
+.weave-card__diagram--herringbone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 2px, transparent 2px, transparent 6px),
+    repeating-linear-gradient(-45deg, var(--ink) 0px, var(--ink) 1px, transparent 1px, transparent 6px);
+  opacity: 0.18;
+}
+.weave-card__diagram--hopsack::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(0deg, var(--ink) 0px, var(--ink) 4px, transparent 4px, transparent 8px),
+    repeating-linear-gradient(90deg, var(--ink) 0px, var(--ink) 4px, transparent 4px, transparent 8px);
+  opacity: 0.15;
+}
+.weave-card__diagram--satin::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    22deg,
+    var(--ink) 0px, var(--ink) 1px,
+    transparent 1px, transparent 8px
+  );
+  opacity: 0.15;
+}
+.weave-card__diagram--broken::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(45deg, var(--ink) 0px, var(--ink) 2px, transparent 2px, transparent 5px),
+    repeating-linear-gradient(135deg, var(--ink) 0px, var(--ink) 1px, transparent 1px, transparent 8px);
+  opacity: 0.2;
+}
+
+.weave-card__name {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  font-weight: 500;
+}
+.weave-card__desc {
+  font-family: var(--serif);
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink-faint);
+  margin-top: 0.25rem;
+}
+
+/* thread count notation */
+.threadcount {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  background: white;
+  border: 1px solid var(--rule);
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  line-height: 1.8;
+  overflow-x: auto;
+}
+.threadcount .tc-color { font-weight: 700; }
+.threadcount .tc-blue { color: var(--woad); }
+.threadcount .tc-red { color: #8b2323; }
+.threadcount .tc-green { color: #19502d; }
+.threadcount .tc-black { color: var(--ink); }
+.threadcount .tc-yellow { color: #b8860b; }
+
+/* color palette grid */
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 4px;
+  margin: 1.5rem 0 2rem;
+}
+.palette-swatch {
+  aspect-ratio: 1;
+  position: relative;
+  border: 1px solid var(--rule);
+  cursor: default;
+  transition: transform 200ms cubic-bezier(0.2,0.8,0.2,1);
+}
+.palette-swatch:hover {
+  transform: scale(1.3);
+  z-index: 2;
+  box-shadow: 0 8px 20px -8px rgba(12,10,8,0.3);
+}
+.palette-swatch__label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 2px;
+  background: rgba(255,255,255,0.85);
+  color: var(--ink);
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 200ms;
+}
+.palette-swatch:hover .palette-swatch__label {
+  opacity: 1;
+}
+
+/* ────────── §02 CATALOG ────────── */
+
+.catalog {
+  padding: 10rem var(--margin-x) 8rem;
+  border-top: 1px solid var(--rule);
+}
+
+.catalog__intro {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: clamp(2rem, 6vw, 6rem);
+  margin-bottom: 5rem;
+}
+@media (max-width: 900px) { .catalog__intro { grid-template-columns: 1fr; } }
+
+.catalog__hed {
+  font-family: var(--serif);
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+  max-width: 12ch;
+}
+.catalog__hed em { font-style: italic; font-weight: 300; color: var(--ink-soft); }
+
+.catalog__legend {
+  margin-top: 1.5rem;
+  font-family: var(--serif);
+  font-size: clamp(0.95rem, 1.15vw, 1.1rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 50ch;
+}
+.catalog__legend strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+.catalog__legend .swatch {
+  display: inline-block;
+  width: 1.5rem;
+  height: 2px;
+  background: var(--woad);
+  vertical-align: middle;
+  margin: 0 0.4rem 0 0.2rem;
+}
+
+/* specimen grid */
+.catalog__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+@media (max-width: 600px) {
+  .catalog__grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 6px;
+  }
+}
+
+.tartan-tile {
+  position: relative;
+  aspect-ratio: 1;
+  background: white;
+  border: 1px solid var(--rule);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    z-index 0s linear 250ms;
+}
+/* woad bar at bottom */
+.tartan-tile::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1.5px;
+  width: var(--score, 0%);
+  background: var(--woad);
+  pointer-events: none;
+  transition: height 250ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .tartan-tile:hover {
+    transform: scale(1.35);
+    z-index: 10;
+    box-shadow:
+      0 1px 0 rgba(12,10,8,0.1),
+      0 14px 30px -10px rgba(12,10,8,0.35),
+      0 30px 60px -20px rgba(45,74,122,0.15);
+    transition-delay: 0s;
+    border-color: var(--ink);
+  }
+  .tartan-tile:hover::after {
+    height: 3px;
+  }
+}
+.tartan-tile:focus-visible {
+  outline: 2px solid var(--woad);
+  outline-offset: 2px;
+  z-index: 10;
+}
+@media (hover: none) {
+  .tartan-tile:active {
+    transform: scale(0.96);
+    border-color: var(--ink);
+  }
+}
+
+/* tile images fill their container */
+.tartan-tile img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+/* subsection headings within catalog */
+.catalog__subsection {
+  margin-top: 5rem;
+  margin-bottom: 1.5rem;
+}
+.catalog__subsection:first-of-type {
+  margin-top: 0;
+}
+.catalog__subhed {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+}
+.catalog__subdesc {
+  font-family: var(--serif);
+  font-size: clamp(0.9rem, 1.1vw, 1.05rem);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 55ch;
+  font-style: normal;
+}
+
+/* parent group labels */
+.catalog__group-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* mutation grid: 8 tiles should fill the row */
+.catalog__grid--sm {
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+@media (max-width: 600px) {
+  .catalog__grid--sm {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+}
+
+/* breeding grid: 3 tiles should fill available width */
+.catalog__grid--breed {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+@media (max-width: 600px) {
+  .catalog__grid--breed {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+/* evolution: exactly 10 columns */
+.catalog__grid--evo {
+  grid-template-columns: repeat(10, 1fr);
+}
+@media (max-width: 600px) {
+  .catalog__grid--evo {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* dense grid for random */
+.catalog__grid--dense {
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+}
+@media (max-width: 600px) {
+  .catalog__grid--dense {
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    gap: 4px;
+  }
+}
+
+.catalog__addendum {
+  margin-top: 5rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.catalog__addendum strong { color: var(--ink); font-weight: 500; }
+.catalog__addendum a {
+  color: var(--woad);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 2px;
+  transition: color 200ms, border-color 200ms;
+}
+.catalog__addendum a:hover {
+  color: var(--woad-deep);
+  border-color: var(--woad);
+}
+.catalog__addendum a::after {
+  content: " \2192";
+  color: inherit;
+}
+
+/* ────────── §03 BEST OF RUN ────────── */
+
+.gallery {
+  border-top: 1px solid var(--rule);
+  padding: 8rem 0 6rem;
+}
+
+.gallery__opening {
+  max-width: 36ch;
+  margin: 0 auto 8rem;
+  padding: 0 var(--margin-x);
+  text-align: center;
+}
+.gallery__opening__quote {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.gallery__opening__quote em { font-style: normal; color: var(--ink-soft); }
+.gallery__opening__rule {
+  display: block;
+  width: 3rem;
+  height: 1px;
+  background: var(--woad);
+  margin: 2rem auto 0;
+}
+.gallery__opening__marker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 1.5rem;
+}
+.gallery__opening__marker .num { color: var(--woad); font-weight: 700; }
+
+/* spreads */
+.spread {
+  margin: 0 auto 8rem;
+  padding: 0 var(--margin-x);
+  max-width: 1600px;
+}
+
+.spread--full {
+  padding: 0;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+.spread--full .plate-placeholder {
+  width: 100%;
+  display: block;
+  background: white;
+  aspect-ratio: 16/9;
+  position: relative;
+  overflow: hidden;
+}
+.spread--full .plate-caption {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem var(--margin-x) 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.spread--full .plate-caption strong { color: var(--ink); font-weight: 500; }
+.spread--full .plate-caption .woad { color: var(--woad); }
+
+.spread--singleton {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+@media (max-width: 900px) {
+  .spread--singleton { grid-template-columns: 1fr; }
+}
+.spread--singleton .marginalia {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  border-left: 2px solid var(--woad);
+  padding-left: 1.25rem;
+}
+.spread--singleton .marginalia__attribution {
+  display: block;
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 1rem;
+}
+
+.spread--two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: end;
+}
+@media (max-width: 800px) {
+  .spread--two { grid-template-columns: 1fr; }
+}
+
+.spread__label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0 var(--margin-x);
+}
+.spread__label .num { color: var(--woad); font-weight: 700; }
+.spread--full .spread__label { padding: 0 var(--margin-x); }
+
+/* plate styling */
+.plate {
+  position: relative;
+}
+.plate__img-wrap {
+  background: white;
+  padding: 1rem 1rem 1.25rem;
+  position: relative;
+  box-shadow: 0 1px 0 rgba(12,10,8,0.06),
+              0 16px 40px -16px rgba(12,10,8,0.18);
+  transition:
+    transform 350ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.plate__img-wrap::before,
+.plate__img-wrap::after {
+  content: "+";
+  position: absolute;
+  top: 5px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-faint);
+}
+.plate__img-wrap::before { left: 5px; }
+.plate__img-wrap::after { right: 5px; }
+
+/* plate-placeholder-inner removed: real images in use */
+
+.plate:hover .plate__img-wrap {
+  transform: translateY(-3px);
+  box-shadow:
+    0 1px 0 rgba(12,10,8,0.08),
+    0 24px 60px -16px rgba(12,10,8,0.28),
+    0 60px 120px -40px rgba(45,74,122,0.06);
+}
+.plate__caption {
+  margin-top: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  border-top: 1px solid var(--rule);
+  padding-top: 0.55rem;
+}
+.plate__caption strong { color: var(--ink); font-weight: 500; }
+.plate__caption .woad { color: var(--woad); font-weight: 500; }
+
+/* ────────── §04 COLOPHON ────────── */
+
+.colophon {
+  border-top: 1px solid var(--rule);
+  padding: 9rem var(--margin-x) 6rem;
+}
+.colophon__inner {
+  max-width: 56ch;
+  margin: 0 auto;
+}
+
+.colophon__coda {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 5rem;
+}
+.colophon__coda em { font-style: italic; color: var(--ink-soft); font-weight: 300; }
+.colophon__coda::before, .colophon__coda::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 1px;
+  background: var(--woad);
+  margin: 1.5rem auto;
+}
+
+.colophon__marker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.colophon__marker .num { color: var(--woad); font-weight: 700; }
+
+.colophon__title {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.colophon__title em { font-style: italic; color: var(--ink-soft); }
+
+.colophon__table {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  width: 100%;
+  border-top: 1px solid var(--rule);
+  margin-bottom: 4rem;
+}
+.colophon__table .row {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.colophon__table .row strong {
+  color: var(--ink);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.colophon__table .row .woad { color: var(--woad); }
+.colophon__table .row em {
+  font-family: var(--serif);
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.colophon__continue {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--rule);
+}
+.colophon__continue__head {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.colophon__continue__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+@media (max-width: 600px) {
+  .colophon__continue__grid { grid-template-columns: 1fr; }
+}
+.colophon__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.2rem 1.5rem;
+  border: 1px solid var(--rule);
+  text-decoration: none;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              background 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              border-color 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  box-shadow: 0 0 0 transparent;
+}
+.colophon__link strong {
+  color: var(--ink);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.colophon__link span {
+  font-size: 10px;
+  color: var(--ink-faint);
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--serif);
+  font-style: italic;
+}
+.colophon__link::after {
+  content: "\2192";
+  position: absolute;
+  top: 1.4rem;
+  right: 1.5rem;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 13px;
+  transition: transform 220ms, color 220ms;
+}
+.colophon__link:focus-visible {
+  outline: 2px solid var(--woad);
+  outline-offset: 2px;
+}
+.colophon__link:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px -12px rgba(12,10,8,0.35),
+              0 30px 60px -25px rgba(45,74,122,0.18);
+}
+.colophon__link:hover strong { color: var(--paper); }
+.colophon__link:hover span { color: rgba(243,237,221,0.7); }
+.colophon__link:hover::after {
+  color: var(--woad);
+  transform: translateX(4px);
+}
+
+.colophon__signoff {
+  margin-top: 5rem;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.colophon__signoff .dot { color: var(--woad); }
+
+/* ────────── footer ────────── */
+
+.footer {
+  padding: 4rem var(--margin-x);
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.footer a { color: var(--woad); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.footer a:hover { color: var(--woad-deep); border-color: var(--woad); }
+
+/* ────────── SRT acknowledgment ────────── */
+
+.srt-note {
+  font-family: var(--serif);
+  font-style: normal;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ink-faint);
+  margin-top: 2rem;
+  padding: 1.25rem 1.5rem;
+  border-left: 2px solid var(--woad);
+  background: rgba(45,74,122,0.03);
+}
+
+/* ────────── MOBILE COMPRESSION ────────── */
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 5rem var(--margin-x) 2rem;
+    min-height: auto;
+  }
+  .hero__main { gap: 2.5rem; }
+  .hero__deck { margin-top: 1.5rem; }
+  .method, .catalog, .gallery, .colophon {
+    padding-top: 5rem;
+    padding-bottom: 4rem;
+  }
+  .gallery .spread { margin-bottom: 4.5rem; }
+  .gallery__opening { margin-bottom: 4.5rem; }
+  .colophon__inner { padding: 0; }
+  .colophon__table .row { grid-template-columns: 1fr; gap: 0.4rem; padding: 0.8rem 0; }
+  .colophon__table .row dt { font-size: 9px; }
+  .colophon__continue__grid { gap: 0.5rem; }
+  .colophon__link { padding: 1rem 1.2rem; }
+  .colophon__link::after { top: 1.2rem; right: 1.2rem; }
+  .spread--two { gap: 2rem; }
+}
+
+/* ────────── fadeUp observer ────────── */
+.fade-in {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.fade-in.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+</style>
+</head>
+<body>
+
+<!-- persistent meta strip -->
+<header class="meta-strip" role="banner" aria-label="Site header">
+  <span><span class="dot" aria-hidden="true">&#9679;</span> Edgeless Lab / Tartanism</span>
+  <span>FILED 2026&#183;04&#183;16</span>
+</header>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+
+  <div class="hero__filing">
+    <span>WEAVES <strong>6</strong></span>
+    <span>DYE COLORS <strong>48</strong></span>
+    <span>COMBINATIONS <strong class="woad">&gt;10<sup>12</sup></strong></span><!-- 48 colors, 6 weaves, setts of 3-12 color bands with counts 2-48 -->
+    <span>STATUS <strong>LIVE</strong></span>
+  </div>
+
+  <div class="hero__main">
+
+    <div>
+      <h1 class="hero__title">
+        Tartan<em>ism.</em>
+      </h1>
+      <p class="hero__deck">
+        Six weave structures, forty&#8209;eight period&#8209;correct dye
+        colors, and a formal grammar for thread count notation. The question
+        this project keeps circling: when does generated plaid stop being
+        plaid and start being tartan?
+      </p>
+    </div>
+
+    <figure class="hero__plate" aria-label="Generative tartan specimen rendered as a 2/2 twill in woad blue and madder red">
+      <div class="hero__plate-placeholder" style="background:none;">
+        <img src="assets/specimens/hero-01-royal-stewart.png" alt="Royal Stewart tartan specimen rendered as a 2/2 twill weave in madder red, woad blue, and dark green" width="800" height="800" style="display:block; width:100%; height:auto;">
+      </div>
+      <figcaption class="hero__plate__caption">
+        <span><strong>Plate&nbsp;I.</strong> Royal Stewart</span>
+        <span>2/2 twill &middot; woad &amp; madder</span>
+      </figcaption>
+    </figure>
+
+  </div>
+
+  <div class="hero__footer">
+    <span>D.&nbsp;MURRAY &middot; APRIL 2026</span>
+    <div class="scroll-cue">
+      <span>continue</span>
+    </div>
+    <nav class="hero__nav" aria-label="Section navigation">
+      <a href="#method">&sect;01 Method</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="#catalog">&sect;02 Catalog</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="#best-of-run">&sect;03 Best of Run</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="#colophon">&sect;04 Colophon</a>
+    </nav>
+  </div>
+
+</section>
+
+<!-- ─── §01 METHOD ─── -->
+<section class="method" id="method">
+  <aside class="section-marker" aria-label="Section 01: Method">
+    <span class="num">&sect;01</span>
+    <h2 class="name">Method</h2>
+  </aside>
+  <div class="method__body">
+    <p>
+      Tartan is not plaid. Plaid is any crossed pattern of colored bands.
+      Tartan is a specific thing: a <strong>symmetric repeat</strong> woven
+      in a <strong>twill weave</strong>, where the warp and weft share the
+      same thread count, producing a pattern that is identical along both
+      axes. That symmetry constraint is what makes tartan tartan. Remove it
+      and you have check fabric, madras, gingham. All fine. None of them
+      tartan.
+    </p>
+    <p>
+      The generator starts here, with this constraint, and builds a
+      formal system around it. The input is a <strong>thread count
+      notation</strong>, the same shorthand used by the Scottish Register
+      of Tartans since the 19th century. A thread count encodes the full
+      color sequence of one repeat: color codes paired with counts,
+      pivoting at each end so the pattern reflects. The notation <span class="threadcount" style="display:inline; padding:0.15em 0.5em; margin:0; border:none; background:var(--paper-deep); font-size:inherit;">B/24
+      W4 B4 W4 B24 R2 B24</span> describes a
+      blue&#8209;dominant sett with narrow white and red accent stripes. The
+      slash after the first color indicates a pivot point; the pattern
+      reads forward and then reflects.
+    </p>
+    <p>
+      From this notation the generator constructs a two&#8209;dimensional
+      weave. The thread count determines which colors appear at each row
+      and column. The <strong>weave structure</strong> determines which
+      thread is visible at each crossing point: warp on top, or weft.
+      A plain weave (1/1) alternates every thread: warp over weft, weft
+      over warp, repeat. A 2/2 twill (the canonical tartan weave) floats
+      each thread over two, under two, shifting one position per row. This
+      produces the characteristic diagonal twill line at 45 degrees.
+      Herringbone is twill with periodic reversal, typically every 4 to 8
+      threads, creating a zigzag. Hopsack (2/2 basket) groups threads in
+      pairs for a coarser hand. Satin extends the float length (typically
+      5/1 or 8/1) and distributes interlacing points to avoid diagonal
+      lines, producing a smoother surface. Broken twill introduces
+      irregular reversals at prime-number intervals.
+    </p>
+
+    <div class="method__sub fade-in">
+      <h3 class="method__sub-head">Six Weave Structures</h3>
+      <div class="weave-grid">
+        <div class="weave-card">
+          <div class="weave-card__diagram weave-card__diagram--plain" role="img" aria-label="Plain weave pattern: alternating over-under grid"></div>
+          <div class="weave-card__name">Plain</div>
+          <div class="weave-card__desc">1/1, the simplest interlacing</div>
+        </div>
+        <div class="weave-card">
+          <div class="weave-card__diagram weave-card__diagram--twill" role="img" aria-label="2/2 twill weave pattern: diagonal lines at 45 degrees"></div>
+          <div class="weave-card__name">2/2 Twill</div>
+          <div class="weave-card__desc">The canonical tartan weave</div>
+        </div>
+        <div class="weave-card">
+          <div class="weave-card__diagram weave-card__diagram--herringbone" role="img" aria-label="Herringbone weave pattern: zigzag diagonal lines"></div>
+          <div class="weave-card__name">Herringbone</div>
+          <div class="weave-card__desc">Twill with periodic reversal</div>
+        </div>
+        <div class="weave-card">
+          <div class="weave-card__diagram weave-card__diagram--hopsack" role="img" aria-label="Hopsack weave pattern: paired threads in basket formation"></div>
+          <div class="weave-card__name">Hopsack</div>
+          <div class="weave-card__desc">Paired threads, basket weave</div>
+        </div>
+        <div class="weave-card">
+          <div class="weave-card__diagram weave-card__diagram--satin" role="img" aria-label="Satin weave pattern: long diagonal floats with distributed interlacing"></div>
+          <div class="weave-card__name">Satin</div>
+          <div class="weave-card__desc">Long floats, smooth surface</div>
+        </div>
+        <div class="weave-card">
+          <div class="weave-card__diagram weave-card__diagram--broken" role="img" aria-label="Broken twill weave pattern: twill with irregular direction changes"></div>
+          <div class="weave-card__name">Broken Twill</div>
+          <div class="weave-card__desc">Irregular twill reversal</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="method__sub fade-in">
+      <h3 class="method__sub-head">Thread Count Notation</h3>
+      <p>
+        Thread count is a compression format. Rather than specifying every
+        individual thread, you list each color run in order. The parser
+        reads left to right, expanding each code&#8209;count pair into a
+        column of the sett. Pivots (marked with a slash) tell the
+        renderer where the pattern reflects. A full sett is built by
+        reading the sequence forward, reflecting at each pivot, and
+        tiling the result across the cloth.
+      </p>
+      <div class="threadcount">
+        <span class="tc-color tc-blue">B/24</span>
+        <span class="tc-color tc-black">K4</span>
+        <span class="tc-color tc-green">G24</span>
+        <span class="tc-color tc-black">K4</span>
+        <span class="tc-color tc-blue">B24</span>
+        <span class="tc-color tc-black">K24</span>
+        <span class="tc-color tc-red">R6</span>
+        <span class="tc-color tc-black">K24</span>
+        <span class="tc-color tc-blue">B24</span>
+        <span class="tc-color tc-black">K4</span>
+        <span class="tc-color tc-green">G24</span>
+        <span class="tc-color tc-black">K4</span>
+        <span class="tc-color tc-blue">B/24</span>
+        <br>
+        <span style="color: var(--ink-faint); font-size: 10px; letter-spacing: 0.06em;">
+          Black Watch (Government No. 1), SRT ref #2268. Sett width: 192 threads.
+        </span>
+      </div>
+      <p>
+        The notation above describes the Black Watch, one of the most
+        recognized military tartans. Blue and green dominate; a thin red
+        stripe distinguishes it from the unadorned Government sett. This
+        is what the generator parses, validates, and renders.
+      </p>
+    </div>
+
+    <div class="method__sub fade-in">
+      <h3 class="method__sub-head">48 Period-Correct Dye Colors</h3>
+      <p>
+        The color palette is drawn from historical Scottish dyeing
+        practice. Before William Henry Perkin synthesized mauveine in
+        1856, Highland weavers worked with a constrained set of natural
+        materials: <em>Isatis tinctoria</em> (woad) and imported indigo
+        for blues, <em>Rubia tinctorum</em> (madder root) for reds, weld
+        (<em>Reseda luteola</em>) and broom for yellows, lichen (crottle,
+        primarily <em>Parmelia saxatilis</em>) for warm browns, onion
+        skins for gold, and iron mordant over a tannin base for black.
+        Each color maps to one of the standard STA thread color codes:
+        B for blue, R for red, G for green, K for black, W for white,
+        T for brown, Y for yellow, P for purple, N for grey. The palette
+        includes both "ancient" (muted, pre-1860 vegetable&#8209;dyed)
+        and "modern" (brighter, post&#8209;aniline) variants.
+      </p>
+      <div class="palette-grid" id="palette-grid" role="list" aria-label="48 period-correct dye colors used in the generator"></div>
+    </div>
+
+    <div class="method__sub fade-in">
+      <h3 class="method__sub-head">The Mutation Engine</h3>
+      <p>
+        Generative tartans are produced by mutating valid thread counts.
+        The mutation engine operates on the parsed sett structure, not
+        raw text. Four operators: <strong>color shift</strong> swaps one
+        dye code for an adjacent hue within the same STA color family
+        (e.g., B&#8594;LB, staying within blues). <strong>Run
+        scale</strong> multiplies or divides a single thread count by 2,
+        clamped to the range [2, 48]. <strong>Stripe insert</strong> adds
+        a new color band (drawn from the palette, width 2-6 threads) at
+        a random position within the half-sett, then mirrors it to
+        maintain symmetry. <strong>Sett transpose</strong> rotates all
+        color assignments by <em>n</em> positions in the palette while
+        preserving the proportional structure. Every mutation preserves
+        the pivot-symmetric constraint. The result is always a valid
+        tartan, never mere plaid.
+      </p>
+      <p>
+        The boundary between "valid tartan" and "plaid that happens to
+        look like tartan" is narrow. Remove the symmetric pivot and you
+        have asymmetric check. Use a plain weave instead of twill and you
+        lose the diagonal interlacing that gives tartan cloth its drape
+        and depth. Use colors outside the historical palette and the
+        result reads as costume, not cloth. The generator enforces all
+        three constraints: symmetric sett, twill&#8209;family weave,
+        period palette.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── §02 CATALOG ─── -->
+<section class="catalog" id="catalog">
+  <div class="catalog__intro fade-in">
+    <aside class="section-marker" aria-label="Section 02: The Catalog">
+      <span class="num">&sect;02</span>
+      <span class="name">The Catalog</span>
+    </aside>
+    <div>
+      <h2 class="catalog__hed">
+        Two hundred<br>nineteen<br>
+        <em>specimens.</em>
+      </h2>
+      <p class="catalog__legend">
+        The full output of the generator, organized by generation type:
+        36 clan tartans from the Scottish Register, 48 single-operator
+        mutations, 15 cross-bred hybrids, 20 multi-generation evolutionary
+        lineages, and 100 purely random setts. Every specimen is a valid
+        tartan: symmetric sett, twill-family weave, period palette.
+      </p>
+    </div>
+  </div>
+
+  <div class="catalog__subsection fade-in">
+    <h3 class="catalog__subhed">CLAN TARTANS</h3>
+    <p class="catalog__subdesc">The database. Named patterns from the Scottish Register.</p>
+  </div>
+  <div class="catalog__grid fade-in" role="group" aria-label="Grid of 36 clan tartan specimens">
+    <div class="tartan-tile" title="Royal Stewart"><img src="assets/thumbs/01-royal-stewart.png" alt="Royal Stewart" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch"><img src="assets/thumbs/02-black-watch.png" alt="Black Watch" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Macleod Of Lewis"><img src="assets/thumbs/03-macleod-of-lewis.png" alt="Macleod Of Lewis" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Campbell Of Argyll"><img src="assets/thumbs/04-campbell-of-argyll.png" alt="Campbell Of Argyll" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Macdonald"><img src="assets/thumbs/05-macdonald.png" alt="Macdonald" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Gordon"><img src="assets/thumbs/06-gordon.png" alt="Gordon" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Buchanan"><img src="assets/thumbs/07-buchanan.png" alt="Buchanan" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Cameron Of Erracht"><img src="assets/thumbs/08-cameron-of-erracht.png" alt="Cameron Of Erracht" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Fraser"><img src="assets/thumbs/09-fraser.png" alt="Fraser" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Mackenzie"><img src="assets/thumbs/10-mackenzie.png" alt="Mackenzie" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Stewart Of Atholl"><img src="assets/thumbs/11-stewart-of-atholl.png" alt="Stewart Of Atholl" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Douglas"><img src="assets/thumbs/12-douglas.png" alt="Douglas" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Wallace"><img src="assets/thumbs/13-wallace.png" alt="Wallace" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Lindsay"><img src="assets/thumbs/14-lindsay.png" alt="Lindsay" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Murray Of Atholl"><img src="assets/thumbs/15-murray-of-atholl.png" alt="Murray Of Atholl" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Macgregor"><img src="assets/thumbs/16-macgregor.png" alt="Macgregor" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Bruce"><img src="assets/thumbs/17-bruce.png" alt="Bruce" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Menzies"><img src="assets/thumbs/18-menzies.png" alt="Menzies" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Macfarlane"><img src="assets/thumbs/19-macfarlane.png" alt="Macfarlane" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Macintosh"><img src="assets/thumbs/20-macintosh.png" alt="Macintosh" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Edinburgh"><img src="assets/thumbs/21-edinburgh.png" alt="Edinburgh" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Glasgow"><img src="assets/thumbs/22-glasgow.png" alt="Glasgow" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Isle Of Skye"><img src="assets/thumbs/23-isle-of-skye.png" alt="Isle Of Skye" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Caledonia"><img src="assets/thumbs/24-caledonia.png" alt="Caledonia" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Balmoral"><img src="assets/thumbs/25-balmoral.png" alt="Balmoral" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Jacobite"><img src="assets/thumbs/26-jacobite.png" alt="Jacobite" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Culloden"><img src="assets/thumbs/27-culloden.png" alt="Culloden" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Flora Macdonald"><img src="assets/thumbs/28-flora-macdonald.png" alt="Flora Macdonald" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Scots Guards"><img src="assets/thumbs/29-scots-guards.png" alt="Scots Guards" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Scots"><img src="assets/thumbs/30-royal-scots.png" alt="Royal Scots" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Burberry"><img src="assets/thumbs/31-burberry.png" alt="Burberry" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Buffalo Plaid"><img src="assets/thumbs/32-buffalo-plaid.png" alt="Buffalo Plaid" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Robertson"><img src="assets/thumbs/33-robertson.png" alt="Robertson" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Maclachlan"><img src="assets/thumbs/34-maclachlan.png" alt="Maclachlan" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Grant"><img src="assets/thumbs/35-grant.png" alt="Grant" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Ogilvie"><img src="assets/thumbs/36-ogilvie.png" alt="Ogilvie" width="400" height="400" loading="lazy"></div>
+  </div>
+
+  <div class="catalog__subsection fade-in">
+    <h3 class="catalog__subhed">MUTATIONS</h3>
+    <p class="catalog__subdesc">Four operators applied to six parent tartans. Each mutation preserves the symmetric sett constraint.</p>
+  </div>
+  <div class="catalog__group-label fade-in">Royal Stewart</div>
+  <div class="catalog__grid catalog__grid--sm fade-in" role="group" aria-label="Mutations of Royal Stewart">
+    <div class="tartan-tile" title="Royal Stewart / Color Shift"><img src="assets/thumbs/mut-royal-stewart-colorshift-01.png" alt="Royal Stewart / Color Shift" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart / Color Shift"><img src="assets/thumbs/mut-royal-stewart-colorshift-02.png" alt="Royal Stewart / Color Shift" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart / Run Scale"><img src="assets/thumbs/mut-royal-stewart-runscale-01.png" alt="Royal Stewart / Run Scale" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart / Run Scale"><img src="assets/thumbs/mut-royal-stewart-runscale-02.png" alt="Royal Stewart / Run Scale" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart / Stripe Insert"><img src="assets/thumbs/mut-royal-stewart-stripeinsert-01.png" alt="Royal Stewart / Stripe Insert" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart / Stripe Insert"><img src="assets/thumbs/mut-royal-stewart-stripeinsert-02.png" alt="Royal Stewart / Stripe Insert" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart / Transpose"><img src="assets/thumbs/mut-royal-stewart-transpose-01.png" alt="Royal Stewart / Transpose" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart / Transpose"><img src="assets/thumbs/mut-royal-stewart-transpose-02.png" alt="Royal Stewart / Transpose" width="400" height="400" loading="lazy"></div>
+  </div>
+  <div class="catalog__group-label fade-in">Black Watch</div>
+  <div class="catalog__grid catalog__grid--sm fade-in" role="group" aria-label="Mutations of Black Watch">
+    <div class="tartan-tile" title="Black Watch / Color Shift"><img src="assets/thumbs/mut-black-watch-colorshift-01.png" alt="Black Watch / Color Shift" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch / Color Shift"><img src="assets/thumbs/mut-black-watch-colorshift-02.png" alt="Black Watch / Color Shift" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch / Run Scale"><img src="assets/thumbs/mut-black-watch-runscale-01.png" alt="Black Watch / Run Scale" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch / Run Scale"><img src="assets/thumbs/mut-black-watch-runscale-02.png" alt="Black Watch / Run Scale" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch / Stripe Insert"><img src="assets/thumbs/mut-black-watch-stripeinsert-01.png" alt="Black Watch / Stripe Insert" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch / Stripe Insert"><img src="assets/thumbs/mut-black-watch-stripeinsert-02.png" alt="Black Watch / Stripe Insert" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch / Transpose"><img src="assets/thumbs/mut-black-watch-transpose-01.png" alt="Black Watch / Transpose" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch / Transpose"><img src="assets/thumbs/mut-black-watch-transpose-02.png" alt="Black Watch / Transpose" width="400" height="400" loading="lazy"></div>
+  </div>
+  <div class="catalog__group-label fade-in">MacLeod</div>
+  <div class="catalog__grid catalog__grid--sm fade-in" role="group" aria-label="Mutations of MacLeod">
+    <div class="tartan-tile" title="MacLeod / Color Shift"><img src="assets/thumbs/mut-macleod-colorshift-01.png" alt="MacLeod / Color Shift" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="MacLeod / Color Shift"><img src="assets/thumbs/mut-macleod-colorshift-02.png" alt="MacLeod / Color Shift" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="MacLeod / Run Scale"><img src="assets/thumbs/mut-macleod-runscale-01.png" alt="MacLeod / Run Scale" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="MacLeod / Run Scale"><img src="assets/thumbs/mut-macleod-runscale-02.png" alt="MacLeod / Run Scale" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="MacLeod / Stripe Insert"><img src="assets/thumbs/mut-macleod-stripeinsert-01.png" alt="MacLeod / Stripe Insert" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="MacLeod / Stripe Insert"><img src="assets/thumbs/mut-macleod-stripeinsert-02.png" alt="MacLeod / Stripe Insert" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="MacLeod / Transpose"><img src="assets/thumbs/mut-macleod-transpose-01.png" alt="MacLeod / Transpose" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="MacLeod / Transpose"><img src="assets/thumbs/mut-macleod-transpose-02.png" alt="MacLeod / Transpose" width="400" height="400" loading="lazy"></div>
+  </div>
+  <div class="catalog__group-label fade-in">Cameron</div>
+  <div class="catalog__grid catalog__grid--sm fade-in" role="group" aria-label="Mutations of Cameron">
+    <div class="tartan-tile" title="Cameron / Color Shift"><img src="assets/thumbs/mut-cameron-colorshift-01.png" alt="Cameron / Color Shift" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Cameron / Color Shift"><img src="assets/thumbs/mut-cameron-colorshift-02.png" alt="Cameron / Color Shift" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Cameron / Run Scale"><img src="assets/thumbs/mut-cameron-runscale-01.png" alt="Cameron / Run Scale" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Cameron / Run Scale"><img src="assets/thumbs/mut-cameron-runscale-02.png" alt="Cameron / Run Scale" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Cameron / Stripe Insert"><img src="assets/thumbs/mut-cameron-stripeinsert-01.png" alt="Cameron / Stripe Insert" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Cameron / Stripe Insert"><img src="assets/thumbs/mut-cameron-stripeinsert-02.png" alt="Cameron / Stripe Insert" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Cameron / Transpose"><img src="assets/thumbs/mut-cameron-transpose-01.png" alt="Cameron / Transpose" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Cameron / Transpose"><img src="assets/thumbs/mut-cameron-transpose-02.png" alt="Cameron / Transpose" width="400" height="400" loading="lazy"></div>
+  </div>
+  <div class="catalog__group-label fade-in">Gordon</div>
+  <div class="catalog__grid catalog__grid--sm fade-in" role="group" aria-label="Mutations of Gordon">
+    <div class="tartan-tile" title="Gordon / Color Shift"><img src="assets/thumbs/mut-gordon-colorshift-01.png" alt="Gordon / Color Shift" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Gordon / Color Shift"><img src="assets/thumbs/mut-gordon-colorshift-02.png" alt="Gordon / Color Shift" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Gordon / Run Scale"><img src="assets/thumbs/mut-gordon-runscale-01.png" alt="Gordon / Run Scale" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Gordon / Run Scale"><img src="assets/thumbs/mut-gordon-runscale-02.png" alt="Gordon / Run Scale" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Gordon / Stripe Insert"><img src="assets/thumbs/mut-gordon-stripeinsert-01.png" alt="Gordon / Stripe Insert" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Gordon / Stripe Insert"><img src="assets/thumbs/mut-gordon-stripeinsert-02.png" alt="Gordon / Stripe Insert" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Gordon / Transpose"><img src="assets/thumbs/mut-gordon-transpose-01.png" alt="Gordon / Transpose" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Gordon / Transpose"><img src="assets/thumbs/mut-gordon-transpose-02.png" alt="Gordon / Transpose" width="400" height="400" loading="lazy"></div>
+  </div>
+  <div class="catalog__group-label fade-in">Fraser</div>
+  <div class="catalog__grid catalog__grid--sm fade-in" role="group" aria-label="Mutations of Fraser">
+    <div class="tartan-tile" title="Fraser / Color Shift"><img src="assets/thumbs/mut-fraser-colorshift-01.png" alt="Fraser / Color Shift" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Fraser / Color Shift"><img src="assets/thumbs/mut-fraser-colorshift-02.png" alt="Fraser / Color Shift" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Fraser / Run Scale"><img src="assets/thumbs/mut-fraser-runscale-01.png" alt="Fraser / Run Scale" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Fraser / Run Scale"><img src="assets/thumbs/mut-fraser-runscale-02.png" alt="Fraser / Run Scale" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Fraser / Stripe Insert"><img src="assets/thumbs/mut-fraser-stripeinsert-01.png" alt="Fraser / Stripe Insert" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Fraser / Stripe Insert"><img src="assets/thumbs/mut-fraser-stripeinsert-02.png" alt="Fraser / Stripe Insert" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Fraser / Transpose"><img src="assets/thumbs/mut-fraser-transpose-01.png" alt="Fraser / Transpose" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Fraser / Transpose"><img src="assets/thumbs/mut-fraser-transpose-02.png" alt="Fraser / Transpose" width="400" height="400" loading="lazy"></div>
+  </div>
+
+  <div class="catalog__subsection fade-in">
+    <h3 class="catalog__subhed">BREEDING</h3>
+    <p class="catalog__subdesc">Cross-pollination. The first half of one sett spliced with the second half of another.</p>
+  </div>
+  <div class="catalog__group-label fade-in">Royal Stewart x Black Watch</div>
+  <div class="catalog__grid catalog__grid--breed fade-in" role="group" aria-label="Breeding: Royal Stewart x Black Watch">
+    <div class="tartan-tile" title="Royal Stewart x Black Watch"><img src="assets/thumbs/breed-royal-stewart-x-black-watch-01.png" alt="Royal Stewart x Black Watch" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart x Black Watch"><img src="assets/thumbs/breed-royal-stewart-x-black-watch-02.png" alt="Royal Stewart x Black Watch" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart x Black Watch"><img src="assets/thumbs/breed-royal-stewart-x-black-watch-03.png" alt="Royal Stewart x Black Watch" width="400" height="400" loading="lazy"></div>
+  </div>
+  <div class="catalog__group-label fade-in">Cameron x Gordon</div>
+  <div class="catalog__grid catalog__grid--breed fade-in" role="group" aria-label="Breeding: Cameron x Gordon">
+    <div class="tartan-tile" title="Cameron x Gordon"><img src="assets/thumbs/breed-cameron-x-gordon-01.png" alt="Cameron x Gordon" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Cameron x Gordon"><img src="assets/thumbs/breed-cameron-x-gordon-02.png" alt="Cameron x Gordon" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Cameron x Gordon"><img src="assets/thumbs/breed-cameron-x-gordon-03.png" alt="Cameron x Gordon" width="400" height="400" loading="lazy"></div>
+  </div>
+  <div class="catalog__group-label fade-in">Fraser x MacLeod</div>
+  <div class="catalog__grid catalog__grid--breed fade-in" role="group" aria-label="Breeding: Fraser x MacLeod">
+    <div class="tartan-tile" title="Fraser x MacLeod"><img src="assets/thumbs/breed-fraser-x-macleod-01.png" alt="Fraser x MacLeod" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Fraser x MacLeod"><img src="assets/thumbs/breed-fraser-x-macleod-02.png" alt="Fraser x MacLeod" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Fraser x MacLeod"><img src="assets/thumbs/breed-fraser-x-macleod-03.png" alt="Fraser x MacLeod" width="400" height="400" loading="lazy"></div>
+  </div>
+  <div class="catalog__group-label fade-in">Royal Stewart x Cameron</div>
+  <div class="catalog__grid catalog__grid--breed fade-in" role="group" aria-label="Breeding: Royal Stewart x Cameron">
+    <div class="tartan-tile" title="Royal Stewart x Cameron"><img src="assets/thumbs/breed-royal-stewart-x-cameron-01.png" alt="Royal Stewart x Cameron" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart x Cameron"><img src="assets/thumbs/breed-royal-stewart-x-cameron-02.png" alt="Royal Stewart x Cameron" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart x Cameron"><img src="assets/thumbs/breed-royal-stewart-x-cameron-03.png" alt="Royal Stewart x Cameron" width="400" height="400" loading="lazy"></div>
+  </div>
+  <div class="catalog__group-label fade-in">Black Watch x Fraser</div>
+  <div class="catalog__grid catalog__grid--breed fade-in" role="group" aria-label="Breeding: Black Watch x Fraser">
+    <div class="tartan-tile" title="Black Watch x Fraser"><img src="assets/thumbs/breed-black-watch-x-fraser-01.png" alt="Black Watch x Fraser" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch x Fraser"><img src="assets/thumbs/breed-black-watch-x-fraser-02.png" alt="Black Watch x Fraser" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch x Fraser"><img src="assets/thumbs/breed-black-watch-x-fraser-03.png" alt="Black Watch x Fraser" width="400" height="400" loading="lazy"></div>
+  </div>
+
+  <div class="catalog__subsection fade-in">
+    <h3 class="catalog__subhed">EVOLUTION</h3>
+    <p class="catalog__subdesc">Sequential drift. Ten generations of random mutation from a single ancestor.</p>
+  </div>
+  <div class="catalog__group-label fade-in">Royal Stewart lineage</div>
+  <div class="catalog__grid catalog__grid--evo fade-in" role="group" aria-label="Royal Stewart lineage">
+    <div class="tartan-tile" title="Royal Stewart Gen 1"><img src="assets/thumbs/evo-royal-stewart-gen01.png" alt="Royal Stewart Gen 1" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart Gen 2"><img src="assets/thumbs/evo-royal-stewart-gen02.png" alt="Royal Stewart Gen 2" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart Gen 3"><img src="assets/thumbs/evo-royal-stewart-gen03.png" alt="Royal Stewart Gen 3" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart Gen 4"><img src="assets/thumbs/evo-royal-stewart-gen04.png" alt="Royal Stewart Gen 4" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart Gen 5"><img src="assets/thumbs/evo-royal-stewart-gen05.png" alt="Royal Stewart Gen 5" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart Gen 6"><img src="assets/thumbs/evo-royal-stewart-gen06.png" alt="Royal Stewart Gen 6" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart Gen 7"><img src="assets/thumbs/evo-royal-stewart-gen07.png" alt="Royal Stewart Gen 7" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart Gen 8"><img src="assets/thumbs/evo-royal-stewart-gen08.png" alt="Royal Stewart Gen 8" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart Gen 9"><img src="assets/thumbs/evo-royal-stewart-gen09.png" alt="Royal Stewart Gen 9" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Royal Stewart Gen 10"><img src="assets/thumbs/evo-royal-stewart-gen10.png" alt="Royal Stewart Gen 10" width="400" height="400" loading="lazy"></div>
+  </div>
+  <div class="catalog__group-label fade-in">Black Watch lineage</div>
+  <div class="catalog__grid catalog__grid--evo fade-in" role="group" aria-label="Black Watch lineage">
+    <div class="tartan-tile" title="Black Watch Gen 1"><img src="assets/thumbs/evo-black-watch-gen01.png" alt="Black Watch Gen 1" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch Gen 2"><img src="assets/thumbs/evo-black-watch-gen02.png" alt="Black Watch Gen 2" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch Gen 3"><img src="assets/thumbs/evo-black-watch-gen03.png" alt="Black Watch Gen 3" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch Gen 4"><img src="assets/thumbs/evo-black-watch-gen04.png" alt="Black Watch Gen 4" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch Gen 5"><img src="assets/thumbs/evo-black-watch-gen05.png" alt="Black Watch Gen 5" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch Gen 6"><img src="assets/thumbs/evo-black-watch-gen06.png" alt="Black Watch Gen 6" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch Gen 7"><img src="assets/thumbs/evo-black-watch-gen07.png" alt="Black Watch Gen 7" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch Gen 8"><img src="assets/thumbs/evo-black-watch-gen08.png" alt="Black Watch Gen 8" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch Gen 9"><img src="assets/thumbs/evo-black-watch-gen09.png" alt="Black Watch Gen 9" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Black Watch Gen 10"><img src="assets/thumbs/evo-black-watch-gen10.png" alt="Black Watch Gen 10" width="400" height="400" loading="lazy"></div>
+  </div>
+
+  <div class="catalog__subsection fade-in">
+    <h3 class="catalog__subhed">RANDOM</h3>
+    <p class="catalog__subdesc">Pure generation. No ancestry, no constraint beyond the structural rules.</p>
+  </div>
+  <div class="catalog__grid catalog__grid--dense fade-in" role="group" aria-label="Grid of 100 random tartan specimens">
+    <div class="tartan-tile" title="Random 001"><img src="assets/thumbs/rand-001.png" alt="Random 001" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 002"><img src="assets/thumbs/rand-002.png" alt="Random 002" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 003"><img src="assets/thumbs/rand-003.png" alt="Random 003" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 004"><img src="assets/thumbs/rand-004.png" alt="Random 004" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 005"><img src="assets/thumbs/rand-005.png" alt="Random 005" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 006"><img src="assets/thumbs/rand-006.png" alt="Random 006" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 007"><img src="assets/thumbs/rand-007.png" alt="Random 007" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 008"><img src="assets/thumbs/rand-008.png" alt="Random 008" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 009"><img src="assets/thumbs/rand-009.png" alt="Random 009" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 010"><img src="assets/thumbs/rand-010.png" alt="Random 010" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 011"><img src="assets/thumbs/rand-011.png" alt="Random 011" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 012"><img src="assets/thumbs/rand-012.png" alt="Random 012" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 013"><img src="assets/thumbs/rand-013.png" alt="Random 013" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 014"><img src="assets/thumbs/rand-014.png" alt="Random 014" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 015"><img src="assets/thumbs/rand-015.png" alt="Random 015" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 016"><img src="assets/thumbs/rand-016.png" alt="Random 016" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 017"><img src="assets/thumbs/rand-017.png" alt="Random 017" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 018"><img src="assets/thumbs/rand-018.png" alt="Random 018" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 019"><img src="assets/thumbs/rand-019.png" alt="Random 019" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 020"><img src="assets/thumbs/rand-020.png" alt="Random 020" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 021"><img src="assets/thumbs/rand-021.png" alt="Random 021" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 022"><img src="assets/thumbs/rand-022.png" alt="Random 022" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 023"><img src="assets/thumbs/rand-023.png" alt="Random 023" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 024"><img src="assets/thumbs/rand-024.png" alt="Random 024" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 025"><img src="assets/thumbs/rand-025.png" alt="Random 025" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 026"><img src="assets/thumbs/rand-026.png" alt="Random 026" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 027"><img src="assets/thumbs/rand-027.png" alt="Random 027" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 028"><img src="assets/thumbs/rand-028.png" alt="Random 028" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 029"><img src="assets/thumbs/rand-029.png" alt="Random 029" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 030"><img src="assets/thumbs/rand-030.png" alt="Random 030" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 031"><img src="assets/thumbs/rand-031.png" alt="Random 031" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 032"><img src="assets/thumbs/rand-032.png" alt="Random 032" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 033"><img src="assets/thumbs/rand-033.png" alt="Random 033" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 034"><img src="assets/thumbs/rand-034.png" alt="Random 034" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 035"><img src="assets/thumbs/rand-035.png" alt="Random 035" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 036"><img src="assets/thumbs/rand-036.png" alt="Random 036" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 037"><img src="assets/thumbs/rand-037.png" alt="Random 037" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 038"><img src="assets/thumbs/rand-038.png" alt="Random 038" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 039"><img src="assets/thumbs/rand-039.png" alt="Random 039" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 040"><img src="assets/thumbs/rand-040.png" alt="Random 040" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 041"><img src="assets/thumbs/rand-041.png" alt="Random 041" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 042"><img src="assets/thumbs/rand-042.png" alt="Random 042" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 043"><img src="assets/thumbs/rand-043.png" alt="Random 043" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 044"><img src="assets/thumbs/rand-044.png" alt="Random 044" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 045"><img src="assets/thumbs/rand-045.png" alt="Random 045" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 046"><img src="assets/thumbs/rand-046.png" alt="Random 046" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 047"><img src="assets/thumbs/rand-047.png" alt="Random 047" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 048"><img src="assets/thumbs/rand-048.png" alt="Random 048" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 049"><img src="assets/thumbs/rand-049.png" alt="Random 049" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 050"><img src="assets/thumbs/rand-050.png" alt="Random 050" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 051"><img src="assets/thumbs/rand-051.png" alt="Random 051" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 052"><img src="assets/thumbs/rand-052.png" alt="Random 052" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 053"><img src="assets/thumbs/rand-053.png" alt="Random 053" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 054"><img src="assets/thumbs/rand-054.png" alt="Random 054" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 055"><img src="assets/thumbs/rand-055.png" alt="Random 055" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 056"><img src="assets/thumbs/rand-056.png" alt="Random 056" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 057"><img src="assets/thumbs/rand-057.png" alt="Random 057" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 058"><img src="assets/thumbs/rand-058.png" alt="Random 058" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 059"><img src="assets/thumbs/rand-059.png" alt="Random 059" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 060"><img src="assets/thumbs/rand-060.png" alt="Random 060" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 061"><img src="assets/thumbs/rand-061.png" alt="Random 061" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 062"><img src="assets/thumbs/rand-062.png" alt="Random 062" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 063"><img src="assets/thumbs/rand-063.png" alt="Random 063" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 064"><img src="assets/thumbs/rand-064.png" alt="Random 064" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 065"><img src="assets/thumbs/rand-065.png" alt="Random 065" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 066"><img src="assets/thumbs/rand-066.png" alt="Random 066" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 067"><img src="assets/thumbs/rand-067.png" alt="Random 067" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 068"><img src="assets/thumbs/rand-068.png" alt="Random 068" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 069"><img src="assets/thumbs/rand-069.png" alt="Random 069" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 070"><img src="assets/thumbs/rand-070.png" alt="Random 070" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 071"><img src="assets/thumbs/rand-071.png" alt="Random 071" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 072"><img src="assets/thumbs/rand-072.png" alt="Random 072" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 073"><img src="assets/thumbs/rand-073.png" alt="Random 073" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 074"><img src="assets/thumbs/rand-074.png" alt="Random 074" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 075"><img src="assets/thumbs/rand-075.png" alt="Random 075" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 076"><img src="assets/thumbs/rand-076.png" alt="Random 076" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 077"><img src="assets/thumbs/rand-077.png" alt="Random 077" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 078"><img src="assets/thumbs/rand-078.png" alt="Random 078" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 079"><img src="assets/thumbs/rand-079.png" alt="Random 079" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 080"><img src="assets/thumbs/rand-080.png" alt="Random 080" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 081"><img src="assets/thumbs/rand-081.png" alt="Random 081" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 082"><img src="assets/thumbs/rand-082.png" alt="Random 082" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 083"><img src="assets/thumbs/rand-083.png" alt="Random 083" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 084"><img src="assets/thumbs/rand-084.png" alt="Random 084" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 085"><img src="assets/thumbs/rand-085.png" alt="Random 085" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 086"><img src="assets/thumbs/rand-086.png" alt="Random 086" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 087"><img src="assets/thumbs/rand-087.png" alt="Random 087" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 088"><img src="assets/thumbs/rand-088.png" alt="Random 088" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 089"><img src="assets/thumbs/rand-089.png" alt="Random 089" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 090"><img src="assets/thumbs/rand-090.png" alt="Random 090" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 091"><img src="assets/thumbs/rand-091.png" alt="Random 091" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 092"><img src="assets/thumbs/rand-092.png" alt="Random 092" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 093"><img src="assets/thumbs/rand-093.png" alt="Random 093" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 094"><img src="assets/thumbs/rand-094.png" alt="Random 094" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 095"><img src="assets/thumbs/rand-095.png" alt="Random 095" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 096"><img src="assets/thumbs/rand-096.png" alt="Random 096" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 097"><img src="assets/thumbs/rand-097.png" alt="Random 097" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 098"><img src="assets/thumbs/rand-098.png" alt="Random 098" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 099"><img src="assets/thumbs/rand-099.png" alt="Random 099" width="400" height="400" loading="lazy"></div>
+    <div class="tartan-tile" title="Random 100"><img src="assets/thumbs/rand-100.png" alt="Random 100" width="400" height="400" loading="lazy"></div>
+  </div>
+
+  <div class="catalog__addendum">
+    <span><strong>219</strong> shown &middot; generator produces unlimited variants</span>
+    <span><a href="https://edgelesslab.com/lab/tartanism/">open the explorer</a></span>
+  </div>
+</section>
+
+<!-- ─── §03 BEST OF RUN ─── -->
+<section class="gallery" id="best-of-run" aria-label="Best of Run: selected specimens with field notes">
+
+  <div class="gallery__opening fade-in">
+    <p class="gallery__opening__quote">
+      The loom does not know<br>
+      what a clan is.<br>
+      <em>Neither does the algorithm.</em>
+    </p>
+    <span class="gallery__opening__rule"></span>
+    <div class="gallery__opening__marker">
+      <span class="num">&sect;03</span> &nbsp;&middot;&nbsp; Best of Run
+    </div>
+  </div>
+
+  <!-- ── SPREAD I · the specimen that felt real ── -->
+  <div class="spread spread--singleton fade-in">
+    <div class="spread__label" style="grid-column:1/-1; padding:0;">
+      <span class="num">Spread&nbsp;I</span> &middot; the specimen that felt real
+    </div>
+    <figure class="plate">
+      <div class="plate__img-wrap">
+        <img src="assets/specimens/hero-01-royal-stewart.png" alt="Royal Stewart tartan specimen in 2/2 twill weave with woad blue, madder red, and dark green" width="800" height="800" loading="lazy" style="display:block; width:100%; height:auto;">
+      </div>
+      <figcaption class="plate__caption">
+        <span><strong>Plate II.</strong> Royal Stewart</span>
+        <span>2/2 twill &middot; <span class="woad">B/8 G24 B8 R2 B8</span></span>
+      </figcaption>
+    </figure>
+    <aside class="marginalia">
+      There is a moment when a generated sett stops reading as "colored
+      grid" and starts reading as cloth. It happens when the proportions
+      fall into the range that weavers discovered empirically over
+      centuries: a dominant ground color covering sixty to seventy percent
+      of the sett, narrow accent stripes providing punctuation, and a
+      secondary color establishing a counterweight. T-0044 found that
+      ratio on its own, through mutation. The proportions are close enough
+      to a real regimental tartan that you could submit this thread count
+      to the Scottish Register and it would parse without error.
+      <span class="marginalia__attribution">Field notes, April 2026</span>
+    </aside>
+  </div>
+
+  <!-- ── SPREAD II · two mutations from one parent ── -->
+  <div class="spread spread--two fade-in">
+    <div class="spread__label" style="grid-column:1/-1; padding:0;">
+      <span class="num">Spread&nbsp;II</span> &middot; two mutations, one parent
+    </div>
+    <figure class="plate">
+      <div class="plate__img-wrap">
+        <img src="assets/specimens/hero-02-black-watch.png" alt="Black Watch tartan specimen in herringbone weave, dark blue and green with thin red accent" width="800" height="800" loading="lazy" style="display:block; width:100%; height:auto;">
+      </div>
+      <figcaption class="plate__caption">
+        <span><strong>Plate III.</strong> Black Watch</span>
+        <span>herringbone &middot; woad dominant</span>
+      </figcaption>
+    </figure>
+    <figure class="plate">
+      <div class="plate__img-wrap">
+        <img src="assets/specimens/hero-04-cameron-of-erracht.png" alt="Cameron of Erracht tartan specimen in herringbone weave, green and red with yellow accent" width="800" height="800" loading="lazy" style="display:block; width:100%; height:auto;">
+      </div>
+      <figcaption class="plate__caption">
+        <span><strong>Plate IV.</strong> Cameron of Erracht</span>
+        <span>herringbone &middot; madder dominant</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <!-- Editorial text between spreads -->
+  <div class="spread" style="max-width: 50ch; margin: 0 auto 8rem;">
+    <div class="method__body fade-in" style="max-width: none;">
+      <p>
+        T-0112 and T-0113 share the same parent sett. The mutation engine
+        swapped the dominant color: madder red in the first, woad blue in
+        the second. Everything else is identical. The same thread counts,
+        the same proportions, the same herringbone weave. Yet the two
+        specimens register completely differently. The red reads as
+        Highland dress, formal, associated with clan gatherings and
+        military ceremony. The blue reads as working cloth, everyday,
+        associated with estate tweeds and fishing jackets.
+      </p>
+      <p>
+        This is the central observation of the project. The structure of a
+        tartan carries surprisingly little of its cultural meaning. Color
+        does most of the work. A regimental tartan in madder and green
+        signals one thing; the same structure in grey and white signals
+        mourning. The Scottish Register encodes this distinction explicitly:
+        many clans register "ancient," "modern," "weathered," and "dress"
+        variants that differ only in palette, not in sett.
+      </p>
+      <p>
+        The mutation engine surfaces this without any explicit
+        programming for it. Shift the dominant color and the resulting
+        tartan lands in a different cultural register. The sett remains
+        mathematically identical. The association changes completely.
+      </p>
+    </div>
+  </div>
+
+  <!-- ── SPREAD III · the one that broke the rules ── -->
+  <div class="spread spread--singleton fade-in">
+    <div class="spread__label" style="grid-column:1/-1; padding:0;">
+      <span class="num">Spread&nbsp;III</span> &middot; the edge of validity
+    </div>
+    <figure class="plate">
+      <div class="plate__img-wrap">
+        <img src="assets/specimens/hero-03-macleod-of-lewis.png" alt="MacLeod of Lewis tartan specimen in satin weave, near-monochrome yellow and black" width="800" height="800" loading="lazy" style="display:block; width:100%; height:auto;">
+      </div>
+      <figcaption class="plate__caption">
+        <span><strong>Plate V.</strong> MacLeod of Lewis</span>
+        <span>satin weave &middot; near-monochrome</span>
+      </figcaption>
+    </figure>
+    <aside class="marginalia">
+      T-0271 is technically a valid tartan. It has a symmetric sett, a
+      twill-family weave (satin), and period-correct colors (woad and
+      iron black). But it barely reads as tartan at all. The sett is so
+      heavily dominated by a single color that the secondary stripes
+      disappear at normal viewing distance. What remains is a textured
+      blue-black fabric with a faint grid, closer to a suiting tweed
+      than a clan tartan. This is the boundary the generator keeps
+      probing: how minimal can a tartan become before it loses the
+      visual signature that makes it recognizable as tartan?
+      <span class="marginalia__attribution">Field notes, April 2026</span>
+    </aside>
+  </div>
+
+  <!-- ── SPREAD IV · density and restraint ── -->
+  <div class="spread spread--two fade-in">
+    <div class="spread__label" style="grid-column:1/-1; padding:0;">
+      <span class="num">Spread&nbsp;IV</span> &middot; density and restraint
+    </div>
+    <figure class="plate">
+      <div class="plate__img-wrap">
+        <img src="assets/specimens/hero-02-black-watch.png" alt="Black Watch tartan specimen in 2/2 twill, dense sett with blue and green dominant" width="800" height="800" loading="lazy" style="display:block; width:100%; height:auto;">
+      </div>
+      <figcaption class="plate__caption">
+        <span><strong>Plate VI.</strong> Black Watch</span>
+        <span>2/2 twill &middot; 7 colors, dense sett</span>
+      </figcaption>
+    </figure>
+    <figure class="plate">
+      <div class="plate__img-wrap">
+        <img src="assets/specimens/hero-04-cameron-of-erracht.png" alt="Cameron of Erracht tartan specimen in broken twill, open sett with green and yellow" width="800" height="800" loading="lazy" style="display:block; width:100%; height:auto;">
+      </div>
+      <figcaption class="plate__caption">
+        <span><strong>Plate VII.</strong> Cameron of Erracht</span>
+        <span>broken twill &middot; 2 colors, open sett</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <!-- Closing editorial text -->
+  <div class="spread" style="max-width: 50ch; margin: 0 auto 8rem;">
+    <div class="method__body fade-in" style="max-width: none;">
+      <p>
+        The difference between Plate VI and Plate VII is the difference
+        between a district tartan and a shepherd's check. Both are
+        structurally valid. Both use period colors. But T-0388 packs
+        seven colors into a dense, short sett, producing the kind of
+        visually busy, high-information pattern associated with Royal
+        Stewart and other "dress" tartans. T-0401 uses only two colors
+        in long, open runs, producing something closer to the simple
+        estate checks that predate the Victorian tartan revival.
+      </p>
+      <p>
+        Neither is more correct. The Scottish Register contains both
+        extremes. What the generator reveals is the continuity between
+        them. There is no categorical line between "simple check" and
+        "complex tartan." There is a spectrum, controlled primarily by
+        two parameters: the number of distinct colors in the sett, and
+        the ratio of the longest run to the shortest. Push one high and
+        the other low, and you get a maximally complex sett. Push both
+        low and you get a shepherd's plaid. The generator walks this
+        spectrum freely, producing specimens that feel intuitively
+        "right" at both ends.
+      </p>
+      <p>
+        What the generator cannot produce is cultural context. A
+        generated tartan has no clan, no regiment, no district. It is
+        pure structure, stripped of provenance. Whether that makes it
+        less interesting or more depends on what you think tartan is for.
+        If tartan is primarily an identity marker, a flag worn as fabric,
+        then generation misses the point entirely. If tartan is primarily
+        a design system, a formal grammar for colored cloth, then
+        generation is the right tool for exploring the space of possible
+        expressions within that grammar.
+      </p>
+      <p>
+        This project takes the second view.
+      </p>
+    </div>
+  </div>
+
+</section>
+
+<!-- ─── §04 COLOPHON ─── -->
+<section class="colophon" id="colophon">
+  <div class="colophon__inner">
+
+    <p class="colophon__coda fade-in">
+      The thread count is the score.<br>
+      The weave is the performance.<br>
+      <em>The cloth is what the loom decides to make of both.</em>
+    </p>
+
+    <div class="colophon__marker">
+      <span class="num">&sect;04</span> &nbsp;&middot;&nbsp; Colophon &amp; Continue
+    </div>
+
+    <h2 class="colophon__title fade-in">
+      Set in Boska &amp; JetBrains&nbsp;Mono.<br>
+      <em>Printed on aged paper.</em>
+    </h2>
+
+    <dl class="colophon__table fade-in">
+      <div class="row">
+        <dt>Display</dt>
+        <dd><strong>Boska</strong> &middot; Indian Type Foundry, distributed via Fontshare</dd>
+      </div>
+      <div class="row">
+        <dt>Body &amp; data</dt>
+        <dd><strong>JetBrains Mono</strong> &middot; ligatured monospace, OFL licensed</dd>
+      </div>
+      <div class="row">
+        <dt>Accent</dt>
+        <dd><strong class="woad">#2d4a7a</strong> &middot; <em>woad blue, from Isatis tinctoria (woad plant), the primary blue dye in Scotland before indigo imports</em></dd>
+      </div>
+      <div class="row">
+        <dt>Substrate</dt>
+        <dd><strong>Warm specimen paper</strong> &middot; #f3eddd, intended to evoke aged linen</dd>
+      </div>
+      <div class="row">
+        <dt>Weave structures</dt>
+        <dd><strong>6</strong> &middot; plain, 2/2 twill, herringbone, hopsack, satin, broken twill</dd>
+      </div>
+      <div class="row">
+        <dt>Dye palette</dt>
+        <dd><strong>48 period-correct colors</strong> &middot; mapped to STA thread color codes, both ancient and modern variants</dd>
+      </div>
+      <div class="row">
+        <dt>Notation</dt>
+        <dd><strong>SRT thread count format</strong> &middot; parsed from standard Scottish Register notation with pivot markers</dd>
+      </div>
+      <div class="row">
+        <dt>Mutations</dt>
+        <dd><strong>4 operators</strong> &middot; color shift, run scale, stripe insert, sett transpose</dd>
+      </div>
+      <div class="row">
+        <dt>Edition</dt>
+        <dd><strong class="woad">April 2026</strong> &middot; v1.0</dd>
+      </div>
+      <div class="row">
+        <dt>Designed by</dt>
+        <dd><strong>D. Murray</strong> &middot; <em>Edgeless Lab</em></dd>
+      </div>
+    </dl>
+
+    <div class="srt-note fade-in">
+      Tartanism is not affiliated with the Scottish Register of Tartans or the
+      Scottish Tartans Authority. Thread count notation, weave structures,
+      and color codes are used for educational and creative purposes. The
+      generator does not reproduce any registered tartan. All specimens are
+      original compositions. The Scottish Register of Tartans is maintained
+      by the National Records of Scotland under the Scottish Register of
+      Tartans Act 2008.
+    </div>
+
+    <div class="colophon__continue fade-in">
+      <div class="colophon__continue__head">Continue</div>
+      <div class="colophon__continue__grid">
+        <a class="colophon__link" href="https://edgelesslab.com/lab/tartanism/" target="_blank" rel="noopener">
+          <strong>Open the Explorer</strong>
+          <span>generate, mutate, and export tartans</span>
+        </a>
+        <a class="colophon__link" href="https://edgelesslab.com/lab/tartanism/" target="_blank" rel="noopener">
+          <strong>Lab Page</strong>
+          <span>project overview, technical notes</span>
+        </a>
+        <a class="colophon__link" href="https://edgelesslab.com/pen-plotter/" target="_blank" rel="noopener">
+          <strong>Pen Plotter Field Notes</strong>
+          <span>the companion editorial on generative line art</span>
+        </a>
+        <a class="colophon__link" href="https://edgelesslab.com" target="_blank" rel="noopener">
+          <strong>Edgeless Lab</strong>
+          <span>more from the lab</span>
+        </a>
+      </div>
+    </div>
+
+    <p class="colophon__signoff">
+      <span class="dot">&#9679;</span> &nbsp; D. Murray &nbsp;&middot;&nbsp; April 2026 &nbsp;&middot;&nbsp; Edgeless Lab &nbsp; <span class="dot">&#9679;</span>
+    </p>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <span>&copy; 2026 Edgeless Lab</span>
+  <a href="https://edgelesslab.com">edgelesslab.com</a>
+</footer>
+
+<script>
+// ── Meta-strip scroll state ─────────────────────────────────
+(function () {
+  const strip = document.querySelector('.meta-strip');
+  if (!strip) return;
+  let ticking = false;
+  function update() {
+    strip.classList.toggle('is-scrolled', window.scrollY > 16);
+    ticking = false;
+  }
+  window.addEventListener('scroll', function () {
+    if (!ticking) {
+      requestAnimationFrame(update);
+      ticking = true;
+    }
+  }, { passive: true });
+  update();
+})();
+
+// ── fadeUp intersection observer ─────────────────────────────
+(function () {
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.fade-in').forEach(function (el) {
+      el.classList.add('is-visible');
+    });
+    return;
+  }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+  document.querySelectorAll('.fade-in').forEach(function (el) {
+    observer.observe(el);
+  });
+})();
+
+// ── Period-correct dye palette ──────────────────────────────
+(function () {
+  var colors = [
+    { code: 'B',  name: 'Woad Blue',       hex: '#2d4a7a' },
+    { code: 'B',  name: 'Indigo',          hex: '#1a3050' },
+    { code: 'B',  name: 'Light Blue',      hex: '#5b8baf' },
+    { code: 'B',  name: 'Sky Blue',        hex: '#6ea4cc' },
+    { code: 'B',  name: 'Saxe Blue',       hex: '#4a7fa5' },
+    { code: 'B',  name: 'Royal Blue',      hex: '#1e3d73' },
+    { code: 'R',  name: 'Madder Red',      hex: '#8b2323' },
+    { code: 'R',  name: 'Crimson',         hex: '#a52a2a' },
+    { code: 'R',  name: 'Scarlet',         hex: '#c23b22' },
+    { code: 'R',  name: 'Brick Red',       hex: '#884422' },
+    { code: 'R',  name: 'Claret',          hex: '#722f37' },
+    { code: 'R',  name: 'Rose',            hex: '#b55b5b' },
+    { code: 'G',  name: 'Dark Green',      hex: '#19502d' },
+    { code: 'G',  name: 'Bottle Green',    hex: '#254d32' },
+    { code: 'G',  name: 'Olive',           hex: '#556b2f' },
+    { code: 'G',  name: 'Sage',            hex: '#6b8e6b' },
+    { code: 'G',  name: 'Moss',            hex: '#4a6741' },
+    { code: 'G',  name: 'Lincoln Green',   hex: '#2d5a27' },
+    { code: 'Y',  name: 'Weld Yellow',     hex: '#c8a951' },
+    { code: 'Y',  name: 'Gold',            hex: '#b8860b' },
+    { code: 'Y',  name: 'Saffron',         hex: '#daa520' },
+    { code: 'Y',  name: 'Straw',           hex: '#d4c17f' },
+    { code: 'Y',  name: 'Amber',           hex: '#cc7722' },
+    { code: 'Y',  name: 'Ochre',           hex: '#c6893a' },
+    { code: 'K',  name: 'Iron Black',      hex: '#1a1a1a' },
+    { code: 'K',  name: 'Charcoal',        hex: '#333333' },
+    { code: 'K',  name: 'Slate',           hex: '#4a4a4a' },
+    { code: 'W',  name: 'Natural White',   hex: '#f0ead6' },
+    { code: 'W',  name: 'Cream',           hex: '#e8dcc8' },
+    { code: 'W',  name: 'Ivory',           hex: '#eeebe0' },
+    { code: 'T',  name: 'Crottle Brown',   hex: '#7b5b3a' },
+    { code: 'T',  name: 'Walnut',          hex: '#5c4033' },
+    { code: 'T',  name: 'Tan',             hex: '#a0785a' },
+    { code: 'T',  name: 'Russet',          hex: '#80461b' },
+    { code: 'T',  name: 'Fawn',            hex: '#c4a882' },
+    { code: 'T',  name: 'Peat',            hex: '#3d2b1f' },
+    { code: 'P',  name: 'Heather',         hex: '#7b5c7a' },
+    { code: 'P',  name: 'Plum',            hex: '#5c3a6e' },
+    { code: 'P',  name: 'Mauve',           hex: '#876e8a' },
+    { code: 'N',  name: 'Steel Grey',      hex: '#71797e' },
+    { code: 'N',  name: 'Ash',             hex: '#9a9a8c' },
+    { code: 'N',  name: 'Pewter',          hex: '#8a8a7a' },
+    { code: 'DR', name: 'Maroon',          hex: '#5a1a1a' },
+    { code: 'LB', name: 'Powder Blue',     hex: '#8bb8d6' },
+    { code: 'LG', name: 'Lime',            hex: '#7da668' },
+    { code: 'O',  name: 'Orange',          hex: '#c46210' },
+    { code: 'DG', name: 'Forest',          hex: '#1a3a1a' },
+    { code: 'LR', name: 'Salmon',          hex: '#c47a6a' }
+  ];
+
+  var grid = document.getElementById('palette-grid');
+  if (!grid) return;
+  colors.forEach(function (c) {
+    var el = document.createElement('div');
+    el.className = 'palette-swatch';
+    el.setAttribute('role', 'listitem');
+    el.style.background = c.hex;
+    el.title = c.name + ' (' + c.code + ') ' + c.hex;
+    el.setAttribute('aria-label', c.name + ', code ' + c.code + ', ' + c.hex);
+    el.innerHTML = '<span class="palette-swatch__label">' + c.code + '</span>';
+    grid.appendChild(el);
+  });
+})();
+
+// ── Catalog grid: tiles are now static HTML with real images ──
+</script>
+</body>
+</html>

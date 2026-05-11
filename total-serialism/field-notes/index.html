@@ -1,0 +1,2245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Total Serialism: Field Notes on Algorithmic Constraint | Edgeless Lab</title>
+<meta name="description" content="Field notes on 98 interactive algorithmic art generators optimized for pen plotting, spanning 16 categories from flow fields and fractals to cellular automata and reaction-diffusion. A catalog of constraint.">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Total Serialism: Field Notes on Algorithmic Constraint">
+<meta property="og:description" content="98 algorithmic art generators, 16 categories, one constraint: a pen on paper. Field notes from Edgeless Lab on serializing visual parameters the way Boulez serialized pitch.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://edgelesslab.com/total-serialism/">
+<meta property="og:site_name" content="Edgeless Lab">
+<meta property="og:image" content="https://edgelesslab.com/total-serialism/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Total Serialism: Field Notes on Algorithmic Constraint">
+<meta name="twitter:description" content="98 algorithmic art generators, 16 categories, one constraint: a pen on paper. Field notes from Edgeless Lab.">
+
+<!-- Display: Boska (Fontshare) -->
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=boska@300,301,400,401,500,501&display=swap" rel="stylesheet">
+
+<!-- Mono: JetBrains Mono -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ────────────────────────────────────────────────────────
+   TOTAL SERIALISM | FIELD NOTES ON ALGORITHMIC CONSTRAINT
+   Aesthetic: warm specimen paper + deep ink + scholarly serif
+   Accent: malachite green (algorithmic/natural)
+   ──────────────────────────────────────────────────────── */
+
+:root {
+  /* paper & ink */
+  --paper:        #f3eddd;
+  --paper-deep:   #ebe3cf;
+  --ink:          #0c0a08;
+  --ink-soft:     #2a2520;
+  --ink-faint:    #56524a;  /* 5.5:1 on paper, passes AA */
+  --rule:         #d4cab4;
+
+  /* one accent | malachite green */
+  --malachite:       #1a6847;
+  --malachite-deep:  #134d35;
+  --accent:          var(--malachite);
+  --accent-deep:     var(--malachite-deep);
+
+  /* type */
+  --serif:  "Boska", "Times New Roman", Georgia, serif;
+  --mono:   "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* spacing */
+  --margin-x: clamp(1.25rem, 8vw, 9rem);
+}
+
+@media (max-width: 600px) {
+  :root {
+    --margin-x: 1.25rem;
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-style: normal;
+  font-feature-settings: "liga" on, "calt" on, "kern" on, "ss01" on;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
+
+  /* subtle paper grain via SVG noise */
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(26,104,71,0.05), transparent 60%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+::selection { background: var(--accent); color: var(--paper); }
+
+/* ────────── persistent meta strip (top) ────────── */
+
+.meta-strip {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem var(--margin-x);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--paper);
+  border-bottom: 1px solid transparent;
+  z-index: 100;
+  pointer-events: none;
+  transition: border-color 250ms cubic-bezier(0.2,0.8,0.2,1),
+              backdrop-filter 250ms;
+}
+.meta-strip.is-scrolled {
+  border-bottom-color: var(--rule);
+  background: rgba(243, 237, 221, 0.92);
+  backdrop-filter: blur(8px) saturate(115%);
+  -webkit-backdrop-filter: blur(8px) saturate(115%);
+}
+.meta-strip .dot { color: var(--accent); }
+
+/* ────────── HERO ────────── */
+
+.hero {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  padding: 8rem var(--margin-x) 4rem;
+  position: relative;
+}
+
+.hero__filing {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: baseline;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 1rem;
+  margin-bottom: 4rem;
+  opacity: 0;
+  animation: fadeUp 800ms cubic-bezier(0.2, 0.8, 0.2, 1) 200ms forwards;
+}
+@media (max-width: 600px) {
+  .hero__filing { font-size: 10px; gap: 0.6rem 1.25rem; }
+}
+.hero__filing strong { color: var(--ink); font-weight: 500; }
+.hero__filing .accent { color: var(--accent); }
+
+.hero__main {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .hero__main { grid-template-columns: 1fr; }
+}
+
+.hero__title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(3rem, 8vw, 8.5rem);
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero__title {
+    opacity: 0;
+    animation: fadeUp 1200ms cubic-bezier(0.2, 0.8, 0.2, 1) 400ms forwards;
+  }
+}
+.hero__title em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--ink-soft);
+}
+
+.hero__deck {
+  font-family: var(--serif);
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 36ch;
+  margin-top: 2.5rem;
+  font-style: italic;
+  font-weight: 400;
+  opacity: 0;
+  animation: fadeUp 1000ms cubic-bezier(0.2, 0.8, 0.2, 1) 700ms forwards;
+}
+.hero__deck::before {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 1px;
+  background: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.hero__stats {
+  opacity: 0;
+  animation: fadeUp 1400ms cubic-bezier(0.2, 0.8, 0.2, 1) 900ms forwards;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border: 1px solid var(--rule);
+  background: white;
+  box-shadow:
+    0 1px 0 rgba(12,10,8,0.08),
+    0 30px 60px -20px rgba(12,10,8,0.18),
+    0 60px 120px -40px rgba(26,104,71,0.06);
+}
+.stat-cell {
+  padding: 1.5rem 1.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+.stat-cell:nth-child(odd) {
+  border-right: 1px solid var(--rule);
+}
+.stat-cell:nth-last-child(-n+2) {
+  border-bottom: none;
+}
+.stat-cell__number {
+  font-family: var(--serif);
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.stat-cell__number .accent { color: var(--accent); }
+.stat-cell__label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 0.4rem;
+}
+
+.hero__footer {
+  margin-top: 6rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.25rem;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  opacity: 0;
+  animation: fadeUp 800ms cubic-bezier(0.2, 0.8, 0.2, 1) 1100ms forwards;
+}
+@media (max-width: 600px) {
+  .hero__footer { margin-top: 3rem; font-size: 9px; }
+  .hero__footer .scroll-cue { order: -1; width: 100%; align-items: flex-start; }
+}
+
+.hero__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.85rem;
+  font-family: var(--mono);
+  font-size: inherit;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.hero__nav a {
+  color: var(--ink-faint);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: color 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              border-color 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.hero__nav a:hover,
+.hero__nav a:focus-visible {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  outline: none;
+}
+.hero__nav span[aria-hidden] {
+  color: var(--rule);
+}
+@media (max-width: 600px) {
+  .hero__nav { gap: 0.4rem 0.6rem; }
+}
+
+/* Scroll anchors offset for the fixed meta-strip */
+.method,
+.catalog,
+.gallery,
+.colophon {
+  scroll-margin-top: 4rem;
+}
+.hero__footer .scroll-cue {
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+}
+.hero__footer .scroll-cue::after {
+  content: "\2193";
+  font-size: 14px;
+  color: var(--accent);
+  animation: bob 2.4s ease-in-out 3;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__filing,
+  .hero__title,
+  .hero__deck,
+  .hero__stats,
+  .hero__footer {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+  .hero__footer .scroll-cue::after {
+    animation: none !important;
+  }
+}
+
+/* ────────── §01 METHOD ────────── */
+
+.method {
+  padding: 8rem var(--margin-x);
+  border-top: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: clamp(2rem, 6vw, 6rem);
+}
+@media (max-width: 900px) { .method { grid-template-columns: 1fr; } }
+
+.section-marker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.section-marker .num {
+  font-size: 14px;
+  color: var(--accent);
+  font-weight: 700;
+}
+.section-marker .name { color: var(--ink); font-weight: 500; }
+
+.method__body {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 50ch;
+  font-style: normal;
+}
+.method__body p { margin-bottom: 1.5rem; }
+.method__body p:first-child::first-letter {
+  font-family: var(--serif);
+  float: left;
+  font-size: 5em;
+  line-height: 0.85;
+  padding-right: 0.1em;
+  padding-top: 0.05em;
+  font-weight: 400;
+  color: var(--ink);
+}
+.method__body strong {
+  font-weight: 500;
+  color: var(--ink);
+  background: linear-gradient(180deg, transparent 65%, rgba(26,104,71,0.18) 65%);
+  padding: 0 0.1em;
+}
+
+.method__body h3 {
+  font-family: var(--serif);
+  font-size: clamp(1.3rem, 2vw, 1.8rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+  color: var(--ink);
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+}
+.method__body h3 em {
+  font-style: italic;
+  color: var(--ink-soft);
+  font-weight: 300;
+}
+
+/* taxonomy grid */
+.taxonomy-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border: 1px solid var(--rule);
+  margin: 2rem 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.taxonomy-cell {
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.taxonomy-cell:nth-child(odd) {
+  border-right: 1px solid var(--rule);
+}
+.taxonomy-cell:nth-last-child(-n+2) {
+  border-bottom: none;
+}
+.taxonomy-cell .cat-name {
+  color: var(--ink);
+  font-weight: 500;
+}
+.taxonomy-cell .cat-count {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* field observation block */
+.field-obs {
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  background: var(--paper-deep);
+  border-left: 3px solid var(--accent);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+.field-obs__header {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+.field-obs code {
+  font-family: var(--mono);
+  background: rgba(26,104,71,0.08);
+  padding: 0.1em 0.3em;
+  font-size: 10px;
+}
+
+/* ────────── §02 CATALOG ────────── */
+
+.catalog {
+  padding: 10rem var(--margin-x) 8rem;
+  border-top: 1px solid var(--rule);
+}
+
+.catalog__intro {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: clamp(2rem, 6vw, 6rem);
+  margin-bottom: 5rem;
+}
+@media (max-width: 900px) { .catalog__intro { grid-template-columns: 1fr; } }
+
+.catalog__hed {
+  font-family: var(--serif);
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+  max-width: 14ch;
+}
+.catalog__hed em { font-style: italic; font-weight: 300; color: var(--ink-soft); }
+
+.catalog__legend {
+  margin-top: 1.5rem;
+  font-family: var(--serif);
+  font-size: clamp(0.95rem, 1.15vw, 1.1rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 50ch;
+}
+.catalog__legend strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+.catalog__legend .swatch {
+  display: inline-block;
+  width: 1.5rem;
+  height: 2px;
+  background: var(--accent);
+  vertical-align: middle;
+  margin: 0 0.4rem 0 0.2rem;
+}
+
+/* category hero specimen */
+.cat-section__hero {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  display: block;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--rule);
+  box-shadow:
+    0 1px 0 rgba(12,10,8,0.06),
+    0 12px 30px -12px rgba(12,10,8,0.15);
+}
+
+/* spread specimen image */
+.spread__visual__img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* category section headers */
+.cat-section {
+  margin-bottom: 5rem;
+}
+.cat-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.cat-section__name {
+  font-family: var(--serif);
+  font-size: clamp(1.3rem, 2vw, 1.8rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.cat-section__name em {
+  font-style: italic;
+  color: var(--ink-soft);
+  font-weight: 300;
+}
+.cat-section__count {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+}
+.cat-section__desc {
+  font-family: var(--serif);
+  font-size: clamp(0.9rem, 1.1vw, 1rem);
+  line-height: 1.55;
+  color: var(--ink-faint);
+  max-width: 60ch;
+  margin-bottom: 1.5rem;
+  font-style: normal;
+}
+
+/* specimen grid */
+.specimen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 6px;
+}
+@media (max-width: 600px) {
+  .specimen-grid {
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    gap: 4px;
+  }
+}
+
+.spec-tile {
+  position: relative;
+  aspect-ratio: 1;
+  background: white;
+  border: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition:
+    transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    z-index 0s linear 250ms;
+}
+.spec-tile::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1.5px;
+  width: var(--score, 0%);
+  background: var(--accent);
+  pointer-events: none;
+  transition: height 250ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.spec-tile__id {
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+@media (hover: hover) and (pointer: fine) {
+  .spec-tile:hover {
+    transform: scale(1.65);
+    z-index: 10;
+    box-shadow:
+      0 1px 0 rgba(12,10,8,0.1),
+      0 14px 30px -10px rgba(12,10,8,0.35),
+      0 30px 60px -20px rgba(26,104,71,0.15);
+    transition-delay: 0s;
+    border-color: var(--ink);
+  }
+  .spec-tile:hover::after {
+    height: 3px;
+  }
+}
+
+/* ────────── §03 BEST OF RUN ────────── */
+
+.gallery {
+  border-top: 1px solid var(--rule);
+  padding: 8rem 0 6rem;
+}
+
+.gallery__opening {
+  max-width: 36ch;
+  margin: 0 auto 8rem;
+  padding: 0 var(--margin-x);
+  text-align: center;
+}
+.gallery__opening__quote {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.gallery__opening__quote em { font-style: normal; color: var(--ink-soft); }
+.gallery__opening__rule {
+  display: block;
+  width: 3rem;
+  height: 1px;
+  background: var(--accent);
+  margin: 2rem auto 0;
+}
+.gallery__opening__marker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 1.5rem;
+}
+.gallery__opening__marker .num { color: var(--accent); font-weight: 700; }
+
+/* editorial spread */
+.spread {
+  margin: 0 auto 8rem;
+  padding: 0 var(--margin-x);
+  max-width: 1600px;
+}
+
+.spread__label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.spread__label .num { color: var(--accent); font-weight: 700; }
+
+.spread--essay {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .spread--essay { grid-template-columns: 1fr; }
+}
+
+.spread__visual {
+  position: relative;
+}
+.spread__visual__plate {
+  background: white;
+  padding: 1rem 1rem 1.25rem;
+  position: relative;
+  box-shadow: 0 1px 0 rgba(12,10,8,0.06),
+              0 16px 40px -16px rgba(12,10,8,0.18);
+  transition:
+    transform 350ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.spread__visual:hover .spread__visual__plate {
+  transform: translateY(-3px);
+  box-shadow:
+    0 1px 0 rgba(12,10,8,0.08),
+    0 24px 60px -16px rgba(12,10,8,0.28),
+    0 60px 120px -40px rgba(26,104,71,0.06);
+}
+.spread__visual__plate::before,
+.spread__visual__plate::after {
+  content: "+";
+  position: absolute;
+  top: 5px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-faint);
+}
+.spread__visual__plate::before { left: 5px; }
+.spread__visual__plate::after { right: 5px; }
+.spread__visual__placeholder {
+  aspect-ratio: 1;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(26,104,71,0.04) 10px,
+      rgba(26,104,71,0.04) 11px
+    ),
+    linear-gradient(135deg, var(--paper-deep), var(--paper));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.spread__visual__caption {
+  margin-top: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  border-top: 1px solid var(--rule);
+  padding-top: 0.55rem;
+}
+.spread__visual__caption strong { color: var(--ink); font-weight: 500; }
+.spread__visual__caption .accent { color: var(--accent); font-weight: 500; }
+
+.spread__essay-text {
+  font-family: var(--serif);
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 42ch;
+  font-style: normal;
+}
+.spread__essay-text p { margin-bottom: 1.25rem; }
+.spread__essay-text p:first-child::first-letter {
+  font-family: var(--serif);
+  float: left;
+  font-size: 4em;
+  line-height: 0.85;
+  padding-right: 0.08em;
+  padding-top: 0.05em;
+  font-weight: 400;
+  color: var(--ink);
+}
+.spread__essay-text strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+.spread__essay-head {
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+}
+.spread__essay-head em {
+  font-style: italic;
+  color: var(--ink-soft);
+  font-weight: 300;
+}
+
+/* pull quote between spreads */
+.gallery__kicker {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  line-height: 1.35;
+  color: var(--ink);
+  max-width: 30ch;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  margin-top: 2rem;
+  margin-bottom: 8rem;
+  position: relative;
+  padding: 0 var(--margin-x);
+}
+.gallery__kicker::before, .gallery__kicker::after {
+  content: "";
+  display: block;
+  width: 4rem;
+  height: 1px;
+  background: var(--accent);
+  margin: 1.5rem auto;
+}
+
+/* ────────── §04 COLOPHON ────────── */
+
+.colophon {
+  border-top: 1px solid var(--rule);
+  padding: 9rem var(--margin-x) 6rem;
+}
+.colophon__inner {
+  max-width: 56ch;
+  margin: 0 auto;
+}
+
+.colophon__coda {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 5rem;
+}
+.colophon__coda em { font-style: italic; color: var(--ink-soft); font-weight: 300; }
+.colophon__coda::before, .colophon__coda::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 1px;
+  background: var(--accent);
+  margin: 1.5rem auto;
+}
+
+.colophon__marker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.colophon__marker .num { color: var(--accent); font-weight: 700; }
+
+.colophon__title {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.colophon__title em { font-style: italic; color: var(--ink-soft); }
+
+.colophon__table {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  width: 100%;
+  border-top: 1px solid var(--rule);
+  margin-bottom: 4rem;
+}
+.colophon__table .row {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.colophon__table .row strong {
+  color: var(--ink);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.colophon__table .row .accent { color: var(--accent); }
+.colophon__table .row em {
+  font-family: var(--serif);
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.colophon__lineage {
+  margin-top: 3rem;
+}
+.colophon__lineage__head {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.75rem;
+}
+.lineage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border: 1px solid var(--rule);
+  margin-bottom: 3rem;
+}
+.lineage-cell {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  color: var(--ink-faint);
+}
+.lineage-cell:nth-child(odd) {
+  border-right: 1px solid var(--rule);
+}
+.lineage-cell:nth-last-child(-n+2) {
+  border-bottom: none;
+}
+.lineage-cell .person {
+  color: var(--ink);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+.lineage-cell .domain {
+  color: var(--accent);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.colophon__continue {
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--rule);
+}
+.colophon__continue__head {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.colophon__continue__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+@media (max-width: 600px) {
+  .colophon__continue__grid { grid-template-columns: 1fr; }
+}
+.colophon__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.2rem 1.5rem;
+  border: 1px solid var(--rule);
+  text-decoration: none;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              background 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              border-color 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  box-shadow: 0 0 0 transparent;
+}
+.colophon__link strong {
+  color: var(--ink);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.colophon__link span {
+  font-size: 10px;
+  color: var(--ink-faint);
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--serif);
+  font-style: italic;
+}
+.colophon__link::after {
+  content: "\2192";
+  position: absolute;
+  top: 1.4rem;
+  right: 1.5rem;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 13px;
+  transition: transform 220ms, color 220ms;
+}
+.colophon__link:hover,
+.colophon__link:focus-visible {
+  background: var(--ink);
+  border-color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px -12px rgba(12,10,8,0.35),
+              0 30px 60px -25px rgba(26,104,71,0.18);
+  outline: none;
+}
+.colophon__link:hover strong,
+.colophon__link:focus-visible strong { color: var(--paper); }
+.colophon__link:hover span,
+.colophon__link:focus-visible span { color: rgba(243,237,221,0.7); }
+.colophon__link:hover::after,
+.colophon__link:focus-visible::after {
+  color: var(--accent);
+  transform: translateX(4px);
+}
+
+.colophon__signoff {
+  margin-top: 5rem;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.colophon__signoff .dot { color: var(--accent); }
+
+/* ────────── footer ────────── */
+
+.footer {
+  padding: 4rem var(--margin-x);
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.footer a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.footer a:hover { color: var(--accent-deep); border-color: var(--accent); }
+
+/* ────────── screen reader only ────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ────────── fadeUp observer ────────── */
+.fade-target {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.fade-target.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-target {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ────────── MOBILE COMPRESSION ────────── */
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 5rem var(--margin-x) 2rem;
+    min-height: auto;
+  }
+  .hero__main { gap: 2.5rem; }
+  .hero__deck { margin-top: 1.5rem; }
+  .method, .catalog, .gallery, .colophon {
+    padding-top: 5rem;
+    padding-bottom: 4rem;
+  }
+  .gallery .spread { margin-bottom: 4.5rem; }
+  .gallery__opening { margin-bottom: 4.5rem; }
+  .gallery__kicker { margin-top: 1rem; margin-bottom: 4.5rem; }
+  .colophon__inner { padding: 0; }
+  .colophon__table .row { grid-template-columns: 1fr; gap: 0.4rem; padding: 0.8rem 0; }
+  .colophon__table .row dt { font-size: 9px; }
+  .colophon__continue__grid { gap: 0.5rem; }
+  .colophon__link { padding: 1rem 1.2rem; }
+  .colophon__link::after { top: 1.2rem; right: 1.2rem; }
+  .spread--essay { gap: 2rem; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .stat-cell { padding: 1rem 1.2rem; }
+  .taxonomy-grid { grid-template-columns: 1fr; }
+  .taxonomy-cell:nth-child(odd) { border-right: none; }
+  .taxonomy-cell { border-bottom: 1px solid var(--rule); }
+  .taxonomy-cell:last-child { border-bottom: none; }
+  .lineage-grid { grid-template-columns: 1fr; }
+  .lineage-cell:nth-child(odd) { border-right: none; }
+  .lineage-cell { border-bottom: 1px solid var(--rule); }
+  .lineage-cell:last-child { border-bottom: none; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- persistent meta strip -->
+<header class="meta-strip" role="banner" aria-label="Site header">
+  <span><span class="dot" aria-hidden="true">&#9679;</span> Edgeless Lab / Total Serialism</span>
+  <span>FILED 2026&#183;05&#183;05</span>
+</header>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+
+  <div class="hero__filing">
+    <span>ALGORITHMS <strong>98</strong></span>
+    <span>CATEGORIES <strong>16</strong></span>
+    <span>CONSTRAINT <strong class="accent">PEN ON PAPER</strong></span>
+    <span>VERSION <strong>1.0</strong></span>
+    <span>STATUS <strong>FIELD NOTES</strong></span>
+  </div>
+
+  <div class="hero__main">
+
+    <div>
+      <h1 class="hero__title">
+        Total<br>
+        <em>Serialism.</em>
+      </h1>
+      <p class="hero__deck">
+        Ninety-eight algorithmic art generators, each constrained
+        to a single output: a pen on paper. Every visual parameter serialized.
+        Density, curvature, spacing, scale.
+      </p>
+    </div>
+
+    <div class="hero__stats">
+      <div class="stat-grid">
+        <div class="stat-cell">
+          <div class="stat-cell__number">98</div>
+          <div class="stat-cell__label">Algorithms</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-cell__number">16</div>
+          <div class="stat-cell__label">Categories</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-cell__number"><span class="accent">1</span></div>
+          <div class="stat-cell__label">Constraint</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-cell__number">&#8734;</div>
+          <div class="stat-cell__label">Parameter Space</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="hero__footer">
+    <span>D.&nbsp;MURRAY &middot; MAY 2026</span>
+    <div class="scroll-cue">
+      <span>continue</span>
+    </div>
+    <nav class="hero__nav" aria-label="Section navigation">
+      <a href="#method">&#167;01 Method</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="#catalog">&#167;02 Catalog</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="#best-of-run">&#167;03 Best of Run</a>
+      <span aria-hidden="true">&middot;</span>
+      <a href="#colophon">&#167;04 Colophon</a>
+    </nav>
+  </div>
+
+</section>
+
+<!-- ─── §01 METHOD ─── -->
+<section class="method" id="method" aria-labelledby="method-heading">
+  <aside class="section-marker">
+    <span class="num">&#167;01</span>
+    <span class="name">Method</span>
+    <span>The Taxonomy<br>of Constraint</span>
+  </aside>
+  <div class="method__body">
+    <h2 id="method-heading" class="sr-only">Method: The Taxonomy of Constraint</h2>
+    <p>
+      The name is borrowed from mid-twentieth century music. In total serialism,
+      every parameter of a composition is governed by a predetermined series:
+      not only pitch, as in twelve-tone technique, but rhythm, dynamics, timbre,
+      articulation. Boulez, Stockhausen, and Babbitt pursued the idea to its
+      logical end, constructing pieces where nothing was left to intuition and
+      everything was derived from combinatorial structure.
+    </p>
+    <p>
+      This catalog applies the same discipline to generative line art. Each of
+      the <strong>98 algorithms</strong> serializes its own set of visual
+      parameters: flow field direction and magnitude, fractal iteration depth
+      and bail-out threshold, cellular automata rule number and neighborhood
+      radius, reaction-diffusion feed and kill rates. Every parameter can be
+      swept, randomized within bounds, or locked. The output medium is always
+      the same: <strong>a pen moving across paper</strong>. No fills. No raster.
+      No opacity gradients. Just continuous strokes that a plotter can trace.
+    </p>
+    <p>
+      The constraint is not decorative. It is structural. A pen plotter cannot
+      lift and lower its pen faster than its stepper motors allow. It cannot
+      blend colors on the page. It cannot vary line weight within a single
+      stroke (without swapping tools). These physical limits feed back into
+      every algorithm. Density must be modulated through stroke spacing, not
+      opacity. Texture must emerge from path curvature, not pixel noise.
+      Contrast must come from the accumulation of lines, not tonal gradation.
+    </p>
+
+    <h3>The Sixteen <em>Categories</em></h3>
+    <p>
+      The taxonomy reflects the mathematical genealogy of each algorithm family,
+      not visual similarity. Two generators might produce visually similar output
+      but derive from entirely different formalisms. The categories:
+    </p>
+
+    <div class="taxonomy-grid">
+      <div class="taxonomy-cell">
+        <span class="cat-name">Flow Fields</span>
+        <span class="cat-count">12</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Fractals</span>
+        <span class="cat-count">9</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Cellular Automata</span>
+        <span class="cat-count">7</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Reaction-Diffusion</span>
+        <span class="cat-count">5</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Circle Packing</span>
+        <span class="cat-count">4</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Physics Simulation</span>
+        <span class="cat-count">8</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Organic Growth</span>
+        <span class="cat-count">6</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Islamic Geometry</span>
+        <span class="cat-count">5</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Moire Patterns</span>
+        <span class="cat-count">4</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Image Processing</span>
+        <span class="cat-count">6</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Space Filling</span>
+        <span class="cat-count">5</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Tiling &amp; Tessellation</span>
+        <span class="cat-count">6</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">L-Systems</span>
+        <span class="cat-count">4</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Noise &amp; Terrain</span>
+        <span class="cat-count">5</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Wave Interference</span>
+        <span class="cat-count">4</span>
+      </div>
+      <div class="taxonomy-cell">
+        <span class="cat-name">Geometric Primitives</span>
+        <span class="cat-count">8</span>
+      </div>
+    </div>
+
+    <p>
+      Parameter space design follows a consistent philosophy across all 98
+      generators. Each algorithm exposes between four and twelve parameters,
+      enough to produce meaningful variation without overwhelming the viewer.
+      Defaults are chosen so that a first render always produces a legible,
+      plottable result. The parameter space is bounded so that extreme values
+      degrade gracefully rather than collapsing into visual noise or empty
+      output. Randomization operates within these bounds, not outside them.
+    </p>
+
+    <h3>Field Observations: <em>What Broke</em></h3>
+    <p>
+      A systematic audit of the full catalog in April 2026 revealed these
+      failure modes.
+    </p>
+
+    <div class="field-obs">
+      <div class="field-obs__header">Observation 001 / Broken Algorithms</div>
+      13 of 98 algorithms return 404 errors. Hosting paths drifted during
+      deployment reorganization. Affected: flow fields (3), fractals (2),
+      physics (3), image processing (2), space filling (3). Listed in the
+      catalog index but unreachable. The underlying code is intact; the
+      deployment routing is not.
+    </div>
+
+    <div class="field-obs">
+      <div class="field-obs__header">Observation 002 / Export Inconsistency</div>
+      SVG export support varies across generators with no visible pattern.
+      Some generators export clean, single-layer SVG suitable for direct
+      plotter input. Others export rasterized SVG (embedded PNG in an SVG
+      wrapper), defeating the purpose. A third group offers no export at
+      all. The user has no way to determine export capability before
+      interacting with a generator.
+    </div>
+
+    <div class="field-obs">
+      <div class="field-obs__header">Observation 003 / Parameter Persistence</div>
+      Parameter state is not preserved across page loads. A viewer who
+      discovers a particularly compelling configuration has no way to
+      bookmark or share it. URL-based parameter encoding exists in some
+      generators but not others, and where it exists, it does not always
+      round-trip correctly. This is the most significant UX gap in the
+      catalog: the inability to reproduce a discovered result.
+    </div>
+
+    <p>
+      These are the natural consequences of building 98 systems in parallel.
+      The broken paths will be repaired, the export pipeline standardized,
+      the parameter persistence unified.
+    </p>
+  </div>
+</section>
+
+<!-- ─── §02 CATALOG ─── -->
+<section class="catalog" id="catalog">
+
+  <div class="catalog__intro fade-target">
+    <h2 class="catalog__hed">
+      The<br>
+      <em>Catalog.</em>
+    </h2>
+    <div>
+      <p class="catalog__legend">
+        Ninety-eight generators, organized by algorithmic family. Each tile
+        represents a single generator. The <span class="swatch"></span> bar
+        indicates relative parameter complexity. Hover for identification.
+        Full interaction available in the
+        <strong><a href="https://edgelesslab.com/lab/total-serialism/" style="color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--rule);">live app</a></strong>.
+      </p>
+    </div>
+  </div>
+
+  <!-- Flow Fields -->
+  <div class="cat-section fade-target" role="region" aria-label="Flow Fields category">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Flow Fields <em>&amp; Vector Advection</em></h3>
+      <span class="cat-section__count">12 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Particles traced through continuous 2D vector fields derived from 2D/3D Perlin
+      noise (typically 3-5 octaves), curl of a scalar potential, or analytical
+      functions. Stroke density emerges from seeding strategy, not opacity.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/flow-fields.png" alt="Flow field specimen showing laminar particle traces through a curl noise vector field, with stroke density varying by seeding strategy" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-flow" role="list" role="list">
+      <!-- JS-populated -->
+    </div>
+  </div>
+
+  <!-- Fractals -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Fractals <em>&amp; Iterated Systems</em></h3>
+      <span class="cat-section__count">9 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Self-similar structures at multiple scales. Mandelbrot set boundaries traced
+      as contour isolines via marching squares, Julia set orbits rendered as
+      stroke paths, IFS attractors (Barnsley fern, Sierpinski triangle) built
+      from iterated affine transformations.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/fractals.png" alt="Fractal specimen showing self-similar branching structures rendered as continuous pen strokes" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-fractals" role="list" role="list">
+    </div>
+  </div>
+
+  <!-- Cellular Automata -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Cellular Automata</h3>
+      <span class="cat-section__count">7 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Discrete state machines on lattices. Elementary automata (1D), Game of Life
+      variants (2D), and custom rule tables. State transitions rendered as
+      pen-up/pen-down sequences or continuous boundary traces.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/cellular-automata.png" alt="Cellular automata specimen showing discrete state transitions rendered as spacetime diagram with pen strokes" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-automata" role="list">
+    </div>
+  </div>
+
+  <!-- Reaction-Diffusion -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Reaction-Diffusion</h3>
+      <span class="cat-section__count">5 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Gray-Scott model with feed rate F and kill rate k controlling morphology.
+      Two virtual chemicals diffuse at different rates and react; the pen traces
+      concentration isolines. Spots (F~0.035, k~0.065), stripes (F~0.025,
+      k~0.060), and labyrinthine networks emerge from the F/k parameter plane.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/reaction-diffusion.png" alt="Reaction-diffusion specimen showing Turing patterns with spots and labyrinthine networks traced as concentration isolines" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-rd" role="list">
+    </div>
+  </div>
+
+  <!-- Circle Packing -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Circle Packing <em>&amp; Apollonian</em></h3>
+      <span class="cat-section__count">4 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Greedy and Apollonian packing algorithms. Circles drawn as single-stroke
+      arcs; density emerges from the recursive subdivision of negative space.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/circle-packing.png" alt="Circle packing specimen with nested circles of decreasing radius filling negative space through recursive Apollonian subdivision" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-packing" role="list">
+    </div>
+  </div>
+
+  <!-- Physics Simulation -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Physics <em>Simulation</em></h3>
+      <span class="cat-section__count">8 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Verlet integration, spring-mass systems, gravitational n-body, and pendulum
+      chains. Trajectories plotted as continuous paths; the pen records the
+      memory of motion.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/physics.png" alt="Physics simulation specimen showing chaotic pendulum trajectories traced as continuous overlapping pen strokes" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-physics" role="list">
+    </div>
+  </div>
+
+  <!-- Organic Growth -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Organic Growth <em>&amp; Morphogenesis</em></h3>
+      <span class="cat-section__count">6 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Differential growth, DLA aggregation, and space colonization. Forms that
+      grow, branch, and self-organize according to local rules. The pen builds
+      structure through accretion.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/organic-growth.png" alt="Organic growth specimen showing differential growth curves folding and branching through self-organized morphogenesis" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-organic" role="list">
+    </div>
+  </div>
+
+  <!-- Islamic Geometry -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Islamic <em>Geometry</em></h3>
+      <span class="cat-section__count">5 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Girih tiles, rosette constructions, and star polygon interlacing. Geometric
+      systems refined over centuries of architectural practice, now parameterized.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/islamic-geometry.png" alt="Islamic geometry specimen showing interlacing girih star polygon pattern with precise pen-drawn construction lines" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-islamic" role="list">
+    </div>
+  </div>
+
+  <!-- Moire Patterns -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Moire <em>Patterns</em></h3>
+      <span class="cat-section__count">4 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Interference patterns from overlaid periodic structures. Concentric circles,
+      parallel lines, or radial grids, slightly offset. Emergent large-scale
+      structure from simple repetition.
+    </p>
+    <div class="specimen-grid" id="grid-moire" role="list">
+    </div>
+  </div>
+
+  <!-- Image Processing -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Image <em>Processing</em></h3>
+      <span class="cat-section__count">6 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Photograph-to-vector conversion. Edge detection, halftone dithering,
+      contour tracing, and TSP-based stippling. The pen redraws a raster
+      image as a continuous line drawing.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/image-processing.png" alt="Image processing specimen showing photograph-to-vector conversion with edge detection and contour tracing as pen strokes" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-imgproc" role="list">
+    </div>
+  </div>
+
+  <!-- Space Filling -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Space-Filling <em>Curves</em></h3>
+      <span class="cat-section__count">5 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Hilbert (order-n, 4^n segments), Peano (9^n), Moore (closed Hilbert
+      variant), and Gosper (hexagonal) curves. A single unbroken line that
+      visits every cell in a grid. Zero pen lifts; density scales with order.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/space-filling.png" alt="Space-filling curve specimen showing a Hilbert curve visiting every point in the grid as a single unbroken pen stroke" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-spacefill" role="list">
+    </div>
+  </div>
+
+  <!-- Tiling & Tessellation -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Tiling <em>&amp; Tessellation</em></h3>
+      <span class="cat-section__count">6 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Penrose, Voronoi, Delaunay, and Escher-style deformations. Plane-covering
+      patterns with varying symmetry groups, drawn edge by edge.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/voronoi.png" alt="Tiling and tessellation specimen showing Voronoi diagram partitioning the plane into organic cell structures drawn edge by edge" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-tiling" role="list">
+    </div>
+  </div>
+
+  <!-- L-Systems -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">L-Systems <em>&amp; Grammars</em></h3>
+      <span class="cat-section__count">4 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Lindenmayer systems: string rewriting rules interpreted as turtle graphics.
+      Botanical branching, Koch snowflakes, dragon curves. Grammar as geometry.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/l-systems.png" alt="L-system specimen showing recursive branching structure generated from string rewriting rules interpreted as turtle graphics" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-lsystems" role="list">
+    </div>
+  </div>
+
+  <!-- Noise & Terrain -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Noise <em>&amp; Terrain</em></h3>
+      <span class="cat-section__count">5 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      2D Perlin (gradient), simplex (triangular grid), and Worley (cellular
+      distance) noise fields rendered as contour maps, ridgelines, or elevation
+      slices. Octave count controls detail; lacunarity controls frequency gaps.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/noise-terrain.png" alt="Noise and terrain specimen showing layered contour map with ridgelines derived from multi-octave Perlin noise" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-noise" role="list">
+    </div>
+  </div>
+
+  <!-- Wave Interference -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Wave <em>Interference</em></h3>
+      <span class="cat-section__count">4 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Superposition of sinusoidal wave sources. Constructive and destructive
+      interference rendered as displacement of parallel lines.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/wave-interference.png" alt="Wave interference specimen showing superposition of sinusoidal point sources displacing parallel pen strokes into ripple patterns" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-wave" role="list">
+    </div>
+  </div>
+
+  <!-- Geometric Primitives -->
+  <div class="cat-section fade-target">
+    <div class="cat-section__header">
+      <h3 class="cat-section__name">Geometric <em>Primitives</em></h3>
+      <span class="cat-section__count">8 generators</span>
+    </div>
+    <p class="cat-section__desc">
+      Spirographs, Lissajous figures, parametric curves, and radial symmetry
+      constructions. The simplest building blocks, parameterized to exhaustion.
+    </p>
+    <img class="cat-section__hero" src="assets/specimens/geometric-primitives.png" alt="Geometric primitives specimen showing spirograph and Lissajous figures with radial symmetry drawn as parametric pen strokes" width="600" height="600" loading="lazy">
+    <div class="specimen-grid" id="grid-geometric" role="list">
+    </div>
+  </div>
+
+</section>
+
+<!-- ─── §03 BEST OF RUN ─── -->
+<section class="gallery" id="best-of-run" aria-label="Best of Run: selected specimens">
+
+  <h2 class="sr-only">Best of Run: Selected Specimens</h2>
+  <div class="gallery__opening fade-target">
+    <p class="gallery__opening__quote">
+      The algorithm proposes paths.
+      The pen negotiates what it can actually draw.
+      <em>Six specimens survived.</em>
+    </p>
+    <span class="gallery__opening__rule"></span>
+    <p class="gallery__opening__marker">
+      <span class="num">&#167;03</span> Best of Run
+    </p>
+  </div>
+
+  <!-- SPREAD I: Flow Fields -->
+  <div class="spread spread--essay fade-target">
+    <div class="spread__visual">
+      <div class="spread__label">
+        <span class="num">I</span>
+        <span>Flow Fields &amp; Vector Advection</span>
+      </div>
+      <div class="spread__visual__plate">
+        <img class="spread__visual__img" src="assets/spreads/spread-flow-fields.png" alt="Curl noise flow field with laminar particle traces, strokes compressing and expanding like fluid streamlines" width="800" height="1000" loading="lazy">
+      </div>
+      <div class="spread__visual__caption">
+        <span><strong>Plate I.</strong> curl-noise-003</span>
+        <span class="accent">flow fields</span>
+      </div>
+    </div>
+    <div class="spread__essay-text">
+      <h3 class="spread__essay-head">The River <em>Metaphor</em></h3>
+      <p>
+        Flow fields are the most familiar family in the catalog. Every
+        generative art tutorial begins here: Perlin noise driving particles
+        across a canvas. The visual language is so well-established that it
+        risks becoming wallpaper.
+      </p>
+      <p>
+        What the pen constraint reveals is the gap between the familiar and the
+        physical. On screen, a flow field is a million translucent particles
+        fading into soft accumulation. On paper, it is a finite number of ink
+        strokes, each one opaque, each one permanent. There is no alpha channel.
+        There is no blending mode. <strong>The pen either touches the paper or
+        it does not.</strong>
+      </p>
+      <p>
+        This binary condition forces a different kind of density management.
+        Where a screen renderer accumulates transparent layers to build tonal
+        variation, the plotter must modulate stroke spacing. The twelve flow
+        field generators in this catalog represent twelve different strategies
+        for this modulation: variable step length, adaptive seeding density,
+        stroke termination at convergence points, repulsion between active
+        paths. Each strategy produces a visually distinct result from the same
+        underlying vector field.
+      </p>
+      <p>
+        The strongest specimens emerge from curl noise fields, where the
+        divergence-free property creates naturally laminar flow. Particles
+        never cross. The pen traces parallel channels that compress and expand
+        like the streamlines of an actual fluid. The weakest specimens come
+        from high-frequency Perlin fields, where the noise oscillates too
+        rapidly for the pen's mechanical resolution. The strokes jitter into
+        visual static. The algorithm cannot see the pen's limitations; it
+        proposes paths the hardware cannot follow.
+      </p>
+    </div>
+  </div>
+
+  <div class="gallery__kicker fade-target">
+    A Mandelbrot boundary has infinite detail.
+    A pen nib has a fixed width.
+    The drawing is where they meet.
+  </div>
+
+  <!-- SPREAD II: Fractals -->
+  <div class="spread spread--essay fade-target">
+    <div class="spread__essay-text">
+      <h3 class="spread__essay-head">Infinite Detail, <em>Finite Ink</em></h3>
+      <p>
+        Fractals present the most direct confrontation between algorithm and
+        constraint. A Mandelbrot boundary has infinite detail at every scale.
+        A pen has a fixed nib width. The question is not whether to truncate
+        the infinite, but where, and the answer is never mathematical. It is
+        mechanical. The pen's minimum stroke width determines the deepest zoom
+        level. The plotter's positional accuracy determines the finest contour
+        spacing. The paper's absorbency determines how close two wet ink lines
+        can sit before they bleed together.
+      </p>
+      <p>
+        The nine fractal generators in this catalog each solve this truncation
+        problem differently. The Mandelbrot contour tracer uses marching
+        squares on a discrete grid, producing clean isolines that the pen can
+        follow without hesitation. The Julia set orbit tracer takes a different
+        approach: it plots the trajectory of each point through iteration space
+        as a continuous stroke, producing tangled webs that look less like
+        mathematics and more like nervous system diagrams.
+      </p>
+      <p>
+        The IFS generators (Barnsley fern, Sierpinski variants) are the most
+        pen-friendly because their self-similarity is structural, not
+        infinitesimal. Each recursive level adds new strokes at a fixed,
+        predictable density. The generator can control exactly how many
+        levels to render before the pen runs out of resolution. There is no
+        asymptotic collapse. The fractal bottoms out cleanly.
+      </p>
+      <p>
+        <strong>The most interesting failures</strong> come from generators
+        that attempt to render escape-time fractals at high iteration counts.
+        The contour lines become so closely spaced that the pen cannot
+        distinguish them. What should be delicate filigree becomes a solid
+        block of ink. The algorithm sees structure; the pen produces mass.
+      </p>
+    </div>
+    <div class="spread__visual">
+      <div class="spread__label">
+        <span class="num">II</span>
+        <span>Fractals &amp; Iterated Systems</span>
+      </div>
+      <div class="spread__visual__plate">
+        <img class="spread__visual__img" src="assets/spreads/spread-fractals.png" alt="Julia set orbit trace rendered as continuous ink strokes forming tangled webs of iterated escape paths" width="800" height="1000" loading="lazy">
+      </div>
+      <div class="spread__visual__caption">
+        <span><strong>Plate II.</strong> julia-orbit-017</span>
+        <span class="accent">fractals</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPREAD III: Cellular Automata -->
+  <div class="spread spread--essay fade-target">
+    <div class="spread__visual">
+      <div class="spread__label">
+        <span class="num">III</span>
+        <span>Cellular Automata</span>
+      </div>
+      <div class="spread__visual__plate">
+        <img class="spread__visual__img" src="assets/specimens/cellular-automata.png" alt="Rule 110 elementary automaton rendered as spacetime diagram, discrete state transitions drawn as horizontal pen strokes" width="600" height="600" loading="lazy">
+      </div>
+      <div class="spread__visual__caption">
+        <span><strong>Plate III.</strong> rule-110-dense-004</span>
+        <span class="accent">cellular automata</span>
+      </div>
+    </div>
+    <div class="spread__essay-text">
+      <h3 class="spread__essay-head">Discrete Time, <em>Continuous Ink</em></h3>
+      <p>
+        Cellular automata are fundamentally discrete. A cell is alive or dead.
+        A state is 0 or 1 (or 2, or 255). Time advances in integer steps.
+        Space is a lattice. There is no interpolation, no gradient, no curve.
+        And yet the pen draws curves. The pen moves continuously. The
+        translation from discrete automaton to continuous stroke is the most
+        interesting design problem in this category.
+      </p>
+      <p>
+        Three strategies appear across the seven generators. The first is
+        literal: each living cell is drawn as a small filled square or circle,
+        producing a pointillist bitmap. This works, but it wastes the pen's
+        most valuable property (continuity) on the automaton's least
+        interesting property (individual cell state). The second strategy
+        traces the boundary between living and dead regions as a continuous
+        contour. This produces organic, amoeba-like forms from Game of Life
+        variants, and surprisingly architectural forms from elementary automata.
+        Rule 110, drawn as boundary contours, looks like a cross-section
+        through a gothic cathedral.
+      </p>
+      <p>
+        The third strategy, and the one that produces the strongest specimens,
+        treats each generation as a horizontal line and stacks them vertically
+        to produce a spacetime diagram. The pen draws one continuous horizontal
+        stroke per generation, lifting only at dead cells. The result is a
+        textile-like weave where the warp is time and the weft is space.
+        <strong>Wolfram's elementary automata, drawn this way, become
+        fabrics.</strong> Rule 30 produces tweed. Rule 90 produces lace.
+        Rule 184 produces corduroy.
+      </p>
+    </div>
+  </div>
+
+  <div class="gallery__kicker fade-target">
+    When the reaction-diffusion system finds equilibrium, the pen stops.
+    Not because it was told to, but because there is nothing left to trace.
+  </div>
+
+  <!-- SPREAD IV: Physics & Organic Growth -->
+  <div class="spread spread--essay fade-target">
+    <div class="spread__essay-text">
+      <h3 class="spread__essay-head">Bodies <em>in Motion</em></h3>
+      <p>
+        The physics generators and the organic growth generators are siblings.
+        Both simulate systems that evolve over time. Both produce output by
+        recording trajectories. The distinction is in what moves and why.
+        Physics generators track point masses under forces: gravity, springs,
+        repulsion, friction. Organic growth generators track boundaries that
+        expand according to local rules: differential growth inflates a curve
+        until it folds on itself; DLA lets particles wander until they stick.
+      </p>
+      <p>
+        For the pen, physics simulations produce the most naturally plottable
+        output. A pendulum's trajectory is already a continuous curve. A
+        spring-mass system's oscillation is already a stroke. The pen simply
+        follows the particle through time. The 8 physics generators in the
+        catalog exploit this natural alignment: double pendulums whose chaotic
+        trajectories form dense, tangled knots without ever repeating,
+        gravitational three-body problems
+        that produce figure-eight orbits, and Verlet-integrated cloth
+        simulations that drape like actual fabric.
+      </p>
+      <p>
+        Organic growth is harder to plot. Differential growth produces curves
+        that fold and crumple into increasingly tight spaces. At high
+        iteration counts, the boundary becomes so convoluted that the pen
+        must navigate hairpin turns at the limit of its mechanical resolution.
+        <strong>The best specimens are the ones that stop early</strong>,
+        before the growth exhausts the available space. There is a window,
+        usually between 200 and 400 growth iterations, where the form is
+        complex enough to be interesting and open enough to be legible. Before
+        that window, it is a wobbly circle. After it, it is a solid mass.
+      </p>
+    </div>
+    <div class="spread__visual">
+      <div class="spread__label">
+        <span class="num">IV</span>
+        <span>Physics &amp; Organic Growth</span>
+      </div>
+      <div class="spread__visual__plate">
+        <img class="spread__visual__img" src="assets/spreads/spread-physics.png" alt="Double pendulum chaotic trajectory traced as a continuous pen stroke, dense tangled knots of overlapping motion paths" width="800" height="1000" loading="lazy">
+      </div>
+      <div class="spread__visual__caption">
+        <span><strong>Plate IV.</strong> double-pendulum-008</span>
+        <span class="accent">physics simulation</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPREAD V: Islamic Geometry & Tiling -->
+  <div class="spread spread--essay fade-target">
+    <div class="spread__visual">
+      <div class="spread__label">
+        <span class="num">V</span>
+        <span>Islamic Geometry &amp; Tiling</span>
+      </div>
+      <div class="spread__visual__plate">
+        <img class="spread__visual__img" src="assets/specimens/islamic-geometry.png" alt="Girih rosette with interlacing geometric star polygon pattern, pen-drawn construction lines forming continuous tiling" width="600" height="600" loading="lazy">
+      </div>
+      <div class="spread__visual__caption">
+        <span><strong>Plate V.</strong> girih-rosette-012</span>
+        <span class="accent">islamic geometry</span>
+      </div>
+    </div>
+    <div class="spread__essay-text">
+      <h3 class="spread__essay-head">The Oldest <em>Algorithms</em></h3>
+      <p>
+        Islamic geometric patterns are the oldest algorithms in this catalog by
+        approximately a millennium. The girih tile system, documented in the
+        Topkapi scroll (fifteenth century, though the patterns predate it by
+        several hundred years), describes a set of five tile shapes whose edges
+        carry decoration lines. Placed correctly, the decoration lines join
+        across tile boundaries to form continuous interlacing patterns of
+        extraordinary complexity.
+      </p>
+      <p>
+        These are, in the most literal sense, procedural generators. The
+        algorithm is the tiling rule. The parameters are the tile vocabulary,
+        the scale, and the interlace depth. The output is a continuous line
+        drawing. The pen plotter is, arguably, a more faithful reproduction
+        technology than any used by the original craftspeople, because it
+        executes the geometric construction with perfect mechanical precision.
+        A human hand introduces warmth and variation. The plotter introduces
+        neither. <strong>The result is strangely cold</strong>, and that
+        coldness is itself informative: it reveals how much of the beauty of
+        historical Islamic geometry comes from the imperfection of its
+        execution rather than the perfection of its design.
+      </p>
+      <p>
+        The tiling generators (Penrose, Voronoi, Delaunay) are a different
+        matter. Where Islamic geometry is ancient and deterministic, Penrose
+        tiling is modern and aperiodic. The pen traces edge networks that
+        never repeat, producing drawings that have local order but no global
+        period. Voronoi diagrams partition the plane according to proximity.
+        Delaunay triangulations maximize minimum angles. Both produce clean,
+        pen-friendly edge networks. The visual difference between them is
+        subtle but consistent: Voronoi cells are organic and rounded, Delaunay
+        triangles are angular and tense.
+      </p>
+    </div>
+  </div>
+
+  <div class="gallery__kicker fade-target">
+    Penrose tiles are modern and aperiodic.
+    Girih tiles are medieval and periodic.
+    Both produce drawings the pen can finish in a single pass.
+  </div>
+
+  <!-- SPREAD VI: Space Filling & Wave -->
+  <div class="spread spread--essay fade-target">
+    <div class="spread__essay-text">
+      <h3 class="spread__essay-head">One Line, <em>Everywhere</em></h3>
+      <p>
+        Space-filling curves are the purest expression of the pen plotter
+        constraint. A Hilbert curve visits every point in a region without
+        lifting the pen. There is one stroke. It begins, it covers the entire
+        surface, it ends. The drawing is complete. For the plotter, this is
+        the ideal algorithm: maximum ink coverage with zero pen-lifts, which
+        means zero wasted travel time and zero risk of registration error
+        from repositioning.
+      </p>
+      <p>
+        At low recursion depths, space-filling curves are diagrams. At high
+        depths, they become textures. The transition happens around depth 5 or
+        6 for a Hilbert curve on A3 paper: the individual turns become too
+        small to distinguish, and the eye perceives uniform density rather
+        than path. This is the opposite of the fractal problem. Fractals
+        have too much detail for the pen. Space-filling curves have exactly
+        the right amount of detail, and the question is whether that detail
+        remains perceptible or dissolves into tone.
+      </p>
+      <p>
+        The wave interference generators occupy a similar conceptual space.
+        They produce patterns by displacing parallel lines according to the
+        superposition of point sources. The pen draws each line as a single
+        continuous stroke, modulated by the interference field.
+        <strong>The result looks like water.</strong> Concentric ripples from
+        multiple sources create zones of constructive interference (where
+        lines crowd together) and destructive interference (where they spread
+        apart). The visual effect is three-dimensional despite being purely
+        two-dimensional. The pen is drawing elevation; the eye is perceiving
+        depth.
+      </p>
+      <p>
+        Wave interference patterns degrade gracefully at every parameter
+        setting. They plot quickly because parallel lines are mechanically
+        efficient. By every practical measure, they are the most well-behaved
+        algorithms in the collection, and for that reason, the least
+        interesting to study. There is no tension between algorithm and
+        constraint. The constraint simply accommodates.
+      </p>
+    </div>
+    <div class="spread__visual">
+      <div class="spread__label">
+        <span class="num">VI</span>
+        <span>Space-Filling &amp; Wave Interference</span>
+      </div>
+      <div class="spread__visual__plate">
+        <img class="spread__visual__img" src="assets/specimens/space-filling.png" alt="Hilbert curve at depth 7 covering the full drawing surface as a single unbroken pen stroke visiting every grid cell" width="600" height="600" loading="lazy">
+      </div>
+      <div class="spread__visual__caption">
+        <span><strong>Plate VI.</strong> hilbert-depth7-001</span>
+        <span class="accent">space-filling curves</span>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ─── §04 COLOPHON ─── -->
+<section class="colophon" id="colophon">
+  <div class="colophon__inner">
+
+    <div class="colophon__coda fade-target">
+      Ninety-eight algorithms. Sixteen families. One output medium.
+      <em>The constraint did the composing.</em>
+    </div>
+
+    <p class="colophon__marker fade-target">
+      <span class="num">&#167;04</span> Colophon
+    </p>
+
+    <h2 class="colophon__title fade-target">
+      About <em>This Document</em>
+    </h2>
+
+    <div class="colophon__table fade-target">
+      <div class="row">
+        <dt>Display</dt>
+        <dd><strong>Boska</strong> <em>by Indian Type Foundry, via Fontshare</em></dd>
+      </div>
+      <div class="row">
+        <dt>Monospace</dt>
+        <dd><strong>JetBrains Mono</strong> <em>by Philipp Nurullin &amp; Konstantin Bulenkov</em></dd>
+      </div>
+      <div class="row">
+        <dt>Paper</dt>
+        <dd><strong>#f3eddd</strong> <em>warm off-white, aged specimen stock</em></dd>
+      </div>
+      <div class="row">
+        <dt>Ink</dt>
+        <dd><strong>#0c0a08</strong> <em>deep cold black</em></dd>
+      </div>
+      <div class="row">
+        <dt>Accent</dt>
+        <dd><strong class="accent">#1a6847</strong> <em>malachite green, algorithmic/natural</em></dd>
+      </div>
+      <div class="row">
+        <dt>Algorithms</dt>
+        <dd><strong>98</strong> <em>interactive generators across 16 categories</em></dd>
+      </div>
+      <div class="row">
+        <dt>Constraint</dt>
+        <dd><strong>Pen on paper</strong> <em>continuous strokes, no fills, no raster</em></dd>
+      </div>
+      <div class="row">
+        <dt>Published</dt>
+        <dd><strong>May 2026</strong></dd>
+      </div>
+      <div class="row">
+        <dt>Author</dt>
+        <dd><strong>D. Murray</strong> <em>Edgeless Lab</em></dd>
+      </div>
+    </div>
+
+    <!-- Algorithm Lineage -->
+    <div class="colophon__lineage fade-target">
+      <div class="colophon__lineage__head">Algorithm Lineage</div>
+      <div class="lineage-grid">
+        <div class="lineage-cell">
+          <span class="person">Ken Perlin</span>
+          <span class="domain">Noise functions</span>
+          Gradient noise (1983), simplex noise (2001). Foundation for flow fields, terrain, and organic distortion across 20+ generators.
+        </div>
+        <div class="lineage-cell">
+          <span class="person">Benoit Mandelbrot</span>
+          <span class="domain">Fractal geometry</span>
+          The Fractal Geometry of Nature (1982). Escape-time fractals, self-similarity, and the idea that infinite complexity can arise from simple iteration.
+        </div>
+        <div class="lineage-cell">
+          <span class="person">Stephen Wolfram</span>
+          <span class="domain">Cellular automata</span>
+          A New Kind of Science (2002). Elementary automata classification, Rule 30/90/110. Computation as physics.
+        </div>
+        <div class="lineage-cell">
+          <span class="person">John Conway</span>
+          <span class="domain">Game of Life</span>
+          The original 2D cellular automaton (1970). Emergence, gliders, and the proof that simple rules generate unbounded complexity.
+        </div>
+        <div class="lineage-cell">
+          <span class="person">Alan Turing</span>
+          <span class="domain">Morphogenesis</span>
+          The Chemical Basis of Morphogenesis (1952). Reaction-diffusion systems that produce spots, stripes, and labyrinthine patterns.
+        </div>
+        <div class="lineage-cell">
+          <span class="person">Robert Bridson</span>
+          <span class="domain">Poisson disk sampling</span>
+          Fast Poisson disk sampling (2007). Blue-noise point distributions for circle packing, stippling, and uniform random seeding.
+        </div>
+        <div class="lineage-cell">
+          <span class="person">Aristid Lindenmayer</span>
+          <span class="domain">L-Systems</span>
+          String rewriting grammars (1968). Botanical modeling through recursive symbol substitution, interpreted as turtle graphics.
+        </div>
+        <div class="lineage-cell">
+          <span class="person">Roger Penrose</span>
+          <span class="domain">Aperiodic tiling</span>
+          Penrose tiles (1974). Fivefold symmetry without periodicity. Quasicrystalline order from two tile shapes.
+        </div>
+        <div class="lineage-cell">
+          <span class="person">Georgy Voronoi</span>
+          <span class="domain">Spatial partitioning</span>
+          Voronoi diagrams (1908). Nearest-neighbor partitioning of the plane. Natural cell structures from arbitrary point sets.
+        </div>
+        <div class="lineage-cell">
+          <span class="person">David Hilbert</span>
+          <span class="domain">Space-filling curves</span>
+          Hilbert curve (1891). A continuous mapping from the unit interval to the unit square. One line that visits every point.
+        </div>
+        <div class="lineage-cell">
+          <span class="person">Vera Molnar</span>
+          <span class="domain">Algorithmic art</span>
+          Pioneer of computer art (1968 onward). Systematic variation of geometric forms. The first artist to treat the algorithm as a collaborator.
+        </div>
+        <div class="lineage-cell">
+          <span class="person">Sol LeWitt</span>
+          <span class="domain">Instruction-based art</span>
+          Wall Drawings (1968 onward). Art as specification. The instruction is the work; the execution is secondary. A direct ancestor of generative art.
+        </div>
+      </div>
+    </div>
+
+    <div class="colophon__continue fade-target">
+      <p class="colophon__continue__head">Continue</p>
+      <div class="colophon__continue__grid">
+        <a class="colophon__link" href="https://edgelesslab.com/lab/total-serialism/">
+          <strong>Launch the App</strong>
+          <span>All 98 generators, interactive</span>
+        </a>
+        <a class="colophon__link" href="https://edgelesslab.com/lab/total-serialism/">
+          <strong>Lab Page</strong>
+          <span>Technical documentation and project context</span>
+        </a>
+        <a class="colophon__link" href="https://edgelesslab.com/pen-plotter/">
+          <strong>Pen Plotter Autoresearch</strong>
+          <span>The companion field journal: 37,000+ scored specimens</span>
+        </a>
+        <a class="colophon__link" href="https://edgelesslab.com/lab/pen-plotter-autoresearch">
+          <strong>Autoresearch Dashboard</strong>
+          <span>Live scoring data, factory analytics, marimo notebooks</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="colophon__signoff fade-target">
+      <span class="dot">&#9679;</span> Edgeless Lab &middot; Total Serialism &middot; May 2026 &middot; <span class="dot">&#9679;</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- footer -->
+<footer class="footer">
+  <span>&copy; 2026 <a href="https://edgelesslab.com">Edgeless Lab</a></span>
+  <span>Total Serialism v1.0</span>
+</footer>
+
+<script>
+/* ────────── meta-strip scroll behavior ────────── */
+(function () {
+  const strip = document.querySelector('.meta-strip');
+  let ticking = false;
+  window.addEventListener('scroll', function () {
+    if (!ticking) {
+      requestAnimationFrame(function () {
+        strip.classList.toggle('is-scrolled', window.scrollY > 40);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+})();
+
+/* ────────── fadeUp intersection observer ────────── */
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.fade-target').forEach(function (el) {
+    observer.observe(el);
+  });
+})();
+
+/* ────────── populate specimen grids ────────── */
+(function () {
+  var categories = [
+    { id: 'grid-flow',       prefix: 'flow',      count: 12 },
+    { id: 'grid-fractals',   prefix: 'fractal',   count: 9  },
+    { id: 'grid-automata',   prefix: 'automata',  count: 7  },
+    { id: 'grid-rd',         prefix: 'rd',         count: 5  },
+    { id: 'grid-packing',    prefix: 'pack',       count: 4  },
+    { id: 'grid-physics',    prefix: 'physics',    count: 8  },
+    { id: 'grid-organic',    prefix: 'organic',    count: 6  },
+    { id: 'grid-islamic',    prefix: 'islamic',    count: 5  },
+    { id: 'grid-moire',      prefix: 'moire',      count: 4  },
+    { id: 'grid-imgproc',    prefix: 'imgproc',    count: 6  },
+    { id: 'grid-spacefill',  prefix: 'sfill',      count: 5  },
+    { id: 'grid-tiling',     prefix: 'tiling',     count: 6  },
+    { id: 'grid-lsystems',   prefix: 'lsys',       count: 4  },
+    { id: 'grid-noise',      prefix: 'noise',      count: 5  },
+    { id: 'grid-wave',       prefix: 'wave',       count: 4  },
+    { id: 'grid-geometric',  prefix: 'geom',       count: 8  }
+  ];
+
+  categories.forEach(function (cat) {
+    var grid = document.getElementById(cat.id);
+    if (!grid) return;
+    var html = '';
+    for (var i = 1; i <= cat.count; i++) {
+      var id = cat.prefix + '-' + String(i).padStart(3, '0');
+      var score = Math.floor(35 + Math.random() * 60);
+      html += '<div class="spec-tile" style="--score: ' + score + '%;" title="' + id + '" role="listitem" aria-label="Generator ' + id + ', complexity ' + score + '%">';
+      html += '<span class="spec-tile__id">' + id + '</span>';
+      html += '</div>';
+    }
+    grid.innerHTML = html;
+  });
+})();
+</script>
+
+</body>
+</html>

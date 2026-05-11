@@ -6,6 +6,7 @@ import { ChevronDown, Play } from "lucide-react";
 // Lazy load the heavy canvas components
 const LabPlayground = lazy(() => import("@/components/lab-playground").then(m => ({ default: m.LabPlayground })));
 const AttractorPlayground = lazy(() => import("@/components/attractor-playground").then(m => ({ default: m.AttractorPlayground })));
+const ASCIIArtGenerator = lazy(() => import("@/components/ascii-art-generator").then(m => ({ default: m.ASCIIArtGenerator })));
 
 function PlaygroundLoader({ label }: { label: string }) {
   return (
@@ -99,6 +100,26 @@ export function LazyAttractorPlayground() {
   return (
     <Suspense fallback={<PlaygroundLoader label="Attractor" />}>
       <AttractorPlayground />
+    </Suspense>
+  );
+}
+
+export function LazyASCIIArtGenerator() {
+  const [isActive, setIsActive] = useState(false);
+
+  if (!isActive) {
+    return (
+      <PlaygroundPlaceholder 
+        label="ASCII Art Generator"
+        description="Click to load generative text patterns"
+        onActivate={() => setIsActive(true)}
+      />
+    );
+  }
+
+  return (
+    <Suspense fallback={<PlaygroundLoader label="ASCII Generator" />}>
+      <ASCIIArtGenerator />
     </Suspense>
   );
 }

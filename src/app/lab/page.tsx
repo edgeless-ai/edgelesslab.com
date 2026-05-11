@@ -2,6 +2,7 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { LabHeader, LabGrid } from "@/components/lab-client";
 import { LabPlayground } from "@/components/lab-playground";
+import { AttractorPlayground } from "@/components/attractor-playground";
 import { experiments } from "@/lib/data";
 import { createPageMetadata } from "@/lib/metadata";
 
@@ -23,8 +24,8 @@ export default function LabPage() {
         </div>
       </section>
 
-      {/* Interactive Playground */}
-      <section className="px-6 pb-12">
+      {/* Interactive Playgrounds */}
+      <section className="px-6 pb-12 space-y-8">
         <div className="max-w-[1280px] mx-auto">
           <div className="mb-6">
             <span
@@ -37,7 +38,10 @@ export default function LabPage() {
               Try It Live
             </h2>
           </div>
-          <LabPlayground />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <LabPlayground />
+            <AttractorPlayground />
+          </div>
         </div>
       </section>
 

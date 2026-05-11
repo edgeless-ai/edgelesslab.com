@@ -12,3 +12,9 @@
 # Local Claude Code overrides (extra Bash permissions for diskutil, du, bun,
 # wrangler, gws, cron alerter, gh commands).
 .claude/settings.local.json
+
+# Project-scope MCP servers (paperclip, chroma, qmd, fetch, tradingview, etc.).
+# Tracked in git but ALSO listed in .gitignore (line 48), so worktrees created
+# from branches that predate its addition won't get it. Without this, Desktop
+# auto-worktrees lose 10+ MCP servers including the Paperclip task system.
+.mcp.json

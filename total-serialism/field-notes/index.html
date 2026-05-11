@@ -2204,36 +2204,38 @@ body {
   });
 })();
 
-/* ────────── populate specimen grids ────────── */
+/* ────────── populate specimen grids with real thumbnails ────────── */
 (function () {
   var categories = [
-    { id: 'grid-flow',       prefix: 'flow',      count: 12 },
-    { id: 'grid-fractals',   prefix: 'fractal',   count: 9  },
-    { id: 'grid-automata',   prefix: 'automata',  count: 7  },
-    { id: 'grid-rd',         prefix: 'rd',         count: 5  },
-    { id: 'grid-packing',    prefix: 'pack',       count: 4  },
-    { id: 'grid-physics',    prefix: 'physics',    count: 8  },
-    { id: 'grid-organic',    prefix: 'organic',    count: 6  },
-    { id: 'grid-islamic',    prefix: 'islamic',    count: 5  },
-    { id: 'grid-moire',      prefix: 'moire',      count: 4  },
-    { id: 'grid-imgproc',    prefix: 'imgproc',    count: 6  },
-    { id: 'grid-spacefill',  prefix: 'sfill',      count: 5  },
-    { id: 'grid-tiling',     prefix: 'tiling',     count: 6  },
-    { id: 'grid-lsystems',   prefix: 'lsys',       count: 4  },
-    { id: 'grid-noise',      prefix: 'noise',      count: 5  },
-    { id: 'grid-wave',       prefix: 'wave',       count: 4  },
-    { id: 'grid-geometric',  prefix: 'geom',       count: 8  }
+    { id: 'grid-flow',       slug: 'flow-fields',         count: 12 },
+    { id: 'grid-fractals',   slug: 'fractals',            count: 12 },
+    { id: 'grid-automata',   slug: 'cellular-automata',   count: 12 },
+    { id: 'grid-rd',         slug: 'reaction-diffusion',  count: 12 },
+    { id: 'grid-packing',    slug: 'circle-packing',      count: 12 },
+    { id: 'grid-physics',    slug: 'physics',             count: 12 },
+    { id: 'grid-organic',    slug: 'organic-growth',      count: 12 },
+    { id: 'grid-islamic',    slug: 'islamic-geometry',    count: 12 },
+    { id: 'grid-moire',      slug: 'wave-interference',   count: 6, start: 0 },
+    { id: 'grid-imgproc',    slug: 'halftone',            count: 12 },
+    { id: 'grid-spacefill',  slug: 'space-filling',       count: 4  },
+    { id: 'grid-tiling',     slug: 'voronoi',             count: 12 },
+    { id: 'grid-lsystems',   slug: 'l-systems',           count: 12 },
+    { id: 'grid-noise',      slug: 'noise-terrain',       count: 12 },
+    { id: 'grid-wave',       slug: 'wave-interference',   count: 6, start: 6 },
+    { id: 'grid-geometric',  slug: 'spirograph',          count: 12 }
   ];
 
   categories.forEach(function (cat) {
     var grid = document.getElementById(cat.id);
     if (!grid) return;
     var html = '';
-    for (var i = 1; i <= cat.count; i++) {
-      var id = cat.prefix + '-' + String(i).padStart(3, '0');
+    var startIdx = cat.start || 0;
+    for (var i = startIdx; i < startIdx + cat.count; i++) {
+      var file = cat.slug + '-' + String(i).padStart(3, '0') + '.png';
+      var id = cat.slug + '-' + String(i).padStart(3, '0');
       var score = Math.floor(35 + Math.random() * 60);
-      html += '<div class="spec-tile" style="--score: ' + score + '%;" title="' + id + '" role="listitem" aria-label="Generator ' + id + ', complexity ' + score + '%">';
-      html += '<span class="spec-tile__id">' + id + '</span>';
+      html += '<div class="spec-tile" style="--score: ' + score + '%;" title="' + id + '" role="listitem" aria-label="Specimen ' + id + ', complexity ' + score + '%">';
+      html += '<img src="assets/thumbs/' + file + '" alt="' + id + '" width="400" height="400" loading="lazy" style="width:100%;height:100%;object-fit:cover;">';
       html += '</div>';
     }
     grid.innerHTML = html;

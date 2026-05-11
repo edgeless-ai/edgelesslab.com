@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { JsonLd } from "@/components/json-ld";
 import { PostHogProvider } from "@/components/posthog-provider";
+import { PerformancePreload } from "@/components/performance-preload";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -72,13 +73,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
+        <PerformancePreload />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' us.i.posthog.com us-assets.i.posthog.com; connect-src 'self' us.i.posthog.com us-assets.i.posthog.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' fonts.gstatic.com;" />
         <meta httpEquiv="X-Frame-Options" content="SAMEORIGIN" />
         <meta httpEquiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
-        <link rel="preconnect" href="https://us.i.posthog.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://edgelessai.gumroad.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://github.com" />
+        {/* Preconnect hints moved to PerformancePreload component for centralized management */}
       </head>
       <body className="min-h-full flex flex-col">
         <JsonLd data={{

@@ -1102,8 +1102,41 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
+/* Large containers: render immediately, fade individual children */
+.cat-section.fade-target,
+.spread.fade-target,
+.gallery__opening.fade-target {
+  opacity: 1;
+  transform: none;
+}
+.cat-section.fade-target > *,
+.spread.fade-target > *,
+.gallery__opening.fade-target > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 600ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cat-section.fade-target.is-visible > *,
+.spread.fade-target.is-visible > *,
+.gallery__opening.fade-target.is-visible > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* stagger children */
+.cat-section.fade-target.is-visible > *:nth-child(2) { transition-delay: 80ms; }
+.cat-section.fade-target.is-visible > *:nth-child(3) { transition-delay: 160ms; }
+.cat-section.fade-target.is-visible > *:nth-child(4) { transition-delay: 240ms; }
+
 @media (prefers-reduced-motion: reduce) {
   .fade-target {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .cat-section.fade-target > *,
+  .spread.fade-target > *,
+  .gallery__opening.fade-target > * {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
@@ -2198,7 +2231,7 @@ body {
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0.02, rootMargin: '0px 0px -30px 0px' });
   document.querySelectorAll('.fade-target').forEach(function (el) {
     observer.observe(el);
   });
@@ -2239,6 +2272,52 @@ body {
       html += '</div>';
     }
     grid.innerHTML = html;
+  });
+
+  /* ────────── click thumbnail → swap hero image ────────── */
+  document.querySelectorAll('.cat-section').forEach(function (section) {
+    var hero = section.querySelector('.cat-section__hero');
+    var grid = section.querySelector('.specimen-grid');
+    if (!hero || !grid) return;
+
+    /* store original hero src so clicking active tile reverts */
+    hero.dataset.originalSrc = hero.src;
+
+    grid.addEventListener('click', function (e) {
+      var tile = e.target.closest('.spec-tile');
+      if (!tile) return;
+
+      var img = tile.querySelector('img');
+      if (!img) return;
+
+      /* if already active, revert to original hero */
+      if (tile.classList.contains('spec-tile--active')) {
+        tile.classList.remove('spec-tile--active');
+        hero.classList.add('cat-section__hero--swapping');
+        setTimeout(function () {
+          hero.src = hero.dataset.originalSrc;
+          hero.alt = 'Category hero specimen';
+          hero.classList.remove('cat-section__hero--swapping');
+        }, 200);
+        return;
+      }
+
+      /* clear previous active in this grid */
+      grid.querySelectorAll('.spec-tile--active').forEach(function (t) {
+        t.classList.remove('spec-tile--active');
+      });
+
+      /* mark clicked tile active */
+      tile.classList.add('spec-tile--active');
+
+      /* swap hero with fade */
+      hero.classList.add('cat-section__hero--swapping');
+      setTimeout(function () {
+        hero.src = img.src;
+        hero.alt = img.alt;
+        hero.classList.remove('cat-section__hero--swapping');
+      }, 200);
+    });
   });
 })();
 </script>

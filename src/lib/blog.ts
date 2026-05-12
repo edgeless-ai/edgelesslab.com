@@ -1203,7 +1203,7 @@ The path optimizer is the most important shared component. It reorders paths to 
 
 ## The Catalog
 
-The full catalog is browseable at [/total-serialism/app/](/total-serialism/app/). Every algorithm has real-time parameter controls, preset management, and one-click SVG export. The editorial companion at [/total-serialism/](/total-serialism/) describes the taxonomy, the toolkit, and the surprises that emerged from building all ninety-six.
+The full catalog is browseable at [/total-serialism/field-notes/](/total-serialism/field-notes/). Every algorithm has real-time parameter controls, preset management, and one-click SVG export. The editorial companion describes the taxonomy, the toolkit, and the surprises that emerged from building all ninety-six.
 
 The most useful entry point is the browse page, which shows every algorithm as a thumbnail grid organized by category. From there, click into any algorithm to adjust parameters and export.
 
@@ -2228,7 +2228,7 @@ Instead, every generator gets scored by an LLM judge before it ever touches the 
 
 The judge generates a score from 0-10 and a brief explanation. I only plot generators that score 7+. This has saved a significant amount of time and paper.
 
-The current scoring prompt and rubric are in the [pen plotter experiment log](/lab/pen-plotter-art).
+The current scoring prompt and rubric are in the [pen plotter experiment log](/lab/pen-plotter-pipeline).
 
 ## Materials Matter
 

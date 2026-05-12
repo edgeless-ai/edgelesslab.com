@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Script from "next/script";
 import { ArrowRight } from "lucide-react";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
@@ -9,9 +10,25 @@ export const metadata: Metadata = {
   description: "The page you are looking for does not exist.",
 };
 
+// SPA redirect script for Tartanism app - handles client-side routing on GitHub Pages
+const spaRedirectScript = `
+(function() {
+  const path = window.location.pathname;
+  if (path.startsWith('/tartanism/app/')) {
+    const route = path.slice(15) || '';
+    const search = window.location.search || '';
+    const hash = window.location.hash || '';
+    window.location.replace('/tartanism/app/?_p=/' + encodeURIComponent(route + search + hash));
+  }
+})();
+`;
+
 export default function NotFound() {
   return (
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
+      <Script id="spa-redirect" strategy="beforeInteractive">
+        {spaRedirectScript}
+      </Script>
       <Nav />
 
       <main id="main-content" className="flex-1 flex items-center justify-center px-6 py-32">

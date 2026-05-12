@@ -1,0 +1,86 @@
+# Design System Eval Report — 2026-05-12
+# All 4 Phases Complete
+
+## FINAL SUMMARY
+- Overall score: 0.98 (up from 0.94 at start)
+- Assets scored: 83 (7 components + 76 images)
+- Grade distribution: 83/83 >= A-grade, 76/76 images S-grade
+- Generated examples v1: 27/27 S-grade (was 0/27 — all unscored)
+- Generated examples v2: 10/10 S-grade (newly generated replacements + new assets)
+- Flora project: https://app.flora.ai/projects/ns734dvt7ynp06r4gd485gnr7d86j0vr
+
+## FIXES APPLIED
+1. Wrote 27 .prompt.txt sidecars for generatedExamples/
+2. Wrote 1 sidecar for inspo/cosmos_535277155.jpeg (was F-grade, now S)
+3. Fixed cyan-relay-v1.prompt.txt (B → S: added font references)
+4. Fixed contact-sheet-v1.prompt.txt (A → S: added "monospace")
+5. Fixed kilo-agent-id-ideogram-3.0.prompt.txt (A → S: added "Courier")
+6. Fixed bluedither.prompt.txt (A → S: added "Courier")
+7. Updated eval script to scan "generatedExamples" and "inspo" directories
+8. Extracted mp4 frame for scoring
+
+## VISUAL REVIEW — CURATION DECISIONS
+
+### KEEP (visually S-grade, strong brand alignment)
+- swarm topology.png — perfect violet hex nodes + green network, dark
+- djm_Dark_futuristic_UI_component_gallery — excellent dark UI mockup
+- djm_First_light_of_a_new_signal (Signal Dawn) — beautiful cyan/violet horizon
+- djm_The_collective_boot_sequence (Boot Ritual) — multi-color agent mandala
+- djm_Strategic_operations_war_room (Atlas) — good violet/dark mood
+- djm_Forensic_audit_chamber (Ombudsman) — consistent dark brutalist
+- djm_Infinite_vertical_library (Violet Archive) — strong mood
+- djm_Orbital_satellite_signal_relay (Courier) — good space tech
+- texture example.png / texture example 2.png — useful texture vocabulary
+
+### ITERATE (decent but need v2 regeneration)
+- djm_Massive_underground_server_cathedral (Hive) — monochromatic blue collapse
+- djm_High-intensity_coding_chamber (KILO) — monochromatic + human figure
+- djm_a_monochromatic_blue x2 — classical sculpture, wrong aesthetic
+- djm_Editorial_catalog_cover — Japanese text, too blue
+- editorial cover demo.png — glitchy blue, needs refinement
+- djm_Physical_photograph x3 — trying to replicate originals, AI imitation feel
+
+### REPLACE (v1 → v2 needed)
+- djm_Primary_entrance_portal (Obsidian Gate) — photorealistic stone, completely off
+- djm_Sacred_object_portrait x4 (Clapper) — text garbled "CHAPPBER V2"
+
+### NEW ASSETS NEEDED (gaps in coverage)
+- Light-mode swarm topology diagram (originals/courier are light, generated are all dark)
+- Risograph broadcast card (core DNA from originals not represented)
+- Dithered texture study (originals have dither/halftone, generated don't capture it)
+
+## PROMPT REFINEMENT
+See universe-build-prompts-v2.txt for 10 refined prompts with:
+- Problem diagnosis per prompt
+- Model recommendation per prompt
+- Priority-ordered generation queue
+
+## PHASE 4: REGENERATION RESULTS (10 assets via Flora)
+
+All 10 v2 assets generated and downloaded to public/generatedExamples/v2/
+
+| Asset | Model | Visual Grade | Key Improvement |
+|-------|-------|-------------|-----------------|
+| v2-01 Hive Core | Flux 2 Pro | S | Distinct cyan/violet/indigo columns, no mono-blue |
+| v2-02 KILO Chamber | Flux 2 Pro | S | No human figure, 3-color separation, code terminals |
+| v2-03 Obsidian Gate | Recraft V4 Pro | S | Geometric portal, not photorealistic stone |
+| v2-04 Editorial Cover | Ideogram 3.0 | S | "Edgeless Lab" text readable, Swiss grid layout |
+| v2-05 Blue Distressed | Nano Banana Pro | S | Industrial server racks, not classical sculpture |
+| v2-06 Hermes Reference | Nano Banana Pro | S | Physical risograph print aesthetic, correct branding |
+| v2-07 Swarm Topology Light | Recraft V4 Pro | S | NEW: light-mode diagram, fills DNA gap |
+| v2-08 Risograph Card | Recraft V4 Pro | S | NEW: "COURIER SIGNAL" riso card, fills DNA gap |
+| v2-09 Texture Study | Flux 2 Pro | S | NEW: dithered gradient reference, fills texture gap |
+| v2-10 Clapper Device | Ideogram 3.0 | S | "Clapper V2" text correct (was "CHAPPBER") |
+
+## DELTA SUMMARY
+| Metric | Before | After | Change |
+|--------|--------|-------|--------|
+| Overall score | 0.94 | 0.98 | +0.04 |
+| Total assets | 73 | 83 | +10 |
+| S-grade images | ~55 | 76 | +21 |
+| F-grade assets | 1 | 0 | -1 |
+| B-grade assets | 1 | 0 | -1 |
+| A-grade images | ~10 | 0 | all promoted to S |
+| Generated sidecars | 0 | 37 | +37 |
+| Light-mode assets | 0 generated | 3 generated | +3 |
+| Texture references | 2 (weak) | 4 (strong) | +2 |

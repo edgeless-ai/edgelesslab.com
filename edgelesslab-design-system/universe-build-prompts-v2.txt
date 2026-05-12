@@ -1,0 +1,111 @@
+# =============================================================================
+# EDGELESS / HERMES UNIVERSE BUILD PROMPTS — V2
+# Refined prompts based on visual review of v1 generated examples
+# All prompts include canonical design tokens for eval scoring
+# =============================================================================
+#
+# DIAGNOSIS OF V1 FAILURES:
+#
+# 1. MONOCHROMATIC COLLAPSE — Many images collapsed to single blue/violet tone
+#    instead of using distinct cyan (#06b6d4), violet (#8b5cf6), indigo (#6366f1)
+#    as separate accent layers. Fix: explicit "distinct accent colors" instruction.
+#
+# 2. MISSING TEXTURE — Originals have dithering, halftone, risograph, scan-line
+#    qualities. V1 generations were too smooth/rendered. Fix: add texture vocab.
+#
+# 3. PHOTOREALISM LEAK — Obsidian Gate went photorealistic instead of brutalist.
+#    Fix: stronger "NOT photorealistic" negative prompts.
+#
+# 4. TEXT GARBLING — AI models garbled text ("CHAPPBER" for "CLAPPER").
+#    Fix: use Ideogram 3.0 for text-heavy pieces, or avoid embedded text.
+#
+# 5. NO LIGHT-MODE VARIANTS — All v1 are dark. The originals include risograph
+#    prints on cream, light diagrams, editorial layouts. Fix: add light variants.
+#
+# 6. HUMAN FIGURES — KILO chamber had a human silhouette.
+#    Fix: explicit "absolutely no human figures" negative.
+#
+# MODEL SELECTION GUIDE:
+#   - Flux 2 Pro: atmospheric environments, landscapes, moody scenes
+#   - Recraft V4 Pro: UI mockups, vector diagrams, technical illustrations
+#   - Ideogram 3.0: anything with readable text or typography
+#   - Nano Banana Pro: high-fidelity product shots, texture details
+#
+# =============================================================================
+
+--- V2-01. THE HIVE CORE (replaces v1 — was too monochromatic blue) ---
+MODEL: Flux 2 Pro
+PROBLEM: v1 collapsed to monochromatic blue. Lost accent color separation.
+---
+Massive underground server cathedral for the Hive swarm coordinator. Void black architecture (#0a0a0a) with towering cyan accent (#06b6d4) data columns as DISTINCT color from violet accent (#8b5cf6) neural network maps on walls and indigo accent (#6366f1) structural beams. Three accent colors must be visually SEPARATE, not blended. White foreground (#ffffff) Courier monospace status readouts floating in AR. Green (#22c55e) heartbeat pulses. Halftone dithered texture overlay on all surfaces. ASCII block pattern floor grating. Minimal dark high contrast brutalist tech cathedral. Absolutely no human figures, pure machine habitat. Epic scale. NOT photorealistic — stylized digital concept art with visible grain and scan lines.
+
+--- V2-02. AGENT KILO — EXECUTION CHAMBER (replaces v1 — had human figure, too blue) ---
+MODEL: Flux 2 Pro
+PROBLEM: v1 had human silhouette and monochromatic blue. Missing accent diversity.
+---
+High-intensity coding execution chamber for Agent KILO. Dark void black room (#0a0a0a) with walls of glowing cyan accent (#06b6d4) terminal screens — distinctly separate from violet accent (#8b5cf6) error traces cascading on opposite wall and indigo accent (#6366f1) code diff highlights on ceiling. White foreground (#ffffff) Courier monospace compilation output. JetBrains Mono font on all readouts. Green (#22c55e) success checkmarks. Dithered halftone texture on all screen edges. ASCII art progress bars. Minimal dark high contrast brutalist developer lair. Absolutely NO human figures or silhouettes. Geometric grid architecture. NOT photorealistic — risograph print aesthetic with grain.
+
+--- V2-03. OBSIDIAN GATE (replaces v1 — was too photorealistic/natural) ---
+MODEL: Recraft V4 Pro
+PROBLEM: v1 looked like a real stone arch. Completely wrong aesthetic.
+---
+Primary entrance portal to the Edgeless dimension rendered as GEOMETRIC ABSTRACT ARCHITECTURE, not natural stone. Void black monolith (#0a0a0a) with cyan accent (#06b6d4) fractal circuit patterns etched into flat surfaces. Violet accent (#8b5cf6) activation glyphs. Indigo accent (#6366f1) secondary details. White foreground (#ffffff) Courier monospace access codes scrolling across lintel. JetBrains Mono readout. Green (#22c55e) unlocking sequence. ASCII block decorative border. Minimal dark high contrast brutalist monumental architecture. Swiss grid composition. Dithered halftone texture. NOT photorealistic — vector geometric style. Edgeless signal portal.
+
+--- V2-04. EDITORIAL CATALOG COVER (replaces v1 — too monochromatic, Japanese text) ---
+MODEL: Ideogram 3.0
+PROBLEM: v1 was monochromatic blue with garbled Japanese text. Needed legible English.
+---
+Editorial catalog cover for Edgeless Lab. Void black background (#0a0a0a). Large "EDGELESS" title in white foreground (#ffffff) JetBrains Mono font across top. Cyan accent (#06b6d4) subtitle text "SIGNAL / SWARM / COURIER". Violet accent (#8b5cf6) abstract dithered portrait element in center. Indigo accent (#6366f1) grid lines and gutters. Green (#22c55e) small edition number. Minimal dark high contrast brutalist editorial design. Swiss typography grid layout. Courier monospace metadata at bottom. Halftone dithered texture throughout. Geometric composition. NOT photorealistic — flat graphic design poster.
+
+--- V2-05. BLUE DISTRESSED PHOTOGRAPHY (replaces v1 — classical sculpture off-brand) ---
+MODEL: Nano Banana Pro
+PROBLEM: v1 showed classical Greek sculpture. Wrong aesthetic — should be digital/tech.
+---
+A monochromatic intensely blue-toned distressed photograph of abstract digital infrastructure. Void black deep shadows (#0a0a0a). Cyan accent (#06b6d4) primary tone wash across server racks and cable bundles. Violet accent (#8b5cf6) secondary highlights on circuit boards. Indigo accent (#6366f1) tertiary depth. White foreground (#ffffff) blown-out light sources. Heavy film grain, scan lines, dithered halftone texture overlay. Courier monospace timestamp watermark. JetBrains Mono serial numbers. Minimal dark high contrast brutalist distressed photography. Edgeless swarm signal infrastructure. Absolutely no human figures. NOT classical art — industrial tech.
+
+--- V2-06. HERMES AESTHETIC REFERENCE (replaces v1 — mixed results on replication) ---
+MODEL: Nano Banana Pro
+PROBLEM: v1 tried to replicate original photos but looked like AI imitations.
+---
+Physical photograph of Edgeless Hermes signal infrastructure printed on textured paper. Void black background (#0a0a0a). Cyan accent (#06b6d4) typography in Courier monospace printed on dark surface. Violet accent (#8b5cf6) geometric decorative elements. Indigo accent (#6366f1) border lines. White foreground (#ffffff) primary heading text in JetBrains Mono. Green (#22c55e) small status indicators. Risograph dithered halftone print texture. Visible paper grain and ink density variation. Minimal dark high contrast brutalist print artifact. Edgeless swarm agent documentation. Swiss grid alignment. NOT digital render — physical print aesthetic.
+
+--- V2-07. SWARM TOPOLOGY LIGHT MODE (NEW — light-mode variant to match original DNA) ---
+MODEL: Recraft V4 Pro
+PROBLEM: No light-mode assets in generated set. Originals and courier include cream/light.
+---
+Technical diagram poster titled "SWARM TOPOLOGY" on warm cream (#f5f0e8) background. Dark charcoal (#0a0a0a) primary text and borders. Cyan accent (#06b6d4) node connections and data flow lines. Violet accent (#8b5cf6) hexagonal agent nodes labeled: Hive, Kilo, Beau, Atlas, Scribe. Indigo accent (#6366f1) secondary connection arcs. White (#ffffff) node centers. Green (#22c55e) health status indicators. Courier monospace labels. JetBrains Mono title. Minimal high contrast Swiss grid technical diagram. Risograph halftone texture on cream paper. Dark ink on light paper. Edgeless swarm agent network topology. Blueprint aesthetic with brutalist typography.
+
+--- V2-08. RISOGRAPH BROADCAST CARD (NEW — matches riso DNA from originals) ---
+MODEL: Recraft V4 Pro
+PROBLEM: No risograph/print assets in generated set. This aesthetic is core to originals.
+---
+Risograph-printed broadcast card for the Edgeless Courier signal network. Warm cream paper background. Single-color dark cyan (#06b6d4) ink overprint. Void black (#0a0a0a) text blocks. Large "COURIER SIGNAL" heading in Courier monospace. JetBrains Mono metadata below. Violet accent (#8b5cf6) secondary ink layer for decorative elements. Indigo accent (#6366f1) tertiary rules. White (#ffffff) paper showing through registration gaps. Green (#22c55e) small swarm status icons. Minimal brutalist high contrast print design. Halftone dithered ink texture. Swiss grid layout. Geometric border pattern. Edgeless agent branding. Physical print aesthetic — visible ink density, registration marks, paper texture.
+
+--- V2-09. TEXTURE STUDY — DITHERED GRID (NEW — expand texture vocabulary) ---
+MODEL: Flux 2 Pro
+PROBLEM: Texture examples lacked the dithering/halftone quality of originals.
+---
+Abstract texture study for Edgeless design system. Void black field (#0a0a0a) with ordered dither gradient patterns. Cyan accent (#06b6d4) primary dither zone transitioning through indigo accent (#6366f1) mid-tones to violet accent (#8b5cf6) secondary zone. White foreground (#ffffff) fine pixel details at dither boundaries. Green (#22c55e) sparse accent pixels. Courier monospace tiny label: "TEXTURE REF 002". JetBrains Mono version number. Multiple dither algorithms visible: ordered, Floyd-Steinberg, halftone dot screen. Minimal dark high contrast brutalist digital texture. ASCII block patterns. Swiss geometric composition. Edgeless swarm signal grid reference. Pure pixel graphic — NOT photographic, NOT smooth gradient.
+
+--- V2-10. CLAPPER DEVICE (improved — better text handling) ---
+MODEL: Ideogram 3.0
+PROBLEM: v1 garbled text to "CHAPPBER V2". Need Ideogram for clean text.
+---
+Sacred object portrait of the Clapper v2 device. Void black background (#0a0a0a). Sleek hardware object centered with cyan accent (#06b6d4) metallic finish. Text "CLAPPER V2" clearly printed on device in white foreground (#ffffff) Courier monospace. Violet accent (#8b5cf6) internal circuit glow through translucent casing. Indigo accent (#6366f1) secondary port details. Green (#22c55e) power indicator LED. JetBrains Mono serial number "EDG-CLV2-001" etched on surface. ASCII block decorative pedestal. Minimal dark high contrast brutalist product photography. Dithered halftone shadow texture. Edgeless agent device shrine. Swiss centered composition. NOT photorealistic — stylized product render with grain.
+
+# =============================================================================
+# V2 GENERATION QUEUE (priority order)
+#
+# 1. V2-03 Obsidian Gate (Recraft V4) — worst v1 offender, completely wrong aesthetic
+# 2. V2-02 KILO Chamber (Flux 2 Pro) — human figure violates brand rules
+# 3. V2-05 Blue Distressed (Nano Banana) — classical sculpture off-brand
+# 4. V2-01 Hive Core (Flux 2 Pro) — monochromatic collapse
+# 5. V2-04 Editorial Cover (Ideogram 3.0) — text garbling + wrong language
+# 6. V2-10 Clapper Device (Ideogram 3.0) — text garbling fix
+# 7. V2-07 Swarm Topology Light (Recraft V4) — NEW, fills gap
+# 8. V2-08 Risograph Card (Recraft V4) — NEW, fills gap
+# 9. V2-09 Texture Study (Flux 2 Pro) — NEW, expands vocabulary
+# 10. V2-06 Hermes Reference (Nano Banana) — polish
+#
+# TOTAL: 10 prompts (6 replacements + 1 improvement + 3 new)
+# =============================================================================

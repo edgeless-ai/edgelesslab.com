@@ -307,7 +307,7 @@ def run_all(project_root: Path) -> List[Dict]:
             results.append(score_component(f))
 
     # Images — scan all asset directories
-    for asset_dir_name in ["courier", "originals", "flora-v2", "inspo and generations"]:
+    for asset_dir_name in ["courier", "originals", "flora-v2", "inspo", "generatedExamples", "generatedExamples/v2"]:
         asset_dir = project_root / "public" / asset_dir_name
         if asset_dir.exists():
             for ext in ["*.png", "*.jpg", "*.jpeg", "*.webp"]:

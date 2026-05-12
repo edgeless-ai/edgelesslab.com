@@ -223,15 +223,13 @@ Start with whatever you already have. If you use YouTube likes, that's your corp
 
 ## What's Next
 
-This is Post 7 of the Agentic OS series. Previous posts:
+This is part of the Agentic OS series. Related posts:
 
-- [Post 1: $12/Week AI Operations Team](/blog/post-1-12-dollar-ai-team.html)
-- [Post 2: Multi-Model Routing](/blog/post-2-multi-model-routing.html)
-- [Post 3: The Knowledge Base Loop](/blog/post-3-kb-loop.html)
-- [Post 4: File-Based Agent Communication](/blog/post-4-file-comms.html)
-- [Post 5: Session Poisoning](/blog/post-5-session-poisoning.html)
-- [Post 6: Reaction-Diffusion Shader](/blog/post-6-reaction-diffusion-shader.html)
-- **Post 7: Mining YouTube with AI Agents** (you are here)
+- [The $12 AI Team](/blog/12-dollar-ai-operations-team)
+- [Agents That Talk to Each Other](/blog/agents-that-talk-to-each-other)
+- [How Claude Code Memory Works](/blog/how-claude-code-memory-works)
+- [Self-Healing AI Infrastructure](/blog/self-healing-ai-infrastructure)
+- [The Hook That Saved My Codebase](/blog/the-hook-that-saved-my-codebase)
 
 Follow me on [X](https://x.com/qt_djm) for updates, or check out the repos linked above.
 

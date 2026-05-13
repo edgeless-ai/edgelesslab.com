@@ -6,6 +6,7 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
 import { BlogArticle } from "@/components/blog-article";
+import { RelatedPosts } from "@/components/related-posts";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -237,8 +238,11 @@ export default async function BlogPostPage({
             );
           })()}
 
+          {/* Related Posts */}
+          <RelatedPosts current={post} allPosts={posts} />
+
           {/* Back link */}
-          <div className="mt-16 pt-8 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+          <div className="mt-12 pt-8 border-t" style={{ borderColor: "var(--border-subtle)" }}>
             <Link
               href="/blog"
               className="text-sm font-medium transition-colors hover:text-white"

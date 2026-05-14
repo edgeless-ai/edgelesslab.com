@@ -38,7 +38,7 @@ export async function generateMetadata({
 
   const fullTitle = `${product.name} (${product.price}) | Edgeless Lab`;
   const url = `${SITE}/products/${slug}`;
-  const image = `${SITE}/product-covers/${slug}.png`;
+  const image = `${SITE}/product-covers/${slug}.webp`;
 
   return {
     title: { absolute: fullTitle },
@@ -191,13 +191,21 @@ export default async function ProductDetailPage({
                 style={{ background: "var(--bg-surface)", borderColor: "var(--border-subtle)" }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/product-covers/${slug}.png`}
-                  alt={`${product.name} cover`}
-                  width={1280}
-                  height={1280}
-                  className="w-full h-auto block"
-                />
+                <picture>
+                  <source
+                    srcSet={`/product-covers/${slug}.webp`}
+                    type="image/webp"
+                  />
+                  <img
+                    src={`/product-covers/${slug}.png`}
+                    alt={`${product.name} cover`}
+                    width={1280}
+                    height={1280}
+                    className="w-full h-auto block"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
               </div>
 
               <div

@@ -1,54 +1,64 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
-import posthog from "posthog-js";
+import { usePathname } from "next/navigation";
 
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 
-function PostHogPageView() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    if (!POSTHOG_KEY) return;
-    if (pathname) {
-      let url = window.origin + pathname;
-      const search = searchParams.toString();
-      if (search) url += "?" + search;
-      posthog.capture("$pageview", { $current_url: url });
-    }
-  }, [pathname, searchParams]);
-
-  return null;
-}
+let posthog: ReturnType<typeof import("posthog-js").default> | null = null;
 
 let initialized = false;
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  // Dynamically import posthog-js on first user interaction or after LCP
   useEffect(() => {
-    if (!POSTHOG_KEY || initialized) return;
-    initialized = true;
+    async function initPostHog() {
+      if (initialized) return;
+      initialized = true;
 
-    posthog.init(POSTHOG_KEY, {
-      api_host: POSTHOG_HOST,
-      person_profiles: "identified_only",
-      capture_pageview: false,
-      capture_pageleave: true,
-      autocapture: true,
-      capture_performance: true,
-      // @ts-expect-error -- web_vitals exists in @posthog/types but not in the exported PostHogConfig wrapper
-      web_vitals: true,
-    });
-  }, []);
+      // Wait for LCP window to pass
+      await new Promise((r) => requestIdleCallback ? requestIdleCallback(r) : setTimeout(r, 2000));
 
-  return (
-    <>
-      <Suspense fallback={null}>
-        <PostHogPageView />
-      </Suspense>
-      {children}
-    </>
-  );
+      const { default: ph } = await import("posthog-js");
+      posthog = ph;
+
+      if (!POSTHOG_KEY) return;
+
+      ph.init(POSTHOG_KEY, {
+        api_host: POSTHOG_HOST,
+        person_profiles: "identified_only",
+        capture_pageview: false,
+        capture_pageleave: true,
+        autocapture: true,
+        capture_performance: false, // disable during init — costs main thread
+        web_vitals: false, // move to idle
+      });
+
+      // Capture initial pageview after lazy init
+      let url = window.origin + (pathname || location.pathname);
+      ph.capture("$pageview", { $current_url: url });
+    }
+
+    // Defer until interaction (guarantees LCP isn't blocked)
+    const onInteraction = () => {
+      window.removeEventListener("pointerdown", onInteraction);
+      window.removeEventListener("keydown", onInteraction);
+      initPostHog();
+    };
+    window.addEventListener("pointerdown", onInteraction, { once: true });
+    window.addEventListener("keydown", onInteraction, { once: true });
+
+    // Fallback: init after 8 seconds even without interaction
+    const fallback = setTimeout(() => {
+      window.removeEventListener("pointerdown", onInteraction);
+      window.removeEventListener("keydown", onInteraction);
+      initPostHog();
+    }, 8000);
+
+    return () => clearTimeout(fallback);
+  }, [pathname]);
+
+  return children;
 }

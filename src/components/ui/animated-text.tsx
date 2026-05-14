@@ -1,3 +1,8 @@
+// Moved keyframes to globals.css to avoid re-injecting duplicate <style> per mount.
+// This file previously injected `<style>@keyframes fadeInUp{...}</style>` on every
+// `AnimatedText` / `AnimatedFadeIn` render — with 20+ uses on the homepage that added
+// 20+ redundant style blocks (~800B each) to the 98 KB index.html.
+
 interface AnimatedTextProps {
   text: string;
   className?: string;
@@ -20,12 +25,6 @@ export function AnimatedText({ text, className, delay = 0 }: AnimatedTextProps) 
           {word}
         </span>
       ))}
-      <style>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px); filter: blur(8px); }
-          to { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-      `}</style>
     </span>
   );
 }
@@ -47,12 +46,6 @@ export function AnimatedFadeIn({
       }}
     >
       {children}
-      <style>{`
-        @keyframes fadeInUpSimple {
-          from { opacity: 0; transform: translateY(16px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }

@@ -26,6 +26,9 @@ export function PerformancePreload() {
       {/* Preload critical WebP images with HIGH priority for LCP */}
       <link rel="preload" href="/og-image.webp" as="image" type="image/webp" fetchPriority="high" />
       
+      {/* Lazy load non-critical scripts after LCP */}
+      <link rel="prefetch" href="/_next/static/chunks/posthog-js.js" as="script" />
+      
       {/* Preconnect to Google Fonts for faster font loading */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       

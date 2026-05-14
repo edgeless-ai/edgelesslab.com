@@ -367,3 +367,34 @@ h1, h2, h3 {
   letter-spacing: 0.1em;
   margin-top: 0.25rem;
 }
+
+/* ============================================
+   Animation keyframes (centralized)
+   Moved from individual component <style> tags
+   to eliminate 20+ redundant inline injections
+   on the homepage (each ~400-800B of repeated CSS).
+   ============================================ */
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); filter: blur(8px); }
+  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes fadeInUpSimple {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ping {
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes orbPulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.2); }
+}
+
+@keyframes orbPulseGreen {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.2); }
+}

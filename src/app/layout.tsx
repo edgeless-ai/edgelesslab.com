@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     title: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
     description: 'One person shipping autonomous agents, generative art, and developer tools. Built in production, released in the open.',
     images: [{
-      url: '/og-image.png',
+      url: '/og-image.webp',
       width: 1200,
       height: 630,
       alt: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
     description: 'One person shipping autonomous agents, generative art, and developer tools.',
-    images: ['/og-image.png'],
+    images: ['/og-image.webp'],
   },
   alternates: {
     canonical: 'https://edgelesslab.com',

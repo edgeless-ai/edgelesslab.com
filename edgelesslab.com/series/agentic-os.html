@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agentic OS — Building Autonomous AI Infrastructure | Edgeless Lab</title>
+  <meta name="description" content="A 6-part series documenting the construction of a multi-agent AI operating system — from research and architecture to deployment, security hardening, and autonomous operation.">
+  <link rel="preconnect" href="https://us.i.posthog.com" crossorigin="anonymous">
+  <meta property="og:title" content="Agentic OS Series — Edgeless Lab">
+  <meta property="og:description" content="A 6-part series on building autonomous AI infrastructure: multi-agent orchestration, knowledge pipelines, security, and self-healing systems.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://edgelesslab.com/series/agentic-os/">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="canonical" href="https://edgelesslab.com/series/agentic-os/">
+  <style>
+    :root{--color-bg:#0a0a0f;--color-surface:#111118;--color-surface-2:#1a1a24;--color-border:#2a2a35;--color-text:#f0f0f5;--color-muted:#aaa;--color-accent:#00d4ff;--color-accent-purple:#a855f7;--color-accent-green:#10b981;--font-mono:'SF Mono',Monaco,Inconsolata,monospace}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--color-bg);color:var(--color-text);line-height:1.6;min-height:100vh}
+    nav{border-bottom:1px solid var(--color-border);padding:1rem 2rem;position:sticky;top:0;background:rgba(10,10,15,0.95);backdrop-filter:blur(12px);z-index:100}
+    .nav-container{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+    .logo{font-family:var(--font-mono);font-weight:700;font-size:1.25rem;color:var(--color-text);text-decoration:none}
+    .nav-links{display:flex;gap:2rem;list-style:none}
+    .nav-links a{color:var(--color-muted);text-decoration:none;font-size:0.9rem;transition:color 0.2s}
+    .nav-links a:hover{color:var(--color-text)}
+    .hero{padding:6rem 2rem;text-align:center;border-bottom:1px solid var(--color-border);background:linear-gradient(180deg,var(--color-surface) 0%,var(--color-bg) 100%)}
+    .hero h1{font-size:3.5rem;font-weight:700;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--color-text),var(--color-accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero .tag{font-family:var(--font-mono);color:var(--color-accent-purple);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:1.5rem}
+    .hero .lead{max-width:700px;margin:0 auto 2rem;color:var(--color-muted);font-size:1.15rem;line-height:1.7}
+    .series-meta{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin-top:2rem}
+    .meta-item{font-family:var(--font-mono);font-size:0.85rem;color:var(--color-accent)}
+    .meta-item span{color:var(--color-muted)}
+    main{max-width:900px;margin:0 auto;padding:3rem 2rem}
+    .overview{background:var(--color-surface);border:1px solid var(--color-border);border-radius:12px;padding:2rem;margin-bottom:3rem}
+    .overview h2{font-family:var(--font-mono);color:var(--color-accent);font-size:1.1rem;margin-bottom:1rem}
+    .overview p{color:var(--color-muted)}
+    .timeline{position:relative;padding-left:2rem;border-left:2px solid var(--color-border)}
+    .timeline::before{content:'';position:absolute;left:-1px;top:0;bottom:0;background:linear-gradient(180deg,var(--color-accent),var(--color-accent-purple),var(--color-accent-green));width:3px;border-radius:2px}
+    .episode{position:relative;padding:1.5rem 0 1.5rem 2rem;border-bottom:1px solid var(--color-border)}
+    .episode:last-child{border-bottom:none}
+    .episode::before{content:attr(data-episode);position:absolute;left:-2.4rem;top:1.5rem;width:1.2rem;height:1.2rem;background:var(--color-surface-2);border:2px solid var(--color-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--color-accent);font-family:var(--font-mono);text-align:center;line-height:1.2rem}
+    .episode h3{font-family:var(--font-mono);color:var(--color-text);font-size:1.1rem;margin-bottom:0.5rem}
+    .episode h3 a{color:inherit;text-decoration:none}
+    .episode h3 a:hover{color:var(--color-accent)}
+    .episode .topic{font-size:0.8rem;color:var(--color-accent-purple);margin-bottom:0.5rem;font-family:var(--font-mono)}
+    .episode p{color:var(--color-muted);font-size:0.95rem}
+    .cta{text-align:center;margin:3rem 0;padding:2rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:12px}
+    .cta h2{font-size:1.5rem;margin-bottom:1rem}
+    .cta p{color:var(--color-muted);margin-bottom:1.5rem}
+    .cta .btn{display:inline-block;padding:0.75rem 2rem;background:var(--color-accent);color:var(--color-bg);text-decoration:none;font-family:var(--font-mono);font-weight:600;border-radius:8px;transition:opacity 0.2s}
+    .cta .btn:hover{opacity:0.85}
+    footer{border-top:1px solid var(--color-border);margin-top:6rem;padding:2rem;text-align:center;color:var(--color-muted);font-size:0.9rem}
+    @media(max-width:768px){
+      .hero h1{font-size:2rem}
+      .nav-links{gap:1rem}
+      .nav-links a{font-size:0.8rem}
+      .series-meta{flex-direction:column;gap:0.25rem}
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-container">
+      <a href="/" class="logo">Edgeless Lab</a>
+      <ul class="nav-links">
+        <li><a href="/work/">Work</a></li>
+        <li><a href="/lab/">Lab</a></li>
+        <li><a href="/products/">Products</a></li>
+        <li><a href="/blog/">Blog</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="tag">Series</div>
+    <h1>Agentic OS</h1>
+    <p class="lead">A 6-part documentary series chronicling the construction of a multi-agent AI operating system from scratch — architecture decisions, real failures, deployment to production, and autonomous operation at scale.</p>
+    <div class="series-meta">
+      <div class="meta-item"><span>Episodes</span> 6</div>
+      <div class="meta-item"><span>Domain</span> Autonomous AI</div>
+      <div class="meta-item"><span>Status</span> Published</div>
+    </div>
+  </section>
+
+  <main>
+    <div class="overview">
+      <h2>## About This Series</h2>
+      <p>Agentic OS documents the real-world engineering behind building an autonomous AI workforce. Each episode covers a distinct phase — from initial architectural reasoning and model routing decisions, through knowledge pipeline construction, to security hardening and self-healing infrastructure. This is not a theoretical exercise: every system described is live, running, and generating output. The architecture handles multi-agent Discord coordination, RSS/YouTube content triage, document processing, and trading — all operating autonomously with human-in-the-loop oversight.</p>
+    </div>
+
+    <div class="timeline">
+      <div class="episode" data-episode="1">
+        <div class="topic">Architecture & Cost</div>
+        <h3><a href="/blog/post-1-12-dollar-ai-team.html">Your $12/Month AI Team That Works While You Sleep</a></h3>
+        <p>The economics of autonomous AI infrastructure. How to build a multi-agent system on Hetzner VPS hosting for $12/month — model routing, cost optimization, and the architectural decisions that make it feasible. Covers the 8-bot swarm topology, Discord gateway collision patterns, and why open-weight models beat API calls at scale.</p>
+      </div>
+
+      <div class="episode" data-episode="2">
+        <div class="topic">Model Routing</div>
+        <h3><a href="/blog/post-2-multi-model-routing.html">Intelligent Multi-Model Routing</a></h3>
+        <p>The routing layer that directs queries to the right model — Kimi K2.5 for reasoning, Qwen for auxiliary tasks, specialized models for vision and compression. Covers the adapter pattern, provider fallback chains, and why routing quality matters more than individual model quality in production systems.</p>
+      </div>
+
+      <div class="episode" data-episode="3">
+        <div class="topic">Knowledge Architecture</div>
+        <h3><a href="/blog/post-3-kb-loop.html">The Knowledge Base Loop</a></h3>
+        <p>How autonomous agents research, enrich, and cross-reference knowledge across a 12,000+ file vault. The enrichment pipeline: RSS triage scoring, YouTube transcript clustering, NotebookLM synthesis, ChromaDB embeddings. Covers the KB score system (0-15 scale), auto-promotion thresholds, and how agents avoid confabulation through cross-referencing.</p>
+      </div>
+
+      <div class="episode" data-episode="4">
+        <div class="topic">System Communication</div>
+        <h3><a href="/blog/post-4-file-comms.html">File-Based Inter-Agent Communication</a></h3>
+        <p>Why we replaced HTTP API calls with filesystem-based messaging for agent coordination. The queue JSONL pattern, atomic file claims, and how shared directories become message buses. Covers inbox dispatching, content-based routing with grep pattern matching, and why this architecture is more resilient than microservices for single-host multi-agent systems.</p>
+      </div>
+
+      <div class="episode" data-episode="5">
+        <div class="topic">Security Deep Dive</div>
+        <h3><a href="/blog/post-5-session-poisoning.html">Session Poisoning & Prompt Injection</a></h3>
+        <p>How prompt injection attacks work on agent systems, why they're harder to defend against than traditional exploits, and the specific hardening measures we deployed: tiered skill loading, redaction filters, fail-closed security defaults, and the Tirith security framework. Real examples of injection attempts and the defense layers that caught them.</p>
+      </div>
+
+      <div class="episode" data-episode="6">
+        <div class="topic">Creative Engineering</div>
+        <h3><a href="/blog/post-6-reaction-diffusion-shader.html">Real-Time Reaction Diffusion via WebGPU Compute Shaders</a></h3>
+        <p>Pushing the visual frontier: building a biological simulation in the browser using WebGPU compute shaders. The reaction-diffusion algorithm, tile-based texture optimization, and how creative output validates that autonomous research produces genuinely novel results, not just assembled documentation.</p>
+      </div>
+    </div>
+
+    <div class="cta">
+      <h2>Follow the Build</h2>
+      <p>New episodes drop as systems reach production readiness. Subscribe to get notified.</p>
+      <a href="/blog/" class="btn">Read All Posts</a>
+    </div>
+  </main>
+
+  <footer>
+    <p>Edgeless Lab — AI-native systems</p>
+  </footer>
+</body>
+</html>

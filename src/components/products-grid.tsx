@@ -12,6 +12,7 @@ import { ArrowUpRight, ChevronDown } from "lucide-react";
 import { usePreText } from "@/hooks/use-pretext";
 import { PreTextMasonry } from "@/components/ui/pretext-masonry";
 import type { Product } from "@/lib/data";
+import { CheckoutButton } from "@/components/checkout-button";
 
 /** Fixed-height zones in each card (px). */
 const CARD_PADDING = 48; // p-6 top+bottom
@@ -489,19 +490,15 @@ function ProductCard({
           <ArrowUpRight size={14} />
         </a>
       ) : (
-        <a
+        <CheckoutButton
+          gumroadId={product.gumroadId}
           href={product.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1 text-sm font-medium hover:text-white transition-colors mt-auto pt-2"
-          style={{ color: "var(--text-secondary)" }}
+          price={product.price}
+          priceCents={product.priceCents}
+          productName={product.name}
+          variant="secondary"
           onClick={(e) => e.stopPropagation()}
-        >
-          {product.price === "Free"
-            ? "Get it free on GitHub"
-            : `Buy now \u2014 ${product.price}`}
-          <ArrowUpRight size={14} />
-        </a>
+        />
       )}
     </div>
   );

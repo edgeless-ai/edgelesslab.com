@@ -15,6 +15,20 @@ export interface Product {
    * Products without a slug link directly to Gumroad from the products grid.
    */
   slug?: string;
+  /**
+   * Gumroad product ID (the slug from the Gumroad URL).
+   * When set, the checkout button opens the Gumroad overlay instead of an external link.
+   */
+  gumroadId?: string;
+  /**
+   * Price in cents for structured data and analytics.
+   * 0 means free. Display price still comes from `price` string.
+   */
+  priceCents?: number;
+  /**
+   * Variant / tier label shown next to the price (e.g., "Pro", "Starter").
+   */
+  variant?: string;
 }
 
 const UTM = "utm_source=edgelesslab&utm_medium=website&utm_campaign=products";
@@ -33,6 +47,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/kszapk?${UTM}`,
     badge: "Free",
+    gumroadId: "kszapk",
+    priceCents: 0,
   },
   {
     name: "Quick Reference Cards",
@@ -47,6 +63,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/dihxts?${UTM}`,
     badge: "Free",
+    gumroadId: "dihxts",
+    priceCents: 0,
   },
   {
     name: "Claude Code Cheat Sheet",
@@ -62,6 +80,8 @@ export const products: Product[] = [
     href: `https://edgelessai.gumroad.com/l/claude-code-cheat-sheet?${UTM}`,
     badge: "Free",
     slug: "claude-code-cheat-sheet",
+    gumroadId: "claude-code-cheat-sheet",
+    priceCents: 0,
   },
   {
     name: "Claude Memory Kit",
@@ -106,6 +126,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/multi-agent-blueprint?${UTM}`,
     badge: "New",
+    gumroadId: "multi-agent-blueprint",
+    priceCents: 0,
     comingSoon: false,
     slug: "multi-agent-blueprint",
   },
@@ -122,6 +144,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/plbzo?${UTM}`,
     badge: null,
+    gumroadId: "plbzo",
+    priceCents: 0,
   },
   {
     name: "Claude Memory Kit Pro",
@@ -136,6 +160,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/claude-memory-kit?${UTM}`,
     badge: "Popular",
+    gumroadId: "claude-memory-kit",
+    priceCents: 0,
   },
   {
     name: "The Prompt Engineering OS",
@@ -150,6 +176,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/prompt-engineering-os?${UTM}`,
     badge: null,
+    gumroadId: "prompt-engineering-os",
+    priceCents: 0,
   },
   {
     name: "Generative Art Starter Kit",
@@ -164,6 +192,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/gen-art-starter?${UTM}`,
     badge: "New",
+    gumroadId: "gen-art-starter",
+    priceCents: 0,
     comingSoon: false,
     slug: "gen-art-starter",
   },
@@ -180,6 +210,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/always-on-agent?${UTM}`,
     badge: "New",
+    gumroadId: "always-on-agent",
+    priceCents: 0,
     comingSoon: true,
     slug: "always-on-agent",
   },
@@ -196,6 +228,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/production-mcp-kit?${UTM}`,
     badge: "New",
+    gumroadId: "production-mcp-kit",
+    priceCents: 0,
     comingSoon: false,
     slug: "production-mcp-kit",
   },
@@ -212,6 +246,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/uacjr?${UTM}`,
     badge: null,
+    gumroadId: "uacjr",
+    priceCents: 0,
   },
   {
     name: "Digital Product Launch Toolkit",
@@ -226,6 +262,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/launch-toolkit?${UTM}`,
     badge: "New",
+    gumroadId: "launch-toolkit",
+    priceCents: 0,
     comingSoon: false,
     slug: "launch-toolkit",
   },
@@ -242,6 +280,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/n8n-ai-workflows?${UTM}`,
     badge: "New",
+    gumroadId: "n8n-ai-workflows",
+    priceCents: 0,
     comingSoon: false,
     slug: "n8n-ai-workflows",
   },
@@ -258,6 +298,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/lixicg?${UTM}`,
     badge: null,
+    gumroadId: "lixicg",
+    priceCents: 0,
   },
   {
     name: "Obsidian + Claude Code Setup Kit",
@@ -272,6 +314,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/fyuwpn?${UTM}`,
     badge: null,
+    gumroadId: "fyuwpn",
+    priceCents: 0,
   },
   {
     name: "Prompt Testing Framework",
@@ -286,6 +330,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/yrail?${UTM}`,
     badge: null,
+    gumroadId: "yrail",
+    priceCents: 0,
   },
   {
     name: "Autonomous Agent Safety Patterns",
@@ -300,6 +346,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/agent-safety-patterns?${UTM}`,
     badge: "New",
+    gumroadId: "agent-safety-patterns",
+    priceCents: 0,
     comingSoon: false,
     slug: "agent-safety-patterns",
   },
@@ -316,6 +364,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/hooks-deep-dive?${UTM}`,
     badge: "New",
+    gumroadId: "hooks-deep-dive",
+    priceCents: 0,
     comingSoon: false,
     slug: "hooks-deep-dive",
   },
@@ -332,6 +382,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/ztaflt?${UTM}`,
     badge: null,
+    gumroadId: "ztaflt",
+    priceCents: 0,
   },
 ];
 

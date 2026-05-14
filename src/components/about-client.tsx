@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { EditorialBlock } from "@/components/ui/pretext-pull-quote";
+
 
 interface Stat {
   label: string;
@@ -134,17 +134,13 @@ export function Philosophy() {
       >
         Philosophy
       </h2>
-      <div style={fadeInStyle(0.1)}>
-        <EditorialBlock
-          paragraphs={philosophyParagraphs}
-          pullQuotes={philosophyPullQuotes}
-          font='300 18px "Geist"'
-          lineHeight={30}
-          quoteFont='600 22px "Geist"'
-          quoteLineHeight={30}
-          className="text-lg font-light"
-          style={{ color: "var(--text-secondary)" }}
-        />
+      <div
+        className="space-y-6 text-lg font-light"
+        style={{ color: "var(--text-secondary)", lineHeight: 1.7, ...fadeInStyle(0.1) }}
+      >
+        {philosophyParagraphs.map((p, i) => (
+          <p key={i}>{p}</p>
+        ))}
       </div>
     </div>
   );

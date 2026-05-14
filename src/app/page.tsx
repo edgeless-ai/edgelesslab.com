@@ -1,20 +1,12 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import {
-  HeroSection,
-  RecentActivity,
-  FeaturedGrid,
-  CapabilitiesGrid,
-  StackFlow,
-  ExperimentsGrid,
-  ProductHighlight,
-  AboutBlurb,
-  SubscribeSection,
-} from "@/components/home-client";
-import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import dynamic from "next/dynamic";
+import { HeroSection, RecentActivity } from "@/components/home-client";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { experiments, projects } from "@/lib/data";
+
+const HomeBelowFold = dynamic(() => import("@/components/home-below-fold"));
 
 const featured = [
   { slug: "safety-hooks", span: "md:col-span-2 md:row-span-2" },
@@ -127,127 +119,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Projects */}
-        <section className="px-6 py-20">
-          <ScrollReveal>
-            <div className="max-w-[1280px] mx-auto">
-              <div className="flex items-baseline justify-between mb-10">
-                <h2
-                  className="text-sm font-mono uppercase tracking-[0.15em]"
-                  style={{ color: "var(--text-tertiary)" }}
-                >
-                  Featured
-                </h2>
-                <Link
-                  href="/projects"
-                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  All projects <ArrowRight size={13} />
-                </Link>
-              </div>
-
-              <FeaturedGrid projects={featured} />
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Infrastructure */}
-        <section
-          className="px-6 py-20"
-          style={{ background: "var(--bg-surface)" }}
-        >
-          <ScrollReveal>
-            <div className="max-w-[1280px] mx-auto">
-              <h2
-                className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                Infrastructure
-              </h2>
-
-              <CapabilitiesGrid capabilities={capabilities} />
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Stack */}
-        <section className="px-6 py-20" style={{ background: "var(--bg-base)" }}>
-          <ScrollReveal>
-            <div className="max-w-[1280px] mx-auto">
-              <h2
-                className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                Stack
-              </h2>
-
-              <StackFlow nodes={stackNodes} />
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Lab */}
-        <section className="px-6 py-20">
-          <ScrollReveal>
-            <div className="max-w-[1280px] mx-auto">
-              <div className="flex items-baseline justify-between mb-10">
-                <h2
-                  className="text-sm font-mono uppercase tracking-[0.15em]"
-                  style={{ color: "var(--text-tertiary)" }}
-                >
-                  Lab
-                </h2>
-                <Link
-                  href="/lab"
-                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  All experiments <ArrowRight size={13} />
-                </Link>
-              </div>
-
-              <ExperimentsGrid experiments={homepageExperiments} />
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Products */}
-        <section className="px-6 py-20" style={{ background: "var(--bg-surface)" }}>
-          <ScrollReveal>
-            <div className="max-w-[1280px] mx-auto">
-              <div className="flex items-baseline justify-between mb-10">
-                <h2
-                  className="text-sm font-mono uppercase tracking-[0.15em]"
-                  style={{ color: "var(--text-tertiary)" }}
-                >
-                  Products
-                </h2>
-                <Link
-                  href="/products"
-                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  All products <ArrowRight size={13} />
-                </Link>
-              </div>
-
-              <ProductHighlight />
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* About */}
-        <section className="px-6 py-24">
-          <ScrollReveal>
-            <div className="max-w-[1280px] mx-auto">
-              <AboutBlurb />
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Subscribe */}
-        <SubscribeSection />
+        {/* Below-fold sections (code-split into separate chunk) */}
+        <HomeBelowFold
+          featured={featured}
+          capabilities={capabilities}
+          stackNodes={stackNodes}
+          homepageExperiments={homepageExperiments}
+        />
       </main>
 
       <Footer />

@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { products } from "@/lib/data";
 import { productContent } from "@/lib/product-content";
 import { posts } from "@/lib/blog";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
+import { CheckoutButton } from "@/components/checkout-button";
 
 const SITE = "https://edgelesslab.com";
 
@@ -38,7 +39,7 @@ export async function generateMetadata({
 
   const fullTitle = `${product.name} (${product.price}) | Edgeless Lab`;
   const url = `${SITE}/products/${slug}`;
-  const image = `${SITE}/product-covers/${slug}.png`;
+  const image = `${SITE}/product-covers/${slug}.webp`;
 
   return {
     title: { absolute: fullTitle },
@@ -85,7 +86,7 @@ export default async function ProductDetailPage({
           "@type": "Product",
           name: product.name,
           description: content.shortDescription,
-          image: `${SITE}/product-covers/${slug}.png`,
+          image: `${SITE}/product-covers/${slug}.webp`,
           brand: { "@type": "Brand", name: "Edgeless Lab" },
           url: `${SITE}/products/${slug}`,
           offers: {
@@ -168,18 +169,19 @@ export default async function ProductDetailPage({
                 >
                   {content.callToAction}
                 </p>
-                <a
+                <CheckoutButton
+                  gumroadId={product.gumroadId}
                   href={product.href}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-md font-medium transition-colors hover:opacity-90"
-                  style={{ background: "var(--accent)", color: "var(--bg-base)" }}
-                >
-                  Get it free on Gumroad <ArrowUpRight size={16} />
-                </a>
+                  price={product.price}
+                  priceCents={product.priceCents}
+                  productName={product.name}
+                  variant="primary"
+                />
                 <span
                   className="ml-3 text-xs font-mono"
                   style={{ color: "var(--text-tertiary)" }}
                 >
-                  Free &middot; instant download
+                  {product.price === "Free" ? "Free · instant download" : "Secure checkout via Gumroad"}
                 </span>
               </div>
             </div>
@@ -190,14 +192,27 @@ export default async function ProductDetailPage({
                 className="rounded-xl border overflow-hidden"
                 style={{ background: "var(--bg-surface)", borderColor: "var(--border-subtle)" }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/product-covers/${slug}.png`}
-                  alt={`${product.name} cover`}
-                  width={1280}
-                  height={1280}
-                  className="w-full h-auto block"
-                />
+                <picture>
+                  <source
+                    srcSet={`/product-covers/${slug}-320.avif 320w, /product-covers/${slug}-640.avif 640w, /product-covers/${slug}-960.avif 960w, /product-covers/${slug}-1280.avif 1280w`}
+                    sizes="(max-width: 1024px) 100vw, 340px"
+                    type="image/avif"
+                  />
+                  <source
+                    srcSet={`/product-covers/${slug}.webp`}
+                    type="image/webp"
+                  />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/product-covers/${slug}.png`}
+                    alt={`${product.name} cover`}
+                    width={1280}
+                    height={1280}
+                    loading="eager"
+                    decoding="async"
+                    className="w-full h-auto block"
+                  />
+                </picture>
               </div>
 
               <div

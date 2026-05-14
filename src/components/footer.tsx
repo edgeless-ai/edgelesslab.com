@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { useState, FormEvent } from "react";
 
 const toolLinks = [
   { label: "Safety Hooks", href: "/projects/safety-hooks" },
@@ -25,9 +26,55 @@ const ASCII_BANNER = `    ______    __           __
             /____/                         `;
 
 export function Footer() {
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    const subject = encodeURIComponent("Subscribe to Edgeless Lab updates");
+    const body = encodeURIComponent(`Please add me to the newsletter: ${email}`);
+    window.location.href = `mailto:david@edgelesslab.com?subject=${subject}&body=${body}`;
+    setSubmitted(true);
+    setEmail("");
+  };
+
   return (
     <footer className="px-6 pt-16 pb-8 mt-auto border-t" style={{ borderColor: "var(--border-subtle)" }}>
       <div className="max-w-[1280px] mx-auto">
+        {/* Email capture */}
+        <div className="mb-12 pb-10 border-b" style={{ borderColor: "var(--border-subtle)" }}>
+          <h3
+            className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
+            style={{ color: "var(--text-tertiary)" }}
+          >
+            Get updates
+          </h3>
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md">
+            <input
+              type="email"
+              required
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="flex-1 h-10 px-4 rounded-lg bg-transparent border text-sm outline-none focus:border-white/30 transition-colors"
+              style={{ borderColor: "var(--border-subtle)", color: "var(--text-primary)" }}
+            />
+            <button
+              type="submit"
+              className="h-10 px-5 text-sm font-medium rounded-lg transition-all hover:brightness-110 shrink-0"
+              style={{ background: "var(--accent)", color: "#fff" }}
+            >
+              Subscribe
+            </button>
+          </form>
+          {submitted && (
+            <p className="mt-3 text-xs font-mono" style={{ color: "var(--green)" }}>
+              Thanks — your email client will open to confirm.
+            </p>
+          )}
+        </div>
+
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
           <div>
             <h2
@@ -115,10 +162,11 @@ export function Footer() {
               className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
               style={{ color: "var(--text-tertiary)" }}
             >
-              Legal
+              About
             </h2>
             <ul className="space-y-2.5">
               {[
+                { label: "Manifesto", href: "/manifesto" },
                 { label: "Privacy", href: "/privacy" },
                 { label: "Terms", href: "/terms" },
               ].map((item) => (

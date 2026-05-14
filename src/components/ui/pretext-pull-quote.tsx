@@ -63,13 +63,16 @@ export function EditorialBlock({
     const maxWidth = containerRef.current.clientWidth;
     if (maxWidth === 0) return;
 
+    // Disable pull quotes on narrow screens where they overlap body text
+    const effectivePullQuotes = maxWidth < 640 ? [] : pullQuotes;
+
     const allLines: typeof renderedLines = [];
     let y = 0;
 
     // Lay out pull quotes first to determine their geometry
     const quoteRects: Array<Obstacle & { side: string; lines: string[] }> = [];
 
-    for (const pq of pullQuotes) {
+    for (const pq of effectivePullQuotes) {
       const qWidth = pq.width ?? Math.min(maxWidth * 0.4, 280);
       const prepared = prepareWithSegments(pq.text, quoteFont);
       if (!prepared) continue;

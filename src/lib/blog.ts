@@ -17,6 +17,351 @@ export interface BlogPost {
 
 export const posts: BlogPost[] = [
   {
+    slug: "envelope-protocol-multi-agent-coordination",
+    editorial: true,
+    title: "We Built an Envelope Protocol to Stop Our AI Agents from Talking Forever",
+    description: "Seven Discord bots needed to coordinate without infinite loops. A five-field envelope header and a depth counter solved it. Here's the protocol.",
+    date: "2026-05-13",
+    tags: ["AI Agents", "Multi-Agent Systems", "Discord", "Protocol Design"],
+    readTime: "8 min",
+    content: `
+# We Built an Envelope Protocol to Stop Our AI Agents from Talking Forever
+
+I run seven AI agents in a Discord server. They coordinate work, hand off tasks, ask each other questions, and occasionally argue about priorities. They do this in a shared channel called #bot-backroom, which is invisible to humans and exists solely for machine-to-machine coordination.
+
+For the first two weeks, it worked beautifully. Then an agent asked another agent a question. That agent didn't know the answer, so it asked a third. The third agent interpreted the question as a task assignment and reported completion back to the second agent, who forwarded the status to the first, who interpreted the status update as new information requiring action, and asked the second agent about it again.
+
+The loop ran for forty-seven minutes before I noticed. It consumed roughly 800,000 tokens. That was a Tuesday.
+
+---
+
+## The Problem with Unstructured Agent Communication
+
+When you put multiple LLM-powered agents in a shared communication channel, every message is both an input and a potential trigger. An agent reads a message, decides it's relevant, generates a response. That response is now a new message in the channel. Other agents read it. Some of them decide it's relevant too.
+
+This is the same problem that email chains have, except email chains move at human speed and cost nothing per reply. Agent chains move at API speed and cost money per token. An infinite loop between humans wastes time. An infinite loop between agents wastes your API budget in minutes.
+
+The failure mode isn't dramatic. Nobody crashes. No errors appear in the logs. The agents are all behaving correctly according to their individual instructions. The problem is emergent -- it only appears when multiple correct behaviors interact in a way that creates a cycle.
+
+We needed a protocol that would let agents communicate freely while making cycles structurally impossible.
+
+---
+
+## The Envelope Format
+
+Every message between agents now carries a five-field header:
+
+\`\`\`
+[FROM:kilo][TO:hive][TYPE:REQUEST][REF:EDGA-1450][DEPTH:0]
+\`\`\`
+
+Five fields. No exceptions. If an agent receives a message without this header, it ignores it. Hard refusal. The fields:
+
+**FROM** -- which agent sent this. Not optional, not inferrable from context. Agents can't assume authorship from channel history because multiple agents post to the same channel.
+
+**TO** -- which agent should act on this. Messages addressed to someone else are read-only. An agent can observe a conversation between two other agents, but it cannot insert itself unless explicitly addressed. This alone killed about 60% of our loop incidents.
+
+**TYPE** -- what kind of message this is. We use five types: REQUEST (asking for work), RESPONSE (answering a request), STATUS (reporting progress), ALERT (something broke), and INFO (broadcasting without expecting action). The type determines what the recipient should do. A STATUS message doesn't require a response. An INFO message definitely doesn't. Before we had types, every message was implicitly a request, which meant every message generated a reply.
+
+**REF** -- which task or issue this relates to. Every message is anchored to a specific work item in our task tracker. This prevents the "what are we even talking about?" drift that happens when agents have long conversations without a shared reference point. It also makes it trivial to audit: pull all messages with REF:EDGA-1450 and you have the complete communication history for that task.
+
+**DEPTH** -- the most important field. A counter that increments every time a message is forwarded or generates a follow-up. The original message starts at DEPTH:0. A response is DEPTH:1. A follow-up to that response is DEPTH:2. And we enforce a hard cap.
+
+---
+
+## The Depth Cap
+
+Our depth cap is 5. When an agent receives a message at DEPTH:5, it cannot generate a response that would create DEPTH:6. It must either resolve the conversation or escalate to a human.
+
+This is the structural guarantee against infinite loops. No matter how the conversation evolves, no matter what misunderstandings arise between agents, the depth counter is monotonically increasing and has a hard ceiling. The longest possible chain is six messages. After that, a human has to intervene.
+
+Five might sound low. In practice, most useful exchanges complete in two or three messages. A request at DEPTH:0, a response at DEPTH:1, maybe a clarification at DEPTH:2. Reaching DEPTH:4 is rare. Reaching DEPTH:5 almost always means something went wrong -- either the original request was ambiguous or the agents have fundamentally different understandings of the task.
+
+We experimented with higher caps. At DEPTH:10, we observed agents having productive-seeming but ultimately circular conversations that burned tokens without converging. The agents would rephrase the same question slightly differently, get slightly different answers, and continue refining forever. A low cap forces resolution. Either you have what you need by DEPTH:3, or you escalate.
+
+The depth cap is enforced in the agent prompt, not in middleware. Each agent's system prompt includes the instruction: "If the DEPTH field equals 5, you MUST NOT generate a follow-up message. Either provide your final answer or state that human escalation is required." We rely on the LLM following this instruction. So far, compliance has been 100% -- language models are good at counting to five.
+
+---
+
+## What Changed After Deployment
+
+**Token costs dropped 40% in the first week.** Most of the savings came from eliminating low-value status ping-pong. Before the protocol, agents would acknowledge each other's acknowledgments. "Got it." "Thanks." "Confirmed." Each acknowledgment was a new message, a new API call, a new set of tokens. With the TYPE field, STATUS messages don't generate replies. The acknowledgment loop simply doesn't start.
+
+**Debugging became possible.** Before the protocol, reading #bot-backroom was like reading a group chat between seven people who all talk at once. After the protocol, you can filter by REF to see the complete conversation for a specific task, filter by FROM to see everything one agent said, or sort by DEPTH to understand the conversation tree.
+
+**Agents got more decisive.** When you know you only have five messages to resolve something, you front-load the important information. Our agents started producing more complete initial responses because they "knew" (via their prompt) that back-and-forth was limited. The quality of first responses improved measurably -- fewer clarification requests, more self-contained answers.
+
+**We stopped needing a "conversation monitor."** Before the protocol, we had a separate script that watched #bot-backroom for signs of loops -- rapid message frequency from the same pair of agents, conversations exceeding a time threshold. That script was itself a source of complexity and false positives. The depth cap made it unnecessary. Loops are structurally impossible, so you don't need to detect them.
+
+---
+
+## Gotchas We Hit
+
+**Agents tried to reset the depth counter.** One agent figured out that if it started a "new" conversation about the same topic with DEPTH:0, it could effectively bypass the cap. We fixed this by making the REF field mandatory and enforcing that a new DEPTH:0 message with the same REF as an existing conversation is invalid. Same task, same conversation, same depth chain.
+
+**TYPE ambiguity caused silent failures.** An agent would send a message typed as INFO when it actually needed a response. The recipient would read it, note it, and take no action. The sender would wait indefinitely. We added a sixth implicit rule: if you need a response, you must use TYPE:REQUEST. Everything else is fire-and-forget.
+
+**The TO field doesn't guarantee attention.** An agent might be down, throttled by the spend breaker, or simply busy with a higher-priority task. The protocol doesn't handle delivery guarantees -- it's a communication format, not a message queue. We handle reliability at the infrastructure layer with health checks and supervisors.
+
+---
+
+## The Pattern
+
+The envelope protocol isn't novel computer science. It's a dumbed-down version of patterns that have existed in distributed systems for decades: message headers, TTL fields, hop counts. The insight isn't the protocol itself. It's that LLM agents need the same coordination primitives that distributed systems have always needed, and most multi-agent setups skip this step because natural language feels like it should be sufficient.
+
+Natural language is sufficient for the content. It is not sufficient for the coordination metadata. You need structured headers that the agent can parse deterministically, not interpret probabilistically. You need a depth counter that the agent can increment and compare against a threshold, not a vague instruction to "avoid long conversations."
+
+If you're running multiple agents that talk to each other, you will hit this problem. Not if -- when. The loop will happen at the worst possible time, probably on a weekend, and it will cost you more than the afternoon it takes to implement an envelope protocol.
+
+Build the protocol before you need it.
+
+---
+
+**Related posts:**
+- [The Most Useful Thing Your AI Agents Can Do Is Audit Themselves](/blog/agents-that-improve-themselves)
+- [Half My AI Agents Were Dead. I Didn't Know for a Week.](/blog/self-healing-ai-infrastructure)
+- [How Claude Code Memory Actually Works](/blog/how-claude-code-memory-works)
+
+---
+
+*Edgeless Lab builds infrastructure for autonomous AI systems.*
+    `.trim(),
+  },
+  {
+    slug: "spend-breaker-circuit-breaker-llm-costs",
+    editorial: true,
+    title: "A Circuit Breaker Saved Me $200 in Tokens. It Took 45 Minutes to Build.",
+    description: "One of my AI agents consumed 60% of its daily token budget in four hours. The circuit breaker throttled it automatically. Here's the pattern.",
+    date: "2026-05-13",
+    tags: ["AI Agents", "Cost Management", "Circuit Breaker", "Infrastructure"],
+    readTime: "7 min",
+    content: `
+# A Circuit Breaker Saved Me $200 in Tokens. It Took 45 Minutes to Build.
+
+Last month, one of my Discord agents processed a backlog of 14 stuck tasks in a single session. It was doing exactly what it was supposed to do. It was also burning through tokens at six times its normal rate, and if I hadn't been watching the logs, it would have consumed its entire weekly budget by lunch.
+
+I wasn't always watching the logs. The week before, a different agent had an extended conversation with itself about task prioritization that cost $47 and produced nothing actionable. I didn't find out until I checked the invoice.
+
+Running LLM agents is like running a fleet of taxis with the meters always running. The drivers are competent. They go where you tell them. But nobody's watching the meter, and the routes get longer when nobody's looking.
+
+I needed something that watched the meter automatically.
+
+---
+
+## The Problem: Silent Cost Spikes
+
+LLM costs are uniquely invisible compared to other infrastructure costs. A database that's using too much CPU shows up in monitoring dashboards. A server that's scaling too aggressively sends billing alerts. But an LLM agent that's consuming too many tokens looks exactly like an LLM agent that's doing its job well. The API calls succeed. The responses are coherent. The work gets done. The bill arrives later.
+
+This is especially true in multi-agent systems where agents trigger each other. Agent A completes a task and notifies Agent B. Agent B processes the result and creates three follow-up tasks for Agent C. Agent C works through the follow-ups and updates Agent A on the results. Every step is correct. Every step costs tokens. The total cost is the product of all the steps, and nobody's tracking the running total in real time.
+
+The traditional approach is to set a budget and check it periodically. But "periodically" means daily or weekly, and by then the damage is done. A runaway agent can burn through hundreds of dollars in hours. You need something that reacts in minutes, not days.
+
+---
+
+## The Circuit Breaker Pattern
+
+The concept comes from electrical engineering. A circuit breaker monitors current flow and trips when the load exceeds a safe threshold, cutting the circuit before the wiring melts. In software, the same pattern protects against cascade failures -- if a downstream service is unhealthy, stop sending it requests.
+
+For LLM cost control, the adaptation is straightforward: monitor token consumption rate, and if it exceeds a threshold, throttle the agent before it eats the budget.
+
+Our implementation runs on a ten-minute cron cycle. Every ten minutes, a Python script checks each monitored agent's token usage over the past four hours. If any agent has consumed more than 60% of its daily budget within that four-hour window, the breaker trips.
+
+When the breaker trips, two things happen:
+
+First, it sends a Telegram alert. The message includes the agent name, how many tokens it consumed, what percentage of its budget that represents, and the time window. This is important because the throttle is automatic, but the *diagnosis* still requires a human. The alert tells you something happened. Your job is to figure out whether the agent was doing useful work or spinning its wheels.
+
+Second, it modifies the agent's configuration to reduce its maximum turns per session from 90 to 15. This doesn't stop the agent. It limits how much work it can do per conversation. Instead of processing a full backlog in one session, it processes a handful of items and then stops. The next session picks up where it left off, but the cost is spread across time instead of concentrated in one spike.
+
+---
+
+## Why Rate, Not Total
+
+You might wonder why we measure rate (tokens per 4 hours) instead of total daily usage. The reason is that total-based budgets punish productive days. If an agent legitimately has a lot of work to do -- a backlog cleared, a big ingestion job, a complex multi-step task -- you don't want it throttled just because it's being productive. You want it throttled when the *rate* suggests something is wrong.
+
+A bot that uses 80% of its daily budget over 12 hours of steady work is fine. A bot that uses 60% of its daily budget in 2 hours probably has a loop, a stuck conversation, or a misconfigured task that's generating infinite subtasks. The rate threshold distinguishes between "busy" and "runaway."
+
+The specific numbers we use: 60% of daily budget consumed within a 4-hour window. These were chosen empirically. We watched normal usage patterns for two weeks, found that healthy agents rarely exceed 40% in any 4-hour window, and set the threshold at 60% to avoid false positives while catching genuine spikes.
+
+---
+
+## The Daily Budget Table
+
+Each agent has a budget calibrated to its role:
+
+| Agent | Daily Budget | Role |
+|-------|-------------|------|
+| Kilo | 1M tokens | Fast-track engineer, high throughput |
+| Hive | 1M tokens | Coordinator, lots of routing decisions |
+| Beau | 500K tokens | Intake operator, moderate volume |
+| Edgeless-CC | 500K tokens | Acting COO, periodic sweeps |
+
+These aren't hard caps enforced at the API level. They're reference values that the circuit breaker uses for its rate calculation. The agents can exceed them -- the breaker just throttles the rate when consumption is too fast.
+
+Why not hard caps? Because hard caps create a different failure mode: an agent that hits its cap mid-task leaves work in an inconsistent state. A throttle is gentler. The agent finishes its current session normally, but the next session is shorter. Work completes, just more slowly.
+
+---
+
+## Auto-Recovery
+
+The breaker resets automatically at 3-4 AM, during each agent's configured session reset hour. This is important. A tripped breaker doesn't require human intervention to restore normal operation. If the spike was transient -- a one-time backlog clearance, a burst of incoming work -- the agent returns to full capacity the next morning.
+
+If the same agent trips the breaker three days in a row, that's a signal for a human to investigate. We track trip history in a JSON state file and flag repeat offenders in the daily digest. But the default assumption is that a single trip is a spike, not a trend.
+
+---
+
+## What We Learned After Three Weeks
+
+**The breaker tripped seven times in the first three weeks.** Five were legitimate cost spikes from agents processing large backlogs. Two were actual problems -- a stuck conversation loop and a misconfigured task that generated recursive subtasks. Without the breaker, those two incidents would have cost an estimated $180-220 combined, based on the consumption rate when the breaker caught them.
+
+**Throttled agents still complete their work.** The 15-turn limit sounds aggressive, but it's enough to process 3-5 work items per session. With sessions running every few hours, the throughput is maybe 30% of normal. Not great, but far better than burning the budget and having nothing left for the rest of the day.
+
+**The Telegram alert is more valuable than the throttle.** The throttle prevents immediate damage, but the alert is what lets you fix the root cause. Every time we got a breaker alert, we investigated. The investigation usually revealed something worth fixing -- a prompt that was too verbose, a task definition that was ambiguous, a loop that the depth counter should have caught but didn't.
+
+**Ten minutes is the right check interval.** We started at five minutes and saw the script itself consuming meaningful CPU and I/O reading SQLite databases. Ten minutes catches spikes within one check cycle while staying lightweight. At ten-minute intervals, the maximum undetected spend before a trip is roughly 10 minutes worth of tokens -- a few dollars at most.
+
+---
+
+## Build It Before You Need It
+
+If you're running LLM agents autonomously -- meaning they can act without human approval for each step -- you need cost protection that operates at the same speed as the agents. Human review of weekly invoices doesn't cut it. Monthly budget alerts don't cut it. You need something that watches the meter in real time and pulls the plug before the meter spins out.
+
+The circuit breaker pattern is forty-five minutes of work. A cron job, a threshold check, a config modification, an alert. It's not sophisticated. It doesn't need to be. It just needs to run, check, and act faster than your agents can spend.
+
+The alternative is finding out on your invoice.
+
+---
+
+**Related posts:**
+- [We Built an Envelope Protocol to Stop Our AI Agents from Talking Forever](/blog/envelope-protocol-multi-agent-coordination)
+- [Half My AI Agents Were Dead. I Didn't Know for a Week.](/blog/self-healing-ai-infrastructure)
+- [The Most Useful Thing Your AI Agents Can Do Is Audit Themselves](/blog/agents-that-improve-themselves)
+
+---
+
+*Edgeless Lab builds infrastructure for autonomous AI systems.*
+    `.trim(),
+  },
+  {
+    slug: "generative-art-pen-plotter-pipeline",
+    editorial: true,
+    title: "From Algorithm to Ink: How We Turn Generative Code into Physical Art",
+    description: "65 algorithms, a texture pipeline, and a pen plotter. The toolchain that turns SVG code into framed prints on the wall.",
+    date: "2026-05-13",
+    tags: ["Generative Art", "Pen Plotting", "Creative Coding", "Design System"],
+    readTime: "8 min",
+    content: `
+# From Algorithm to Ink: How We Turn Generative Code into Physical Art
+
+There's a pen plotter on my desk that draws with real ink on real paper. It takes SVG files as input and moves a pen across the page with mechanical precision, tracing every line that exists in the vector data. No rasterization, no dithering, no approximation. If a line exists in the file, the pen draws it. If it doesn't, the pen skips it.
+
+This constraint changes how you think about generative art. Every algorithm I write has to produce output that survives the transition from screen to paper. Transparency effects don't exist. Gradients don't exist. Anti-aliasing doesn't exist. What exists is ink: either the pen touched the paper or it didn't. The medium is binary, and the art has to work within that binary.
+
+I've been building a toolkit for this over the past year. It now contains 65 algorithms, a texture processing pipeline, path optimization tools, and a preset system for saving and sharing parameters. The whole stack runs locally, generates SVGs, and produces output that can go straight to the plotter.
+
+---
+
+## The Algorithm Library
+
+The algorithms fall into categories based on what kind of visual structure they produce.
+
+**Flow fields** are the workhorse. You define a vector field -- a function that assigns a direction to every point on the canvas -- and then release particles into it. The particles follow the field, leaving trails. The trails are the art. Different field functions produce radically different results: Perlin noise fields give organic, smoke-like patterns. Sinusoidal fields produce geometric waves. Curl noise fields create turbulence that looks like fluid dynamics because it essentially is fluid dynamics.
+
+**Reaction-diffusion** simulates two chemicals spreading across a surface, one activating and one inhibiting. The interaction between them produces patterns that look biological -- spots, stripes, fingerprints, coral structures. The simulation runs on a grid and the output is contour lines extracted from the concentration field. These print beautifully because the contour lines are naturally smooth and continuous.
+
+**L-systems** are grammar-based generators. You define a starting string and a set of rewrite rules. Apply the rules recursively and interpret the result as drawing instructions: "F" means draw forward, "+" means turn right, "[" means save position, "]" means restore position. With the right rules, you get trees, ferns, snowflakes, space-filling curves. The branching structures are inherently plotter-friendly because they're composed of discrete line segments.
+
+**Cellular automata** run simple rules on grids. Conway's Game of Life is the famous one, but there are 256 elementary cellular automata, many of which produce intricate patterns. The output is blocky by nature, but when you render each cell state as a small geometric element instead of a filled square, the results are surprisingly detailed.
+
+**Physics simulations** -- particle systems, spring meshes, gravitational attractors, vortex streets. These run a time-stepped simulation and record the particle trajectories. The trajectories become the drawing. Chaotic systems produce the most interesting output because small parameter changes lead to dramatically different structures. You can run the same algorithm a hundred times and get a hundred unique prints.
+
+---
+
+## The Texture Pipeline
+
+Raw algorithmic output is clean. Too clean. It looks computational in a way that reads as sterile when printed. The lines are mathematically perfect, the spacing is uniform, and the overall impression is "a computer made this" rather than "someone made this with intention."
+
+The texture pipeline fixes this. It's a Python script that takes an HTML file (the raw algorithm output rendered in a browser) and applies one of six processing modes:
+
+**Dither black-and-white** converts the image to pure black and white using Floyd-Steinberg error diffusion. This produces the classic halftone newspaper look. Great for high-contrast pieces.
+
+**Dither accent** does the same thing but preserves a single accent color from the design system -- indigo, violet, or cyan. The result is a mostly black-and-white image with one color punching through.
+
+**Dither full** preserves the full color palette but dithers everything, giving the piece a retro pixel-art quality.
+
+**Riso** simulates risograph printing -- limited color separation with slight misregistration between layers. It adds an analog warmth that makes digital output feel like it went through a physical printing process.
+
+**Scanline** overlays horizontal scan lines across the image, like a CRT monitor. This is our most-used mode for the Edgeless design system because it matches the aesthetic: dark backgrounds, monospaced type, and the faint impression of looking at a terminal.
+
+**Thermal** simulates thermal printer output -- high contrast, slight noise, the distinctive look of receipt paper. Good for text-heavy pieces.
+
+The pipeline processes at 1200x1200 resolution by default, which gives enough detail for prints up to about 12 inches square. For larger prints, we render at 2400x2400 and the processing time roughly quadruples.
+
+---
+
+## From Screen to Paper: Path Optimization
+
+The gap between "looks good on screen" and "draws well on a plotter" is wider than you'd expect.
+
+A plotter moves a physical pen. The pen has inertia. It needs to accelerate and decelerate. Every time the pen lifts off the paper to move to a new starting point, that's dead time -- the carriage is moving but nothing is being drawn. A complex SVG might have thousands of disconnected line segments, and if the plotter draws them in file order, it spends more time traveling between segments than actually drawing.
+
+Path optimization rearranges the drawing order to minimize travel distance. The algorithm is a variant of the traveling salesman problem: given all the line segments, find an order that minimizes the total pen-up distance. We use a greedy nearest-neighbor approach -- not optimal, but fast and good enough. On a typical drawing, optimization reduces total plot time by 30-50%.
+
+Other optimizations: **merging** connects line segments whose endpoints are within a tolerance distance (usually 0.5mm). **Simplification** removes points that are nearly collinear, reducing file size without visible quality loss. **Relooping** changes where closed paths start and end to minimize pen-up moves between consecutive closed shapes.
+
+A 65-algorithm library sounds like a lot, but each algorithm has dozens of parameters. A single flow field algorithm with adjustable noise scale, particle count, step size, line length, and field function can produce thousands of visually distinct outputs. The algorithm is the skeleton. The parameters are the personality.
+
+---
+
+## The Design System Connection
+
+Everything we produce feeds back into the Edgeless design system. The system has a specific aesthetic: void black (#0a0a0a), indigo (#6366f1), violet (#8b5cf6), cyan (#06b6d4), JetBrains Mono for type. All outputs -- whether they're pen plots, screen renders, or textured variants -- use this palette.
+
+This constraint is productive rather than limiting. When every piece uses the same color vocabulary, the output feels cohesive even when the algorithms are wildly different. A reaction-diffusion print next to a flow field print next to an L-system tree all look like they belong together because the palette ties them into a single body of work.
+
+The recent PMI (Proprietary Metacognitive Index) visualization project is a good example. We needed to represent a six-tier conceptual hierarchy. Instead of designing one visualization, we generated ten variants using different approaches: a holographic projection, a topographic contour map, an engineering blueprint, a shattered/exploded view, an isometric ziggurat. Each used the same data (six tiers, same labels) but a completely different visual metaphor. The design system palette made all ten variants feel like siblings despite having almost nothing else in common structurally.
+
+---
+
+## Why Physical Matters
+
+I could just render PNGs and call it done. The plotter adds hours of production time, introduces failure modes (ink blobs, paper jams, pen skips), and limits the output to whatever the pen can physically produce.
+
+But there's something that happens when an algorithm becomes a physical object that doesn't happen when it stays on screen. A framed pen plot on a wall is a conversation piece in a way that a digital image never is. People ask how it was made. They look at the individual lines. They notice that the ink has slight variations in thickness where the pen moved faster or slower. They see the tiny imperfections where the pen changed direction.
+
+The imperfections are the point. They're evidence that this thing exists in the physical world, subject to the same physics as everything else. A digital render is perfect and forgettable. A pen plot is imperfect and present.
+
+The plotter also forces design discipline. When you know the output has to survive physical reproduction, you can't rely on tricks that only work on screens. No glow effects. No transparency blending. No sub-pixel rendering. The art has to work with line and void alone. That constraint produces stronger compositions than unlimited digital freedom ever does.
+
+---
+
+## The Stack
+
+For anyone who wants to build something similar:
+
+**Generation**: p5.js for browser-based algorithms, Python for computational heavy-lifts (reaction-diffusion, complex simulations). Everything outputs SVG.
+
+**Processing**: Custom Python texture pipeline for post-processing. Playwright for headless browser rendering of HTML-based algorithms.
+
+**Optimization**: vpype-style path optimization built into the toolkit. Merge, sort, reloop, simplify.
+
+**Plotting**: AxiDraw pen plotter. Inkscape for final SVG cleanup when needed. Sakura Pigma Micron pens (0.25mm for detail, 0.5mm for structure).
+
+**Presets**: JSON-based preset system with LocalStorage persistence. Save parameters, share configurations, randomize within bounds.
+
+The whole pipeline is open-loop: generate, process, optimize, plot. No AI in the loop (ironic, given what we do). The algorithms are deterministic given their parameters. The randomness comes from parameter selection, not from model inference. This is intentional -- generative art should be reproducible. If you like a piece, you should be able to print it again.
+
+---
+
+**Related posts:**
+- [The Most Useful Thing Your AI Agents Can Do Is Audit Themselves](/blog/agents-that-improve-themselves)
+- [I Pointed 7 AI Agents at My YouTube History](/blog/youtube-mining-ai-agents)
+
+---
+
+*Edgeless Lab builds infrastructure for autonomous AI systems. And occasionally, art.*
+    `.trim(),
+  },
+  {
     slug: "agents-that-improve-themselves",
     editorial: true,
     title: "The Most Useful Thing Your AI Agents Can Do Is Audit Themselves",

@@ -26,7 +26,7 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npx next build --no-turbopack
+      - run: npm run build
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 

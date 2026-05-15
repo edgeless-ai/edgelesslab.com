@@ -22,10 +22,11 @@ jobs:
         with:
           sparse-checkout: |
             /*
-            !pen-plotter
-            !tartanism
-            !total-serialism
-            !flow-viz
+            !/pen-plotter
+            !/tartanism
+            !/total-serialism
+            !/flow-viz
+          sparse-checkout-cone-mode: false
 
       - uses: actions/setup-node@v4
         with:

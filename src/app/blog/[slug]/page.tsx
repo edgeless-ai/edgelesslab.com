@@ -38,7 +38,7 @@ export async function generateMetadata({
       siteName: "Edgeless Lab",
       url: `https://edgelesslab.com/blog/${post.slug}`,
       images: [{
-        url: "/og-image.png",
+        url: `/og/${post.slug}`,
         width: 1200,
         height: 630,
         alt: post.title,
@@ -51,7 +51,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: fullTitle,
       description: post.description,
-      images: ["/og-image.png"],
+      images: [`/og/${post.slug}`],
     },
   };
 }
@@ -435,7 +435,7 @@ function escapeHtml(text: string): string {
 
 function inlineFormat(text: string): string {
   return text
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/`(.+?)`/g, "<code>$1</code>")
-    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
 }

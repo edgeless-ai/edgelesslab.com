@@ -710,8 +710,8 @@ export function SubscribeSection() {
               href="https://github.com/edgeless-ai"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
-              style={{ background: "var(--accent)" }}
+              className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
+              style={{ background: "var(--accent)", color: "#1e1b4b" }}
             >
               GitHub <ArrowUpRight size={14} />
             </a>

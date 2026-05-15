@@ -4,6 +4,7 @@ import { JsonLd } from "@/components/json-ld";
 import { createPageMetadata } from "@/lib/metadata";
 import { ProductsGrid } from "@/components/products-grid";
 import { ProductsSubtitle } from "@/components/products-subtitle";
+import { GumroadScript } from "@/components/gumroad-overlay";
 import { products } from "@/lib/data";
 
 export const metadata = createPageMetadata({
@@ -21,6 +22,7 @@ export default function ProductsPage() {
       style={{ background: "var(--bg-base)" }}
     >
       <Nav />
+      <GumroadScript />
 
       <JsonLd data={{
         "@context": "https://schema.org",

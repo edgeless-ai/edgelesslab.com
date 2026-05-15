@@ -1,9 +1,10 @@
-import posthog from "posthog-js";
-
 export function trackEvent(event: string, properties?: Record<string, unknown>) {
-  if (typeof window !== "undefined") {
+  if (typeof window === "undefined") return;
+
+  // Lazy-load PostHog so importing this module doesn't bloat the main JS bundle.
+  void import("posthog-js").then(({ default: posthog }) => {
     posthog.capture(event, properties);
-  }
+  });
 }
 
 export function trackCTA(name: string, destination?: string) {

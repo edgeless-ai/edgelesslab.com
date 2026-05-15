@@ -11,6 +11,7 @@ import {
 import { ArrowUpRight, ChevronDown } from "lucide-react";
 import { usePreText } from "@/hooks/use-pretext";
 import { PreTextMasonry } from "@/components/ui/pretext-masonry";
+import { GumroadBuyCTA } from "@/components/gumroad-overlay";
 import type { Product } from "@/lib/data";
 
 /** Fixed-height zones in each card (px). */
@@ -19,7 +20,7 @@ const HEADER_HEIGHT = 32; // name line
 const PRICE_HEIGHT = 40; // price + margin
 const DESC_MARGIN = 20; // mb-5
 const TOGGLE_HEIGHT = 36; // expand/collapse button
-const CTA_HEIGHT = 28; // buy link
+const CTA_HEIGHT = 60; // details + buy link
 const FEATURE_ITEM_HEIGHT = 24;
 const FEATURE_GAP = 8;
 const FEATURE_PADDING = 16;
@@ -479,15 +480,47 @@ function ProductCard({
           Coming soon
         </span>
       ) : product.slug ? (
-        <a
-          href={`/products/${product.slug}`}
-          className="flex items-center gap-1 text-sm font-medium hover:text-white transition-colors mt-auto pt-2"
-          style={{ color: "var(--text-secondary)" }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {`View details \u2014 ${product.price}`}
-          <ArrowUpRight size={14} />
-        </a>
+        <div className="mt-auto pt-2 space-y-2">
+          <a
+            href={`/products/${product.slug}`}
+            className="flex items-center gap-1 text-sm font-medium hover:text-white transition-colors"
+            style={{ color: "var(--text-secondary)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            View details
+            <ArrowUpRight size={14} />
+          </a>
+
+          {product.href.includes("gumroad.com") ? (
+            <GumroadBuyCTA
+              href={product.href}
+              productName={product.name}
+              price={product.price}
+              label={product.price === "Free" ? "Get it free" : `Buy now \u2014 ${product.price}`}
+              stopPropagation
+            />
+          ) : (
+            <a
+              href={product.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-sm font-medium hover:text-white transition-colors"
+              style={{ color: "var(--text-secondary)" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {product.price === "Free" ? "Get it free" : `Buy now \u2014 ${product.price}`}
+              <ArrowUpRight size={14} />
+            </a>
+          )}
+        </div>
+      ) : product.href.includes("gumroad.com") ? (
+        <GumroadBuyCTA
+          href={product.href}
+          productName={product.name}
+          price={product.price}
+          label={product.price === "Free" ? "Get it free" : `Buy now \u2014 ${product.price}`}
+          stopPropagation
+        />
       ) : (
         <a
           href={product.href}
@@ -497,9 +530,7 @@ function ProductCard({
           style={{ color: "var(--text-secondary)" }}
           onClick={(e) => e.stopPropagation()}
         >
-          {product.price === "Free"
-            ? "Get it free on GitHub"
-            : `Buy now \u2014 ${product.price}`}
+          {product.price === "Free" ? "Get it free" : `Buy now \u2014 ${product.price}`}
           <ArrowUpRight size={14} />
         </a>
       )}

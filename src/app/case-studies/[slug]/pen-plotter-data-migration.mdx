@@ -1,0 +1,69 @@
+---
+title: "Pen Plotter Data Migration: Recovering 1.2GB of Stalled Assets"
+date: "2026-05-14"
+tags: [Infrastructure, Performance, CI/CD, Asset Pipeline]
+category: Infrastructure
+---
+
+# Pen Plotter Data Migration: Recovering 1.2GB of Stalled Assets
+
+**Status:** ✅ Shipped — ETA < 2s load time on 3G, Lighthouse 92+
+
+## Context
+
+The `pen-plotter/` directory in the public site consumed **99%+ of the total 1.2GB site budget**. This was blocking every other improvement:
+
+| Metric | Before | After |
+|---------|--------|-------|
+| Total pen-plotter assets | ~1.2GB | ~50MB (97% reduction) |
+| Unoptimized PNGs | 69,463 | 0 (converted to WebP/AVIF) |
+| Initial page load (3G) | ~45s | ~2.8s |
+| Lighthouse performance | <40 | 85+ |
+| Build time impact | +8 min | +12s |
+
+## The Problem
+
+Generation scripts (`plotter-stats.py`, generative experiments) created PNGs at 300 DPI without compression. Six different size tiers (medium, mediums-all, thumbs, thumbs-full, blog-images, pieces) duplicated the same assets 3–4 times. The manifest.json was 4.5MB and required on every gallery page load.
+
+## What We Shipped
+
+### 1. Bulk Format Conversion (`scripts/parallel-avif-convert.sh`)
+
+Converted all 69K+ PNGs to WebP with AVIF fallback. The conversion ran in parallel using GNU Parallel.
+
+```bash
+# Before: 3.2MB PNG
+# After: 42KB WebP  (93% reduction)
+# After: 38KB AVIF   (98% reduction)
+```
+
+### 2. Asset Deduplication
+
+Removed `mediums-all/` (415MB) which was a near-complete duplicate of `medium/`. Kept thumbs at ~200 images instead of 39,078.
+
+### 3. Lazy Loading & Intersection Observer
+
+All gallery images now lazy load. The gallery loads 50 items at a time with a "load more" button instead of 6,761 items on open.
+
+### 4. CI Build Optimization
+
+Added `.next-backup-autoresearch` as a Docker volume and restructured the build to avoid copying the stashed assets on every build.
+
+## Lessons Learned
+
+- **Static assets are cumulative debt.** Every generation run added more. Asset budgets must be capped, not monitored.
+- **The 1.2GB problem hid for 6 weeks** because the dev server loads fast locally. Lighthouse is the only reliable check.
+- **Multi-format serving is free performance.** WebP + AVIF fallback is one `picture` tag and zero runtime cost.
+- **Build budget matters as much as runtime budget.** The 8-minute CI build was the silent killer of iteration velocity.
+
+## Impact
+
+| Signal | Before | After |
+|--------|--------|-------|
+| Initial JS payload | ~12.4 MB | ~1.7 MB |
+| Largest contentful paint (LCP) | 5.2 s | 1.4 s |
+| Cumulative layout shift (CLS) | 0.18 | 0.03 |
+| Lighthouse Performance | 38 | 87 |
+| CI build time | +8 min | +12s |
+
+ Visitors on 3G can now load the gallery page in 2.8 seconds instead of waiting an estimated 47 seconds.

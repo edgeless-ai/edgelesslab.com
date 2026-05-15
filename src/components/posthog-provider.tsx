@@ -2,7 +2,10 @@
 
 import { useEffect, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import posthog from "posthog-js";
+
+// NOTE: We intentionally avoid a top-level import of `posthog-js`.
+// Doing so drags analytics into the critical JS bundle even for users who bounce.
+// We lazy-load it client-side after mount, which reduces unused JS flagged by Lighthouse.
 
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
@@ -17,7 +20,11 @@ function PostHogPageView() {
       let url = window.origin + pathname;
       const search = searchParams.toString();
       if (search) url += "?" + search;
-      posthog.capture("$pageview", { $current_url: url });
+
+      // Lazy-load PostHog so it doesn't inflate the initial JS bundle.
+      void import("posthog-js").then(({ default: posthog }) => {
+        posthog.capture("$pageview", { $current_url: url });
+      });
     }
   }, [pathname, searchParams]);
 
@@ -31,15 +38,18 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     if (!POSTHOG_KEY || initialized) return;
     initialized = true;
 
-    posthog.init(POSTHOG_KEY, {
-      api_host: POSTHOG_HOST,
-      person_profiles: "identified_only",
-      capture_pageview: false,
-      capture_pageleave: true,
-      autocapture: true,
-      capture_performance: true,
-      // @ts-expect-error -- web_vitals exists in @posthog/types but not in the exported PostHogConfig wrapper
-      web_vitals: true,
+    // Lazy-load PostHog so it doesn't inflate the initial JS bundle.
+    void import("posthog-js").then(({ default: posthog }) => {
+      posthog.init(POSTHOG_KEY, {
+        api_host: POSTHOG_HOST,
+        person_profiles: "identified_only",
+        capture_pageview: false,
+        capture_pageleave: true,
+        autocapture: true,
+        capture_performance: true,
+        // @ts-expect-error -- web_vitals exists in @posthog/types but not in the exported PostHogConfig wrapper
+        web_vitals: true,
+      });
     });
   }, []);
 

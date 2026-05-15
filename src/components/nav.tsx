@@ -7,7 +7,9 @@ import { useState, useEffect } from "react";
 
 const navLinks = [
   { label: "Projects", href: "/projects" },
+  { label: "Agents", href: "/agents" },
   { label: "Products", href: "/products" },
+  { label: "Case Studies", href: "/case-studies" },
   { label: "Lab", href: "/lab" },
   { label: "Blog", href: "/blog" },
   { label: "Knowledge", href: "/knowledge" },

@@ -5,6 +5,16 @@ import { productContent } from '@/lib/product-content';
 
 export const dynamic = 'force-static';
 
+const CASE_STUDIES = [
+  {
+    slug: "pen-plotter-data-migration",
+    url: "https://edgelesslab.com/case-studies/pen-plotter-data-migration/",
+    lastModified: new Date('2026-05-14'),
+    changeFrequency: 'monthly' as const,
+    priority: 0.8,
+  },
+];
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
     {
@@ -39,6 +49,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: 'https://edgelesslab.com/knowledge/',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://edgelesslab.com/case-studies/',
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
@@ -90,6 +106,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
+  const caseStudyPages: MetadataRoute.Sitemap = CASE_STUDIES.map((cs) => ({
+    url: cs.url,
+    lastModified: cs.lastModified,
+    changeFrequency: cs.changeFrequency,
+    priority: cs.priority,
+  }));
+
   const productPages: MetadataRoute.Sitemap = products
     .filter((p) => p.slug && !p.comingSoon && productContent[p.slug])
     .map((product) => ({
@@ -99,5 +122,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     }));
 
-  return [...staticPages, ...projectPages, ...experimentPages, ...blogPages, ...productPages];
+  return [
+    ...staticPages,
+    ...projectPages,
+    ...experimentPages,
+    ...blogPages,
+    ...caseStudyPages,
+    ...productPages,
+  ];
 }

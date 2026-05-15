@@ -46,7 +46,7 @@ html{color-scheme:dark only}
 body{margin:0;min-height:100vh;font-family:var(--font-geist-sans),system-ui,sans-serif;background:#09090B;color:#FAFAFA;line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 
 /* CSS Variables */
-:root{--bg-base:#09090B;--bg-surface:#111113;--bg-surface-hover:#1A1A1F;--bg-elevated:#1E1E23;--border-subtle:rgba(255,255,255,0.08);--border-focus:rgba(255,255,255,0.15);--text-primary:#FAFAFA;--text-secondary:rgba(255,255,255,0.72);--text-tertiary:rgba(255,255,255,0.55);--accent:#818CF8;--accent-hover:#A5B4FC;--accent-muted:rgba(129,140,248,0.12);--green:#34D399;--green-muted:rgba(52,211,153,0.12);--ease-out:cubic-bezier(0.16,1,0.3,1)}
+:root{--bg-base:#09090B;--bg-surface:#111113;--bg-surface-hover:#1A1A1F;--bg-elevated:#1E1E23;--border-subtle:rgba(255,255,255,0.08);--border-focus:rgba(255,255,255,0.15);--text-primary:#FAFAFA;--text-secondary:rgba(255,255,255,0.72);--text-tertiary:rgba(255,255,255,0.55);--accent:#6367D8;--accent-hover:#8C95E8;--accent-muted:rgba(99,103,216,0.12);--green:#34D399;--green-muted:rgba(52,211,153,0.12);--ease-out:cubic-bezier(0.16,1,0.3,1)}
 
 /* Critical Hero Styles - Above the fold */
 .hero-section{position:relative;display:flex;min-height:92svh;align-items:center;padding:112px 24px 64px}

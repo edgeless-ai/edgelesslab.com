@@ -8,6 +8,7 @@ import { posts } from "@/lib/blog";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
+import { GumroadBuyCTA, GumroadScript } from "@/components/gumroad-overlay";
 
 const SITE = "https://edgelesslab.com";
 
@@ -78,6 +79,7 @@ export default async function ProductDetailPage({
   return (
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
       <Nav />
+      <GumroadScript />
 
       <JsonLd
         data={{
@@ -168,13 +170,12 @@ export default async function ProductDetailPage({
                 >
                   {content.callToAction}
                 </p>
-                <a
+                <GumroadBuyCTA
                   href={product.href}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-md font-medium transition-colors hover:opacity-90"
-                  style={{ background: "var(--accent)", color: "var(--bg-base)" }}
-                >
-                  Get it free on Gumroad <ArrowUpRight size={16} />
-                </a>
+                  productName={product.name}
+                  price={product.price}
+                  label="Get it on Gumroad"
+                />
                 <span
                   className="ml-3 text-xs font-mono"
                   style={{ color: "var(--text-tertiary)" }}

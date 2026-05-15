@@ -19,6 +19,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /*
+            !pen-plotter
+            !tartanism
+            !total-serialism
+            !flow-viz
 
       - uses: actions/setup-node@v4
         with:
@@ -26,7 +33,7 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm run build
+      - run: npx next build
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 

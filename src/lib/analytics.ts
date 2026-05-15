@@ -17,3 +17,7 @@ export function trackProductView(product: string) {
 export function trackOutboundLink(url: string, label?: string) {
   trackEvent("outbound_link_clicked", { url, label });
 }
+
+export function trackPurchaseInitiated(product: string, priceCents: number, provider: string) {
+  trackEvent("purchase_initiated", { product_name: product, price_cents: priceCents, provider });
+}

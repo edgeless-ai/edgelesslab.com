@@ -26,21 +26,14 @@ jobs:
             !/tartanism
             !/total-serialism
             !/flow-viz
+            !/src
+            !/node_modules
+            !/.github
           sparse-checkout-cone-mode: false
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - run: npm ci
-      - run: npx next build
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: out
+          path: .
 
   deploy:
     needs: build

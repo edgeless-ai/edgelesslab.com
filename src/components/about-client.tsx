@@ -48,7 +48,7 @@ export function AboutHeader() {
         </span>
       </div>
       <Image
-        src="/og-image.png"
+        src="/og-image.webp"
         alt="Edgeless Lab"
         width={0}
         height={0}

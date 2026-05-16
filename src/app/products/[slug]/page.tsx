@@ -197,12 +197,12 @@ export default async function ProductDetailPage({
                     type="image/webp"
                   />
                   <img
-                    src={`/product-covers/${slug}.png`}
+                    src={`/product-covers/${slug}.webp`}
                     alt={`${product.name} cover`}
                     width={1280}
                     height={1280}
                     className="w-full h-auto block"
-                    loading="lazy"
+                    fetchPriority="high"
                     decoding="async"
                   />
                 </picture>

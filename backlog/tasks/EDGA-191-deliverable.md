@@ -1,4 +1,9 @@
-# EDGA-191 Deliverable: IndyDevDan Domain-Locking Analysis
+---
+id: EDGA-191
+title: EDGA-191 Deliverable: IndyDevDan Domain-Locking Analysis
+status: done
+priority: P2
+---
 
 ## Source
 - Video: [My Pi Agent Teams. Claude Code Leak SIGNAL. Harness Engineering](https://www.youtube.com/watch?v=RairMJflUSA)

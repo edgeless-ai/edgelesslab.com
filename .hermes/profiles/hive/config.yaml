@@ -1,0 +1,9 @@
+budget:
+  metered: false
+  token_budget_per_day: 1500000
+  cycle_budget_per_hour: 80
+  warning_threshold: 0.9
+  halt_threshold: 1.0
+meta:
+  name: hive
+  role: Coordinator, Fireworks free tier

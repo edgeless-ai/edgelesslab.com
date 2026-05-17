@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { products } from "@/lib/data";
 import { productContent } from "@/lib/product-content";
 import { posts } from "@/lib/blog";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
+import { GumroadButton } from "@/components/gumroad-button";
 
 const SITE = "https://edgelesslab.com";
 
@@ -168,18 +169,19 @@ export default async function ProductDetailPage({
                 >
                   {content.callToAction}
                 </p>
-                <a
+                <GumroadButton
                   href={product.href}
+                  price={product.price}
+                  productName={product.name}
                   className="inline-flex items-center gap-2 px-5 py-3 rounded-md font-medium transition-colors hover:opacity-90"
                   style={{ background: "var(--accent)", color: "var(--bg-base)" }}
-                >
-                  Get it free on Gumroad <ArrowUpRight size={16} />
-                </a>
+                  icon
+                />
                 <span
                   className="ml-3 text-xs font-mono"
                   style={{ color: "var(--text-tertiary)" }}
                 >
-                  Free &middot; instant download
+                  {product.price === "Free" ? "Free \u00b7 instant download" : `${product.price} \u00b7 instant download`}
                 </span>
               </div>
             </div>

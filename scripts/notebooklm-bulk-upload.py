@@ -1,180 +1,259 @@
 #!/usr/bin/env python3
 """
-NotebookLM Bulk Upload — Task 326
+NotebookLM Bulk Upload Pipeline
 
-Automates source upload to notebooklm.google.com via Playwright.
-Requires: Google auth cookies exported from browser (see setup below).
-
-Setup:
-    1. Install:  pip install playwright
-    2. Browser:  playwright install chromium
-    3. Auth:     Log into notebooklm.google.com in Chrome
-    4. Export:   Use 'EditThisCookie' extension → export cookies.json
-    5. Place:    Save as ~/.notebooklm_cookies.json
+Bulk-uploads YouTube KB articles from the vault to NotebookLM notebooks.
+Supports topic filtering, idempotency, rate limiting, and 50-source cap handling.
 
 Usage:
-    python scripts/notebooklm-bulk-upload.py --batch-dir claude-vault/10-Meta/notebooklm-batches/batch-01 --notebook-name "YouTube Batch 1"
-    python scripts/notebooklm-bulk-upload.py --all-batches
+    python scripts/notebooklm-bulk-upload.py --channel ColeMedin --notebook <id>
+    python scripts/notebooklm-bulk-upload.py --channel ColeMedin --topics agentic,ai-tooling --notebook <id>
+    python scripts/notebooklm-bulk-upload.py --channel ColeMedin --list-topics
 """
 
-import argparse
-import json
 import os
 import sys
+import json
 import time
+import re
+import argparse
+import subprocess
 from pathlib import Path
-from typing import List, Optional
+from dataclasses import dataclass
+from typing import List, Optional, Dict
+from datetime import datetime
 
-# Playwright import with graceful fallback
-try:
-    from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
-except ImportError:
-    print("ERROR: playwright not installed. Run: pip install playwright && playwright install chromium")
-    sys.exit(1)
-
-
-COOKIE_PATH = Path.home() / ".notebooklm_cookies.json"
-BASE_URL = "https://notebooklm.google.com"
+VAULT_BASE = Path("/Users/djm/claude-projects/claude-vault/03-Knowledge/YouTube")
+STATE_PATH = Path("/Users/djm/claude-projects/.runtime/notebooklm_upload_state.json")
+NOTEBOOKLM_LIMIT = 50  # NotebookLM source limit per notebook
+RATE_DELAY = 2.0  # seconds between uploads
 
 
-def load_cookies() -> List[dict]:
-    if not COOKIE_PATH.exists():
-        print(f"ERROR: Cookie file not found at {COOKIE_PATH}")
-        print("  1. Log into notebooklm.google.com in Chrome")
-        print("  2. Use 'EditThisCookie' extension → export → save as cookies.json")
-        print(f"  3. Copy to: {COOKIE_PATH}")
-        sys.exit(1)
-    with open(COOKIE_PATH) as f:
-        return json.load(f)
+@dataclass
+class KBArticle:
+    path: Path
+    title: str
+    channel: str
+    url: str
+    published: str
+    topics: List[str]
+    enrichment_tier: str
 
 
-def setup_context(p, cookies: List[dict]):
-    browser = p.chromium.launch(headless=False)  # headless=False for Google bot evasion
-    context = browser.new_context(
-        viewport={"width": 1280, "height": 900},
-        user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    )
-    context.add_cookies(cookies)
-    return browser, context
-
-
-def find_or_create_notebook(page, name: str) -> str:
-    """Navigate to a notebook by name, creating if not found."""
-    page.goto(f"{BASE_URL}/")
-    page.wait_for_selector("text=Notebooks", timeout=15000)
-    
-    # Check if notebook exists
-    notebooks = page.query_selector_all("[data-testid='notebook-card'], .notebook-card, [role='listitem']")
-    for nb in notebooks:
-        title_el = nb.query_selector("h3, .title, [data-testid='notebook-title']")
-        if title_el and name in (title_el.inner_text() or ""):
-            nb.click()
-            page.wait_for_load_state("networkidle")
-            return "existing"
-    
-    # Create new notebook
-    page.click("text=New notebook")
-    page.wait_for_selector("input[placeholder*='name' i], input[aria-label*='name' i]", timeout=10000)
-    page.fill("input[placeholder*='name' i], input[aria-label*='name' i]", name)
-    page.click("text=Create")
-    page.wait_for_load_state("networkidle")
-    return "created"
-
-
-def upload_sources(page, files: List[Path]) -> dict:
-    """Upload markdown files to current notebook."""
-    results = {"uploaded": 0, "failed": 0, "errors": []}
-    
-    for filepath in files:
-        try:
-            # Click "Add sources" or "+"
-            add_btn = page.query_selector("text=Add sources, button:has-text('+'), [aria-label*='add source' i]")
-            if not add_btn:
-                # Try alternative selectors
-                add_btn = page.query_selector("button:has-text('Sources'), button:has-text('Upload')")
-            if add_btn:
-                add_btn.click()
+def parse_frontmatter(content: str) -> Dict:
+    """Extract YAML frontmatter from markdown."""
+    if not content.startswith("---"):
+        return {}
+    end = content.find("---", 3)
+    if end == -1:
+        return {}
+    fm = content[3:end].strip()
+    data = {}
+    current_key = None
+    current_list = []
+    in_list = False
+    for line in fm.split("\n"):
+        stripped = line.strip()
+        if stripped.startswith("-"):
+            item = stripped[1:].strip().strip("'\"[]")
+            if in_list and current_key:
+                current_list.append(item)
+            continue
+        if in_list and current_key:
+            data[current_key] = current_list
+            current_list = []
+            in_list = False
+            current_key = None
+        if ":" in stripped:
+            key, val = stripped.split(":", 1)
+            key = key.strip()
+            val = val.strip().strip("'\"")
+            if val.startswith("["):
+                items = [x.strip().strip("'\"") for x in val.strip("[]").split(",") if x.strip()]
+                data[key] = items
             else:
-                # Direct file upload via hidden input
-                file_input = page.query_selector("input[type='file']")
-                if file_input:
-                    file_input.set_input_files(str(filepath))
-                else:
-                    raise PlaywrightTimeout("Could not find upload trigger")
-            
-            page.wait_for_timeout(2000)  # Upload processing
-            results["uploaded"] += 1
-            
-        except Exception as e:
-            results["failed"] += 1
-            results["errors"].append(f"{filepath.name}: {e}")
-    
-    return results
+                data[key] = val
+            if val == "":
+                current_key = key
+                current_list = []
+                in_list = True
+    if in_list and current_key:
+        data[current_key] = current_list
+    return data
 
 
-def upload_batch(batch_dir: Path, notebook_name: str, dry_run: bool = False) -> dict:
-    files = sorted(batch_dir.glob("*.md"))
-    if not files:
-        return {"status": "empty", "files": 0}
-    
+def load_state() -> Dict:
+    if STATE_PATH.exists():
+        return json.loads(STATE_PATH.read_text())
+    return {"uploads": {}, "notebooks": {}}
+
+
+def save_state(state: Dict):
+    STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    STATE_PATH.write_text(json.dumps(state, indent=2))
+
+
+def discover_articles(channel: str) -> List[KBArticle]:
+    channel_dir = VAULT_BASE / channel
+    if not channel_dir.exists():
+        candidates = [d for d in VAULT_BASE.iterdir() if d.is_dir() and channel.lower() in d.name.lower()]
+        if candidates:
+            channel_dir = candidates[0]
+        else:
+            print(f"Error: Channel '{channel}' not found in {VAULT_BASE}")
+            sys.exit(1)
+
+    articles = []
+    for md_file in sorted(channel_dir.glob("*.md")):
+        content = md_file.read_text()
+        fm = parse_frontmatter(content)
+        if not fm.get("title"):
+            continue
+        articles.append(KBArticle(
+            path=md_file,
+            title=fm.get("title", md_file.stem),
+            channel=fm.get("channel", channel),
+            url=fm.get("url", ""),
+            published=fm.get("published", ""),
+            topics=fm.get("topics", []),
+            enrichment_tier=fm.get("enrichment_tier", "unknown")
+        ))
+    return articles
+
+
+def filter_by_topics(articles: List[KBArticle], topics: List[str]) -> List[KBArticle]:
+    topics_lower = [t.lower() for t in topics]
+    filtered = []
+    for art in articles:
+        art_topics = [t.lower() for t in art.topics]
+        if any(t in art_topics for t in topics_lower):
+            filtered.append(art)
+    return filtered
+
+
+def list_topics(articles: List[KBArticle]) -> Dict[str, int]:
+    counts = {}
+    for art in articles:
+        for t in art.topics:
+            counts[t] = counts.get(t, 0) + 1
+    return dict(sorted(counts.items(), key=lambda x: -x[1]))
+
+
+def upload_source(article: KBArticle, notebook_id: str, dry_run: bool = False) -> bool:
+    title = article.title.replace('"', '\\"')
+    cmd = [
+        "notebooklm", "source", "add",
+        str(article.path),
+        "-n", notebook_id,
+        "--title", title,
+        "--type", "text",
+        "--json"
+    ]
     if dry_run:
-        print(f"[DRY-RUN] Would upload {len(files)} files to '{notebook_name}'")
-        for f in files[:3]:
-            print(f"  → {f.name}")
-        if len(files) > 3:
-            print(f"  ... and {len(files)-3} more")
-        return {"status": "dry_run", "files": len(files)}
-    
-    cookies = load_cookies()
-    
-    with sync_playwright() as p:
-        browser, context = setup_context(p, cookies)
-        page = context.new_page()
-        
-        try:
-            status = find_or_create_notebook(page, notebook_name)
-            print(f"Notebook '{notebook_name}': {status}")
-            
-            results = upload_sources(page, files)
-            results["notebook"] = notebook_name
-            results["notebook_status"] = status
-            return results
-            
-        except PlaywrightTimeout as e:
-            print(f"TIMEOUT: {e}")
-            page.screenshot(path=f"/tmp/notebooklm-error-{notebook_name}.png")
-            return {"status": "timeout", "error": str(e)}
-        finally:
-            browser.close()
+        print(f"  [DRY-RUN] Would run: {' '.join(cmd)}")
+        return True
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        if result.returncode == 0:
+            print(f"  ✅ {article.title[:60]}")
+            return True
+        else:
+            err = result.stderr or result.stdout
+            if "already exists" in err.lower() or "duplicate" in err.lower():
+                print(f"  ⚠️  Already exists: {article.title[:60]}")
+                return True
+            print(f"  ❌ {article.title[:60]} | {err[:100]}")
+            return False
+    except subprocess.TimeoutExpired:
+        print(f"  ⏰ Timeout: {article.title[:60]}")
+        return False
+    except Exception as e:
+        print(f"  ❌ Error: {article.title[:60]} | {e}")
+        return False
+
+
+def run_upload(channel: str, notebook_id: str, topics: Optional[List[str]] = None, dry_run: bool = False):
+    state = load_state()
+    articles = discover_articles(channel)
+    print(f"Found {len(articles)} articles for channel '{channel}'")
+
+    if topics:
+        articles = filter_by_topics(articles, topics)
+        print(f"After topic filter ({','.join(topics)}): {len(articles)} articles")
+
+    if len(articles) > NOTEBOOKLM_LIMIT:
+        print(f"WARNING: {len(articles)} articles exceeds NotebookLM {NOTEBOOKLM_LIMIT}-source limit.")
+        print(f"Only first {NOTEBOOKLM_LIMIT} will be uploaded. Consider creating additional notebooks.")
+        articles = articles[:NOTEBOOKLM_LIMIT]
+
+    current_count = state.get("notebooks", {}).get(notebook_id, 0)
+    available_slots = NOTEBOOKLM_LIMIT - current_count
+    if available_slots <= 0:
+        print(f"Notebook {notebook_id} is full ({current_count}/{NOTEBOOKLM_LIMIT}). Skipping.")
+        return
+    if len(articles) > available_slots:
+        print(f"Notebook has {available_slots} slots left. Truncating upload.")
+        articles = articles[:available_slots]
+
+    uploaded = 0
+    skipped = 0
+    failed = 0
+
+    for art in articles:
+        key = f"{notebook_id}:{art.path.name}"
+        if key in state.get("uploads", {}):
+            skipped += 1
+            continue
+
+        success = upload_source(art, notebook_id, dry_run=dry_run)
+        if success and not dry_run:
+            state["uploads"][key] = {
+                "uploaded_at": datetime.now().isoformat(),
+                "title": art.title,
+                "path": str(art.path)
+            }
+            current_count += 1
+            uploaded += 1
+            save_state(state)
+            time.sleep(RATE_DELAY)
+        elif not success:
+            failed += 1
+
+    if not dry_run:
+        state["notebooks"][notebook_id] = current_count
+        save_state(state)
+
+    print(f"\n{'='*50}")
+    print(f"Upload complete: {uploaded} uploaded, {skipped} skipped, {failed} failed")
+    print(f"Notebook {notebook_id}: {current_count}/{NOTEBOOKLM_LIMIT} sources")
+    print(f"State: {STATE_PATH}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="NotebookLM Bulk Upload")
-    parser.add_argument("--batch-dir", type=Path, help="Directory containing .md files to upload")
-    parser.add_argument("--notebook-name", help="Target notebook name")
-    parser.add_argument("--all-batches", action="store_true", help="Upload all 7 batches sequentially")
-    parser.add_argument("--dry-run", action="store_true", help="Print what would be uploaded without doing it")
+    parser = argparse.ArgumentParser(description="NotebookLM Bulk Upload Pipeline")
+    parser.add_argument("--channel", required=True, help="YouTube channel name (vault folder)")
+    parser.add_argument("--notebook", help="NotebookLM notebook ID")
+    parser.add_argument("--topics", help="Comma-separated topic tags (OR filter)")
+    parser.add_argument("--list-topics", action="store_true", help="List available topics and counts")
+    parser.add_argument("--dry-run", action="store_true", help="Show what would be uploaded without uploading")
+
     args = parser.parse_args()
-    
-    if args.all_batches:
-        base = Path("/Users/djm/claude-projects/claude-vault/10-Meta/notebooklm-batches")
-        for i in range(1, 8):
-            batch_dir = base / f"batch-{i:02d}"
-            name = f"YouTube Corpus Batch {i}"
-            print(f"\n{'='*50}")
-            print(f"Batch {i}/7: {name}")
-            print(f"{'='*50}")
-            result = upload_batch(batch_dir, name, dry_run=args.dry_run)
-            print(json.dumps(result, indent=2))
-            if not args.dry_run and i < 7:
-                print("\n[PAUSE] Press Enter to continue to next batch...")
-                input()
-    elif args.batch_dir and args.notebook_name:
-        result = upload_batch(args.batch_dir, args.notebook_name, dry_run=args.dry_run)
-        print(json.dumps(result, indent=2))
-    else:
-        parser.print_help()
+
+    articles = discover_articles(args.channel)
+
+    if args.list_topics:
+        topics = list_topics(articles)
+        print(f"Topics for '{args.channel}' ({len(articles)} articles):")
+        for t, c in topics.items():
+            print(f"  {t}: {c}")
+        return
+
+    if not args.notebook and not args.dry_run:
+        print("Error: --notebook required (or use --dry-run)")
         sys.exit(1)
+
+    topics = [t.strip() for t in args.topics.split(",")] if args.topics else None
+    run_upload(args.channel, args.notebook or "dry-run", topics=topics, dry_run=args.dry_run)
 
 
 if __name__ == "__main__":

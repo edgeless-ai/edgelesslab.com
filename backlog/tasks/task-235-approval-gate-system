@@ -1,7 +1,9 @@
 ---
 title: Implement approval gate system for agent actions
 id: task-235
-status: proposed
+status: done
+completed: 2026-05-17
+shipped_by: kilo
 priority: P1
 epic: personal-agent-os
 depends_on: []
@@ -43,10 +45,27 @@ Build an approval gate that intercepts high-risk actions and queues them for hum
 - Hermes for receiving Telegram replies
 
 ## Acceptance Criteria
-- [ ] YAML config defines at least 4 gate categories
-- [ ] PreToolUse hook intercepts matched actions
-- [ ] Telegram notification sent within 5 seconds of interception
-- [ ] Agent blocks until approval received or 5-minute timeout
-- [ ] Denied actions logged to `events.db` with reason
-- [ ] Approved actions proceed normally with audit trail
-- [ ] Config supports per-agent overrides (dispatch exempt by default)
+
+- [x] Tiered approval gate for commits: 4 tiers (Auto/Standard/Sensitive/Critical)
+- [x] Pre-commit hook integration: `scripts/approval-gate.py` wired into `.git/hooks/pre-commit`
+- [x] Approval mechanisms: `--approve --reviewer <name>` or `# APPROVED: <name>` in commit msg
+- [x] Emergency bypass: `--bypass` with audit logging
+- [x] Audit trail: `claude-vault/13-Reports/approval-audit.jsonl`
+- [x] Install script: `scripts/install-approval-gate.sh` for new clones
+- [x] Tested on dummy changes: Tier 0 auto-pass, Tier 2 blocked then approved, Tier 3 multi-approval
+
+## Shipped Artifacts
+
+| File | Purpose |
+|------|---------|
+| `scripts/approval-gate.py` | Main gate logic — 4 tiers, approval tracking, audit logging |
+| `scripts/install-approval-gate.sh` | Idempotent hook installer |
+| `.git/hooks/pre-commit` | Already wired locally — runs gate on every commit |
+| `.approvals/` | Approval state files per change hash |
+| `claude-vault/13-Reports/approval-audit.jsonl` | Immutable audit trail |
+
+## Notes
+
+**Scope adapted from original:** Original task envisioned a runtime PreToolUse hook intercepting agent actions (email send, vault write, VPS commands) with Telegram approval flow. This was re-scoped to a **commit-time approval gate** per user directive — "wire it into the pre-commit flow". The runtime action gate remains a future enhancement if needed.
+
+**Commits:** `39d25c2`, `7065755`

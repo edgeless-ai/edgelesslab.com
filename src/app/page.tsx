@@ -11,6 +11,7 @@ import {
   AboutBlurb,
   SubscribeSection,
 } from "@/components/home-client";
+import { RecentlyShipped } from "@/components/recently-shipped";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
@@ -103,6 +104,37 @@ export default function Home() {
       <main id="main-content">
         {/* Hero */}
         <HeroSection />
+
+        {/* Recently Shipped (agent-populated widget) */}
+        <section className="px-6 py-12 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+          <div className="max-w-[920px] mx-auto">
+            <div className="flex items-baseline justify-between mb-6">
+              <h2
+                className="text-sm font-mono uppercase tracking-[0.15em]"
+                style={{ color: "var(--text-tertiary)" }}
+              >
+                Recently shipped
+              </h2>
+              <span
+                className="text-[11px] font-mono flex items-center gap-1.5"
+                style={{ color: "var(--green)" }}
+              >
+                <span className="relative flex h-1.5 w-1.5">
+                  <span
+                    className="absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping"
+                    style={{ background: "var(--green)" }}
+                  />
+                  <span
+                    className="relative inline-flex h-1.5 w-1.5 rounded-full"
+                    style={{ background: "var(--green)" }}
+                  />
+                </span>
+                Live from Paperclip
+              </span>
+            </div>
+            <RecentlyShipped />
+          </div>
+        </section>
 
         {/* Recent Activity (chronological stream) */}
         <section className="px-6 py-16 border-t" style={{ borderColor: "var(--border-subtle)" }}>

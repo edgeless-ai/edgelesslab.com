@@ -1,0 +1,52 @@
+---
+title: Implement approval gate system for agent actions
+id: 223
+status: proposed
+priority: P1
+epic: personal-agent-os
+depends_on: []
+blocks: [227]
+owner: unassigned
+created: 2026-03-20
+---
+
+# Task 223: Approval Gate System for Agent Actions
+
+## Problem
+Agents (especially inbox-spawned sessions and Hermes) can execute actions without human review. The only governance is `damage-control.py` which blocks known-dangerous commands but cannot require approval for sensitive operations like sending emails, modifying backlog, or writing to vault.
+
+## Proposed Solution
+Build an approval gate that intercepts high-risk actions and queues them for human review via Telegram.
+
+### Design
+1. **Gate definitions** in a YAML config (`config/approval-gates.yaml`):
+   - `email_send`: any call to `consolidated_email_api.py` from a spawned session
+   - `backlog_modify`: task status changes by non-dispatch agents
+   - `vault_write`: writes to canonical vault paths by spawned sessions
+   - `vps_command`: any SSH command to Hetzner from inbox-watcher
+
+2. **Interception point**: New PreToolUse hook (`approval-gate.py`) that:
+   - Checks if the current action matches a gate definition
+   - Writes a pending approval to `.inboxes/dispatch/inbox/approval-{uuid}.md`
+   - Sends a Telegram notification with action summary
+   - Blocks execution until approval file appears in outbox (or timeout)
+
+3. **Approval flow**:
+   - David receives Telegram message: "Agent session-1 wants to send email: [subject]. Reply APPROVE or DENY"
+   - Hermes writes approval/denial to `.inboxes/{agent}/outbox/approval-{uuid}.md`
+   - Hook reads response and proceeds or blocks
+
+### Existing infrastructure used
+- `.claude/hooks/` PreToolUse event
+- `.inboxes/` messaging system
+- Telegram via `send_telegram.py`
+- Hermes for receiving Telegram replies
+
+## Acceptance Criteria
+- [ ] YAML config defines at least 4 gate categories
+- [ ] PreToolUse hook intercepts matched actions
+- [ ] Telegram notification sent within 5 seconds of interception
+- [ ] Agent blocks until approval received or 5-minute timeout
+- [ ] Denied actions logged to `events.db` with reason
+- [ ] Approved actions proceed normally with audit trail
+- [ ] Config supports per-agent overrides (dispatch exempt by default)

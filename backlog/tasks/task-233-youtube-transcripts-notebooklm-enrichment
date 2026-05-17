@@ -1,0 +1,43 @@
+---
+id: task-233
+title: Push YouTube Transcripts Through NotebookLM for Knowledge Enrichment
+status: backlog
+priority: P1
+epic: 4-knowledge
+effort: L
+depends_on: []
+blocks: []
+created: 2026-03-21
+---
+
+## Goal
+
+Extract all YouTube transcripts from ChromaDB, group them by topic similarity, and push grouped collections into NotebookLM notebooks to enrich our knowledge base and enable source-grounded Q&A across all ingested video content.
+
+## Context
+
+We have a large collection of YouTube video transcripts stored in ChromaDB. NotebookLM provides powerful source-grounded citation and synthesis capabilities. By grouping transcripts by similarity and creating topic-focused NotebookLM notebooks, we can:
+- Enable deep Q&A across related video content
+- Surface connections between videos on similar topics
+- Build enriched knowledge layers on top of raw transcripts
+
+## Acceptance Criteria
+
+- [ ] Query ChromaDB for all YouTube transcript documents
+- [ ] Cluster/group transcripts by topic similarity (use embeddings distance or metadata tags)
+- [ ] Create NotebookLM notebooks per topic cluster (e.g., "AI Agent Patterns", "Trading Strategies", "Developer Tooling")
+- [ ] Upload grouped transcripts as sources to corresponding notebooks
+- [ ] Document the notebook inventory and topic mappings
+- [ ] Verify at least 3 notebooks can answer cross-video questions accurately
+
+## Technical Approach
+
+1. Query ChromaDB `youtube_transcripts` (or similar) collection for all documents
+2. Use embedding similarity to cluster into 8-12 topic groups
+3. For each group, use `notebooklm` CLI to create notebook and add sources
+4. Track mapping in a reference file
+
+## Artifacts
+
+- NotebookLM notebooks (8-12 topic clusters)
+- Mapping doc in `claude-vault/03-Knowledge/`

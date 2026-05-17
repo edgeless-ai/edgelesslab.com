@@ -1,0 +1,1 @@
+Build a Python script that fetches an RSS feed, parses entries, and outputs a JSON file with title, link, published date, and summary for each item.

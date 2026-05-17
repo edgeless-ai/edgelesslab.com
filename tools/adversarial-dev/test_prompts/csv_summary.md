@@ -1,0 +1,1 @@
+Build a Python CLI tool that reads CSV files and prints summary statistics. Support both table and JSON output. Handle missing values.

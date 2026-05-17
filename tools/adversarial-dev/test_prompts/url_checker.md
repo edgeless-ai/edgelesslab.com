@@ -1,0 +1,1 @@
+Build a Python script that takes a list of URLs and checks HTTP status codes. Output a CSV with url, status_code, redirect_chain, and response_time_ms.

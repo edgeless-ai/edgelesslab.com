@@ -379,6 +379,24 @@ function renderMarkdown(content: string): string {
       i++;
       continue;
     }
+    if (line.startsWith("# ")) {
+      blocks.push(`<h1>${inlineFormat(line.slice(2))}</h1>`);
+      i++;
+      continue;
+    }
+    // Catch any remaining heading levels (h4–h6)
+    if (/^#{1,6}\s/.test(line)) {
+      const level = line.match(/^(#+)/)?.[1].length ?? 4;
+      blocks.push(`<h${level}>${inlineFormat(line.slice(level + 1))}</h${level}>`);
+      i++;
+      continue;
+    }
+    // Horizontal rules
+    if (/^---+$/.test(line.trim())) {
+      blocks.push("<hr />");
+      i++;
+      continue;
+    }
 
     // Lists
     if (line.trimStart().startsWith("- ") || /^\d+\.\s/.test(line.trimStart())) {

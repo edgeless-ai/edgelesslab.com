@@ -7,6 +7,41 @@
     <language>en-us</language>
     <atom:link href="https://edgelesslab.com/feed.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>We Built an Envelope Protocol to Stop Our AI Agents from Talking Forever</title>
+      <link>https://edgelesslab.com/blog/envelope-protocol-multi-agent-coordination</link>
+      <description>Seven Discord bots needed to coordinate without infinite loops. A five-field envelope header and a depth counter solved it. Here&apos;s the protocol.</description>
+      <pubDate>Wed, 13 May 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/envelope-protocol-multi-agent-coordination</guid>
+    </item>
+    <item>
+      <title>A Circuit Breaker Saved Me $200 in Tokens. It Took 45 Minutes to Build.</title>
+      <link>https://edgelesslab.com/blog/spend-breaker-circuit-breaker-llm-costs</link>
+      <description>One of my AI agents consumed 60% of its daily token budget in four hours. The circuit breaker throttled it automatically. Here&apos;s the pattern.</description>
+      <pubDate>Wed, 13 May 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/spend-breaker-circuit-breaker-llm-costs</guid>
+    </item>
+    <item>
+      <title>From Algorithm to Ink: How We Turn Generative Code into Physical Art</title>
+      <link>https://edgelesslab.com/blog/generative-art-pen-plotter-pipeline</link>
+      <description>65 algorithms, a texture pipeline, and a pen plotter. The toolchain that turns SVG code into framed prints on the wall.</description>
+      <pubDate>Wed, 13 May 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/generative-art-pen-plotter-pipeline</guid>
+    </item>
+    <item>
+      <title>The Most Useful Thing Your AI Agents Can Do Is Audit Themselves</title>
+      <link>https://edgelesslab.com/blog/agents-that-improve-themselves</link>
+      <description>We pointed our agents at our own knowledge base and asked what they should be doing that they weren&apos;t. Then we built the fixes.</description>
+      <pubDate>Tue, 12 May 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/agents-that-improve-themselves</guid>
+    </item>
+    <item>
+      <title>I Pointed 7 AI Agents at My YouTube History. They Found What I Couldn&apos;t See.</title>
+      <link>https://edgelesslab.com/blog/youtube-mining-ai-agents</link>
+      <description>7 agents analyzed 1,062 YouTube videos and found 14 things they should be doing that they weren&apos;t. Topic clusters, channel ROI, knowledge gaps, and the meta-move: agents auditing themselves.</description>
+      <pubDate>Tue, 12 May 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://edgelesslab.com/blog/youtube-mining-ai-agents</guid>
+    </item>
+    <item>
       <title>The Real Cost of Running AI Agents in Production — A Monthly Breakdown (2026)</title>
       <link>https://edgelesslab.com/blog/real-cost-ai-agents-production-2026</link>
       <description>Your AI agent costs 5–15× more in production than your prototype. Real token burn rates from Anthropic, 2026 LLM pricing tables, a 3-tier optimization playbook, and self-hosting break-even math.</description>

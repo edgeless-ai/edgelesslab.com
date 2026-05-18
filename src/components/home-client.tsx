@@ -23,34 +23,25 @@ const HERO_SUBTITLE =
 
 export function HeroSection() {
   return (
-    <section className="relative flex min-h-[92svh] items-center px-6 pb-16 pt-28 md:min-h-screen md:items-end md:pb-24 md:pt-32">
+    <section className="relative flex min-h-[92svh] items-center px-6 pb-16 pt-28 md:min-h-screen md:items-end md:pb-24 md:pt-32 texture-grain texture-scanlines overflow-hidden">
       <GenerativeHeroBackground />
       <div className="relative max-w-[1280px] w-full mx-auto grid grid-cols-1 gap-12 lg:grid-cols-[1.25fr_1fr] lg:items-end">
         {/* Left column: headline + supporting copy */}
         <div className="min-w-0">
           <AnimatedFadeIn>
             <div
-              className="inline-flex items-center gap-2.5 mb-8 px-3 py-1.5 rounded-full border"
+              className="inline-flex items-center gap-2 mb-8 px-3 py-1.5 border"
               style={{
-                borderColor: "rgba(52, 211, 153, 0.25)",
-                background: "rgba(52, 211, 153, 0.06)",
+                borderColor: "rgba(57, 255, 20, 0.2)",
+                background: "rgba(57, 255, 20, 0.04)",
+                borderRadius: 0,
               }}
             >
-              <span className="relative flex h-2 w-2">
-                <span
-                  className="absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping"
-                  style={{ background: "var(--green)" }}
-                />
-                <span
-                  className="relative inline-flex h-2 w-2 rounded-full"
-                  style={{ background: "var(--green)" }}
-                />
-              </span>
               <span
                 className="text-[11px] font-mono uppercase tracking-[0.14em]"
-                style={{ color: "var(--green)" }}
+                style={{ color: "var(--phosphor)" }}
               >
-                Shipping daily &middot; Live now
+                [SYS] 18 products online &middot; shipping daily
               </span>
             </div>
           </AnimatedFadeIn>
@@ -154,6 +145,15 @@ export function HeroSection() {
 
 /* ── Recent Activity (Simon Willison-style chronological stream) ─── */
 
+interface ActivityItem {
+  id: string;
+  type: "post" | "launch" | "ship" | "wip";
+  title: string;
+  date: string;
+  href: string;
+  agent?: string;
+}
+
 function formatRelative(dateStr: string): string {
   const then = new Date(dateStr).getTime();
   const now = Date.now();
@@ -165,20 +165,80 @@ function formatRelative(dateStr: string): string {
   return `${Math.floor(days / 365)}y ago`;
 }
 
+function badgeStyle(type: ActivityItem["type"]) {
+  switch (type) {
+    case "launch":
+      return { background: "var(--accent-muted)", color: "var(--accent)" };
+    case "ship":
+      return { background: "var(--green-muted)", color: "var(--green)" };
+    case "wip":
+      return { background: "var(--accent-muted)", color: "var(--accent)" };
+    default:
+      return { background: "var(--bg-surface)", color: "var(--text-tertiary)" };
+  }
+}
+
+function badgeLabel(type: ActivityItem["type"]) {
+  switch (type) {
+    case "launch": return "launch";
+    case "ship": return "ship";
+    case "wip": return "wip";
+    default: return "post";
+  }
+}
+
 export function RecentActivity() {
-  // Take the 8 most recent blog posts. Each post that has a productSlug
-  // doubles as a product launch announcement.
-  const recent = [...posts]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 8);
+  const [items, setItems] = useState<ActivityItem[]>([]);
+
+  useEffect(() => {
+    // Merge static blog posts with live agent activity feed
+    const blogItems: ActivityItem[] = [...posts]
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .map((post) => ({
+        id: post.slug,
+        type: post.isLaunch ? ("launch" as const) : ("post" as const),
+        title: post.title,
+        date: post.date,
+        href: `/blog/${post.slug}`,
+      }));
+
+    // Fetch live agent activity from the generated feed
+    fetch("/site-activity.json")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((feed) => {
+        if (!feed?.items) {
+          setItems(blogItems.slice(0, 8));
+          return;
+        }
+        const agentItems: ActivityItem[] = feed.items.map((a: any) => ({
+          id: a.id,
+          type: a.type === "ship" ? ("ship" as const) : ("wip" as const),
+          title: a.title,
+          date: a.date,
+          href: `/blog`, // Agent activity links to blog feed as fallback
+          agent: a.agent,
+        }));
+
+        // Merge, dedupe, sort by date desc, take top 10
+        const merged = [...agentItems, ...blogItems]
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+          .filter((item, idx, arr) => arr.findIndex((x) => x.id === item.id) === idx)
+          .slice(0, 10);
+
+        setItems(merged);
+      })
+      .catch(() => {
+        setItems(blogItems.slice(0, 8));
+      });
+  }, []);
 
   return (
     <ul className="divide-y" style={{ borderColor: "var(--border-subtle)" }}>
-      {recent.map((post, i) => {
-        const isLaunch = Boolean(post.isLaunch);
+      {items.map((item, i) => {
+        const style = badgeStyle(item.type);
         return (
           <li
-            key={post.slug}
+            key={item.id}
             style={{
               borderColor: "var(--border-subtle)",
               animation: `fadeInUp 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 0.05}s both`,
@@ -186,36 +246,37 @@ export function RecentActivity() {
             className="border-b first:border-t"
           >
             <Link
-              href={`/blog/${post.slug}`}
+              href={item.href}
               className="group grid grid-cols-[auto_auto_1fr_auto] items-center gap-4 py-4 px-1 transition-colors"
             >
               <span
                 className="text-[11px] font-mono tabular-nums shrink-0 w-[68px]"
                 style={{ color: "var(--text-tertiary)" }}
               >
-                {post.date.slice(5)}
+                {item.date.slice(5, 10)}
               </span>
               <span
                 className="text-[10px] font-mono uppercase tracking-[0.12em] px-2 py-0.5 rounded shrink-0"
                 style={{
-                  background: isLaunch ? "var(--accent-muted)" : "var(--bg-surface)",
-                  color: isLaunch ? "var(--accent)" : "var(--text-tertiary)",
+                  ...style,
                   border: "1px solid var(--border-subtle)",
                 }}
               >
-                {isLaunch ? "launch" : "post"}
+                {badgeLabel(item.type)}
               </span>
               <span
                 className="text-[14px] font-medium truncate transition-colors group-hover:text-white"
                 style={{ color: "var(--text-primary)" }}
               >
-                {post.title}
+                {item.agent && item.type !== "post" && item.type !== "launch"
+                  ? `${item.agent}: ${item.title}`
+                  : item.title}
               </span>
               <span
                 className="text-[11px] font-mono shrink-0 hidden sm:inline"
                 style={{ color: "var(--text-tertiary)" }}
               >
-                {formatRelative(post.date)}
+                {formatRelative(item.date)}
               </span>
             </Link>
           </li>

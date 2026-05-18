@@ -11,6 +11,7 @@ const navLinks = [
   { label: "Products", href: "/products" },
   { label: "Case Studies", href: "/case-studies" },
   { label: "Lab", href: "/lab" },
+  { label: "Field Notes", href: "/field-notes" },
   { label: "Blog", href: "/blog" },
   { label: "Knowledge", href: "/knowledge" },
   { label: "About", href: "/about" },
@@ -43,14 +44,10 @@ export function Nav() {
           >
             <Link
               href="/"
-              className="flex items-center gap-2 text-[15px] font-semibold tracking-tight font-mono hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2 text-[15px] font-semibold tracking-tight font-mono hover:opacity-80 transition-opacity cursor-blink"
               style={{ color: "var(--text-primary)" }}
             >
-              <span
-                className="inline-block w-1.5 h-1.5 rounded-full"
-                style={{ background: "var(--accent)" }}
-              />
-              edgeless<span style={{ color: "var(--text-tertiary)" }}>/lab</span>
+              edgeless<span style={{ color: "var(--phosphor)" }}>~/</span><span style={{ color: "var(--text-tertiary)" }}>lab</span>
             </Link>
             <div className="hidden md:flex items-center gap-5">
               {navLinks.map((link) => (
@@ -91,7 +88,7 @@ export function Nav() {
 
           {isOpen && (
             <div
-              className="mt-3 rounded-[1.5rem] border p-3 backdrop-blur-xl md:hidden"
+              className="mt-3 border p-3 backdrop-blur-xl md:hidden"
               style={{
                 background: "rgba(17, 17, 19, 0.92)",
                 borderColor: "var(--border-subtle)",
@@ -102,7 +99,7 @@ export function Nav() {
                   <Link
                     key={link.label}
                     href={link.href}
-                    className="rounded-2xl px-4 py-3 text-sm transition-colors"
+                    className="px-4 py-3 text-sm transition-colors font-mono"
                     aria-current={pathname === link.href ? "page" : undefined}
                     onClick={() => setIsOpen(false)}
                     style={{

@@ -517,7 +517,7 @@ export const experiments = [
     stack: ["JavaScript", "Canvas API", "SVG", "CSS"],
     category: "Generative",
     status: "Live",
-    href: "/tartanism/app/",
+    href: "/tartanism/field-notes/",
   },
   {
     slug: "mastra-dashboard",
@@ -545,7 +545,7 @@ export const experiments = [
     description: `Generative SVG art pipeline with AI scoring. ${PLOTTER.factories} procedural factories producing work across moire interference, op-art, voxel sculpture, halftone, pointillism, circle packing, hatching, ridgelines, calligraphic gestures, and more.`,
     longDescription: [
       `A Python pipeline that runs ${PLOTTER.factories} independent factory generators, feeds each output through a scoring engine combining seven algorithmic signals (including a CLIP aesthetic predictor trained on 250K artworks), five vision-language judges, and routes high-scoring pieces to the physical plotter. Factories span the full visual range: sports field geometry, 3D rayhatched landscapes, colour cross-hatching, CMY halftone dots, moire interference, recursive territory maps, woven textile patterns, op-art, wavy engraving, and more.`,
-      "The scoring stack (v3): ink coverage, line complexity, multi-scale composition, visual entropy, CLIP aesthetic score, uniqueness (perceptual hash), and feasibility. On top of those, five vision-language judges score the top pieces: Claude via subagents, Gemini twice (aesthetic + adversarial), Qwen via OpenRouter, and Cerebras. CLIP also provides zero-shot art movement classification — tagging each piece as Op Art, Constructivism, Minimalism, Engraving, etc.",
+      "The scoring stack (v3): ink coverage, line complexity, multi-scale composition, visual entropy, CLIP aesthetic score, uniqueness (perceptual hash), and feasibility. On top of those, five vision-language judges score the top pieces: Claude via subagents, Gemini twice (aesthetic + adversarial), Qwen via OpenRouter, and Cerebras. CLIP also provides zero-shot art movement classification that tags each piece as Op Art, Constructivism, Minimalism, Engraving, etc.",
       "Physical output goes through iDraw 2.0 with archival-quality pigment ink on A3 cotton paper. Pen speed, acceleration, and lift height are tuned per factory. Path optimization via vpype reduces pen-up travel by 93 to 96% before every plot.",
       `${PLOTTER.pieces} specimens have been scored to date. The full editorial field journal, including the discovery that 26% of the algorithmic top-50 are 'grey rectangles' the algorithms loved but Claude rated 1.8/10, is published as a separate artifact.`,
     ],
@@ -621,5 +621,36 @@ export const experiments = [
     stack: ["Python", "Excalidraw JSON", "Obsidian", "Markdown", "SVG"],
     category: "Data",
     status: "Active",
+  },
+];
+
+export const fieldNotes = [
+  {
+    slug: "pen-plotter",
+    title: "Pen Plotter Field Journal",
+    description: "44,000+ scored specimens from 62 procedural factories. Five AI judges, method notes, anomaly analysis.",
+    href: "/pen-plotter/",
+    stat: "44K+ specimens",
+  },
+  {
+    slug: "total-serialism",
+    title: "Total Serialism",
+    description: "98 interactive algorithmic art generators. Flow fields, fractals, cellular automata. SVG export for pen plotters.",
+    href: "/total-serialism/field-notes/",
+    stat: "98 generators",
+  },
+  {
+    slug: "tartanism",
+    title: "Tartanism Field Notes",
+    description: "Tartan pattern explorer. Six weave structures, 48 traditional colors, loom-ready WIF export.",
+    href: "/tartanism/field-notes/",
+    stat: "48 colors",
+  },
+  {
+    slug: "flow-viz",
+    title: "Flow Viz",
+    description: "Live data visualization. Bitcoin mempool, GitHub repositories, Polymarket as fluid particle dynamics.",
+    href: "/flow-viz/",
+    stat: "3 live sources",
   },
 ];

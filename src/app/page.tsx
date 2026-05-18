@@ -109,10 +109,10 @@ export default function Home() {
           <div className="max-w-[920px] mx-auto">
             <div className="flex items-baseline justify-between mb-6">
               <h2
-                className="text-sm font-mono uppercase tracking-[0.15em]"
-                style={{ color: "var(--text-tertiary)" }}
+                className="text-sm font-mono tracking-[0.08em]"
+                style={{ color: "var(--phosphor)" }}
               >
-                Recent activity
+                $ recent_activity
               </h2>
               <Link
                 href="/blog"
@@ -133,10 +133,10 @@ export default function Home() {
             <div className="max-w-[1280px] mx-auto">
               <div className="flex items-baseline justify-between mb-10">
                 <h2
-                  className="text-sm font-mono uppercase tracking-[0.15em]"
-                  style={{ color: "var(--text-tertiary)" }}
+                  className="text-sm font-mono tracking-[0.08em]"
+                  style={{ color: "var(--phosphor)" }}
                 >
-                  Featured
+                  $ featured
                 </h2>
                 <Link
                   href="/projects"
@@ -160,10 +160,10 @@ export default function Home() {
           <ScrollReveal>
             <div className="max-w-[1280px] mx-auto">
               <h2
-                className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
-                style={{ color: "var(--text-tertiary)" }}
+                className="text-sm font-mono tracking-[0.08em] mb-10"
+                style={{ color: "var(--phosphor)" }}
               >
-                Infrastructure
+                $ infrastructure
               </h2>
 
               <CapabilitiesGrid capabilities={capabilities} />
@@ -176,10 +176,10 @@ export default function Home() {
           <ScrollReveal>
             <div className="max-w-[1280px] mx-auto">
               <h2
-                className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
-                style={{ color: "var(--text-tertiary)" }}
+                className="text-sm font-mono tracking-[0.08em] mb-10"
+                style={{ color: "var(--phosphor)" }}
               >
-                Stack
+                $ stack
               </h2>
 
               <StackFlow nodes={stackNodes} />
@@ -193,10 +193,10 @@ export default function Home() {
             <div className="max-w-[1280px] mx-auto">
               <div className="flex items-baseline justify-between mb-10">
                 <h2
-                  className="text-sm font-mono uppercase tracking-[0.15em]"
-                  style={{ color: "var(--text-tertiary)" }}
+                  className="text-sm font-mono tracking-[0.08em]"
+                  style={{ color: "var(--phosphor)" }}
                 >
-                  Lab
+                  $ lab
                 </h2>
                 <Link
                   href="/lab"
@@ -218,10 +218,10 @@ export default function Home() {
             <div className="max-w-[1280px] mx-auto">
               <div className="flex items-baseline justify-between mb-10">
                 <h2
-                  className="text-sm font-mono uppercase tracking-[0.15em]"
-                  style={{ color: "var(--text-tertiary)" }}
+                  className="text-sm font-mono tracking-[0.08em]"
+                  style={{ color: "var(--phosphor)" }}
                 >
-                  Products
+                  $ products
                 </h2>
                 <Link
                   href="/products"

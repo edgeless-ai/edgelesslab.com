@@ -38,7 +38,7 @@ export async function generateMetadata({
       siteName: "Edgeless Lab",
       url: `https://edgelesslab.com/blog/${post.slug}`,
       images: [{
-        url: `/og/${post.slug}`,
+        url: `/og-image.png`,
         width: 1200,
         height: 630,
         alt: post.title,
@@ -51,7 +51,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: fullTitle,
       description: post.description,
-      images: [`/og/${post.slug}`],
+      images: [`/og-image.png`],
     },
   };
 }

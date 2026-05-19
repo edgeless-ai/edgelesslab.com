@@ -171,14 +171,14 @@ export default async function BlogPostPage({
                 return (
                   <a
                     href={product.href}
-                    className="block p-4 rounded-lg border transition-colors hover:border-white/20"
+                    className="block p-4 rounded-lg border transition-colors hover:border-[var(--border-hover)]"
                     style={{
                       background: "var(--bg-surface)",
                       borderColor: "var(--border-subtle)",
                     }}
                   >
                     <div
-                      className="text-[10px] font-mono uppercase tracking-[0.12em] mb-2"
+                      className="text-label font-mono uppercase tracking-[0.12em] mb-2"
                       style={{ color: "var(--accent)" }}
                     >
                       Companion
@@ -214,7 +214,7 @@ export default async function BlogPostPage({
             return (
               <a
                 href={product.href}
-                className="block mt-12 p-6 rounded-lg border transition-colors hover:border-white/30"
+                className="block mt-12 p-6 rounded-lg border transition-colors hover:border-[var(--border-hover)]"
                 style={{
                   background: "var(--accent-muted)",
                   borderColor: "var(--border-subtle)",
@@ -245,7 +245,7 @@ export default async function BlogPostPage({
           <div className="mt-12 pt-8 border-t" style={{ borderColor: "var(--border-subtle)" }}>
             <Link
               href="/blog"
-              className="text-sm font-medium transition-colors hover:text-white"
+              className="text-sm font-medium transition-colors hover:text-[var(--text-primary)]"
               style={{ color: "var(--text-secondary)" }}
             >
               &larr; All posts

@@ -54,11 +54,13 @@ export function PenPlotterGallery() {
               alt={`${p.factory} best piece`}
               loading="lazy"
               decoding="async"
+              width={297}
+              height={420}
               className="block w-full h-auto"
               style={{ aspectRatio: "297 / 420", objectFit: "cover", background: "white" }}
             />
             <div
-              className="absolute inset-x-0 bottom-0 px-2 py-1.5 text-[10px] font-mono uppercase tracking-wider flex justify-between items-baseline opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute inset-x-0 bottom-0 px-2 py-1.5 text-label font-mono uppercase tracking-wider flex justify-between items-baseline opacity-0 group-hover:opacity-100 transition-opacity"
               style={{
                 background: "linear-gradient(to top, rgba(12,10,8,0.85), transparent)",
                 color: "rgba(243,237,221,0.95)",
@@ -71,7 +73,7 @@ export function PenPlotterGallery() {
         ))}
       </div>
 
-      <p className="text-[12px] font-mono uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
+      <p className="text-caption font-mono uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
         9 of {PLOTTER.pieces} specimens · top piece per factory ·{" "}
         <a
           href="/pen-plotter/"
@@ -97,11 +99,13 @@ export function PenPlotterGallery() {
             <img
               src={`/lab/pen-plotter-pipeline/${active.id}.png`}
               alt={`${active.factory} best piece`}
+              width={594}
+              height={840}
               className="block max-h-[85vh] mx-auto"
               style={{ background: "white" }}
             />
             <div
-              className="mt-4 flex justify-between items-baseline text-[11px] font-mono uppercase tracking-wider"
+              className="mt-4 flex justify-between items-baseline text-small font-mono uppercase tracking-wider"
               style={{ color: "rgba(243,237,221,0.7)" }}
             >
               <span>

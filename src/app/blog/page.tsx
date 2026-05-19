@@ -37,7 +37,7 @@ export default function BlogPage() {
           <div className="flex items-center gap-2.5 mb-6">
             <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--accent)" }} />
             <span
-              className="text-[11px] font-mono uppercase tracking-[0.14em]"
+              className="text-small font-mono uppercase tracking-[0.14em]"
               style={{ color: "var(--text-tertiary)" }}
             >
               Field notes
@@ -69,7 +69,7 @@ export default function BlogPage() {
           <div className="flex items-center gap-4 mb-10">
             <a
               href="/feed.xml"
-              className="inline-flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-full border transition-colors hover:text-white"
+              className="inline-flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-full border transition-colors hover:text-[var(--text-primary)]"
               style={{ color: "var(--text-secondary)", borderColor: "var(--border-subtle)" }}
             >
               <Rss size={11} /> RSS feed <ArrowUpRight size={11} />
@@ -79,7 +79,7 @@ export default function BlogPage() {
           {/* Tag counts (Simon Willison-style: count is the proof) */}
           <div className="mb-12 pb-8 border-b" style={{ borderColor: "var(--border-subtle)" }}>
             <h2
-              className="text-[10px] font-mono uppercase tracking-[0.14em] mb-4"
+              className="text-label font-mono uppercase tracking-[0.14em] mb-4"
               style={{ color: "var(--text-tertiary)" }}
             >
               Topics
@@ -96,7 +96,7 @@ export default function BlogPage() {
                 .map(([tag, count]) => (
                   <span
                     key={tag}
-                    className="text-[13px] font-mono"
+                    className="text-detail font-mono"
                     style={{ color: "var(--text-secondary)" }}
                   >
                     {tag.toLowerCase().replace(/\s+/g, "-")}{" "}

@@ -26,7 +26,7 @@ export function ProjectDetail({ project }: { project: Project }) {
           <div className="max-w-[1280px] mx-auto">
             <Link
               href="/projects"
-              className="inline-flex items-center gap-1.5 text-sm mb-8 transition-colors hover:text-white"
+              className="inline-flex items-center gap-1.5 text-sm mb-8 transition-colors hover:text-[var(--text-primary)]"
               style={{
                 color: "var(--text-tertiary)",
                 animation: "fadeInUp 0.3s cubic-bezier(0.16,1,0.3,1) both",
@@ -107,7 +107,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                     </span>
                   </div>
                   <pre
-                    className="px-4 py-4 text-[12px] leading-[1.8] font-mono whitespace-pre overflow-x-auto"
+                    className="px-4 py-4 text-caption leading-[1.8] font-mono whitespace-pre overflow-x-auto"
                     style={{ color: "var(--green)" }}
                   >
                     {project.snippet}
@@ -156,7 +156,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                     {project.stack.map((item) => (
                       <li
                         key={item}
-                        className="text-[13px] font-mono"
+                        className="text-detail font-mono"
                         style={{ color: "var(--text-secondary)" }}
                       >
                         {item}
@@ -181,7 +181,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                   </h2>
                   <a
                     href="https://github.com/edgeless-ai"
-                    className="text-[13px] hover:text-white transition-colors inline-flex items-center gap-1"
+                    className="text-detail hover:text-[var(--text-primary)] transition-colors inline-flex items-center gap-1"
                     style={{ color: "var(--text-secondary)" }}
                   >
                     GitHub <ArrowUpRight size={12} />
@@ -208,7 +208,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                         <li key={item.href}>
                           <Link
                             href={item.href}
-                            className="text-[13px] hover:text-white transition-colors"
+                            className="text-detail hover:text-[var(--text-primary)] transition-colors"
                             style={{ color: "var(--text-secondary)" }}
                           >
                             {item.title}

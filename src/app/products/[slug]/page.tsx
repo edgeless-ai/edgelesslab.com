@@ -115,7 +115,7 @@ export default async function ProductDetailPage({
         <div className="max-w-[1080px] mx-auto">
           <Link
             href="/products"
-            className="inline-flex items-center gap-1.5 text-sm mb-8 transition-colors hover:text-white"
+            className="inline-flex items-center gap-1.5 text-sm mb-8 transition-colors hover:text-[var(--text-primary)]"
             style={{ color: "var(--text-tertiary)" }}
           >
             <ArrowLeft size={14} /> All products
@@ -214,7 +214,7 @@ export default async function ProductDetailPage({
                   {product.features.map((feature) => (
                     <li
                       key={feature}
-                      className="text-[13px]"
+                      className="text-detail"
                       style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
                     >
                       &mdash; {feature}
@@ -236,13 +236,13 @@ export default async function ProductDetailPage({
                   </h2>
                   <Link
                     href={`/blog/${companionPost.slug}`}
-                    className="text-[14px] font-medium hover:text-white transition-colors block"
+                    className="text-body-sm font-medium hover:text-[var(--text-primary)] transition-colors block"
                     style={{ color: "var(--text-primary)" }}
                   >
                     {companionPost.title}
                   </Link>
                   <p
-                    className="text-[12px] mt-2"
+                    className="text-caption mt-2"
                     style={{ color: "var(--text-tertiary)", lineHeight: 1.5 }}
                   >
                     {companionPost.description}

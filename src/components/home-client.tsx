@@ -38,7 +38,7 @@ export function HeroSection() {
               }}
             >
               <span
-                className="text-[11px] font-mono uppercase tracking-[0.14em]"
+                className="text-small font-mono uppercase tracking-[0.14em]"
                 style={{ color: "var(--phosphor)" }}
               >
                 [SYS] 18 products online &middot; shipping daily
@@ -77,7 +77,7 @@ export function HeroSection() {
 
           <AnimatedFadeIn delay={0.85}>
             <div
-              className="mt-8 flex items-center gap-2.5 max-w-xl text-[12px] font-mono"
+              className="mt-8 flex items-center gap-2.5 max-w-xl text-caption font-mono"
               style={{ color: "var(--text-tertiary)" }}
             >
               <span
@@ -90,7 +90,7 @@ export function HeroSection() {
                 Shipping{" "}
                 <Link
                   href="/products/launch-toolkit"
-                  className="underline-offset-2 hover:underline transition-colors hover:text-white"
+                  className="underline-offset-2 hover:underline transition-colors hover:text-[var(--text-primary)]"
                   style={{ color: "var(--text-secondary)" }}
                 >
                   Digital Product Launch Toolkit
@@ -123,7 +123,7 @@ export function HeroSection() {
               </Link>
               <a
                 href="https://github.com/edgeless-ai"
-                className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-white"
+                className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-[var(--text-primary)]"
                 style={{ color: "var(--text-secondary)" }}
               >
                 GitHub <ArrowUpRight size={14} />
@@ -250,13 +250,13 @@ export function RecentActivity() {
               className="group grid grid-cols-[auto_auto_1fr_auto] items-center gap-4 py-4 px-1 transition-colors"
             >
               <span
-                className="text-[11px] font-mono tabular-nums shrink-0 w-[68px]"
+                className="text-small font-mono tabular-nums shrink-0 w-[68px]"
                 style={{ color: "var(--text-tertiary)" }}
               >
                 {item.date.slice(5, 10)}
               </span>
               <span
-                className="text-[10px] font-mono uppercase tracking-[0.12em] px-2 py-0.5 rounded shrink-0"
+                className="text-label font-mono uppercase tracking-[0.12em] px-2 py-0.5 rounded shrink-0"
                 style={{
                   ...style,
                   border: "1px solid var(--border-subtle)",
@@ -265,7 +265,7 @@ export function RecentActivity() {
                 {badgeLabel(item.type)}
               </span>
               <span
-                className="text-[14px] font-medium truncate transition-colors group-hover:text-white"
+                className="text-body-sm font-medium truncate transition-colors group-hover:text-[var(--text-primary)]"
                 style={{ color: "var(--text-primary)" }}
               >
                 {item.agent && item.type !== "post" && item.type !== "launch"
@@ -273,7 +273,7 @@ export function RecentActivity() {
                   : item.title}
               </span>
               <span
-                className="text-[11px] font-mono shrink-0 hidden sm:inline"
+                className="text-small font-mono shrink-0 hidden sm:inline"
                 style={{ color: "var(--text-tertiary)" }}
               >
                 {formatRelative(item.date)}
@@ -530,7 +530,7 @@ export function ExperimentsGrid({ experiments }: { experiments: Experiment[] }) 
             </span>
             {exp.status && (
               <span
-                className="text-[10px] font-mono uppercase tracking-[0.1em] px-1.5 py-0.5 rounded"
+                className="text-label font-mono uppercase tracking-[0.1em] px-1.5 py-0.5 rounded"
                 style={{
                   background: exp.status === "Live" ? "var(--green-muted)" : "var(--accent-muted)",
                   color: exp.status === "Live" ? "var(--green)" : "var(--accent)",
@@ -559,7 +559,7 @@ export function ExperimentsGrid({ experiments }: { experiments: Experiment[] }) 
               {exp.stack.map((tech) => (
                 <span
                   key={tech}
-                  className="text-[10px] font-mono px-1.5 py-0.5 rounded"
+                  className="text-label font-mono px-1.5 py-0.5 rounded"
                   style={{
                     background: "rgba(255,255,255,0.05)",
                     color: "var(--text-tertiary)",
@@ -598,7 +598,7 @@ export function ProductHighlight() {
           href={product.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="group block rounded-xl border p-5 transition-all hover:scale-[1.01] hover:border-white/20"
+          className="group block rounded-xl border p-5 transition-all hover:scale-[1.01] hover:border-[var(--border-hover)]"
           style={{
             background: "var(--bg-surface)",
             borderColor: "var(--border-subtle)",
@@ -635,7 +635,7 @@ export function ProductHighlight() {
       {free && (
         <Link
           href="/products/"
-          className="group block rounded-xl border p-5 transition-all hover:scale-[1.01] hover:border-white/20"
+          className="group block rounded-xl border p-5 transition-all hover:scale-[1.01] hover:border-[var(--border-hover)]"
           style={{
             background: "var(--bg-surface)",
             borderColor: "var(--border-subtle)",
@@ -719,7 +719,7 @@ export function AboutBlurb() {
       >
         <Link
           href="/about"
-          className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-white"
+          className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-[var(--text-primary)]"
           style={{ color: "var(--accent)" }}
         >
           About the lab <ArrowRight size={14} />

@@ -82,7 +82,7 @@ export function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-[13px] hover:text-white transition-colors"
+                    className="text-detail hover:text-[var(--text-primary)] transition-colors"
                     style={{ color: "var(--text-secondary)" }}
                   >
                     {item.label}
@@ -106,7 +106,7 @@ export function Footer() {
                       href={item.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[13px] hover:text-white transition-colors inline-flex items-center gap-1"
+                      className="text-detail hover:text-[var(--text-primary)] transition-colors inline-flex items-center gap-1"
                       style={{ color: "var(--text-secondary)" }}
                     >
                       {item.label}
@@ -115,7 +115,7 @@ export function Footer() {
                   ) : (
                     <Link
                       href={item.href}
-                      className="text-[13px] hover:text-white transition-colors"
+                      className="text-detail hover:text-[var(--text-primary)] transition-colors"
                       style={{ color: "var(--text-secondary)" }}
                     >
                       {item.label}
@@ -141,7 +141,7 @@ export function Footer() {
                 <li key={item.label}>
                   <a
                     href={item.href}
-                    className="text-[13px] hover:text-white transition-colors inline-flex items-center gap-1"
+                    className="text-detail hover:text-[var(--text-primary)] transition-colors inline-flex items-center gap-1"
                     style={{ color: "var(--text-secondary)" }}
                   >
                     {item.label}
@@ -166,7 +166,7 @@ export function Footer() {
                 <li key={item.label}>
                   <Link
                     href={item.href}
-                    className="text-[13px] hover:text-white transition-colors"
+                    className="text-detail hover:text-[var(--text-primary)] transition-colors"
                     style={{ color: "var(--text-secondary)" }}
                   >
                     {item.label}
@@ -203,7 +203,7 @@ export function Footer() {
                 placeholder="you@domain.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 sm:w-[260px] px-3 py-2 text-[13px] font-mono rounded-lg border outline-none"
+                className="flex-1 sm:w-[260px] px-3 py-2 text-detail font-mono rounded-lg border outline-none"
                 style={{
                   background: "var(--bg-base)",
                   borderColor: "var(--border-subtle)",
@@ -213,7 +213,7 @@ export function Footer() {
               <button
                 type="submit"
                 disabled={status === "saving"}
-                className="px-3 py-2 text-[13px] font-mono rounded-lg border hover:border-white/[0.16] transition-colors"
+                className="px-3 py-2 text-detail font-mono rounded-lg border hover:border-[var(--border-hover)] transition-colors"
                 style={{
                   background: "var(--bg-base)",
                   borderColor: "var(--border-subtle)",
@@ -227,7 +227,7 @@ export function Footer() {
           </div>
 
           {message ? (
-            <div className="mt-3 text-[12px] font-mono" style={{ color: "var(--text-tertiary)" }}>
+            <div className="mt-3 text-caption font-mono" style={{ color: "var(--text-tertiary)" }}>
               {status === "error" ? (
                 <a href={mailtoHref} className="underline underline-offset-4">
                   {message}
@@ -242,7 +242,7 @@ export function Footer() {
         {/* ASCII logo banner */}
         <div className="mb-8 flex justify-center">
           <pre
-            className="text-[9px] sm:text-xs leading-[1.3] font-mono select-none hidden sm:block"
+            className="text-label sm:text-xs leading-[1.3] font-mono select-none hidden sm:block"
             style={{
               color: "var(--text-tertiary)",
               textShadow: "0 0 8px rgba(129,140,248,0.15)",

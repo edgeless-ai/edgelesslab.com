@@ -32,7 +32,7 @@ export function ProjectsHeader() {
           />
         </span>
         <span
-          className="text-[11px] font-mono uppercase tracking-[0.14em]"
+          className="text-small font-mono uppercase tracking-[0.14em]"
           style={{ color: "var(--green)" }}
         >
           Running now

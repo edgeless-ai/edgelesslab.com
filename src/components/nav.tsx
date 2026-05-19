@@ -42,7 +42,7 @@ export function Nav() {
           >
             <Link
               href="/"
-              className="flex items-center gap-2 text-[15px] font-semibold tracking-tight font-mono hover:opacity-80 transition-opacity cursor-blink"
+              className="flex items-center gap-2 text-body font-semibold tracking-tight font-mono hover:opacity-80 transition-opacity cursor-blink"
               style={{ color: "var(--text-primary)" }}
             >
               edgeless<span style={{ color: "var(--phosphor)" }}>~/</span><span style={{ color: "var(--text-tertiary)" }}>lab</span>
@@ -52,7 +52,7 @@ export function Nav() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className="text-[13px] hover:text-white transition-colors"
+                  className="text-detail hover:text-[var(--text-primary)] transition-colors"
                   aria-current={pathname === link.href ? "page" : undefined}
                   style={{
                     color: pathname === link.href ? "var(--text-primary)" : "var(--text-secondary)",
@@ -65,7 +65,7 @@ export function Nav() {
                 href="https://github.com/edgeless-ai"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[13px] hover:text-white transition-colors flex items-center gap-1"
+                className="text-detail hover:text-[var(--text-primary)] transition-colors flex items-center gap-1"
                 style={{ color: "var(--text-secondary)" }}
               >
                 GitHub <ArrowUpRight size={12} />
@@ -86,10 +86,10 @@ export function Nav() {
 
           {isOpen && (
             <div
-              className="mt-3 border p-3 backdrop-blur-xl md:hidden"
+              className="mt-3 p-3 backdrop-blur-xl md:hidden tui-border"
+              data-label="nav"
               style={{
                 background: "rgba(17, 17, 19, 0.92)",
-                borderColor: "var(--border-subtle)",
               }}
             >
               <div className="flex flex-col gap-1">
@@ -113,7 +113,7 @@ export function Nav() {
                   href="https://github.com/edgeless-ai"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 rounded-2xl px-4 py-3 text-sm transition-colors hover:text-white"
+                  className="inline-flex items-center gap-1 rounded-xl px-4 py-3 text-sm transition-colors hover:text-[var(--text-primary)]"
                   style={{ color: "var(--text-secondary)" }}
                   onClick={() => setIsOpen(false)}
                 >

@@ -46,7 +46,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
           <div className="max-w-[1280px] mx-auto">
             <Link
               href="/lab"
-              className="inline-flex items-center gap-1.5 text-sm mb-8 transition-colors hover:text-white"
+              className="inline-flex items-center gap-1.5 text-sm mb-8 transition-colors hover:text-[var(--text-primary)]"
               style={{
                 color: "var(--text-tertiary)",
                 animation: "fadeInUp 0.3s cubic-bezier(0.16,1,0.3,1) both",
@@ -140,6 +140,8 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                       src="/lab/strange-attractors/hero.png"
                       alt="Topographic line study from the pen plotter autoresearch catalog"
                       loading="lazy"
+                      width={1200}
+                      height={800}
                       className="block w-full rounded-md"
                       style={{
                         background: "white",
@@ -147,7 +149,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                       }}
                     />
                     <p
-                      className="mt-3 text-[11px] font-mono uppercase tracking-wider"
+                      className="mt-3 text-small font-mono uppercase tracking-wider"
                       style={{ color: "var(--text-tertiary)" }}
                     >
                       Sample line study from the autoresearch catalog ·{" "}
@@ -171,7 +173,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                     {(experiment.longDescription as string[]).map((para, i) => (
                       <p
                         key={i}
-                        className="text-[15px] leading-[1.8]"
+                        className="text-body leading-[1.8]"
                         style={{ color: "var(--text-secondary)" }}
                       >
                         {para}
@@ -200,7 +202,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                       {(experiment.highlights as string[]).map((item, i) => (
                         <li
                           key={i}
-                          className="flex items-start gap-3 text-[13px]"
+                          className="flex items-start gap-3 text-detail"
                           style={{ color: "var(--text-secondary)" }}
                         >
                           <span
@@ -260,7 +262,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                       {(experiment.stack as string[]).map((item) => (
                         <li
                           key={item}
-                          className="text-[13px] font-mono"
+                          className="text-detail font-mono"
                           style={{ color: "var(--text-secondary)" }}
                         >
                           {item}
@@ -293,7 +295,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                           }
                         ).relatedProject.href
                       }
-                      className="text-[13px] hover:text-white transition-colors"
+                      className="text-detail hover:text-[var(--text-primary)] transition-colors"
                       style={{ color: "var(--text-secondary)" }}
                     >
                       {
@@ -326,7 +328,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                       href={(experiment as { href: string }).href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[13px] hover:text-white transition-colors inline-flex items-center gap-1"
+                      className="text-detail hover:text-[var(--text-primary)] transition-colors inline-flex items-center gap-1"
                       style={{ color: "var(--text-secondary)" }}
                     >
                       Live demo <ArrowUpRight size={12} />

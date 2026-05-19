@@ -116,7 +116,7 @@ export default function Home() {
                 Recently shipped
               </h2>
               <span
-                className="text-[11px] font-mono flex items-center gap-1.5"
+                className="text-small font-mono flex items-center gap-1.5"
                 style={{ color: "var(--green)" }}
               >
                 <span className="relative flex h-1.5 w-1.5">
@@ -148,7 +148,7 @@ export default function Home() {
               </h2>
               <Link
                 href="/blog"
-                className="text-sm flex items-center gap-1 transition-colors hover:text-white"
+                className="text-sm flex items-center gap-1 transition-colors hover:text-[var(--text-primary)]"
                 style={{ color: "var(--text-secondary)" }}
               >
                 Full feed <ArrowRight size={13} />
@@ -172,7 +172,7 @@ export default function Home() {
                 </h2>
                 <Link
                   href="/projects"
-                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
+                  className="text-sm flex items-center gap-1 transition-colors hover:text-[var(--text-primary)]"
                   style={{ color: "var(--text-secondary)" }}
                 >
                   All projects <ArrowRight size={13} />
@@ -232,7 +232,7 @@ export default function Home() {
                 </h2>
                 <Link
                   href="/lab"
-                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
+                  className="text-sm flex items-center gap-1 transition-colors hover:text-[var(--text-primary)]"
                   style={{ color: "var(--text-secondary)" }}
                 >
                   All experiments <ArrowRight size={13} />
@@ -257,7 +257,7 @@ export default function Home() {
                 </h2>
                 <Link
                   href="/products"
-                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
+                  className="text-sm flex items-center gap-1 transition-colors hover:text-[var(--text-primary)]"
                   style={{ color: "var(--text-secondary)" }}
                 >
                   All products <ArrowRight size={13} />

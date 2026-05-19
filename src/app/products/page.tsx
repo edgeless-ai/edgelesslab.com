@@ -50,7 +50,7 @@ export default function ProductsPage() {
               style={{ background: "var(--accent)" }}
             />
             <span
-              className="text-[11px] font-mono uppercase tracking-[0.14em]"
+              className="text-small font-mono uppercase tracking-[0.14em]"
               style={{ color: "var(--accent)" }}
             >
               On Gumroad &middot; {products.filter(p => !p.comingSoon).length} live
@@ -84,7 +84,7 @@ export default function ProductsPage() {
               Start free with Claude Memory Kit
             </a>
             <span
-              className="text-[11px] font-mono"
+              className="text-small font-mono"
               style={{ color: "var(--text-tertiary)" }}
             >
               all free &middot; instant download

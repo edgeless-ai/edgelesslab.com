@@ -41,7 +41,7 @@ export function AboutHeader() {
           style={{ background: "var(--accent)" }}
         />
         <span
-          className="text-[11px] font-mono uppercase tracking-[0.14em]"
+          className="text-small font-mono uppercase tracking-[0.14em]"
           style={{ color: "var(--text-secondary)" }}
         >
           The studio
@@ -93,7 +93,7 @@ export function StatsGrid({ stats }: { stats: Stat[] }) {
             {stat.value}
           </span>
           <span
-            className="text-[11px] font-mono uppercase tracking-[0.14em]"
+            className="text-small font-mono uppercase tracking-[0.14em]"
             style={{ color: "var(--text-tertiary)" }}
           >
             {stat.label}
@@ -244,7 +244,7 @@ export function ConnectGrid({ links }: { links: Link[] }) {
           <a
             key={link.label}
             href={link.href}
-            className="group rounded-xl border p-6 transition-colors hover:border-white/[0.12]"
+            className="group rounded-xl border p-6 transition-colors hover:border-[var(--border-hover)]"
             style={{
               background: "var(--bg-surface)",
               borderColor: "var(--border-subtle)",
@@ -265,7 +265,7 @@ export function ConnectGrid({ links }: { links: Link[] }) {
               />
             </div>
             <p
-              className="text-[13px]"
+              className="text-detail"
               style={{ color: "var(--text-tertiary)" }}
             >
               {link.description}

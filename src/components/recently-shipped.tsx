@@ -140,13 +140,13 @@ export function RecentlyShipped() {
               className="group grid grid-cols-[auto_auto_1fr_auto] items-center gap-4 py-4 px-1 transition-colors"
             >
               <span
-                className="text-[11px] font-mono tabular-nums shrink-0 w-[68px]"
+                className="text-small font-mono tabular-nums shrink-0 w-[68px]"
                 style={{ color: "var(--text-tertiary)" }}
               >
                 {item.completedAt ? item.completedAt.slice(5, 10) : "—"}
               </span>
               <span
-                className="text-[10px] font-mono uppercase tracking-[0.12em] px-2 py-0.5 rounded shrink-0 flex items-center gap-1"
+                className="text-label font-mono uppercase tracking-[0.12em] px-2 py-0.5 rounded shrink-0 flex items-center gap-1"
                 style={{
                   background: "var(--accent-muted)",
                   color: "var(--accent)",
@@ -157,13 +157,13 @@ export function RecentlyShipped() {
                 shipped
               </span>
               <span
-                className="text-[14px] font-medium truncate transition-colors group-hover:text-white"
+                className="text-body-sm font-medium truncate transition-colors group-hover:text-[var(--text-primary)]"
                 style={{ color: "var(--text-primary)" }}
               >
                 {item.title}
               </span>
               <span
-                className="text-[11px] font-mono shrink-0 hidden sm:inline"
+                className="text-small font-mono shrink-0 hidden sm:inline"
                 style={{ color: "var(--text-tertiary)" }}
               >
                 {formatRelative(item.completedAt)}
@@ -175,7 +175,7 @@ export function RecentlyShipped() {
 
       {source === "fallback" && (
         <p
-          className="mt-3 text-[11px] font-mono"
+          className="mt-3 text-small font-mono"
           style={{ color: "var(--text-tertiary)" }}
         >
           Offline mode — showing cached shipments.

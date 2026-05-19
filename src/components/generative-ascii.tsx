@@ -324,7 +324,7 @@ export function GenerativeAscii() {
         {/* ASCII art display */}
         <div className="px-5 py-4 overflow-x-auto">
           <pre
-            className="text-[10px] sm:text-xs leading-[1.4] font-mono select-all"
+            className="text-label sm:text-xs leading-[1.4] font-mono select-all"
             style={{
               color: isRevealed ? rarityColor : "var(--text-tertiary)",
               transition: "color 0.5s ease",
@@ -407,7 +407,7 @@ export function GenerativeAscii() {
         {(["common", "uncommon", "rare", "mythic"] as const).map((r) => (
           <span
             key={r}
-            className="text-[10px] font-mono uppercase tracking-[0.1em] flex items-center gap-1.5"
+            className="text-label font-mono uppercase tracking-[0.1em] flex items-center gap-1.5"
             style={{ color: RARITY_COLORS[r] }}
           >
             <span

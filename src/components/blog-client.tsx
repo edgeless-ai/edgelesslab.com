@@ -14,7 +14,7 @@ export function BlogPostCard({ post }: { post: BlogPost }) {
         style={{ color: "var(--text-primary)" }}
       >
         <div className="min-w-0">
-          <h2 className="text-[15px] font-medium truncate mb-1">
+          <h2 className="text-body font-medium truncate mb-1">
             {post.title}
           </h2>
           <p

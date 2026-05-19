@@ -13,9 +13,11 @@ export interface BlogPost {
   editorial?: boolean;
   /** One-line hook for the companion product CTA. Pain-point framing, not generic. */
   ctaHook?: string;
+  /** Posts with status "draft" are excluded from the public site. Omit or set "published" to publish. */
+  status?: "draft" | "published";
 }
 
-export const posts: BlogPost[] = [
+const allPosts: BlogPost[] = [
   {
     slug: "envelope-protocol-multi-agent-coordination",
     editorial: true,
@@ -3129,3 +3131,7 @@ The best time to set up memory is before your next session. Takes 15 minutes, sa
     `.trim(),
   },
 ];
+
+export const posts: BlogPost[] = allPosts.filter(
+  (p) => p.status !== "draft",
+);

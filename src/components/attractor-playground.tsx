@@ -241,7 +241,7 @@ export function AttractorPlayground() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <label className="text-[10px] font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
+            <label className="text-label font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
               Iterations
             </label>
             <input
@@ -258,7 +258,7 @@ export function AttractorPlayground() {
             </span>
           </div>
           <div>
-            <label className="text-[10px] font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
+            <label className="text-label font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
               Scale
             </label>
             <input
@@ -274,7 +274,7 @@ export function AttractorPlayground() {
             </span>
           </div>
           <div>
-            <label className="text-[10px] font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
+            <label className="text-label font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
               Param A
             </label>
             <input
@@ -291,7 +291,7 @@ export function AttractorPlayground() {
             </span>
           </div>
           <div>
-            <label className="text-[10px] font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
+            <label className="text-label font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
               Color
             </label>
             <input

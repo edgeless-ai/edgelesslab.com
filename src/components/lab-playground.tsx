@@ -175,7 +175,7 @@ export function LabPlayground() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="p-2 rounded-lg transition-colors hover:bg-white/5"
+            className="p-2 rounded-lg transition-colors hover:bg-[var(--grid-line)]"
             style={{ color: "var(--text-secondary)" }}
             aria-label={isPlaying ? "Pause" : "Play"}
           >
@@ -183,7 +183,7 @@ export function LabPlayground() {
           </button>
           <button
             onClick={handleReset}
-            className="p-2 rounded-lg transition-colors hover:bg-white/5"
+            className="p-2 rounded-lg transition-colors hover:bg-[var(--grid-line)]"
             style={{ color: "var(--text-secondary)" }}
             aria-label="Reset"
           >
@@ -191,7 +191,7 @@ export function LabPlayground() {
           </button>
           <button
             onClick={handleDownload}
-            className="p-2 rounded-lg transition-colors hover:bg-white/5"
+            className="p-2 rounded-lg transition-colors hover:bg-[var(--grid-line)]"
             style={{ color: "var(--accent)" }}
             aria-label="Download"
           >
@@ -215,7 +215,7 @@ export function LabPlayground() {
         style={{ borderColor: "var(--border-subtle)", background: "var(--bg-surface)" }}
       >
         <div>
-          <label className="text-[10px] font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
+          <label className="text-label font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
             Particles
           </label>
           <input
@@ -231,7 +231,7 @@ export function LabPlayground() {
           </span>
         </div>
         <div>
-          <label className="text-[10px] font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
+          <label className="text-label font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
             Flow Scale
           </label>
           <input
@@ -247,7 +247,7 @@ export function LabPlayground() {
           </span>
         </div>
         <div>
-          <label className="text-[10px] font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
+          <label className="text-label font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
             Speed
           </label>
           <input
@@ -264,7 +264,7 @@ export function LabPlayground() {
           </span>
         </div>
         <div>
-          <label className="text-[10px] font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
+          <label className="text-label font-mono uppercase tracking-wider block mb-2" style={{ color: "var(--text-tertiary)" }}>
             Decay
           </label>
           <input

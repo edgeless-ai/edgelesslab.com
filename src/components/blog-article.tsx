@@ -169,7 +169,7 @@ export function BlogArticle({ html, editorial, sidebar }: BlogArticleProps) {
           {toc.length >= 3 && (
             <nav aria-label="Table of contents">
               <div
-                className="text-[10px] font-mono uppercase tracking-[0.14em] mb-3"
+                className="text-label font-mono uppercase tracking-[0.14em] mb-3"
                 style={{ color: "var(--text-tertiary)" }}
               >
                 On this page

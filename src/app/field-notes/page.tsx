@@ -46,7 +46,7 @@ export default function FieldNotesPage() {
             <a
               key={note.slug}
               href={note.href}
-              className="tui-border block p-6 transition-colors hover:border-white/20 overflow-hidden"
+              className="tui-border block p-6 transition-colors hover:border-[var(--border-hover)] overflow-hidden"
               data-label={note.stat}
               style={{ background: "var(--bg-surface)" }}
             >

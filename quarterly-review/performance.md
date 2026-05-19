@@ -114,27 +114,41 @@ The `out/` directory with pre-built static files is committed to the repo and de
 
 ---
 
-## 8. Lighthouse Scores -- NEEDS MEASUREMENT
+## 8. Lighthouse Baseline (measured 2026-05-19)
 
-No Lighthouse data collected yet this quarter. Need to run on:
-- Homepage
-- /products
-- /blog
-- /lab
-- One blog post (e.g., /blog/envelope-protocol-multi-agent-coordination/)
+Measured against production build (`pnpm build` -> `out/`) served via Python http.server (no gzip, no HTTP/2, no CDN).
 
-**Target**: 95+ across Performance, Accessibility, Best Practices, SEO.
+| Page | Perf | A11y | BP | SEO |
+|------|------|------|----|-----|
+| Homepage | 75 | 100 | 100 | 100 |
+| /blog | 74 | 100 | 100 | 100 |
+| /products | 74 | 100 | 100 | 100 |
+| /lab | 75 | 100 | 100 | 100 |
+| /blog/envelope-protocol... | 75 | 100 | 100 | 100 |
 
-PostHog Web Vitals data may already have CWV baselines -- check dashboard.
+**Observed (real-world) metrics** (not throttled):
+- LCP: 120ms | FCP: 120ms | Speed Index: 433ms
+- TBT: 7ms | CLS: 0.083 | TTI: 119ms
+
+Performance score (74-75) reflects Lighthouse's simulated 4x CPU throttle + network simulation over uncompressed localhost. The sole failing metric is simulated LCP (8s) caused by JS hydration under throttling. Real observed LCP is 120ms.
+
+On GitHub Pages with CDN, gzip, HTTP/2, and edge caching, expect Performance 90+.
+
+### Fixes applied
+- **A11y 96->100**: Added `<main id="main-content">` to all pages; added `--accent-solid` (#5B5EEB) for WCAG AA contrast on CTA buttons (4.95:1)
+- **BP 96->100**: Fixed og-image preload (.webp->.png); removed invalid X-Frame-Options meta tag
+- **SEO 100**: Already perfect, no changes needed
 
 ---
 
-## Fix Priority
+## Fix Priority (updated)
 
-| # | Item | Effort | Impact |
+| # | Item | Status | Impact |
 |---|------|--------|--------|
-| 1 | Move playwright to devDependencies | 2min | Removes 200MB from dep tree |
-| 2 | Convert images to WebP | 30min | 30-50% size reduction |
-| 3 | Add width/height to img tags | 15min | Prevents CLS |
-| 4 | Run Lighthouse baseline | 15min | Establishes metrics |
-| 5 | Check PostHog Web Vitals dashboard | 5min | Real user CWV data |
+| 1 | Move playwright to devDependencies | DONE | Removed 200MB from dep tree |
+| 2 | Add width/height to img tags | DONE | Prevents CLS |
+| 3 | Run Lighthouse baseline | DONE | Established metrics |
+| 4 | Fix color contrast (a11y) | DONE | A11y 96->100 |
+| 5 | Fix og-image preload + X-Frame-Options | DONE | BP 96->100 |
+| 6 | Convert images to WebP | BACKLOG | 30-50% size reduction |
+| 7 | Check PostHog Web Vitals dashboard | BACKLOG | Real user CWV data |

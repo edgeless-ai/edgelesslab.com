@@ -111,6 +111,7 @@ export default async function ProductDetailPage({
         }}
       />
 
+      <main id="main-content">
       <article className="pt-28 pb-20 px-6">
         <div className="max-w-[1080px] mx-auto">
           <Link
@@ -253,6 +254,7 @@ export default async function ProductDetailPage({
           </div>
         </div>
       </article>
+      </main>
 
       <Footer />
     </div>

@@ -15,6 +15,7 @@ export default function FieldNotesPage() {
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
       <Nav />
 
+      <main id="main-content">
       <section className="px-6 pt-40 pb-16">
         <div className="max-w-[960px] mx-auto">
           <div className="mb-4">
@@ -72,6 +73,7 @@ export default function FieldNotesPage() {
           ))}
         </div>
       </section>
+      </main>
 
       <Footer />
     </div>

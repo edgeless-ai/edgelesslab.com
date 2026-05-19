@@ -109,6 +109,7 @@ export default async function BlogPostPage({
         }}
       />
 
+      <main id="main-content">
       <article className="pt-28 pb-20 px-6">
         <div className={post.editorial ? "max-w-[960px] mx-auto" : "max-w-[680px] mx-auto"}>
           {/* Header */}
@@ -253,6 +254,7 @@ export default async function BlogPostPage({
           </div>
         </div>
       </article>
+      </main>
 
       <Footer />
     </div>

@@ -57,7 +57,7 @@ export default function NotFound() {
             <Link
               href="/"
               className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
-              style={{ background: "var(--accent)" }}
+              style={{ background: "var(--accent-solid)" }}
             >
               Go home <ArrowRight size={15} />
             </Link>

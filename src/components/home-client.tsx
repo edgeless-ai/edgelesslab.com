@@ -105,7 +105,7 @@ export function HeroSection() {
               <Link
                 href="/products"
                 className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
-                style={{ background: "var(--accent)" }}
+                style={{ background: "var(--accent-solid)" }}
                 onClick={() => trackCTA("hero_view_products", "/products")}
               >
                 18 free products <ArrowRight size={15} />
@@ -772,7 +772,7 @@ export function SubscribeSection() {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
-              style={{ background: "var(--accent)" }}
+              style={{ background: "var(--accent-solid)" }}
             >
               GitHub <ArrowUpRight size={14} />
             </a>

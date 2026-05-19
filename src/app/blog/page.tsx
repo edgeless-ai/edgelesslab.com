@@ -32,7 +32,7 @@ export default function BlogPage() {
         })),
       }} />
 
-      <main className="pt-32 pb-20 px-6">
+      <main id="main-content" className="pt-32 pb-20 px-6">
         <div className="max-w-[800px] mx-auto">
           <div className="flex items-center gap-2.5 mb-6">
             <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--accent)" }} />

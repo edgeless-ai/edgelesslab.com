@@ -36,6 +36,7 @@ export default function ProductsPage() {
         })),
       }} />
 
+      <main id="main-content">
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-[1080px] mx-auto">
           <div
@@ -94,6 +95,7 @@ export default function ProductsPage() {
           <ProductsGrid products={products} />
         </div>
       </section>
+      </main>
 
       <Footer />
     </div>

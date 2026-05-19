@@ -17,6 +17,7 @@ export default function LabPage() {
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
       <Nav />
 
+      <main id="main-content">
       <section className="px-6 pt-40 pb-16">
         <div className="max-w-[1280px] mx-auto">
           <LabHeader />
@@ -91,6 +92,7 @@ export default function LabPage() {
           <LabGrid experiments={experiments} />
         </div>
       </section>
+      </main>
 
       <Footer />
     </div>

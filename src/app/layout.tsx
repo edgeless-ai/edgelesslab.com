@@ -76,7 +76,6 @@ export default function RootLayout({
         <PerformancePreload />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' us.i.posthog.com us-assets.i.posthog.com; connect-src 'self' us.i.posthog.com us-assets.i.posthog.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' fonts.gstatic.com;" />
-        <meta httpEquiv="X-Frame-Options" content="SAMEORIGIN" />
         <meta httpEquiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
         {/* Preconnect hints moved to PerformancePreload component for centralized management */}
       </head>
@@ -99,7 +98,7 @@ export default function RootLayout({
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-full focus:text-sm focus:font-medium focus:text-white"
-          style={{ background: "var(--accent)" }}
+          style={{ background: "var(--accent-solid)" }}
         >
           Skip to main content
         </a>

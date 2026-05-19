@@ -24,7 +24,7 @@ export function PerformancePreload() {
       <link rel="dns-prefetch" href="https://us.i.posthog.com" />
       
       {/* Preload critical WebP images with HIGH priority for LCP */}
-      <link rel="preload" href="/og-image.webp" as="image" type="image/webp" fetchPriority="high" />
+      <link rel="preload" href="/og-image.png" as="image" type="image/png" fetchPriority="high" />
       
       {/* Preconnect to Google Fonts for faster font loading */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -241,8 +241,7 @@ CONFIG.loadEnvironment = function() {
   if (params.has('debug')) {
     this.debug.enabled = params.get('debug') === 'true';
   }
-  
-  this.validate();
+
   return this;
 };
 

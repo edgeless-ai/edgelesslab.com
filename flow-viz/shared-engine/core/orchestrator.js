@@ -76,27 +76,37 @@ class Orchestrator {
   }
 
   loadConfig(userConfig) {
-    // Deep clone default config
+    // Deep clone default config (JSON round-trip strips functions)
     const config = JSON.parse(JSON.stringify(CONFIG));
-    
+
+    // Re-attach methods from the original CONFIG prototype
+    if (typeof CONFIG.loadEnvironment === 'function') {
+      config.loadEnvironment = CONFIG.loadEnvironment.bind(config);
+    }
+    if (typeof CONFIG.validate === 'function') {
+      config.validate = CONFIG.validate.bind(config);
+    }
+
     // Apply user overrides
     if (userConfig) {
       this.deepMerge(config, userConfig);
     }
-    
+
     // Load environment (URL params)
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && config.loadEnvironment) {
       config.loadEnvironment();
     }
-    
+
     // Validate
-    config.validate();
-    
+    if (config.validate) {
+      config.validate();
+    }
+
     // Resolve seed
     if (config.engine.seed === null) {
       config.engine.seed = Math.floor(Math.random() * 999999);
     }
-    
+
     return config;
   }
 

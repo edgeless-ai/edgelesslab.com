@@ -141,9 +141,9 @@ class Orchestrator {
       if (sourceParam) {
         overrides.dataSource = { type: sourceParam };
       }
-      this.loadConfig(overrides);
+      this.config = this.loadConfig(overrides);
     }
-    
+
     const c = this.config.engine;
     
     // Apply p5 settings

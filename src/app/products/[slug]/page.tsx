@@ -193,7 +193,7 @@ export default async function ProductDetailPage({
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={`/product-covers/${slug}.png`}
+                  src={`/product-covers/${slug}.webp`}
                   alt={`${product.name} cover`}
                   width={1280}
                   height={1280}

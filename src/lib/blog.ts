@@ -1903,8 +1903,6 @@ If you are starting from zero, begin with the flow field. It is the most forgivi
     tags: ["Prompt Engineering", "AI Agents", "System Prompts"],
     readTime: "8 min",
     editorial: true,
-    productSlug: "prompt-engineering-os",
-    ctaHook: "The lint rules, banned phrases, and production prompt templates behind this post.",
     content: `
 Someone leaked Meta AI's production system prompt. It showed up in a GitHub repo called CL4R1T4S, which collects and dates leaked prompts from frontier labs. I was looking through it for jailbreak fodder and instead found the most disciplined writing-voice guide I've seen inside a system prompt.
 
@@ -2577,8 +2575,6 @@ Every technique on this site is built from those six functions. The [source is o
     date: "2026-03-30",
     tags: ["Prompt Engineering", "AI", "Production"],
     readTime: "5 min",
-    productSlug: "prompt-engineering-os",
-    ctaHook: "Production prompt templates, lint rules, and the full system behind this approach.",
     content: `
 Demo prompts work great in demos. "Summarize this article" returns a clean summary. "Extract the key entities" returns a nice list. Ship that to production and watch it break on the first malformed input.
 
@@ -2667,8 +2663,6 @@ The [Prompt Engineering OS](/products) covers 30 chapters of patterns like these
     date: "2026-03-26",
     tags: ["Claude Code", "Productivity", "Memory"],
     readTime: "4 min",
-    productSlug: "claude-memory-kit",
-    ctaHook: "The CLAUDE.md template, memory taxonomy, and session initializer from this setup.",
     content: `
 Every session, I used to start the same way. "We're using TypeScript, not JavaScript." "Don't use default exports." "The API is in \`src/api/\`, not root." "We already tried Redis here and it didn't work."
 
@@ -2770,8 +2764,6 @@ Read the longer technical version in [How Claude Code Memory Actually Works](/bl
     date: "2026-03-24",
     tags: ["MCP", "Architecture", "Developer Tools"],
     readTime: "5 min",
-    productSlug: "lixicg",
-    ctaHook: "Production MCP server templates with auth, rate limiting, and Docker deployment.",
     content: `
 In 1978, Doug McIlroy wrote the Unix philosophy in three sentences. The one that matters: "Write programs that do one thing and do it well. Write programs to work together."
 
@@ -2942,8 +2934,6 @@ If you want to go deeper into the scoring and iteration pipeline, the [pen plott
     date: "2026-03-21",
     tags: ["Agents", "MCP", "Infrastructure"],
     readTime: "8 min",
-    productSlug: "plbzo",
-    ctaHook: "The full agent cookbook: dispatch patterns, bus protocol, and production deployment configs.",
     content: `
 When people hear "multi-agent system," they picture a team of engineers, months of planning, and enterprise infrastructure. I built one by myself, and it runs on a single $15/month VPS.
 
@@ -3026,8 +3016,6 @@ The goal isn't to build the most complex system. It's to build the most useful o
     date: "2026-03-21",
     tags: ["Claude Code", "Memory", "Developer Tools"],
     readTime: "6 min",
-    productSlug: "claude-memory-kit",
-    ctaHook: "CLAUDE.md template, 4-type memory taxonomy, and the session initializer script.",
     content: `
 Every Claude Code session starts the same way: a blank slate. No memory of yesterday's architecture decisions. No recall of your coding conventions. No idea that you spent three hours debugging that OAuth flow last week.
 

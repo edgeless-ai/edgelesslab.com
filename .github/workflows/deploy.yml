@@ -19,17 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            /*
-            !/pen-plotter
-            !/tartanism
-            !/total-serialism
-            !/flow-viz
-            !/src
-            !/node_modules
-            !/.github
-          sparse-checkout-cone-mode: false
+
+      - name: Remove non-deployable content
+        run: |
+          rm -rf src node_modules .github
+          rm -rf pen-plotter/assets/medium pen-plotter/assets/mediums-all pen-plotter/assets/thumbs-full
 
       - uses: actions/upload-pages-artifact@v3
         with:

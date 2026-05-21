@@ -151,8 +151,9 @@ class Orchestrator {
     const renderer = c.renderer === 'WEBGL' ? WEBGL : P2D;
     createCanvas(windowWidth, windowHeight, renderer);
     
-    // Set color mode
-    colorMode(c.colorMode, c.colorRanges.h, c.colorRanges.s, c.colorRanges.b, c.colorRanges.a);
+    // Set color mode — p5 constants are lowercase strings ('hsb', 'rgb', 'hsl')
+    const mode = typeof c.colorMode === 'string' ? c.colorMode.toLowerCase() : c.colorMode;
+    colorMode(mode, c.colorRanges.h, c.colorRanges.s, c.colorRanges.b, c.colorRanges.a);
     
     // Set pixel density
     pixelDensity(c.pixelDensity);

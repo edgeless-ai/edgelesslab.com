@@ -10,7 +10,7 @@ const CONFIG = {
   engine: {
     seed: null,                    // null = random, or specify for reproducible
     frameRate: 60,
-    colorMode: 'HSB',              // 'HSB' | 'RGB'
+    colorMode: 'hsb',              // 'hsb' | 'rgb' (p5 constants are lowercase)
     colorRanges: {                 // For HSB mode
       h: 360,
       s: 100,

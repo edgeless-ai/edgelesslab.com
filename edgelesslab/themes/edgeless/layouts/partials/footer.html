@@ -1,0 +1,15 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-content">
+    <p>&copy; {{ now.Year }} {{ .Site.Params.organizationName | default .Site.Title }}. All rights reserved.</p>
+    
+    <nav aria-label="Footer navigation">
+      <a href="/sitemap.xml">Sitemap</a>
+      <a href="/index.json">API Feed</a>
+    </nav>
+    
+    {{/* Dynamic content notice for SEO freshness signals */}}
+    <p class="build-info">
+      <small>Last updated: <time datetime="{{ now.Format "2006-01-02T15:04:05Z07:00" }}">{{ now.Format "January 2, 2006" }}</time></small>
+    </p>
+  </div>
+</footer>

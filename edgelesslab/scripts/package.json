@@ -1,0 +1,10 @@
+{
+  "name": "edgeless-og-generator",
+  "version": "1.0.0",
+  "description": "Open Graph image generator for Edgeless Lab website",
+  "private": true,
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "playwright": "^1.40.0"
+  }
+}

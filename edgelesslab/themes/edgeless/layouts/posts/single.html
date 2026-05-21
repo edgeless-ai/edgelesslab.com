@@ -1,0 +1,55 @@
+{{ define "main" }}
+<article class="post single">
+  <header class="post-header">
+    <div class="post-meta">
+      <time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "January 2, 2006" }}</time>
+      <span class="reading-time">{{ .ReadingTime }} min read</span>
+    </div>
+    <h1 class="post-title">{{ .Title }}</h1>
+    {{ if .Params.subtitle }}
+    <p class="post-subtitle">{{ .Params.subtitle }}</p>
+    {{ end }}
+    {{ if .Params.author }}
+    <div class="post-author">
+      <span>By {{ .Params.author }}</span>
+    </div>
+    {{ end }}
+  </header>
+
+  {{ if .Params.image }}
+  <figure class="post-featured-image">
+    <img src="{{ .Params.image | relURL }}" alt="{{ .Title }}">
+  </figure>
+  {{ end }}
+
+  <div class="post-content prose">
+    {{ .Content }}
+  </div>
+
+  {{ if .Params.tags }}
+  <footer class="post-footer">
+    <div class="post-tags">
+      <span>Tagged:</span>
+      {{ range .Params.tags }}
+      <a href="{{ "/tags/" | relURL }}{{ . | urlize }}" class="tag">{{ . }}</a>
+      {{ end }}
+    </div>
+  </footer>
+  {{ end }}
+
+  <nav class="post-nav" aria-label="Post navigation">
+    {{ with .PrevInSection }}
+    <a href="{{ .RelPermalink }}" class="prev">
+      <span>← Previous</span>
+      <strong>{{ .Title }}</strong>
+    </a>
+    {{ end }}
+    {{ with .NextInSection }}
+    <a href="{{ .RelPermalink }}" class="next">
+      <span>Next →</span>
+      <strong>{{ .Title }}</strong>
+    </a>
+    {{ end }}
+  </nav>
+</article>
+{{ end }}

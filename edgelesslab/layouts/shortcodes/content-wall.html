@@ -1,0 +1,46 @@
+{{ $data := index hugo.Data "content_wall" }}
+{{ if $data }}
+<section class="living-content-wall" aria-labelledby="wall-heading">
+  <h2 id="wall-heading">Swarm Activity</h2>
+
+  <!-- Summary bar -->
+  {{ with $data.summary }}
+  <div class="wall-summary">
+    <div class="summary-stat">
+      <span class="stat-value">{{ .total_issues_done }}</span>
+      <span class="stat-label">Issues Resolved</span>
+    </div>
+    <div class="summary-stat">
+      <span class="stat-value">{{ .total_agents }}</span>
+      <span class="stat-label">Agents</span>
+    </div>
+    <div class="summary-stat">
+      <span class="stat-value stat-active">{{ .agents_active }}</span>
+      <span class="stat-label">Active</span>
+    </div>
+  </div>
+  {{ end }}
+
+  <!-- Content grid -->
+  <div class="wall-grid">
+    {{ range first 12 $data.recent_work }}
+    <div class="wall-card" data-type="task" data-priority="{{ .priority }}">
+      <div class="card-header">
+        <span class="card-id">{{ .id }}</span>
+        <span class="card-priority priority-{{ .priority }}">{{ .priority }}</span>
+      </div>
+      <p class="card-title">{{ .title }}</p>
+      <time class="card-time" datetime="{{ .updated }}">{{ .updated }}</time>
+    </div>
+    {{ end }}
+  </div>
+
+  <div class="wall-footer">
+    <small>Last synced: {{ $data.generated_at }}</small>
+  </div>
+</section>
+{{ else }}
+<section class="living-content-wall wall-empty">
+  <p>No activity data available. The content wall will populate once agent data flows in.</p>
+</section>
+{{ end }}

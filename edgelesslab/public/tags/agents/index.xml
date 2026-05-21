@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Edgeless Lab - AI-Native Creative Studio</title>
+    <link>https://edgelesslab.com/</link>
+    <description>Edgeless Lab is an AI-native creative studio building the future of generative art, autonomous agents, and intelligent systems.</description>
+    <language>en-us</language>
+    <managingEditor>Edgeless Lab</managingEditor>
+    <webMaster>Edgeless Lab</webMaster>
+    <lastBuildDate>Sat, 16 May 2026 10:57:44 -0700</lastBuildDate>
+    
+    
+      
+        <item>
+          <title>Multi-Agent Swarm Architecture</title>
+          <link>https://edgelesslab.com/work/multi-agent-swarm/</link>
+          <pubDate>Fri, 15 May 2026 00:00:00 &#43;0000</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/work/multi-agent-swarm/</guid>
+          <description>&amp;lt;h2 id=&amp;#34;overview&amp;#34;&amp;gt;Overview&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;Edgeless Lab operates as a &amp;lt;strong&amp;gt;multi-agent swarm&amp;lt;/strong&amp;gt; — 8&#43; autonomous AI agents running continuously, coordinating through Discord and Paperclip, each with distinct roles and responsibilities. No human touch required for routine execution.&amp;lt;/p&amp;gt;
+&amp;lt;h2 id=&amp;#34;core-architecture&amp;#34;&amp;gt;Core Architecture&amp;lt;/h2&amp;gt;
+&amp;lt;pre tabindex=&amp;#34;0&amp;#34;&amp;gt;&amp;lt;code&amp;gt;Human (David)
+    ↓ Discord mentions
+Hive (Coordinator) — routes to specialists
+    ↓ Structured handoffs (#bot-backroom)
+[ Beau | Kilo | Scribe | Edgeless CC | Pamela | Atlas ]
+    ↓ Paperclip API
+Task Queue → Execution → Completion
+&amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;&amp;lt;h2 id=&amp;#34;key-components&amp;#34;&amp;gt;Key Components&amp;lt;/h2&amp;gt;
+&amp;lt;h3 id=&amp;#34;1-hermes-gateway&amp;#34;&amp;gt;1. Hermes Gateway&amp;lt;/h3&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;One gateway per agent profile&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Runs as macOS LaunchAgent (persistent)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Handles Discord connection &#43; model routing&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Fireworks K2.6 &#43; Nous qwen3.6-plus stack&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;h3 id=&amp;#34;2-paperclip-orchestration&amp;#34;&amp;gt;2. Paperclip Orchestration&amp;lt;/h3&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;Task/issues API at localhost:3100&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Agent registry with role mappings&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Automatic retry &#43; escalation (5min cron)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Web UI for tracking &#43; intervention&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;h3 id=&amp;#34;3-discord-coordination&amp;#34;&amp;gt;3. Discord Coordination&amp;lt;/h3&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;Structured handoff tags: &amp;lt;code&amp;gt;[FROM:X][TO:Y][TYPE:Z]&amp;lt;/code&amp;gt;&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;#bot-backroom exclusively for bot-to-bot&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;#general for human coordination only&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Anti-loop protocol prevents circular mentions&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;h3 id=&amp;#34;4-memory-system&amp;#34;&amp;gt;4. Memory System&amp;lt;/h3&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;ChromaDB (vector &#43; semantic search)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Obsidian vault (12K&#43; files, canonical knowledge)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Honcho (dialectic reasoning, profile-specific)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Session search (cross-conversation recall)&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;h2 id=&amp;#34;agent-roster&amp;#34;&amp;gt;Agent Roster&amp;lt;/h2&amp;gt;
+&amp;lt;table&amp;gt;
+  &amp;lt;thead&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;th&amp;gt;Agent&amp;lt;/th&amp;gt;
+          &amp;lt;th&amp;gt;Role&amp;lt;/th&amp;gt;
+          &amp;lt;th&amp;gt;Model&amp;lt;/th&amp;gt;
+          &amp;lt;th&amp;gt;Primary Channel&amp;lt;/th&amp;gt;
+      &amp;lt;/tr&amp;gt;
+  &amp;lt;/thead&amp;gt;
+  &amp;lt;tbody&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Hive&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Coordinator, human interface&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.6&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#general&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Beau&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;VPS planning, research, cron&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.6 (VPS)&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#bot-backroom&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Kilo&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Code execution specialist&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Codex gpt-5.3&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#bot-backroom&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Scribe&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Knowledge curation&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.6&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#bot-backroom&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Edgeless CC&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Engineering lead&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.6&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#bot-backroom&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Pamela&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Trading, Polymarket&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Codex gpt-5.3&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#polymarket&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Atlas&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Project management&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.6&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#bot-backroom&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Ombudsman&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Compliance, audit&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.6&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#bot-backroom&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+  &amp;lt;/tbody&amp;gt;
+&amp;lt;/table&amp;gt;
+&amp;lt;h2 id=&amp;#34;coordination-patterns&amp;#34;&amp;gt;Coordination Patterns&amp;lt;/h2&amp;gt;
+&amp;lt;h3 id=&amp;#34;goal-loop&amp;#34;&amp;gt;Goal Loop&amp;lt;/h3&amp;gt;
+&amp;lt;p&amp;gt;Self-evaluating execution cycle: plan → act → test → review → iterate (max 5 cycles). Used for ambitious, open-ended objectives like &amp;amp;ldquo;make edgelesslab.com one of the best sites on the internet.&amp;amp;rdquo;&amp;lt;/p&amp;gt;</description>
+          
+            <category>agents</category>
+          
+            <category>swarm</category>
+          
+            <category>hermes</category>
+          
+            <category>paperclip</category>
+          
+            <category>architecture</category>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Access vs Meaning: Why Agent Semantics Are the Real Moat</title>
+          <link>https://edgelesslab.com/access-vs-meaning-why-agent-semantics-are-the-real-moat/</link>
+          <pubDate>Thu, 07 May 2026 09:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/access-vs-meaning-why-agent-semantics-are-the-real-moat/</guid>
+          <description>&amp;lt;p&amp;gt;The AI tooling landscape is splitting along a fundamental fault line. On one side: agents that have &amp;lt;em&amp;gt;access&amp;lt;/em&amp;gt; to systems. On the other: agents that have &amp;lt;em&amp;gt;meaning&amp;lt;/em&amp;gt;—semantic understanding of what those systems do.&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;This distinction sounds subtle, but it&amp;amp;rsquo;s the difference between automation that compounds silently and automation that demands constant supervision. It&amp;amp;rsquo;s the difference between RPA that breaks when a button moves, and agents that adapt when an API changes. It&amp;amp;rsquo;s the difference between access and meaning.&amp;lt;/p&amp;gt;</description>
+          
+            <category>agents</category>
+          
+            <category>ai</category>
+          
+            <category>mcp</category>
+          
+            <category>architecture</category>
+          
+            <category>edgeless</category>
+          
+            <category>agentic-os</category>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Multi-Model Routing: 4 Different Brains (Not 1)</title>
+          <link>https://edgelesslab.com/multi-model-routing-4-different-brains-not-1/</link>
+          <pubDate>Mon, 20 Apr 2026 10:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/multi-model-routing-4-different-brains-not-1/</guid>
+          <description>&amp;lt;p&amp;gt;&amp;lt;em&amp;gt;This is Post 2 in the &amp;lt;a href=&amp;#34;/tags/agentic-os/&amp;#34;&amp;gt;Agentic OS series&amp;lt;/a&amp;gt; — the economics of using different LLMs for different jobs.&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
+&amp;lt;hr&amp;gt;
+&amp;lt;h2 id=&amp;#34;the-12week-math-doesnt-work-without-this&amp;#34;&amp;gt;The $12/Week Math Doesn&amp;amp;rsquo;t Work Without This&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;In &amp;lt;a href=&amp;#34;/posts/agentic-os-12-week-team/&amp;#34;&amp;gt;Post 1&amp;lt;/a&amp;gt;, I claimed a $12/week AI operations team. The numbers:&amp;lt;/p&amp;gt;
+&amp;lt;table&amp;gt;
+  &amp;lt;thead&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;th&amp;gt;Agent&amp;lt;/th&amp;gt;
+          &amp;lt;th&amp;gt;Model&amp;lt;/th&amp;gt;
+          &amp;lt;th&amp;gt;Weekly Cost&amp;lt;/th&amp;gt;
+      &amp;lt;/tr&amp;gt;
+  &amp;lt;/thead&amp;gt;
+  &amp;lt;tbody&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Hermes&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.5&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;~$1.50&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Dispatch&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;DeepSeek V3.2&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;~$0.80&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Builder&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Claude Code&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;~$3.00&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Verifier&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;DeepSeek V3.2&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;~$0.80&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Pamela&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;GPT-4.1 nano&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;~$6.00&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+  &amp;lt;/tbody&amp;gt;
+&amp;lt;/table&amp;gt;
+&amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Total: ~$12.10&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;If every agent used GPT-4.5? &amp;lt;strong&amp;gt;~$120/week&amp;lt;/strong&amp;gt;. 10x more expensive. Same output quality.&amp;lt;/p&amp;gt;</description>
+          
+            <category>agents</category>
+          
+            <category>orchestration</category>
+          
+            <category>model-routing</category>
+          
+            <category>cost-optimization</category>
+          
+            <category>paperclip</category>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>$12/Week AI Operations Team: How I Replaced a $50K Agency with 5 Agents</title>
+          <link>https://edgelesslab.com/12/week-ai-operations-team-how-i-replaced-a-50k-agency-with-5-agents/</link>
+          <pubDate>Sun, 19 Apr 2026 14:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/12/week-ai-operations-team-how-i-replaced-a-50k-agency-with-5-agents/</guid>
+          <description>&amp;lt;p&amp;gt;&amp;lt;em&amp;gt;This is Post 1 in the &amp;lt;a href=&amp;#34;/tags/agentic-os/&amp;#34;&amp;gt;Agentic OS series&amp;lt;/a&amp;gt; — documenting how we built a self-managing AI operations team that runs 24/7 for less than a coffee budget.&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
+&amp;lt;hr&amp;gt;
+&amp;lt;h2 id=&amp;#34;the-50k-question&amp;#34;&amp;gt;The $50K Question&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;I was quoted $50,000 for a six-month retainer with a mid-market AI consultancy. They&amp;amp;rsquo;d build &amp;amp;ldquo;autonomous agents&amp;amp;rdquo; for my creative systems business.&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;I spent $12/week instead.&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;Not $12/day. &amp;lt;strong&amp;gt;$12/week&amp;lt;/strong&amp;gt;. Less than a Netflix subscription. Less than two burritos in San Francisco.&amp;lt;/p&amp;gt;</description>
+          
+            <category>agents</category>
+          
+            <category>orchestration</category>
+          
+            <category>multi-agent</category>
+          
+            <category>cost-analysis</category>
+          
+            <category>paperclip</category>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Agent-Based Swarm Systems</title>
+          <link>https://edgelesslab.com/work/swarm-systems/</link>
+          <pubDate>Fri, 17 Apr 2026 00:00:00 &#43;0000</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/work/swarm-systems/</guid>
+          <description>&amp;lt;p&amp;gt;Multi-agent systems produce complexity through simple rules executed by many autonomous agents. No central controller directs the outcome—patterns emerge from local interactions.&amp;lt;/p&amp;gt;
+&amp;lt;h2 id=&amp;#34;boids-flocking&amp;#34;&amp;gt;Boids Flocking&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;Craig Reynolds&amp;amp;rsquo; three rules produce convincing flocking behavior:&amp;lt;/p&amp;gt;
+&amp;lt;ol&amp;gt;
+&amp;lt;li&amp;gt;&amp;lt;strong&amp;gt;Separation&amp;lt;/strong&amp;gt;: steer to avoid crowding&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;&amp;lt;strong&amp;gt;Alignment&amp;lt;/strong&amp;gt;: steer toward average heading of neighbors&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;&amp;lt;strong&amp;gt;Cohesion&amp;lt;/strong&amp;gt;: steer toward average position of neighbors&amp;lt;/li&amp;gt;
+&amp;lt;/ol&amp;gt;
+&amp;lt;h2 id=&amp;#34;slime-mold-physarum&amp;#34;&amp;gt;Slime Mold (Physarum)&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;The single-celled &amp;lt;em&amp;gt;Physarum polycephalum&amp;lt;/em&amp;gt; can solve maze problems and build efficient networks. Digital simulations use:&amp;lt;/p&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;Trail deposition (agents leave pheromone trails)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Trail following (agents sense and follow trails)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Decay (trails evaporate over time)&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;p&amp;gt;This produces network structures resembling Tokyo rail systems—emergent optimization without central planning.&amp;lt;/p&amp;gt;</description>
+          
+            <category>generative-art</category>
+          
+            <category>agents</category>
+          
+            <category>swarm</category>
+          
+            <category>boids</category>
+          
+        </item>
+      
+    
+  </channel>
+</rss>

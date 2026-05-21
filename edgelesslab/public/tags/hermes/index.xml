@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Edgeless Lab - AI-Native Creative Studio</title>
+    <link>https://edgelesslab.com/</link>
+    <description>Edgeless Lab is an AI-native creative studio building the future of generative art, autonomous agents, and intelligent systems.</description>
+    <language>en-us</language>
+    <managingEditor>Edgeless Lab</managingEditor>
+    <webMaster>Edgeless Lab</webMaster>
+    <lastBuildDate>Sat, 16 May 2026 10:57:44 -0700</lastBuildDate>
+    
+    
+      
+        <item>
+          <title>Case Study: Paperclip AI Platform</title>
+          <link>https://edgelesslab.com/work/paperclip-ai-platform/</link>
+          <pubDate>Fri, 15 May 2026 09:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/work/paperclip-ai-platform/</guid>
+          <description>&amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Case Study #1&amp;lt;/strong&amp;gt; | Project: Paperclip AI | Web Dev: Jacob — March 2026&amp;lt;/p&amp;gt;
+&amp;lt;hr&amp;gt;
+&amp;lt;h2 id=&amp;#34;problem&amp;#34;&amp;gt;Problem&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;Solo developers who want AI agents to work &amp;lt;em&amp;gt;for&amp;lt;/em&amp;gt; them end up with a stack of disconnected tools — Discord bots, cron jobs, local LLMs, GitHub repos — with no unified control plane. Every new agent costs time: new tokens, new routing, new monitoring, new failure modes.&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;Edgeless Lab&amp;amp;rsquo;s clients needed to know: &amp;lt;em&amp;gt;can we run a production-grade AI ops team at solo-founder prices, without DevOps overhead?&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;</description>
+          
+            <category>multi-agent</category>
+          
+            <category>orchestration</category>
+          
+            <category>paperclip</category>
+          
+            <category>hermes</category>
+          
+            <category>platform</category>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Multi-Agent Swarm Architecture</title>
+          <link>https://edgelesslab.com/work/multi-agent-swarm/</link>
+          <pubDate>Fri, 15 May 2026 00:00:00 &#43;0000</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/work/multi-agent-swarm/</guid>
+          <description>&amp;lt;h2 id=&amp;#34;overview&amp;#34;&amp;gt;Overview&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;Edgeless Lab operates as a &amp;lt;strong&amp;gt;multi-agent swarm&amp;lt;/strong&amp;gt; — 8&#43; autonomous AI agents running continuously, coordinating through Discord and Paperclip, each with distinct roles and responsibilities. No human touch required for routine execution.&amp;lt;/p&amp;gt;
+&amp;lt;h2 id=&amp;#34;core-architecture&amp;#34;&amp;gt;Core Architecture&amp;lt;/h2&amp;gt;
+&amp;lt;pre tabindex=&amp;#34;0&amp;#34;&amp;gt;&amp;lt;code&amp;gt;Human (David)
+    ↓ Discord mentions
+Hive (Coordinator) — routes to specialists
+    ↓ Structured handoffs (#bot-backroom)
+[ Beau | Kilo | Scribe | Edgeless CC | Pamela | Atlas ]
+    ↓ Paperclip API
+Task Queue → Execution → Completion
+&amp;lt;/code&amp;gt;&amp;lt;/pre&amp;gt;&amp;lt;h2 id=&amp;#34;key-components&amp;#34;&amp;gt;Key Components&amp;lt;/h2&amp;gt;
+&amp;lt;h3 id=&amp;#34;1-hermes-gateway&amp;#34;&amp;gt;1. Hermes Gateway&amp;lt;/h3&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;One gateway per agent profile&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Runs as macOS LaunchAgent (persistent)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Handles Discord connection &#43; model routing&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Fireworks K2.6 &#43; Nous qwen3.6-plus stack&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;h3 id=&amp;#34;2-paperclip-orchestration&amp;#34;&amp;gt;2. Paperclip Orchestration&amp;lt;/h3&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;Task/issues API at localhost:3100&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Agent registry with role mappings&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Automatic retry &#43; escalation (5min cron)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Web UI for tracking &#43; intervention&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;h3 id=&amp;#34;3-discord-coordination&amp;#34;&amp;gt;3. Discord Coordination&amp;lt;/h3&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;Structured handoff tags: &amp;lt;code&amp;gt;[FROM:X][TO:Y][TYPE:Z]&amp;lt;/code&amp;gt;&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;#bot-backroom exclusively for bot-to-bot&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;#general for human coordination only&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Anti-loop protocol prevents circular mentions&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;h3 id=&amp;#34;4-memory-system&amp;#34;&amp;gt;4. Memory System&amp;lt;/h3&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;ChromaDB (vector &#43; semantic search)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Obsidian vault (12K&#43; files, canonical knowledge)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Honcho (dialectic reasoning, profile-specific)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Session search (cross-conversation recall)&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;h2 id=&amp;#34;agent-roster&amp;#34;&amp;gt;Agent Roster&amp;lt;/h2&amp;gt;
+&amp;lt;table&amp;gt;
+  &amp;lt;thead&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;th&amp;gt;Agent&amp;lt;/th&amp;gt;
+          &amp;lt;th&amp;gt;Role&amp;lt;/th&amp;gt;
+          &amp;lt;th&amp;gt;Model&amp;lt;/th&amp;gt;
+          &amp;lt;th&amp;gt;Primary Channel&amp;lt;/th&amp;gt;
+      &amp;lt;/tr&amp;gt;
+  &amp;lt;/thead&amp;gt;
+  &amp;lt;tbody&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Hive&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Coordinator, human interface&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.6&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#general&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Beau&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;VPS planning, research, cron&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.6 (VPS)&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#bot-backroom&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Kilo&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Code execution specialist&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Codex gpt-5.3&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#bot-backroom&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Scribe&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Knowledge curation&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.6&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#bot-backroom&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Edgeless CC&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Engineering lead&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.6&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#bot-backroom&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Pamela&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Trading, Polymarket&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Codex gpt-5.3&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#polymarket&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Atlas&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Project management&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.6&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#bot-backroom&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Ombudsman&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Compliance, audit&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.6&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;#bot-backroom&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+  &amp;lt;/tbody&amp;gt;
+&amp;lt;/table&amp;gt;
+&amp;lt;h2 id=&amp;#34;coordination-patterns&amp;#34;&amp;gt;Coordination Patterns&amp;lt;/h2&amp;gt;
+&amp;lt;h3 id=&amp;#34;goal-loop&amp;#34;&amp;gt;Goal Loop&amp;lt;/h3&amp;gt;
+&amp;lt;p&amp;gt;Self-evaluating execution cycle: plan → act → test → review → iterate (max 5 cycles). Used for ambitious, open-ended objectives like &amp;amp;ldquo;make edgelesslab.com one of the best sites on the internet.&amp;amp;rdquo;&amp;lt;/p&amp;gt;</description>
+          
+            <category>agents</category>
+          
+            <category>swarm</category>
+          
+            <category>hermes</category>
+          
+            <category>paperclip</category>
+          
+            <category>architecture</category>
+          
+        </item>
+      
+    
+  </channel>
+</rss>

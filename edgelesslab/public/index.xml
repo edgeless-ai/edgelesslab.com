@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Edgeless Lab - AI-Native Creative Studio</title>
+    <link>https://edgelesslab.com/</link>
+    <description>Edgeless Lab is an AI-native creative studio building the future of generative art, autonomous agents, and intelligent systems.</description>
+    <language>en-us</language>
+    <managingEditor>Edgeless Lab</managingEditor>
+    <webMaster>Edgeless Lab</webMaster>
+    <lastBuildDate>Sat, 16 May 2026 10:57:44 -0700</lastBuildDate>
+    
+      <atom:link href="https://edgelesslab.com/index.json" rel="self" type="application/json"/>
+    
+    
+      
+        <item>
+          <title>Updates</title>
+          <link>https://edgelesslab.com/posts/</link>
+          <pubDate>Fri, 15 May 2026 20:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/posts/</guid>
+          <description>&amp;lt;p&amp;gt;Stay current with what we&amp;amp;rsquo;re building. From shipping new generative art systems to agent experiments and technical deep-dives.&amp;lt;/p&amp;gt;</description>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Work</title>
+          <link>https://edgelesslab.com/work/</link>
+          <pubDate>Fri, 15 May 2026 09:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/work/</guid>
+          <description>&amp;lt;p&amp;gt;Our work explores the intersection of artificial intelligence and creative expression.&amp;lt;/p&amp;gt;</description>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Dashboard</title>
+          <link>https://edgelesslab.com/dashboard/</link>
+          <pubDate>Thu, 07 May 2026 14:00:00 &#43;0000</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/dashboard/</guid>
+          <description>&amp;lt;h1 id=&amp;#34;edgeless-lab-dashboard&amp;#34;&amp;gt;Edgeless Lab Dashboard&amp;lt;/h1&amp;gt;
+&amp;lt;p&amp;gt;Real-time visibility into what we&amp;amp;rsquo;re building.&amp;lt;/p&amp;gt;
+&amp;lt;h2 id=&amp;#34;recent-ships&amp;#34;&amp;gt;Recent Ships&amp;lt;/h2&amp;gt;
+
+
+&amp;lt;div class=&amp;#34;ship-log&amp;#34;&amp;gt;
+  &amp;lt;div class=&amp;#34;ship-log-header&amp;#34;&amp;gt;
+    &amp;lt;h3&amp;gt;Recent Ships&amp;lt;/h3&amp;gt;
+    &amp;lt;span class=&amp;#34;ship-count&amp;#34;&amp;gt;10 completed&amp;lt;/span&amp;gt;
+  &amp;lt;/div&amp;gt;
+  &amp;lt;div class=&amp;#34;ship-log-entries&amp;#34;&amp;gt;
+    
+    &amp;lt;div class=&amp;#34;ship-entry&amp;#34;&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-id&amp;#34;&amp;gt;
+        &amp;lt;a href=&amp;#34;https://paperclip.internal/issues/EDGA-2421&amp;#34; target=&amp;#34;_blank&amp;#34;&amp;gt;EDGA-2421&amp;lt;/a&amp;gt;
+      &amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-title&amp;#34;&amp;gt;[Swarm-Repair] Install psql client to query Paperclip PostgreSQL (port 54329)&amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-meta&amp;#34;&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-agent&amp;#34;&amp;gt;97898794...&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-time&amp;#34; data-timestamp=&amp;#34;2026-05-16T03:13:10.818Z&amp;#34;&amp;gt;2026-05-16T03:13:10.818Z&amp;lt;/span&amp;gt;
+      &amp;lt;/div&amp;gt;
+    &amp;lt;/div&amp;gt;
+    
+    &amp;lt;div class=&amp;#34;ship-entry&amp;#34;&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-id&amp;#34;&amp;gt;
+        &amp;lt;a href=&amp;#34;https://paperclip.internal/issues/EDGA-2075&amp;#34; target=&amp;#34;_blank&amp;#34;&amp;gt;EDGA-2075&amp;lt;/a&amp;gt;
+      &amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-title&amp;#34;&amp;gt;[Morning Briefing] Agent fleet 100% failure rate - investigate and remediate&amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-meta&amp;#34;&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-agent&amp;#34;&amp;gt;97898794...&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-time&amp;#34; data-timestamp=&amp;#34;2026-05-16T03:12:10.773Z&amp;#34;&amp;gt;2026-05-16T03:12:10.773Z&amp;lt;/span&amp;gt;
+      &amp;lt;/div&amp;gt;
+    &amp;lt;/div&amp;gt;
+    
+    &amp;lt;div class=&amp;#34;ship-entry&amp;#34;&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-id&amp;#34;&amp;gt;
+        &amp;lt;a href=&amp;#34;https://paperclip.internal/issues/EDGA-1833&amp;#34; target=&amp;#34;_blank&amp;#34;&amp;gt;EDGA-1833&amp;lt;/a&amp;gt;
+      &amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-title&amp;#34;&amp;gt;Edgeless Website Goal Loop&amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-meta&amp;#34;&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-agent&amp;#34;&amp;gt;97898794...&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-time&amp;#34; data-timestamp=&amp;#34;2026-05-16T03:06:14.873Z&amp;#34;&amp;gt;2026-05-16T03:06:14.873Z&amp;lt;/span&amp;gt;
+      &amp;lt;/div&amp;gt;
+    &amp;lt;/div&amp;gt;
+    
+    &amp;lt;div class=&amp;#34;ship-entry&amp;#34;&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-id&amp;#34;&amp;gt;
+        &amp;lt;a href=&amp;#34;https://paperclip.internal/issues/EDGA-2940&amp;#34; target=&amp;#34;_blank&amp;#34;&amp;gt;EDGA-2940&amp;lt;/a&amp;gt;
+      &amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-title&amp;#34;&amp;gt;Recover stalled issue EDGA-989&amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-meta&amp;#34;&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-agent&amp;#34;&amp;gt;97898794...&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-time&amp;#34; data-timestamp=&amp;#34;2026-05-16T02:57:18.955Z&amp;#34;&amp;gt;2026-05-16T02:57:18.955Z&amp;lt;/span&amp;gt;
+      &amp;lt;/div&amp;gt;
+    &amp;lt;/div&amp;gt;
+    
+    &amp;lt;div class=&amp;#34;ship-entry&amp;#34;&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-id&amp;#34;&amp;gt;
+        &amp;lt;a href=&amp;#34;https://paperclip.internal/issues/EDGA-2993&amp;#34; target=&amp;#34;_blank&amp;#34;&amp;gt;EDGA-2993&amp;lt;/a&amp;gt;
+      &amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-title&amp;#34;&amp;gt;Recover stalled issue EDGA-1833&amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-meta&amp;#34;&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-agent&amp;#34;&amp;gt;575260e2...&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-time&amp;#34; data-timestamp=&amp;#34;2026-05-16T02:57:17.217Z&amp;#34;&amp;gt;2026-05-16T02:57:17.217Z&amp;lt;/span&amp;gt;
+      &amp;lt;/div&amp;gt;
+    &amp;lt;/div&amp;gt;
+    
+    &amp;lt;div class=&amp;#34;ship-entry&amp;#34;&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-id&amp;#34;&amp;gt;
+        &amp;lt;a href=&amp;#34;https://paperclip.internal/issues/EDGA-2733&amp;#34; target=&amp;#34;_blank&amp;#34;&amp;gt;EDGA-2733&amp;lt;/a&amp;gt;
+      &amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-title&amp;#34;&amp;gt;Review productivity for EDGA-1746&amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-meta&amp;#34;&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-agent&amp;#34;&amp;gt;7f8aa3c8...&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-time&amp;#34; data-timestamp=&amp;#34;2026-05-16T02:41:35.668Z&amp;#34;&amp;gt;2026-05-16T02:41:35.668Z&amp;lt;/span&amp;gt;
+      &amp;lt;/div&amp;gt;
+    &amp;lt;/div&amp;gt;
+    
+    &amp;lt;div class=&amp;#34;ship-entry&amp;#34;&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-id&amp;#34;&amp;gt;
+        &amp;lt;a href=&amp;#34;https://paperclip.internal/issues/EDGA-2916&amp;#34; target=&amp;#34;_blank&amp;#34;&amp;gt;EDGA-2916&amp;lt;/a&amp;gt;
+      &amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-title&amp;#34;&amp;gt;Recover stalled issue EDGA-924&amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-meta&amp;#34;&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-agent&amp;#34;&amp;gt;575260e2...&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-time&amp;#34; data-timestamp=&amp;#34;2026-05-16T02:29:21.668Z&amp;#34;&amp;gt;2026-05-16T02:29:21.668Z&amp;lt;/span&amp;gt;
+      &amp;lt;/div&amp;gt;
+    &amp;lt;/div&amp;gt;
+    
+    &amp;lt;div class=&amp;#34;ship-entry&amp;#34;&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-id&amp;#34;&amp;gt;
+        &amp;lt;a href=&amp;#34;https://paperclip.internal/issues/EDGA-924&amp;#34; target=&amp;#34;_blank&amp;#34;&amp;gt;EDGA-924&amp;lt;/a&amp;gt;
+      &amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-title&amp;#34;&amp;gt;EDGA-882 Blocker: Install sentence-transformers in cron environment&amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-meta&amp;#34;&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-agent&amp;#34;&amp;gt;7f8aa3c8...&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-time&amp;#34; data-timestamp=&amp;#34;2026-05-16T02:29:21.589Z&amp;#34;&amp;gt;2026-05-16T02:29:21.589Z&amp;lt;/span&amp;gt;
+      &amp;lt;/div&amp;gt;
+    &amp;lt;/div&amp;gt;
+    
+    &amp;lt;div class=&amp;#34;ship-entry&amp;#34;&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-id&amp;#34;&amp;gt;
+        &amp;lt;a href=&amp;#34;https://paperclip.internal/issues/EDGA-1973&amp;#34; target=&amp;#34;_blank&amp;#34;&amp;gt;EDGA-1973&amp;lt;/a&amp;gt;
+      &amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-title&amp;#34;&amp;gt;HL-2: Install SDK and validate on testnet&amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-meta&amp;#34;&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-agent&amp;#34;&amp;gt;4152d542...&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-time&amp;#34; data-timestamp=&amp;#34;2026-05-16T02:20:23.696Z&amp;#34;&amp;gt;2026-05-16T02:20:23.696Z&amp;lt;/span&amp;gt;
+      &amp;lt;/div&amp;gt;
+    &amp;lt;/div&amp;gt;
+    
+    &amp;lt;div class=&amp;#34;ship-entry&amp;#34;&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-id&amp;#34;&amp;gt;
+        &amp;lt;a href=&amp;#34;https://paperclip.internal/issues/EDGA-2212&amp;#34; target=&amp;#34;_blank&amp;#34;&amp;gt;EDGA-2212&amp;lt;/a&amp;gt;
+      &amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-title&amp;#34;&amp;gt;Nous Aesthetic Multi-Color Pen Plotting — Ultraplan&amp;lt;/div&amp;gt;
+      &amp;lt;div class=&amp;#34;ship-meta&amp;#34;&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-agent&amp;#34;&amp;gt;97898794...&amp;lt;/span&amp;gt;
+        &amp;lt;span class=&amp;#34;ship-time&amp;#34; data-timestamp=&amp;#34;2026-05-16T02:16:58.369Z&amp;#34;&amp;gt;2026-05-16T02:16:58.369Z&amp;lt;/span&amp;gt;
+      &amp;lt;/div&amp;gt;
+    &amp;lt;/div&amp;gt;
+    
+  &amp;lt;/div&amp;gt;
+  &amp;lt;div class=&amp;#34;ship-log-footer&amp;#34;&amp;gt;
+    &amp;lt;small&amp;gt;Last updated: &amp;lt;span data-timestamp=&amp;#34;2026-05-15T20:13:45.023706&amp;#34;&amp;gt;2026-05-15T20:13:45.023706&amp;lt;/span&amp;gt;&amp;lt;/small&amp;gt;
+  &amp;lt;/div&amp;gt;
+&amp;lt;/div&amp;gt;
+
+&amp;lt;h2 id=&amp;#34;about-this-dashboard&amp;#34;&amp;gt;About This Dashboard&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;This page auto-updates with:&amp;lt;/p&amp;gt;</description>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Lab</title>
+          <link>https://edgelesslab.com/lab/</link>
+          <pubDate>Sun, 19 Apr 2026 00:00:00 &#43;0000</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/lab/</guid>
+          <description>&amp;lt;p&amp;gt;Documenting the research process, technical experiments, and lessons learned building AI-native creative systems.&amp;lt;/p&amp;gt;</description>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Agents</title>
+          <link>https://edgelesslab.com/agents/</link>
+          <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/agents/</guid>
+          <description>&amp;lt;p&amp;gt;Our agent fleet includes autonomous systems for trading, research, content generation, and creative coding.&amp;lt;/p&amp;gt;</description>
+          
+        </item>
+      
+    
+      
+    
+      
+        <item>
+          <title>Products</title>
+          <link>https://edgelesslab.com/store/</link>
+          <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/store/</guid>
+          <description>&amp;lt;p&amp;gt;Digital products from Edgeless Lab. Build autonomous agent systems, knowledge pipelines, and production deployments.&amp;lt;/p&amp;gt;
+&amp;lt;h2 id=&amp;#34;available-products&amp;#34;&amp;gt;Available Products&amp;lt;/h2&amp;gt;
+
+
+
+  
+    &amp;lt;a href=&amp;#34;https://edgelessai.gumroad.com/l/multi-agent-blueprint&amp;#34; class=&amp;#34;btn btn-primary buy-button&amp;#34; target=&amp;#34;_blank&amp;#34;&amp;gt;
+      Buy on Gumroad — $39
+    &amp;lt;/a&amp;gt;
+  
+
+
+
+
+  
+    &amp;lt;button class=&amp;#34;btn btn-primary buy-button&amp;#34; disabled&amp;gt;
+      Coming Soon — $29
+    &amp;lt;/button&amp;gt;
+  
+
+
+
+
+  
+    &amp;lt;button class=&amp;#34;btn btn-primary buy-button&amp;#34; disabled&amp;gt;
+      Coming Soon — $19
+    &amp;lt;/button&amp;gt;
+  
+
+&amp;lt;hr&amp;gt;
+&amp;lt;p&amp;gt;&amp;lt;em&amp;gt;All products include lifetime updates. 30-day money-back guarantee.&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;</description>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Pulse</title>
+          <link>https://edgelesslab.com/pulse/</link>
+          <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/pulse/</guid>
+          <description></description>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Search</title>
+          <link>https://edgelesslab.com/search/</link>
+          <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/search/</guid>
+          <description>&amp;lt;p&amp;gt;Use the search below to find content across the site. Press &amp;lt;code&amp;gt;Cmd&#43;K&amp;lt;/code&amp;gt; (or &amp;lt;code&amp;gt;Ctrl&#43;K&amp;lt;/code&amp;gt;) from any page to open search instantly.&amp;lt;/p&amp;gt;</description>
+          
+        </item>
+      
+    
+  </channel>
+</rss>

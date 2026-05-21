@@ -1,0 +1,112 @@
+{{ define "main" }}
+<section class="hero" aria-labelledby="hero-heading">
+  <h1 id="hero-heading" fetchpriority="high">{{ .Site.Params.tagline | default "AI-Native Creative Studio" }}</h1>
+  <p class="hero-description">{{ .Site.Params.description }}</p>
+
+  {{ if .Site.Menus.main }}
+    <nav class="cta-nav" aria-label="Primary actions">
+      {{ range first 2 .Site.Menus.main }}
+        <a href="{{ .URL }}" class="cta">{{ .Name }}</a>
+      {{ end }}
+    </nav>
+  {{ end }}
+</section>
+
+{{/* Recent work section - populated from content/work/ */}}
+{{ with (where .Site.RegularPages "Section" "work") | first 6 }}
+  <section class="featured-work" aria-labelledby="work-heading">
+    <h2 id="work-heading">Recent Work</h2>
+    <ul class="work-grid" role="list">
+      {{ range . }}
+        <li>
+          <article class="work-card">
+            <a href="{{ .RelPermalink }}">
+              {{ if .Params.image }}
+                <img src="{{ .Params.image }}" alt="" loading="lazy" width="400" height="300">
+              {{ end }}
+              <h3 id="work-title-{{ .File.UniqueID }}">{{ .Title }}</h3>
+              {{ with .Params.description }}
+                <p>{{ . | truncate 100 }}</p>
+              {{ end }}
+            </a>
+          </article>
+        </li>
+      {{ end }}
+    </ul>
+    <a href="/work/" class="view-all">View all work &rarr;</a>
+  </section>
+{{ end }}
+
+{{/* Living Content Wall - auto-populated from agent swarm activity */}}
+{{ partial "content-wall" . }}
+
+{{/* Recently Shipped — auto-generated from Paperclip + blog + GitHub PRs */}}
+{{ $shipLog := index hugo.Data "ship_log" }}
+{{ if $shipLog }}
+<section class="recently-shipped" aria-labelledby="ships-heading">
+  <h2 id="ships-heading">Recently Shipped</h2>
+  <ul class="ship-grid" role="list">
+    {{ range first 5 $shipLog.ships }}
+    <li class="ship-card">
+      <a href="{{ .url }}" target="_blank" rel="noopener" class="ship-link">
+        <span class="ship-id">{{ .id }}</span>
+        <span class="ship-title">{{ .title }}</span>
+        <span class="ship-meta">
+          <span class="ship-agent">{{ .agent }}</span>
+          <time class="ship-time" datetime="{{ .completed }}">{{ .completed | time.Format "Jan 2" }}</time>
+        </span>
+      </a>
+    </li>
+    {{ end }}
+  </ul>
+  <p class="panel-footer">Last synced: {{ $shipLog.generated_at | time.Format "Jan 2, 15:04 MST" }}</p>
+</section>
+{{ end }}
+
+{{/* Recent posts / lab notes - populated from content/lab/ or content/posts/ */}}
+{{ with (where .Site.RegularPages "Section" "lab") | first 4 }}
+  <section class="lab-notes" aria-labelledby="lab-heading">
+    <h2 id="lab-heading">Lab Notes</h2>
+    <ul class="notes-list" role="list">
+      {{ range . }}
+        <li>
+          <article class="note-teaser">
+            <time datetime="{{ .PublishDate.Format "2006-01-02" }}">{{ .PublishDate.Format "Jan 2" }}</time>
+            <a href="{{ .RelPermalink }}">
+              <h3>{{ .Title }}</h3>
+              <p>{{ .Summary | truncate 120 }}</p>
+            </a>
+          </article>
+        </li>
+      {{ end }}
+    </ul>
+  </section>
+{{ end }}
+
+{{/* Structured data for homepage content - only if work exists */}}
+{{ with where .Site.RegularPages "Section" "work" }}
+{{ $workItems := . }}
+{{ if gt (len $workItems) 0 }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": [
+    {{ range $index, $item := first 6 $workItems }}
+    {
+      "@type": "ListItem",
+      "position": {{ add $index 1 }},
+      "item": {
+        "@type": "CreativeWork",
+        "name": "{{ $item.Title }}",
+        "url": "{{ $item.Permalink }}"{{ if $item.Params.description }},
+        "description": "{{ $item.Params.description }}"{{ end }}
+      }
+    }{{ if ne (add $index 1) (len (first 6 $workItems)) }},{{ end }}
+    {{ end }}
+  ]
+}
+</script>
+{{ end }}
+{{ end }}
+{{ end }}

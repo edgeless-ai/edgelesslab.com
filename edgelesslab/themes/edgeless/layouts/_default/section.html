@@ -1,0 +1,39 @@
+{{ define "main" }}
+<section class="section-listing">
+  <header class="section-header">
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}
+      <p>{{ . }}</p>
+    {{ end }}
+  </header>
+  
+  {{ if .Content }}
+    <div class="section-intro">
+      {{ .Content }}
+    </div>
+  {{ end }}
+  
+  {{ if .Pages }}
+    <div class="section-grid" role="list">
+      {{ range .Pages }}
+        <article class="section-item" role="listitem">
+          {{ if .Params.image }}
+            <a href="{{ .RelPermalink }}" aria-hidden="true">
+              <img src="{{ .Params.image }}" alt="" loading="lazy" width="300" height="200">
+            </a>
+          {{ end }}
+          <div class="item-info">
+            <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+            {{ with .Params.description }}
+              <p>{{ . | truncate 120 }}</p>
+            {{ else }}
+              <p>{{ .Summary | truncate 120 }}</p>
+            {{ end }}
+            <time datetime="{{ .PublishDate.Format "2006-01-02" }}">{{ .PublishDate.Format "Jan 2006" }}</time>
+          </div>
+        </article>
+      {{ end }}
+    </div>
+  {{ end }}
+</section>
+{{ end }}

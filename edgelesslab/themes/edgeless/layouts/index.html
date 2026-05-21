@@ -1,0 +1,89 @@
+{{ define "main" }}
+<section class="hero" aria-labelledby="hero-heading">
+  <h1 id="hero-heading" fetchpriority="high">{{ .Site.Params.tagline | default "AI-Native Creative Studio" }}</h1>
+  <p class="hero-description">{{ .Site.Params.description }}</p>
+
+  {{ if .Site.Menus.main }}
+    <nav class="cta-nav" aria-label="Primary actions">
+      {{ range first 2 .Site.Menus.main }}
+        <a href="{{ .URL }}" class="cta">{{ .Name }}</a>
+      {{ end }}
+    </nav>
+  {{ end }}
+</section>
+
+{{/* Recent work section - populated from content/work/ */}}
+{{ with (where .Site.RegularPages "Section" "work") | first 6 }}
+  <section class="featured-work" aria-labelledby="work-heading">
+    <h2 id="work-heading">Recent Work</h2>
+    <ul class="work-grid" role="list">
+      {{ range . }}
+        <li>
+          <article class="work-card">
+            <a href="{{ .RelPermalink }}" aria-labelledby="work-title-{{ .File.UniqueID }}">
+              {{ if .Params.image }}
+                <img src="{{ .Params.image }}" alt="" loading="lazy" width="400" height="300">
+              {{ end }}
+              <h3 id="work-title-{{ .File.UniqueID }}">{{ .Title }}</h3>
+              {{ with .Params.description }}
+                <p>{{ . | truncate 100 }}</p>
+              {{ end }}
+            </a>
+          </article>
+        </li>
+      {{ end }}
+    </ul>
+    <a href="/work/" class="view-all">View all work &rarr;</a>
+  </section>
+{{ end }}
+
+{{/* Living Content Wall - auto-populated from agent swarm activity */}}
+{{ partial "content-wall" . }}
+
+{{/* Recent posts / lab notes - populated from content/lab/ or content/posts/ */}}
+{{ with (where .Site.RegularPages "Section" "lab") | first 4 }}
+  <section class="lab-notes" aria-labelledby="lab-heading">
+    <h2 id="lab-heading">Lab Notes</h2>
+    <ul class="notes-list" role="list">
+      {{ range . }}
+        <li>
+          <article class="note-teaser">
+            <time datetime="{{ .PublishDate.Format "2006-01-02" }}">{{ .PublishDate.Format "Jan 2" }}</time>
+            <a href="{{ .RelPermalink }}">
+              <h3>{{ .Title }}</h3>
+              <p>{{ .Summary | truncate 120 }}</p>
+            </a>
+          </article>
+        </li>
+      {{ end }}
+    </ul>
+  </section>
+{{ end }}
+
+{{/* Structured data for homepage content - only if work exists */}}
+{{ with where .Site.RegularPages "Section" "work" }}
+{{ $workItems := . }}
+{{ if gt (len $workItems) 0 }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": [
+    {{ range $index, $item := first 6 $workItems }}
+    {
+      "@type": "ListItem",
+      "position": {{ add $index 1 }},
+      "item": {
+        "@type": "CreativeWork",
+        "name": "{{ $item.Title }}",
+        "url": "{{ $item.Permalink }}"{{ if $item.Params.description }},
+        "description": "{{ $item.Params.description }}"{{ end }}
+      }
+    }{{ if ne (add $index 1) (len (first 6 $workItems)) }},{{ end }}
+    {{ end }}
+  ]
+}
+</script>
+{{ end }}
+{{ end }}
+{{ end }}

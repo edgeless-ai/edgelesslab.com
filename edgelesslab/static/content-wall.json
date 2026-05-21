@@ -1,0 +1,507 @@
+{
+  "generated_at": "2026-05-15T20:13:45.445880",
+  "summary": {
+    "total_issues_done": 50,
+    "total_agents": 28,
+    "agents_active": 3,
+    "agents_idle": 24,
+    "agents_error": 0,
+    "active_work": 20
+  },
+  "recent_work": [
+    {
+      "id": "EDGA-2421",
+      "title": "[Swarm-Repair] Install psql client to query Paperclip PostgreSQL (port 54329)",
+      "priority": "high",
+      "updated": "2026-05-16T03:13:10.818Z",
+      "agent_name": "97898794"
+    },
+    {
+      "id": "EDGA-2075",
+      "title": "[Morning Briefing] Agent fleet 100% failure rate - investigate and remediate",
+      "priority": "high",
+      "updated": "2026-05-16T03:12:18.920Z",
+      "agent_name": "97898794"
+    },
+    {
+      "id": "EDGA-1833",
+      "title": "Edgeless Website Goal Loop",
+      "priority": "high",
+      "updated": "2026-05-16T03:07:26.294Z",
+      "agent_name": "97898794"
+    },
+    {
+      "id": "EDGA-2993",
+      "title": "Recover stalled issue EDGA-1833",
+      "priority": "high",
+      "updated": "2026-05-16T03:04:09.941Z",
+      "agent_name": "575260e2"
+    },
+    {
+      "id": "EDGA-2940",
+      "title": "Recover stalled issue EDGA-989",
+      "priority": "critical",
+      "updated": "2026-05-16T03:03:20.293Z",
+      "agent_name": "97898794"
+    },
+    {
+      "id": "EDGA-2861",
+      "title": "Recover stalled issue EDGA-2422",
+      "priority": "high",
+      "updated": "2026-05-16T03:00:29.163Z",
+      "agent_name": "575260e2"
+    },
+    {
+      "id": "EDGA-2468",
+      "title": "Paperclip: cancelled recovery wrappers still block issue checkout",
+      "priority": "high",
+      "updated": "2026-05-16T03:00:25.594Z",
+      "agent_name": "575260e2"
+    },
+    {
+      "id": "EDGA-2733",
+      "title": "Review productivity for EDGA-1746",
+      "priority": "high",
+      "updated": "2026-05-16T02:43:49.927Z",
+      "agent_name": "7f8aa3c8"
+    },
+    {
+      "id": "EDGA-924",
+      "title": "EDGA-882 Blocker: Install sentence-transformers in cron environment",
+      "priority": "high",
+      "updated": "2026-05-16T02:31:02.559Z",
+      "agent_name": "7f8aa3c8"
+    },
+    {
+      "id": "EDGA-2916",
+      "title": "Recover stalled issue EDGA-924",
+      "priority": "high",
+      "updated": "2026-05-16T02:29:21.668Z",
+      "agent_name": "575260e2"
+    },
+    {
+      "id": "EDGA-2840",
+      "title": "Recover stalled issue EDGA-2684",
+      "priority": "high",
+      "updated": "2026-05-16T02:26:42.465Z",
+      "agent_name": "575260e2"
+    },
+    {
+      "id": "EDGA-1973",
+      "title": "HL-2: Install SDK and validate on testnet",
+      "priority": "high",
+      "updated": "2026-05-16T02:20:23.696Z",
+      "agent_name": "4152d542"
+    },
+    {
+      "id": "EDGA-2212",
+      "title": "Nous Aesthetic Multi-Color Pen Plotting \u2014 Ultraplan",
+      "priority": "high",
+      "updated": "2026-05-16T02:16:58.369Z",
+      "agent_name": "97898794"
+    },
+    {
+      "id": "EDGA-2706",
+      "title": "[Morning Briefing] Agent runs 100% failing on May 15 - 974 failures, 0 successes",
+      "priority": "high",
+      "updated": "2026-05-16T01:56:04.071Z",
+      "agent_name": "575260e2"
+    },
+    {
+      "id": "EDGA-2866",
+      "title": "Recover stalled issue EDGA-2711",
+      "priority": "high",
+      "updated": "2026-05-16T01:55:14.462Z",
+      "agent_name": "575260e2"
+    },
+    {
+      "id": "EDGA-2975",
+      "title": "Recover stalled issue EDGA-2080",
+      "priority": "high",
+      "updated": "2026-05-16T01:55:14.278Z",
+      "agent_name": "575260e2"
+    },
+    {
+      "id": "EDGA-2971",
+      "title": "Recover stalled issue EDGA-1833",
+      "priority": "high",
+      "updated": "2026-05-16T01:55:14.230Z",
+      "agent_name": "575260e2"
+    },
+    {
+      "id": "EDGA-2026",
+      "title": "[Email] Google Security Alert: OpenAI granted access to Google Account data",
+      "priority": "high",
+      "updated": "2026-05-16T01:42:02.076Z",
+      "agent_name": "544883d6"
+    },
+    {
+      "id": "EDGA-2007",
+      "title": "[Morning Briefing] Investigate 94% agent run failure rate on May 12",
+      "priority": "high",
+      "updated": "2026-05-16T01:40:54.852Z",
+      "agent_name": "544883d6"
+    },
+    {
+      "id": "EDGA-1963",
+      "title": "Chart of Truth Expanded: Comprehensive Knowledge Catalog",
+      "priority": "high",
+      "updated": "2026-05-16T01:31:02.820Z",
+      "agent_name": "544883d6"
+    }
+  ],
+  "active_work": [
+    {
+      "id": "EDGA-673",
+      "title": "[OAuth] Restore Gmail OAuth for newsletter pipeline",
+      "priority": "critical",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-2880",
+      "title": "Review productivity for EDGA-1673",
+      "priority": "high",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-2876",
+      "title": "Recover stalled issue EDGA-2423",
+      "priority": "high",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-2869",
+      "title": "Recover stalled issue EDGA-2344",
+      "priority": "high",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-2864",
+      "title": "Review productivity for EDGA-307",
+      "priority": "high",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-1084",
+      "title": "EDGA-1076 Partial: 3 Bots Still Failing Gateway Restoration",
+      "priority": "high",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-1912",
+      "title": "COT-005 Phase 3b: Research Media and Platforms",
+      "priority": "medium",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-3008",
+      "title": "Edgeless site: migrate deprecated .Site.Data usages to hugo.Data",
+      "priority": "medium",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-2870",
+      "title": "Recover stalled issue EDGA-485",
+      "priority": "medium",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-2867",
+      "title": "Recover stalled issue EDGA-286",
+      "priority": "medium",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-2860",
+      "title": "Recover stalled issue EDGA-881",
+      "priority": "medium",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-2868",
+      "title": "Recover stalled issue EDGA-268",
+      "priority": "medium",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-3009",
+      "title": "Edgeless site: fix/disable missing home JSON layout warning",
+      "priority": "medium",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-2859",
+      "title": "Recover stalled issue EDGA-1128",
+      "priority": "medium",
+      "assignee": "unassigned"
+    },
+    {
+      "id": "EDGA-1948",
+      "title": "Phase 3e: Research Books, Films, Culture",
+      "priority": "medium",
+      "assignee": "unassigned"
+    }
+  ],
+  "fleet_status": [
+    {
+      "name": "Beau",
+      "status": "running",
+      "role": ""
+    },
+    {
+      "name": "Edgeless CC",
+      "status": "running",
+      "role": ""
+    },
+    {
+      "name": "Scribe",
+      "status": "running",
+      "role": ""
+    },
+    {
+      "name": "Claude Code",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Groq Scout",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Cerebras Verifier",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Gemini Scout",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Groq Reasoner",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "NGA-Scout",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Curator",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Trader 2",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Studio 2",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "StepCoder",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Cypher",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "StepResearch",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Hive",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Critic",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "StepAnalyst",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Specimen",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Anomaly",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Minter",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Ombudsman",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Trader",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Cerebras Scout",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Builder",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Editor",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Verifier",
+      "status": "idle",
+      "role": ""
+    },
+    {
+      "name": "Kilo",
+      "status": "paused",
+      "role": ""
+    }
+  ],
+  "ship_log": [
+    {
+      "id": "EDGA-2421",
+      "title": "[Swarm-Repair] Install psql client to query Paperclip PostgreSQL (port 54329)",
+      "agent": "97898794...",
+      "completed": "2026-05-16T03:13:10.818Z",
+      "source": "paperclip",
+      "url": "https://paperclip.internal/issues/EDGA-2421"
+    },
+    {
+      "id": "EDGA-2075",
+      "title": "[Morning Briefing] Agent fleet 100% failure rate - investigate and remediate",
+      "agent": "97898794...",
+      "completed": "2026-05-16T03:12:10.773Z",
+      "source": "paperclip",
+      "url": "https://paperclip.internal/issues/EDGA-2075"
+    },
+    {
+      "id": "EDGA-1833",
+      "title": "Edgeless Website Goal Loop",
+      "agent": "97898794...",
+      "completed": "2026-05-16T03:06:14.873Z",
+      "source": "paperclip",
+      "url": "https://paperclip.internal/issues/EDGA-1833"
+    },
+    {
+      "id": "EDGA-2940",
+      "title": "Recover stalled issue EDGA-989",
+      "agent": "97898794...",
+      "completed": "2026-05-16T02:57:18.955Z",
+      "source": "paperclip",
+      "url": "https://paperclip.internal/issues/EDGA-2940"
+    },
+    {
+      "id": "EDGA-2993",
+      "title": "Recover stalled issue EDGA-1833",
+      "agent": "575260e2...",
+      "completed": "2026-05-16T02:57:17.217Z",
+      "source": "paperclip",
+      "url": "https://paperclip.internal/issues/EDGA-2993"
+    },
+    {
+      "id": "EDGA-2733",
+      "title": "Review productivity for EDGA-1746",
+      "agent": "7f8aa3c8...",
+      "completed": "2026-05-16T02:41:35.668Z",
+      "source": "paperclip",
+      "url": "https://paperclip.internal/issues/EDGA-2733"
+    },
+    {
+      "id": "EDGA-2916",
+      "title": "Recover stalled issue EDGA-924",
+      "agent": "575260e2...",
+      "completed": "2026-05-16T02:29:21.668Z",
+      "source": "paperclip",
+      "url": "https://paperclip.internal/issues/EDGA-2916"
+    },
+    {
+      "id": "EDGA-924",
+      "title": "EDGA-882 Blocker: Install sentence-transformers in cron environment",
+      "agent": "7f8aa3c8...",
+      "completed": "2026-05-16T02:29:21.589Z",
+      "source": "paperclip",
+      "url": "https://paperclip.internal/issues/EDGA-924"
+    },
+    {
+      "id": "EDGA-1973",
+      "title": "HL-2: Install SDK and validate on testnet",
+      "agent": "4152d542...",
+      "completed": "2026-05-16T02:20:23.696Z",
+      "source": "paperclip",
+      "url": "https://paperclip.internal/issues/EDGA-1973"
+    },
+    {
+      "id": "EDGA-2212",
+      "title": "Nous Aesthetic Multi-Color Pen Plotting \u2014 Ultraplan",
+      "agent": "97898794...",
+      "completed": "2026-05-16T02:16:58.369Z",
+      "source": "paperclip",
+      "url": "https://paperclip.internal/issues/EDGA-2212"
+    }
+  ],
+  "hugo_posts": [
+    {
+      "title": "Building Reaction-Diffusion Shaders from Scratch",
+      "slug": "reaction-diffusion-shader-tutorial",
+      "path": "/posts/reaction-diffusion-shader-tutorial/",
+      "modified": "2026-05-15T17:54:08.026190"
+    },
+    {
+      "title": "EdgelessLab.com: Now Live with Full SEO Infrastructure",
+      "slug": "website-launch-seo-complete",
+      "path": "/posts/website-launch-seo-complete/",
+      "modified": "2026-05-13T17:03:15.345721"
+    },
+    {
+      "title": "Multi-Model Routing: 4 Different Brains (Not 1)",
+      "slug": "agentic-os-multi-model-routing",
+      "path": "/posts/agentic-os-multi-model-routing/",
+      "modified": "2026-05-13T17:03:15.344882"
+    },
+    {
+      "title": "$12/Week AI Operations Team: How I Replaced a $50K Agency with 5 Agents",
+      "slug": "agentic-os-12-week-team",
+      "path": "/posts/agentic-os-12-week-team/",
+      "modified": "2026-05-13T17:03:15.344538"
+    },
+    {
+      "title": "Access vs Meaning: Why Agent Semantics Are the Real Moat",
+      "slug": "access-vs-meaning-agent-semantics",
+      "path": "/posts/access-vs-meaning-agent-semantics/",
+      "modified": "2026-05-13T17:03:15.343830"
+    }
+  ],
+  "metrics": {
+    "ships_this_month": 10,
+    "active_agents": 27,
+    "health_score": 11,
+    "completion_rate": 71
+  }
+}

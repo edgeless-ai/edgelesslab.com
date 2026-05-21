@@ -1,5 +1,5 @@
 {{ $productId := .Get "product" }}
-{{ $product := index (where site.Data.products "id" $productId) 0 }}
+{{ $product := index (where hugo.Data.products "id" $productId) 0 }}
 {{ if $product }}
   {{ if $product.stripe_price_id }}
     <div class="stripe-checkout">

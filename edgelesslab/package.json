@@ -1,0 +1,29 @@
+{
+  "name": "edgelesslab-site",
+  "version": "1.0.0",
+  "description": "Edgeless Lab website with Pagefind search",
+  "browserslist": [
+    "Chrome >= 80",
+    "Firefox >= 78",
+    "Safari >= 14",
+    "Edge >= 80",
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions"
+  ],
+  "scripts": {
+    "build": "hugo --gc --minify && npm run search:index",
+    "build:fast": "hugo && npm run search:index",
+    "search:index": "pagefind --site public --output-subdir pagefind",
+    "search:serve": "npx serve public",
+    "dev": "hugo server -D --bind 0.0.0.0",
+    "clean": "rm -rf public resources",
+    "prebuild": "python3 scripts/generate_content_wall.py"
+  },
+  "devDependencies": {
+    "pagefind": "^1.3.0"
+  },
+  "dependencies": {
+    "lighthouse": "^13.3.0"
+  }
+}

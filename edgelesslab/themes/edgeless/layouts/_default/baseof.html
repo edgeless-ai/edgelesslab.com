@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode | default "en-us" }}" prefix="og: http://ogp.me/ns#">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  {{/* Critical Security Headers via Meta (CSP best in headers, but meta fallback) */}}
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.stripe.com https://*.netlify.app; frame-src https://checkout.stripe.com https://js.stripe.com; media-src 'self';">
+  
+  {{/* Base Title Logic */}}
+  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
+  
+  {{/* Meta Description with fallbacks */}}
+  {{ $description := .Params.description | default .Summary | default .Site.Params.description | plainify | truncate 160 }}
+  <meta name="description" content="{{ $description }}">
+  <meta name="author" content="{{ .Params.author | default .Site.Params.author }}">
+  
+  {{/* Keywords from params or auto-generate from tags */}}
+  {{ if .Params.keywords }}
+    <meta name="keywords" content="{{ delimit .Params.keywords ", " }}">
+  {{ else if .Params.tags }}
+    <meta name="keywords" content="{{ delimit .Params.tags ", " }}">
+  {{ else if .Site.Params.keywords }}
+    <meta name="keywords" content="{{ delimit .Site.Params.keywords ", " }}">
+  {{ end }}
+  
+  {{/* Canonical URL - critical for SEO */}}
+  <link rel="canonical" href="{{ .Permalink }}">
+  
+  {{/* Alternate formats */}}
+  {{ range .AlternativeOutputFormats }}
+    <link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ $.Site.Title }}">
+  {{ end }}
+  
+  {{/* Open Graph / Facebook */}}
+  <meta property="og:site_name" content="{{ .Site.Title }}">
+  <meta property="og:title" content="{{ if .IsHome }}{{ .Site.Params.ogTitle | default .Site.Title }}{{ else }}{{ .Title }}{{ end }}">
+  <meta property="og:description" content="{{ $description }}">
+  <meta property="og:url" content="{{ .Permalink }}">
+  <meta property="og:locale" content="{{ .Site.LanguageCode | replaceRE "-" "_" }}">
+  {{ if .IsPage }}
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="{{ .PublishDate.Format "2006-01-02T15:04:05Z07:00" }}">
+    <meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">
+    {{ range .Params.tags }}
+      <meta property="article:tag" content="{{ . }}">
+    {{ end }}
+  {{ else if eq .Kind "taxonomy" }}
+    <meta property="og:type" content="website">
+  {{ else }}
+    <meta property="og:type" content="website">
+  {{ end }}
+  
+  {{/* Open Graph Images */}}
+  {{ $ogImage := .Params.ogImage | default .Params.image | default (index .Site.Params.images 0) | absURL }}
+  {{ if $ogImage }}
+    <meta property="og:image" content="{{ $ogImage }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{{ .Title }}">
+  {{ end }}
+  
+  {{/* Twitter Card */}}
+  <meta name="twitter:card" content="{{ .Site.Params.twitterCard | default "summary_large_image" }}">
+  <meta name="twitter:site" content="{{ .Site.Params.twitterSite }}">
+  <meta name="twitter:creator" content="{{ .Params.twitterAuthor | default .Site.Params.twitterSite }}">
+  <meta name="twitter:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }}{{ end }}">
+  <meta name="twitter:description" content="{{ $description }}">
+  {{ if $ogImage }}
+    <meta name="twitter:image" content="{{ $ogImage }}">
+    <meta name="twitter:image:alt" content="{{ .Title }}">
+  {{ end }}
+  
+  {{/* Robots directive */}}
+  {{ if .Params.noindex }}
+    <meta name="robots" content="noindex, nofollow">
+  {{ else if .Params.nofollow }}
+    <meta name="robots" content="index, nofollow">
+  {{ else }}
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  {{ end }}
+  
+  {{/* Structured Data JSON-LD */}}
+  {{ partial "json-ld.html" . }}
+  
+  {{/* Resource hints for performance */}}
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  {{ if .IsHome }}
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" as="style">
+  {{ end }}
+  
+  {{/* Favicon */}}
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  
+  {{/* Stripe Configuration (store pages only) */}}
+  {{ if or (eq .Section "store") (eq .Section "checkout") }}
+    <meta name="stripe-publishable-key" content="{{ .Site.Params.stripePublishableKey }}">
+    <meta name="stripe-checkout-endpoint" content="{{ .Site.Params.stripeCheckoutEndpoint | default "/.netlify/functions/create-checkout" }}">
+  {{ end }}
+  
+  {{/* Critical CSS inline for LCP — below 14KB limit */}}
+  {{ $css := resources.Get "css/main.css" | resources.Minify | resources.Fingerprint }}
+  {{ if $css }}
+    <link rel="preload" href="{{ $css.RelPermalink }}" as="style" integrity="{{ $css.Data.Integrity }}">
+    <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+  {{ else }}
+    <style>
+      /* Critical CSS inline for performance */
+      *,*::before,*::after{box-sizing:border-box}
+      body{font-family:system-ui,-apple-system,sans-serif;margin:0;line-height:1.6;color:#1a1a1a;background:#fafafa}
+      h1,h2,h3,h4,h5,h6{margin:0 0 1rem;line-height:1.2}
+      p{margin:0 0 1rem}
+      a{color:inherit}
+      img{max-width:100%;height:auto}
+    </style>
+  {{ end }}
+  
+  {{/* RSS Feed */}}
+  {{ with .OutputFormats.Get "rss" }}
+    <link rel="alternate" type="application/rss+xml" href="{{ .RelPermalink }}" title="{{ $.Site.Title }}">
+  {{ end }}
+</head>
+
+<body class="{{ if .IsHome }}home{{ end }} {{ .Kind }} {{ .Type }}">
+  {{ block "header" . }}
+    {{ partial "header.html" . }}
+  {{ end }}
+  
+  <main id="main" role="main">
+    {{ block "main" . }}{{ end }}
+  </main>
+  
+  {{ block "footer" . }}
+    {{ partial "footer.html" . }}
+  {{ end }}
+  
+  {{ block "scripts" . }}
+    {{ $js := resources.Get "js/interactive.js" | resources.Minify }}
+    {{ if $js }}
+      <script src="{{ $js.RelPermalink }}" defer></script>
+    {{ else }}
+      <script src="/js/interactive.js" defer></script>
+    {{ end }}
+  {{ end }}
+  
+  {{/* Stripe Checkout Script - only on store/product pages */}}
+  {{ if or (eq .Section "store") (eq .Section "checkout") }}
+    <script src="/js/stripe-checkout.js" defer></script>
+  {{ end }}
+</body>
+</html>

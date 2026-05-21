@@ -1,0 +1,57 @@
+{{ define "main" }}
+<article class="posts-list">
+  <header class="section-header">
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}
+    <p class="section-description">{{ . }}</p>
+    {{ end }}
+  </header>
+
+  {{ $paginator := .Paginate .Pages.ByDate.Reverse 10 }}
+  
+  <div class="posts-grid">
+    {{ range $paginator.Pages }}
+    <article class="post-card">
+      <a href="{{ .RelPermalink }}" class="post-link">
+        {{ if .Params.image }}
+        <div class="post-thumbnail">
+          <img src="{{ .Params.image | relURL }}" alt="{{ .Title }}" loading="lazy">
+        </div>
+        {{ end }}
+        <div class="post-meta">
+          <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+          {{ if .Params.readingTime }}
+          <span class="reading-time">{{ .ReadingTime }} min read</span>
+          {{ end }}
+        </div>
+        <h2 class="post-title">{{ .Title }}</h2>
+        {{ if .Params.description }}
+        <p class="post-summary">{{ .Params.description | truncate 160 }}</p>
+        {{ else if .Summary }}
+        <p class="post-summary">{{ .Summary | plainify | truncate 160 }}</p>
+        {{ end }}
+        {{ if .Params.tags }}
+        <div class="post-tags">
+          {{ range first 3 .Params.tags }}
+          <span class="tag">{{ . }}</span>
+          {{ end }}
+        </div>
+        {{ end }}
+      </a>
+    </article>
+    {{ end }}
+  </div>
+
+  {{ if gt $paginator.TotalPages 1 }}
+  <nav class="pagination" aria-label="Pagination">
+    {{ if $paginator.HasPrev }}
+    <a href="{{ $paginator.Prev.URL }}" class="prev">← Previous</a>
+    {{ end }}
+    <span class="page-info">Page {{ $paginator.PageNumber }} of {{ $paginator.TotalPages }}</span>
+    {{ if $paginator.HasNext }}
+    <a href="{{ $paginator.Next.URL }}" class="next">Next →</a>
+    {{ end }}
+  </nav>
+  {{ end }}
+</article>
+{{ end }}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Edgeless Lab - AI-Native Creative Studio</title>
+    <link>https://edgelesslab.com/</link>
+    <description>Edgeless Lab is an AI-native creative studio building the future of generative art, autonomous agents, and intelligent systems.</description>
+    <language>en-us</language>
+    <managingEditor>Edgeless Lab</managingEditor>
+    <webMaster>Edgeless Lab</webMaster>
+    <lastBuildDate>Sat, 16 May 2026 10:57:44 -0700</lastBuildDate>
+    
+    
+      
+        <item>
+          <title>Case Study: TouchDesigner Pen Plotter</title>
+          <link>https://edgelesslab.com/work/touchdesigner-pen-plotter/</link>
+          <pubDate>Fri, 15 May 2026 09:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/work/touchdesigner-pen-plotter/</guid>
+          <description>&amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Case Study #3&amp;lt;/strong&amp;gt; | Project: TouchDesigner &#43; Pen Plotter | Status: Feature complete&amp;lt;/p&amp;gt;
+&amp;lt;hr&amp;gt;
+&amp;lt;h2 id=&amp;#34;problem&amp;#34;&amp;gt;Problem&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;Generative artists who use TouchDesigner typically export static imagery — PNGs, MOVs, stills. The physical output path (pen plotter, plotter SVG, vpype → AxiDraw) requires a different file format, different tolerance, and a different rendering mindset.&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;The goal: build a TouchDesigner → SVG → AxiDraw pipeline that produces output a pen plotter can physically render — no &amp;amp;ldquo;image export&amp;amp;rdquo; middleman.&amp;lt;/p&amp;gt;</description>
+          
+            <category>generative-art</category>
+          
+            <category>touchdesigner</category>
+          
+            <category>pen-plotter</category>
+          
+            <category>svg</category>
+          
+            <category>physical-output</category>
+          
+            <category>ascii</category>
+          
+        </item>
+      
+    
+  </channel>
+</rss>

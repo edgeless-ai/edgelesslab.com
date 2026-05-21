@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Edgeless Lab - AI-Native Creative Studio</title>
+    <link>https://edgelesslab.com/</link>
+    <description>Edgeless Lab is an AI-native creative studio building the future of generative art, autonomous agents, and intelligent systems.</description>
+    <language>en-us</language>
+    <managingEditor>Edgeless Lab</managingEditor>
+    <webMaster>Edgeless Lab</webMaster>
+    <lastBuildDate>Sat, 16 May 2026 10:57:44 -0700</lastBuildDate>
+    
+    
+      
+        <item>
+          <title>Case Study: YouTube Intelligence Pipeline</title>
+          <link>https://edgelesslab.com/work/youtube-intelligence-pipeline/</link>
+          <pubDate>Fri, 15 May 2026 09:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/work/youtube-intelligence-pipeline/</guid>
+          <description>&amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Case Study #2&amp;lt;/strong&amp;gt; | Project: YouTube Intelligence Pipeline | Status: Active (21.2% enriched)&amp;lt;/p&amp;gt;
+&amp;lt;hr&amp;gt;
+&amp;lt;h2 id=&amp;#34;problem&amp;#34;&amp;gt;Problem&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;The Edgeless system collects YouTube liked videos from a personal account — hundreds of hours of AI, coding, and creative content. Raw transcripts stored in ChromaDB are searchable but not &amp;lt;em&amp;gt;understandable&amp;lt;/em&amp;gt;. The comparison problem:&amp;lt;/p&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;&amp;lt;strong&amp;gt;Before:&amp;lt;/strong&amp;gt; YouTube liked videos sit as raw text in CSV form, searchable only by keyword. Zero context, zero linkage, zero prioritization.&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;&amp;lt;strong&amp;gt;After:&amp;lt;/strong&amp;gt; 7-track enrichment turns each video into categorized, cross-linked, scored knowledge — usable by any agent in the swarm.&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;p&amp;gt;Target: 20% fully enriched by June 2026. Hit in one session: &amp;lt;strong&amp;gt;21.2% (248/1,172 notes).&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;</description>
+          
+            <category>youtube</category>
+          
+            <category>enrichment</category>
+          
+            <category>knowledge-base</category>
+          
+            <category>chromadb</category>
+          
+            <category>notebooklm</category>
+          
+        </item>
+      
+    
+  </channel>
+</rss>

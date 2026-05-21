@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Edgeless Lab - AI-Native Creative Studio</title>
+    <link>https://edgelesslab.com/</link>
+    <description>Edgeless Lab is an AI-native creative studio building the future of generative art, autonomous agents, and intelligent systems.</description>
+    <language>en-us</language>
+    <managingEditor>Edgeless Lab</managingEditor>
+    <webMaster>Edgeless Lab</webMaster>
+    <lastBuildDate>Sat, 16 May 2026 10:57:44 -0700</lastBuildDate>
+    
+    
+      
+        <item>
+          <title>Building Reaction-Diffusion Shaders from Scratch</title>
+          <link>https://edgelesslab.com/building-reaction-diffusion-shaders-from-scratch/</link>
+          <pubDate>Fri, 15 May 2026 20:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/building-reaction-diffusion-shaders-from-scratch/</guid>
+          <description>&amp;lt;p&amp;gt;Zebra stripes. Coral growth rings. Leopard spots. The Turing patterns that decorate the natural world all spring from the same mechanism: two chemicals diffusing and reacting in a field.&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;This is not poetry — this is code. The Gray-Scott reaction-diffusion model is a handful of arithmetic operations that, when mapped onto a GPU fragment shader, produce the same intricate geometries that evolution has been running for hundreds of millions of years.&amp;lt;/p&amp;gt;</description>
+          
+            <category>shaders</category>
+          
+            <category>webgl</category>
+          
+            <category>generative-art</category>
+          
+            <category>reaction-diffusion</category>
+          
+            <category>tutorial</category>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Case Study: TouchDesigner Pen Plotter</title>
+          <link>https://edgelesslab.com/work/touchdesigner-pen-plotter/</link>
+          <pubDate>Fri, 15 May 2026 09:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/work/touchdesigner-pen-plotter/</guid>
+          <description>&amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Case Study #3&amp;lt;/strong&amp;gt; | Project: TouchDesigner &#43; Pen Plotter | Status: Feature complete&amp;lt;/p&amp;gt;
+&amp;lt;hr&amp;gt;
+&amp;lt;h2 id=&amp;#34;problem&amp;#34;&amp;gt;Problem&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;Generative artists who use TouchDesigner typically export static imagery — PNGs, MOVs, stills. The physical output path (pen plotter, plotter SVG, vpype → AxiDraw) requires a different file format, different tolerance, and a different rendering mindset.&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;The goal: build a TouchDesigner → SVG → AxiDraw pipeline that produces output a pen plotter can physically render — no &amp;amp;ldquo;image export&amp;amp;rdquo; middleman.&amp;lt;/p&amp;gt;</description>
+          
+            <category>generative-art</category>
+          
+            <category>touchdesigner</category>
+          
+            <category>pen-plotter</category>
+          
+            <category>svg</category>
+          
+            <category>physical-output</category>
+          
+            <category>ascii</category>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Reaction-Diffusion Systems</title>
+          <link>https://edgelesslab.com/work/reaction-diffusion-systems/</link>
+          <pubDate>Sat, 18 Apr 2026 00:00:00 &#43;0000</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/work/reaction-diffusion-systems/</guid>
+          <description>&amp;lt;p&amp;gt;Reaction-diffusion systems simulate how chemicals spread and react to create emergent patterns found throughout nature—zebra stripes, coral formations, and leopard spots all arise from similar mathematical processes.&amp;lt;/p&amp;gt;
+&amp;lt;h2 id=&amp;#34;gray-scott-model&amp;#34;&amp;gt;Gray-Scott Model&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;The Gray-Scott model simulates two chemical reactants (A and B) where:&amp;lt;/p&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;A is continuously fed into the system&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;B is continuously removed&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;A &#43; 2B → 3B (the reaction)&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;p&amp;gt;Parameters control the resulting patterns: spots, stripes, mazes, and chaotic regions emerge from simple parameter shifts.&amp;lt;/p&amp;gt;</description>
+          
+            <category>generative-art</category>
+          
+            <category>shaders</category>
+          
+            <category>webgl</category>
+          
+            <category>patterns</category>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Agent-Based Swarm Systems</title>
+          <link>https://edgelesslab.com/work/swarm-systems/</link>
+          <pubDate>Fri, 17 Apr 2026 00:00:00 &#43;0000</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/work/swarm-systems/</guid>
+          <description>&amp;lt;p&amp;gt;Multi-agent systems produce complexity through simple rules executed by many autonomous agents. No central controller directs the outcome—patterns emerge from local interactions.&amp;lt;/p&amp;gt;
+&amp;lt;h2 id=&amp;#34;boids-flocking&amp;#34;&amp;gt;Boids Flocking&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;Craig Reynolds&amp;amp;rsquo; three rules produce convincing flocking behavior:&amp;lt;/p&amp;gt;
+&amp;lt;ol&amp;gt;
+&amp;lt;li&amp;gt;&amp;lt;strong&amp;gt;Separation&amp;lt;/strong&amp;gt;: steer to avoid crowding&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;&amp;lt;strong&amp;gt;Alignment&amp;lt;/strong&amp;gt;: steer toward average heading of neighbors&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;&amp;lt;strong&amp;gt;Cohesion&amp;lt;/strong&amp;gt;: steer toward average position of neighbors&amp;lt;/li&amp;gt;
+&amp;lt;/ol&amp;gt;
+&amp;lt;h2 id=&amp;#34;slime-mold-physarum&amp;#34;&amp;gt;Slime Mold (Physarum)&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;The single-celled &amp;lt;em&amp;gt;Physarum polycephalum&amp;lt;/em&amp;gt; can solve maze problems and build efficient networks. Digital simulations use:&amp;lt;/p&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;Trail deposition (agents leave pheromone trails)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Trail following (agents sense and follow trails)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Decay (trails evaporate over time)&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;p&amp;gt;This produces network structures resembling Tokyo rail systems—emergent optimization without central planning.&amp;lt;/p&amp;gt;</description>
+          
+            <category>generative-art</category>
+          
+            <category>agents</category>
+          
+            <category>swarm</category>
+          
+            <category>boids</category>
+          
+        </item>
+      
+    
+  </channel>
+</rss>

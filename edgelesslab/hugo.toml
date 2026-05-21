@@ -18,7 +18,7 @@ theme = 'edgeless'
   # Structured Data
   organizationName = "Edgeless Lab"
   organizationUrl = "https://edgelesslab.com"
-  organizationLogo = "/logo.png"
+  organizationLogo = "/logo.svg"
 
 [permalinks]
   posts = "/:slug/"

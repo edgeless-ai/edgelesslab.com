@@ -1,0 +1,43 @@
+{{ $data := index site.Data "content_wall" }}
+{{ if $data }}
+<section class="living-content-wall" aria-labelledby="wall-heading">
+  <h2 id="wall-heading">Swarm Activity</h2>
+
+  {{ with $data.summary }}
+  <div class="wall-summary">
+    <div class="summary-stat">
+      <span class="stat-value">{{ .total_issues_done }}</span>
+      <span class="stat-label">Issues Resolved</span>
+    </div>
+    <div class="summary-stat">
+      <span class="stat-value">{{ .total_agents }}</span>
+      <span class="stat-label">Agents</span>
+    </div>
+    <div class="summary-stat">
+      <span class="stat-value stat-active">{{ .agents_active }}</span>
+      <span class="stat-label">Active</span>
+    </div>
+  </div>
+  {{ end }}
+
+  <div class="wall-grid">
+    {{ range first 12 $data.recent_work }}
+    <div class="wall-card" data-priority="{{ .priority }}">
+      <div class="card-header">
+        <span class="card-id">{{ .id }}</span>
+        <span class="card-priority priority-{{ .priority }}">{{ .priority }}</span>
+      </div>
+      <p class="card-title">{{ .title | truncate 80 }}</p>
+      {{ $updated := .updated }}
+      {{ with time $updated }}
+      <time class="card-time" datetime="{{ .Format "2006-01-02" }}">{{ .Format "Jan 2 15:04" }}</time>
+      {{ end }}
+    </div>
+    {{ end }}
+  </div>
+
+  <div class="wall-footer">
+    <small>Last synced: {{ $data.generated_at }}</small>
+  </div>
+</section>
+{{ end }}

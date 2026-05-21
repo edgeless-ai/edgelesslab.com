@@ -1,0 +1,14 @@
+# Hugo build lock
+.hugo_build.lock
+
+# Node modules
+node_modules/
+
+# Generated resources
+resources/
+
+# Local lighthouse reports
+lighthouse-report-*
+
+# OS files
+.DS_Store

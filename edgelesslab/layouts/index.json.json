@@ -1,0 +1,8 @@
+{{/* Home JSON output format template.
+
+Hugo is configured (hugo.toml) to emit JSON for the home page.
+We keep this minimal to avoid warnings and preserve existing site rendering.
+*/ -}}
+{
+  "ok": true
+}

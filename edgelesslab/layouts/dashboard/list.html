@@ -12,7 +12,7 @@
   <div class="dashboard-grid">
     <section class="dashboard-panel">
       <h2>Recent Ships</h2>
-      {{ $shipLog := index site.Data "ship_log" }}
+      {{ $shipLog := index hugo.Data "ship_log" }}
       {{ if $shipLog }}
         <ul class="ship-list">
         {{ range $shipLog.ships }}
@@ -62,7 +62,7 @@
 
     <section class="dashboard-panel">
       <h2>This Month</h2>
-      {{ $shipLog := index site.Data "ship_log" }}
+      {{ $shipLog := index hugo.Data "ship_log" }}
       {{ $count := 0 }}
       {{ if $shipLog }}
         {{ $count = $shipLog.count }}

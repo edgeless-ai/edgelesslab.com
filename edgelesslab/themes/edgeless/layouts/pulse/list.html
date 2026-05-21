@@ -1,0 +1,438 @@
+{{ define "main" }}
+<section class="living-wall" id="livingWall">
+  <header class="wall-header">
+    <h1 class="wall-title">Living Content Wall</h1>
+    <p class="wall-subtitle">Real-time fleet activity, shipped work, and system health</p>
+    <div class="wall-controls">
+      <span id="lastUpdate" class="update-time">Loading...</span>
+      <button id="refreshBtn" class="refresh-btn" title="Refresh data">↻</button>
+    </div>
+  </header>
+
+  <div class="wall-grid">
+    <!-- Fleet Status Panel -->
+    <section class="wall-panel fleet-status">
+      <h2 class="panel-title">Agent Fleet</h2>
+      <div class="fleet-metrics" id="fleetMetrics">
+        <div class="metric-card">
+          <span class="metric-value" id="fleetTotal">-</span>
+          <span class="metric-label">Total Agents</span>
+        </div>
+        <div class="metric-card active">
+          <span class="metric-value" id="fleetActive">-</span>
+          <span class="metric-label">Active</span>
+        </div>
+        <div class="metric-card error">
+          <span class="metric-value" id="fleetError">-</span>
+          <span class="metric-label">Error</span>
+        </div>
+        <div class="metric-card idle">
+          <span class="metric-value" id="fleetIdle">-</span>
+          <span class="metric-label">Idle</span>
+        </div>
+      </div>
+      <div class="health-bar">
+        <div class="health-fill" id="healthBar"></div>
+        <span class="health-label" id="healthLabel">Health: --</span>
+      </div>
+      <ul class="agent-list" id="agentList"></ul>
+    </section>
+
+    <!-- Recent Ships - Ticker -->
+    <section class="wall-panel ship-ticker">
+      <h2 class="panel-title">Ship Log</h2>
+      <div class="ticker-wrapper">
+        <div class="ticker-track" id="tickerTrack"></div>
+      </div>
+      <div class="recent-ships" id="recentShips"></div>
+    </section>
+
+    <!-- Work Activity Wall -->
+    <section class="wall-panel work-wall">
+      <h2 class="panel-title">Recent Work</h2>
+      <div class="activity-grid" id="activityGrid"></div>
+    </section>
+  </div>
+
+  <footer class="wall-footer">
+    <p>Powered by Paperclip AI &bull; Edgeless Lab <span id="year"></span></p>
+  </footer>
+</section>
+
+<div id="connectionStatus" class="connection-indicator disconnected">
+  <span class="status-dot"></span>
+  <span class="status-text">Connecting...</span>
+</div>
+
+<style>
+:root {
+  --wall-bg: #0a0a0f;
+  --wall-panel: #12121a;
+  --wall-border: #1e1e2e;
+  --wall-accent: #6d5aff;
+  --wall-active: #4ade80;
+  --wall-error: #f87171;
+  --wall-idle: #fbbf24;
+  --wall-text: #e2e8f0;
+  --wall-dim: #94a3b8;
+}
+
+.living-wall {
+  background: var(--wall-bg);
+  color: var(--wall-text);
+  padding: 2rem;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.wall-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--wall-border);
+}
+
+.wall-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(135deg, #6d5aff, #4ade80);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+}
+
+.wall-subtitle {
+  color: var(--wall-dim);
+  margin: 0.5rem 0 0;
+}
+
+.wall-controls {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.update-time { color: var(--wall-dim); font-size: 0.875rem; }
+
+.refresh-btn {
+  background: var(--wall-panel);
+  border: 1px solid var(--wall-border);
+  color: var(--wall-text);
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.refresh-btn:hover { border-color: var(--wall-accent); }
+
+.wall-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.wall-panel {
+  background: var(--wall-panel);
+  border: 1px solid var(--wall-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+.panel-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--wall-text);
+}
+
+.fleet-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.metric-card {
+  background: rgba(109, 90, 255, 0.1);
+  border: 1px solid var(--wall-border);
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.metric-card.active { border-color: var(--wall-active); }
+.metric-card.error { border-color: var(--wall-error); }
+.metric-card.idle { border-color: var(--wall-idle); }
+
+.metric-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.metric-card.active .metric-value { color: var(--wall-active); }
+.metric-card.error .metric-value { color: var(--wall-error); }
+.metric-card.idle .metric-value { color: var(--wall-idle); }
+
+.metric-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--wall-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.health-bar {
+  height: 24px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.health-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--wall-error), var(--wall-active));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.health-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--wall-text);
+}
+
+.agent-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.agent-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--wall-border);
+}
+
+.agent-item:last-child { border-bottom: none; }
+
+.agent-name { font-size: 0.875rem; }
+
+.agent-status {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.agent-status.running { background: rgba(74, 222, 128, 0.2); color: var(--wall-active); }
+.agent-status.error { background: rgba(248, 113, 113, 0.2); color: var(--wall-error); }
+.agent-status.idle { background: rgba(251, 191, 36, 0.2); color: var(--wall-idle); }
+
+.ticker-wrapper {
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+  mask: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+  -webkit-mask: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
+
+.ticker-track {
+  animation: scroll 30s linear infinite;
+}
+
+@keyframes scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+.ticker-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--wall-border);
+}
+
+.ticker-id { font-weight: 600; color: var(--wall-accent); }
+.ticker-title { margin-top: 0.25rem; font-size: 0.875rem; color: var(--wall-dim); }
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  max-height: 500px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--wall-accent) var(--wall-panel);
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(109, 90, 255, 0.05);
+  border-radius: 6px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.activity-priority {
+  min-width: 60px;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.activity-priority.critical { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+.activity-priority.high { background: rgba(249, 115, 22, 0.2); color: #fdba74; }
+.activity-priority.medium { background: rgba(234, 179, 8, 0.2); color: #fef08a; }
+.activity-priority.low { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+
+.activity-title {
+  font-size: 0.875rem;
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.wall-footer {
+  text-align: center;
+  margin-top: 2rem;
+  color: var(--wall-dim);
+  font-size: 0.75rem;
+}
+
+.connection-indicator {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--wall-panel);
+  border-radius: 8px;
+  border: 1px solid var(--wall-border);
+  font-size: 0.75rem;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.disconnected .status-dot { background: var(--wall-error); }
+.connected .status-dot { background: var(--wall-active); animation: pulse 2s infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@media (max-width: 768px) {
+  .wall-grid {
+    grid-template-columns: 1fr;
+  }
+  .wall-title { font-size: 1.75rem; }
+}
+</style>
+
+<script>
+let refreshInterval;
+
+async function loadWallData() {
+  try {
+    const res = await fetch('/content-wall.json');
+    const data = await res.json();
+    renderWall(data);
+    setConnection(true);
+  } catch (e) {
+    console.error('Failed to load content wall:', e);
+    setConnection(false);
+  }
+}
+
+function renderWall(data) {
+  const s = data.summary || {};
+  document.getElementById('fleetTotal').textContent = s.total_agents || 0;
+  document.getElementById('fleetActive').textContent = s.agents_active || 0;
+  document.getElementById('fleetError').textContent = s.agents_error || 0;
+  const idle = (s.total_agents || 0) - (s.agents_active || 0) - (s.agents_error || 0);
+  document.getElementById('fleetIdle').textContent = idle;
+  
+  const m = data.metrics || {};
+  const health = m.health_score || 0;
+  document.getElementById('healthBar').style.width = health + '%';
+  document.getElementById('healthLabel').textContent = `Health: ${health}%`;
+  
+  const agents = data.fleet_status || [];
+  const agentList = document.getElementById('agentList');
+  agentList.innerHTML = '';
+  agents.slice(0, 15).forEach(a => {
+    const li = document.createElement('li');
+    li.className = 'agent-item';
+    li.innerHTML = `<span class="agent-name">${a.name || 'Unknown'}</span><span class="agent-status ${a.status || 'idle'}">${a.status || 'idle'}</span>`;
+    agentList.appendChild(li);
+  });
+  
+  const ships = data.ship_log || [];
+  const ticker = document.getElementById('tickerTrack');
+  ticker.innerHTML = '';
+  
+  for (let i = 0; i < 2; i++) {
+    ships.forEach((ship, idx) => {
+      const div = document.createElement('div');
+      div.className = 'ticker-item';
+      div.innerHTML = `<div class="ticker-id">${ship.id}</div><div class="ticker-title">${ship.title || ''}</div>`;
+      ticker.appendChild(div);
+    });
+  }
+  
+  const work = data.recent_work || [];
+  const grid = document.getElementById('activityGrid');
+  grid.innerHTML = '';
+  work.slice(0, 15).forEach(w => {
+    const div = document.createElement('div');
+    div.className = 'activity-item';
+    div.innerHTML = `<span class="activity-priority ${w.priority || 'low'}">${w.priority || 'low'}</span><span class="activity-title">${w.id}: ${w.title || ''}</span>`;
+    grid.appendChild(div);
+  });
+  
+  const updated = data.generated_at ? new Date(data.generated_at).toLocaleString() : 'Unknown';
+  document.getElementById('lastUpdate').textContent = 'Updated: ' + updated;
+  document.getElementById('year').textContent = new Date().getFullYear();
+}
+
+function setConnection(isConnected) {
+  const el = document.getElementById('connectionStatus');
+  el.className = `connection-indicator ${isConnected ? 'connected' : 'disconnected'}`;
+  el.querySelector('.status-text').textContent = isConnected ? 'Live' : 'Offline';
+}
+
+document.getElementById('refreshBtn').addEventListener('click', loadWallData);
+
+loadWallData();
+refreshInterval = setInterval(loadWallData, 5 * 60 * 1000);
+</script>
+{{ end }}

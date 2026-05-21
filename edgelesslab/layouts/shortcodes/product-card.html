@@ -2,7 +2,7 @@
 {{ $productId := .Get "product" }}
 {{ $layout := .Get "layout" | default "horizontal" }}
 
-{{ $product := index (where .Site.Data.products "id" $productId) 0 }}
+{{ $product := index (where hugo.Data.products "id" $productId) 0 }}
 
 {{ if $product }}
   <article class="product-card product-card--{{ $layout }}" data-product-id="{{ $product.id }}">
@@ -43,7 +43,7 @@
   <div class="product-card-error">
     <p>Product "{{ $productId }}" not found. Available products:</p>
     <ul>
-      {{ range .Site.Data.products }}
+      {{ range hugo.Data.products }}
         <li>{{ .id }} — {{ .name }}</li>
       {{ end }}
     </ul>

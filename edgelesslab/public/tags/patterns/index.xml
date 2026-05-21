@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Edgeless Lab - AI-Native Creative Studio</title>
+    <link>https://edgelesslab.com/</link>
+    <description>Edgeless Lab is an AI-native creative studio building the future of generative art, autonomous agents, and intelligent systems.</description>
+    <language>en-us</language>
+    <managingEditor>Edgeless Lab</managingEditor>
+    <webMaster>Edgeless Lab</webMaster>
+    <lastBuildDate>Sat, 16 May 2026 10:57:44 -0700</lastBuildDate>
+    
+    
+      
+        <item>
+          <title>Reaction-Diffusion Systems</title>
+          <link>https://edgelesslab.com/work/reaction-diffusion-systems/</link>
+          <pubDate>Sat, 18 Apr 2026 00:00:00 &#43;0000</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/work/reaction-diffusion-systems/</guid>
+          <description>&amp;lt;p&amp;gt;Reaction-diffusion systems simulate how chemicals spread and react to create emergent patterns found throughout nature—zebra stripes, coral formations, and leopard spots all arise from similar mathematical processes.&amp;lt;/p&amp;gt;
+&amp;lt;h2 id=&amp;#34;gray-scott-model&amp;#34;&amp;gt;Gray-Scott Model&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;The Gray-Scott model simulates two chemical reactants (A and B) where:&amp;lt;/p&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;A is continuously fed into the system&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;B is continuously removed&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;A &#43; 2B → 3B (the reaction)&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;p&amp;gt;Parameters control the resulting patterns: spots, stripes, mazes, and chaotic regions emerge from simple parameter shifts.&amp;lt;/p&amp;gt;</description>
+          
+            <category>generative-art</category>
+          
+            <category>shaders</category>
+          
+            <category>webgl</category>
+          
+            <category>patterns</category>
+          
+        </item>
+      
+    
+  </channel>
+</rss>

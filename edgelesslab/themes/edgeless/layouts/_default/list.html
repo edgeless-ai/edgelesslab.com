@@ -1,0 +1,55 @@
+{{ define "main" }}
+<article class="content-list">
+  <header class="page-header">
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}
+      <p class="page-description">{{ . }}</p>
+    {{ end }}
+  </header>
+  
+  {{ .Content }}
+  
+  {{ if .Pages }}
+    <ul class="item-list" role="list">
+      {{ range .Pages }}
+        <li>
+          <article class="item-card">
+            {{ if .Params.image }}
+              <a href="{{ .RelPermalink }}" class="item-image" aria-hidden="true">
+                <img src="{{ .Params.image }}" alt="" loading="lazy" width="400" height="300">
+              </a>
+            {{ end }}
+            <div class="item-content">
+              <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+              {{ with .Params.description }}
+                <p>{{ . }}</p>
+              {{ else }}
+                <p>{{ .Summary | truncate 150 }}</p>
+              {{ end }}
+              <footer class="item-meta">
+                <time datetime="{{ .PublishDate.Format "2006-01-02" }}">{{ .PublishDate.Format "Jan 2, 2006" }}</time>
+                {{ if .Params.tags }}
+                  <span class="tags">{{ delimit .Params.tags ", " }}</span>
+                {{ end }}
+              </footer>
+            </div>
+          </article>
+        </li>
+      {{ end }}
+    </ul>
+  {{ end }}
+  
+  {{/* Pagination for larger lists */}}
+  {{ if gt .Paginator.TotalPages 1 }}
+    <nav class="pagination" role="navigation" aria-label="Pagination">
+      {{ if .Paginator.HasPrev }}
+        <a href="{{ .Paginator.Prev.URL }}" class="prev">← Previous</a>
+      {{ end }}
+      <span class="page-info">Page {{ .Paginator.PageNumber }} of {{ .Paginator.TotalPages }}</span>
+      {{ if .Paginator.HasNext }}
+        <a href="{{ .Paginator.Next.URL }}" class="next">Next →</a>
+      {{ end }}
+    </nav>
+  {{ end }}
+</article>
+{{ end }}

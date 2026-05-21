@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Edgeless Lab - AI-Native Creative Studio</title>
+    <link>https://edgelesslab.com/</link>
+    <description>Edgeless Lab is an AI-native creative studio building the future of generative art, autonomous agents, and intelligent systems.</description>
+    <language>en-us</language>
+    <managingEditor>Edgeless Lab</managingEditor>
+    <webMaster>Edgeless Lab</webMaster>
+    <lastBuildDate>Sat, 16 May 2026 10:57:44 -0700</lastBuildDate>
+    
+    
+      
+        <item>
+          <title>Agent-Based Swarm Systems</title>
+          <link>https://edgelesslab.com/work/swarm-systems/</link>
+          <pubDate>Fri, 17 Apr 2026 00:00:00 &#43;0000</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/work/swarm-systems/</guid>
+          <description>&amp;lt;p&amp;gt;Multi-agent systems produce complexity through simple rules executed by many autonomous agents. No central controller directs the outcome—patterns emerge from local interactions.&amp;lt;/p&amp;gt;
+&amp;lt;h2 id=&amp;#34;boids-flocking&amp;#34;&amp;gt;Boids Flocking&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;Craig Reynolds&amp;amp;rsquo; three rules produce convincing flocking behavior:&amp;lt;/p&amp;gt;
+&amp;lt;ol&amp;gt;
+&amp;lt;li&amp;gt;&amp;lt;strong&amp;gt;Separation&amp;lt;/strong&amp;gt;: steer to avoid crowding&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;&amp;lt;strong&amp;gt;Alignment&amp;lt;/strong&amp;gt;: steer toward average heading of neighbors&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;&amp;lt;strong&amp;gt;Cohesion&amp;lt;/strong&amp;gt;: steer toward average position of neighbors&amp;lt;/li&amp;gt;
+&amp;lt;/ol&amp;gt;
+&amp;lt;h2 id=&amp;#34;slime-mold-physarum&amp;#34;&amp;gt;Slime Mold (Physarum)&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;The single-celled &amp;lt;em&amp;gt;Physarum polycephalum&amp;lt;/em&amp;gt; can solve maze problems and build efficient networks. Digital simulations use:&amp;lt;/p&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;Trail deposition (agents leave pheromone trails)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Trail following (agents sense and follow trails)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Decay (trails evaporate over time)&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;p&amp;gt;This produces network structures resembling Tokyo rail systems—emergent optimization without central planning.&amp;lt;/p&amp;gt;</description>
+          
+            <category>generative-art</category>
+          
+            <category>agents</category>
+          
+            <category>swarm</category>
+          
+            <category>boids</category>
+          
+        </item>
+      
+    
+  </channel>
+</rss>

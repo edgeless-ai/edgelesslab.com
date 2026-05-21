@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en-us" prefix="og: http://ogp.me/ns#">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.stripe.com https://*.netlify.app; frame-src https://checkout.stripe.com https://js.stripe.com; media-src 'self';">
+  
+  
+  <title>Building Reaction-Diffusion Shaders from Scratch | Edgeless Lab - AI-Native Creative Studio</title>
+  
+  
+  
+  <meta name="description" content="How the Gray-Scott model spawns biological patterns in a WebGL fragment shader — with a live interactive demo you can tweak in real time.">
+  <meta name="author" content="Edgeless Lab">
+  
+  
+  
+    <meta name="keywords" content="shaders, webgl, generative-art, reaction-diffusion, tutorial">
+  
+  
+  
+  <link rel="canonical" href="https://edgelesslab.com/building-reaction-diffusion-shaders-from-scratch/">
+  
+  
+  
+  
+  
+  <meta property="og:site_name" content="Edgeless Lab - AI-Native Creative Studio">
+  <meta property="og:title" content="Building Reaction-Diffusion Shaders from Scratch">
+  <meta property="og:description" content="How the Gray-Scott model spawns biological patterns in a WebGL fragment shader — with a live interactive demo you can tweak in real time.">
+  <meta property="og:url" content="https://edgelesslab.com/building-reaction-diffusion-shaders-from-scratch/">
+  <meta property="og:locale" content="en_us">
+  
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-05-15T20:00:00-07:00">
+    <meta property="article:modified_time" content="2026-05-15T20:00:00-07:00">
+    
+      <meta property="article:tag" content="shaders">
+    
+      <meta property="article:tag" content="webgl">
+    
+      <meta property="article:tag" content="generative-art">
+    
+      <meta property="article:tag" content="reaction-diffusion">
+    
+      <meta property="article:tag" content="tutorial">
+    
+  
+  
+  
+  
+  
+    <meta property="og:image" content="https://edgelesslab.com/og/reaction-diffusion-shader-tutorial.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Building Reaction-Diffusion Shaders from Scratch">
+  
+  
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@edgelesslab">
+  <meta name="twitter:creator" content="@edgelesslab">
+  <meta name="twitter:title" content="Building Reaction-Diffusion Shaders from Scratch">
+  <meta name="twitter:description" content="How the Gray-Scott model spawns biological patterns in a WebGL fragment shader — with a live interactive demo you can tweak in real time.">
+  
+    <meta name="twitter:image" content="https://edgelesslab.com/og/reaction-diffusion-shader-tutorial.webp">
+    <meta name="twitter:image:alt" content="Building Reaction-Diffusion Shaders from Scratch">
+  
+  
+  
+  
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  
+  
+  
+  
+
+
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Building Reaction-Diffusion Shaders from Scratch",
+  "description": "How the Gray-Scott model spawns biological patterns in a WebGL fragment shader — with a live interactive demo you can tweak in real time.",
+  "url": "https:\/\/edgelesslab.com\/building-reaction-diffusion-shaders-from-scratch\/",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Edgeless Lab - AI-Native Creative Studio",
+    "url": "https:\/\/edgelesslab.com\/"
+  },
+  "datePublished": "2026-05-15T20:00:00-07:00",
+  "dateModified": "2026-05-15T20:00:00-07:00"
+}
+</script>
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Building Reaction-Diffusion Shaders from Scratch",
+  "description": "How the Gray-Scott model spawns biological patterns in a WebGL fragment shader — with a live interactive demo you can tweak in real time.",
+  "url": "https:\/\/edgelesslab.com\/building-reaction-diffusion-shaders-from-scratch\/",
+  "datePublished": "2026-05-15T20:00:00-07:00",
+  "dateModified": "2026-05-15T20:00:00-07:00",
+  "author": {
+    "@type": "Organization",
+    "name": "Edgeless Lab"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Edgeless Lab",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https:\/\/edgelesslab.com\/logo.svg"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https:\/\/edgelesslab.com\/building-reaction-diffusion-shaders-from-scratch\/"
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https:\/\/edgelesslab.com\/og\/reaction-diffusion-shader-tutorial.webp",
+    "width": 1200,
+    "height": 630
+  },
+  "keywords": "shaders, webgl, generative-art, reaction-diffusion, tutorial"
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+  
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Home",
+      "item": "https:\/\/edgelesslab.com\/"
+    },
+  
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Updates",
+      "item": "https:\/\/edgelesslab.com\/posts\/"
+    },
+  
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "Building Reaction-Diffusion Shaders from Scratch",
+      "item": "https:\/\/edgelesslab.com\/building-reaction-diffusion-shaders-from-scratch\/"
+    }
+  
+  ]
+}
+</script>
+
+
+
+  
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  
+  
+  
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  
+  
+  
+  
+  
+  
+  
+    <link rel="preload" href="/css/main.min.9567fbcf47a910d0647165b048399182a92f3190155327b87011d667cf5da178.css" as="style" integrity="sha256-lWf7z0epENBkcWWwSDmRgqkvMZAVUye4cBHWZ89doXg=">
+    <link rel="stylesheet" href="/css/main.min.9567fbcf47a910d0647165b048399182a92f3190155327b87011d667cf5da178.css" integrity="sha256-lWf7z0epENBkcWWwSDmRgqkvMZAVUye4cBHWZ89doXg=">
+  
+  
+  
+  
+</head>
+
+<body class=" page posts">
+  
+    <header class="site-header" role="banner">
+  <nav class="main-nav" role="navigation" aria-label="Main navigation">
+    <a href="/" class="logo" aria-label="Edgeless Lab Home">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+        <circle cx="16" cy="16" r="6" fill="currentColor"/>
+      </svg>
+      <span>Edgeless Lab</span>
+    </a>
+
+    <div class="nav-right">
+      <ul class="nav-menu" role="menubar">
+        
+          <li role="none">
+            <a href="/work/" role="menuitem" >
+              Work
+            </a>
+          </li>
+        
+          <li role="none">
+            <a href="/agents/" role="menuitem" >
+              Agents
+            </a>
+          </li>
+        
+          <li role="none">
+            <a href="/lab/" role="menuitem" >
+              Lab
+            </a>
+          </li>
+        
+          <li role="none">
+            <a href="/posts/" role="menuitem" >
+              Updates
+            </a>
+          </li>
+        
+          <li role="none">
+            <a href="/store/" role="menuitem" >
+              Store
+            </a>
+          </li>
+        
+          <li role="none">
+            <a href="/about/" role="menuitem" >
+              About
+            </a>
+          </li>
+        
+      </ul>
+
+      <button class="search-trigger" id="search-trigger" aria-label="Search (Cmd+K)" title="Search (Cmd+K)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <span class="search-shortcut">⌘K</span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+
+<div class="search-modal" id="search-modal" role="dialog" aria-modal="true" aria-label="Site search" hidden>
+  <div class="search-modal__overlay" id="search-overlay"></div>
+  <div class="search-modal__content">
+    <div id="modal-search" class="pagefind-ui pagefind-ui--modal" data-pagefind-ui></div>
+  </div>
+</div>
+
+<script defer>
+  (function() {
+    var modal = document.getElementById('search-modal');
+    var trigger = document.getElementById('search-trigger');
+    var overlay = document.getElementById('search-overlay');
+    var pagefindLoaded = false;
+    var pagefindUI = null;
+    var pendingOpen = false;
+
+    function loadPagefind(callback) {
+      if (pagefindLoaded) { callback(); return; }
+      var s = document.createElement('script');
+      s.src = '/pagefind/pagefind-ui.js';
+      s.onload = function() { pagefindLoaded = true; callback(); };
+      s.onerror = function() { console.warn('[Search] Pagefind load failed'); };
+      document.body.appendChild(s);
+    }
+
+    function initPagefindUI() {
+      if (pagefindUI) return;
+      if (!pagefindLoaded || !window.PagefindUI) return;
+      pagefindUI = new PagefindUI({
+        element: '#modal-search',
+        showSubResults: true,
+        showImages: false,
+        excerptLength: 25,
+        autofocus: true,
+        resetStyles: false,
+        processResult: function(r) {
+          if (r.meta && r.meta.title) r.meta.title = r.meta.title.replace(/ \| Edgeless Lab/g, '');
+          return r;
+        }
+      });
+      setTimeout(function() {
+        var inp = modal.querySelector('.pagefind-ui__search-input');
+        if (inp) inp.focus();
+      }, 50);
+    }
+
+    function openSearch() {
+      if (!pagefindLoaded) {
+        pendingOpen = true;
+        loadPagefind(function() { initPagefindUI(); });
+      }
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      if (pendingOpen) { initPagefindUI(); pendingOpen = false; }
+      else if (pagefindUI) {
+        setTimeout(function() {
+          var inp = modal.querySelector('.pagefind-ui__search-input');
+          if (inp) inp.focus();
+        }, 50);
+      }
+    }
+
+    function closeSearch() {
+      modal.hidden = true;
+      document.body.style.overflow = '';
+    }
+
+    trigger.addEventListener('click', openSearch);
+    overlay.addEventListener('click', closeSearch);
+    document.addEventListener('keydown', function(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        modal.hidden ? openSearch() : closeSearch();
+      }
+      if (e.key === 'Escape' && !modal.hidden) closeSearch();
+    });
+  })();
+</script>
+
+  
+  
+  <main id="main" role="main">
+    
+<article class="post single">
+  <header class="post-header">
+    <div class="post-meta">
+      <time datetime="2026-05-15T20:00:00-07:00">May 15, 2026</time>
+      <span class="reading-time">9 min read</span>
+    </div>
+    <h1 class="post-title">Building Reaction-Diffusion Shaders from Scratch</h1>
+    
+    
+    <div class="post-author">
+      <span>By Edgeless Lab</span>
+    </div>
+    
+  </header>
+
+  
+  <figure class="post-featured-image">
+    <img src="/og/reaction-diffusion-shader-tutorial.webp" alt="Building Reaction-Diffusion Shaders from Scratch">
+  </figure>
+  
+
+  <div class="post-content prose">
+    <p>Zebra stripes. Coral growth rings. Leopard spots. The Turing patterns that decorate the natural world all spring from the same mechanism: two chemicals diffusing and reacting in a field.</p>
+<p>This is not poetry — this is code. The Gray-Scott reaction-diffusion model is a handful of arithmetic operations that, when mapped onto a GPU fragment shader, produce the same intricate geometries that evolution has been running for hundreds of millions of years.</p>
+<p>This tutorial builds one from scratch. You&rsquo;ll understand the math, write the shader, and build a live demo that lets you paint chemistry across the screen.</p>
+<hr>
+<h2 id="what-is-reaction-diffusion">What Is Reaction-Diffusion?</h2>
+<p>At its core, a reaction-diffusion system is a field where two substances coexist and interact. Call them U (the <em>substrate</em>) and V (the <em>activator</em>).</p>
+<h3 id="the-rules">The Rules</h3>
+<ol>
+<li><strong>Diffusion:</strong> U and V spread to neighboring cells each frame. In a shader, this is a 3×3 Laplacian convolution.</li>
+<li><strong>Feeding:</strong> U is continuously added to the system.</li>
+<li><strong>Killing:</strong> V is continuously removed.</li>
+<li><strong>Reaction:</strong> U and V interact: <code>U + 2V → 3V</code>. Substrate turns into activator when activator is present.</li>
+</ol>
+<p>On a CPU grid this sounds like a simulation. On a GPU it is a texture operation — each pixel computes its own chemistry based on its neighbors&rsquo; chemistry, in parallel.</p>
+<hr>
+<h2 id="setting-up-the-simulator">Setting Up the Simulator</h2>
+<p>WebGL 1 is everywhere. We use it because it requires zero build tooling to run a shader in a <code>&lt;canvas&gt;</code>.</p>
+<h3 id="the-ping-pong-pattern">The Ping-Pong Pattern</h3>
+<p>A simulation needs to <em>read last frame, write this frame</em>. Textures are immutable resources in WebGL — you can&rsquo;t write into the texture you&rsquo;re reading from. The solution is two framebuffers: read from A, write to B, then swap.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-glsl" data-lang="glsl"><span style="display:flex;"><span><span style="color:#75715e">// fragment shader — read from sampler2D u_texture, write gl_FragColor</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">precision</span> <span style="color:#66d9ef">mediump</span> <span style="color:#66d9ef">float</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">uniform</span> <span style="color:#66d9ef">vec2</span> u_resolution;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">uniform</span> <span style="color:#66d9ef">vec2</span> u_mouse;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">uniform</span> <span style="color:#66d9ef">float</span> u_time;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">uniform</span> <span style="color:#66d9ef">sampler2D</span> u_texture;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> main() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">vec2</span> uv <span style="color:#f92672">=</span> gl_FragCoord.xy <span style="color:#f92672">/</span> u_resolution.xy;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">vec4</span> pixel <span style="color:#f92672">=</span> texture2D(u_texture, uv);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ... chemistry here ...</span>
+</span></span><span style="display:flex;"><span>    gl_FragColor <span style="color:#f92672">=</span> result;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="building-the-state-texture">Building the State Texture</h3>
+<p>Before running the simulation, the state texture needs initial conditions. Pure noise makes the system collapse to trivial attractors. The right initialization is a sparse injection of V into a sea of U:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">initStateTexture</span>(<span style="color:#a6e22e">gl</span>, <span style="color:#a6e22e">width</span>, <span style="color:#a6e22e">height</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Float32Array</span>(<span style="color:#a6e22e">width</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">height</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">4</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">y</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">y</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">height</span>; <span style="color:#a6e22e">y</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">x</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">x</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">width</span>; <span style="color:#a6e22e">x</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">y</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">width</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">x</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">4</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>]     <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span>; <span style="color:#75715e">// U = 1
+</span></span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>; <span style="color:#75715e">// V = 0
+</span></span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Inject activator in the center
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cx</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">width</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.5</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cy</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">floor</span>(<span style="color:#a6e22e">height</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.5</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">min</span>(<span style="color:#a6e22e">width</span>, <span style="color:#a6e22e">height</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.15</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">y</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">y</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">height</span>; <span style="color:#a6e22e">y</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">x</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">x</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">width</span>; <span style="color:#a6e22e">x</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">dx</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">x</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">cx</span>, <span style="color:#a6e22e">dy</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">y</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">cy</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">dx</span><span style="color:#f92672">*</span><span style="color:#a6e22e">dx</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">dy</span><span style="color:#f92672">*</span><span style="color:#a6e22e">dy</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">r</span><span style="color:#f92672">*</span><span style="color:#a6e22e">r</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">y</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">width</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">x</span>) <span style="color:#f92672">*</span> <span style="color:#ae81ff">4</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>]     <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>; <span style="color:#75715e">// U
+</span></span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.25</span>; <span style="color:#75715e">// V seed
+</span></span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">textureFromData</span>(<span style="color:#a6e22e">gl</span>, <span style="color:#a6e22e">data</span>, <span style="color:#a6e22e">width</span>, <span style="color:#a6e22e">height</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><hr>
+<h2 id="the-chemistry">The Chemistry</h2>
+<h3 id="laplacian-diffusion-operator">Laplacian (Diffusion Operator)</h3>
+<p>The discrete Laplacian is a weighted sum of a pixel and its 8 neighbors. It&rsquo;s the standard 3×3 stencil used in PDE solvers:</p>
+<pre tabindex="0"><code>|  0  0.5  0 |
+| 0.5 -2  0.5 |
+|  0  0.5  0 |
+(plus diagonals weighted 0.25 each for isotropic diffusion)
+</code></pre><p>In GLSL:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-glsl" data-lang="glsl"><span style="display:flex;"><span><span style="color:#66d9ef">vec4</span> laplacian(<span style="color:#66d9ef">vec2</span> uv, <span style="color:#66d9ef">vec2</span> texel) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">vec4</span> c <span style="color:#f92672">=</span> texture2D(u_texture, uv);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">vec4</span> n  <span style="color:#f92672">=</span> texture2D(u_texture, uv <span style="color:#f92672">+</span> <span style="color:#66d9ef">vec2</span>(<span style="color:#ae81ff">0.0</span>,  texel.y));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">vec4</span> s  <span style="color:#f92672">=</span> texture2D(u_texture, uv <span style="color:#f92672">+</span> <span style="color:#66d9ef">vec2</span>(<span style="color:#ae81ff">0.0</span>, <span style="color:#f92672">-</span>texel.y));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">vec4</span> e  <span style="color:#f92672">=</span> texture2D(u_texture, uv <span style="color:#f92672">+</span> <span style="color:#66d9ef">vec2</span>( texel.x, <span style="color:#ae81ff">0.0</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">vec4</span> w  <span style="color:#f92672">=</span> texture2D(u_texture, uv <span style="color:#f92672">+</span> <span style="color:#66d9ef">vec2</span>(<span style="color:#f92672">-</span>texel.x, <span style="color:#ae81ff">0.0</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">vec4</span> nw <span style="color:#f92672">=</span> texture2D(u_texture, uv <span style="color:#f92672">+</span> <span style="color:#66d9ef">vec2</span>(<span style="color:#f92672">-</span>texel.x,  texel.y));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">vec4</span> ne <span style="color:#f92672">=</span> texture2D(u_texture, uv <span style="color:#f92672">+</span> <span style="color:#66d9ef">vec2</span>( texel.x,  texel.y));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">vec4</span> sw <span style="color:#f92672">=</span> texture2D(u_texture, uv <span style="color:#f92672">+</span> <span style="color:#66d9ef">vec2</span>(<span style="color:#f92672">-</span>texel.x, <span style="color:#f92672">-</span>texel.y));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">vec4</span> se <span style="color:#f92672">=</span> texture2D(u_texture, uv <span style="color:#f92672">+</span> <span style="color:#66d9ef">vec2</span>( texel.x, <span style="color:#f92672">-</span>texel.y));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (n <span style="color:#f92672">+</span> s <span style="color:#f92672">+</span> e <span style="color:#f92672">+</span> w) <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.5</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>           (ne <span style="color:#f92672">+</span> nw <span style="color:#f92672">+</span> se <span style="color:#f92672">+</span> sw) <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.25</span> <span style="color:#f92672">-</span>
+</span></span><span style="display:flex;"><span>           c <span style="color:#f92672">*</span> <span style="color:#ae81ff">2.0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="the-gray-scott-update">The Gray-Scott Update</h3>
+<p>This is the heart of the simulation, 8 lines:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-glsl" data-lang="glsl"><span style="display:flex;"><span><span style="color:#75715e">// Reaction-diffusion parameters</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">float</span> dU <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.16</span>;   <span style="color:#75715e">// Diffusion rate of U</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">float</span> dV <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.08</span>;   <span style="color:#75715e">// Diffusion rate of V</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">float</span> f  <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.060</span>;  <span style="color:#75715e">// Feed rate (U replenishment)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">float</span> k  <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.062</span>;  <span style="color:#75715e">// Kill rate (V removal)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">vec2</span> st <span style="color:#f92672">=</span> fragCoord <span style="color:#f92672">/</span> iResolution.xy;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">vec2</span> texel <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span> <span style="color:#f92672">/</span> iResolution.xy;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">vec4</span> L <span style="color:#f92672">=</span> laplacian(st, texel);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">float</span> U <span style="color:#f92672">=</span> state.r;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">float</span> V <span style="color:#f92672">=</span> state.g;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Gray-Scott equations</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">float</span> dU_dt <span style="color:#f92672">=</span> dU <span style="color:#f92672">*</span> L.r <span style="color:#f92672">-</span> U <span style="color:#f92672">*</span> V <span style="color:#f92672">*</span> V <span style="color:#f92672">+</span> f <span style="color:#f92672">*</span> (<span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> U);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">float</span> dV_dt <span style="color:#f92672">=</span> dV <span style="color:#f92672">*</span> L.g <span style="color:#f92672">+</span> U <span style="color:#f92672">*</span> V <span style="color:#f92672">*</span> V <span style="color:#f92672">-</span> (f <span style="color:#f92672">+</span> k) <span style="color:#f92672">*</span> V;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>U <span style="color:#f92672">+=</span> dU_dt <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.8</span>; <span style="color:#75715e">// timestep</span>
+</span></span><span style="display:flex;"><span>V <span style="color:#f92672">+=</span> dV_dt <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.8</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>outColor <span style="color:#f92672">=</span> <span style="color:#66d9ef">vec4</span>(U, V, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>);
+</span></span></code></pre></div><p>The <code>(f + k)</code> term is killer — literally. When V exceeds the threshold <code>f + k</code>, it dies faster than the reaction can produce it. This is the knife edge: a small change to <code>k</code> can collapse a rich pattern into featureless gray or explode it into total activation.</p>
+<hr>
+<h2 id="pattern-phases--reading-the-parameter-space">Pattern Phases — Reading the Parameter Space</h2>
+<p>The GB of the Gray-Scott model is the <code>f * k</code> plane. Different emerge for different regions. Here are the landmarks:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Region</th>
+          <th>f range</th>
+          <th>k range</th>
+          <th>Pattern</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Spots</td>
+          <td>0.030–0.070</td>
+          <td>0.060–0.065</td>
+          <td>U-shaped &ldquo;holes&rdquo; in V field</td>
+      </tr>
+      <tr>
+          <td>Waves</td>
+          <td>0.014–0.020</td>
+          <td>0.054–0.060</td>
+          <td>Traveling pulse trains</td>
+      </tr>
+      <tr>
+          <td>Maze</td>
+          <td>0.029–0.030</td>
+          <td>0.057–0.063</td>
+          <td>Labyrinthine corridors</td>
+      </tr>
+      <tr>
+          <td>Chaos</td>
+          <td>0.025–0.027</td>
+          <td>0.060–0.065</td>
+          <td>Turbulent agititating</td>
+      </tr>
+  </tbody>
+</table>
+<p>This is why the demo below has a &ldquo;Magic Seed&rdquo; button — it tweaks those values into a region we copied from published Turing maps. You can break it in interesting ways.</p>
+<hr>
+<h2 id="rendering-the-patterns">Rendering the Patterns</h2>
+<p>After running the simulation, we need to turn the <code>(U, V)</code> field into something visible. The simplest is a direct mapping: <code>rgb = normalize(vec3(V, V*0.8, 1.0-U))</code> which maps the activation field to a cyan → green → hot color ramp.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-glsl" data-lang="glsl"><span style="display:flex;"><span><span style="color:#75715e">// Render pass — distinct from simulation pass</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">vec4</span> state <span style="color:#f92672">=</span> texture2D(u_texture, uv);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">float</span> V <span style="color:#f92672">=</span> state.g;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">float</span> U <span style="color:#f92672">=</span> state.r;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Two-tone highlight: pinks for high activation, greys for U field</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">vec3</span> color <span style="color:#f92672">=</span> mix(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">vec3</span>(<span style="color:#ae81ff">0.08</span>, <span style="color:#ae81ff">0.04</span>, <span style="color:#ae81ff">0.12</span>),  <span style="color:#75715e">// deep background</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">vec3</span>(<span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.6</span>, <span style="color:#ae81ff">0.75</span>),    <span style="color:#75715e">// hot pink for V</span>
+</span></span><span style="display:flex;"><span>    pow(V, <span style="color:#ae81ff">0.8</span>)              <span style="color:#75715e">// nonlinear boost</span>
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>color <span style="color:#f92672">=</span> mix(color, <span style="color:#66d9ef">vec3</span>(<span style="color:#ae81ff">0.6</span>, <span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">1.0</span>), pow(V, <span style="color:#ae81ff">2.5</span>));
+</span></span><span style="display:flex;"><span>gl_FragColor <span style="color:#f92672">=</span> <span style="color:#66d9ef">vec4</span>(color, <span style="color:#ae81ff">1.0</span>);
+</span></span></code></pre></div><p>The nonlinear transfer functions (<code>pow(V, 0.8)</code>, <code>pow(V, 2.5)</code>) are where &ldquo;artistic&rdquo; meets &ldquo;mathematical.&rdquo; Linear mapping looks flat. Small power adjustments compress the dynamic range and make patterns <em>punch</em>.</p>
+<hr>
+<h2 id="interactive-demo">Interactive Demo</h2>
+<p>The embed below is the full shader running in your browser. Click and drag to inject V (activator) into the U field. Use the parameter sliders to explore the phase space.</p>
+<div class="shader-embed" id="gray-scott-demo" data-feed-rate="0.054" data-kill-rate="0.064"></div>
+<script type="module" src="/demos/reaction-diffusion-demo.js"></script>
+<!--
+NOTE: The interactive demo implementation lives in /static/demos/reaction-diffusion-demo.js.
+We intentionally keep this post free of giant inline JS blocks.
+-->
+<hr>
+<h2 id="the-api-reference-in-practice">The API Reference in Practice</h2>
+<p>When writing a WebGL shader, the math is only half the battle. The half that will slow you down is <em>picking values</em> that actually work. Here&rsquo;s a condensed reference showing the safe zones and notable frontiers:</p>
+<figure class="post-embed" style="margin:2em 0;overflow-x:auto">
+  <table style="width:100%;border-collapse:collapse;font-size:0.85em">
+    <thead>
+      <tr style="background:var(--accent,#4f46e5);color:white">
+        <th style="padding:8px;text-align:left">Name</th>
+        <th style="padding:8px;text-align:left">f (feed)</th>
+        <th style="padding:8px;text-align:left">k (kill)</th>
+        <th style="padding:8px;text-align:left">Visual</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:#f9f9f9"><td>目标</td><td>0.054</td><td>0.064</td><td>目标状态</td></tr>
+      <tr><td>骆驼</td><td>0.0250</td><td>0.0645</td><td>驼峰状曲线</td></tr>
+      <tr style="background:#f9f9f9"><td>海螺</td><td>0.0620</td><td>0.0609</td><td>螺旋形状</td></tr>
+      <tr><td>洞穴</td><td>0.0580</td><td>0.0630</td><td>洞穴结构</td></tr>
+      <tr style="background:#f9f9f9"><td>波纹带</td><td>0.0140</td><td>0.0540</td><td>周期性波纹</td></tr>
+      <tr><td>涟漪</td><td>0.0180</td><td>0.0500</td><td>扩散波纹</td></tr>
+    </tbody>
+  </table>
+</figure>
+<p><strong>Safe zones</strong>: <code>f &gt; 0</code> and <code>f + k &lt; 1</code>. The kill rate <code>k</code> should almost always exceed the feed rate <code>f</code> — that&rsquo;s what prevents runaway activation and keeps the system near equilibrium rather than reaching saturation at <code>V = 1.0</code>.</p>
+<p><strong>Practical starting point</strong>: <code>f = 0.055, k = 0.062</code> (or your target: <code>f = 0.054, k = 0.064</code>) is the region we use in the demo. It produces spots and maze-like corridors without vanishing into noise. You will lose hours here — the space is fractal and every pixel of parameter shift produces a new organism.</p>
+<hr>
+<h2 id="adding-mouse-interaction">Adding Mouse Interaction</h2>
+<p>The demo lets you <em>paint</em> V into the simulation. This is the difference between watching and exploring: you see the pattern react to your intervention.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">canvas</span>.<span style="color:#a6e22e">addEventListener</span>(<span style="color:#e6db74">&#39;mousemove&#39;</span>, (<span style="color:#a6e22e">e</span>) =&gt; {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">isDrawing</span>) <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">rect</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">canvas</span>.<span style="color:#a6e22e">getBoundingClientRect</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">x</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">clientX</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">rect</span>.<span style="color:#a6e22e">left</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">rect</span>.<span style="color:#a6e22e">width</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">simWidth</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">y</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span> <span style="color:#f92672">-</span> (<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">clientY</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">rect</span>.<span style="color:#a6e22e">top</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">rect</span>.<span style="color:#a6e22e">height</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">simHeight</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// Inject V at mouse position — done by drawing a circle into the state texture
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">brushRadius</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">simWidth</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0.02</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">injectActivator</span>(<span style="color:#a6e22e">x</span>, <span style="color:#a6e22e">y</span>, <span style="color:#a6e22e">brushRadius</span>);
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>The subtle trick: mouse injection is <em>matrix-under</em> to simulation, not a simulation parameter. You&rsquo;re seeding the attractor externally, and the attractor&rsquo;s own growth dynamics determine how far that bleed spreads over subsequent ticks. If you inject in a stable attractor, the injection dissipates. If you inject in a previously dormant zone, you might seed an entirely new organism.</p>
+<hr>
+<h2 id="deployment-gotchas">Deployment Gotchas</h2>
+<p><strong>Color accuracy</strong>: WebGL renders in sRGB but the framebuffer is linear. Wrap rendering with <code>gl.needContext(gl, { antialias: false })</code> and call <code>gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false)</code>. For proper sRGB output, use <code>gl.renderbufferStorageMultisample</code> and <code>gl.SRGB8</code> attachments when available.</p>
+<p><strong>Mobile performance</strong>: A 512×512 simulation on a mobile GPU is one thing; a 1024×1024 with antialiased rendering is another. The live demo detects available memory caps on loadgear and steps down to 256×256 on constrained devices automatically.</p>
+<p><strong>Loop unrolling</strong>: WebGL 1 frag shaders disallow for-loops with dynamic bounds in some implementations. Hard-code your stencil or precompute offsets. In the live demo, the Laplacian is unrolled manually rather than looped.</p>
+<hr>
+<h2 id="where-to-go-next">Where to Go Next</h2>
+<p>The Gray-Scott model is the teaching tool, not the endgame. Once you grok these mechanics, the obvious extensions are:</p>
+<ol>
+<li><strong>Chunks / load culling</strong> — run simulation only in regions that have changed, an infinite plane</li>
+<li><strong>GPU compute</strong> — WebGL 2 transform feedback or WebGPU for 3D reaction-diffusion fields</li>
+<li><strong>ShaderToy port</strong> — same method, GLSL sandbox trivially, with bonus Perlin noise parameters</li>
+<li><strong>Physics coupling</strong> — let the activation field push vertices (displacement surface)</li>
+<li><strong>Audio-reactive seeding</strong> — feed in spectrum analysis to bias parameters in real-time</li>
+</ol>
+<p>The core insight survives all of these: <em>diffusion + nonlinear reaction = emergence</em>. The rest is packaging.</p>
+<hr>
+<h2 id="attribution--origins">Attribution &amp; Origins</h2>
+<p>This system originates with Alan Turing&rsquo;s 1952 paper <em>&ldquo;The Chemical Basis of Morphogenesis&rdquo;</em> — substrate morphogenesis. The two-species Gray-Scott variant was formalized in 1983 by P. Gray &amp; S.K. Scott, then rediscovered by the procedural graphics community in the 2010s when shader demoscene artists ported it to fragment shaders and began posting iterations on GLSL sandboxes. The Turing paper is essential reading: the reaction mechanism is <em>precisely</em> what Turing described, just run on a rectangular grid instead of a developing organism&rsquo;s tissues.</p>
+
+  </div>
+
+  
+  <footer class="post-footer">
+    <div class="post-tags">
+      <span>Tagged:</span>
+      
+      <a href="/tags/shaders" class="tag">shaders</a>
+      
+      <a href="/tags/webgl" class="tag">webgl</a>
+      
+      <a href="/tags/generative-art" class="tag">generative-art</a>
+      
+      <a href="/tags/reaction-diffusion" class="tag">reaction-diffusion</a>
+      
+      <a href="/tags/tutorial" class="tag">tutorial</a>
+      
+    </div>
+  </footer>
+  
+
+  <nav class="post-nav" aria-label="Post navigation">
+    
+    <a href="/access-vs-meaning-why-agent-semantics-are-the-real-moat/" class="prev">
+      <span>← Previous</span>
+      <strong>Access vs Meaning: Why Agent Semantics Are the Real Moat</strong>
+    </a>
+    
+    
+  </nav>
+</article>
+
+  </main>
+  
+  
+    <footer class="site-footer" role="contentinfo">
+  <div class="footer-content">
+    <p>&copy; 2026 Edgeless Lab. All rights reserved.</p>
+    
+    <nav aria-label="Footer navigation">
+      <a href="/sitemap.xml">Sitemap</a>
+      <a href="/index.json">API Feed</a>
+    </nav>
+    
+    
+    <p class="build-info">
+      <small>Last updated: <time datetime="2026-05-16T10:57:44-07:00">May 16, 2026</time></small>
+    </p>
+  </div>
+</footer>
+
+  
+  
+  
+    
+    
+      <script src="/js/interactive.min.js" defer></script>
+    
+  
+  
+  
+  
+</body>
+</html>

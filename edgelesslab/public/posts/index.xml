@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Edgeless Lab - AI-Native Creative Studio</title>
+    <link>https://edgelesslab.com/</link>
+    <description>Edgeless Lab is an AI-native creative studio building the future of generative art, autonomous agents, and intelligent systems.</description>
+    <language>en-us</language>
+    <managingEditor>Edgeless Lab</managingEditor>
+    <webMaster>Edgeless Lab</webMaster>
+    <lastBuildDate>Sat, 16 May 2026 10:57:44 -0700</lastBuildDate>
+    
+    
+      
+        <item>
+          <title>Building Reaction-Diffusion Shaders from Scratch</title>
+          <link>https://edgelesslab.com/building-reaction-diffusion-shaders-from-scratch/</link>
+          <pubDate>Fri, 15 May 2026 20:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/building-reaction-diffusion-shaders-from-scratch/</guid>
+          <description>&amp;lt;p&amp;gt;Zebra stripes. Coral growth rings. Leopard spots. The Turing patterns that decorate the natural world all spring from the same mechanism: two chemicals diffusing and reacting in a field.&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;This is not poetry — this is code. The Gray-Scott reaction-diffusion model is a handful of arithmetic operations that, when mapped onto a GPU fragment shader, produce the same intricate geometries that evolution has been running for hundreds of millions of years.&amp;lt;/p&amp;gt;</description>
+          
+            <category>shaders</category>
+          
+            <category>webgl</category>
+          
+            <category>generative-art</category>
+          
+            <category>reaction-diffusion</category>
+          
+            <category>tutorial</category>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Access vs Meaning: Why Agent Semantics Are the Real Moat</title>
+          <link>https://edgelesslab.com/access-vs-meaning-why-agent-semantics-are-the-real-moat/</link>
+          <pubDate>Thu, 07 May 2026 09:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/access-vs-meaning-why-agent-semantics-are-the-real-moat/</guid>
+          <description>&amp;lt;p&amp;gt;The AI tooling landscape is splitting along a fundamental fault line. On one side: agents that have &amp;lt;em&amp;gt;access&amp;lt;/em&amp;gt; to systems. On the other: agents that have &amp;lt;em&amp;gt;meaning&amp;lt;/em&amp;gt;—semantic understanding of what those systems do.&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;This distinction sounds subtle, but it&amp;amp;rsquo;s the difference between automation that compounds silently and automation that demands constant supervision. It&amp;amp;rsquo;s the difference between RPA that breaks when a button moves, and agents that adapt when an API changes. It&amp;amp;rsquo;s the difference between access and meaning.&amp;lt;/p&amp;gt;</description>
+          
+            <category>agents</category>
+          
+            <category>ai</category>
+          
+            <category>mcp</category>
+          
+            <category>architecture</category>
+          
+            <category>edgeless</category>
+          
+            <category>agentic-os</category>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>Multi-Model Routing: 4 Different Brains (Not 1)</title>
+          <link>https://edgelesslab.com/multi-model-routing-4-different-brains-not-1/</link>
+          <pubDate>Mon, 20 Apr 2026 10:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/multi-model-routing-4-different-brains-not-1/</guid>
+          <description>&amp;lt;p&amp;gt;&amp;lt;em&amp;gt;This is Post 2 in the &amp;lt;a href=&amp;#34;/tags/agentic-os/&amp;#34;&amp;gt;Agentic OS series&amp;lt;/a&amp;gt; — the economics of using different LLMs for different jobs.&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
+&amp;lt;hr&amp;gt;
+&amp;lt;h2 id=&amp;#34;the-12week-math-doesnt-work-without-this&amp;#34;&amp;gt;The $12/Week Math Doesn&amp;amp;rsquo;t Work Without This&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;In &amp;lt;a href=&amp;#34;/posts/agentic-os-12-week-team/&amp;#34;&amp;gt;Post 1&amp;lt;/a&amp;gt;, I claimed a $12/week AI operations team. The numbers:&amp;lt;/p&amp;gt;
+&amp;lt;table&amp;gt;
+  &amp;lt;thead&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;th&amp;gt;Agent&amp;lt;/th&amp;gt;
+          &amp;lt;th&amp;gt;Model&amp;lt;/th&amp;gt;
+          &amp;lt;th&amp;gt;Weekly Cost&amp;lt;/th&amp;gt;
+      &amp;lt;/tr&amp;gt;
+  &amp;lt;/thead&amp;gt;
+  &amp;lt;tbody&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Hermes&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Kimi K2.5&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;~$1.50&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Dispatch&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;DeepSeek V3.2&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;~$0.80&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Builder&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;Claude Code&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;~$3.00&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Verifier&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;DeepSeek V3.2&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;~$0.80&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+      &amp;lt;tr&amp;gt;
+          &amp;lt;td&amp;gt;Pamela&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;GPT-4.1 nano&amp;lt;/td&amp;gt;
+          &amp;lt;td&amp;gt;~$6.00&amp;lt;/td&amp;gt;
+      &amp;lt;/tr&amp;gt;
+  &amp;lt;/tbody&amp;gt;
+&amp;lt;/table&amp;gt;
+&amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Total: ~$12.10&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;If every agent used GPT-4.5? &amp;lt;strong&amp;gt;~$120/week&amp;lt;/strong&amp;gt;. 10x more expensive. Same output quality.&amp;lt;/p&amp;gt;</description>
+          
+            <category>agents</category>
+          
+            <category>orchestration</category>
+          
+            <category>model-routing</category>
+          
+            <category>cost-optimization</category>
+          
+            <category>paperclip</category>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>$12/Week AI Operations Team: How I Replaced a $50K Agency with 5 Agents</title>
+          <link>https://edgelesslab.com/12/week-ai-operations-team-how-i-replaced-a-50k-agency-with-5-agents/</link>
+          <pubDate>Sun, 19 Apr 2026 14:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/12/week-ai-operations-team-how-i-replaced-a-50k-agency-with-5-agents/</guid>
+          <description>&amp;lt;p&amp;gt;&amp;lt;em&amp;gt;This is Post 1 in the &amp;lt;a href=&amp;#34;/tags/agentic-os/&amp;#34;&amp;gt;Agentic OS series&amp;lt;/a&amp;gt; — documenting how we built a self-managing AI operations team that runs 24/7 for less than a coffee budget.&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
+&amp;lt;hr&amp;gt;
+&amp;lt;h2 id=&amp;#34;the-50k-question&amp;#34;&amp;gt;The $50K Question&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;I was quoted $50,000 for a six-month retainer with a mid-market AI consultancy. They&amp;amp;rsquo;d build &amp;amp;ldquo;autonomous agents&amp;amp;rdquo; for my creative systems business.&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;I spent $12/week instead.&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;Not $12/day. &amp;lt;strong&amp;gt;$12/week&amp;lt;/strong&amp;gt;. Less than a Netflix subscription. Less than two burritos in San Francisco.&amp;lt;/p&amp;gt;</description>
+          
+            <category>agents</category>
+          
+            <category>orchestration</category>
+          
+            <category>multi-agent</category>
+          
+            <category>cost-analysis</category>
+          
+            <category>paperclip</category>
+          
+        </item>
+      
+    
+      
+        <item>
+          <title>EdgelessLab.com: Now Live with Full SEO Infrastructure</title>
+          <link>https://edgelesslab.com/edgelesslab.com-now-live-with-full-seo-infrastructure/</link>
+          <pubDate>Sun, 19 Apr 2026 08:00:00 -0700</pubDate>
+          <guid isPermaLink="true">https://edgelesslab.com/edgelesslab.com-now-live-with-full-seo-infrastructure/</guid>
+          <description>&amp;lt;p&amp;gt;Today marks the completion of our technical SEO foundation. The site now ships with:&amp;lt;/p&amp;gt;
+&amp;lt;h2 id=&amp;#34;whats-live&amp;#34;&amp;gt;What&amp;amp;rsquo;s Live&amp;lt;/h2&amp;gt;
+&amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Technical SEO&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;Comprehensive sitemap with weekly refresh&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;JSON-LD structured data (Organization, WebSite, WebPage, BlogPosting, CreativeWork, BreadcrumbList)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Canonical URLs and alternate formats&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;robots.txt with crawl directives&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Semantic HTML with proper heading hierarchy&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Social Sharing&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
+&amp;lt;ul&amp;gt;
+&amp;lt;li&amp;gt;Open Graph meta tags for Facebook, LinkedIn, Discord&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Twitter Cards (summary_large_image)&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Dynamic image generation with proper 1200x630 dimensions&amp;lt;/li&amp;gt;
+&amp;lt;li&amp;gt;Page-specific titles and descriptions&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;Performance&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;</description>
+          
+            <category>meta</category>
+          
+            <category>seo</category>
+          
+            <category>infrastructure</category>
+          
+            <category>launch</category>
+          
+        </item>
+      
+    
+  </channel>
+</rss>

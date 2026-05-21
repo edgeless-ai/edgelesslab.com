@@ -3,7 +3,7 @@
 {{ $style := .Get "style" | default "primary" }}
 {{ $text := .Get "text" | default "Buy Now" }}
 
-{{ $product := index (where .Site.Data.products "id" $productId) 0 }}
+{{ $product := index (where hugo.Data.products "id" $productId) 0 }}
 
 {{ if $product }}
   <button 

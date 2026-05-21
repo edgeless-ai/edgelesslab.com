@@ -1,0 +1,11 @@
+name = "Edgeless"
+license = "MIT"
+licenselink = "https://github.com/edgelesslab/edgelesslab/blob/main/LICENSE"
+description = "SEO-optimized, performance-focused theme for Edgeless Lab"
+homepage = "https://edgelesslab.com"
+demosite = "https://edgelesslab.com"
+features = ["seo", "structured-data", "open-graph", "twitter-cards", "json-ld", "responsive", "accessible"]
+
+[author]
+  name = "Edgeless Lab"
+  homepage = "https://edgelesslab.com"

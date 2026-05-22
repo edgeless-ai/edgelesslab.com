@@ -1,0 +1,72 @@
+# Entry points registry for smoke-import testing
+# This file is used by scripts/preflight/smoke_test.py to verify all entry points import correctly
+# Add new modules here when introducing new package entry points
+# Format: one Python import path per line, comments with #
+# NOTE: Only use underscores in module names (no hyphens - Python can't import them)
+
+# === src.youtube_intelligence (triage/sync/cron/agent code) ===
+# NOTE: These require chromadb which may not be installed in test environments
+# src.youtube_intelligence.pipeline
+# src.youtube_intelligence.pipeline_enhanced
+# src.youtube_intelligence.knowledge_router
+# src.youtube_intelligence.knowledge_router_cli
+# src.youtube_intelligence.cli
+src.youtube_intelligence.config
+src.youtube_intelligence.credentials
+src.youtube_intelligence.models
+src.youtube_intelligence.models_enhanced
+src.youtube_intelligence.registry
+src.youtube_intelligence.voxtral_client
+
+# === src.tools (tooling code) ===
+src.tools.heartbeat
+src.tools.llm_client
+src.tools.llm_client.legacy
+
+# === src.creative (creative pipeline) ===
+# src.creative.meme_factory  # Module does not exist
+
+# === src.ingestion (ingestion pipeline - heavy deps) ===
+# Note: youtube_likes_triage requires chromadb which may not be installed in all envs
+# src.ingestion.youtube_likes_triage
+
+# === scripts.lib (library modules - underscore names only) ===
+scripts.lib.triage_core
+scripts.lib.youtube_triage_scorer
+scripts.lib.rss_triage_runner
+scripts.lib.rss_triage_scorer
+scripts.lib.rss_security_hardening
+scripts.lib.youtube_security_hardening
+scripts.lib.triage_runner
+scripts.lib.backlog_ticket_creator
+scripts.lib.insight_extractor
+scripts.lib.notebooklm_integration
+scripts.lib.notebooklm_pipeline
+# scripts.lib.sync_kb_to_chroma  # requires chromadb
+# scripts.lib.sync_memory_to_chroma  # requires chromadb
+scripts.lib.semantic_router
+scripts.lib.rss_delta_producer
+scripts.lib.skill_filter
+scripts.lib.paperclip_constants
+scripts.lib.nga_curator_runner
+scripts.lib.nga_curator_scorer
+scripts.lib.discord_backroom_protocol
+
+# === scripts (top-level scripts with underscore names - importable) ===
+# NOTE: Scripts with hyphens (e.g., agent-dashboard) cannot be imported and are excluded
+scripts.audit_skills
+scripts.chroma_vault_sync_pipeline
+scripts.cron_failure_alerter
+scripts.bridge_daemon
+scripts.ideation_runner
+scripts.notebooklm_sa_client
+# scripts.newsletter_digest  # requires feedparser
+scripts.pamela_ai_exposure_signal
+# scripts.rebuild_unified_knowledge  # Module does not exist
+# scripts.rss_ingest  # requires feedparser
+scripts.weekly_health_summary
+scripts.weekly_skill_digest
+scripts.youtube_notebooklm_integration
+scripts.youtube_oauth_refresh
+scripts.youtube_oauth_setup
+scripts.lib.karpathy_loop

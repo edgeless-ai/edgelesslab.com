@@ -50,5 +50,9 @@ temp/
 # Runtime state (per-video enrichment dedup)
 .enrich-state/
 
+# Auto-generated reports (recreated by cron)
+reports/system-manifest.md
+reports/system-manifest.json
+
 # Bot config cheat sheet contains plaintext bot tokens — never commit
 output/bot-config-cheatsheet.xlsx

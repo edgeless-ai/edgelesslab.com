@@ -314,6 +314,138 @@ class CronFailureAlerter:
         except Exception as e:
             print(f"Warning: Failed to write to failure log: {e}")
 
+    def state_notify_inline(self, job_name: str, exit_code: int, dry_run: bool = False) -> bool:
+        """Called by cron-wrapper after each job. Reads state file and alerts on failure."""
+        state_dir = LOGS_DIR / 'state'
+        state_file = state_dir / f'{job_name}.json'
+
+        if not state_file.exists():
+            print(f"[state-notify] No state file for {job_name}")
+            return True
+
+        try:
+            with open(state_file) as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, OSError) as e:
+            print(f"[state-notify] Failed to read state for {job_name}: {e}")
+            return False
+
+        status = data.get('status', 'unknown')
+        wall_seconds = data.get('wall_seconds', '?')
+        error_msg = data.get('error')
+
+        if status == 'ok':
+            print(f"[state-notify] {job_name} OK (exit={exit_code}, {wall_seconds}s)")
+            return True
+
+        if not self._should_alert(job_name, cooldown_hours=24):
+            print(f"[state-notify] {job_name} failed but alert rate-limited (24h cooldown)")
+            return True
+
+        body = (
+            f"Job: {job_name}\n"
+            f"Status: {status}\n"
+            f"Exit code: {exit_code}\n"
+            f"Wall time: {wall_seconds}s\n"
+            f"Error: {error_msg or 'none'}\n"
+            f"Started: {data.get('started_at', '?')}\n"
+        )
+
+        stderr_file = state_dir / f'{job_name}.stderr'
+        if stderr_file.exists():
+            try:
+                stderr_tail = stderr_file.read_text()[-500:]
+                if stderr_tail.strip():
+                    body += f"\nStderr (last 500 chars):\n{stderr_tail}"
+            except OSError:
+                pass
+
+        diagnosis = self.diagnose_error(error_msg or '') if error_msg else None
+        if diagnosis:
+            body += f"\n\nDiagnosis: {diagnosis[0]}\nSuggested fix: {diagnosis[1]}"
+
+        if dry_run:
+            print(f"[state-notify] [DRY RUN] Would alert for {job_name}: {status}")
+            return True
+
+        self._log_failure(job_name, error_msg or f'exit {exit_code}', exit_code)
+        self._record_alert(job_name)
+        return self.send_failure_alert(job_name, error_msg or f'exit {exit_code}', exit_code)
+
+    def state_notify_scan(self, dry_run: bool = False) -> bool:
+        """Periodic scan of all state files. Sends digest of failures."""
+        state_dir = LOGS_DIR / 'state'
+        if not state_dir.exists():
+            print("[scan] No state directory")
+            return True
+
+        failed = []
+        ok_count = 0
+        total = 0
+
+        for sf in sorted(state_dir.glob('*.json')):
+            total += 1
+            try:
+                with open(sf) as f:
+                    data = json.load(f)
+                status = data.get('status', 'unknown')
+                if status == 'ok':
+                    ok_count += 1
+                elif status in ('failed', 'killed'):
+                    failed.append({
+                        'job': data.get('job', sf.stem),
+                        'status': status,
+                        'exit_code': data.get('exit_code', '?'),
+                        'error': data.get('error'),
+                        'wall_seconds': data.get('wall_seconds', '?'),
+                        'started_at': data.get('started_at', '?'),
+                    })
+            except (json.JSONDecodeError, OSError):
+                continue
+
+        print(f"[scan] {len(failed)} failed, {ok_count} OK out of {total} total")
+
+        if not failed:
+            print("[scan] All jobs OK, nothing to report")
+            return True
+
+        # Guard 1: skip when ALL jobs failed (infra error)
+        if ok_count == 0 and total > 0:
+            print(f"[scan] All {total} jobs failed — likely infra issue, skipping digest")
+            return True
+
+        # Guard 2: rate limit digest to 1/day
+        digest_key = '_state_notify_digest'
+        if not self._should_alert(digest_key, cooldown_hours=24):
+            print("[scan] Digest rate-limited (1 per 24h)")
+            return True
+
+        if dry_run:
+            print(f"[scan] [DRY RUN] Would send digest for {len(failed)} failed jobs:")
+            for job in failed:
+                print(f"  - {job['job']}: {job['status']} (exit={job['exit_code']})")
+            return True
+
+        subject = f"Cron Digest: {len(failed)} failed, {ok_count} OK"
+        body = (
+            f"Failed jobs ({len(failed)}/{total}):\n\n"
+            + '\n'.join(
+                f"- {job['job']}: {job['status']} (exit {job['exit_code']}, {job['wall_seconds']}s)\n"
+                f"  Error: {job['error'] or 'none'}\n"
+                f"  Started: {job['started_at']}"
+                for job in failed
+            )
+        )
+
+        self._record_alert(digest_key)
+        try:
+            send_email_to_david(subject, body)
+            print(f"[scan] Digest sent: {len(failed)} failed jobs")
+            return True
+        except Exception as e:
+            print(f"[scan] Failed to send digest: {e}")
+            return False
+
     def _send_ntfy_backup(self, job_name: str, error: str) -> bool:
         """Send backup notification via ntfy.sh (in case email fails)"""
         try:
@@ -1071,6 +1203,16 @@ Examples:
         help='Send weekly health summary email',
     )
     parser.add_argument(
+        '--state-notify',
+        action='store_true',
+        help='State-based alerting. With JOB EXIT args: inline per-job alert. Without: scan all state files.',
+    )
+    parser.add_argument(
+        '--dry-run',
+        action='store_true',
+        help='Show what would be done without sending emails',
+    )
+    parser.add_argument(
         '--diagnose',
         metavar='ERROR_TEXT',
         help='Diagnose an error message and suggest fixes',
@@ -1078,7 +1220,7 @@ Examples:
     parser.add_argument(
         'command',
         nargs='*',
-        help='Command to wrap (use after --)',
+        help='Command to wrap (use after --), or JOB_NAME EXIT_CODE for --state-notify',
     )
 
     args = parser.parse_args()
@@ -1104,6 +1246,18 @@ Examples:
         else:
             print("❓ No diagnosis available for this error pattern")
         sys.exit(0)
+
+    elif args.state_notify:
+        if args.command and len(args.command) >= 2:
+            job_name = args.command[0]
+            try:
+                exit_code = int(args.command[1])
+            except ValueError:
+                exit_code = 1
+            success = alerter.state_notify_inline(job_name, exit_code, dry_run=args.dry_run)
+        else:
+            success = alerter.state_notify_scan(dry_run=args.dry_run)
+        sys.exit(0 if success else 1)
 
     elif args.check_logs:
         alerter.send_stale_job_alerts()

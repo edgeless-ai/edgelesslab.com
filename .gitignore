@@ -1,0 +1,54 @@
+# MCP Credentials and sensitive data
+.mcp/
+**/credentials.json
+**/token.json
+**/*_token.json
+**/*_credentials.json
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+.aider*
+data/
+*.log.*
+temp/
+.mcp.json
+
+# Runtime state (per-video enrichment dedup)
+.enrich-state/
+
+# Bot config cheat sheet contains plaintext bot tokens — never commit
+output/bot-config-cheatsheet.xlsx

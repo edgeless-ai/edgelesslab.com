@@ -9,6 +9,7 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
 import { GumroadButton } from "@/components/gumroad-button";
+import { StripeButton } from "@/components/stripe-button";
 
 const SITE = "https://edgelesslab.com";
 
@@ -169,14 +170,25 @@ export default async function ProductDetailPage({
                 >
                   {content.callToAction}
                 </p>
-                <GumroadButton
-                  href={product.href}
-                  price={product.price}
-                  productName={product.name}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-md font-medium transition-colors hover:opacity-90"
-                  style={{ background: "var(--accent)", color: "var(--bg-base)" }}
-                  icon
-                />
+                {slug === "agent-starter-kit" ? (
+                  <StripeButton
+                    href={product.href}
+                    price={product.price}
+                    productName={product.name}
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-md font-medium transition-colors hover:opacity-90"
+                    style={{ background: "var(--accent)", color: "var(--bg-base)" }}
+                    icon
+                  />
+                ) : (
+                  <GumroadButton
+                    href={product.href}
+                    price={product.price}
+                    productName={product.name}
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-md font-medium transition-colors hover:opacity-90"
+                    style={{ background: "var(--accent)", color: "var(--bg-base)" }}
+                    icon
+                  />
+                )}
                 <span
                   className="ml-3 text-xs font-mono"
                   style={{ color: "var(--text-tertiary)" }}

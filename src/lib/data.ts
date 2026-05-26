@@ -333,7 +333,7 @@ export const products: Product[] = [
       "Troubleshooting guide from 3 months of production ops",
       "Discord community access for support",
     ],
-    href: `https://edgelessai.gumroad.com/l/agent-starter-kit?${UTM}`,
+    href: `https://buy.stripe.com/PLACEHOLDER_AGENT_STARTER_KIT`,
     badge: "New",
     comingSoon: false,
     slug: "agent-starter-kit",

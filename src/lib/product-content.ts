@@ -499,32 +499,100 @@ A single printable PDF cheat sheet covering:
 - Installation paths and activation triggers
 
 **MCP Server Setup**
-- Server configuration syntax (stdio vs HTTP)
-- Tool naming and schema definition
-- Error handling patterns
-- Health check commands
+- Installing and configuring Model Context Protocol servers
+- Server discovery patterns
+- Common server configurations
 
-**Memory System Quick-Start**
-- MEMORY.md structure and indexing
-- CLAUDE.md integration
-- 4 memory types: user, feedback, project, reference
-- Auto-load mechanisms
+**Memory System Commands**
+- /memory operations
+- Context loading and persistence
+- Memory search and recall patterns
 
-**Format:**
-Single-page PDF, designed for printing (US Letter and A4). High contrast, monospace fonts, clear section headers. Pin it, tape it, keep it reachable.
+**Installation:**
+- macOS, Linux, and Windows setup
+- PATH configuration and shell integration
+- Update and maintenance commands
 
-**Who this is for:**
-- New Claude Code users who want a reference while learning
-- Power users who need command reminders without breaking flow
-- Team leads distributing onboarding materials
-- Anyone who prefers physical reference over tab-switching
+All on one printable page. No fluff.`,
+    callToAction: "Pin this next to your monitor and stop hunting through docs.",
+  },
 
-**Who this is NOT for:**
-- If you already have every command memorized, you don't need this
-- This is a reference, not a tutorial (see the CLAUDE.md Template Pack for walkthroughs)
-- No interactive elements, no videos, just text you can print
+  "agent-starter-kit": {
+    longTitle: "Edgeless Agent Starter Kit: Launch Your AI Swarm on macOS in Under an Hour",
+    shortDescription:
+      "The complete starter kit for running a multi-agent AI swarm on macOS. Pre-configured profiles, working cron jobs, 8 starter skills, and the exact setup we use to run 10+ agents daily. No theory. Just configs that work.",
+    body: `Setting up a multi-agent AI swarm from scratch is overwhelming. Hermes Agent has dozens of moving parts: profiles, skills, cron jobs, Paperclip integration, ChromaDB, Discord bridge. Most people give up before they get a single agent working.
 
-Free. No email required. Download and print.`,
-    callToAction: "Print it. Pin it. Code faster.",
+This kit is the exact setup we use to run 10+ agents daily on a MacBook Pro. Extracted from 3+ months of production use. Not a tutorial. A working system you deploy in under an hour.
+
+## What you get
+
+**45-page PDF guide** with 6 sections and 5 bonuses:
+
+**Section 1: One-Command Setup**
+- \`setup.sh\` script: installs Hermes, creates your first profile, connects Discord + Telegram
+- Tested on macOS 14+ (Apple Silicon)
+- Linux instructions included (not automated)
+
+**Section 2: Agent Swarm Blueprint**
+- 5 pre-configured agent roles: Beau (research), Hive (orchestrator), Kilo (execution), Scribe (documentation), Verifier (audit)
+- AGENTS.md templates for each role
+- Routing matrix: when to use which agent, with real examples
+- Paperclip integration config
+
+**Section 3: Skill System**
+- 8 starter skills (research, coding, docs, monitoring, triage, enrichment, sales, dispatch)
+- Skill authoring template (YAML frontmatter + markdown body)
+- How to load skills on-demand vs. default
+- How to add your own skills
+
+**Section 4: Automation Stack**
+- 3 pre-built cron job templates: RSS intelligence, email triage, health checks
+- Cron silent-failure detection built-in
+- Notification routing: Telegram vs. Discord thresholds
+- How to add your own cron jobs
+
+**Section 5: Knowledge Base**
+- Obsidian vault setup (taxonomy, templates, inbox system)
+- ChromaDB integration for semantic search
+- RSS intelligence pipeline config
+- How to query your knowledge base from agents
+
+**Section 6: Troubleshooting**
+- 15+ common failures and fixes from production ops
+- Provider fallback patterns (OpenAI to Fireworks to etc.)
+- Supervisor threshold tuning
+- What to do when an agent goes silent
+
+## Bonuses
+
+1. **Agent Autonomy Policy Template** -- fill-in-the-blank AGENTS.md for any new agent
+2. **Discord Envelope Protocol Cheatsheet** -- compact routing reference
+3. **50 Production Skills Index** -- curated list of best Hermes skills with install commands
+4. **Weekly Health Check Script** -- automated system audit
+5. **Paperclip Task Routing Config** -- project-to-agent mapping template
+
+## Who this is for
+
+- AI developers who want to run local agents but the setup is overwhelming
+- Solopreneurs who need a research + coding + documentation team that works while they sleep
+- AI researchers experimenting with multi-agent systems
+- NousResearch community members who want a working Hermes swarm on macOS
+
+## Who this is NOT for
+
+- This is macOS-optimized. Windows users need WSL2 or a Linux VM.
+- You need API keys for at least one LLM provider (we recommend Fireworks for cost efficiency)
+- This is not a beginner's guide to AI. You should know what an LLM is.
+
+## Technical requirements
+
+- macOS 14+ (Apple Silicon)
+- API key for OpenAI, Fireworks, or similar
+- 8GB RAM minimum (16GB recommended for multiple agents)
+- ~2GB disk space for the full stack
+
+All configs are tested and working. No "edit this file and hope it works."`,
+    callToAction: "From zero to working swarm in 60 minutes.",
   },
 };

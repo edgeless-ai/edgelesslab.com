@@ -1,11 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 
-let posthog: ReturnType<typeof import("posthog-js").default> | null = null;
+let posthog: any = null;
 
 let initialized = false;
 
@@ -33,8 +34,8 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
         capture_pageleave: true,
         autocapture: true,
         capture_performance: false, // disable during init — costs main thread
-        web_vitals: false, // move to idle
-      });
+        web_vitals: false,
+      } as any); // @ts-error suppressed — PostHog v2 removed web_vitals type, runtime option still works
 
       // Capture initial pageview after lazy init
       let url = window.origin + (pathname || location.pathname);

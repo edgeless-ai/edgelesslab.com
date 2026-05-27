@@ -31,6 +31,7 @@ STANDALONE_DIRS=(
   "tartanism"
   "total-serialism"
   "flow-viz"
+  "shared"
 )
 
 case "${1:-}" in

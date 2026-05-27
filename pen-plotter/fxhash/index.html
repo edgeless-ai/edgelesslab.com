@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Generative Editions — fxhash · Edgeless Lab</title>
+  <meta name="description" content="On-chain generative editions from the Edgeless Lab pen-plotter pipeline. The same algorithms that drive ink on paper, minted on fxhash. CC0, free." />
+  <link rel="canonical" href="https://edgelesslab.com/pen-plotter/fxhash/" />
+  <meta property="og:title" content="Generative Editions — fxhash · Edgeless Lab" />
+  <meta property="og:description" content="The same algorithm that draws on paper, minted on-chain. CC0, free. Moiré + Op Art, five output modes each." />
+  <meta property="og:image" content="https://edgelesslab.com/pen-plotter/fxhash/previews/opart-plotter.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <style>
+    :root{
+      --void:#0c0c0d; --panel:#141416; --line:#26262b; --fg:#ece9e2; --mut:#8b8a85;
+      --cyan:#06b6d4; --amber:#c2410c; --cream:#f5f0e8;
+      --mono:ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
+      --serif:"Boska",Georgia,"Times New Roman",serif;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--void);color:var(--fg)}
+    body{font-family:var(--serif);line-height:1.6;-webkit-font-smoothing:antialiased}
+    a{color:var(--cyan);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .mono{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+    .wrap{max-width:1040px;margin:0 auto;padding:0 1.5rem}
+    header.top{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(12,12,13,.86);
+      -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);z-index:10}
+    header.top .wrap{display:flex;justify-content:space-between;align-items:center;height:52px}
+    .hero{padding:5rem 0 2.5rem}
+    .hero h1{font-size:clamp(2.6rem,7vw,4.6rem);line-height:1.02;margin:.4rem 0 1rem;letter-spacing:-.02em}
+    .hero h1 em{font-style:italic;color:var(--amber)}
+    .lede{font-size:1.18rem;max-width:62ch;color:#cfccc4}
+    .badges{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.6rem 0 0}
+    .badge{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
+      border:1px solid var(--line);border-radius:999px;padding:.32rem .7rem;color:var(--fg);background:var(--panel)}
+    .badge.on{border-color:var(--cyan);color:var(--cyan)}
+    section.proj{padding:3rem 0;border-top:1px solid var(--line)}
+    .proj-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap}
+    .proj-head h2{font-size:2rem;margin:.2rem 0;letter-spacing:-.01em}
+    .proj-desc{max-width:60ch;color:#cfccc4;margin:.6rem 0 1.4rem}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    @media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:460px){.grid{grid-template-columns:1fr}}
+    figure{margin:0;background:var(--panel);border:1px solid var(--line);overflow:hidden}
+    figure img{width:100%;height:auto;display:block;aspect-ratio:297/420;object-fit:cover}
+    figcaption{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--mut);padding:.5rem .6rem;border-top:1px solid var(--line)}
+    .spec{display:flex;gap:1.4rem;flex-wrap:wrap;margin:1.4rem 0 1.2rem;font-family:var(--mono);font-size:.74rem;color:var(--mut)}
+    .spec b{color:var(--fg);font-weight:400}
+    .cta{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.78rem;
+      letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--cyan);color:var(--cyan);
+      padding:.6rem 1.1rem;border-radius:4px;background:transparent}
+    .cta[aria-disabled="true"]{border-color:var(--line);color:var(--mut);cursor:default}
+    .note{font-family:var(--mono);font-size:.68rem;color:var(--mut);margin-top:.6rem}
+    .how{padding:3rem 0;border-top:1px solid var(--line)}
+    .how ul{max-width:64ch;padding-left:1.1rem}
+    .how li{margin:.5rem 0;color:#cfccc4}
+    footer{border-top:1px solid var(--line);padding:2.5rem 0 4rem;color:var(--mut)}
+    footer .mono a{color:var(--mut)}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <span class="mono">● Edgeless Lab / <a href="/pen-plotter/">Pen Plotter</a> / fxhash</span>
+      <span class="mono">CC0 · FREE</span>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="hero">
+      <div class="mono">OUTPUT 012 / CLASS: ON_CHAIN_EDITIONS</div>
+      <h1>Generative <em>Editions.</em></h1>
+      <p class="lede">
+        The same algorithms that draw ink across cotton paper, minted on-chain.
+        Each project ships as a self-contained generator — the SVG on paper and the
+        canvas on fxhash are two projections of one piece of math. The medium is a
+        parameter. <strong>Take everything.</strong>
+      </p>
+      <div class="badges">
+        <span class="badge on">CC0 — public domain</span>
+        <span class="badge on">Free mint</span>
+        <span class="badge">5 output modes</span>
+        <span class="badge">Deterministic</span>
+        <span class="badge">Pen-plottable</span>
+      </div>
+    </section>
+
+    <section class="proj" id="moire">
+      <div class="proj-head">
+        <div>
+          <div class="mono">EDITION 01 / OP ART · INTERFERENCE</div>
+          <h2>Moiré</h2>
+        </div>
+        <a class="cta" aria-disabled="true" href="#"><!-- TODO: paste fxhash project URL when minted -->Mint on fxhash — soon</a>
+      </div>
+      <p class="proj-desc">
+        Interference patterns between overlapping grids — beauty in the gap between two
+        simple structures. Concentric, radial, and spiral fields, rendered as thousands
+        of fine strokes. Bridget Riley by way of Floyd–Steinberg.
+      </p>
+      <div class="grid">
+        <figure><img src="previews/moire-vivid.jpg" alt="Moiré — vivid mode, red radial interference" loading="lazy"><figcaption>vivid</figcaption></figure>
+        <figure><img src="previews/moire-neon.jpg" alt="Moiré — neon mode, magenta spiral on black" loading="lazy"><figcaption>neon</figcaption></figure>
+        <figure><img src="previews/moire-plotter.jpg" alt="Moiré — plotter mode, graphite vortex on warm paper" loading="lazy"><figcaption>plotter</figcaption></figure>
+      </div>
+      <div class="spec">
+        <span><b>8</b> styles</span><span><b>22</b> palettes</span>
+        <span>modes: <b>plotter · vivid · delicate · neon · watercolor</b></span>
+      </div>
+      <div class="note">Planned terms — free mint · CC0 · edition of 256 · 5% secondary.</div>
+    </section>
+
+    <section class="proj" id="opart">
+      <div class="proj-head">
+        <div>
+          <div class="mono">EDITION 02 / OP ART · DISTORTION</div>
+          <h2>Op Art</h2>
+        </div>
+        <a class="cta" aria-disabled="true" href="#"><!-- TODO: paste fxhash project URL when minted -->Mint on fxhash — soon</a>
+      </div>
+      <p class="proj-desc">
+        Line fields warped around invisible forms — bulges, waves, nested rotations and
+        frequency modulation. Flat strokes that read as depth. A polygon-count feature
+        pushes outputs from quiet to vibrating at the extremes.
+      </p>
+      <div class="grid">
+        <figure><img src="previews/opart-vivid.jpg" alt="Op Art — vivid mode, rust concentric vibration on cream" loading="lazy"><figcaption>vivid</figcaption></figure>
+        <figure><img src="previews/opart-neon.jpg" alt="Op Art — neon mode, cyan and magenta frequency bars" loading="lazy"><figcaption>neon</figcaption></figure>
+        <figure><img src="previews/opart-plotter.jpg" alt="Op Art — plotter mode, nested spiral linework on paper" loading="lazy"><figcaption>plotter</figcaption></figure>
+      </div>
+      <div class="spec">
+        <span><b>8</b> styles</span><span><b>18</b> palettes</span>
+        <span>modes: <b>plotter · vivid · delicate · neon · watercolor</b></span>
+      </div>
+      <div class="note">Planned terms — free mint · CC0 · edition of 256 · 5% secondary.</div>
+    </section>
+
+    <section class="how">
+      <div class="mono">HOW IT WORKS</div>
+      <ul>
+        <li>One algorithm, five output modes — <b>plotter</b> (graphite on warm paper), <b>vivid</b>, <b>delicate</b>, <b>neon</b>, and <b>watercolor</b>. The geometry is invariant; the palette and stroke treatment are parameters.</li>
+        <li>Deterministic: same hash in, same artwork out — on screen or under the pen.</li>
+        <li>Every mint is also a plot. The on-chain token and the AxiDraw drawing are the same coordinates.</li>
+        <li>Released CC0 — no rights reserved. Mint it, fork it, plot it, sell prints. <a href="/pen-plotter/kandinsky-to-canvas/">Read the lineage →</a></li>
+      </ul>
+    </section>
+  </div>
+
+  <footer>
+    <div class="wrap mono">
+      Built by <a href="https://edgelesslab.com">Edgeless Lab</a> · CC0 — take everything ·
+      <a href="/pen-plotter/">← Pen Plotter</a>
+      <div style="margin-top:.5rem">OUTPUT 012 / SEED: 0000000000 / ALGO: ON_CHAIN</div>
+    </div>
+  </footer>
+
+  <script src="/shared/lightbox.js" defer></script>
+</body>
+</html>

@@ -90,3 +90,4 @@ scripts.lib.session_digest_extractor
 # === scripts.cron (cron jobs with underscore names - importable) ===
 scripts.cron.weekly_learning_report
 scripts.cron.connection_miner
+scripts.cron.memory_circulation_tuner

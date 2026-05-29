@@ -211,6 +211,325 @@ For now, you can watch Bitcoin breathe.
     `.trim(),
   },
   {
+    slug: "hermes-curator-skill-lifecycle",
+    title: "Hermes Curator: The Agent That Cleans Up After Your Agents",
+    description: "Nous Research just shipped Hermes Agent v0.12.0. The headline feature solves a problem every multi-agent operator hits eventually: skill rot.",
+    date: "2026-05-17",
+    tags: ["Hermes Agent", "Skills", "Multi-Agent", "Infrastructure"],
+    readTime: "6 min",
+    editorial: true,
+    content: `
+Nous Research just shipped Hermes Agent v0.12.0, and the headline feature solves a problem every multi-agent operator hits eventually: skill rot.
+
+## The Problem
+
+Hermes agents learn by creating skills. Every time an agent figures out how to do something new, it writes a skill file. Over weeks of operation, the skill library grows. And grows. And never shrinks.
+
+We run Hermes as part of our agent swarm at Edgeless. Before this release, our primary Hermes instance had accumulated 91 skills. Some were redundant. Some referenced patterns we'd deprecated months ago. Some existed because two agents independently learned the same thing and wrote separate skills for it. The skill metadata alone was consuming thousands of tokens per conversation, eating into useful context window for actual work.
+
+There was no cleanup mechanism. Skills were write-only.
+
+## What Curator Does
+
+Curator is an autonomous background agent that runs on Hermes's cron scheduler. By default it cycles every 7 days. It does three things:
+
+**1. Staleness detection.** Skills unused for 30 days get flagged as stale. Skills inactive for 90 days get archived. Archived skills are recoverable, not deleted.
+
+**2. Consolidation.** When Curator finds overlapping skills (two skills that do roughly the same thing), it merges them. The result is one cleaner skill instead of two mediocre ones.
+
+**3. Pruning.** Skills that reference deprecated tools, dead APIs, or patterns that no longer apply get archived with a classification of why.
+
+Each run produces a structured report (\`logs/curator/run.json\`) and a human-readable summary (\`REPORT.md\`).
+
+## Safety
+
+The obvious concern: what if Curator archives something important?
+
+Nous built defense-in-depth:
+- **Bundled skills** (shipped with Hermes) are never touched
+- **Hub-installed skills** (from the Hermes skill marketplace) are exempt
+- **Pinned skills** -- you can pin any skill to block Curator from modifying it
+- **Archive-only** -- nothing is deleted, everything is recoverable
+- Curator only touches agent-created skills
+
+## Why This Matters for Multi-Agent Systems
+
+If you run one agent, skill rot is manageable. You can manually audit the skill list occasionally. But if you run a swarm -- where multiple agents create skills independently, where worker-pull jobs generate context-specific skills, where the self-improvement loop is constantly iterating -- the skill library becomes a coordination problem.
+
+Without Curator, you get:
+- Token waste from bloated skill metadata in every conversation
+- Routing confusion when multiple skills claim to handle the same task
+- Stale skills that point agents toward deprecated patterns
+
+With Curator, the skill lifecycle is closed: create, use, maintain, consolidate, archive. The library stays lean.
+
+## CLI
+
+Two commands:
+
+\`\`\`
+hermes curator run      # Run a maintenance cycle manually
+hermes curator status   # See skill rankings (most/least used)
+\`\`\`
+
+Configuration lives under \`auxiliary.curator\` in the Hermes config. The Curator model is selectable separately from the primary agent model, so you can run it on a cheaper model.
+
+## What Else Shipped in v0.12.0
+
+The Curator was the headline, but v0.12.0 also included:
+- Rubric-based self-improvement (replacing free-form review)
+- New inference providers
+- Native Spotify and Google Meet integrations
+- 57% reduction in TUI cold start time
+
+## Our Take
+
+We've been running Hermes since v0.6.0. The skill accumulation problem was real -- we'd periodically do manual audits of the skill directory, which is exactly the kind of toil that agents should handle. Curator formalizes what we were doing by hand.
+
+We'll be enabling it on our production Hermes instance and reporting back on the first few cycles. The 30/90 day staleness windows feel right for our usage patterns, but we'll tune if needed.
+
+---
+
+*Edgeless Labs builds autonomous creative infrastructure. We run Hermes as part of our multi-agent swarm for intake, research, and knowledge operations.*
+    `.trim(),
+  },
+  {
+    slug: "35000-specimens-computational-aesthetics",
+    title: "35,000 Specimens: What We Learned About Computational Aesthetics",
+    description: "A data-driven analysis of 41,572 algorithmic artworks, their scores, and what they reveal about the nature of machine-generated beauty.",
+    date: "2026-05-16",
+    tags: ["Generative Art", "Pen Plotter", "Computational Aesthetics", "Data Analysis"],
+    readTime: "8 min",
+    editorial: true,
+    content: `
+*A data-driven analysis of 41,572 algorithmic artworks, their scores, and what they reveal about the nature of machine-generated beauty.*
+
+---
+
+## The Numbers
+
+Over six weeks, Edgeless Lab's generative art platform produced **41,572 unique specimens** across **187 distinct algorithmic factories**. Each specimen was evaluated by an automated scoring system measuring seven dimensions: ink coverage, line complexity, composition, entropy, uniqueness, feasibility, and an overall composite score from 0-100.
+
+The results tell a striking story about the difficulty of algorithmic excellence:
+
+| Metric | Value |
+|--------|-------|
+| Total Specimens | 41,572 |
+| Unique Factories | 187 |
+| Mean Score | 64.9 |
+| Score Ceiling | **89.1** |
+| Specimens >= 80 | **721** (1.7%) |
+| Specimens >= 85 | **16** (0.04%) |
+
+The ceiling of 89.1 is revealing. Despite exploring 187 different algorithmic approaches, our system has not produced a single specimen scoring 90+. This isn't a calibration issue -- it's a fundamental property of the current scoring architecture. The 721 specimens that scored 80+ represent a mere 1.7% success rate. Achieving 85+ is a 1-in-2,600 event.
+
+This is the **aesthetic scarcity problem** in computational art: when you automate generation at scale, excellence doesn't become more common -- it reveals itself as statistically rare by design.
+
+---
+
+## What Scores High, and Why
+
+The top-performing factories paint a clear picture of what our scoring system values:
+
+| Factory | High Scorers (>=80) | % of Total High Scorers |
+|---------|-------------------|------------------------|
+| moire | 213 | 29.5% |
+| rayscape | 197 | 27.3% |
+| hatchcolor | 149 | 20.7% |
+| hatching | 69 | 9.6% |
+| squiggle | 22 | 3.1% |
+| optic | 16 | 2.2% |
+| lewitt | 16 | 2.2% |
+
+Three factories -- moire, rayscape, and hatchcolor -- account for 77.5% of all high-scoring specimens. This concentration suggests that certain algorithmic structures are fundamentally more amenable to aesthetic scoring than others.
+
+### What these factories share
+
+1. **Controlled complexity**: They operate in the narrow band between chaos and order. Too simple = boring. Too complex = unreadable. The sweet spot requires precision tuning.
+
+2. **Emergent pattern**: The high-scoring specimens often contain patterns that are not explicitly coded but arise from the interaction of simple rules. The moire factory's interference patterns, rayscape's angular convergence, and hatchcolor's layered color interactions all produce visual depth without explicit depth algorithms.
+
+3. **Ink efficiency**: High scorers tend to use 30-60% of the page's ink. Below 20% feels empty; above 70% feels muddy. The scoring system rewards density without clutter.
+
+4. **Scale independence**: The best specimens work at multiple scales. They look coherent as a thumbnail and reveal new detail when zoomed. This is a proxy for the "good composition" metric that human curators value.
+
+---
+
+## The Scoring Ceiling
+
+Why 89.1 and not higher? The scoring system is not capped at 90. The 89.1 is an empirical ceiling -- the best our current 187 factories have achieved. This is important because it suggests two things:
+
+**First**, the ceiling is not a bug. It is a feature of the current algorithmic space. Our 187 factories are not random -- they are the result of deliberate curation, community contribution, and systematic exploration. The fact that the ceiling has held steady for 10,000+ specimens suggests we are near the top of this particular hill.
+
+**Second**, the path to 90+ probably requires a new algorithmic paradigm, not more tuning of existing factories. The factories that cluster near 80-85 are all variations on the same structural themes (interference, layering, hatching). A 90+ specimen might require a fundamentally different approach -- perhaps one that introduces temporal or interactive elements, or one that combines multiple factory types in a single composition.
+
+---
+
+## What This Means for Generative Art Practice
+
+1. **Quality does not scale linearly with quantity.** Our 41,572 specimens did not produce proportionally more high scorers than our first 10,000. The high-scorer rate stayed flat at ~1.7%. This means the production pipeline is the easy part. The curation pipeline is the hard part.
+
+2. **Algorithmic diversity matters more than parameter tuning.** We spent weeks tuning individual factories. The returns were marginal. The biggest gains came from adding new factory types, not from optimizing existing ones.
+
+3. **The scoring system is a design tool, not just a filter.** The seven metrics (ink coverage, line complexity, composition, entropy, uniqueness, feasibility, overall) give us a language for talking about why one specimen works and another doesn't. This is more valuable than the binary pass/fail of the threshold.
+
+4. **The gap between 85 and 90 is the hardest.** The 721 specimens at 80+ are good. The 16 at 85+ are exceptional. The jump from 85 to 90 is larger than the jump from 70 to 85. This is the "final mile" problem of computational aesthetics.
+
+---
+
+## Next Steps
+
+We are exploring three paths to break the ceiling:
+
+1. **Hybrid factories**: Combining the top 3 factory types (moire, rayscape, hatchcolor) in single compositions.
+2. **Human-in-the-loop curation**: Using the scoring system as a pre-filter, then applying human judgment to the top 5% to find the hidden gems.
+3. **Temporal extension**: Adding animation or time-based parameters to see if the scoring ceiling changes when the medium is not static.
+
+The 89.1 ceiling is not a failure. It is a map. It tells us where the current algorithmic space ends and where the next one begins.
+
+---
+
+*Edgeless Lab runs a generative art platform for pen plotter and computational art. Our scoring system is open-source and documented at [edgelesslab.com/pen-plotter](https://edgelesslab.com/pen-plotter).*
+    `.trim(),
+  },
+  {
+    slug: "production-cost-benchmarks-ai-agents",
+    title: "The Real Cost of Running AI Agents in Production: A Monthly Breakdown",
+    description: "Anthropic's own estimate: $13/day per developer. We run 5 agents for $12/week. The complete cost breakdown and the technical decisions that make cheap infrastructure reliable.",
+    date: "2026-05-14",
+    tags: ["AI Agents", "Cost Optimization", "Production", "Infrastructure"],
+    readTime: "10 min",
+    editorial: true,
+    content: `
+Enterprise AI operations run \$50,000 per month for a modest setup. The bill breaks down predictably: API calls at scale, managed vector databases, orchestration platforms with per-seat pricing, and the human team to manage the agents that are supposed to reduce labor.
+
+We run five AI agents 24/7 for \$12 per week. They handle code review, research synthesis, content triage, knowledge base maintenance, and production monitoring. The architecture isn't a demo. It's been running for three months, survived a corrupted session recovery, and processed 8,000+ tasks without a manual restart.
+
+This is the complete cost breakdown and the specific technical decisions that make cheap infrastructure reliable.
+
+---
+
+## The Weekly Cost Stack
+
+| Service | Cost/Week | Purpose |
+|---------|-----------|---------|
+| Hetzner VPS (2 vCPU, 4GB) | \$3.00 | Hosts 2 agents (Beau + Pamela) |
+| Fireworks API (FirePass) | \$2.50 | Model inference via Nous Portal |
+| Paperclip AI (self-hosted) | \$0.00 | Task management, runs on the VPS |
+| ChromaDB (local) | \$0.00 | Vector search, runs on the VPS |
+| Cron jobs (system) | \$0.00 | Scheduled tasks via cron + scripts |
+| GitHub (free tier) | \$0.00 | Code repos, PRs, actions |
+| Discord (free tier) | \$0.00 | Agent coordination, alerting |
+| **Total** | **\$5.50** | Core infrastructure |
+
+The remaining \$6.50/week covers: API overages during heavy weeks, occasional OpenAI calls for image generation, and the Nous Portal subscription that gives us access to 300+ models and managed tools.
+
+---
+
+## Tokens Per Agent Per Day: Real Benchmarks
+
+The single most striking public data point: Anthropic raised its own estimate of average Claude Code cost from **\$6 to \$13 per developer per active day** in April 2026, while the "90th percentile" ceiling jumped from \$12 to \$30/day.
+
+**Per-task token benchmarks (6-month test, identical tasks, same backing model Claude Sonnet 4.5):**
+
+| Task | Aider Tokens | Cursor Tokens | Claude Code Tokens |
+|------|-------------|--------------|-------------------|
+| Add auth middleware | 82,400 | 68,200 | 340,000 |
+| Refactor 12 components | 195,000 | 224,000 | 890,000 |
+| Write test suite | 110,500 | 96,800 | 520,000 |
+| Fix 5 TypeScript errors | 34,200 | 28,100 | 165,000 |
+| **Average** | **105K** | **104K** | **479K** |
+
+Claude Code burns **4.2x more tokens per task** than Aider or Cursor on the same work. This is not a criticism of Claude Code -- it's a different product category. But it means cost planning must be model-specific.
+
+---
+
+## Monthly Cost at Different Usage Intensities
+
+| Usage Level | Aider (BYOK) | Cursor (subscription) | Claude Code (subscription) |
+|-------------|-------------|----------------------|---------------------------|
+| Light (2-3 hrs/day) | \$15-30 | \$16 flat | \$20 flat |
+| Moderate (4-6 hrs/day) | \$40-60 | \$16 + \$20-40 overages | \$100 (Max tier needed) |
+| Heavy (8+ hrs/day) | \$60-80 | \$50-80 total | \$200 (still hits limits) |
+| Team of 5, heavy use | \$200-400 | \$160+ | \$500-1,000 |
+
+**Our stack, for comparison:**
+- Hive (coordinator): ~\$0.50/day in Fireworks tokens
+- Kilo (code execution): ~\$1.00/day (Codex CLI, included in ChatGPT Pro)
+- Beau (infrastructure): ~\$0.20/day (VPS + monitoring)
+- Scribe (knowledge): ~\$0.30/day (ChromaDB queries + embedding)
+- Pamela (trading): ~\$0.50/day (API calls + data feeds)
+
+**Total: ~\$2.50/day, \$17.50/week** for 5 agents, 24/7, full autonomy. The \$12/week figure above is the base infrastructure; the extra \$5.50 covers the variable API costs.
+
+---
+
+## The Architecture Decisions That Cut Costs
+
+**1. BYOK (Bring Your Own Key) with gateway fallback.**
+We use Fireworks for most inference via the Nous Portal subscription. When Fireworks is down or a model is unavailable, we fall back to OpenRouter (no token markup, just a 5.5% credit fee). This gives us provider redundancy without paying for two full subscriptions.
+
+**2. Local vector database.**
+ChromaDB runs on the VPS instead of using a managed service like Pinecone. This saves \$2,400/month. The trade-off: we manage backups ourselves. The backup is a cron job that exports to S3 weekly.
+
+**3. Self-hosted task management.**
+Paperclip AI runs on the VPS instead of a SaaS subscription. This saves \$50-200/month depending on the team size. The trade-off: we maintain the Postgres database and the application server.
+
+**4. Cron-based scheduling.**
+Agent cycles run on cron instead of a managed scheduler like Temporal or AWS EventBridge. This saves \$100-500/month. The trade-off: we write our own retry logic and failure handling.
+
+**5. Model routing.**
+Not every task needs a frontier model. We route:
+- Simple tasks: Gemini 2.5 Flash-Lite (\$0.10/1M input)
+- Standard tasks: DeepSeek V3.2 (\$0.28/1M input)
+- Complex tasks: Claude Sonnet 4.6 (\$3.00/1M input)
+- Reasoning tasks: DeepSeek R1 (\$0.55/1M input)
+
+This routing alone cuts our inference bill by 60% compared to using a single frontier model for everything.
+
+---
+
+## The Hidden Costs Nobody Talks About
+
+**1. Context window bloat.**
+Every agent conversation includes the system prompt, the skill library, the memory context, and the conversation history. For a 5-agent swarm, the daily context token count can exceed 1M tokens just in "overhead" before any actual work is done. We solved this by:
+- Keeping the skill library lean (Curator archives unused skills)
+- Using ChromaDB for long-term memory instead of inline context
+- Feeding summaries instead of full transcripts
+
+**2. Failed API calls.**
+Not every API call succeeds. Timeouts, rate limits, and model unavailability happen. We budget 10% overhead for retries. With a 5-agent swarm, this means ~500 failed calls per day at peak. The cost is small but the noise is real.
+
+**3. Human oversight.**
+The agents are autonomous, but they are not unsupervised. Someone needs to review the weekly reports, handle edge cases, and fix the agents when they break. We budget 2 hours/week of human oversight. At \$100/hour consulting rate, this is \$200/week in "hidden" labor cost.
+
+**4. Debugging time.**
+When an agent goes wrong, debugging is not free. The "oh shit" moments -- when an agent loops, hallucinates, or corrupts data -- require human intervention. We budget 1 hour/week for this. This is the cost of autonomy.
+
+---
+
+## The Bottom Line
+
+| Setup | Monthly Cost | Agents | 24/7 | Human Oversight |
+|-------|-------------|--------|------|----------------|
+| Enterprise (managed) | \$50,000 | 20 | No | 2 FTE |
+| Mid-tier (mixed) | \$5,000 | 10 | Partial | 0.5 FTE |
+| Our stack (self-hosted) | \$75 | 5 | Yes | 2 hrs/week |
+
+The \$75/month is not magic. It is the result of deliberate trade-offs:
+- We manage our own infrastructure instead of paying for managed services.
+- We use cheaper models for simple tasks instead of one frontier model for everything.
+- We accept that 2 hours/week of human oversight is cheaper than a full-time ops engineer.
+- We tolerate the occasional "oh shit" moment instead of building a bulletproof system.
+
+The question is not whether you can run AI agents cheaply. The question is whether you are willing to trade convenience for cost.
+
+---
+
+*Edgeless Lab runs a 5-agent swarm on a \$5 VPS. We publish our cost breakdowns and infrastructure decisions at [edgelesslab.com/blog](https://edgelesslab.com/blog).*
+    `.trim(),
+  },
+  {
     slug: "envelope-protocol-multi-agent-coordination",
     title: "We Built an Envelope Protocol to Stop Our AI Agents from Talking Forever",
     description: "Seven Discord bots needed to coordinate without infinite loops. A five-field envelope header and a depth counter solved it. Here's the protocol.",
@@ -439,6 +758,130 @@ The whole pipeline is open-loop: generate, process, optimize, plot. No AI in the
 ---
 
 *Edgeless Lab builds infrastructure for autonomous AI systems. And occasionally, art.*
+    `.trim(),
+  },
+  {
+    slug: "llm-pricing-may-2026",
+    title: "The Complete LLM Pricing Table (May 2026): 80+ Models, 10 Providers, Zero Bullshit",
+    description: "The most comprehensive LLM pricing comparison available. 80+ models across 10 providers with caching, batch discounts, and free tiers. Updated weekly.",
+    date: "2026-05-13",
+    tags: ["LLM Pricing", "API Costs", "AI Infrastructure", "Cost Optimization"],
+    readTime: "12 min",
+    editorial: true,
+    content: `
+> **Methodology:** Prices sourced from official provider pricing pages as of late April-early May 2026, cross-referenced with independent aggregators. Model names reflect provider versioning conventions as of this date. Prices in USD per 1 million (1M) tokens unless stated otherwise. "Cached input" refers to prompt-cache read pricing. Batch API discounts apply to asynchronous workloads with 24-hour+ processing windows.
+
+---
+
+## The Executive Summary
+
+If you are building on LLMs in May 2026, here are the numbers that matter:
+
+| Category | Winner | Detail |
+|---|---|---|
+| **Cheapest frontier model** | DeepSeek V4 Flash | \$0.14/1M input; \$0.0028/1M with cache hit |
+| **Cheapest proprietary model** | Gemini 2.5 Flash-Lite | \$0.10/1M input; \$0.40/1M output |
+| **Best caching deal** | Anthropic Claude | 90% savings on cache reads; stacks with batch for 95% total |
+| **Fastest inference** | Cerebras | 3,115 TPS on GPT-OSS 120B |
+| **Best speed/dollar** | Groq | 20M input tokens per \$1 on Llama 3.1 8B |
+| **Best free tier** | Google AI Studio | All models, rate-limited, no credit card |
+| **Cheapest reasoning** | DeepSeek R1 | \$0.55/1M input vs. OpenAI o3 at \$2.00/1M |
+| **Best EU-jurisdiction** | Mistral Large 3 | \$0.50/1M input; 4x cheaper than GPT-4.1 |
+| **Best aggregator** | OpenRouter | No token markup; 5.5% credit fee only |
+
+---
+
+## OpenAI
+
+| Model | Input \$/1M | Output \$/1M | Cached Input | Batch | Context | Notes |
+|---|---|---|---|---|---|---|
+| **GPT-5.5** | \$5.00 | \$30.00 | \$0.50 | 50% off | 1.1M | Current frontier flagship |
+| **GPT-5.4** | \$2.50 | \$15.00 | \$0.25 | 50% off | 1.1M | Previous-gen flagship |
+| **GPT-5.4 mini** | \$0.75 | \$4.50 | \$0.075 | 50% off | 272K | Best mid-tier price/perf |
+| **GPT-5.4 nano** | \$0.20 | \$1.25 | \$0.02 | 50% off | 272K | Cheapest OpenAI proprietary |
+| **GPT-4.1 nano** | \$0.10 | \$0.40 | \$0.01 | 50% off | 1M | Cheapest 1M-context model |
+| **o3** | \$2.00 | \$8.00 | \$0.50 | 50% off | 200K | Reasoning model |
+| **o3-pro** | \$20.00 | \$80.00 | -- | -- | 200K | Premium reasoning |
+| **o4-mini** | \$1.10 | \$4.40 | \$0.275 | 50% off | 200K | Budget reasoning |
+
+**Key insight:** OpenAI's output tokens are expensive. GPT-5.5 at \$30/1M output means a long-form generation of 4K tokens costs \$0.12 per request. For high-volume agents, this adds up fast.
+
+---
+
+## Anthropic
+
+| Model | Input \$/1M | Output \$/1M | Cached Input | Batch | Context | Notes |
+|---|---|---|---|---|---|---|
+| **Claude Opus 4.7** | \$5.00 | \$25.00 | \$0.50 | 50% off | 1M | Latest flagship (Apr 2026) |
+| **Claude Opus 4.6** | \$5.00 | \$25.00 | \$0.50 | 50% off | 1M | Feb 2026; includes 1M ctx |
+| **Claude Sonnet 4.6** | \$3.00 | \$15.00 | \$0.30 | 50% off | 1M | Production workhorse |
+| **Claude Haiku 4.5** | \$1.00 | \$5.00 | \$0.10 | 50% off | 200K | Fastest, cheapest Claude |
+
+**Prompt caching details:**
+- 5-minute cache write: 1.25x base input price
+- 1-hour cache write: 2x base input price
+- Cache read (hit): 0.10x base input = **90% savings**
+- Both stack with 50% Batch API discount
+
+**Key insight:** Anthropic's caching system is the most generous of any frontier provider. For agents with large repeated system prompts, this is the cheapest option by a wide margin.
+
+---
+
+## Google (Gemini)
+
+| Model | Input \$/1M | Output \$/1M | Cached Input | Batch | Context | Notes |
+|---|---|---|---|---|---|---|
+| **Gemini 3.1 Pro** | \$2.00 / \$4.00 | \$12.00 / \$18.00 | \$0.20 / \$0.40 | ~50% | 1M | Current flagship reasoning |
+| **Gemini 3 Flash** | \$0.50 | \$3.00 | \$0.05 | ~50% | 1M | Mid-tier 3-series |
+| **Gemini 3.1 Flash-Lite** | \$0.25 | \$1.50 | \$0.025 | ~50% | 1M | Cheapest 3-series |
+| **Gemini 2.5 Pro** | \$1.25 / \$2.50 | \$10.00 / \$15.00 | \$0.125 / \$0.25 | 50% | 1M | Previous flagship |
+| **Gemini 2.5 Flash-Lite** | \$0.10 | \$0.40 | \$0.01 | 50% | 1M | **Cheapest proprietary model** |
+
+**Key insight:** Google AI Studio offers a genuine free tier for all models (rate-limited) with no credit card required. For experimentation and prototyping, this is the most accessible entry point.
+
+---
+
+## DeepSeek
+
+| Model | Input \$/1M | Output \$/1M | Cached Input | Context | Notes |
+|---|---|---|---|---|---|
+| **DeepSeek V4 Flash** | \$0.14 | \$0.28 | \$0.0028 | 1M | **Cheapest frontier model** |
+| **DeepSeek V4 Pro** | \$0.435* | \$0.87* | \$0.0036* | 1M | *75% promo until May 31 |
+| **DeepSeek V3.2** | \$0.28 | \$0.42 | \$0.028 | 128K | Workhorse model |
+| **DeepSeek R1** | \$0.55 | \$2.00 | \$0.14 | 128K | **Cheapest reasoning model** |
+
+**Key insight:** DeepSeek is the undisputed price leader for frontier-class performance. V4 Flash at \$0.14/1M input is up to 95% cheaper than GPT-5.4 for comparable tasks. The automatic context caching (10% of cache-miss price on hits) makes repeated prefix patterns extremely economical.
+
+---
+
+## The Speed Tier
+
+For latency-sensitive applications:
+
+| Provider | Model | Speed | Input \$/1M | Output \$/1M |
+|---|---|---|---|---|
+| **Cerebras** | Llama 3.1 8B | ~2,200 TPS | \$0.10 | \$0.10 |
+| **Cerebras** | GPT-OSS 120B | ~3,115 TPS | \$0.35 | \$0.75 |
+| **Groq** | Llama 3.1 8B | 840 TPS | \$0.05 | \$0.08 |
+| **Groq** | Llama 3.3 70B | 394 TPS | \$0.59 | \$0.79 |
+
+**Key insight:** Cerebras Wafer-Scale Engine delivers 10-20x the throughput of H100 GPU clusters. For voice AI, real-time streaming, or agent frameworks where latency compounds across many steps, Cerebras is the fastest option.
+
+---
+
+## How to Use This Table
+
+1. **For cost-sensitive production:** Start with DeepSeek V4 Flash or Gemini 2.5 Flash-Lite.
+2. **For reasoning tasks:** Use DeepSeek R1 (\$0.55/\$2.00) instead of OpenAI o3 (\$2.00/\$8.00).
+3. **For large repeated context:** Use Anthropic Claude with caching (90% savings on cache hits).
+4. **For experimentation:** Use Google AI Studio (free tier, no credit card).
+5. **For multi-provider redundancy:** Use OpenRouter (no token markup, 300+ models).
+
+---
+
+*All prices in USD. Prices change frequently -- verify against official provider pages before making production infrastructure decisions. Last updated: May 2026.*
+
+*Sources: [OpenAI](https://openai.com/api/pricing/) | [Anthropic](https://platform.claude.com/docs/en/about-claude/pricing) | [Google](https://ai.google.dev/gemini-api/docs/pricing) | [DeepSeek](https://api-docs.deepseek.com/quick_start/pricing) | [Mistral](https://mistral.ai/pricing) | [Groq](https://groq.com/pricing) | [Cerebras](https://www.cerebras.ai/pricing) | [Together](https://www.together.ai/pricing) | [Fireworks](https://fireworks.ai/pricing) | [OpenRouter](https://openrouter.ai/pricing)*
     `.trim(),
   },
   {
@@ -1412,91 +1855,6 @@ Portland has roughly 14,000 small businesses with fewer than 50 employees. If 2 
 The pitch isn't "AI." The pitch is: "You have seventeen Google reviews about unanswered calls. I can fix that for \$99 a month."
 
 That's not a technology conversation. It's a business conversation. And it starts with reading the reviews.
-    `.trim(),
-  },
-  {
-    slug: "hermes-curator-skill-lifecycle",
-    title: "Hermes Curator: The Agent That Cleans Up After Your Agents",
-    description: "Nous Research shipped Hermes v0.12.0 with Curator, an autonomous background agent that detects stale skills, consolidates duplicates, and prunes dead references. Here's why it matters for multi-agent systems.",
-    date: "2026-05-01",
-    tags: ["Hermes", "AI Agents", "Skill Management", "Multi-Agent"],
-    readTime: "4 min",
-    editorial: true,
-    productSlug: "multi-agent-blueprint",
-    ctaHook: "The dispatch pattern, skill architecture, and reference implementations for building your own self-maintaining agent system.",
-    content: `
-Nous Research just shipped Hermes Agent v0.12.0, and the headline feature solves a problem every multi-agent operator hits eventually: skill rot.
-
-## The Problem
-
-Hermes agents learn by creating skills. Every time an agent figures out how to do something new, it writes a skill file. Over weeks of operation, the skill library grows. And grows. And never shrinks.
-
-We run Hermes as part of our agent swarm at Edgeless. Before this release, our primary Hermes instance had accumulated 91 skills. Some were redundant. Some referenced patterns we'd deprecated months ago. Some existed because two agents independently learned the same thing and wrote separate skills for it. The skill metadata alone was consuming thousands of tokens per conversation, eating into useful context window for actual work.
-
-There was no cleanup mechanism. Skills were write-only.
-
-## What Curator Does
-
-Curator is an autonomous background agent that runs on Hermes's cron scheduler. By default it cycles every 7 days. It does three things:
-
-**1. Staleness detection.** Skills unused for 30 days get flagged as stale. Skills inactive for 90 days get archived. Archived skills are recoverable, not deleted.
-
-**2. Consolidation.** When Curator finds overlapping skills (two skills that do roughly the same thing), it merges them. The result is one cleaner skill instead of two mediocre ones.
-
-**3. Pruning.** Skills that reference deprecated tools, dead APIs, or patterns that no longer apply get archived with a classification of why.
-
-Each run produces a structured report (\`logs/curator/run.json\`) and a human-readable summary (\`REPORT.md\`).
-
-## Safety
-
-The obvious concern: what if Curator archives something important?
-
-Nous built defense-in-depth:
-- **Bundled skills** (shipped with Hermes) are never touched
-- **Hub-installed skills** (from the Hermes skill marketplace) are exempt
-- **Pinned skills** \\u2014 you can pin any skill to block Curator from modifying it
-- **Archive-only** \\u2014 nothing is deleted, everything is recoverable
-- Curator only touches agent-created skills
-
-## Why This Matters for Multi-Agent Systems
-
-If you run one agent, skill rot is manageable. You can manually audit the skill list occasionally. But if you run a swarm \\u2014 where multiple agents create skills independently, where worker-pull jobs generate context-specific skills, where the self-improvement loop is constantly iterating \\u2014 the skill library becomes a coordination problem.
-
-Without Curator, you get:
-- Token waste from bloated skill metadata in every conversation
-- Routing confusion when multiple skills claim to handle the same task
-- Stale skills that point agents toward deprecated patterns
-
-With Curator, the skill lifecycle is closed: create, use, maintain, consolidate, archive. The library stays lean.
-
-## CLI
-
-Two commands:
-
-\`\`\`
-hermes curator run      # Run a maintenance cycle manually
-hermes curator status   # See skill rankings (most/least used)
-\`\`\`
-
-Configuration lives under \`auxiliary.curator\` in the Hermes config. The Curator model is selectable separately from the primary agent model, so you can run it on a cheaper model.
-
-## What Else Shipped in v0.12.0
-
-The Curator was the headline, but v0.12.0 also included:
-- Rubric-based self-improvement (replacing free-form review)
-- New inference providers
-- Native Spotify and Google Meet integrations
-- 57% reduction in TUI cold start time
-
-## Our Take
-
-We've been running Hermes since v0.6.0. The skill accumulation problem was real \\u2014 we'd periodically do manual audits of the skill directory, which is exactly the kind of toil that agents should handle. Curator formalizes what we were doing by hand.
-
-We'll be enabling it on our production Hermes instance and reporting back on the first few cycles. The 30/90 day staleness windows feel right for our usage patterns, but we'll tune if needed.
-
----
-
-*Edgeless Labs builds autonomous creative infrastructure. We run Hermes as part of our multi-agent swarm for intake, research, and knowledge operations.*
     `.trim(),
   },
   {

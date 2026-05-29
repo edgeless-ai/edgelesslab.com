@@ -1,0 +1,33 @@
+# Memory injection feature flags
+# Each agent can have injection enabled/disabled with per-agent token caps
+# Mode: "off" = no injection, "shadow" = log only, "active" = inject into prompts
+
+defaults:
+  mode: "shadow"
+  max_tokens: 1500
+  min_tier: "decision"          # Only inject decision/lesson/policy (never raw observations)
+  max_age_hours: 168            # 7 days
+  citation_format: "[Memory: {source_agent}, {date}, tier={tier}]"
+
+agents:
+  hive:
+    mode: "shadow"
+    max_tokens: 2000
+  beau:
+    mode: "shadow"
+    max_tokens: 1500
+  scribe:
+    mode: "shadow"
+    max_tokens: 1500
+  trader:
+    mode: "shadow"
+    max_tokens: 1000
+  edgeless-cc:
+    mode: "shadow"
+    max_tokens: 2000
+
+# Task-type overrides (agent.task_type combination)
+task_overrides:
+  # Example: give trading tasks less memory context
+  # trader.execute: { max_tokens: 500 }
+  # hive.coordinate: { max_tokens: 2500 }

@@ -1,0 +1,32 @@
+{
+  "defaults": {
+    "mode": "shadow",
+    "max_tokens": 1500,
+    "min_tier": "decision",
+    "max_age_hours": 168,
+    "citation_format": "[Memory: {source_agent}, {date}, tier={tier}]"
+  },
+  "agents": {
+    "hive": {
+      "mode": "shadow",
+      "max_tokens": 2000
+    },
+    "beau": {
+      "mode": "shadow",
+      "max_tokens": 1500
+    },
+    "scribe": {
+      "mode": "shadow",
+      "max_tokens": 1500
+    },
+    "trader": {
+      "mode": "shadow",
+      "max_tokens": 1000
+    },
+    "edgeless-cc": {
+      "mode": "shadow",
+      "max_tokens": 2000
+    }
+  },
+  "task_overrides": {}
+}

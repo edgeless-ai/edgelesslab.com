@@ -70,3 +70,23 @@ scripts.youtube_notebooklm_integration
 scripts.youtube_oauth_refresh
 scripts.youtube_oauth_setup
 scripts.lib.karpathy_loop
+
+# === src.kernel.shared_memory (working memory subsystem) ===
+src.kernel.shared_memory.working_memory
+src.kernel.shared_memory.shadow_retrieval
+src.kernel.shared_memory.context_injection
+
+# === scripts (swarm working memory CLI) ===
+scripts.swarm_memory
+scripts.shadow_retrieval
+scripts.injection_gate
+
+# === scripts.hooks (hook scripts) ===
+scripts.hooks.shadow_preflight_hook
+
+# === scripts.lib (session digest extractor) ===
+scripts.lib.session_digest_extractor
+
+# === scripts.cron (cron jobs with underscore names - importable) ===
+scripts.cron.weekly_learning_report
+scripts.cron.connection_miner

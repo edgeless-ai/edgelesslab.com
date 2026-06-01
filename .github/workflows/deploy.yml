@@ -23,7 +23,6 @@ jobs:
       - name: Remove non-deployable content
         run: |
           rm -rf src node_modules .github
-          rm -rf pen-plotter/assets/medium pen-plotter/assets/mediums-all pen-plotter/assets/thumbs-full
 
       - uses: actions/upload-pages-artifact@v3
         with:

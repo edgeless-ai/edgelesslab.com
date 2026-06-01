@@ -11,6 +11,7 @@ import {
 import { ArrowUpRight, ChevronDown } from "lucide-react";
 import { usePreText } from "@/hooks/use-pretext";
 import { PreTextMasonry } from "@/components/ui/pretext-masonry";
+import { GumroadButton } from "@/components/gumroad-button";
 import type { Product } from "@/lib/data";
 
 /** Fixed-height zones in each card (px). */
@@ -412,7 +413,7 @@ function ProductCard({
           e.stopPropagation();
           onToggle();
         }}
-        className="flex items-center gap-1.5 text-xs font-mono mb-2 transition-colors hover:text-[var(--text-primary)]"
+        className="flex items-center gap-1.5 text-xs font-mono mb-2 transition-colors hover:text-white"
         style={{ color: "var(--text-tertiary)" }}
       >
         <ChevronDown
@@ -481,7 +482,7 @@ function ProductCard({
       ) : product.slug ? (
         <a
           href={`/products/${product.slug}`}
-          className="flex items-center gap-1 text-sm font-medium hover:text-[var(--text-primary)] transition-colors mt-auto pt-2"
+          className="flex items-center gap-1 text-sm font-medium hover:text-white transition-colors mt-auto pt-2"
           style={{ color: "var(--text-secondary)" }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -489,19 +490,13 @@ function ProductCard({
           <ArrowUpRight size={14} />
         </a>
       ) : (
-        <a
+        <GumroadButton
           href={product.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1 text-sm font-medium hover:text-[var(--text-primary)] transition-colors mt-auto pt-2"
+          price={product.price}
+          productName={product.name}
+          className="flex items-center gap-1 text-sm font-medium hover:text-white transition-colors mt-auto pt-2"
           style={{ color: "var(--text-secondary)" }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {product.price === "Free"
-            ? "Get it free on GitHub"
-            : `Buy now \u2014 ${product.price}`}
-          <ArrowUpRight size={14} />
-        </a>
+        />
       )}
     </div>
   );

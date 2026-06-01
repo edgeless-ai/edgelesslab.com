@@ -7,6 +7,16 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },
+  turbopack: {},
+  webpack: (config) => {
+    // Tree-shake unused exports
+    config.optimization = {
+      ...config.optimization,
+      usedExports: true,
+      sideEffects: true,
+    };
+    return config;
+  },
 };
 
 export default nextConfig;

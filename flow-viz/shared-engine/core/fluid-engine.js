@@ -50,19 +50,28 @@ class FluidEngine extends Plugin {
 
   initGraphics() {
     const c = this.config;
-    // p5.Graphics.colorMode requires the p5 constant, not a string
-    const mode = { hsb: HSB, hsl: HSL, rgb: RGB }[c.engine.colorMode.toLowerCase()] || RGB;
-    const ranges = c.engine.colorRanges;
-
+    
     // Create trail layer
     if (c.trails.enabled) {
       this.trailLayer = createGraphics(width, height);
-      this.trailLayer.colorMode(mode, ranges.h, ranges.s, ranges.b, ranges.a);
+      this.trailLayer.colorMode(
+        c.engine.colorMode,
+        c.engine.colorRanges.h,
+        c.engine.colorRanges.s,
+        c.engine.colorRanges.b,
+        c.engine.colorRanges.a
+      );
       this.applyBackground(this.trailLayer);
     }
-
+    
     // Set main canvas color mode
-    colorMode(mode, ranges.h, ranges.s, ranges.b, ranges.a);
+    colorMode(
+      c.engine.colorMode,
+      c.engine.colorRanges.h,
+      c.engine.colorRanges.s,
+      c.engine.colorRanges.b,
+      c.engine.colorRanges.a
+    );
   }
 
   onDataUpdated(data) {

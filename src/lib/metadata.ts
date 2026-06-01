@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 const SITE_URL = "https://edgelesslab.com";
 const SITE_NAME = "Edgeless Lab";
-const OG_IMAGE = "/og-image.png";
+const OG_IMAGE = "/og-image.webp";
 
 type PageMetadataOptions = {
   title: string;

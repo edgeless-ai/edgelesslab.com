@@ -36,7 +36,6 @@ export default function ProductsPage() {
         })),
       }} />
 
-      <main id="main-content">
       <section className="pt-32 pb-20 px-6">
         <div className="max-w-[1080px] mx-auto">
           <div
@@ -51,7 +50,7 @@ export default function ProductsPage() {
               style={{ background: "var(--accent)" }}
             />
             <span
-              className="text-small font-mono uppercase tracking-[0.14em]"
+              className="text-[11px] font-mono uppercase tracking-[0.14em]"
               style={{ color: "var(--accent)" }}
             >
               On Gumroad &middot; {products.filter(p => !p.comingSoon).length} live
@@ -85,7 +84,7 @@ export default function ProductsPage() {
               Start free with Claude Memory Kit
             </a>
             <span
-              className="text-small font-mono"
+              className="text-[11px] font-mono"
               style={{ color: "var(--text-tertiary)" }}
             >
               all free &middot; instant download
@@ -95,7 +94,6 @@ export default function ProductsPage() {
           <ProductsGrid products={products} />
         </div>
       </section>
-      </main>
 
       <Footer />
     </div>

@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { products } from "@/lib/data";
 import { productContent } from "@/lib/product-content";
 import { posts } from "@/lib/blog";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
+import { GumroadButton } from "@/components/gumroad-button";
+import { StripeButton } from "@/components/stripe-button";
 
 const SITE = "https://edgelesslab.com";
 
@@ -38,7 +40,7 @@ export async function generateMetadata({
 
   const fullTitle = `${product.name} (${product.price}) | Edgeless Lab`;
   const url = `${SITE}/products/${slug}`;
-  const image = `${SITE}/product-covers/${slug}.png`;
+  const image = `${SITE}/product-covers/${slug}.webp`;
 
   return {
     title: { absolute: fullTitle },
@@ -111,12 +113,11 @@ export default async function ProductDetailPage({
         }}
       />
 
-      <main id="main-content">
       <article className="pt-28 pb-20 px-6">
         <div className="max-w-[1080px] mx-auto">
           <Link
             href="/products"
-            className="inline-flex items-center gap-1.5 text-sm mb-8 transition-colors hover:text-[var(--text-primary)]"
+            className="inline-flex items-center gap-1.5 text-sm mb-8 transition-colors hover:text-white"
             style={{ color: "var(--text-tertiary)" }}
           >
             <ArrowLeft size={14} /> All products
@@ -169,18 +170,30 @@ export default async function ProductDetailPage({
                 >
                   {content.callToAction}
                 </p>
-                <a
-                  href={product.href}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-md font-medium transition-colors hover:opacity-90"
-                  style={{ background: "var(--accent)", color: "var(--bg-base)" }}
-                >
-                  Get it free on Gumroad <ArrowUpRight size={16} />
-                </a>
+                {slug === "agent-starter-kit" ? (
+                  <StripeButton
+                    href={product.href}
+                    price={product.price}
+                    productName={product.name}
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-md font-medium transition-colors hover:opacity-90"
+                    style={{ background: "var(--accent)", color: "var(--bg-base)" }}
+                    icon
+                  />
+                ) : (
+                  <GumroadButton
+                    href={product.href}
+                    price={product.price}
+                    productName={product.name}
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-md font-medium transition-colors hover:opacity-90"
+                    style={{ background: "var(--accent)", color: "var(--bg-base)" }}
+                    icon
+                  />
+                )}
                 <span
                   className="ml-3 text-xs font-mono"
                   style={{ color: "var(--text-tertiary)" }}
                 >
-                  Free &middot; instant download
+                  {product.price === "Free" ? "Free \u00b7 instant download" : `${product.price} \u00b7 instant download`}
                 </span>
               </div>
             </div>
@@ -192,13 +205,21 @@ export default async function ProductDetailPage({
                 style={{ background: "var(--bg-surface)", borderColor: "var(--border-subtle)" }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/product-covers/${slug}.webp`}
-                  alt={`${product.name} cover`}
-                  width={1280}
-                  height={1280}
-                  className="w-full h-auto block"
-                />
+                <picture>
+                  <source
+                    srcSet={`/product-covers/${slug}.webp`}
+                    type="image/webp"
+                  />
+                  <img
+                    src={`/product-covers/${slug}.webp`}
+                    alt={`${product.name} cover`}
+                    width={1280}
+                    height={1280}
+                    className="w-full h-auto block"
+                    fetchPriority="high"
+                    decoding="async"
+                  />
+                </picture>
               </div>
 
               <div
@@ -215,7 +236,7 @@ export default async function ProductDetailPage({
                   {product.features.map((feature) => (
                     <li
                       key={feature}
-                      className="text-detail"
+                      className="text-[13px]"
                       style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
                     >
                       &mdash; {feature}
@@ -237,13 +258,13 @@ export default async function ProductDetailPage({
                   </h2>
                   <Link
                     href={`/blog/${companionPost.slug}`}
-                    className="text-body-sm font-medium hover:text-[var(--text-primary)] transition-colors block"
+                    className="text-[14px] font-medium hover:text-white transition-colors block"
                     style={{ color: "var(--text-primary)" }}
                   >
                     {companionPost.title}
                   </Link>
                   <p
-                    className="text-caption mt-2"
+                    className="text-[12px] mt-2"
                     style={{ color: "var(--text-tertiary)", lineHeight: 1.5 }}
                   >
                     {companionPost.description}
@@ -254,7 +275,6 @@ export default async function ProductDetailPage({
           </div>
         </div>
       </article>
-      </main>
 
       <Footer />
     </div>

@@ -26,7 +26,6 @@ export default function KnowledgePage() {
     >
       <Nav />
 
-      <main id="main-content">
       <section className="px-6 pt-40 pb-12">
         <div className="max-w-[1280px] mx-auto">
           <div className="flex items-center gap-2.5 mb-6">
@@ -63,7 +62,6 @@ export default function KnowledgePage() {
           <KnowledgeExplorer />
         </div>
       </section>
-      </main>
 
       <Footer />
     </div>

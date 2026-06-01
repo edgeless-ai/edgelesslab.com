@@ -16,7 +16,7 @@ export function GlowingCard({
 }: GlowingCardProps) {
   const content = (
     <div
-      className={`group relative overflow-hidden border p-8 transition-all duration-200 hover:scale-[1.01] texture-dots ${className}`}
+      className={`group relative overflow-hidden rounded-2xl border p-8 transition-all duration-200 hover:scale-[1.01] ${className}`}
       style={{
         background: "var(--bg-surface)",
         borderColor: "var(--border-subtle)",
@@ -24,7 +24,7 @@ export function GlowingCard({
     >
       {/* Glow effect on hover */}
       <div
-        className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
           background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${glowColor}10, transparent 40%)`,
         }}

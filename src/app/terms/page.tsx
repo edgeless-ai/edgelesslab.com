@@ -16,19 +16,18 @@ export default function TermsOfService() {
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
       <Nav />
 
-      <main id="main-content">
       <section className="px-6 pt-32 pb-20">
         <div className="max-w-[1280px] mx-auto">
           <Link
             href="/"
-            className="inline-block text-detail mb-8 transition-colors"
+            className="inline-block text-[13px] mb-8 transition-colors"
             style={{ color: "var(--text-tertiary)" }}
           >
             &larr; Edgeless Lab
           </Link>
 
           <h1
-            className="text-3xl font-bold tracking-tight mb-2"
+            className="text-[32px] font-bold tracking-tight mb-2"
             style={{ color: "var(--text-primary)" }}
           >
             Terms of Service
@@ -153,7 +152,6 @@ export default function TermsOfService() {
           </div>
         </div>
       </section>
-      </main>
 
       <Footer />
     </div>

@@ -56,7 +56,6 @@ export default function About() {
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
       <Nav />
 
-      <main id="main-content">
       <section className="px-6 pt-32 pb-20">
         <div className="max-w-[1280px] mx-auto">
           <AboutHeader />
@@ -92,7 +91,6 @@ export default function About() {
           <ConnectGrid links={links} />
         </div>
       </section>
-      </main>
 
       <Footer />
     </div>

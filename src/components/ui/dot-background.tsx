@@ -4,6 +4,7 @@
  * Animated gradient orb background with grid lines.
  * Pure CSS animation -- no JS tick loop.
  */
+// Keyframes moved to globals.css to avoid duplicate <style> injection per mount.
 export function DotBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -32,16 +33,6 @@ export function DotBackground() {
           animation: "orbPulseGreen 12s ease-in-out 3s infinite",
         }}
       />
-      <style>{`
-        @keyframes orbPulse {
-          0%, 100% { opacity: 0.2; transform: translateX(-50%) translateY(-33.333%) scale(1); }
-          50% { opacity: 0.28; transform: translateX(-50%) translateY(-33.333%) scale(1.08); }
-        }
-        @keyframes orbPulseGreen {
-          0%, 100% { opacity: 0.1; transform: translateX(25%) scale(1); }
-          50% { opacity: 0.18; transform: translateX(25%) scale(1.12); }
-        }
-      `}</style>
     </div>
   );
 }

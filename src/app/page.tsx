@@ -11,7 +11,6 @@ import {
   AboutBlurb,
   SubscribeSection,
 } from "@/components/home-client";
-import { RecentlyShipped } from "@/components/recently-shipped";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
@@ -105,50 +104,19 @@ export default function Home() {
         {/* Hero */}
         <HeroSection />
 
-        {/* Recently Shipped (agent-populated widget) */}
-        <section className="px-6 py-12 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+        {/* Recent Activity (chronological stream) */}
+        <section className="px-6 py-16 border-t" style={{ borderColor: "var(--border-subtle)" }}>
           <div className="max-w-[920px] mx-auto">
             <div className="flex items-baseline justify-between mb-6">
               <h2
                 className="text-sm font-mono uppercase tracking-[0.15em]"
                 style={{ color: "var(--text-tertiary)" }}
               >
-                Recently shipped
-              </h2>
-              <span
-                className="text-small font-mono flex items-center gap-1.5"
-                style={{ color: "var(--green)" }}
-              >
-                <span className="relative flex h-1.5 w-1.5">
-                  <span
-                    className="absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping"
-                    style={{ background: "var(--green)" }}
-                  />
-                  <span
-                    className="relative inline-flex h-1.5 w-1.5 rounded-full"
-                    style={{ background: "var(--green)" }}
-                  />
-                </span>
-                Live from Paperclip
-              </span>
-            </div>
-            <RecentlyShipped />
-          </div>
-        </section>
-
-        {/* Recent Activity (chronological stream) */}
-        <section className="px-6 py-16 border-t" style={{ borderColor: "var(--border-subtle)" }}>
-          <div className="max-w-[920px] mx-auto">
-            <div className="flex items-baseline justify-between mb-6">
-              <h2
-                className="text-sm font-mono tracking-[0.08em]"
-                style={{ color: "var(--phosphor)" }}
-              >
-                $ recent_activity
+                Recent activity
               </h2>
               <Link
                 href="/blog"
-                className="text-sm flex items-center gap-1 transition-colors hover:text-[var(--text-primary)]"
+                className="text-sm flex items-center gap-1 transition-colors hover:text-white"
                 style={{ color: "var(--text-secondary)" }}
               >
                 Full feed <ArrowRight size={13} />
@@ -165,14 +133,14 @@ export default function Home() {
             <div className="max-w-[1280px] mx-auto">
               <div className="flex items-baseline justify-between mb-10">
                 <h2
-                  className="text-sm font-mono tracking-[0.08em]"
-                  style={{ color: "var(--phosphor)" }}
+                  className="text-sm font-mono uppercase tracking-[0.15em]"
+                  style={{ color: "var(--text-tertiary)" }}
                 >
-                  $ featured
+                  Featured
                 </h2>
                 <Link
                   href="/projects"
-                  className="text-sm flex items-center gap-1 transition-colors hover:text-[var(--text-primary)]"
+                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
                   style={{ color: "var(--text-secondary)" }}
                 >
                   All projects <ArrowRight size={13} />
@@ -192,10 +160,10 @@ export default function Home() {
           <ScrollReveal>
             <div className="max-w-[1280px] mx-auto">
               <h2
-                className="text-sm font-mono tracking-[0.08em] mb-10"
-                style={{ color: "var(--phosphor)" }}
+                className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
+                style={{ color: "var(--text-tertiary)" }}
               >
-                $ infrastructure
+                Infrastructure
               </h2>
 
               <CapabilitiesGrid capabilities={capabilities} />
@@ -208,10 +176,10 @@ export default function Home() {
           <ScrollReveal>
             <div className="max-w-[1280px] mx-auto">
               <h2
-                className="text-sm font-mono tracking-[0.08em] mb-10"
-                style={{ color: "var(--phosphor)" }}
+                className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
+                style={{ color: "var(--text-tertiary)" }}
               >
-                $ stack
+                Stack
               </h2>
 
               <StackFlow nodes={stackNodes} />
@@ -225,14 +193,14 @@ export default function Home() {
             <div className="max-w-[1280px] mx-auto">
               <div className="flex items-baseline justify-between mb-10">
                 <h2
-                  className="text-sm font-mono tracking-[0.08em]"
-                  style={{ color: "var(--phosphor)" }}
+                  className="text-sm font-mono uppercase tracking-[0.15em]"
+                  style={{ color: "var(--text-tertiary)" }}
                 >
-                  $ lab
+                  Lab
                 </h2>
                 <Link
                   href="/lab"
-                  className="text-sm flex items-center gap-1 transition-colors hover:text-[var(--text-primary)]"
+                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
                   style={{ color: "var(--text-secondary)" }}
                 >
                   All experiments <ArrowRight size={13} />
@@ -250,14 +218,14 @@ export default function Home() {
             <div className="max-w-[1280px] mx-auto">
               <div className="flex items-baseline justify-between mb-10">
                 <h2
-                  className="text-sm font-mono tracking-[0.08em]"
-                  style={{ color: "var(--phosphor)" }}
+                  className="text-sm font-mono uppercase tracking-[0.15em]"
+                  style={{ color: "var(--text-tertiary)" }}
                 >
-                  $ products
+                  Products
                 </h2>
                 <Link
                   href="/products"
-                  className="text-sm flex items-center gap-1 transition-colors hover:text-[var(--text-primary)]"
+                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
                   style={{ color: "var(--text-secondary)" }}
                 >
                   All products <ArrowRight size={13} />

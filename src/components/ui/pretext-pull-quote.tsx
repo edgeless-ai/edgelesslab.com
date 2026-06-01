@@ -63,33 +63,12 @@ export function EditorialBlock({
     const maxWidth = containerRef.current.clientWidth;
     if (maxWidth === 0) return;
 
+    // Pull quotes use hardcoded yOffset which overlaps body text.
+    // Fix: position pull quotes AFTER body text ends, stacked vertically.
     const allLines: typeof renderedLines = [];
     let y = 0;
 
-    // Lay out pull quotes first to determine their geometry
-    const quoteRects: Array<Obstacle & { side: string; lines: string[] }> = [];
-
-    for (const pq of pullQuotes) {
-      const qWidth = pq.width ?? Math.min(maxWidth * 0.4, 280);
-      const prepared = prepareWithSegments(pq.text, quoteFont);
-      if (!prepared) continue;
-
-      const result = layoutWithLines(prepared, qWidth, quoteLineHeight);
-      if (!result) continue;
-      const qHeight = result.height + 32;
-
-      const qX = pq.side === "right" ? maxWidth - qWidth : 0;
-      quoteRects.push({
-        x: qX,
-        y: pq.yOffset,
-        width: qWidth + 24,
-        height: qHeight,
-        side: pq.side,
-        lines: result.lines.map((l) => l.text.trimEnd()),
-      });
-    }
-
-    // Lay out body paragraphs with obstacle awareness
+    // Lay out body paragraphs first (no obstacle awareness needed)
     for (let pi = 0; pi < paragraphs.length; pi++) {
       if (pi > 0) y += paragraphGap;
 
@@ -101,35 +80,16 @@ export function EditorialBlock({
       let safetyCounter = 0;
 
       while (safetyCounter++ < 500) {
-        let availableWidth = maxWidth;
-        let indent = 0;
-
-        for (const qr of quoteRects) {
-          if (y + lineHeight > qr.y && y < qr.y + qr.height) {
-            if (qr.side === "left") {
-              const thisIndent = qr.width;
-              if (thisIndent > indent) {
-                indent = thisIndent;
-                availableWidth = maxWidth - indent;
-              }
-            } else {
-              availableWidth = Math.min(availableWidth, qr.x - 24);
-            }
-          }
-        }
-
-        availableWidth = Math.max(availableWidth, 80);
-
         const prevSeg = cursor.segmentIndex;
         const prevGr = cursor.graphemeIndex;
 
-        const line = layoutNextLine(prepared, cursor, availableWidth);
+        const line = layoutNextLine(prepared, cursor, maxWidth);
         if (!line) break;
 
         allLines.push({
           text: line.text.trimEnd(),
           y,
-          indent,
+          indent: 0,
           isPullQuote: false,
         });
 
@@ -140,30 +100,37 @@ export function EditorialBlock({
       }
     }
 
-    // Add pull quote lines
-    for (const qr of quoteRects) {
-      let qy = qr.y + 16;
-      for (const qline of qr.lines) {
+    // Stack pull quotes after body text with gap
+    if (pullQuotes.length > 0) {
+      y += 16; // gap after body text
+    }
+
+    for (const pq of pullQuotes) {
+      const qWidth = pq.width ?? Math.min(maxWidth * 0.4, 280);
+      const prepared = prepareWithSegments(pq.text, quoteFont);
+      if (!prepared) continue;
+
+      const result = layoutWithLines(prepared, qWidth, quoteLineHeight);
+      if (!result) continue;
+
+      const qX = pq.side === "right" ? maxWidth - qWidth : 0;
+      let qy = y + 16;
+
+      for (const qline of result.lines.map((l) => l.text.trimEnd())) {
         allLines.push({
           text: qline,
           y: qy,
-          indent: qr.side === "right" ? qr.x : 0,
+          indent: qX,
           isPullQuote: true,
         });
         qy += quoteLineHeight;
       }
+
+      y = qy + 16; // gap before next quote
     }
 
-    allLines.sort((a, b) => a.y - b.y);
-
-    // Total height includes pull quotes that may extend below body text
-    const maxQuoteBottom = quoteRects.reduce(
-      (max, qr) => Math.max(max, qr.y + qr.height),
-      0
-    );
-
     setRenderedLines(allLines);
-    setTotalHeight(Math.max(y, maxQuoteBottom));
+    setTotalHeight(y);
   }, [
     ready,
     paragraphs,

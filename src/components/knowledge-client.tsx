@@ -59,7 +59,7 @@ export function KnowledgeExplorer() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by title, topic, or tag..."
-          className="w-full h-11 pl-11 pr-10 text-sm rounded-xl border outline-none transition-colors focus:border-[var(--border-hover)]"
+          className="w-full h-11 pl-11 pr-10 text-sm rounded-xl border outline-none transition-colors focus:border-white/20"
           style={{
             background: "var(--bg-surface)",
             borderColor: "var(--border-subtle)",
@@ -70,7 +70,7 @@ export function KnowledgeExplorer() {
           <button
             type="button"
             onClick={() => setQuery("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md transition-colors hover:bg-[var(--dot-subtle)]"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md transition-colors hover:bg-white/10"
             style={{ color: "var(--text-tertiary)" }}
             aria-label="Clear search"
           >
@@ -134,7 +134,7 @@ export function KnowledgeExplorer() {
             return (
               <article
                 key={entry.id}
-                className="rounded-xl border p-5 flex flex-col transition-colors hover:border-[var(--border-hover)]"
+                className="rounded-xl border p-5 flex flex-col transition-colors hover:border-white/15"
                 style={{
                   background: "var(--bg-surface)",
                   borderColor: "var(--border-subtle)",
@@ -144,14 +144,14 @@ export function KnowledgeExplorer() {
                 {/* Header: source badge + date */}
                 <div className="flex items-center justify-between mb-3">
                   <span
-                    className="text-label font-mono uppercase tracking-[0.12em] px-2 py-0.5 rounded"
+                    className="text-[10px] font-mono uppercase tracking-[0.12em] px-2 py-0.5 rounded"
                     style={{ background: colors.bg, color: colors.text }}
                   >
                     {entry.source}
                   </span>
                   {entry.date && (
                     <span
-                      className="text-small font-mono"
+                      className="text-[11px] font-mono"
                       style={{ color: "var(--text-tertiary)" }}
                     >
                       {entry.date}
@@ -182,7 +182,7 @@ export function KnowledgeExplorer() {
                       key={tag}
                       type="button"
                       onClick={() => setQuery(tag)}
-                      className="text-label font-mono px-1.5 py-0.5 rounded transition-colors hover:bg-[var(--dot-subtle)] cursor-pointer"
+                      className="text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors hover:bg-white/10 cursor-pointer"
                       style={{
                         background: "rgba(255,255,255,0.05)",
                         color: "var(--text-tertiary)",

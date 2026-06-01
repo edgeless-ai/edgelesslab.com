@@ -23,25 +23,34 @@ const HERO_SUBTITLE =
 
 export function HeroSection() {
   return (
-    <section className="relative flex min-h-[92svh] items-center px-6 pb-16 pt-28 md:min-h-screen md:items-end md:pb-24 md:pt-32 texture-grain texture-scanlines overflow-hidden">
+    <section className="relative flex min-h-[92svh] items-center px-6 pb-16 pt-28 md:min-h-screen md:items-end md:pb-24 md:pt-32">
       <GenerativeHeroBackground />
       <div className="relative max-w-[1280px] w-full mx-auto grid grid-cols-1 gap-12 lg:grid-cols-[1.25fr_1fr] lg:items-end">
         {/* Left column: headline + supporting copy */}
         <div className="min-w-0">
           <AnimatedFadeIn>
             <div
-              className="inline-flex items-center gap-2 mb-8 px-3 py-1.5 border"
+              className="inline-flex items-center gap-2.5 mb-8 px-3 py-1.5 rounded-full border"
               style={{
-                borderColor: "rgba(57, 255, 20, 0.2)",
-                background: "rgba(57, 255, 20, 0.04)",
-                borderRadius: 0,
+                borderColor: "rgba(52, 211, 153, 0.25)",
+                background: "rgba(52, 211, 153, 0.06)",
               }}
             >
+              <span className="relative flex h-2 w-2">
+                <span
+                  className="absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping"
+                  style={{ background: "var(--green)" }}
+                />
+                <span
+                  className="relative inline-flex h-2 w-2 rounded-full"
+                  style={{ background: "var(--green)" }}
+                />
+              </span>
               <span
-                className="text-small font-mono uppercase tracking-[0.14em]"
-                style={{ color: "var(--phosphor)" }}
+                className="text-[11px] font-mono uppercase tracking-[0.14em]"
+                style={{ color: "var(--green)" }}
               >
-                [SYS] 18 products online &middot; shipping daily
+                Shipping daily &middot; Live now
               </span>
             </div>
           </AnimatedFadeIn>
@@ -77,7 +86,7 @@ export function HeroSection() {
 
           <AnimatedFadeIn delay={0.85}>
             <div
-              className="mt-8 flex items-center gap-2.5 max-w-xl text-caption font-mono"
+              className="mt-8 flex items-center gap-2.5 max-w-xl text-[12px] font-mono"
               style={{ color: "var(--text-tertiary)" }}
             >
               <span
@@ -90,7 +99,7 @@ export function HeroSection() {
                 Shipping{" "}
                 <Link
                   href="/products/launch-toolkit"
-                  className="underline-offset-2 hover:underline transition-colors hover:text-[var(--text-primary)]"
+                  className="underline-offset-2 hover:underline transition-colors hover:text-white"
                   style={{ color: "var(--text-secondary)" }}
                 >
                   Digital Product Launch Toolkit
@@ -105,7 +114,7 @@ export function HeroSection() {
               <Link
                 href="/products"
                 className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
-                style={{ background: "var(--accent-solid)" }}
+                style={{ background: "var(--accent)" }}
                 onClick={() => trackCTA("hero_view_products", "/products")}
               >
                 18 free products <ArrowRight size={15} />
@@ -123,7 +132,7 @@ export function HeroSection() {
               </Link>
               <a
                 href="https://github.com/edgeless-ai"
-                className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-[var(--text-primary)]"
+                className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-white"
                 style={{ color: "var(--text-secondary)" }}
               >
                 GitHub <ArrowUpRight size={14} />
@@ -145,15 +154,6 @@ export function HeroSection() {
 
 /* ── Recent Activity (Simon Willison-style chronological stream) ─── */
 
-interface ActivityItem {
-  id: string;
-  type: "post" | "launch" | "ship" | "wip";
-  title: string;
-  date: string;
-  href: string;
-  agent?: string;
-}
-
 function formatRelative(dateStr: string): string {
   const then = new Date(dateStr).getTime();
   const now = Date.now();
@@ -165,80 +165,20 @@ function formatRelative(dateStr: string): string {
   return `${Math.floor(days / 365)}y ago`;
 }
 
-function badgeStyle(type: ActivityItem["type"]) {
-  switch (type) {
-    case "launch":
-      return { background: "var(--accent-muted)", color: "var(--accent)" };
-    case "ship":
-      return { background: "var(--green-muted)", color: "var(--green)" };
-    case "wip":
-      return { background: "var(--accent-muted)", color: "var(--accent)" };
-    default:
-      return { background: "var(--bg-surface)", color: "var(--text-tertiary)" };
-  }
-}
-
-function badgeLabel(type: ActivityItem["type"]) {
-  switch (type) {
-    case "launch": return "launch";
-    case "ship": return "ship";
-    case "wip": return "wip";
-    default: return "post";
-  }
-}
-
 export function RecentActivity() {
-  const [items, setItems] = useState<ActivityItem[]>([]);
-
-  useEffect(() => {
-    // Merge static blog posts with live agent activity feed
-    const blogItems: ActivityItem[] = [...posts]
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .map((post) => ({
-        id: post.slug,
-        type: post.isLaunch ? ("launch" as const) : ("post" as const),
-        title: post.title,
-        date: post.date,
-        href: `/blog/${post.slug}`,
-      }));
-
-    // Fetch live agent activity from the generated feed
-    fetch("/site-activity.json")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((feed) => {
-        if (!feed?.items) {
-          setItems(blogItems.slice(0, 8));
-          return;
-        }
-        const agentItems: ActivityItem[] = feed.items.map((a: any) => ({
-          id: a.id,
-          type: a.type === "ship" ? ("ship" as const) : ("wip" as const),
-          title: a.title,
-          date: a.date,
-          href: `/blog`, // Agent activity links to blog feed as fallback
-          agent: a.agent,
-        }));
-
-        // Merge, dedupe, sort by date desc, take top 10
-        const merged = [...agentItems, ...blogItems]
-          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-          .filter((item, idx, arr) => arr.findIndex((x) => x.id === item.id) === idx)
-          .slice(0, 10);
-
-        setItems(merged);
-      })
-      .catch(() => {
-        setItems(blogItems.slice(0, 8));
-      });
-  }, []);
+  // Take the 8 most recent blog posts. Each post that has a productSlug
+  // doubles as a product launch announcement.
+  const recent = [...posts]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 8);
 
   return (
     <ul className="divide-y" style={{ borderColor: "var(--border-subtle)" }}>
-      {items.map((item, i) => {
-        const style = badgeStyle(item.type);
+      {recent.map((post, i) => {
+        const isLaunch = Boolean(post.isLaunch);
         return (
           <li
-            key={item.id}
+            key={post.slug}
             style={{
               borderColor: "var(--border-subtle)",
               animation: `fadeInUp 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 0.05}s both`,
@@ -246,37 +186,36 @@ export function RecentActivity() {
             className="border-b first:border-t"
           >
             <Link
-              href={item.href}
+              href={`/blog/${post.slug}`}
               className="group grid grid-cols-[auto_auto_1fr_auto] items-center gap-4 py-4 px-1 transition-colors"
             >
               <span
-                className="text-small font-mono tabular-nums shrink-0 w-[68px]"
+                className="text-[11px] font-mono tabular-nums shrink-0 w-[68px]"
                 style={{ color: "var(--text-tertiary)" }}
               >
-                {item.date.slice(5, 10)}
+                {post.date.slice(5)}
               </span>
               <span
-                className="text-label font-mono uppercase tracking-[0.12em] px-2 py-0.5 rounded shrink-0"
+                className="text-[10px] font-mono uppercase tracking-[0.12em] px-2 py-0.5 rounded shrink-0"
                 style={{
-                  ...style,
+                  background: isLaunch ? "var(--accent-muted)" : "var(--bg-surface)",
+                  color: isLaunch ? "var(--accent)" : "var(--text-tertiary)",
                   border: "1px solid var(--border-subtle)",
                 }}
               >
-                {badgeLabel(item.type)}
+                {isLaunch ? "launch" : "post"}
               </span>
               <span
-                className="text-body-sm font-medium truncate transition-colors group-hover:text-[var(--text-primary)]"
+                className="text-[14px] font-medium truncate transition-colors group-hover:text-white"
                 style={{ color: "var(--text-primary)" }}
               >
-                {item.agent && item.type !== "post" && item.type !== "launch"
-                  ? `${item.agent}: ${item.title}`
-                  : item.title}
+                {post.title}
               </span>
               <span
-                className="text-small font-mono shrink-0 hidden sm:inline"
+                className="text-[11px] font-mono shrink-0 hidden sm:inline"
                 style={{ color: "var(--text-tertiary)" }}
               >
-                {formatRelative(item.date)}
+                {formatRelative(post.date)}
               </span>
             </Link>
           </li>
@@ -530,7 +469,7 @@ export function ExperimentsGrid({ experiments }: { experiments: Experiment[] }) 
             </span>
             {exp.status && (
               <span
-                className="text-label font-mono uppercase tracking-[0.1em] px-1.5 py-0.5 rounded"
+                className="text-[10px] font-mono uppercase tracking-[0.1em] px-1.5 py-0.5 rounded"
                 style={{
                   background: exp.status === "Live" ? "var(--green-muted)" : "var(--accent-muted)",
                   color: exp.status === "Live" ? "var(--green)" : "var(--accent)",
@@ -559,7 +498,7 @@ export function ExperimentsGrid({ experiments }: { experiments: Experiment[] }) 
               {exp.stack.map((tech) => (
                 <span
                   key={tech}
-                  className="text-label font-mono px-1.5 py-0.5 rounded"
+                  className="text-[10px] font-mono px-1.5 py-0.5 rounded"
                   style={{
                     background: "rgba(255,255,255,0.05)",
                     color: "var(--text-tertiary)",
@@ -598,7 +537,7 @@ export function ProductHighlight() {
           href={product.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="group block rounded-xl border p-5 transition-all hover:scale-[1.01] hover:border-[var(--border-hover)]"
+          className="group block rounded-xl border p-5 transition-all hover:scale-[1.01] hover:border-white/20"
           style={{
             background: "var(--bg-surface)",
             borderColor: "var(--border-subtle)",
@@ -635,7 +574,7 @@ export function ProductHighlight() {
       {free && (
         <Link
           href="/products/"
-          className="group block rounded-xl border p-5 transition-all hover:scale-[1.01] hover:border-[var(--border-hover)]"
+          className="group block rounded-xl border p-5 transition-all hover:scale-[1.01] hover:border-white/20"
           style={{
             background: "var(--bg-surface)",
             borderColor: "var(--border-subtle)",
@@ -719,7 +658,7 @@ export function AboutBlurb() {
       >
         <Link
           href="/about"
-          className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-[var(--text-primary)]"
+          className="text-sm font-medium flex items-center gap-1.5 transition-colors hover:text-white"
           style={{ color: "var(--accent)" }}
         >
           About the lab <ArrowRight size={14} />
@@ -771,8 +710,8 @@ export function SubscribeSection() {
               href="https://github.com/edgeless-ai"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
-              style={{ background: "var(--accent-solid)" }}
+              className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
+              style={{ background: "var(--accent)", color: "#1e1b4b" }}
             >
               GitHub <ArrowUpRight size={14} />
             </a>

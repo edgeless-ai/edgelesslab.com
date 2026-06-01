@@ -38,7 +38,7 @@ export async function generateMetadata({
       siteName: "Edgeless Lab",
       url: `https://edgelesslab.com/blog/${post.slug}`,
       images: [{
-        url: `/og-image.png`,
+        url: "/og-image.webp",
         width: 1200,
         height: 630,
         alt: post.title,
@@ -51,7 +51,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: fullTitle,
       description: post.description,
-      images: [`/og-image.png`],
+      images: ["/og-image.webp"],
     },
   };
 }
@@ -109,7 +109,6 @@ export default async function BlogPostPage({
         }}
       />
 
-      <main id="main-content">
       <article className="pt-28 pb-20 px-6">
         <div className={post.editorial ? "max-w-[960px] mx-auto" : "max-w-[680px] mx-auto"}>
           {/* Header */}
@@ -172,14 +171,14 @@ export default async function BlogPostPage({
                 return (
                   <a
                     href={product.href}
-                    className="block p-4 rounded-lg border transition-colors hover:border-[var(--border-hover)]"
+                    className="block p-4 rounded-lg border transition-colors hover:border-white/20"
                     style={{
                       background: "var(--bg-surface)",
                       borderColor: "var(--border-subtle)",
                     }}
                   >
                     <div
-                      className="text-label font-mono uppercase tracking-[0.12em] mb-2"
+                      className="text-[10px] font-mono uppercase tracking-[0.12em] mb-2"
                       style={{ color: "var(--accent)" }}
                     >
                       Companion
@@ -215,7 +214,7 @@ export default async function BlogPostPage({
             return (
               <a
                 href={product.href}
-                className="block mt-12 p-6 rounded-lg border transition-colors hover:border-[var(--border-hover)]"
+                className="block mt-12 p-6 rounded-lg border transition-colors hover:border-white/30"
                 style={{
                   background: "var(--accent-muted)",
                   borderColor: "var(--border-subtle)",
@@ -246,7 +245,7 @@ export default async function BlogPostPage({
           <div className="mt-12 pt-8 border-t" style={{ borderColor: "var(--border-subtle)" }}>
             <Link
               href="/blog"
-              className="text-sm font-medium transition-colors hover:text-[var(--text-primary)]"
+              className="text-sm font-medium transition-colors hover:text-white"
               style={{ color: "var(--text-secondary)" }}
             >
               &larr; All posts
@@ -254,7 +253,6 @@ export default async function BlogPostPage({
           </div>
         </div>
       </article>
-      </main>
 
       <Footer />
     </div>
@@ -381,24 +379,6 @@ function renderMarkdown(content: string): string {
       i++;
       continue;
     }
-    if (line.startsWith("# ")) {
-      blocks.push(`<h1>${inlineFormat(line.slice(2))}</h1>`);
-      i++;
-      continue;
-    }
-    // Catch any remaining heading levels (h4–h6)
-    if (/^#{1,6}\s/.test(line)) {
-      const level = line.match(/^(#+)/)?.[1].length ?? 4;
-      blocks.push(`<h${level}>${inlineFormat(line.slice(level + 1))}</h${level}>`);
-      i++;
-      continue;
-    }
-    // Horizontal rules
-    if (/^---+$/.test(line.trim())) {
-      blocks.push("<hr />");
-      i++;
-      continue;
-    }
 
     // Lists
     if (line.trimStart().startsWith("- ") || /^\d+\.\s/.test(line.trimStart())) {
@@ -455,7 +435,7 @@ function escapeHtml(text: string): string {
 
 function inlineFormat(text: string): string {
   return text
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/`(.+?)`/g, "<code>$1</code>")
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
 }

@@ -58,7 +58,7 @@ export function RelatedPosts({
             }}
           >
             <div
-              className="text-sm font-semibold mb-1 transition-colors group-hover:text-[var(--text-primary)]"
+              className="text-sm font-semibold mb-1 transition-colors group-hover:text-white"
               style={{ color: "var(--text-primary)" }}
             >
               {post.title}
@@ -71,7 +71,7 @@ export function RelatedPosts({
             </div>
             <div className="flex items-center gap-2 mt-3">
               <time
-                className="text-label font-mono"
+                className="text-[10px] font-mono"
                 style={{ color: "var(--text-tertiary)" }}
                 dateTime={post.date}
               >
@@ -81,7 +81,7 @@ export function RelatedPosts({
                 })}
               </time>
               <span
-                className="text-label font-mono"
+                className="text-[10px] font-mono"
                 style={{ color: "var(--text-tertiary)" }}
               >
                 {post.readTime}

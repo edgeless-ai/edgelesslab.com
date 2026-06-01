@@ -76,29 +76,27 @@ class Orchestrator {
   }
 
   loadConfig(userConfig) {
-    // Deep clone default config (JSON round-trip strips functions)
+    // Deep clone default config
     const config = JSON.parse(JSON.stringify(CONFIG));
-
+    
     // Apply user overrides
     if (userConfig) {
       this.deepMerge(config, userConfig);
     }
-
-    // Load environment (URL params) — call on original CONFIG bound to clone
-    if (typeof window !== 'undefined' && typeof CONFIG.loadEnvironment === 'function') {
-      try { CONFIG.loadEnvironment.call(config); } catch (e) { console.warn('loadEnvironment:', e); }
+    
+    // Load environment (URL params)
+    if (typeof window !== 'undefined') {
+      config.loadEnvironment();
     }
-
+    
     // Validate
-    if (typeof CONFIG.validate === 'function') {
-      try { CONFIG.validate.call(config); } catch (e) { console.warn('config validation:', e); }
-    }
-
+    config.validate();
+    
     // Resolve seed
-    if (config.engine && config.engine.seed === null) {
+    if (config.engine.seed === null) {
       config.engine.seed = Math.floor(Math.random() * 999999);
     }
-
+    
     return config;
   }
 
@@ -133,9 +131,9 @@ class Orchestrator {
       if (sourceParam) {
         overrides.dataSource = { type: sourceParam };
       }
-      this.config = this.loadConfig(overrides);
+      this.loadConfig(overrides);
     }
-
+    
     const c = this.config.engine;
     
     // Apply p5 settings
@@ -151,9 +149,8 @@ class Orchestrator {
     const renderer = c.renderer === 'WEBGL' ? WEBGL : P2D;
     createCanvas(windowWidth, windowHeight, renderer);
     
-    // Set color mode — p5 constants are lowercase strings ('hsb', 'rgb', 'hsl')
-    const mode = typeof c.colorMode === 'string' ? c.colorMode.toLowerCase() : c.colorMode;
-    colorMode(mode, c.colorRanges.h, c.colorRanges.s, c.colorRanges.b, c.colorRanges.a);
+    // Set color mode
+    colorMode(c.colorMode, c.colorRanges.h, c.colorRanges.s, c.colorRanges.b, c.colorRanges.a);
     
     // Set pixel density
     pixelDensity(c.pixelDensity);

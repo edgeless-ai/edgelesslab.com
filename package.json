@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/build-blog-data.mjs && ./scripts/preserve-standalone.sh save",
+    "prebuild": "./scripts/preserve-standalone.sh save",
     "build": "next build",
     "postbuild": "./scripts/preserve-standalone.sh restore && cp -r pen-plotter/assets out/pen-plotter/ && cp -r pen-plotter/fxhash out/pen-plotter/ && cp -r pen-plotter/kandinsky-to-canvas out/pen-plotter/",
     "start": "next start",
@@ -16,9 +16,9 @@
     "@chenglou/pretext": "^0.0.3",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
-    "gray-matter": "^4.0.3",
     "lucide-react": "^0.577.0",
     "next": "16.2.0",
+    "playwright": "^1.59.1",
     "posthog-js": "^1.363.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -31,7 +31,6 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.0",
-    "playwright": "^1.59.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From Kandinsky to Canvas - Edgeless Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+ *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+ body {
+ background: #F4EFE6;
+ color: #1A1A1A;
+ font-family: Georgia, 'Times New Roman', serif;
+ font-size: 18px;
+ line-height: 1.7;
+ -webkit-font-smoothing: antialiased;
+ }
+
+ .article {
+ max-width: 720px;
+ margin: 0 auto;
+ padding: 60px 24px 100px;
+ }
+
+ /* Header */
+ .lab-name {
+ font-family: 'JetBrains Mono', monospace;
+ font-size: 11px;
+ font-weight: 500;
+ letter-spacing: 0.2em;
+ text-transform: uppercase;
+ color: #E8A838;
+ margin-bottom: 24px;
+ }
+
+ h1 {
+ font-family: Georgia, serif;
+ font-size: 42px;
+ line-height: 1.15;
+ font-weight: 700;
+ color: #1A1A1A;
+ margin-bottom: 16px;
+ letter-spacing: -0.01em;
+ }
+
+ .deck {
+ font-family: Georgia, serif;
+ font-size: 20px;
+ font-style: italic;
+ color: #555;
+ line-height: 1.6;
+ margin-bottom: 8px;
+ }
+
+ .date {
+ font-family: 'JetBrains Mono', monospace;
+ font-size: 12px;
+ color: #999;
+ letter-spacing: 0.05em;
+ margin-bottom: 48px;
+ }
+
+ /* Section dividers */
+ hr {
+ border: none;
+ border-top: 1px solid #D6D0C4;
+ margin: 48px 0;
+ }
+
+ /* Headings */
+ h2 {
+ font-family: Georgia, serif;
+ font-size: 28px;
+ font-weight: 700;
+ color: #1A1A1A;
+ margin-top: 48px;
+ margin-bottom: 20px;
+ line-height: 1.3;
+ }
+
+ /* Body text */
+ p {
+ margin-bottom: 20px;
+ }
+
+ em { font-style: italic; }
+ strong { font-weight: 700; }
+
+ a {
+ color: #E8A838;
+ text-decoration: underline;
+ text-decoration-thickness: 1px;
+ text-underline-offset: 2px;
+ }
+ a:hover { color: #C08020; }
+
+ /* Lists */
+ ul {
+ margin-bottom: 20px;
+ padding-left: 28px;
+ }
+ li {
+ margin-bottom: 10px;
+ }
+
+ /* Inline code */
+ code {
+ font-family: 'JetBrains Mono', monospace;
+ font-size: 0.85em;
+ background: #EDE8DE;
+ padding: 2px 6px;
+ border-radius: 3px;
+ }
+
+ /* Code blocks */
+ pre {
+ background: #EDE8DE;
+ border-radius: 6px;
+ padding: 20px 24px;
+ overflow-x: auto;
+ margin-bottom: 24px;
+ border: 1px solid #D6D0C4;
+ }
+ pre code {
+ background: none;
+ padding: 0;
+ font-size: 14px;
+ line-height: 1.6;
+ }
+
+ /* Figure / Image containers */
+ figure {
+ margin: 40px 0;
+ }
+ figcaption {
+ font-family: 'JetBrains Mono', monospace;
+ font-size: 12px;
+ color: #888;
+ text-align: center;
+ margin-top: 8px;
+ letter-spacing: 0.02em;
+ }
+
+ .image-row {
+ display: flex;
+ gap: 12px;
+ justify-content: center;
+ flex-wrap: wrap;
+ }
+
+ .image-row figure {
+ flex: 1 1 0;
+ min-width: 140px;
+ max-width: 300px;
+ margin: 0;
+ }
+
+ .image-row img,
+ figure.full-width img {
+ width: 100%;
+ max-width: 100%;
+ display: block;
+ background: #E8E4DC;
+ padding: 4px;
+ border: 1px solid #D6D0C4;
+ border-radius: 4px;
+ }
+
+ figure.full-width {
+ margin: 40px 0;
+ }
+ figure.full-width img {
+ max-width: 100%;
+ }
+
+ .image-pair {
+ display: flex;
+ gap: 12px;
+ justify-content: center;
+ }
+ .image-pair figure {
+ flex: 1 1 0;
+ min-width: 200px;
+ max-width: 50%;
+ margin: 0;
+ }
+ .image-pair img {
+ width: 100%;
+ display: block;
+ background: #E8E4DC;
+ padding: 4px;
+ border: 1px solid #D6D0C4;
+ border-radius: 4px;
+ }
+
+ /* Closing note */
+ .closing {
+ font-style: italic;
+ color: #666;
+ border-top: 1px solid #D6D0C4;
+ padding-top: 32px;
+ margin-top: 48px;
+ font-size: 16px;
+ }
+
+ /* Accent bar */
+ .accent-bar {
+ width: 48px;
+ height: 3px;
+ background: #E8A838;
+ margin-bottom: 32px;
+ }
+
+ @media (max-width: 600px) {
+ h1 { font-size: 30px; }
+ .deck { font-size: 17px; }
+ .article { padding: 40px 16px 60px; }
+ .image-row { gap: 8px; }
+ .image-row figure { min-width: 100px; }
+ }
+</style>
+</head>
+<body>
+<article class="article">
+
+ <!-- Header -->
+ <div class="lab-name">Edgeless Lab</div>
+ <h1>From Kandinsky to Canvas: How Art Theory Drives Our Algorithms</h1>
+ <p class="deck">Every stroke our pen plotter draws has a lineage that stretches back a century.</p>
+ <div class="date">May 2026</div>
+ <div class="accent-bar"></div>
+
+ <!-- Lede -->
+ <p>When Wassily Kandinsky published <em>Point and Line to Plane</em> in 1926, he wasn't writing about art in the way we typically mean. He was writing a specification. A point is potential energy. A line is a point in motion under force. A plane has weight, tension, warmth. He decomposed visual experience into primitives and operations -the same vocabulary we use when we write generative algorithms today.</p>
+
+ <p>At Edgeless Lab, we've spent the past months building an autoresearch pipeline that takes these ideas seriously. Not as metaphor, but as engineering requirements. Our <code>factory_botanical</code> generates grass blades as Bezier curves -Kandinsky's "line produced by two simultaneous forces." Our <code>factory_softshapes</code> fills curves with thousands of parallel hatching lines -rendering his concept of "plane" through pure linear accumulation. Our <code>factory_interlace</code> builds Islamic star patterns from intersecting equidistant lines on grids, implementing Owen Jones' 1856 propositions as executable code.</p>
+
+ <p>The result, so far: 40 factory files generating pen-plotter-ready SVGs, 36,000+ scored specimens, and a scoring pipeline that draws on Galanter's complexity theory, Feldman's art criticism framework, and Tyler Hobbs' compositional essays. The lineage runs in a clear line: Kandinsky (1926) to Georg Nees (1965, the first computer art exhibition) to Sol LeWitt (1967, wall drawings as instruction sets) to Vera Molnar (1968, <em>machine imaginaire</em>) to Tyler Hobbs (2021, Fidenza) to this lab, this year.</p>
+
+ <p>We didn't set out to write a history paper. But when we started building factories that actually work -that produce art people want to put on walls -we found that the path always led back to specific theoretical commitments made by people who never saw a computer.</p>
+
+ <hr>
+
+ <!-- The Factory System -->
+ <h2>The Factory System</h2>
+
+ <p>The pipeline works like this: a factory is a Python script that takes a random seed and produces an SVG. Each factory encodes a thesis about visual structure -a specific set of decisions about what makes a drawing worth looking at. We run each factory hundreds or thousands of times, score every output, and the best survive into our catalog.</p>
+
+ <p>Forty factories, each with 8 sub-styles, each sub-style parameterized across dozens of continuous dimensions. 36,772 specimens scored and logged. 721 of those score above 80/100. Top ceiling: moire at 89.1.</p>
+
+ <p>Each factory is named for its theoretical lineage:</p>
+
+ <ul>
+ <li><strong>Moire</strong> (Op Art, Bridget Riley) -interference patterns between overlapping grids. Beauty emerges from the gap between two simple structures. 8 styles: <code>circles_offset</code>, <code>circles_lines</code>, <code>circles_radial</code>, <code>lines_crossed</code>, <code>ellipses_offset</code>, <code>circles_spiral</code>, <code>triple_circles</code>, <code>lines_circles_radial</code>.</li>
+ <li><strong>Molnar</strong> (Vera Molnar) -systematic disorder. Begin with a perfect grid, then introduce controlled randomness. The tension between the grid you expect and the grid you see is the entire piece.</li>
+ <li><strong>LeWitt</strong> (Sol LeWitt) -the instruction is the artwork. Our implementation generates wall-drawing-style line fields from rule sets. The algorithm IS the art; the SVG is just one realization.</li>
+ <li><strong>Interlace</strong> (Owen Jones) -Islamic geometric patterns reconstructed as algorithms. Star-and-rosette knotwork from intersecting lines on triangular and hexagonal grids, with over/under weaving.</li>
+ <li><strong>Botanical</strong> (Zancan) -nature rendered as density. Grass blades, fern fronds, wildflowers, moss, vines -all built from force-driven Bezier curves. Each piece is a section of wild garden, not a repeating pattern.</li>
+ <li><strong>Softshapes</strong> (Tyler Hobbs / Fidenza) -thick curved rectangles rendered as thousands of tiny parallel lines with Gaussian noise displacement. Flow field drives direction; Poisson-disk seeding prevents overlap; recursive splitting adds organic branching.</li>
+ <li><strong>Watercolor</strong> (Tyler Hobbs) -recursive polygon deformation. Base shapes are deformed through iterative edge subdivision with Gaussian displacement, then rendered as stacked transparent layers of open polylines.</li>
+ <li><strong>Rayscape</strong> -3D ray-marched landscapes rendered as pen-plotter-compatible line art. The highest average score in the catalog at 74.9.</li>
+ </ul>
+
+ <!-- 4 specimens side-by-side -->
+ <div class="image-row">
+ <figure>
+ <img src="assets/blog-images/moire-0005.png" alt="Moire specimen 0005">
+ <figcaption>moire-0005 / score 89.1</figcaption>
+ </figure>
+ <figure>
+ <img src="assets/blog-images/botanical-0006.png" alt="Botanical specimen 0006">
+ <figcaption>botanical-0006 / ruins</figcaption>
+ </figure>
+ <figure>
+ <img src="assets/blog-images/softshapes-0000.png" alt="Softshapes specimen 0000">
+ <figcaption>softshapes-0000 / gentle_flow</figcaption>
+ </figure>
+ <figure>
+ <img src="assets/blog-images/interlace-0002.png" alt="Interlace specimen 0002">
+ <figcaption>interlace-0002 / star_8</figcaption>
+ </figure>
+ </div>
+
+ <hr>
+
+ <!-- What Kandinsky Taught Our Algorithms -->
+ <h2>What Kandinsky Taught Our Algorithms</h2>
+
+ <p>Three specific ideas from <em>Point and Line to Plane</em> show up directly in our codebase.</p>
+
+ <p><strong>Force-based path generation.</strong> Kandinsky wrote: "The line is the track made by the moving point; it is created by movement -specifically through the destruction of the intense self-contained repose of the point." One force acting on a point produces a straight line. Two alternating forces produce a zigzag. Two simultaneous forces produce a curve.</p>
+
+ <p>Our <code>factory_botanical</code> uses exactly this model. Each plant element -a grass blade, a fern frond, a vine tendril -is a point moved by simultaneous forces: gravity pulling downward, wind pushing laterally, and a growth vector pointing upward with species-specific curvature. The <code>terrain_y()</code> function generates a ground plane from summed sine waves, and each element grows from that surface under the influence of these competing forces. The result is Bezier curves that look organic because they follow the same force-composition rules that Kandinsky identified in natural forms.</p>
+
+ <p>In code, this looks like computing amplitudes, phases, and frequencies for multiple octaves of sine waves, then summing them to produce a terrain function. Each botanical element samples this terrain for its origin point, then traces a path under the combined influence of gravity, wind, and growth direction. Two simultaneous forces, one curve. Kandinsky's formula, implemented literally.</p>
+
+ <p><strong>Basic Plane weighting.</strong> Kandinsky divided the picture plane into regions with distinct character. The top is "lightness, dissolution, freedom." The bottom is "density, weight, constraint." Left carries associations of advance and movement; right of home and rest.</p>
+
+ <p>Our botanical factory scales element size by Y-position. Foreground plants (bottom of the frame) are larger, denser, rendered with thicker strokes. Background elements (top) are smaller, sparser, thinner. This isn't an arbitrary design decision -it's Kandinsky's Basic Plane theory implemented as position-dependent parameters. The stroke width varies from <code>STROKE_THIN</code> (0.3mm) in the upper reaches to <code>STROKE_THICK</code> (0.8mm) at the base, creating atmospheric perspective through pen pressure alone.</p>
+
+ <p><strong>Concealed construction.</strong> Kandinsky wrote about "concealed construction" -the structural skeleton that organizes a composition but remains invisible in the final work. The viewer feels the order without seeing the grid.</p>
+
+ <p>Our <code>factory_softshapes</code> generates a flow field using four octaves of sine-wave superposition, with random frequencies between 0.005 and 0.04 per millimeter. But the field itself is never drawn. Only the shapes that follow it appear on paper. The construction is concealed, exactly as Kandinsky prescribed. When you look at a softshapes piece, you perceive coherent directional flow -shapes that move together, that share an invisible current -but the underlying angle field remains hidden. The eye registers the order without being shown the mechanism.</p>
+
+ <!-- botanical-0000 full-width -->
+ <figure class="full-width">
+ <img src="assets/blog-images/botanical-0000.png" alt="Botanical specimen 0000 - meadow">
+ <figcaption>botanical-0000 / meadow - force-driven Bezier curves following Kandinsky's model</figcaption>
+ </figure>
+
+ <hr>
+
+ <!-- Owen Jones -->
+ <h2>Owen Jones and the Grammar of Generative Ornament</h2>
+
+ <p>Owen Jones published <em>The Grammar of Ornament</em> in 1856, 170 years before our interlace factory. The book contains 37 propositions for creating decorative patterns. Read them today and they feel like a programming specification:</p>
+
+ <p><strong>Proposition 7</strong>: "All ornament should be based upon a geometrical construction." This is our grid system. Every factory begins with geometry -a triangular lattice, a hexagonal tiling, a Cartesian grid -and builds upward from there. The geometry is the data structure; the ornament is the rendering pass.</p>
+
+ <p><strong>Proposition 11</strong>: "In surface decoration all the ornament should be based on traceable junctions, showing that each line grows out of another." This is our L-system and botanical factories. Every curve connects to a root. Every branch traces back to a stem. The <code>factory_botanical</code> explicitly models this -its vine elements grow from anchor points on the terrain surface, each tendril branching from the previous joint.</p>
+
+ <p><strong>Proposition 12</strong>: "All junctions of curved lines with curved lines, or of curved lines with straight, should be tangential to each other." This is our Bezier curve constraint. Wherever two paths meet in our interlace factory, we enforce C1 continuity -the tangent vectors match at the junction. The visual result is smooth knotwork that flows without corners, even when the underlying geometry is a grid of straight intersections.</p>
+
+ <p>Our <code>factory_interlace</code> implements Jones' Arabian and Moresque principles directly. It generates star patterns by placing regular polygons on a grid and connecting their vertices along angular offsets. The "star-6" style, for example, uses a hexagonal grid where lines radiate from each center at 30-degree intervals, intersecting with neighbors to form six-pointed stars. Over/under weaving is achieved by breaking each line segment at intersection points and offsetting the crossing strands -one lifts, one dips -creating the illusion of interlaced ribbons from flat pen strokes.</p>
+
+ <p>Line weight controls prominence, exactly as Jones prescribed. Primary structural lines draw at 0.8mm; secondary fill lines at 0.3mm. The hierarchy of weight produces the visual depth that makes Islamic geometric patterns read as woven fabric rather than flat grids.</p>
+
+ <!-- interlace-0209 full-width -->
+ <figure class="full-width">
+ <img src="assets/blog-images/interlace-0209.png" alt="Interlace specimen 0209 - tuned with focal point">
+ <figcaption>interlace-0209 / tuned, with focal point - Owen Jones' propositions as executable code</figcaption>
+ </figure>
+
+ <hr>
+
+ <!-- Tyler Hobbs -->
+ <h2>Tyler Hobbs and the Modern Canon</h2>
+
+ <p>If Kandinsky wrote the first spec, Tyler Hobbs wrote the modern API documentation. His essays on flow fields, long-form generative art, and compositional technique gave us concrete engineering parameters.</p>
+
+ <p><strong>Flow fields with angle snapping.</strong> Hobbs describes snapping flow field angles to multiples of &pi;/N to produce "rocky, sculpted" forms rather than smooth organic ones. Our <code>factory_softshapes</code> implements this directly in its <code>orthogonal</code> style (style index 2), where angles snap to &pi;/4 multiples. The result is shapes that feel carved rather than grown -geometric but not rigid, structured but not gridded.</p>
+
+ <p><strong>Soft shapes from parallel lines.</strong> The Fidenza technique: render a thick curved rectangle not as a filled polygon but as thousands of tiny parallel lines with Gaussian noise displacement. The pen moves back and forth across the shape's width, each pass displaced slightly from the last. The accumulation of imperfect parallel strokes creates a painterly, soft-edged texture that reads as watercolor from a distance and as meticulous linework up close. Our softshapes factory implements this with 8 style variants -<code>gentle_flow</code>, <code>turbulent</code>, <code>orthogonal</code>, <code>spiral</code>, <code>diagonal</code>, <code>sparse</code>, <code>dense</code>, and <code>mixed</code> -each modulating the flow field parameters and shape density.</p>
+
+ <p><strong>The squint test.</strong> Hobbs argues that strong generative art must hold at macro scale, not just in detail. If you squint at the piece and can still identify distinct compositional regions -large-scale color clumping, tonal zones, structural blocks -the composition works. If it dissolves into undifferentiated texture, it fails.</p>
+
+ <p>Our scoring v3 proposal implements this literally: downsample the image to 64&times;64 pixels, blur it, and compute entropy at that reduced resolution. A piece that maintains structure at both macro and micro scales scores higher than one that is only interesting at full resolution. This catches a specific failure mode we observed: pieces that are locally beautiful but globally uniform, with no large-scale compositional movement.</p>
+
+ <p><strong>Orthogonality.</strong> For long-form generative art (editions of hundreds or thousands from a single algorithm), Hobbs emphasizes that visual features must be independent. If shape size always correlates with color, the edition collapses to a narrow band of outputs. Our factories parameterize features along independent axes -color palette, shape density, flow field frequency, stroke width, element scale -so that the combinatorial space of outputs is genuinely large.</p>
+
+ <!-- softshapes + watercolor side-by-side -->
+ <div class="image-pair">
+ <figure>
+ <img src="assets/blog-images/softshapes-0215.png" alt="Softshapes specimen 0215">
+ <figcaption>softshapes-0215 / flow field</figcaption>
+ </figure>
+ <figure>
+ <img src="assets/blog-images/watercolor-0300.png" alt="Watercolor specimen 0300">
+ <figcaption>watercolor-0300 / deformed polygons</figcaption>
+ </figure>
+ </div>
+
+ <hr>
+
+ <!-- Computational Aesthetics -->
+ <h2>Computational Aesthetics: What 36,000 Specimens Taught Us</h2>
+
+ <p>Running 36,772 specimens through algorithmic scoring and four LLM judges produces data. Some of it confirmed what we expected. Some of it surprised us.</p>
+
+ <p><strong>Entropy is the bottleneck.</strong> Across all 40 factories, entropy (visual information density measured from the PNG histogram) is the single most constraining scoring dimension. A majority of specimens that fail to break 70/100 are held back by entropy -either too low (the piece is sparse and uniform, a few lines on a blank page) or too high (the piece is chaotic noise with no structure). This maps directly to Philip Galanter's complexity theory: aesthetic value follows a bell curve across the complexity spectrum, peaking in the "complex middle" where order and disorder coexist.</p>
+
+ <p>We implemented this insight by adding a quadratic penalty to the entropy metric. Raw entropy used to reward disorder linearly -more chaos, higher score. Now, the scoring curve peaks at entropy 0.5&ndash;0.7 and drops off toward both extremes. The effect was immediate: chaotic noise-fill pieces that used to score 75+ dropped to the low 60s, while structured-but-rich pieces like our moire and rayscape outputs rose.</p>
+
+ <p><strong>Dense-line bias is real, and it reveals something.</strong> Our top-performing factories -moire (89.1 ceiling), opart (87.7), hatchcolor (86.2) -are all dense-line techniques. Hatched fills, overlapping grids, thousands of parallel strokes. Sparse and minimal work consistently underperforms. We initially treated this as a scoring bug, but after three rounds of recalibration, the bias persists even with human judges. Dense line art reads as "more" -more effort, more information, more visual texture. Whether this reflects genuine aesthetic preference or just a measurement artifact, we haven't fully resolved. We've documented it as a known bias and added style-axis-aware rubrics (following Wolfflin's linear/painterly distinction) to give sparse work a fairer shake.</p>
+
+ <p><strong>Intra-factory uniqueness matters.</strong> Before we added intra-factory deduplication, 30% of all specimens scoring above 80 came from a single factory: moire. The moire algorithm produces consistently high-scoring outputs, but many of them look similar to each other -same visual frequency, same interference pattern, different only in subtle parameter shifts. When we added a uniqueness penalty that compares each specimen against the top 20 from its own factory (using perceptual hashing), the concentration dropped and other factories' best work surfaced. The lesson: a factory that produces one great image is less valuable than one that produces twenty genuinely different great images.</p>
+
+ <p><strong>Feldman's criticism framework improved LLM judges.</strong> When we restructured our LLM judge prompts using Edmund Feldman's four-step method -description (what do you see?), analysis (how are elements organized?), interpretation (what mood does it convey?), judgment (overall quality) -the score distributions became more discriminating. Generic "rate this art" prompts produced tight, undifferentiated score clusters. Feldman-structured prompts produced wider spreads with clearer separation between strong and weak pieces. The judges still disagree with each other -that's by design, since score standard deviation captures "interestingness" -but each individual judge became more consistent and more articulate about why.</p>
+
+ <p>We maintain three NotebookLM knowledge bases with 22+ sources feeding these decisions: one for classic art theory (Kandinsky, Jones, Wolfflin, Galanter), one for modern generative art practice (Hobbs, Zancan, Shiffman), and one for academic computational aesthetics (NIMA, LAION, AADB). The knowledge bases function as persistent research context -we query them before making pipeline changes to check whether the modification has theoretical grounding or whether we're just overfitting to our own taste.</p>
+
+ <hr>
+
+ <!-- From Pen Plotter to Blockchain -->
+ <h2>From Pen Plotter to Blockchain</h2>
+
+ <p>Here is the part that would have made Kandinsky's head spin.</p>
+
+ <p>The same algorithm that drives a pen across A3 cotton paper can, with a parameter change, produce neon-saturated digital art for an fxhash generative drop. Our moire factory, transpiled from Python to JavaScript, ships as a 9KB zip file with 5 output modes: <code>plotter</code> (graphite lines on warm paper), <code>vivid</code> (rich color on dark backgrounds), <code>delicate</code> (soft monochrome and cool tones), <code>neon</code> (fluorescent strokes on near-black), and <code>watercolor</code> (translucent layered washes). The algorithm is identical across all five modes. What changes is the palette, the stroke treatment, and the background. The geometry -the mathematical core that creates interference patterns from overlapping circle grids -is invariant.</p>
+
+ <p>This is the argument for treating the algorithm as the artwork. The SVG on paper and the Canvas element on-chain are both projections of the same underlying structure. The medium is a parameter. The math is the piece.</p>
+
+ <p>We have two fxhash projects packaged and ready to mint -moire (8 styles, 22 palettes) and opart (8 styles, 18 palettes, with a polygon-count feature that produces dramatically different outputs at the extremes). Both use the multi-output-mode architecture, meaning collectors receive not just a static image but a position in a parameter space -a specific combination of style, palette, and mode that no other token will ever reproduce.</p>
+
+ <p>Meanwhile, back in the physical world, we have SVGs queued for plotting on an AxiDraw. The same specimens that could become on-chain tokens are also being drawn with archival ink on acid-free paper. The pen takes forty minutes to complete a single A3 moire. The blockchain transaction takes four seconds. The algorithm doesn't care. It produced both.</p>
+
+ <p>Kandinsky wanted to find the universal laws of visual form -principles that would hold regardless of medium, culture, or era. He didn't have the tools to test that claim at scale. We do. Forty factories, thirty-six thousand specimens, a scoring pipeline grounded in a century of art theory, and output modes that span physical ink to on-chain generative tokens.</p>
+
+ <p>The line is still the track made by the moving point. We just have more ways to move it now.</p>
+
+ <!-- Final gallery: 4 moire specimens representing output modes -->
+ <div class="image-row" style="margin-top: 48px;">
+ <figure>
+ <img src="assets/blog-images/moire-0000.png" alt="Moire specimen 0000">
+ <figcaption>moire-0000</figcaption>
+ </figure>
+ <figure>
+ <img src="assets/blog-images/moire-0001.png" alt="Moire specimen 0001">
+ <figcaption>moire-0001</figcaption>
+ </figure>
+ <figure>
+ <img src="assets/blog-images/moire-0002.png" alt="Moire specimen 0002">
+ <figcaption>moire-0002</figcaption>
+ </figure>
+ <figure>
+ <img src="assets/blog-images/moire-0003.png" alt="Moire specimen 0003">
+ <figcaption>moire-0003</figcaption>
+ </figure>
+ </div>
+
+ <hr>
+
+ <p class="closing">Edgeless Lab builds generative art systems for pen plotters and on-chain platforms. Follow the work at <a href="https://edgelesslab.com/pen-plotter">edgelesslab.com/pen-plotter</a>.</p>
+
+</article>
+</body>
+</html>

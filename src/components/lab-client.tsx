@@ -25,7 +25,7 @@ export function LabHeader() {
           style={{ background: "var(--accent)" }}
         />
         <span
-          className="text-small font-mono uppercase tracking-[0.14em]"
+          className="text-[11px] font-mono uppercase tracking-[0.14em]"
           style={{ color: "var(--accent)" }}
         >
           Works in progress
@@ -85,7 +85,7 @@ export function LabGrid({ experiments }: { experiments: Experiment[] }) {
           key={exp.slug}
           href={exp.href || `/lab/${exp.slug}`}
           {...(exp.href ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-          className="group relative flex flex-col rounded-xl border p-6 transition-colors hover:border-[var(--border-hover)]"
+          className="group relative flex flex-col rounded-xl border p-6 transition-colors hover:border-white/20"
           style={{
             background: "var(--bg-surface)",
             borderColor: "var(--border-subtle)",

@@ -8,114 +8,53 @@
   <meta property="og:title" content="Flow Viz — Bitcoin Mempool">
   <meta property="og:description" content="Watch systems breathe. Real-time Bitcoin transaction fee visualization.">
   <meta property="og:type" content="website">
-
-  <!-- Display: Boska (Fontshare) -->
-  <link rel="preconnect" href="https://api.fontshare.com">
-  <link href="https://api.fontshare.com/v2/css?f[]=boska@300,301,400,401,500,501&display=swap" rel="stylesheet">
-
-  <!-- Mono: JetBrains Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-
   <script>p5 = { disableFriendlyErrors: true };</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.min.js"></script>
   <style>
-    :root {
-      /* paper & ink — matches pen-plotter / tartanism / total-serialism */
-      --paper:        #f3eddd;
-      --paper-deep:   #ebe3cf;
-      --ink:          #0c0a08;
-      --ink-soft:     #2a2520;
-      --ink-faint:    #6a6256;
-      --rule:         #d4cab4;
-
-      /* warm accent — sodium-vapor amber */
-      --amber:        #c2410c;
-      --amber-deep:   #9a3412;
-
-      /* secondary accents for data */
-      --terracotta:   #b45309;
-      --olive:        #4d6a3b;
-
-      /* type */
-      --serif:  "Boska", "Times New Roman", Georgia, serif;
-      --mono:   "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
-    }
-
-    html, body {
-      margin: 0; padding: 0; overflow: hidden;
-      background: var(--paper);
-      /* subtle paper grain via SVG noise — same as pen-plotter */
-      background-image:
-        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(194,65,12,0.05), transparent 60%),
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.05  0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    }
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #0a0a0f; }
     canvas { display: block; }
-
     #ui {
       position: fixed; top: 20px; left: 20px;
-      color: var(--ink-soft); font-family: var(--mono); font-size: 11px;
+      color: #e8d5b7; font-family: 'Courier New', monospace; font-size: 11px;
       z-index: 100; line-height: 1.6;
-      background: rgba(243, 237, 221, 0.92); padding: 15px; border-radius: 4px;
-      border: 1px solid var(--rule);
-      backdrop-filter: blur(8px) saturate(115%);
-      -webkit-backdrop-filter: blur(8px) saturate(115%);
+      background: rgba(10, 10, 15, 0.85); padding: 15px; border-radius: 8px;
+      border: 1px solid rgba(232, 213, 183, 0.15);
     }
-    #ui .title {
-      color: var(--ink); font-family: var(--serif); font-weight: 500;
-      font-size: 16px; margin-bottom: 2px; letter-spacing: -0.01em;
-    }
-    #ui .subtitle {
-      color: var(--amber); font-family: var(--mono);
-      font-size: 10px; margin-bottom: 10px;
-      letter-spacing: 0.05em; text-transform: uppercase;
-    }
-    #ui .key { color: var(--amber); font-weight: 500; }
-    #ui .muted { color: var(--ink-faint); }
+    #ui .title { color: #fff; font-weight: bold; font-size: 14px; margin-bottom: 4px; }
+    #ui .subtitle { color: #73c99c; font-size: 10px; margin-bottom: 10px; }
+    #ui .key { color: #73c99c; }
+    #ui .muted { color: #555; }
     .metric { display: inline-block; margin-right: 14px; }
-
     #status {
       position: fixed; top: 20px; right: 20px;
-      color: var(--ink-faint); font-family: var(--mono); font-size: 10px;
-      text-align: right;
-      background: rgba(243, 237, 221, 0.92); padding: 10px; border-radius: 4px;
-      border: 1px solid var(--rule);
-      backdrop-filter: blur(8px) saturate(115%);
-      -webkit-backdrop-filter: blur(8px) saturate(115%);
-      letter-spacing: 0.03em; text-transform: uppercase;
+      color: #666; font-family: 'Courier New', monospace; font-size: 10px;
+      text-align: right; background: rgba(10, 10, 15, 0.85); padding: 10px; border-radius: 8px;
     }
-
     #info-panel {
       position: fixed; bottom: 20px; left: 20px; right: 20px;
-      color: var(--ink-soft); font-family: var(--mono); font-size: 10px;
-      z-index: 100;
-      background: rgba(243, 237, 221, 0.95); padding: 12px; border-radius: 4px;
-      border: 1px solid var(--rule); display: none;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      color: #e8d5b7; font-family: 'Courier New', monospace; font-size: 10px;
+      z-index: 100; background: rgba(10, 10, 15, 0.92); padding: 12px; border-radius: 8px;
+      border: 1px solid rgba(232, 213, 183, 0.15); display: none;
     }
     #info-panel.visible { display: block; }
-    #info-panel strong { color: var(--ink); }
-
     #brand {
       position: fixed; bottom: 20px; right: 20px;
-      color: var(--ink-faint); font-family: var(--mono); font-size: 9px;
-      z-index: 100; letter-spacing: 0.05em; text-transform: uppercase;
+      color: #444; font-family: 'Courier New', monospace; font-size: 9px;
+      z-index: 100;
     }
-    #brand a { color: var(--ink-faint); text-decoration: none; }
-    #brand a:hover { color: var(--amber); }
+    #brand a { color: #555; text-decoration: none; }
+    #brand a:hover { color: #73c99c; }
   </style>
 </head>
 <body>
 <div id="ui">
-  <div class="title">Flow Viz <span class="muted">—</span> Bitcoin Mempool</div>
+  <div class="title">FLOW VIZ <span class="muted">—</span> BITCOIN MEMPOOL</div>
   <div class="subtitle">Transaction fee markets, live from mempool.space</div>
   <span class="key">[s]</span> Save PNG <span class="muted">|</span>
   <span class="key">[r]</span> Regenerate <span class="muted">|</span>
   <span class="key">[space]</span> Pause <span class="muted">|</span>
   <span class="key">[d]</span> Debug<br>
-  <div id="metrics" class="muted" style="margin-top: 8px; border-top: 1px solid var(--rule); padding-top: 8px;">
+  <div id="metrics" class="muted" style="margin-top: 8px;">
     <span class="metric">Buckets: <span id="market-count">-</span></span>
     <span class="metric">Particles: <span id="particle-count">-</span></span>
     <span class="metric">FPS: <span id="fps">-</span></span>
@@ -123,18 +62,18 @@
 </div>
 <div id="status">
   <span id="data-status">Connecting to mempool.space...</span><br>
-  <span id="block-info" style="color: var(--ink-faint);">-</span>
+  <span id="block-info" class="muted">-</span>
 </div>
 <div id="info-panel"><span id="hover-info"></span></div>
-<div id="brand"><a href="https://edgelesslab.com">edgeless lab</a> — field notes</div>
+<div id="brand"><a href="https://edgelesslab.com">edgeless lab</a> — watch systems breathe</div>
 
-<script src="../../shared-engine/config/default.js?v=2"></script>
-<script src="../../shared-engine/core/event-bus.js?v=2"></script>
-<script src="../../shared-engine/core/plugin.js?v=2"></script>
-<script src="../../shared-engine/adapters/data-source.js?v=2"></script>
-<script src="../../shared-engine/adapters/bitcoin-mempool.js?v=2"></script>
-<script src="../../shared-engine/core/fluid-engine.js?v=2"></script>
-<script src="../../shared-engine/core/orchestrator.js?v=2"></script>
+<script src="../../shared-engine/config/default.js"></script>
+<script src="../../shared-engine/core/event-bus.js"></script>
+<script src="../../shared-engine/core/plugin.js"></script>
+<script src="../../shared-engine/adapters/data-source.js"></script>
+<script src="../../shared-engine/adapters/bitcoin-mempool.js"></script>
+<script src="../../shared-engine/core/fluid-engine.js"></script>
+<script src="../../shared-engine/core/orchestrator.js"></script>
 
 <script>
 // Override factory for bitcoin-mempool type
@@ -197,120 +136,10 @@ function setup() {
   colorMode(HSB, 360, 100, 100, 100);
   CONFIG.engine.seed = 42;
   CONFIG.dataSource.type = 'bitcoin-mempool';
-  CONFIG.dataSource.apiUrl = 'https://mempool.space/api';
+  CONFIG.dataSource.apiUrl = 'https://mempool.space/api/v1';
   CONFIG.dataSource.refreshInterval = 30000; // Refresh every 30s
   CONFIG.particles.count = 2000;
-
-  // === Warm paper aesthetic overrides ===
-  // Background: warm cream (#f3eddd) in HSB
-  CONFIG.colors.background = { h: 40, s: 8, b: 95 };
-
-  // Category palette: warm tones with good contrast on cream paper
-  // Urgency mapping: crypto=imminent, finance=likely, sports=uncertain, tech=stuck, politics=danger
-  CONFIG.colors.categories = {
-    crypto:        { base: [25, 65, 55],  accent: [20, 80, 70] },    // Amber/burnt sienna (imminent)
-    finance:       { base: [85, 50, 40],  accent: [75, 65, 50] },    // Olive/moss (likely)
-    sports:        { base: [35, 55, 50],  accent: [30, 70, 60] },    // Warm ochre (uncertain)
-    tech:          { base: [350, 45, 45], accent: [345, 60, 55] },   // Muted terracotta (stuck)
-    politics:      { base: [5, 55, 45],   accent: [0, 70, 55] },     // Deep rust (danger)
-    entertainment: { base: [40, 50, 50],  accent: [35, 65, 60] },    // Tawny
-    science:       { base: [160, 35, 40], accent: [150, 50, 50] },   // Sage
-    other:         { base: [30, 15, 50],  accent: [30, 20, 60] }     // Warm gray
-  };
-
-  // Particle visual adjustments for light background
-  CONFIG.particles.visual.opacity = 0.5;
-  CONFIG.particles.visual.blendMode = 'normal';
-
-  // Trails: softer fade on warm background
-  CONFIG.trails.fadeRate = 5;
-  CONFIG.trails.opacity = 20;
-
-  // Connections: dark hairlines instead of white
-  CONFIG.connections.visual.maxAlpha = 25;
-
   orchestrator.setup(this);
-
-  // === Warm paper rendering overrides ===
-  // Market labels: dark ink instead of white on cream background
-  Market.prototype.render = function() {
-    const cfg = this.config.markets.visual;
-    const palette = this.config.colors.categories[this.category] || this.config.colors.categories.other;
-
-    const warmth = this.data.yesPrice || 0.5;
-    const h = this.lerp(palette.base[0], palette.accent[0], warmth);
-    const s = this.lerp(palette.base[1], palette.accent[1], warmth);
-    const b = this.lerp(palette.base[2], palette.accent[2], warmth);
-
-    // Glow — subtle warm glow instead of bright
-    for (let i = cfg.glowLayers; i > 0; i--) {
-      const alpha = 20 - i * 5;
-      fill(h, s, b, alpha);
-      noStroke();
-      ellipse(this.x, this.y, this.radius * 2 + i * cfg.glowSpread + Math.sin(this.pulsePhase) * 5);
-    }
-
-    // Core — warm tones with paper-matching stroke
-    fill(h, s, b, 85);
-    stroke(h, s + 10, b - 20, 60);
-    strokeWeight(cfg.coreStrokeWeight);
-    ellipse(this.x, this.y, this.radius * 2);
-
-    // Volume indicator arc
-    fill(h, s + 10, b + 10, 50);
-    noStroke();
-    arc(this.x, this.y, this.radius * 1.6, this.radius * 1.6, Math.PI, Math.PI + Math.PI * 0.5);
-
-    // Labels — dark ink on cream
-    if (cfg.showLabels) {
-      fill(30, 20, 15, 85);  // dark warm brown
-      noStroke();
-      textAlign(CENTER, CENTER);
-      textSize(cfg.labelSize);
-      const shortName = this.data.question?.substring(0, 20) + '...' || 'Unknown';
-      text(shortName, this.x, this.y - this.radius - 15);
-    }
-
-    if (cfg.showMetrics) {
-      textSize(cfg.metricSize);
-      fill(30, 15, 30, 65);  // lighter warm brown
-      const price = Math.round((this.data.yesPrice || 0.5) * 100);
-      const vol = ((this.data.volume24h || 0) / 1000000).toFixed(1);
-      text(`${price}% | $${vol}M`, this.x, this.y + this.radius + 15);
-    }
-  };
-
-  // Override engine rendering once it's initialized (async)
-  Events.on('ENGINE_INIT', () => {
-    const engine = orchestrator.engine;
-    if (!engine) return;
-
-    // Connection lines: warm dark hairlines instead of white
-    engine.renderConnections = function() {
-      const cfg = this.config.connections;
-      if (!cfg.enabled) return;
-      strokeWeight(cfg.visual.strokeWeight);
-      for (const conn of this.connections) {
-        const alpha = conn.strength * cfg.visual.maxAlpha;
-        stroke(30, 20, 25, alpha);  // warm dark brown hairlines
-        line(conn.m1.x, conn.m1.y, conn.m2.x, conn.m2.y);
-      }
-    };
-
-    // Particles: ensure good contrast on cream background
-    engine.renderParticles = function() {
-      const cfg = this.config.particles;
-      for (const p of this.particles) {
-        if (p.life > 0) {
-          const sat = 60;
-          const bri = map(p.life, 0, 255, 20, 65);
-          fill(p.hue, sat, bri, cfg.visual.opacity * 100);
-          noStroke();
-          ellipse(p.x, p.y, p.size);
-        }
-      }
-    };
-  });
 }
 
 function draw() { orchestrator.draw(); }

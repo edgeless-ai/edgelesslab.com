@@ -9,7 +9,7 @@ const navLinks = [
   { label: "Projects", href: "/projects" },
   { label: "Products", href: "/products" },
   { label: "Lab", href: "/lab" },
-  { label: "Field Notes", href: "/field-notes" },
+  { label: "Agents", href: "/agents" },
   { label: "Blog", href: "/blog" },
   { label: "Knowledge", href: "/knowledge" },
   { label: "About", href: "/about" },
@@ -42,17 +42,21 @@ export function Nav() {
           >
             <Link
               href="/"
-              className="flex items-center gap-2 text-body font-semibold tracking-tight font-mono hover:opacity-80 transition-opacity cursor-blink"
+              className="flex items-center gap-2 text-[15px] font-semibold tracking-tight font-mono hover:opacity-80 transition-opacity"
               style={{ color: "var(--text-primary)" }}
             >
-              edgeless<span style={{ color: "var(--phosphor)" }}>~/</span><span style={{ color: "var(--text-tertiary)" }}>lab</span>
+              <span
+                className="inline-block w-1.5 h-1.5 rounded-full"
+                style={{ background: "var(--accent)" }}
+              />
+              edgeless<span style={{ color: "var(--text-tertiary)" }}>/lab</span>
             </Link>
             <div className="hidden md:flex items-center gap-5">
               {navLinks.map((link) => (
                 <Link
                   key={link.label}
                   href={link.href}
-                  className="text-detail hover:text-[var(--text-primary)] transition-colors"
+                  className="text-[13px] hover:text-white transition-colors"
                   aria-current={pathname === link.href ? "page" : undefined}
                   style={{
                     color: pathname === link.href ? "var(--text-primary)" : "var(--text-secondary)",
@@ -65,7 +69,7 @@ export function Nav() {
                 href="https://github.com/edgeless-ai"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-detail hover:text-[var(--text-primary)] transition-colors flex items-center gap-1"
+                className="text-[13px] hover:text-white transition-colors flex items-center gap-1"
                 style={{ color: "var(--text-secondary)" }}
               >
                 GitHub <ArrowUpRight size={12} />
@@ -86,10 +90,10 @@ export function Nav() {
 
           {isOpen && (
             <div
-              className="mt-3 p-3 backdrop-blur-xl md:hidden tui-border"
-              data-label="nav"
+              className="mt-3 rounded-[1.5rem] border p-3 backdrop-blur-xl md:hidden"
               style={{
                 background: "rgba(17, 17, 19, 0.92)",
+                borderColor: "var(--border-subtle)",
               }}
             >
               <div className="flex flex-col gap-1">
@@ -97,7 +101,7 @@ export function Nav() {
                   <Link
                     key={link.label}
                     href={link.href}
-                    className="px-4 py-3 text-sm transition-colors font-mono"
+                    className="rounded-2xl px-4 py-3 text-sm transition-colors"
                     aria-current={pathname === link.href ? "page" : undefined}
                     onClick={() => setIsOpen(false)}
                     style={{
@@ -113,7 +117,7 @@ export function Nav() {
                   href="https://github.com/edgeless-ai"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 rounded-xl px-4 py-3 text-sm transition-colors hover:text-[var(--text-primary)]"
+                  className="inline-flex items-center gap-1 rounded-2xl px-4 py-3 text-sm transition-colors hover:text-white"
                   style={{ color: "var(--text-secondary)" }}
                   onClick={() => setIsOpen(false)}
                 >

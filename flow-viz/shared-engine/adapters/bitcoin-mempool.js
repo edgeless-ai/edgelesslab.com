@@ -10,7 +10,7 @@
 class BitcoinMempoolAdapter extends DataSourceAdapter {
   constructor(config = {}) {
     super('bitcoin-mempool');
-    this.apiUrl = config.apiUrl || 'https://mempool.space/api';
+    this.apiUrl = config.apiUrl || 'https://mempool.space/api/v1';
     this.feeBuckets = config.feeBuckets || [
       { min: 1, max: 5, label: '1-5 sat/vB' },
       { min: 5, max: 10, label: '5-10 sat/vB' },

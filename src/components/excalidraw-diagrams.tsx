@@ -119,7 +119,7 @@ export function ExcalidrawDiagrams() {
                 />
               </div>
               <div
-                className="px-3 py-2 text-small font-mono truncate border-t"
+                className="px-3 py-2 text-[11px] font-mono truncate border-t"
                 style={{
                   color: "var(--text-secondary)",
                   background: "var(--bg-surface)",
@@ -146,7 +146,7 @@ export function ExcalidrawDiagrams() {
             type="button"
             aria-label="Close"
             onClick={() => setActive(null)}
-            className="absolute top-4 right-4 rounded-md p-2 transition-colors hover:bg-[var(--dot-subtle)]"
+            className="absolute top-4 right-4 rounded-md p-2 transition-colors hover:bg-white/10"
             style={{ color: "#ffffff" }}
           >
             <X size={20} />

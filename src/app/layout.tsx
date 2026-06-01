@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     title: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
     description: 'One person shipping autonomous agents, generative art, and developer tools. Built in production, released in the open.',
     images: [{
-      url: '/og-image.png',
+      url: '/og-image.webp',
       width: 1200,
       height: 630,
       alt: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
     description: 'One person shipping autonomous agents, generative art, and developer tools.',
-    images: ['/og-image.png'],
+    images: ['/og-image.webp'],
   },
   alternates: {
     canonical: 'https://edgelesslab.com',
@@ -75,7 +75,8 @@ export default function RootLayout({
       <head>
         <PerformancePreload />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
-        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' us.i.posthog.com us-assets.i.posthog.com; connect-src 'self' us.i.posthog.com us-assets.i.posthog.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' fonts.gstatic.com;" />
+        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' us.i.posthog.com us-assets.i.posthog.com gumroad.com; connect-src 'self' us.i.posthog.com us-assets.i.posthog.com gumroad.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' fonts.gstatic.com; frame-src 'self' gumroad.com;" />
+        <meta httpEquiv="X-Frame-Options" content="SAMEORIGIN" />
         <meta httpEquiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
         {/* Preconnect hints moved to PerformancePreload component for centralized management */}
       </head>
@@ -98,7 +99,7 @@ export default function RootLayout({
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-full focus:text-sm focus:font-medium focus:text-white"
-          style={{ background: "var(--accent-solid)" }}
+          style={{ background: "var(--accent)" }}
         >
           Skip to main content
         </a>

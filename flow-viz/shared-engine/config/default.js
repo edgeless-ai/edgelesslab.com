@@ -10,7 +10,7 @@ const CONFIG = {
   engine: {
     seed: null,                    // null = random, or specify for reproducible
     frameRate: 60,
-    colorMode: 'hsb',              // 'hsb' | 'rgb' (p5 constants are lowercase)
+    colorMode: 'HSB',              // 'HSB' | 'RGB'
     colorRanges: {                 // For HSB mode
       h: 360,
       s: 100,
@@ -241,7 +241,8 @@ CONFIG.loadEnvironment = function() {
   if (params.has('debug')) {
     this.debug.enabled = params.get('debug') === 'true';
   }
-
+  
+  this.validate();
   return this;
 };
 

@@ -6,7 +6,7 @@
     "dev": "next dev",
     "prebuild": "./scripts/preserve-standalone.sh save",
     "build": "next build",
-    "postbuild": "./scripts/preserve-standalone.sh restore && cp -r pen-plotter/assets out/pen-plotter/ && cp -r pen-plotter/fxhash out/pen-plotter/ && cp -r pen-plotter/kandinsky-to-canvas out/pen-plotter/",
+    "postbuild": "./scripts/preserve-standalone.sh restore && cp -r pen-plotter/assets out/pen-plotter/ && rm -rf out/pen-plotter/assets/medium out/pen-plotter/assets/mediums-all; [ -d pen-plotter/fxhash ] && cp -r pen-plotter/fxhash out/pen-plotter/; [ -d pen-plotter/kandinsky-to-canvas ] && cp -r pen-plotter/kandinsky-to-canvas out/pen-plotter/; true",
     "start": "next start",
     "lint": "eslint && node scripts/lint-experiments.mjs && npm run lint:voice",
     "lint:experiments": "node scripts/lint-experiments.mjs",

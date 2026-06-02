@@ -10,11 +10,21 @@ const eslintConfig = defineConfig([
     // Default ignores of eslint-config-next:
     ".next/**",
     ".next-backup-autoresearch/**",
+    ".standalone-stash/**",
     "_next/**",
     "out/**",
     "build/**",
+    "flow-viz/**",
+    "public/flow-viz/**",
+    "public/tartanism/**",
+    "tartanism/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      "react/no-unescaped-entities": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

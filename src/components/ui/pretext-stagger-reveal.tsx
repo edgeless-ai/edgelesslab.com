@@ -55,10 +55,13 @@ export function StaggerReveal({
   // Detect reduced motion preference
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mq.matches);
+    const frame = requestAnimationFrame(() => setReducedMotion(mq.matches));
     const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
     mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
+    return () => {
+      cancelAnimationFrame(frame);
+      mq.removeEventListener("change", handler);
+    };
   }, []);
 
   // Measure lines

@@ -398,3 +398,13 @@ h1, h2, h3 {
   0%, 100% { opacity: 0.3; transform: scale(1); }
   50% { opacity: 0.8; transform: scale(1.2); }
 }
+
+/* Agent card hover (CSS-only so /agents stays a Server Component for static export) */
+.agent-card {
+  background: var(--bg-surface);
+  border-color: var(--border-subtle);
+}
+.agent-card:hover {
+  background: var(--bg-surface-hover);
+  border-color: rgba(255, 255, 255, 0.12);
+}

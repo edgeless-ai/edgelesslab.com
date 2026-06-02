@@ -156,11 +156,14 @@ export function ASCIIArtGenerator() {
 
   // Generate demo pattern on mount and when settings change
   useEffect(() => {
-    if (!image) {
-      generateDemoPattern();
-    } else {
-      imageToASCII(image);
-    }
+    const frame = requestAnimationFrame(() => {
+      if (!image) {
+        generateDemoPattern();
+      } else {
+        imageToASCII(image);
+      }
+    });
+    return () => cancelAnimationFrame(frame);
   }, [settings, image, generateDemoPattern, imageToASCII]);
 
   return (

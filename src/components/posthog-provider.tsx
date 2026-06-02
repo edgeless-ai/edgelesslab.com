@@ -6,8 +6,6 @@ import { usePathname } from "next/navigation";
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 
-let posthog: any = null;
-
 let initialized = false;
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
@@ -23,22 +21,22 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       await new Promise((r) => requestIdleCallback ? requestIdleCallback(r) : setTimeout(r, 2000));
 
       const { default: ph } = await import("posthog-js");
-      posthog = ph;
 
       if (!POSTHOG_KEY) return;
 
-      ph.init(POSTHOG_KEY, {
+      const options: Parameters<typeof ph.init>[1] & { web_vitals?: boolean } = {
         api_host: POSTHOG_HOST,
         person_profiles: "identified_only",
         capture_pageview: false,
         capture_pageleave: true,
         autocapture: true,
-        capture_performance: false, // disable during init — costs main thread
+        capture_performance: false,
         web_vitals: false,
-      } as any); // @ts-error suppressed — PostHog v2 removed web_vitals type, runtime option still works
+      };
+      ph.init(POSTHOG_KEY, options);
 
       // Capture initial pageview after lazy init
-      let url = window.origin + (pathname || location.pathname);
+      const url = window.origin + (pathname || location.pathname);
       ph.capture("$pageview", { $current_url: url });
     }
 

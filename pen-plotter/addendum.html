@@ -675,8 +675,7 @@ body {
     if (idx < 0 || !manifest.length || idx >= manifest.length) return;
     activeIndex = idx;
     const p = manifest[idx];
-    // load 400px medium webp (deployable, no symlink)
-    lbImg.src = `assets/mediums-all/${p.id}.webp`;
+    lbImg.src = p.thumb;
     lbImg.alt = p.id;
     lbPlateId.textContent = p.id;
     lbPlateRank.textContent = `#${idx + 1} of ${manifest.length.toLocaleString()}`;
@@ -692,7 +691,7 @@ body {
       const n = manifest[idx + d];
       if (n) {
         const i = new Image();
-        i.src = `assets/mediums-all/${n.id}.webp`;
+        i.src = n.thumb;
       }
     });
   }

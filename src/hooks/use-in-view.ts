@@ -20,8 +20,8 @@ export function useInView<T extends HTMLElement = HTMLDivElement>(
       "(prefers-reduced-motion: reduce)",
     ).matches;
     if (prefersReduced) {
-      setInView(true);
-      return;
+      const frame = requestAnimationFrame(() => setInView(true));
+      return () => cancelAnimationFrame(frame);
     }
 
     const observer = new IntersectionObserver(

@@ -535,7 +535,7 @@ This kit is the exact setup we use to run 10+ agents daily on a MacBook Pro. Ext
 - Linux instructions included (not automated)
 
 **Section 2: Agent Swarm Blueprint**
-- 5 pre-configured agent roles: Beau (research), Hive (orchestrator), Kilo (execution), Scribe (documentation), Verifier (audit)
+- 5 pre-configured agent roles: research, orchestration, execution, documentation, and audit
 - AGENTS.md templates for each role
 - Routing matrix: when to use which agent, with real examples
 - Paperclip integration config
@@ -566,11 +566,11 @@ This kit is the exact setup we use to run 10+ agents daily on a MacBook Pro. Ext
 
 ## Bonuses
 
-1. **Agent Autonomy Policy Template** -- fill-in-the-blank AGENTS.md for any new agent
-2. **Discord Envelope Protocol Cheatsheet** -- compact routing reference
-3. **50 Production Skills Index** -- curated list of best Hermes skills with install commands
-4. **Weekly Health Check Script** -- automated system audit
-5. **Paperclip Task Routing Config** -- project-to-agent mapping template
+1. **Agent Autonomy Policy Template**: fill-in-the-blank AGENTS.md for any new agent
+2. **Discord Envelope Protocol Cheatsheet**: compact routing reference
+3. **50 Production Skills Index**: curated list of best Hermes skills with install commands
+4. **Weekly Health Check Script**: automated system audit
+5. **Paperclip Task Routing Config**: project-to-agent mapping template
 
 ## Who this is for
 

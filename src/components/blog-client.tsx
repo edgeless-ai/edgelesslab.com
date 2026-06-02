@@ -161,7 +161,7 @@ export function BlogSearch({
                 style={{ color: "var(--accent)" }}
               >
                 {filtered.length} result{filtered.length !== 1 ? "s" : ""}{" "}
-                for "{query}"
+                for &quot;{query}&quot;
               </span>
             )}
           </div>

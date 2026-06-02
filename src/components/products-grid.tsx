@@ -58,7 +58,10 @@ export function ProductsGrid({ products }: { products: Product[] }) {
     offsetY: number;
   } | null>(null);
   const dragRef = useRef(dragState);
-  dragRef.current = dragState;
+
+  useEffect(() => {
+    dragRef.current = dragState;
+  }, [dragState]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -106,11 +109,6 @@ export function ProductsGrid({ products }: { products: Product[] }) {
         const colWidth = (containerWidth - gap * (columns - 1)) / columns;
 
         // Find which column the drop landed in
-        const dropCol = Math.min(
-          columns - 1,
-          Math.max(0, Math.floor(dropX / (colWidth + gap)))
-        );
-
         // Find insertion point based on Y position within the masonry
         const draggedKey = ds.key;
         const otherKeys = cardOrder.filter((k) => k !== draggedKey);
@@ -124,7 +122,7 @@ export function ProductsGrid({ products }: { products: Product[] }) {
         for (const key of cardOrder) {
           const product = products.find((p) => p.name === key);
           if (!product) continue;
-          let h = estimateHeight(product, ready, prepare, layout, textWidth, expandedCards.has(key));
+          const h = estimateHeight(product, ready, prepare, layout, textWidth, expandedCards.has(key));
           heights.set(key, h);
         }
 
@@ -341,13 +339,6 @@ function ProductCard({
   isDragging: boolean;
   onDragStart: (e: ReactPointerEvent<HTMLDivElement>) => void;
 }) {
-  const [wasExpanded, setWasExpanded] = useState(false);
-  const justExpanded = expanded && !wasExpanded;
-
-  useEffect(() => {
-    setWasExpanded(expanded);
-  }, [expanded]);
-
   return (
     <div
       onPointerDown={onDragStart}
@@ -447,7 +438,7 @@ function ProductCard({
                 transform: expanded
                   ? "translateY(0) scale(1)"
                   : `translateY(${-6 - i * 2}px) scale(0.97)`,
-                transition: justExpanded
+                transition: expanded
                   ? `opacity 0.3s ease ${i * 60}ms, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 60}ms`
                   : "opacity 0.12s ease, transform 0.12s ease",
               }}
@@ -461,7 +452,7 @@ function ProductCard({
                   borderRadius: "50%",
                   background: "var(--accent)",
                   transform: expanded ? "scale(1)" : "scale(0)",
-                  transition: justExpanded
+                  transition: expanded
                     ? `transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 60 + 40}ms`
                     : "transform 0.1s ease",
                 }}

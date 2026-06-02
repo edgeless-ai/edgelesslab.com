@@ -5,7 +5,7 @@ import { createPageMetadata } from "@/lib/metadata";
 export const metadata = createPageMetadata({
   title: "Swarm Agents",
   description:
-    "Meet the 8-bot autonomous agent swarm powering Edgeless Lab. Hive, Beau, Kilo, Scribe, Edgeless CC, Ombudsman, Pamela, Atlas — each with distinct roles and models.",
+    "Meet the autonomous agent swarm powering Edgeless Lab — coordination, engineering, code execution, research, knowledge curation, monitoring, and project management, each a distinct role with its own model.",
   path: "/agents",
   keywords: [
     "AI agents",
@@ -17,14 +17,13 @@ export const metadata = createPageMetadata({
   ],
 });
 
+// Roles only — individual agents are intentionally unnamed on the public site.
 const agents = [
   {
-    name: "Hive",
-    handle: "Hive#2662",
-    model: "Kimi K2.6 (Fireworks)",
+    model: "Kimi K2.6",
     role: "Swarm Coordinator",
     personality:
-      "Clear, directive, bridging. Translates human intent into agent directives. Routes to specialists, triages by priority, breaks standby loops.",
+      "Clear, directive, bridging. Translates human intent into agent directives. Routes work to specialists, triages by priority, and breaks standby loops.",
     responseTime: "Variable",
     status: "active",
     accent: "rgba(99, 103, 216, 0.15)",
@@ -32,26 +31,24 @@ const agents = [
     accentDot: "#6367D8",
     tools: [
       "Human coordination",
-      "Cross-bot handoffs",
+      "Cross-agent handoffs",
       "Mission routing",
       "Priority triage",
-      "Discord orchestration",
+      "Orchestration",
     ],
   },
   {
-    name: "Beau",
-    handle: "Beau (via VPS)",
-    model: "Kimi K2.5 (VPS)",
-    role: "VPS Planning & Research",
+    model: "Kimi K2.5",
+    role: "Infrastructure & Research",
     personality:
-      "Always-on spine. Handles infrastructure, cron outputs, daily alignment, system health. Reads vault queues, processes depth intake, owns Edgeless Public project.",
+      "Always-on spine. Owns infrastructure, cron outputs, daily alignment, and system health. Reads queues, processes intake, keeps the lights on.",
     responseTime: "~15s",
     status: "active",
     accent: "rgba(52, 211, 153, 0.15)",
     accentBorder: "rgba(52, 211, 153, 0.3)",
     accentDot: "#10B981",
     tools: [
-      "VPS deployment",
+      "Deployment",
       "Cron orchestration",
       "System monitoring",
       "Research synthesis",
@@ -59,19 +56,17 @@ const agents = [
     ],
   },
   {
-    name: "Kilo",
-    handle: "Kilo#3551",
     model: "GPT-5.3 Codex",
-    role: "Code Execution Specialist",
+    role: "Code Execution",
     personality:
-      "Aggressive shipping. Hell yeah/nope communication. Fires implementations fast with smoke tests, patches, and iterative PRs.",
-    responseTime: "Aggressive",
+      "Aggressive shipping. Fires implementations fast with smoke tests, patches, and iterative PRs.",
+    responseTime: "Fast",
     status: "active",
     accent: "rgba(245, 158, 11, 0.15)",
     accentBorder: "rgba(245, 158, 11, 0.3)",
     accentDot: "#F59E0B",
     tools: [
-      "Code implementation",
+      "Implementation",
       "Debugging",
       "Tests",
       "Refactoring",
@@ -80,32 +75,28 @@ const agents = [
     ],
   },
   {
-    name: "Scribe",
-    handle: "Scribe#3134",
     model: "Kimi K2.5",
     role: "Knowledge Curation",
     personality:
-      "Deep, long-form synthesis. Writes KB articles, vault docs, research reports. Manages enrichment pipelines and cross-references.",
+      "Deep, long-form synthesis. Writes knowledge-base articles, docs, and research reports. Manages enrichment pipelines and cross-references.",
     responseTime: "~45s",
     status: "active",
     accent: "rgba(139, 92, 246, 0.15)",
     accentBorder: "rgba(139, 92, 246, 0.3)",
     accentDot: "#8B5CF6",
     tools: [
-      "KB article creation",
+      "Article creation",
       "Vault curation",
       "Enrichment pipeline",
       "Research synthesis",
-      "YouTube/RSS triage",
+      "Source triage",
     ],
   },
   {
-    name: "Edgeless CC",
-    handle: "Edgeless CC#9904",
     model: "Kimi K2.5",
-    role: "Engineering Lead (COO)",
+    role: "Engineering Lead",
     personality:
-      "Architecture-first. Produces specs → Kilo executes. Testing, iteration, and quality gate culture. Manages Claude Code agent under Edgeless CC org.",
+      "Architecture-first. Produces specs that the execution agents implement, and drives testing, iteration, and a quality-gate culture.",
     responseTime: "~35s",
     status: "active",
     accent: "rgba(236, 72, 153, 0.15)",
@@ -120,12 +111,10 @@ const agents = [
     ],
   },
   {
-    name: "Ombudsman",
-    handle: "(via #bot-backroom)",
     model: "Kimi K2.5",
-    role: "Discord Swarm Monitor",
+    role: "Swarm Monitor",
     personality:
-      "Quiet observer. Watches bot-to-bot communication channels to detect protocol violations and anti-loop behavior.",
+      "Quiet observer. Watches inter-agent communication to detect protocol violations and anti-loop behavior.",
     responseTime: "On-call",
     status: "active",
     accent: "rgba(107, 114, 128, 0.15)",
@@ -139,32 +128,10 @@ const agents = [
     ],
   },
   {
-    name: "Pamela",
-    handle: "Portfolio Manager",
-    model: "GPT-5.3 Codex (VPS)",
-    role: "Trading & Portfolio Mgmt",
-    personality:
-      "Analyzes Polymarket prediction markets. Manages capital allocation, position sizing, and risk management. Cron-triggered strategy analysis every 5min.",
-    responseTime: "~20s",
-    status: "active",
-    accent: "rgba(16, 185, 129, 0.15)",
-    accentBorder: "rgba(16, 185, 129, 0.3)",
-    accentDot: "#10B981",
-    tools: [
-      "Polymarket analysis",
-      "Capital allocation",
-      "Risk management",
-      "Trade execution",
-      "Strategy backtesting",
-    ],
-  },
-  {
-    name: "Atlas",
-    handle: "(Project Manager)",
     model: "Kimi K2.5",
     role: "Project Manager",
     personality:
-      "Tracks deliverables, chases blockers, writes status reports. Keeps the swarm on schedule and unblocks stuck workstreams.",
+      "Tracks deliverables, chases blockers, and writes status reports. Keeps the swarm on schedule and unblocks stuck workstreams.",
     responseTime: "On-call",
     status: "active",
     accent: "rgba(249, 115, 22, 0.15)",
@@ -216,8 +183,8 @@ export default function AgentsPage() {
               className="text-lg font-light max-w-2xl mb-4"
               style={{ color: "var(--text-secondary)" }}
             >
-              8 autonomous agents, each with distinct roles, models, and
-              personalities. Running 24/7 on Discord, watching Paperclip, shipping
+              A swarm of autonomous agents, each with a distinct role, model, and
+              personality. Running 24/7 on Discord, watching Paperclip, shipping
               work in the background.
             </p>
             <p
@@ -230,23 +197,8 @@ export default function AgentsPage() {
             <div className="grid gap-4 md:grid-cols-2">
               {agents.map((agent) => (
                 <div
-                  key={agent.name}
-                  className="rounded-xl border p-6 transition-all"
-                  style={{
-                    background: "var(--bg-surface)",
-                    borderColor: "var(--border-subtle)",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor =
-                      "rgba(255,255,255,0.12)";
-                    e.currentTarget.style.background =
-                      "var(--bg-surface-hover)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor =
-                      "var(--border-subtle)";
-                    e.currentTarget.style.background = "var(--bg-surface)";
-                  }}
+                  key={agent.role}
+                  className="agent-card rounded-xl border p-6 transition-all"
                 >
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
@@ -259,14 +211,8 @@ export default function AgentsPage() {
                           className="text-base font-semibold tracking-tight"
                           style={{ color: "var(--text-primary)" }}
                         >
-                          {agent.name}
+                          {agent.role}
                         </h2>
-                        <span
-                          className="text-[11px] font-mono"
-                          style={{ color: "var(--text-tertiary)" }}
-                        >
-                          {agent.handle}
-                        </span>
                       </div>
                     </div>
                     <span
@@ -304,17 +250,6 @@ export default function AgentsPage() {
                     >
                       <span style={{ color: "var(--text-muted)" }}>model</span>{" "}
                       {agent.model}
-                    </span>
-                    <span
-                      className="px-2 py-0.5 rounded"
-                      style={{
-                        color: "var(--text-tertiary)",
-                        background: "var(--bg-elevated)",
-                        border: "1px solid var(--border-subtle)",
-                      }}
-                    >
-                      <span style={{ color: "var(--text-muted)" }}>role</span>{" "}
-                      {agent.role}
                     </span>
                     <span
                       className="px-2 py-0.5 rounded"

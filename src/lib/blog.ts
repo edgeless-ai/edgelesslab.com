@@ -1,3 +1,5 @@
+import { newPosts } from "./blog-new-posts";
+
 export interface BlogPost {
   slug: string;
   title: string;
@@ -2886,4 +2888,5 @@ The source repo has the full set of skills we use to build these demos automatic
 **Bottom line:** Research shouldn't be read-only. Every paper that matters to your work should have a live, interactive demo attached. marimo makes that practical at scale.
     `.trim(),
   },
+  ...newPosts,
 ];

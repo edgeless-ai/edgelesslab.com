@@ -129,7 +129,8 @@ export function PreTextBlock({
   ]);
 
   useEffect(() => {
-    doLayout();
+    const frame = requestAnimationFrame(doLayout);
+    return () => cancelAnimationFrame(frame);
   }, [doLayout]);
 
   // ResizeObserver -- no `ready` guard needed, doLayout checks it internally

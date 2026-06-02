@@ -63,7 +63,8 @@ export function PreTextAccordion({
   }, [ready, prepare, layout, items, font, lineHeight, containerWidth, paddingY, itemGap]);
 
   useEffect(() => {
-    measure();
+    const frame = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(frame);
   }, [measure]);
 
   return (

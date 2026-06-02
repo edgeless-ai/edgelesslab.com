@@ -45,7 +45,8 @@ export default function AvvatarWidget() {
   }, [seed, gridSize, palette, patternType, shape, symmetric])
 
   useEffect(() => {
-    regenerate()
+    const frame = requestAnimationFrame(regenerate)
+    return () => cancelAnimationFrame(frame)
   }, [regenerate])
 
   const reroll = () => {

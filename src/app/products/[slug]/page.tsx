@@ -204,7 +204,6 @@ export default async function ProductDetailPage({
                 className="rounded-xl border overflow-hidden"
                 style={{ background: "var(--bg-surface)", borderColor: "var(--border-subtle)" }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <picture>
                   <source
                     srcSet={`/product-covers/${slug}.webp`}
@@ -304,6 +303,11 @@ function renderMarkdown(content: string): string {
       i++;
       continue;
     }
+    if (line.startsWith("# ")) {
+      blocks.push(`<h1>${inlineFormat(line.slice(2))}</h1>`);
+      i++;
+      continue;
+    }
 
     if (line.trimStart().startsWith("- ") || /^\d+\.\s/.test(line.trimStart())) {
       const isOrdered = /^\d+\.\s/.test(line.trimStart());
@@ -339,6 +343,8 @@ function renderMarkdown(content: string): string {
     }
     if (paraLines.length) {
       blocks.push(`<p>${inlineFormat(paraLines.join(" "))}</p>`);
+    } else {
+      i++;
     }
   }
 

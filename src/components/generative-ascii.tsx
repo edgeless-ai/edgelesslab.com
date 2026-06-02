@@ -213,7 +213,7 @@ function generatePiece(seed: number): AsciiPiece {
 }
 
 export function GenerativeAscii() {
-  const { ready } = usePreText("Geist Mono");
+  usePreText("Geist Mono");
   const [piece, setPiece] = useState<AsciiPiece | null>(null);
   const [isRevealed, setIsRevealed] = useState(false);
   const [revealProgress, setRevealProgress] = useState(0);
@@ -222,8 +222,11 @@ export function GenerativeAscii() {
 
   // Generate on mount
   useEffect(() => {
-    const seed = Date.now() ^ (Math.random() * 0xffffffff);
-    setPiece(generatePiece(seed));
+    const frame = requestAnimationFrame(() => {
+      const seed = Date.now() ^ (Math.random() * 0xffffffff);
+      setPiece(generatePiece(seed));
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   // Reveal animation

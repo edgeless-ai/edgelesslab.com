@@ -64,6 +64,7 @@ export default async function BlogPostPage({
   const { slug } = await params;
   const post = posts.find((p) => p.slug === slug);
   if (!post) notFound();
+  const html = renderMarkdown(post.content);
 
   return (
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
@@ -162,7 +163,7 @@ export default async function BlogPostPage({
 
           {/* Content */}
           <BlogArticle
-            html={renderMarkdown(post.content)}
+            html={html}
             editorial={post.editorial}
             sidebar={
               post.productSlug ? (() => {
@@ -379,6 +380,11 @@ function renderMarkdown(content: string): string {
       i++;
       continue;
     }
+    if (line.startsWith("# ")) {
+      blocks.push(`<h1>${inlineFormat(line.slice(2))}</h1>`);
+      i++;
+      continue;
+    }
 
     // Lists
     if (line.trimStart().startsWith("- ") || /^\d+\.\s/.test(line.trimStart())) {
@@ -416,6 +422,8 @@ function renderMarkdown(content: string): string {
     }
     if (paraLines.length) {
       blocks.push(`<p>${inlineFormat(paraLines.join(" "))}</p>`);
+    } else {
+      i++;
     }
   }
 

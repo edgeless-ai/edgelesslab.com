@@ -7,7 +7,9 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },
-  turbopack: {},
+  turbopack: {
+    root: process.cwd(),
+  },
   webpack: (config) => {
     // Tree-shake unused exports
     config.optimization = {

@@ -90,7 +90,8 @@ export function useShrinkWrap(
   ]);
 
   useEffect(() => {
-    calculate();
+    const frame = requestAnimationFrame(calculate);
+    return () => cancelAnimationFrame(frame);
   }, [calculate]);
 
   return balancedWidth;

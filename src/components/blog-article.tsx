@@ -31,7 +31,7 @@ function useScrollReveal(containerRef: React.RefObject<HTMLDivElement | null>) {
       ).matches;
 
       // Check if already wrapped (React strict mode double-run)
-      let wrappers = Array.from(
+      const wrappers = Array.from(
         el.querySelectorAll<HTMLDivElement>(".blog-section")
       );
 

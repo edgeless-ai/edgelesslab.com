@@ -56,3 +56,25 @@ reports/system-manifest.json
 
 # Bot config cheat sheet contains plaintext bot tokens — never commit
 output/bot-config-cheatsheet.xlsx
+
+# === Bloated generated artifacts / data / cloned repos (EDGA cleanup 2026-06-02) ===
+# Generated media & scratch artifacts (canonical: regenerated, not version-controlled)
+generated/
+captures/
+ascii_demo_clips/
+# Vector store & DB snapshots
+chroma-data/
+backups/
+*.sqlite3
+*.sqlite
+# Third-party cloned repos (not ours to commit)
+github-repos/
+# Legacy workspace & runtime state
+_legacy-01-tools/
+.feeds/
+.coord/
+# Large data backup (78MB+ CSV) — untracked below
+edgelesslab/_nga_data_backup/
+# Large binary media
+*.mp4
+*.zip

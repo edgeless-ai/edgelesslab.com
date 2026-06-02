@@ -7,6 +7,7 @@ interface Experiment {
   status: string;
   slug: string;
   href?: string;
+  liveHref?: string;
 }
 
 export function LabHeader() {
@@ -83,8 +84,7 @@ export function LabGrid({ experiments }: { experiments: Experiment[] }) {
       {experiments.map((exp, i) => (
         <a
           key={exp.slug}
-          href={exp.href || `/lab/${exp.slug}`}
-          {...(exp.href ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          href={`/lab/${exp.slug}`}
           className="group relative flex flex-col rounded-xl border p-6 transition-colors hover:border-white/20"
           style={{
             background: "var(--bg-surface)",

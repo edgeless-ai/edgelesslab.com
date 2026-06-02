@@ -11,7 +11,13 @@ import type { experiments } from "@/lib/data";
 type Experiment = (typeof experiments)[number];
 
 export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
-  const hasLive = "href" in experiment && typeof experiment.href === "string";
+  const liveHref =
+    "liveHref" in experiment && typeof experiment.liveHref === "string"
+      ? experiment.liveHref
+      : "href" in experiment && typeof experiment.href === "string"
+        ? experiment.href
+        : null;
+  const hasLive = liveHref != null;
   const hasRelatedProject =
     "relatedProject" in experiment &&
     experiment.relatedProject != null &&
@@ -241,7 +247,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                     style={{ animation: "fadeInUp 0.4s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}
                   >
                     <a
-                      href={(experiment as { href: string }).href}
+                      href={liveHref}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors"
@@ -381,7 +387,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                       Links
                     </h2>
                     <a
-                      href={(experiment as { href: string }).href}
+                      href={liveHref}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[13px] hover:text-white transition-colors inline-flex items-center gap-1"

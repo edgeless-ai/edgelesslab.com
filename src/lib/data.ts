@@ -622,7 +622,7 @@ export const experiments = [
     stack: ["Python", "librosa", "numba", "Canvas", "Web Audio", "FFmpeg"],
     category: "Audio Visual",
     status: "Live",
-    href: "/chladni-visualizer/",
+    liveHref: "/chladni-visualizer/",
     relatedFieldNote: {
       title: "Turning Audio Into a Resonant Plate",
       href: "/blog/chladni-waveform-visualizer",

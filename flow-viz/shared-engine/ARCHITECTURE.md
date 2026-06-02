@@ -80,7 +80,7 @@ CONFIG_CHANGED, DATA_SOURCE_SWITCH
 **Future plugins:**
 - `AudioReactive` -- WebAudio FFT input
 - `TooltipOverlay` -- market info on hover
-- `TradingBridge` -- trading bot position overlay
+- `PamelaBridge` -- trading bot position overlay
 - `Recording` -- automated frame capture
 
 ### 4. Adapter Pattern for Data Sources
@@ -235,15 +235,15 @@ orchestrator.plugins.enable('audio-reactive');
 ### Add new data source:
 
 ```javascript
-// adapters/trading-source.js
-class TradingDataSource extends DataSourceAdapter {
+// adapters/pamela-source.js
+class PamelaDataSource extends DataSourceAdapter {
   constructor(wsUrl) {
-    super('trading-websocket');
+    super('pamela-websocket');
     this.wsUrl = wsUrl;
   }
 
   async fetch() {
-    // Connect to Trading bot WebSocket
+    // Connect to Pamela bot WebSocket
     // Return positions as market-like data
   }
 
@@ -324,5 +324,5 @@ test('MockDataSource generates valid markets', async () => {
 2. **Next** -- Cloudflare proxy for CORS, test REST source
 3. **Then** -- Public demo page (no UI, just viz)
 4. **Then** -- Trader workstation (detail panels, controls)
-5. **Then** -- Trading integration (position overlay, alerts)
+5. **Then** -- Pamela integration (position overlay, alerts)
 6. **Then** -- WebSocket real-time (if API available)

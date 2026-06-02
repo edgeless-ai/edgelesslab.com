@@ -53,6 +53,11 @@ export default function BlogPage() {
     })
   );
 
+  // Sort posts by date descending (newest first)
+  const sortedPosts = [...posts].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
   return (
     <div
       className="flex flex-col min-h-full"
@@ -67,8 +72,8 @@ export default function BlogPage() {
           name: "Edgeless Lab Blog",
           description:
             "Field notes from one developer running AI agents, MCP servers, and generative art pipelines in production.",
-          numberOfItems: posts.length,
-          itemListElement: posts.map((post, i) => ({
+          numberOfItems: sortedPosts.length,
+          itemListElement: sortedPosts.map((post, i) => ({
             "@type": "ListItem",
             position: i + 1,
             url: `https://edgelesslab.com/blog/${post.slug}`,
@@ -77,7 +82,7 @@ export default function BlogPage() {
         }}
       />
 
-      <BlogSearch allPosts={posts} tagCounts={tagCounts} />
+      <BlogSearch allPosts={sortedPosts} tagCounts={tagCounts} />
 
       <Footer />
     </div>

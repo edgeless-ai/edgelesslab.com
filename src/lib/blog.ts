@@ -15,6 +15,8 @@ export interface BlogPost {
   editorial?: boolean;
   /** One-line hook for the companion product CTA. Pain-point framing, not generic. */
   ctaHook?: string;
+  /** Blog post cover image / og:image path */
+  image?: string;
 }
 
 export const posts: BlogPost[] = [

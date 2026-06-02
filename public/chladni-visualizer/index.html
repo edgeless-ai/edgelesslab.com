@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chladni Visualizer - Edgeless Lab</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --hm-paper: #f4f0e7;
+      --hm-porcelain: #f8f8f2;
+      --hm-carbon: #050505;
+      --hm-toner: #202826;
+      --hm-blueprint: #061f59;
+      --hm-signal-blue: #133cff;
+      --hm-cyan: #dceaff;
+      --hm-riso-green: #178c58;
+      --hm-alert: #f2f0d9;
+      --hm-font-display: Impact, Haettenschweiler, "Arial Black", sans-serif;
+      --hm-font-mono: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --hm-font-ui: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --hm-line: 2px;
+      --hm-radius-tight: 2px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--hm-paper);
+      color: var(--hm-carbon);
+      font-family: var(--hm-font-ui);
+      min-height: 100vh;
+      background-image:
+        radial-gradient(rgba(0,0,0,.13) .7px, transparent .8px),
+        radial-gradient(rgba(0,0,0,.07) .6px, transparent .7px);
+      background-position: 0 0, 6px 8px;
+      background-size: 13px 17px, 19px 23px;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
+    }
+
+    .rail {
+      border-right: var(--hm-line) solid var(--hm-carbon);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background: rgba(244, 240, 231, .94);
+    }
+
+    .brand {
+      display: grid;
+      gap: 12px;
+    }
+
+    .route {
+      font-family: var(--hm-font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 2px solid var(--hm-carbon);
+      padding-bottom: 10px;
+    }
+
+    h1 {
+      font-family: var(--hm-font-display);
+      font-size: clamp(44px, 8vw, 78px);
+      line-height: .84;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    .drop {
+      position: relative;
+      border: 2px dashed var(--hm-carbon);
+      min-height: 128px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      text-align: center;
+      background: var(--hm-cyan);
+      cursor: pointer;
+      box-shadow: 7px 7px 0 var(--hm-carbon);
+    }
+
+    .drop[data-active="true"] {
+      background: var(--hm-alert);
+    }
+
+    .drop input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .drop strong {
+      font-family: var(--hm-font-mono);
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .panel {
+      border: 2px solid var(--hm-carbon);
+      padding: 14px;
+      background: rgba(248, 248, 242, .8);
+    }
+
+    .panel h2 {
+      font-family: var(--hm-font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      margin: 0 0 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      font-family: var(--hm-font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      border: 2px solid var(--hm-carbon);
+      border-radius: var(--hm-radius-tight);
+      background: var(--hm-porcelain);
+      color: var(--hm-carbon);
+      min-height: 38px;
+      padding: 7px 9px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn {
+      border: 2px solid var(--hm-carbon);
+      background: transparent;
+      color: var(--hm-carbon);
+      min-height: 42px;
+      padding: 8px 10px;
+      font-family: var(--hm-font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 var(--hm-carbon);
+    }
+
+    .btn[data-fill="true"] {
+      background: var(--hm-carbon);
+      color: var(--hm-paper);
+    }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .status {
+      font-family: var(--hm-font-mono);
+      font-size: 12px;
+      line-height: 1.45;
+      text-transform: uppercase;
+      min-height: 54px;
+      border-top: 2px solid var(--hm-carbon);
+      padding-top: 12px;
+    }
+
+    .stage {
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(19,60,255,.09), transparent 28%, rgba(23,140,88,.10)),
+        var(--hm-toner);
+    }
+
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .16;
+      pointer-events: none;
+      background-image: repeating-linear-gradient(to bottom, rgba(255,255,255,.5) 0 1px, transparent 1px 6px);
+    }
+
+    .scope {
+      width: min(86vh, 86vw);
+      aspect-ratio: 1;
+      border: 2px solid var(--hm-paper);
+      position: relative;
+      box-shadow: 14px 14px 0 rgba(0,0,0,.5);
+      background: #050505;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+    }
+
+    .meta {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 4px;
+      color: var(--hm-paper);
+      font-family: var(--hm-font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .plate-label {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      color: var(--hm-cyan);
+      font-family: var(--hm-font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    @media (max-width: 820px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+      .rail {
+        border-right: 0;
+        border-bottom: 2px solid var(--hm-carbon);
+      }
+      .stage {
+        min-height: 62vh;
+        padding: 16px;
+      }
+      .scope {
+        width: min(92vw, 62vh);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="rail">
+      <section class="brand">
+        <div class="route">
+          <span>EDGELESS / SIGNAL PLATE</span>
+          <span id="checksum">CHK 0000</span>
+        </div>
+        <h1>Chladni Visualizer</h1>
+      </section>
+
+      <label class="drop" id="dropzone">
+        <input id="file" type="file" accept="audio/*">
+        <strong>Drop audio / select file</strong>
+      </label>
+
+      <section class="panel">
+        <h2><span>Route Controls</span><span id="modeReadout">M5 N4</span></h2>
+        <div class="field">
+          <label for="preset">Preset</label>
+          <select id="preset">
+            <option value="classic">Classic Plate</option>
+            <option value="festival">Festival Identity</option>
+            <option value="album">Album Art</option>
+            <option value="social">Social Clip</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="style">Style</label>
+          <select id="style">
+            <option value="sand">Sand</option>
+            <option value="liquid">Liquid</option>
+            <option value="paint">Paint</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="title">Title</label>
+          <input id="title" value="Untitled Signal">
+        </div>
+        <div class="field">
+          <label for="artist">Artist</label>
+          <input id="artist" value="Edgeless Lab">
+        </div>
+        <div class="buttons">
+          <button class="btn" id="play" disabled data-fill="true">Play</button>
+          <button class="btn" id="png">PNG</button>
+          <button class="btn" id="record" disabled>WebM</button>
+          <button class="btn" id="reset">Reset</button>
+        </div>
+      </section>
+
+      <div class="status" id="status">STATUS: WAITING FOR AUDIO<br>ROUTE: LOCAL PREVIEW</div>
+    </aside>
+
+    <section class="stage">
+      <div class="scope">
+        <canvas id="canvas" width="960" height="960"></canvas>
+        <div class="plate-label" id="plateLabel">PLATE: IDLE / 960 GRID</div>
+        <div class="meta">
+          <span id="trackMeta">NO AUDIO</span>
+          <span>HERMES CYAN RELAY</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const fileInput = document.getElementById("file");
+    const dropzone = document.getElementById("dropzone");
+    const playButton = document.getElementById("play");
+    const pngButton = document.getElementById("png");
+    const recordButton = document.getElementById("record");
+    const resetButton = document.getElementById("reset");
+    const presetInput = document.getElementById("preset");
+    const styleInput = document.getElementById("style");
+    const titleInput = document.getElementById("title");
+    const artistInput = document.getElementById("artist");
+    const statusEl = document.getElementById("status");
+    const modeReadout = document.getElementById("modeReadout");
+    const trackMeta = document.getElementById("trackMeta");
+    const checksum = document.getElementById("checksum");
+    const plateLabel = document.getElementById("plateLabel");
+
+    const presets = {
+      classic: { m: 5, n: 4, warmth: 205, sharpness: 1.8 },
+      festival: { m: 7, n: 5, warmth: 190, sharpness: 2.4 },
+      album: { m: 4, n: 6, warmth: 240, sharpness: 1.5 },
+      social: { m: 6, n: 3, warmth: 28, sharpness: 2.8 }
+    };
+
+    let audioContext;
+    let buffer;
+    let source;
+    let analyser;
+    let dataArray;
+    let isPlaying = false;
+    let startedAt = 0;
+    let pausedAt = 0;
+    let raf = 0;
+    let recorder;
+    let chunks = [];
+
+    function status(text) {
+      statusEl.innerHTML = text;
+    }
+
+    function hashName(name) {
+      let h = 2166136261;
+      for (let i = 0; i < name.length; i++) {
+        h ^= name.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return (h >>> 0).toString(16).slice(0, 4).toUpperCase();
+    }
+
+    function drawPattern(level = 0.35, centroid = 0.35, bass = 0.4, treble = 0.5, beat = 0) {
+      const preset = presets[presetInput.value];
+      const style = styleInput.value;
+      const w = canvas.width;
+      const h = canvas.height;
+      const image = ctx.createImageData(w, h);
+      const modeM = Math.max(1, Math.round(preset.m + treble * 3));
+      const modeN = Math.max(1, Math.round(preset.n + bass * 3));
+      const warmHue = (preset.warmth + centroid * 160 + beat * 28) % 360;
+      const sharp = preset.sharpness + treble * 2.8;
+      const t = performance.now() * 0.001;
+
+      modeReadout.textContent = `M${modeM} N${modeN}`;
+      plateLabel.textContent = `PLATE: ACTIVE / ${w} GRID`;
+
+      let p = 0;
+      for (let y = 0; y < h; y++) {
+        const yy = y / (h - 1);
+        for (let x = 0; x < w; x++) {
+          const xx = x / (w - 1);
+          const waveA = Math.sin(modeM * Math.PI * xx + t * bass) * Math.sin(modeN * Math.PI * yy - t * treble);
+          const waveB = Math.sin((modeN + 1) * Math.PI * (xx + yy * .18)) * Math.sin((modeM + 1) * Math.PI * (yy - xx * .12));
+          const node = 1 - Math.min(1, Math.abs(waveA * .78 + waveB * .32) * sharp);
+          const dust = Math.max(0, node) * (.55 + level * .75);
+          const ring = Math.sin((xx * xx + yy * yy) * 24 + t * 2) * 0.05;
+          const value = Math.max(0, Math.min(1, dust + ring + beat * 0.12));
+          const hue = (warmHue + value * (style === "paint" ? 95 : 42)) % 360;
+          const sat = style === "liquid" ? 72 : 86;
+          const lum = style === "sand" ? 12 + value * 74 : 18 + value * 68;
+          const [r, g, b] = hslToRgb(hue, sat / 100, lum / 100);
+          image.data[p++] = r;
+          image.data[p++] = g;
+          image.data[p++] = b;
+          image.data[p++] = 255;
+        }
+      }
+      ctx.putImageData(image, 0, 0);
+      drawOverlay();
+    }
+
+    function drawOverlay() {
+      const title = titleInput.value.trim();
+      const artist = artistInput.value.trim();
+      if (!title && !artist) return;
+      const pad = 28;
+      ctx.save();
+      ctx.fillStyle = "rgba(5, 5, 5, .78)";
+      ctx.strokeStyle = "#f4f0e7";
+      ctx.lineWidth = 2;
+      ctx.fillRect(pad, canvas.height - 124, canvas.width - pad * 2, 90);
+      ctx.strokeRect(pad, canvas.height - 124, canvas.width - pad * 2, 90);
+      ctx.font = "16px monospace";
+      ctx.fillStyle = "#dceaff";
+      ctx.fillText("EDGELESS LAB / SIGNAL PLATE", pad + 18, canvas.height - 94);
+      ctx.fillStyle = "#f4f0e7";
+      ctx.font = "28px Impact, Arial Black, sans-serif";
+      ctx.fillText(title || "UNTITLED SIGNAL", pad + 18, canvas.height - 58);
+      ctx.font = "14px monospace";
+      ctx.fillStyle = "#b9d8c5";
+      ctx.fillText((artist || "UNKNOWN ARTIST").toUpperCase(), pad + 18, canvas.height - 34);
+      ctx.restore();
+    }
+
+    function hslToRgb(h, s, l) {
+      const c = (1 - Math.abs(2 * l - 1)) * s;
+      const hp = h / 60;
+      const x = c * (1 - Math.abs((hp % 2) - 1));
+      let r = 0, g = 0, b = 0;
+      if (hp < 1) [r, g, b] = [c, x, 0];
+      else if (hp < 2) [r, g, b] = [x, c, 0];
+      else if (hp < 3) [r, g, b] = [0, c, x];
+      else if (hp < 4) [r, g, b] = [0, x, c];
+      else if (hp < 5) [r, g, b] = [x, 0, c];
+      else [r, g, b] = [c, 0, x];
+      const m = l - c / 2;
+      return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
+    }
+
+    async function loadFile(file) {
+      if (!audioContext) audioContext = new AudioContext();
+      const data = await file.arrayBuffer();
+      buffer = await audioContext.decodeAudioData(data);
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 1024;
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
+      playButton.disabled = false;
+      recordButton.disabled = false;
+      trackMeta.textContent = `${file.name} / ${buffer.duration.toFixed(1)}S`;
+      checksum.textContent = `CHK ${hashName(file.name)}`;
+      status(`STATUS: AUDIO READY<br>ROUTE: ${file.name.toUpperCase()}`);
+      drawPattern(.45, .35, .42, .55, .15);
+    }
+
+    function connectSource(offset = 0) {
+      source = audioContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+      source.onended = () => {
+        if (isPlaying && audioContext.currentTime - startedAt >= buffer.duration - .05) stopPlayback();
+      };
+      source.start(0, offset);
+      startedAt = audioContext.currentTime - offset;
+    }
+
+    function animate() {
+      if (!analyser) {
+        drawPattern();
+        raf = requestAnimationFrame(animate);
+        return;
+      }
+      analyser.getByteFrequencyData(dataArray);
+      const bins = dataArray.length;
+      let low = 0, mid = 0, high = 0;
+      for (let i = 0; i < bins; i++) {
+        const v = dataArray[i] / 255;
+        if (i < bins * .18) low += v;
+        else if (i < bins * .55) mid += v;
+        else high += v;
+      }
+      low /= bins * .18;
+      mid /= bins * .37;
+      high /= bins * .45;
+      const level = Math.min(1, (low + mid + high) / 2.2);
+      const centroid = Math.min(1, (mid * .45 + high * .85));
+      const beat = Math.max(0, low - .55) * 1.8;
+      drawPattern(level, centroid, low, high, beat);
+      raf = requestAnimationFrame(animate);
+    }
+
+    function stopPlayback() {
+      if (source) source.stop();
+      source = null;
+      isPlaying = false;
+      pausedAt = Math.max(0, audioContext.currentTime - startedAt);
+      playButton.textContent = "Play";
+      cancelAnimationFrame(raf);
+      status("STATUS: PAUSED<br>ROUTE: LOCAL PREVIEW");
+    }
+
+    async function togglePlay() {
+      if (!buffer) return;
+      if (!audioContext) audioContext = new AudioContext();
+      if (audioContext.state === "suspended") await audioContext.resume();
+      if (isPlaying) {
+        stopPlayback();
+        return;
+      }
+      if (pausedAt >= buffer.duration) pausedAt = 0;
+      connectSource(pausedAt);
+      isPlaying = true;
+      playButton.textContent = "Pause";
+      status("STATUS: PLAYING<br>ROUTE: AUDIO TO PLATE");
+      animate();
+    }
+
+    function savePng() {
+      const a = document.createElement("a");
+      a.href = canvas.toDataURL("image/png");
+      a.download = "chladni-preview.png";
+      a.click();
+    }
+
+    function toggleRecord() {
+      if (recorder && recorder.state === "recording") {
+        recorder.stop();
+        recordButton.textContent = "WebM";
+        return;
+      }
+      chunks = [];
+      const stream = canvas.captureStream(30);
+      recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+      recorder.ondataavailable = (event) => chunks.push(event.data);
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: "video/webm" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "chladni-preview.webm";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      };
+      recorder.start();
+      recordButton.textContent = "Stop";
+      status("STATUS: RECORDING WEBM<br>ROUTE: CANVAS CAPTURE");
+    }
+
+    fileInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (file) loadFile(file);
+    });
+
+    ["dragenter", "dragover"].forEach((type) => {
+      dropzone.addEventListener(type, (event) => {
+        event.preventDefault();
+        dropzone.dataset.active = "true";
+      });
+    });
+    ["dragleave", "drop"].forEach((type) => {
+      dropzone.addEventListener(type, (event) => {
+        event.preventDefault();
+        dropzone.dataset.active = "false";
+      });
+    });
+    dropzone.addEventListener("drop", (event) => {
+      const file = event.dataTransfer.files[0];
+      if (file) loadFile(file);
+    });
+
+    playButton.addEventListener("click", togglePlay);
+    pngButton.addEventListener("click", savePng);
+    recordButton.addEventListener("click", toggleRecord);
+    resetButton.addEventListener("click", () => {
+      pausedAt = 0;
+      drawPattern(.45, .35, .42, .55, .15);
+    });
+    [presetInput, styleInput, titleInput, artistInput].forEach((el) => {
+      el.addEventListener("input", () => drawPattern(.45, .35, .42, .55, .15));
+    });
+
+    drawPattern(.4, .32, .5, .45, .1);
+  </script>
+</body>
+</html>

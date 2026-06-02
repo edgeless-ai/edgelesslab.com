@@ -38,7 +38,7 @@ export async function generateMetadata({
       siteName: "Edgeless Lab",
       url: `https://edgelesslab.com/blog/${post.slug}`,
       images: [{
-        url: "/og-image.webp",
+        url: post.image || "/og-image.webp",
         width: 1200,
         height: 630,
         alt: post.title,
@@ -51,7 +51,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: fullTitle,
       description: post.description,
-      images: ["/og-image.webp"],
+      images: [post.image || "/og-image.webp"],
     },
   };
 }
@@ -114,6 +114,11 @@ export default async function BlogPostPage({
         <div className={post.editorial ? "max-w-[960px] mx-auto" : "max-w-[680px] mx-auto"}>
           {/* Header */}
           <div className="mb-12 max-w-[680px]">
+            {post.image && (
+              <div className="mb-6 rounded-lg overflow-hidden border" style={{ borderColor: "var(--border-subtle)" }}>
+                <img src={post.image} alt={post.title} className="w-full h-auto" />
+              </div>
+            )}
             <div className="flex items-center gap-3 mb-4">
               <time
                 className="text-xs font-mono"

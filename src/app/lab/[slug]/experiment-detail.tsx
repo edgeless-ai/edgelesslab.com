@@ -31,6 +31,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
     "highlights" in experiment && Array.isArray(experiment.highlights);
   const hasLongDescription =
     "longDescription" in experiment && Array.isArray(experiment.longDescription);
+  const isChladni = experiment.slug === "chladni-visualizer";
 
   return (
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
@@ -106,7 +107,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
 
                 {/* Lead description */}
                 <p
-                  className="text-lg font-light mb-10"
+                  className="text-lg font-light mb-6"
                   style={{
                     color: "var(--text-secondary)",
                     lineHeight: 1.7,
@@ -115,6 +116,32 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                 >
                   {experiment.description}
                 </p>
+
+                {isChladni && liveHref && (
+                  <div
+                    className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center"
+                    style={{ animation: "fadeInUp 0.45s cubic-bezier(0.16,1,0.3,1) 0.17s both" }}
+                  >
+                    <a
+                      href={liveHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-colors"
+                      style={{
+                        background: "var(--accent)",
+                        color: "#fff",
+                      }}
+                    >
+                      Open full visualizer <ArrowUpRight size={14} />
+                    </a>
+                    <span
+                      className="text-xs font-mono uppercase tracking-[0.12em]"
+                      style={{ color: "var(--text-tertiary)" }}
+                    >
+                      Embedded preview below · full app opens in a clean viewport
+                    </span>
+                  </div>
+                )}
 
                 {/* Interactive embed for experiments with live components */}
                 {experiment.slug === "generative-ascii" && (
@@ -171,7 +198,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                     </p>
                   </div>
                 )}
-                {experiment.slug === "chladni-visualizer" && (
+                {isChladni && (
                   <div
                     className="mb-10"
                     style={{ animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.18s both" }}
@@ -181,7 +208,8 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                       title="Chladni Visualizer live preview"
                       className="block w-full rounded-md"
                       style={{
-                        minHeight: "760px",
+                        height: "min(86vh, 860px)",
+                        minHeight: "620px",
                         border: "1px solid var(--border-subtle)",
                         background: "var(--bg-surface)",
                       }}
@@ -242,7 +270,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                 )}
 
                 {/* Live link button */}
-                {hasLive && (
+                {hasLive && !isChladni && (
                   <div
                     style={{ animation: "fadeInUp 0.4s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}
                   >
@@ -372,7 +400,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                 )}
 
                 {/* External link card for experiments with href */}
-                {hasLive && (
+                {hasLive && !isChladni && (
                   <div
                     className="rounded-xl border p-6"
                     style={{

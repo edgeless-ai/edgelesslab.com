@@ -42,6 +42,7 @@ export function Nav() {
           >
             <Link
               href="/"
+              prefetch={false}
               className="flex items-center gap-2 text-[15px] font-semibold tracking-tight font-mono hover:opacity-80 transition-opacity"
               style={{ color: "var(--text-primary)" }}
             >
@@ -56,6 +57,7 @@ export function Nav() {
                 <Link
                   key={link.label}
                   href={link.href}
+                  prefetch={false}
                   className="text-[13px] hover:text-white transition-colors"
                   aria-current={pathname === link.href ? "page" : undefined}
                   style={{
@@ -101,6 +103,7 @@ export function Nav() {
                   <Link
                     key={link.label}
                     href={link.href}
+                    prefetch={false}
                     className="rounded-2xl px-4 py-3 text-sm transition-colors"
                     aria-current={pathname === link.href ? "page" : undefined}
                     onClick={() => setIsOpen(false)}

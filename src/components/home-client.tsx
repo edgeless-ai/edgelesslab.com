@@ -2,12 +2,11 @@
 
 import { useRef, useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import { AnimatedText, AnimatedFadeIn } from "@/components/ui/animated-text";
 import { GlowingCard } from "@/components/ui/glowing-card";
-import { GenerativeHeroBackground } from "@/components/ui/generative-hero-bg";
-import { GenerativeAscii } from "@/components/generative-ascii";
 import { KineticPreText } from "@/components/ui/kinetic-pretext";
 import { StaggerReveal } from "@/components/ui/pretext-stagger-reveal";
 import { PreTextRichFlow, type RichFlowSegment } from "@/components/ui/pretext-rich-flow";
@@ -15,6 +14,17 @@ import { PreTextOrbs } from "@/components/ui/pretext-orbs";
 import { useShrinkWrap } from "@/hooks/use-shrink-wrap";
 import { products } from "@/lib/data";
 import { posts } from "@/lib/blog";
+
+/* ── Dynamic imports for heavy client-side visual components ── */
+const GenerativeHeroBackground = dynamic(
+  () => import("@/components/ui/generative-hero-bg").then(m => m.GenerativeHeroBackground),
+  { ssr: false }
+);
+
+const GenerativeAscii = dynamic(
+  () => import("@/components/generative-ascii").then(m => m.GenerativeAscii),
+  { ssr: false }
+);
 
 const HERO_SUBTITLE =
   "One developer shipping autonomous agents, MCP servers, and generative art. 18 products, all free. Everything open source.";

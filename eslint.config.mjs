@@ -12,6 +12,7 @@ const eslintConfig = defineConfig([
     ".next-backup-autoresearch/**",
     ".standalone-stash/**",
     "_next/**",
+    "docs/source-refs/**",
     "out/**",
     "build/**",
     "flow-viz/**",

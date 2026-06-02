@@ -146,7 +146,8 @@ export function EditorialBlock({
   ]);
 
   useEffect(() => {
-    doLayout();
+    const frame = requestAnimationFrame(() => doLayout());
+    return () => cancelAnimationFrame(frame);
   }, [doLayout]);
 
   useEffect(() => {

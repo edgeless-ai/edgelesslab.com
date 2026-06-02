@@ -1,18 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { JsonLd } from "@/components/json-ld";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { PerformancePreload } from "@/components/performance-preload";
 
-const geistSans = Geist({
+const geistSans = localFont({
+  src: "../fonts/Geist[wght].woff2",
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: "../fonts/GeistMono[wght].woff2",
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -75,7 +79,7 @@ export default function RootLayout({
       <head>
         <PerformancePreload />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
-        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' us.i.posthog.com us-assets.i.posthog.com gumroad.com; connect-src 'self' us.i.posthog.com us-assets.i.posthog.com gumroad.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' fonts.gstatic.com; frame-src 'self' gumroad.com;" />
+        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' us.i.posthog.com us-assets.i.posthog.com gumroad.com; connect-src 'self' us.i.posthog.com us-assets.i.posthog.com gumroad.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src 'self' gumroad.com;" />
         <meta httpEquiv="X-Frame-Options" content="SAMEORIGIN" />
         <meta httpEquiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
         {/* Preconnect hints moved to PerformancePreload component for centralized management */}

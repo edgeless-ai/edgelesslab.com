@@ -5,7 +5,6 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
-import { AnimatedText, AnimatedFadeIn } from "@/components/ui/animated-text";
 import { GlowingCard } from "@/components/ui/glowing-card";
 import { KineticPreText } from "@/components/ui/kinetic-pretext";
 import { StaggerReveal } from "@/components/ui/pretext-stagger-reveal";
@@ -38,7 +37,7 @@ export function HeroSection() {
       <div className="relative max-w-[1280px] w-full mx-auto grid grid-cols-1 gap-12 lg:grid-cols-[1.25fr_1fr] lg:items-end">
         {/* Left column: headline + supporting copy */}
         <div className="min-w-0">
-          <AnimatedFadeIn>
+          <div className="animate-fade-in-up">
             <div
               className="inline-flex items-center gap-2.5 mb-8 px-3 py-1.5 rounded-full border"
               style={{
@@ -63,21 +62,21 @@ export function HeroSection() {
                 Shipping daily &middot; Live now
               </span>
             </div>
-          </AnimatedFadeIn>
+          </div>
 
           <h1
             className="text-[clamp(3rem,8vw,7.5rem)] font-bold leading-[0.88] tracking-[-0.04em]"
             style={{ color: "var(--text-primary)" }}
           >
-            <AnimatedText text="Built solo" delay={0.1} />
+            <span className="inline-block animate-char-reveal" style={{ animationDelay: "0.1s" }}>Built solo</span>
             <br />
             <span style={{ color: "var(--accent)" }}>
-              <AnimatedText text="Shipped" delay={0.3} />
+              <span className="inline-block animate-char-reveal" style={{ animationDelay: "0.3s" }}>Shipped</span>
             </span>{" "}
-            <AnimatedText text="open" delay={0.45} />
+            <span className="inline-block animate-char-reveal" style={{ animationDelay: "0.45s" }}>open</span>
           </h1>
 
-          <AnimatedFadeIn delay={0.7}>
+          <div className="animate-fade-in-up" style={{ animationDelay: "0.7s" }}>
             <div className="mt-8 max-w-xl">
               <KineticPreText
                 text={HERO_SUBTITLE}
@@ -92,9 +91,9 @@ export function HeroSection() {
                 }
               />
             </div>
-          </AnimatedFadeIn>
+          </div>
 
-          <AnimatedFadeIn delay={0.85}>
+          <div className="animate-fade-in-up" style={{ animationDelay: "0.85s" }}>
             <div
               className="mt-8 flex items-center gap-2.5 max-w-xl text-[12px] font-mono"
               style={{ color: "var(--text-tertiary)" }}
@@ -117,9 +116,9 @@ export function HeroSection() {
                 {" "}&middot; 7 products in 7 days
               </span>
             </div>
-          </AnimatedFadeIn>
+          </div>
 
-          <AnimatedFadeIn delay={0.9}>
+          <div className="animate-fade-in-up" style={{ animationDelay: "0.9s" }}>
             <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5">
               <Link
                 href="/products"
@@ -148,15 +147,15 @@ export function HeroSection() {
                 GitHub <ArrowUpRight size={14} />
               </a>
             </div>
-          </AnimatedFadeIn>
+          </div>
         </div>
 
         {/* Right column: generative ASCII art piece — unique each visit */}
-        <AnimatedFadeIn delay={0.5}>
+        <div className="animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
           <div className="hidden lg:block">
             <GenerativeAscii />
           </div>
-        </AnimatedFadeIn>
+        </div>
       </div>
     </section>
   );

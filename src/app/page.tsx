@@ -3,18 +3,15 @@ import Link from "next/link";
 import {
   HeroSection,
   RecentActivity,
-  FeaturedGrid,
-  CapabilitiesGrid,
-  StackFlow,
-  ExperimentsGrid,
-  ProductHighlight,
-  AboutBlurb,
   SubscribeSection,
 } from "@/components/home-client";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { experiments, projects } from "@/lib/data";
+import ProjectShowcaseSection from "@/components/sections/project-showcase-section";
+import TechShowcaseSection from "@/components/sections/tech-showcase-section";
+import CTASection from "@/components/sections/cta-section";
 
 const featured = [
   { slug: "safety-hooks", span: "md:col-span-2 md:row-span-2" },
@@ -147,26 +144,7 @@ export default function Home() {
                 </Link>
               </div>
 
-              <FeaturedGrid projects={featured} />
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Infrastructure */}
-        <section
-          className="px-6 py-20"
-          style={{ background: "var(--bg-surface)" }}
-        >
-          <ScrollReveal>
-            <div className="max-w-[1280px] mx-auto">
-              <h2
-                className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                Infrastructure
-              </h2>
-
-              <CapabilitiesGrid capabilities={capabilities} />
+              <ProjectShowcaseSection projects={featured} capabilities={capabilities} />
             </div>
           </ScrollReveal>
         </section>
@@ -182,32 +160,7 @@ export default function Home() {
                 Stack
               </h2>
 
-              <StackFlow nodes={stackNodes} />
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Lab */}
-        <section className="px-6 py-20">
-          <ScrollReveal>
-            <div className="max-w-[1280px] mx-auto">
-              <div className="flex items-baseline justify-between mb-10">
-                <h2
-                  className="text-sm font-mono uppercase tracking-[0.15em]"
-                  style={{ color: "var(--text-tertiary)" }}
-                >
-                  Lab
-                </h2>
-                <Link
-                  href="/lab"
-                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  All experiments <ArrowRight size={13} />
-                </Link>
-              </div>
-
-              <ExperimentsGrid experiments={homepageExperiments} />
+              <TechShowcaseSection nodes={stackNodes} experiments={homepageExperiments} />
             </div>
           </ScrollReveal>
         </section>
@@ -232,16 +185,7 @@ export default function Home() {
                 </Link>
               </div>
 
-              <ProductHighlight />
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* About */}
-        <section className="px-6 py-24">
-          <ScrollReveal>
-            <div className="max-w-[1280px] mx-auto">
-              <AboutBlurb />
+              <CTASection />
             </div>
           </ScrollReveal>
         </section>

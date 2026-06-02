@@ -13,8 +13,7 @@
 export function PerformancePreload() {
   return (
     <>
-      {/* Preconnect to critical origins */}
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      {/* Preconnect to critical origins — fonts are self-hosted via next/font/local, no Google Fonts preconnect needed */}
       <link rel="preconnect" href="https://edgelesslab.com" crossOrigin="anonymous" />
       <link rel="preconnect" href="https://us.i.posthog.com" crossOrigin="anonymous" />
       <link rel="preconnect" href="https://edgelessai.gumroad.com" crossOrigin="anonymous" />
@@ -25,12 +24,6 @@ export function PerformancePreload() {
       
       {/* Preload critical WebP images with HIGH priority for LCP */}
       <link rel="preload" href="/og-image.webp" as="image" type="image/webp" fetchPriority="high" />
-      
-      {/* Lazy load non-critical scripts after LCP */}
-      <link rel="prefetch" href="/_next/static/chunks/posthog-js.js" as="script" />
-      
-      {/* Preconnect to Google Fonts for faster font loading */}
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
       
       {/* Critical CSS for above-fold content - inlined to eliminate render-blocking stylesheet */}
       <style dangerouslySetInnerHTML={{ __html: CRITICAL_CSS }} />

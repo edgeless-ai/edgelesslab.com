@@ -2,7 +2,7 @@
  * Font constants for PreText measurement.
  *
  * PreText requires named fonts (not CSS variables or system-ui).
- * Geist is loaded via next/font/google -- the FontFace.family is "Geist".
+ * Geist is loaded via next/font/local -- the FontFace.family is "Geist".
  *
  * IMPORTANT: system-ui is unsafe on macOS -- always use named fonts.
  */

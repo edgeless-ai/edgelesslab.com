@@ -81,7 +81,7 @@ h1{font-size:2.8rem}
 
 <div class="container">
 
-<div class="badge">Available Now — Launch Price $29</div>
+<div class="badge">Available Now — $29 Launch Price</div>
 
 <p class="eyebrow">Built by people who actually run this</p>
 
@@ -94,11 +94,11 @@ h1{font-size:2.8rem}
 
 <!-- Email capture -->
 <div class="email-section">
-  <h3>Get notified when the kit ships</h3>
-  <p>We'll email you the instant the Agent Starter Kit is ready to download.</p>
+  <h3>Stay updated on new skills & add-ons</h3>
+  <p>Get notified when we ship new agent skills, starter kit updates, and community tools.</p>
   <form class="email-form" id="email-form">
     <input type="email" id="email-input" placeholder="you@example.com" required>
-    <button type="submit">Notify Me</button>
+    <button type="submit">Join List</button>
   </form>
   <div id="signup-status"></div>
 </div>
@@ -106,8 +106,8 @@ h1{font-size:2.8rem}
 <div class="price-box">
   <div class="old-price">$49</div>
   <div class="price">$29</div>
-  <div class="price-note">Early-bird pre-order price -- first 50 customers</div>
-  <div class="urgency">[WARN] 41 spots left at this price</div>
+  <div class="price-note">Early-bird price — first 50 customers</div>
+  <div class="urgency">41 spots left at this price</div>
 </div>
 
 <div class="spot-counter">
@@ -120,7 +120,7 @@ h1{font-size:2.8rem}
    class="buy-overlay"
    target="_blank"
    rel="noopener noreferrer">
-  [NEW] Pre-Order Now -- $29
+  Buy Now — $29
 </a>
 
 <p class="guarantee">
@@ -148,19 +148,19 @@ h1{font-size:2.8rem}
   <h2>Who This Is For</h2>
   <div class="feature-grid">
     <div class="feature">
-      <h3><span class="icon">[OK]</span> AI Developers</h3>
+      <h3><span class="icon">✓</span> AI Developers</h3>
       <p>You want to run local agents but the setup is overwhelming. This gets you from zero to working swarm in 60 minutes.</p>
     </div>
     <div class="feature">
-      <h3><span class="icon">[OK]</span> Solopreneurs</h3>
+      <h3><span class="icon">✓</span> Solopreneurs</h3>
       <p>You need a research + coding + documentation team that works while you sleep. Agents don't take breaks.</p>
     </div>
     <div class="feature">
-      <h3><span class="icon">[OK]</span> AI Researchers</h3>
+      <h3><span class="icon">✓</span> AI Researchers</h3>
       <p>You're experimenting with multi-agent systems. Skip the config rabbit hole and start iterating on agent behavior.</p>
     </div>
     <div class="feature">
-      <h3><span class="icon">[NEW]</span> NousResearch Community</h3>
+      <h3><span class="icon">➕</span> NousResearch Community</h3>
       <p>You've heard about Hermes but haven't set it up yet. This is the fastest path to a working agent swarm on macOS.</p>
     </div>
   </div>
@@ -187,7 +187,7 @@ h1{font-size:2.8rem}
     </div>
     <div class="faq-item">
       <div class="faq-q">When will I receive the product?</div>
-      <div class="faq-a">Pre-orders deliver June 2, 2026 via email download link. If we ship early, you get it early. If we're delayed, we refund + you keep the product free.</div>
+      <div class="faq-a">Immediate access upon purchase. You'll receive download instructions by email and can access the kit on Gumroad right away.</div>
     </div>
   </div>
 </div>
@@ -196,14 +196,14 @@ h1{font-size:2.8rem}
   <div class="old-price">$49</div>
   <div class="price">$29</div>
   <div class="price-note">Early-bird ends when 50 spots fill</div>
-  <div class="urgency">[WARN] 41 spots left</div>
+  <div class="urgency">41 spots left</div>
 </div>
 
 <a href="https://edgelessai.gumroad.com/l/agent-kit" 
    class="buy-overlay"
    target="_blank"
    rel="noopener noreferrer">
-  Pre-Order Now -- $29
+  Buy Now -- $29
 </a>
 
 <p class="guarantee">
@@ -211,9 +211,9 @@ h1{font-size:2.8rem}
 </p>
 
 <div class="footer">
-  <p>Edgeless Labs [OK] 2026</p>
+  <p>Edgeless Labs — 2026</p>
   <p style="margin-top:.5rem">Not affiliated with NousResearch. Built by people who run Hermes daily.</p>
-  <p style="margin-top:.5rem"><a href="mailto:djm.claude.assistant@gmail.com">Contact</a> [OK] <a href="https://edgelessai.gumroad.com">Gumroad Store</a></p>
+  <p style="margin-top:.5rem"><a href="mailto:djm.claude.assistant@gmail.com">Contact</a> · <a href="https://edgelessai.gumroad.com">Gumroad Store</a></p>
 </div>
 
 </div>
@@ -246,11 +246,11 @@ form.addEventListener('submit', async (e) => {
     localStorage.setItem('agent-kit-leads', JSON.stringify(leads));
 
     status.className = 'success';
-    status.textContent = '[OK] Thanks! We\'ll notify you when the kit ships.';
+    status.textContent = 'Thanks! We\'ll notify you when the kit ships.';
     input.value = '';
   } catch (err) {
     status.className = 'error';
-    status.textContent = '[FAIL] Something went wrong. Try emailing djm.claude.assistant@gmail.com directly.';
+    status.textContent = 'Something went wrong. Try emailing directly: djm.claude.assistant@gmail.com.';
   }
 });
 </script>

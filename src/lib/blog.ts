@@ -1485,8 +1485,8 @@ At what point does generated plaid become tartan? I do not have an answer. But t
   {
     slug: "ninety-six-algorithms-one-constraint",
     editorial: true,
-    title: "96 Algorithms, One Constraint: A Pen on Paper",
-    description: "A taxonomy of every generative art algorithm that survives the pen plotter constraint. Flow fields to fractals, reaction-diffusion to recursive trees. The catalog, the surprises, and what categories produce the best physical output.",
+    title: "98 Algorithms, One Constraint: A Pen on Paper",
+    description: "A taxonomy of every generative art algorithm that survives the pen plotter constraint. Flow fields to fractals, reaction-diffusion to recursive trees. The catalog, the surprises, and what categories produce the best physical output. Updated to reflect 98 generators as of June 2026.",
     date: "2026-04-15",
     tags: ["Generative Art", "Creative Coding", "Pen Plotters", "Algorithms"],
     readTime: "8 min",
@@ -1495,7 +1495,7 @@ At what point does generated plaid become tartan? I do not have an answer. But t
     content: `
 Total Serialism started as a homework assignment: implement every algorithmic art family I could find, each as a self-contained interactive sketch with real-time parameter controls and SVG export. The constraint was physical output. Every algorithm had to produce something a pen plotter could draw on paper.
 
-Ninety-six algorithms later, the project became a taxonomy. Patterns emerged across categories that no single algorithm would have revealed. Some entire families of generative art are excellent on screen and useless for plotters. Others that look mundane in a browser produce physical output that rewards close inspection for minutes.
+Ninety-eight algorithms later, the project became a taxonomy. Patterns emerged across categories that no single algorithm would have revealed. Some entire families of generative art are excellent on screen and useless for plotters. Others that look mundane in a browser produce physical output that rewards close inspection for minutes.
 
 ## The Taxonomy
 
@@ -1539,13 +1539,13 @@ Three categories consistently disappoint on paper: fractals (escape-time), cellu
 
 ## The Shared Toolkit
 
-All 96 algorithms share a common infrastructure: a parameter control panel, preset management (save, load, share via URL), and a unified export pipeline (SVG, PNG, GIF). The SVG export includes a path optimizer that cleans and sorts strokes for efficient plotting.
+All 98 algorithms share a common infrastructure: a parameter control panel, preset management (save, load, share via URL), and a unified export pipeline (SVG, PNG, GIF). The SVG export includes a path optimizer that cleans and sorts strokes for efficient plotting.
 
 The path optimizer is the most important shared component. It reorders paths to minimize pen-up travel distance, removes duplicate strokes, and merges nearly-collinear segments. A 10,000-path SVG that takes 45 minutes to plot unoptimized can drop to 20 minutes after optimization. That matters when you are burning through archival ink and Bristol board.
 
 ## The Catalog
 
-The full catalog is browseable at [/total-serialism/field-notes/](/total-serialism/field-notes/). Every algorithm has real-time parameter controls, preset management, and one-click SVG export. The editorial companion describes the taxonomy, the toolkit, and the surprises that emerged from building all ninety-six.
+The full catalog is browseable at [/total-serialism/field-notes/](/total-serialism/field-notes/). Every algorithm has real-time parameter controls, preset management, and one-click SVG export. The editorial companion describes the taxonomy, the toolkit, and the surprises that emerged from building all ninety-eight.
 
 The most useful entry point is the browse page, which shows every algorithm as a thumbnail grid organized by category. From there, click into any algorithm to adjust parameters and export.
 

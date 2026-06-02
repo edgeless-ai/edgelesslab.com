@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   images: { unoptimized: true },
   experimental: {
     optimizePackageImports: ["lucide-react"],
+    turbo: {
+      treeShaking: true,
+    },
   },
   turbopack: {
     root: process.cwd(),

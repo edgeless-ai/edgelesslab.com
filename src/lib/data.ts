@@ -604,6 +604,31 @@ export const experiments = [
     relatedProject: { title: "Pen Plotter Art (Project)", href: "/projects/pen-plotter-art" },
   },
   {
+    slug: "chladni-visualizer",
+    title: "Chladni Visualizer",
+    description:
+      "Audio-reactive standing-wave renderer that maps waveform features into Chladni modes, palette shifts, beat flashes, and exportable social clips.",
+    longDescription: [
+      "The visualizer turns audio into a simulated resonant plate. A librosa analyzer extracts waveform, FFT, tempo, onset, chroma, MFCC, and band-energy features. Those features drive mode selection, intensity, scale, sharpness, palette warmth, and beat-responsive flashes.",
+      "The physics layer renders standing-wave superpositions with numba acceleration, then a color engine maps the signed pattern into HSL palettes. The CLI can export MP4, WebM, GIF, PNG previews, and title overlays; the browser lab version gives the same idea as an immediate drag-and-drop preview.",
+      "This sits best as a lab artifact first because the useful object is interactive: drop a track, watch the plate respond, tune a preset, export a frame or clip. The field note records the implementation choices, the false starts, and why nearest-neighbor resizing preserved the nodal lines better than a smoother filter.",
+    ],
+    highlights: [
+      "Web Audio preview with drag-and-drop input, presets, typography overlay, PNG export, and WebM capture",
+      "Python render pipeline: librosa analysis, feature mapping, numba Chladni simulation, HSL color mapping",
+      "Presets for classic plate studies, festival visuals, album art, and social clips",
+      "Field note paired with the live artifact so the implementation is inspectable, not just decorative",
+    ],
+    stack: ["Python", "librosa", "numba", "Canvas", "Web Audio", "FFmpeg"],
+    category: "Audio Visual",
+    status: "Live",
+    href: "/chladni-visualizer/",
+    relatedFieldNote: {
+      title: "Turning Audio Into a Resonant Plate",
+      href: "/blog/chladni-waveform-visualizer",
+    },
+  },
+  {
     slug: "generative-ascii",
     title: "Generative ASCII",
     description: "Typographic ASCII art generated from particle attractor systems. Each page load produces a unique piece with rarity tiers, like pulling a shiny card.",

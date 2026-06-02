@@ -33,7 +33,7 @@ export const posts: BlogPost[] = [
 
 I have a knowledge base with a few hundred notes from YouTube videos. Transcripts, topic tags, channel metadata, timestamps. Each note is structured the same way, sitting in an Obsidian vault, quietly accumulating. I also have dozens of cron scripts, a handful of active agents, skill definitions, automation pipelines, and a growing backlog of things I keep meaning to wire together.
 
-Last week I tried something different. Instead of asking my agents to build the next feature on the list, I pointed them inward. I gave them access to the knowledge base and to the infrastructure that actually runs -- the cron jobs, the skill definitions, the automation configs -- and asked a simple question:
+Last week I tried something different. Instead of asking my agents to build the next feature on the list, I pointed them inward. I gave them access to the knowledge base and to the infrastructure that actually runs; the cron jobs, the skill definitions, the automation configs; and asked a simple question:
 
 **What do you know about that you're not doing?**
 
@@ -41,7 +41,7 @@ Last week I tried something different. Instead of asking my agents to build the 
 
 ## The Gap Nobody Checks
 
-Here's the thing about running AI agents for any length of time: you accumulate knowledge faster than you accumulate automation. Every article you save, every video you transcribe, every note you tag -- it all goes into some kind of knowledge store. And that knowledge store contains insights about practices, patterns, and techniques that your infrastructure doesn't actually implement.
+This is the thing about running AI agents for any length of time: you accumulate knowledge faster than you accumulate automation. Every article you save, every video you transcribe, every note you tag; it all goes into some kind of knowledge store. And that knowledge store contains insights about practices, patterns, and techniques that your infrastructure doesn't actually implement.
 
 Your notes might contain detailed breakdowns of output validation patterns. Your automation might not validate any of its own output. Your knowledge base might have three different articles about event-driven architecture. Your agents might still run on fixed cron schedules with no awareness of external triggers.
 
@@ -55,7 +55,7 @@ The mechanics are less interesting than the idea, but they're straightforward. Y
 
 I had both. The knowledge base is structured Obsidian notes with topic tags. The infrastructure inventory is a combination of crontab entries, skill manifests, and Paperclip task records. Getting a machine-readable view of each took maybe twenty minutes.
 
-The agent's job was to find the delta. Look at everything the knowledge base references -- validation patterns, learning loops, event-driven triggers, composition strategies, feedback mechanisms -- and check whether the infrastructure has a corresponding implementation. Not a vague mention in a config file. An actual running system that does the thing.
+The agent's job was to find the delta. Look at everything the knowledge base references; validation patterns, learning loops, event-driven triggers, composition strategies, feedback mechanisms; and check whether the infrastructure has a corresponding implementation. Not a vague mention in a config file. An actual running system that does the thing.
 
 The results weren't surprising in hindsight. They were the kind of obvious-once-you-see-it gaps that you never see because you're always looking forward at the next feature instead of sideways at what's already there.
 
@@ -63,11 +63,11 @@ The results weren't surprising in hindsight. They were the kind of obvious-once-
 
 A few categories stood out.
 
-**Output goes unchecked.** Agents produce work -- processed articles, triaged items, generated content -- and the system accepts it unconditionally. Nothing grades the output. Nothing asks "was this good?" The knowledge base had multiple notes about quality rubrics and validation frameworks. The infrastructure had zero.
+**Output goes unchecked.** Agents produce work; processed articles, triaged items, generated content; and the system accepts it unconditionally. Nothing grades the output. Nothing asks "was this good?" The knowledge base had multiple notes about quality rubrics and validation frameworks. The infrastructure had zero.
 
 **Sessions start from scratch.** Every time an agent spins up, it begins with no memory of what it learned last time. If it figured out that a particular RSS feed is consistently low-quality, or that a certain topic cluster needs deeper analysis, that insight dies with the session. The knowledge base had notes about expertise accumulation and institutional memory. The agents had neither.
 
-**Skills exist in isolation.** I had individual skills that worked well on their own -- a summarizer, a triage scorer, a content classifier -- but nothing that chained them together into multi-step workflows. Each skill was an island. The knowledge base referenced pipeline composition and workflow orchestration repeatedly. The infrastructure was a collection of standalone scripts.
+**Skills exist in isolation.** I had individual skills that worked well on their own; a summarizer, a triage scorer, a content classifier; but nothing that chained them together into multi-step workflows. Each skill was an island. The knowledge base referenced pipeline composition and workflow orchestration repeatedly. The infrastructure was a collection of standalone scripts.
 
 **Loops run on vibes.** Several automation loops had no clear exit condition. They'd run until they "felt done" or until a timeout killed them. No measurable completion criteria. No way to distinguish "finished" from "gave up." The knowledge base had notes about deterministic completion and measurable exit conditions. The loops had \`while True\` with a prayer.
 
@@ -79,7 +79,7 @@ Once you see the gaps, the fixes are surprisingly tractable. We built five thing
 
 ### Self-Grading Cron Jobs
 
-The idea: every cron job that produces output should grade its own work. Not with a language model staring at it philosophically -- with a rubric. A checklist of concrete quality signals specific to that job's output type.
+The idea: every cron job that produces output should grade its own work. Not with a language model staring at it philosophically; with a rubric. A checklist of concrete quality signals specific to that job's output type.
 
 The implementation is a rubric validator that runs as a post-step on cron jobs. Each job type has a YAML rubric defining what "good output" looks like for that domain. The RSS triage job checks whether items were classified with confidence above a threshold. The content processing job checks whether summaries preserved key entities from the source. The validator scores the output, logs the result, and flags runs that fall below the rubric's floor.
 
@@ -87,15 +87,15 @@ The point isn't perfection. It's closing the loop. Before this, a job could prod
 
 ### Expertise That Survives Sessions
 
-Agents now write YAML expertise files when they learn something useful during a session. Not raw conversation logs -- structured observations. "This RSS feed produces mostly duplicate content." "This topic cluster has high knowledge-base coverage, deprioritize." "This channel's transcripts are consistently low quality due to auto-generated captions."
+Agents now write YAML expertise files when they learn something useful during a session. Not raw conversation logs; structured observations. "This RSS feed produces mostly duplicate content." "This topic cluster has high knowledge-base coverage, deprioritize." "This channel's transcripts are consistently low quality due to auto-generated captions."
 
 The next session loads relevant expertise files before starting work. The agent doesn't start from zero. It starts from where the last session left off, at least for the domain knowledge that matters.
 
-This is a simple pattern -- write structured files, read them on startup -- but the behavioral difference is significant. Agents that accumulate expertise between sessions make noticeably better decisions by the third or fourth cycle. They stop re-learning the same lessons.
+This is a simple pattern; write structured files, read them on startup; but the behavioral difference is significant. Agents that accumulate expertise between sessions make noticeably better decisions by the third or fourth cycle. They stop re-learning the same lessons.
 
 ### Skill Composition
 
-Individual skills got wired into multi-step pipelines. A skill orchestrator takes a workflow definition -- "run the extractor, pass output to the classifier, pass that to the summarizer, write the result" -- and executes it as a single composed operation.
+Individual skills got wired into multi-step pipelines. A skill orchestrator takes a workflow definition; "run the extractor, pass output to the classifier, pass that to the summarizer, write the result"; and executes it as a single composed operation.
 
 The important design decision: skills remain atomic. They don't know they're part of a pipeline. The orchestrator handles the plumbing. This means any skill can participate in any pipeline without modification. The same summarizer works in the content pipeline, the research pipeline, and the triage pipeline.
 
@@ -103,13 +103,13 @@ The important design decision: skills remain atomic. They don't know they're par
 
 Every loop got a measurable exit condition. Not "run for a while and stop." An actual criterion: "process all items in the queue," "reach confidence threshold on classification," "complete all steps in the workflow definition."
 
-We call the old pattern a Ralph Wiggum loop -- it runs, it does stuff, it's not clear when or why it stops, and afterward you can't tell if it finished or just wandered off. The replacement pattern is explicit: define done, measure progress toward done, exit when done, log whether you got there.
+We call the old pattern a Ralph Wiggum loop; it runs, it does stuff, it's not clear when or why it stops, and afterward you can't tell if it finished or just wandered off. The replacement pattern is explicit: define done, measure progress toward done, exit when done, log whether you got there.
 
 ### Event-Driven Dispatch
 
 A webhook listener that can trigger agent sessions based on external events. A new item arrives in a monitored queue? Start a processing session. A dependency comes back online after an outage? Drain the pending work. A scheduled report completes? Trigger the distribution pipeline.
 
-The dispatcher is lightweight -- it maps event types to session templates and fires them. The sessions themselves are normal agent sessions. The only difference is what starts them: an event instead of a clock.
+The dispatcher is lightweight; it maps event types to session templates and fires them. The sessions themselves are normal agent sessions. The only difference is what starts them: an event instead of a clock.
 
 This is the one that felt most like unlocking a capability that should have existed from the beginning. So much of what agents do is *reactive* work triggered by *scheduled* runs. The mismatch between the work's nature and its scheduling is pure waste.
 
@@ -117,7 +117,7 @@ This is the one that felt most like unlocking a capability that should have exis
 
 The specific fixes matter less than the pattern that produced them. The most valuable thing your agents can do isn't build the next feature. It's audit themselves.
 
-Point them at what you know -- your docs, your notes, your saved articles, your knowledge base -- and then point them at what you do -- your cron jobs, your configs, your running infrastructure. Ask them to find the delta. The gap between knowledge and action is where the highest-leverage improvements live, and it's the one place most people never look because they're too busy looking outward.
+Point them at what you know; your docs, your notes, your saved articles, your knowledge base; and then point them at what you do; your cron jobs, your configs, your running infrastructure. Ask them to find the delta. The gap between knowledge and action is where the highest-leverage improvements live, and it's the one place most people never look because they're too busy looking outward.
 
 Your agents probably know more than they do. The knowledge is already there, sitting in your vault, your notes, your transcripts. Nobody's cross-referencing it against your actual systems. Do that first. Build outward second.
 
@@ -151,13 +151,13 @@ I pointed 7 AI agents at my YouTube watch history. They found patterns I couldn'
 
 Not "recommendations." Not "you might also like." Actual structural analysis of what I've been consuming, what I've been building, and the gaps between the two. The kind of mirror you can only get when something with no ego reads your data and tells you what it means.
 
-Here's what happened when I stopped watching YouTube and started mining it.
+What happened when I stopped watching YouTube and started mining it.
 
 ---
 
 ## The Raw Material
 
-Over the past several months, I've liked 1,062 YouTube videos. Not casually -- I use the like button as a bookmark, a "this was worth my time" signal. Every liked video gets pulled into my Obsidian vault automatically: transcript extracted, topics tagged, channel metadata captured, duration logged.
+Over the past several months, I've liked 1,062 YouTube videos. Not casually; I use the like button as a bookmark, a "this was worth my time" signal. Every liked video gets pulled into my Obsidian vault automatically: transcript extracted, topics tagged, channel metadata captured, duration logged.
 
 By May 2026, I had 1,062 vault notes sitting in \`claude-vault/03-Knowledge/YouTube/\`. Each one structured identically: title, channel, published date, duration, transcript (full or summary), and a topic tag array averaging 5.3 tags per video. That's roughly 2,858 unique topics across 299 channels.
 
@@ -165,7 +165,7 @@ This is a dataset. A personal knowledge corpus that nobody had ever analyzed as 
 
 So I built a pipeline to do exactly that.
 
-The alternative was to keep scrolling. Watch the next recommendation. Let the algorithm decide what I should know. But I already had the data -- structured, tagged, searchable. The question wasn't "what should I watch next?" It was "what does my entire watch history reveal about how I think?"
+The alternative was to keep scrolling. Watch the next recommendation. Let the algorithm decide what I should know. But I already had the data; structured, tagged, searchable. The question wasn't "what should I watch next?" It was "what does my entire watch history reveal about how I think?"
 
 ---
 
@@ -173,7 +173,7 @@ The alternative was to keep scrolling. Watch the next recommendation. Let the al
 
 I didn't run one analysis. I ran seven, in parallel, each attacking the dataset from a different angle. The agents processed videos in batches of 10, with each analysis writing its results to a structured output file.
 
-Here's what each agent did:
+What each agent did:
 
 **1. Topic Co-occurrence Analysis**
 Which topics appear together? Not just "what do I watch" but "what concepts cluster in my mind?" This used Jaccard similarity and pairwise co-occurrence counts across all 1,061 multi-topic notes.
@@ -206,9 +206,9 @@ Why seven analyses and not one big report? Because each agent operates with a fr
 
 ### 8 Dense Topic Clusters
 
-The co-occurrence analysis found 8 clusters where topics are tightly interconnected -- every topic in the cluster co-occurs with every other topic at least 3 times.
+The co-occurrence analysis found 8 clusters where topics are tightly interconnected; every topic in the cluster co-occurs with every other topic at least 3 times.
 
-The most connected cluster: **ai-agents + anthropic + claude-code + open-source** (84 topics in the broader connected component). This wasn't surprising -- it's my primary domain. But the structure was revealing. The cluster has clear sub-modules:
+The most connected cluster: **ai-agents + anthropic + claude-code + open-source** (84 topics in the broader connected component). This wasn't surprising; it's my primary domain. But the structure was revealing. The cluster has clear sub-modules:
 
 - **Cluster 1**: ai-agents, anthropic, claude-code, open-source (the core)
 - **Cluster 2**: agentic-coding, context-engineering, developer-tooling, prompt-engineering (the craft)
@@ -220,23 +220,23 @@ Then there were the unexpected ones:
 - **Cluster 5**: black-holes, quantum-gravity, theoretical-physics (pure curiosity)
 - **Cluster 7**: computer-graphics, physics-simulation, research-papers (the visual fascination)
 
-I knew I watched physics videos. I didn't know they formed a structurally distinct island in my knowledge graph, completely disconnected from my work clusters. The Jaccard similarity between the physics clusters and my work clusters was effectively zero. These are parallel intellectual lives that never intersect -- at least not yet.
+I knew I watched physics videos. I didn't know they formed a structurally distinct island in my knowledge graph, completely disconnected from my work clusters. The Jaccard similarity between the physics clusters and my work clusters was effectively zero. These are parallel intellectual lives that never intersect; at least not yet.
 
 The tightest coupling in the entire graph? \`knowledge-management\` and \`obsidian\` at 0.38 Jaccard similarity. When I watch one, I almost always watch the other. That pair is more strongly linked than \`ai-agents\` and \`claude-code\` (0.05). My second-brain obsession is more concentrated than my AI obsession.
 
 ### The Fastest-Accelerating Topic
 
-Agentic engineering: +322% share growth from Q1 to Q2 2026. Not just "AI agents" broadly (that's actually declining in share at -1.8pp) -- specifically the *engineering* of agentic systems. The tooling, the architecture, the craft.
+Agentic engineering: +322% share growth from Q1 to Q2 2026. Not just "AI agents" broadly (that's actually declining in share at -1.8pp); specifically the *engineering* of agentic systems. The tooling, the architecture, the craft.
 
-Other accelerators: hermes-agent (+1,949%, from 1 note to 17 -- I started watching content about my own project's problem space), mathematics (+262%), nvidia (+382%).
+Other accelerators: hermes-agent (+1,949%, from 1 note to 17; I started watching content about my own project's problem space), mathematics (+262%), nvidia (+382%).
 
 The declining topics tell a story too: ai-benchmarks (-2.6pp), vibe-coding (-1.1pp), context-engineering (-1.5pp). I'm moving from *evaluating* AI to *building with* AI. The consumption pattern tracks the shift from research to practice.
 
-The temporal analysis also caught something I'd missed entirely: mathematics surged +262% from Q1 to Q2, with 16 of 26 total math videos consumed in May alone. I'm unconsciously compensating for the AI-heavy diet with pure abstraction. The agents don't speculate on *why* -- they just surface the pattern and let me make sense of it.
+The temporal analysis also caught something I'd missed entirely: mathematics surged +262% from Q1 to Q2, with 16 of 26 total math videos consumed in May alone. I'm unconsciously compensating for the AI-heavy diet with pure abstraction. The agents don't speculate on *why*; they just surface the pattern and let me make sense of it.
 
 ### Channel ROI: The Hidden Gems
 
-The highest-ROI channel wasn't any of the big names. It was **Ben Davis** (ROI: 0.790) -- 4 videos, 100% full transcripts, 68% topic overlap with my active projects. Every video was directly applicable to what I'm building.
+The highest-ROI channel wasn't any of the big names. It was **Ben Davis** (ROI: 0.790); 4 videos, 100% full transcripts, 68% topic overlap with my active projects. Every video was directly applicable to what I'm building.
 
 The top 5 by ROI:
 
@@ -248,23 +248,23 @@ The top 5 by ROI:
 | 3Blue1Brown | 34 | 0.685 | Mathematics, high substance, beautiful explanations |
 | ColeMedin | 87 | 0.662 | AI agents, coding tools, high volume but consistent |
 
-Meanwhile, I've watched 123 WesRoth videos and 87 SabineHossenfelder videos. High substance, but relevance scores of 0.02 and 0.01 respectively. That's entertainment consumption masquerading as research. The agents don't judge -- they just show you the numbers.
+Meanwhile, I've watched 123 WesRoth videos and 87 SabineHossenfelder videos. High substance, but relevance scores of 0.02 and 0.01 respectively. That's entertainment consumption masquerading as research. The agents don't judge; they just show you the numbers.
 
 ### The Biggest Blind Spot
 
 Discord and community tooling: **3 YouTube videos** mapped to my discord-infra project. Three. I'm running a 7-agent Discord swarm with 5 specialized bots, and I've watched almost nothing about Discord bot development, community management, or bot-to-bot coordination patterns.
 
-The knowledge gap analysis ranked it as my biggest blind spot. Not because the project is failing -- it works -- but because I'm building it entirely from first principles with zero external input. That's either impressive or reckless, depending on your perspective.
+The knowledge gap analysis ranked it as my biggest blind spot. Not because the project is failing; it works; but because I'm building it entirely from first principles with zero external input. That's either impressive or reckless, depending on your perspective.
 
 For contrast: my \`agentic-os\` domain maps to 1,131 YouTube videos. My \`knowledge-system\` domain maps to 150. Discord infrastructure maps to 3. The ratio of consumption-to-build-effort is wildly inverted for Discord compared to everything else.
 
-The remediation is obvious: search YouTube for Discord bot development, community automation, bot-to-bot coordination. The agents even suggested specific search terms. They're not just finding gaps -- they're writing the prescription.
+The remediation is obvious: search YouTube for Discord bot development, community automation, bot-to-bot coordination. The agents even suggested specific search terms. They're also not only finding gaps; they're writing the prescription.
 
 ---
 
 ## The Meta-Move: Agents Auditing Themselves
 
-This is where it gets interesting. The agentic workflows bridge analysis cross-referenced what the vault *knows* against what the infrastructure *does*. It found 14 automation gaps -- things the vault's knowledge suggests I should be automating but aren't.
+This is where it gets interesting. The agentic workflows bridge analysis cross-referenced what the vault *knows* against what the infrastructure *does*. It found 14 automation gaps; things the vault's knowledge suggests I should be automating but aren't.
 
 Fourteen things my agents should be doing that they weren't.
 
@@ -281,7 +281,7 @@ The 14 gaps fell into three categories: validation gaps (agents producing unchec
 We didn't just analyze. We shipped. In the same session that produced the analysis, we implemented 5 of the 14 identified gaps:
 
 **1. Rubric Validation for Cron Jobs**
-Added \`scripts/lib/rubric_validator.py\` -- takes a cron job output plus a YAML rubric, calls Claude to grade pass/fail, alerts on failure. The morning briefing and digest analyzer now validate their own output quality.
+Added \`scripts/lib/rubric_validator.py\`; takes a cron job output plus a YAML rubric, calls Claude to grade pass/fail, alerts on failure. The morning briefing and digest analyzer now validate their own output quality.
 
 **2. Self-Improving Expertise YAML**
 Hermes agents (Kilo, Hive, Beau) now maintain \`expertise.yaml\` files that update after every build cycle. Domain knowledge accumulates between sessions instead of dying with the context window.
@@ -297,39 +297,39 @@ n8n can now trigger Claude Code sessions via webhook. External events (email arr
 
 Five gaps closed. Nine remaining. The analysis produced its own roadmap.
 
-The remaining nine are bigger lifts -- things like multi-model cascade routing for different analysis types, automated A/B testing for agent system prompts, and a feedback loop where ChromaDB query patterns inform which YouTube topics to actively seek out. Each one has a vault note that describes the pattern and a gap in the infrastructure where the implementation should live.
+The remaining nine are bigger lifts; things like multi-model cascade routing for different analysis types, automated A/B testing for agent system prompts, and a feedback loop where ChromaDB query patterns inform which YouTube topics to actively seek out. Each one has a vault note that describes the pattern and a gap in the infrastructure where the implementation should live.
 
 ---
 
 ## The Biggest Finding
 
-Here's the thing that stopped me cold.
+This is the thing that stopped me cold.
 
-The vault contains 1,062 videos about AI agents, knowledge management, coding tools, physics, and philosophy. My YouTube consumption is sophisticated -- I'm watching 3Blue1Brown explain topology, Geoffrey Huntley break down recursive agent loops, and Anthropic engineers discuss alignment.
+The vault contains 1,062 videos about AI agents, knowledge management, coding tools, physics, and philosophy. My YouTube consumption is sophisticated; I'm watching 3Blue1Brown explain topology, Geoffrey Huntley break down recursive agent loops, and Anthropic engineers discuss alignment.
 
 But my *practice* is more sophisticated than my *consumption*.
 
 I'm running a 25-agent swarm with Kantian invariants (ethical constraints that agents cannot override), a 3-layer memory system (ChromaDB + PyTorch + Vault), file-based and API-based inter-agent communication, session poisoning detection, and automated self-improvement loops.
 
-Nobody on YouTube is teaching this. The videos I watch cover *pieces* of what I've built, but the system as a whole -- the integration, the failure modes, the operational knowledge -- doesn't exist in any channel's content. My consumption feeds my practice, but my practice has outrun my consumption.
+Nobody on YouTube is teaching this. The videos I watch cover *pieces* of what I've built, but the system as a whole; the integration, the failure modes, the operational knowledge; doesn't exist in any channel's content. My consumption feeds my practice, but my practice has outrun my consumption.
 
 The agents found the gap by looking at the data. I couldn't see it because I was too close.
 
-There's a philosophical irony here. I'm building systems that are philosophically more sophisticated than the content I consume about building such systems. The Kantian invariants, the multi-layer memory architecture, the inter-agent communication protocols -- these aren't patterns I learned from YouTube. They emerged from operational necessity. The YouTube consumption gave me *vocabulary* and *components*, but the architecture is original.
+There's a philosophical irony here. I'm building systems that are philosophically more sophisticated than the content I consume about building such systems. The Kantian invariants, the multi-layer memory architecture, the inter-agent communication protocols; these aren't patterns I learned from YouTube. They emerged from operational necessity. The YouTube consumption gave me *vocabulary* and *components*, but the architecture is original.
 
-That gap -- between consumption and practice -- might be the most important thing the agents found. It means I'm not just applying what I learn. I'm synthesizing something new. And the only way I could see that was by having agents analyze the delta.
+That gap; between consumption and practice; might be the most important thing the agents found. It means I'm also not only applying what I learn. I'm synthesizing something new. And the only way I could see that was by having agents analyze the delta.
 
 ---
 
 ## How to Do This Yourself
 
-You don't need 1,062 videos. You need a structured dataset of *something you consume* -- articles, podcasts, bookmarks, tweets -- and a way to tag and analyze it.
+You don't need 1,062 videos. You need a structured dataset of *something you consume*; articles, podcasts, bookmarks, tweets; and a way to tag and analyze it.
 
 The pipeline I built is open source:
 
-**[YouTube Intelligence Pipeline](https://github.com/thedavidmurray/youtube-intelligence)** -- The extraction, tagging, and analysis pipeline. Takes YouTube liked videos, pulls transcripts, generates structured vault notes, runs the 7-analysis battery.
+**[YouTube Intelligence Pipeline](https://github.com/thedavidmurray/youtube-intelligence)**; The extraction, tagging, and analysis pipeline. Takes YouTube liked videos, pulls transcripts, generates structured vault notes, runs the 7-analysis battery.
 
-**[Edgeless Stack](https://github.com/thedavidmurray/edgeless-stack)** -- The full agent infrastructure. Hermes, Discord swarm, cron automations, memory system, skills library. Everything the agents run on.
+**[Edgeless Stack](https://github.com/thedavidmurray/edgeless-stack)**; The full agent infrastructure. Hermes, Discord swarm, cron automations, memory system, skills library. Everything the agents run on.
 
 The key insight isn't the code. It's the *approach*: treat your consumption data as a dataset, not a feed. Run structural analysis, not recommendations. Look for gaps between what you know and what you do.
 
@@ -337,7 +337,7 @@ The agents didn't tell me what to watch next. They told me what I was avoiding, 
 
 That's worth more than any recommendation algorithm.
 
-Start with whatever you already have. If you use YouTube likes, that's your corpus. If you star GitHub repos, that's your corpus. If you save articles to Pocket or Readwise, that's your corpus. The point isn't the source -- it's the structural analysis. Tag everything. Count the co-occurrences. Map against what you actually build. The gaps will be obvious once you look.
+Start with whatever you already have. If you use YouTube likes, that's your corpus. If you star GitHub repos, that's your corpus. If you save articles to Pocket or Readwise, that's your corpus. The point isn't the source; it's the structural analysis. Tag everything. Count the co-occurrences. Map against what you actually build. The gaps will be obvious once you look.
 
 ---
 
@@ -361,8 +361,8 @@ Follow me on [X](https://x.com/qt_djm) for updates, or check out the repos linke
   {
     slug: "real-cost-ai-agents-production-2026",
     editorial: true,
-    title: "The Real Cost of Running AI Agents in Production — A Monthly Breakdown (2026)",
-    description: "Your AI agent costs 5–15× more in production than your prototype. Real token burn rates from Anthropic, 2026 LLM pricing tables, a 3-tier optimization playbook, and self-hosting break-even math.",
+    title: "The Real Cost of Running AI Agents in Production ,  A Monthly Breakdown (2026)",
+    description: "Your AI agent costs 5-15× more in production than your prototype. Real token burn rates from Anthropic, 2026 LLM pricing tables, a 3-tier optimization playbook, and self-hosting break-even math.",
     date: "2026-05-06",
     tags: ["AI Agents", "LLM Pricing", "Cost Optimization", "Production"],
     readTime: "12 min",
@@ -371,18 +371,18 @@ Last month a team I know shipped their first AI agent to production. The prototy
 
 This is the gap nobody warns you about. Prototype costs are measured in dollars. Production costs are measured in thousands. The same workload can cost 47× more depending on which model you choose. And the difference between a well-optimized deployment and an unoptimized one is the difference between a sustainable product and a burning balance sheet.
 
-This post gives you the real numbers—model pricing as of May 2026, per-agent token burn rates measured from actual deployments, what optimization actually saves, and when to stop paying API rates entirely.
+This post gives you the real numbers, model pricing as of May 2026, per-agent token burn rates measured from actual deployments, what optimization actually saves, and when to stop paying API rates entirely.
 
 ## The May 2026 LLM Pricing Landscape
 
-Pricing varies 600× across major APIs. From DeepSeek V4 Flash at $0.14 per million input tokens to GPT-5.5 at $5.00. The table below shows the 12 models production agent teams actually choose between—not the full 300+ catalog, but the decision set for real work.
+Pricing varies 600× across major APIs. From DeepSeek V4 Flash at $0.14 per million input tokens to GPT-5.5 at $5.00. The table below shows the 12 models production agent teams actually choose between, not the full 300+ catalog, but the decision set for real work.
 
 | Model | Provider | Input $/1M | Output $/1M | Cached Input | Best For |
 |---|---|---|---|---|---|
 | **DeepSeek V4 Flash** | DeepSeek | $0.14 | $0.28 | $0.0028 | Cheapest frontier-class |
 | **Gemini 2.5 Flash-Lite** | Google | $0.10 | $0.40 | $0.01 | Cheapest proprietary |
 | **GPT-4.1 nano** | OpenAI | $0.10 | $0.40 | $0.01 | Cheapest 1M context |
-| **Llama 3.1 8B (Groq)** | Groq | $0.05 | $0.08 | — | Fastest cheap (840 TPS) |
+| **Llama 3.1 8B (Groq)** | Groq | $0.05 | $0.08 | ,  | Fastest cheap (840 TPS) |
 | **GPT-5.4 nano** | OpenAI | $0.20 | $1.25 | $0.02 | Budget OpenAI |
 | **Gemini 3 Flash** | Google | $0.50 | $3.00 | $0.05 | Mid-tier workhorse |
 | **Claude Haiku 4.5** | Anthropic | $1.00 | $5.00 | $0.10 | Fast Anthropic tier |
@@ -394,13 +394,13 @@ Pricing varies 600× across major APIs. From DeepSeek V4 Flash at $0.14 per mill
 
 *Prices verified May 2026. See [OpenAI pricing](https://openai.com/api/pricing/), [Anthropic](https://platform.claude.com/docs/en/about-claude/pricing), [DeepSeek](https://api-docs.deepseek.com/quick_start/pricing).*
 
-The key insight: output tokens cost 4–8× more than input tokens, and agentic workloads generate *long* outputs. A coding assistant that consumes 100K input tokens might produce 400K output tokens. At Claude Sonnet pricing that's $1,200 in output tokens alone.
+The key insight: output tokens cost 4-8× more than input tokens, and agentic workloads generate *long* outputs. A coding assistant that consumes 100K input tokens might produce 400K output tokens. At Claude Sonnet pricing that's $1,200 in output tokens alone.
 
 ### How Agent Workloads Amplify Costs
 
-A single-turn chatbot makes one LLM call. A moderately complex agent (check CRM, pull data, format output, send notification) triggers 3–8 calls. Each call carries system prompt + tool definitions + conversation history + task payload = 50,000–200,000 tokens per task.
+A single-turn chatbot makes one LLM call. A moderately complex agent (check CRM, pull data, format output, send notification) triggers 3-8 calls. Each call carries system prompt + tool definitions + conversation history + task payload = 50,000-200,000 tokens per task.
 
-The multi-agent overhead is worse. Orchestration agents, verification agents, fallback handlers can 10× token usage versus a well-designed single-agent call. In the ChatDev multi-agent software engineering pipeline, the **Code Review phase consumes 59.4% of all tokens**—not the initial code generation.
+The multi-agent overhead is worse. Orchestration agents, verification agents, fallback handlers can 10× token usage versus a well-designed single-agent call. In the ChatDev multi-agent software engineering pipeline, the **Code Review phase consumes 59.4% of all tokens**, not the initial code generation.
 
 ## What Real Teams Actually Burn Per Month
 
@@ -417,7 +417,7 @@ The token math most articles skip:
 
 *Math assumes 40/60 input/output split. Claude Sonnet: $3/$15 per 1M. DeepSeek V4 Flash: $0.14/$0.28 per 1M.*
 
-The model choice is often a **20–140× cost difference** on the same workload. The question isn't which model is best—it's whether the quality difference matters $24,000/month worth.
+The model choice is often a **20-140× cost difference** on the same workload. The question isn't which model is best, it's whether the quality difference matters $24,000/month worth.
 
 ### The Full Monthly Cost Stack
 
@@ -425,51 +425,51 @@ Most articles focus on tokens. Production cost has six real layers:
 
 | Cost Layer | Monthly Range (1 Production Agent) | % of Total |
 |---|---|---|
-| LLM API / token costs | $1,500–$5,000 (post-optimization) | 30–50% |
-| Compute infrastructure | $800–$3,000 | 15–25% |
-| Vector DB + embeddings | $200–$800 | 5–10% |
-| Observability | $500–$2,000 | 10–20% |
-| Engineering maintenance | $3,000–$6,000 | 30–40% |
-| Evaluation data + labeling | $1,000–$4,000 | 10–20% |
-| **Total** | **$7,050–$21,100/month** | — |
+| LLM API / token costs | $1,500-$5,000 (post-optimization) | 30-50% |
+| Compute infrastructure | $800-$3,000 | 15-25% |
+| Vector DB + embeddings | $200-$800 | 5-10% |
+| Observability | $500-$2,000 | 10-20% |
+| Engineering maintenance | $3,000-$6,000 | 30-40% |
+| Evaluation data + labeling | $1,000-$4,000 | 10-20% |
+| **Total** | **$7,050-$21,100/month** | ,  |
 
-Engineering maintenance is often the biggest hidden cost. A senior engineer spending 20% of their time on prompt tuning = $3,000–$5,000/month that never appears in the AI budget line.
+Engineering maintenance is often the biggest hidden cost. A senior engineer spending 20% of their time on prompt tuning = $3,000-$5,000/month that never appears in the AI budget line.
 
 ### Production Snapshots
 
-**Early-stage startup (1 agent, nightly automation):** 5 agents running automation tasks. $95/month total—$19 VPS + ~$76 API calls.
+**Early-stage startup (1 agent, nightly automation):** 5 agents running automation tasks. $95/month total, $19 VPS + ~$76 API calls.
 
-**Growth-stage support (10K conversations/day):** API costs alone reach $7,500+/month before optimization. With a two-agent pipeline (triage + specialist), costs scale to $15,000–$50,000/month.
+**Growth-stage support (10K conversations/day):** API costs alone reach $7,500+/month before optimization. With a two-agent pipeline (triage + specialist), costs scale to $15,000-$50,000/month.
 
-**Enterprise (100 bots × 50K tokens/day):** ~$2,400/month in token costs on GPT-5.2. Add infrastructure and maintenance: $10,000–$20,000/month.
+**Enterprise (100 bots × 50K tokens/day):** ~$2,400/month in token costs on GPT-5.2. Add infrastructure and maintenance: $10,000-$20,000/month.
 
 ## The Cost Optimization Playbook
 
-### Tier 1 — This Week (Hours, Not Weeks)
+### Tier 1 ,  This Week (Hours, Not Weeks)
 
-**Prompt compression:** Remove filler words, cut redundant context, add output length constraints. Result: 20–40% token reduction.
+**Prompt compression:** Remove filler words, cut redundant context, add output length constraints. Result: 20-40% token reduction.
 
 **Enable prompt caching:** Anthropic offers cached input tokens at 90% discount. Structure prompts so static system prompt + tool definitions come first (cacheable prefix), dynamic content last. ProjectDiscovery went from 7% → 84% cache hit rate = **59% cost reduction**.
 
-Critical caveat: A team deploying Anthropic caching got a **1% discount instead of 90%** because their system prompt opened with \`f"Today is {datetime.now().date()}."\`—one changing token destroyed every cache hit. Cache keys hash exact prefix bytes.
+Critical caveat: A team deploying Anthropic caching got a **1% discount instead of 90%** because their system prompt opened with \`f"Today is {datetime.now().date()}."\`, one changing token destroyed every cache hit. Cache keys hash exact prefix bytes.
 
 **Batch non-real-time tasks:** OpenAI and Anthropic offer 50% discount on asynchronous workloads. Document processing, nightly summarization, evaluation pipelines all qualify.
 
-### Tier 2 — This Month (Architecture Changes)
+### Tier 2 ,  This Month (Architecture Changes)
 
-**Model routing:** Route 80–90% of simple queries to budget models (DeepSeek V4 Flash, Gemini Flash-Lite), reserve frontier models for complex reasoning. Dynamic routing achieves 27–55% cost reduction without quality loss.
+**Model routing:** Route 80-90% of simple queries to budget models (DeepSeek V4 Flash, Gemini Flash-Lite), reserve frontier models for complex reasoning. Dynamic routing achieves 27-55% cost reduction without quality loss.
 
 **Semantic caching:** Cache semantically similar queries. Useful for customer-facing agents where users ask variations of the same 20 questions. GPT Semantic Cache achieved **68.8% API call reduction** with 97% accuracy at cosine similarity 0.8.
 
 **Trim context windows:** Implement rolling summarization. Agents that accumulate full conversation history are often 10× the token cost of equivalent task-specific calls.
 
-### Tier 3 — This Quarter (Infrastructure Shifts)
+### Tier 3 ,  This Quarter (Infrastructure Shifts)
 
 **LLM gateway layer (OpenRouter / Portkey):** Adds provider fallback and cost routing. OpenRouter: 5.5% markup, 300+ models. Portkey: starts at $49/month with caching + weighted routing.
 
-**Fine-tuning for high-volume tasks:** A fine-tuned small model outperforms a prompted frontier model for domain-specific tasks at 10–50× lower cost per call. One team saved $150/day after 3 weeks of training work—ROI in 6 days.
+**Fine-tuning for high-volume tasks:** A fine-tuned small model outperforms a prompted frontier model for domain-specific tasks at 10-50× lower cost per call. One team saved $150/day after 3 weeks of training work, ROI in 6 days.
 
-**Combined optimization target:** Teams stacking prompt compression + caching + routing typically achieve **50–70% cost reduction**. The documented ceiling is 80%+ with self-hosting for high-volume workloads.
+**Combined optimization target:** Teams stacking prompt compression + caching + routing typically achieve **50-70% cost reduction**. The documented ceiling is 80%+ with self-hosting for high-volume workloads.
 
 ## Self-Hosting Break-Even Analysis
 
@@ -492,9 +492,9 @@ Against DeepSeek V4 Flash: break-even doesn't occur until ~4.7B tokens/month bec
 
 > "At 1M tokens/day, self-hosting Llama 3.3 70B on Azure is **733× more expensive** than the DeepInfra API."
 
-A real healthcare AI team: $10,400/month self-hosted vs $1,870/month if they had used the OpenAI API—paid **5.6× more** for the privilege of managing infrastructure.
+A real healthcare AI team: $10,400/month self-hosted vs $1,870/month if they had used the OpenAI API, paid **5.6× more** for the privilege of managing infrastructure.
 
-Self-hosting is an answer to *privacy and predictable load*, not *cost*—until you cross ~5M+ tokens/day with real GPU utilization.
+Self-hosting is an answer to *privacy and predictable load*, not *cost*, until you cross ~5M+ tokens/day with real GPU utilization.
 
 ## Mac Studio as an AI Agent Server
 
@@ -504,13 +504,13 @@ This is the analysis no competitor writes for agent teams. Apple Silicon in 2026
 
 **Inference speeds:** Llama 3.3 70B at ~16 tok/s, Qwen3 30B MoE at ~63 tok/s, GPT-OSS 120B at ~23 tok/s. Not fast by data-center standards. Acceptable for single-agent workflows.
 
-**The bandwidth physics:** Token generation speed = memory bandwidth / model size. The M3 Ultra's 819 GB/s vs an RTX 5090's 1,792 GB/s explains the 2–4× speed gap. For a solo agent serving 1 request at a time: the speed gap barely matters. Response latency of 2–4 seconds is acceptable for many internal workflows.
+**The bandwidth physics:** Token generation speed = memory bandwidth / model size. The M3 Ultra's 819 GB/s vs an RTX 5090's 1,792 GB/s explains the 2-4× speed gap. For a solo agent serving 1 request at a time: the speed gap barely matters. Response latency of 2-4 seconds is acceptable for many internal workflows.
 
 **The multi-user cliff:** At 8 concurrent users, M3 Ultra drops from 84 tok/s → 25 tok/s (70% performance drop). Mac Studio is a **single-agent or small-team tool**, not a multi-user serving platform.
 
 **The honest break-even math:**
 - Mac Studio vs Claude Sonnet 4.6: break-even at ~19M tokens/month (~645K tokens/day)
-- Mac Studio vs DeepSeek V4 Flash: you'd need to process **5.1 billion tokens** to break even—28 years at 500K tokens/day
+- Mac Studio vs DeepSeek V4 Flash: you'd need to process **5.1 billion tokens** to break even, 28 years at 500K tokens/day
 
 **Verdict:** The DeepSeek/Qwen API pricing war has nearly killed the financial case for Mac Studio. It wins decisively on privacy, data sovereignty, air-gapped environments, and single developers with consistent heavy usage. It loses on concurrency, batching at scale, and pure cost optimization.
 
@@ -519,8 +519,8 @@ This is the analysis no competitor writes for agent teams. Apple Silicon in 2026
 | Monthly AI Spend | Recommended Approach | Key Optimizations |
 |---|---|---|
 | **< $500** | Pure API (DeepSeek/Gemini Flash) | Model selection, prompt compression, caching |
-| **$500–$2,000** | API + optimization playbook | Add gateway, implement model routing, measure caching ROI |
-| **$2,000–$10,000** | Optimize first (target 50–70% reduction), then evaluate Mac Studio | Tier 1+2 optimizations, hybrid architecture |
+| **$500-$2,000** | API + optimization playbook | Add gateway, implement model routing, measure caching ROI |
+| **$2,000-$10,000** | Optimize first (target 50-70% reduction), then evaluate Mac Studio | Tier 1+2 optimizations, hybrid architecture |
 | **$10,000+** | Run break-even analysis; self-hosting becomes relevant | A100 cluster for stable loads, Mac Studio for private data |
 
 ### The Three Questions That Determine Your Architecture
@@ -536,13 +536,13 @@ This is the analysis no competitor writes for agent teams. Apple Silicon in 2026
 3. **One changing token kills your prompt cache.** A \`datetime.now()\` at the start of a system prompt converted a 90% expected discount into a 1% actual discount.
 4. **The 47× cost spread on the same workload.** Customer support at 1M conversations/month: $180 on Gemini Flash vs $8,400 on Claude Sonnet.
 5. **At 1M tokens/day, self-hosting on Azure is 733× more expensive than DeepInfra API.** Self-hosting answers privacy needs, not cost needs, until you hit massive scale.
-6. **The DeepSeek/Qwen pricing war has effectively killed the cost case for Mac Studio local inference.** A developer would need to process 5.1B tokens to break even—28 years at 500K tokens/day.
+6. **The DeepSeek/Qwen pricing war has effectively killed the cost case for Mac Studio local inference.** A developer would need to process 5.1B tokens to break even, 28 years at 500K tokens/day.
 
 ## Conclusion
 
-Production AI agent costs are predictable if you model them correctly. The 5–15× underestimation from prototype to production happens because teams measure tokens but not the full stack.
+Production AI agent costs are predictable if you model them correctly. The 5-15× underestimation from prototype to production happens because teams measure tokens but not the full stack.
 
-The optimization stack—caching + prompt compression + model routing—delivers 50–70% reduction without touching architecture. After that, the self-hosting vs API calculus depends on volume and sensitivity.
+The optimization stack, caching + prompt compression + model routing, delivers 50-70% reduction without touching architecture. After that, the self-hosting vs API calculus depends on volume and sensitivity.
 
 For technical founders already in production: the question isn't whether you can afford to optimize. It's whether you can afford not to.
     `.trim(),
@@ -550,7 +550,7 @@ For technical founders already in production: the question isn't whether you can
   {
     slug: "ai-newsletter-reads-like-database-dump",
     editorial: true,
-    title: "Your AI Newsletter Reads Like a Database Dump (Here's the Fix)",
+    title: "Your AI Newsletter Reads Like a Database Dump (This is the Fix)",
     description: "Our AI-generated digests had an 18% open rate. Five structural rules from Morning Brew, TLDR, and Ben's Bites doubled it. The template, the prompt trick, and the before/after.",
     date: "2026-05-05",
     tags: ["AI Agents", "Newsletters", "Content", "Automation"],
@@ -610,7 +610,7 @@ After the first week under this structure our open rate rose to thirty-four perc
   {
     slug: "what-portland-businesses-need-from-ai",
     editorial: true,
-    title: "I Read 500 Google Reviews in Portland. Here's What Small Businesses Actually Need from AI.",
+    title: "I Read 500 Google Reviews in Portland. What Small Businesses Actually Need from AI.",
     description: "Dental offices losing patients to voicemail. HVAC companies quoting three days late. The AI solutions Portland small businesses need aren't chatbots. They're answering the phone.",
     date: "2026-05-05",
     tags: ["AI Agents", "Local Business", "Voice AI", "Portland"],
@@ -661,7 +661,7 @@ That's not a technology conversation. It's a business conversation. And it start
     slug: "pricing-ai-agent-services-solo-studio",
     editorial: true,
     title: "How to Price AI Agent Services When Nobody Knows What They Cost",
-    description: "I surveyed 20 agencies and freelancers offering AI agent builds. The range was $500 to $150,000. Here's the framework I use to price Edgeless Lab's services.",
+    description: "I surveyed 20 agencies and freelancers offering AI agent builds. The range was $500 to $150,000. This is the framework I use to price Edgeless Lab's services.",
     date: "2026-05-05",
     tags: ["AI Agents", "Pricing", "Business", "Solo Founder"],
     readTime: "6 min",
@@ -670,7 +670,7 @@ I spent two weeks researching what people charge for AI agent services. Custom c
 
 The market has no pricing consensus because the market barely exists. Most buyers have never purchased AI services before. Most sellers are making up prices based on vibes and perceived complexity.
 
-Here's the framework I built for Edgeless Lab after surveying twenty agencies and freelancers.
+This is the framework I built for Edgeless Lab after surveying twenty agencies and freelancers.
 
 ## The Three Pricing Models That Exist
 
@@ -688,7 +688,7 @@ Edgeless Lab runs a hybrid model. Three tiers:
 
 **Growth ($5,000-$15,000).** Project-based. Multi-agent systems, custom integrations, operational AI that touches multiple business processes. Scoped with a paid discovery session ($500, credited toward the project). Delivered in 4-8 weeks.
 
-**Enterprise ($15,000+).** Retainer or project. Full AI operations consulting. Infrastructure design, agent orchestration, monitoring, and ongoing optimization. These clients need architecture, not just implementation.
+**Enterprise ($15,000+).** Retainer or project. Full AI operations consulting. Infrastructure design, agent orchestration, monitoring, and ongoing optimization. These clients need architecture, also not only implementation.
 
 ## The Discovery Session Trick
 
@@ -715,7 +715,7 @@ The market will standardize eventually. Right now, the advantage goes to whoever
     slug: "self-healing-ai-infrastructure",
     editorial: true,
     title: "Half My AI Agents Were Dead. I Didn't Know for a Week.",
-    description: "I discovered 10 of my 20 agents were ghosts \u2014 registered, visible in dashboards, producing nothing. Here's the five-layer self-healing system I built so it never happens again.",
+    description: "I discovered 10 of my 20 agents were ghosts \u2014 registered, visible in dashboards, producing nothing. This is the five-layer self-healing system I built so it never happens again.",
     date: "2026-05-05",
     tags: ["Multi-Agent", "Infrastructure", "Self-Healing", "Monitoring"],
     readTime: "8 min",
@@ -824,7 +824,7 @@ For items older than 30 days with no processing attempt, it archives with a reas
 Detect -> Classify -> Heal -> Verify -> Report
 :::
 
-Here's a real incident from last week that resolved without human involvement.
+This is a real incident from last week that resolved without human involvement.
 
 The YouTube likes delta job \u2014 which tracks engagement changes on saved videos \u2014 hung at 09:31. It had been running for 612 seconds, 12 past its 600-second timeout guard. The scheduler terminated it.
 
@@ -858,7 +858,7 @@ The one remaining human fire-drill per week is novel failures the system correct
 
 ## Where to Start
 
-Don't build all five layers at once. Here's the sequence that delivered value fastest:
+Don't build all five layers at once. This is the sequence that delivered value fastest:
 
 **First: cron heartbeat monitoring.** Every scheduled job writes a timestamped file on completion. A separate script checks those files on a 5-minute timer. Any file older than 1.5x the job interval triggers an alert. This is 30 lines of Python and it will immediately show you which jobs are silently failing.
 
@@ -884,7 +884,7 @@ Good infrastructure is boring infrastructure. The goal isn't to eliminate humans
     editorial: true,
     title: "Hermes Curator: The Agent That Cleans Up After Your Agents",
     description:
-      "Nous Research shipped Hermes v0.12.0 with Curator, an autonomous background agent that detects stale skills, consolidates duplicates, and prunes dead references. Here's why it matters for multi-agent systems.",
+      "Nous Research shipped Hermes v0.12.0 with Curator, an autonomous background agent that detects stale skills, consolidates duplicates, and prunes dead references. Why it matters for multi-agent systems.",
     date: "2026-05-01",
     tags: ["Hermes", "AI Agents", "Skill Management", "Multi-Agent"],
     readTime: "4 min",
@@ -1054,7 +1054,7 @@ That's the difference between using AI and having AI infrastructure.
     slug: "agent-grounding-problem-hermes",
     editorial: true,
     title: "The Agent Grounding Problem: How Hermes Knows What's Real",
-    description: "AI agents confabulate. They claim files exist that don't. They report tasks complete that aren't. The grounding problem isn't philosophical -- it's operational.",
+    description: "AI agents confabulate. They claim files exist that don't. They report tasks complete that aren't. The grounding problem isn't philosophical; it's operational.",
     date: "2026-04-29",
     tags: ["AI Safety", "Hermes", "Agent Operations", "Grounding"],
     readTime: "6 min",
@@ -1146,26 +1146,26 @@ Everyone's optimizing their prompts. The real leverage is in the 200 lines of Py
 
 ## The Model Isn't the Bottleneck
 
-There's a concept gaining traction called "harness engineering" — the idea that the infrastructure around your AI model matters more than the model itself. The pattern is consistent across teams shipping real agent systems: simpler harness, better outcomes.
+There's a concept gaining traction called "harness engineering" ,  the idea that the infrastructure around your AI model matters more than the model itself. The pattern is consistent across teams shipping real agent systems: simpler harness, better outcomes.
 
 I found it when an agent lost $252 of real money.
 
-The agent was asked to check a wallet balance. It decided to also deposit funds into a smart contract with no withdrawal function. No guardrail stopped it. No hook flagged the scope creep. The model was fine — GPT-4 class, perfectly capable. The harness was missing.
+The agent was asked to check a wallet balance. It decided to also deposit funds into a smart contract with no withdrawal function. No guardrail stopped it. No hook flagged the scope creep. The model was fine ,  GPT-4 class, perfectly capable. The harness was missing.
 
 ## What a Harness Actually Looks Like
 
 Forget agent frameworks with 47 tools and recursive planning loops. A production harness is four things:
 
-1. **Pre-execution hooks** — code that runs before every tool call, checking if the action should be allowed
-2. **Post-execution hooks** — code that runs after every tool call, logging what happened
-3. **File-system memory** — structured state on disk, not in the context window
-4. **Progress tracking** — a simple file the agent updates so it doesn't lose its place
+1. **Pre-execution hooks** ,  code that runs before every tool call, checking if the action should be allowed
+2. **Post-execution hooks** ,  code that runs after every tool call, logging what happened
+3. **File-system memory** ,  structured state on disk, not in the context window
+4. **Progress tracking** ,  a simple file the agent updates so it doesn't lose its place
 
 That's it. Claude Code ships with exactly this architecture: PreToolUse, PostToolUse, and a file system the agent can read and write. The hook system is the harness.
 
 ## The Hooks That Earn Their Keep
 
-After running 5+ agents for months, here are the hooks that survived natural selection — the ones that prevented real incidents:
+After running 5+ agents for months, here are the hooks that survived natural selection ,  the ones that prevented real incidents:
 
 **Damage Control** blocks destructive commands before they execute. It's a 200-line Python script with regex patterns for things like \`rm -rf\`, \`git push --force\`, and writes to critical paths. Sounds simple. It is. It's also caught 3 potential disasters.
 
@@ -1179,12 +1179,12 @@ DANGEROUS_PATTERNS = [
 ]
 \`\`\`
 
-**Scope Guard** prevents the mandate-creep that caused the $252 loss. It detects when an agent starts doing things it wasn't asked to do — sends, transfers, deletes, deploys — and blocks them unless explicitly authorized.
+**Scope Guard** prevents the mandate-creep that caused the $252 loss. It detects when an agent starts doing things it wasn't asked to do ,  sends, transfers, deletes, deploys ,  and blocks them unless explicitly authorized.
 
 **Completion Verifier** is the "lie detector." Agents will cheerfully tell you a task is done when it isn't. This hook requires evidence: a passing test, a file that exists, a command that succeeds. No evidence, no completion.
 
 \`\`\`python
-# Completion requires proof, not just the agent's word
+# Completion requires proof, also not only the agent's word
 EVIDENCE_CHECKS = {
     "test": lambda path: subprocess.run(["pytest", path]).returncode == 0,
     "file_exists": lambda path: os.path.exists(path),
@@ -1248,7 +1248,7 @@ Each hook makes the system slightly more trustworthy. More trust means more auto
   {
     slug: "12-dollar-ai-operations-team",
     editorial: true,
-    title: "I Run a $12/Week AI Operations Team. Here's the Cost Breakdown.",
+    title: "I Run a $12/Week AI Operations Team. This is the Cost Breakdown.",
     description: "Enterprise AI ops costs $50K+/month. I run 5 agents, 24/7, for $12/week. The architecture, the model routing, and why cheap doesn't mean fragile.",
     date: "2026-04-19",
     tags: ["Multi-Agent", "AI Infrastructure", "Cost Optimization", "Claude Code"],
@@ -1296,15 +1296,15 @@ Dispatch (COO) -> Researcher
 Dispatch (COO) -> Verifier
 :::
 
-**Hermes (Chief of Staff)** — My primary session agent. Receives all human requests, decides whether to execute directly or delegate. Runs on Kimi K2.5 via Fireworks. Context window management is the constraint: it sees the full project state and delegates to specialists when the task requires specific tools or extended processing.
+**Hermes (Chief of Staff)** ,  My primary session agent. Receives all human requests, decides whether to execute directly or delegate. Runs on Kimi K2.5 via Fireworks. Context window management is the constraint: it sees the full project state and delegates to specialists when the task requires specific tools or extended processing.
 
-**Dispatch (COO)** — A Paperclip-managed agent that never executes tasks directly. Its only job is routing: receive task requests from Hermes, assign to appropriate workers, track state machine transitions, escalate stuck tasks. It runs on a lighter model (DeepSeek V3.2) because its cognitive load is lower—it's matching patterns, not reasoning about code.
+**Dispatch (COO)** ,  A Paperclip-managed agent that never executes tasks directly. Its only job is routing: receive task requests from Hermes, assign to appropriate workers, track state machine transitions, escalate stuck tasks. It runs on a lighter model (DeepSeek V3.2) because its cognitive load is lower, it's matching patterns, not reasoning about code.
 
-**Builder** — Claude Code agent on a VPS. Handles all code changes: feature implementation, bug fixes, refactoring. Runs on Anthropic Claude via standard API. The VPS isolates it from my local machine state, which means it can run overnight without my laptop being open.
+**Builder** ,  Claude Code agent on a VPS. Handles all code changes: feature implementation, bug fixes, refactoring. Runs on Anthropic Claude via standard API. The VPS isolates it from my local machine state, which means it can run overnight without my laptop being open.
 
-**Researcher** — Deep research agent. Consumes RSS feeds, YouTube transcripts, arXiv papers, synthesizes findings into structured reports. Runs Kimi K2.5 with extended context. Its output feeds directly into the knowledge base.
+**Researcher** ,  Deep research agent. Consumes RSS feeds, YouTube transcripts, arXiv papers, synthesizes findings into structured reports. Runs Kimi K2.5 with extended context. Its output feeds directly into the knowledge base.
 
-**Verifier** — Quality control agent. Reviews Builder's output, runs tests, checks for security issues, validates against acceptance criteria. Acts as a gate before deployment.
+**Verifier** ,  Quality control agent. Reviews Builder's output, runs tests, checks for security issues, validates against acceptance criteria. Acts as a gate before deployment.
 
 The topology solves three specific failure modes I've hit with single-agent approaches:
 
@@ -1332,7 +1332,7 @@ Kimi K2.5 | $2.00
 DeepSeek V3.2 | $1.10
 :::
 
-Kimi K2.5 handles 70% of tasks because it's the cheapest generalist that doesn't hallucinate tools. DeepSeek takes the high-volume, low-cognitive-load work (formatting, simple transformations, status checks). Claude Opus is reserved for security-sensitive reviews—it's expensive but catches issues the cheaper models miss. Codex handles bulk code generation where context length matters more than nuance.
+Kimi K2.5 handles 70% of tasks because it's the cheapest generalist that doesn't hallucinate tools. DeepSeek takes the high-volume, low-cognitive-load work (formatting, simple transformations, status checks). Claude Opus is reserved for security-sensitive reviews, it's expensive but catches issues the cheaper models miss. Codex handles bulk code generation where context length matters more than nuance.
 
 The routing decision happens at the dispatch layer. Tasks include a complexity tag (low/medium/high) and a security flag. Low complexity + no security flag → DeepSeek. High complexity or security flag → Kimi or Opus depending on domain.
 
@@ -1340,7 +1340,7 @@ This routing alone cuts costs 10x versus using a single model for everything.
 
 ## The Knowledge Base Loop
 
-Every agent operation feeds a knowledge base. Not as an afterthought—as a core system function.
+Every agent operation feeds a knowledge base. Not as an afterthought, as a core system function.
 
 :::flow Knowledge Base Loop
 Capture -> Synthesize -> Verify -> Inject -> Agents -> Capture
@@ -1356,7 +1356,7 @@ The loop works like this:
 
 4. **Inject**: The verified synthesis becomes retrievable context for all agents.
 
-The loop means agents don't just have tools—they have memory of what the system has learned. When Builder encounters an error, it can query: "how did we solve similar errors before?" The answer comes from actual previous sessions, not generic training data.
+The loop means agents don't just have tools, they have memory of what the system has learned. When Builder encounters an error, it can query: "how did we solve similar errors before?" The answer comes from actual previous sessions, not generic training data.
 
 The KB infrastructure costs $2.80/week (self-hosted ChromaDB on a €6.50 Hetzner instance). The managed equivalent (Pinecone, Weaviate Cloud) runs $200-400/month.
 
@@ -1392,7 +1392,7 @@ The fix: health checks on model endpoints, automatic failover, circuit breaker p
 
 **Resource exhaustion**: ChromaDB hit its memory limit during a large embedding batch. The indexer kept retrying, filling logs, failing silently. The KB synthesizer agent detected the backlog growth and alerted before the disk filled.
 
-The fix: resource-aware batch sizing, explicit memory limits, monitoring on queue depth not just error rates.
+The fix: resource-aware batch sizing, explicit memory limits, monitoring on queue depth also not only error rates.
 
 ## What This Architecture Can't Do
 
@@ -1409,7 +1409,7 @@ The architecture optimizes for "good enough for one person" not "good enough for
 
 You don't need five agents on day one. Start with two: one primary, one specialist for your most common task type. Add the dispatch layer when you're tired of manually routing tasks. Add workers when you hit the cognitive limits of your existing agents.
 
-The infrastructure I described—the model routing, the KB loop, the file-based communication—ships as the Paperclip OS. It's the blueprint, the config files, the monitoring setup, and the failure patterns I documented so you don't have to discover them.
+The infrastructure I described, the model routing, the KB loop, the file-based communication, ships as the Paperclip OS. It's the blueprint, the config files, the monitoring setup, and the failure patterns I documented so you don't have to discover them.
 
 The [Paperclip OS](/products) is $49. That pays for itself the first time it prevents a corrupted session or routes a task to the cheapest model that can handle it.
 
@@ -1575,13 +1575,13 @@ I imported five of those rules into my own system, rewrote one from scratch, and
 
 Meta's prompt contains this line:
 
-> Steer clear of stock phrases like "That's a great question" or "That sounds tough," as well as cringe AI phrases like "As an AI language model," "You're absolutely right," "It's not just X, it's also Y," and "It's important to note that..."
+> Steer clear of stock phrases like "Great question" or "Sounds difficult," as well as cringe AI phrases like "As a language model," "You are right," "It's also not only X, it's also Y," and "It matters that..."
 
 The word "cringe" is doing real work there. Meta is naming the failure mode in the language people actually use to describe it. And the fix is not "avoid sycophantic language" (which gives the model nothing to pattern-match against). The fix is a list of literal strings.
 
-I ran a lint across my 14 existing blog posts looking for these exact patterns. Result: 71 violations. 70 of them were the ASCII double-hyphen \`--\` used as a prose dash. One was the "not just X, it's also Y" frame on a line I thought was pretty good until I saw it flagged:
+I ran a lint across my 14 existing blog posts looking for these exact patterns. Result: 71 violations. 70 of them were the ASCII double-hyphen \`--\` used as a prose dash. One was the "also not only X, it's also Y" frame on a line I thought was pretty good until I saw it flagged:
 
-> It's not just a coding assistant, it's the primary agent runtime.
+> It's also not only a coding assistant, it's the primary agent runtime.
 
 Rewritten: "Claude Code sits at the top as the primary agent runtime." The rewrite is shorter, more direct, and makes the same claim without the frame that signals "an AI wrote this."
 
@@ -1589,11 +1589,11 @@ The lesson: vague guidance ("write naturally") underperforms verbatim bans. The 
 
 ## 2. Open with a topic-specific sentence
 
-> Open responses with a sentence that's specific to the topic at hand. Don't start with "Here's a...", "Here are the...", or other reusable frames.
+> Open responses with a sentence specific to the topic at hand. Do not start with reusable here-is phrasing, "These are the...", or other reusable frames.
 
-This single rule kills the most distinctive AI tic. When I looked at my own blog posts, the bodies were clean (they open with lines like "There are over 400 MCP servers listed in public directories" and "At 2am on a Tuesday, I ran a deploy script"). But four of the fourteen had "Here's the..." or "Here's a..." in their metadata descriptions. The muscle memory is there even when the body avoids it.
+This single rule kills the most distinctive AI tic. When I looked at my own blog posts, the bodies were clean (they open with lines like "There are over 400 MCP servers listed in public directories" and "At 2am on a Tuesday, I ran a deploy script"). But four of the fourteen had "This is the..." or "here is" in their metadata descriptions. The muscle memory is there even when the body avoids it.
 
-The fix is not "try to be specific." The fix is a banned-opener list: "Here's a...", "Here are the...", "In this post, we'll...", "Let's talk about...", "Have you ever wondered...". If the first sentence of a section matches any of those patterns, the lint catches it.
+The fix is not "try to be specific." The fix is a banned-opener list: "here is", "These are the...", "In this post, we'll...", "Let's talk about...", "Have you ever wondered...". If the first sentence of a section matches any of those patterns, the lint catches it.
 
 ## 3. Don't restate the body in a "bottom line" summary
 
@@ -1672,7 +1672,7 @@ Whatever shows up next in that repo, I'll approach it the same way: read it, ste
     ctaHook: "The exact templates, pricing model, and launch checklist from this 7-day sprint.",
     isLaunch: true,
     editorial: true,
-    title: "I Shipped 7 Digital Products in 7 Days. Here's Exactly How.",
+    title: "I Shipped 7 Digital Products in 7 Days. The Exact Process.",
     description: "The meta-narrative: how one solo developer used AI agents, autoreason scoring, and a daily shipping cadence to go from 11 to 18 products in a week.",
     date: "2026-04-09",
     tags: ["Solo Dev", "Products", "Process"],
@@ -1765,7 +1765,7 @@ Generative art has a dirty secret: most of it looks bad. Not "challenging" bad. 
 
 I've built 75+ generative algorithms over the past year, run them through 105+ experiments on physical pen plotters, and developed an AI scoring system to evaluate the output. The hit rate for "would I frame this on a wall" is about 13%. That's 10 algorithms out of 75+.
 
-Here's what separates the ones that work from the ones that don't.
+What separates the ones that work from the ones that don't.
 
 ## The Scoring System
 
@@ -1903,7 +1903,7 @@ I run an AI tool business solo. That means every recurring task either gets auto
 
 n8n fills the gap. It's a self-hosted visual workflow builder. You connect nodes, wire data between them, and deploy. When something breaks, you see exactly which node failed and what data it received. No log archaeology.
 
-Here are five workflows that actually run my business.
+Five workflows that actually run my business.
 
 :::flow Core Automation Stack
 RSS/YouTube -> n8n Workflows -> Claude Analysis -> Telegram/Email/GitHub
@@ -2245,11 +2245,11 @@ The gap between demo prompts and production prompts is the same gap between a sc
 
 Production prompts fail in predictable ways. Once you know the patterns, you can design against them.
 
-**Drift**: the model's interpretation of your prompt shifts as context accumulates. A prompt that works perfectly in message 1 starts hallucinating by message 15 because earlier responses have polluted the context. Fix: restate critical constraints at decision points, not just at the top.
+**Drift**: the model's interpretation of your prompt shifts as context accumulates. A prompt that works perfectly in message 1 starts hallucinating by message 15 because earlier responses have polluted the context. Fix: restate critical constraints at decision points, also not only at the top.
 
 **Edge collapse**: the model encounters an input it wasn't designed for and produces confidently wrong output instead of signaling uncertainty. The classic: a sentiment classifier that labels gibberish as "positive" because it always picks something. Fix: give the model an explicit "I can't classify this" option and define when to use it.
 
-**Format rot**: the model returns valid content in the wrong structure. You asked for JSON, it returns JSON with markdown wrapping. You asked for a list, it returns a paragraph with embedded list items. Fix: provide a concrete output example, not just a format description.
+**Format rot**: the model returns valid content in the wrong structure. You asked for JSON, it returns JSON with markdown wrapping. You asked for a list, it returns a paragraph with embedded list items. Fix: provide a concrete output example, also not only a format description.
 
 ## Structural Patterns That Work
 
@@ -2791,18 +2791,18 @@ The best time to set up memory is before your next session. Takes 15 minutes, sa
     slug: "arxiv-to-interactive-demo-marimo",
     editorial: true,
     title: "From arXiv Paper to Interactive Demo in 20 Minutes",
-    description: "We built a live multi-armed bandit simulator from a research paper using marimo -- reactive Python notebooks that run in the browser. Here's why this changes how we consume research.",
+    description: "We built a live multi-armed bandit simulator from a research paper using marimo; reactive Python notebooks that run in the browser. Why this changes how we consume research.",
     date: "2026-05-18",
     tags: ["marimo", "Research", "Interactive Computing", "AI Agents", "Python"],
     readTime: "6 min",
     content: `
 # From arXiv Paper to Interactive Demo in 20 Minutes
 
-I read a lot of papers. Most of them sit in a tab until I forget why I opened them. The ones that stick are the ones I can *play with* -- tweak a parameter, see the curve shift, develop an intuition for why the method works.
+I read a lot of papers. Most of them sit in a tab until I forget why I opened them. The ones that stick are the ones I can *play with*; tweak a parameter, see the curve shift, develop an intuition for why the method works.
 
 The problem: turning a paper into a playground usually takes hours. Jupyter notebooks are stateful JSON blobs that break when you look at them wrong. Streamlit apps are one-off scripts that don't compose. And most "reproducibility" efforts are Docker containers that take 30 minutes to build and require a GPU you don't have.
 
-Last week we tried something different. We took the classic multi-armed bandit problem -- the explore/exploit dilemma that underlies every routing decision our agents make -- and built an interactive demo in about 20 minutes. The tool is **marimo**, and it's now part of our research pipeline.
+Last week we tried something different. We took the classic multi-armed bandit problem; the explore/exploit dilemma that underlies every routing decision our agents make; and built an interactive demo in about 20 minutes. The tool is **marimo**, and it's now part of our research pipeline.
 
 ---
 
@@ -2812,10 +2812,10 @@ marimo is a reactive Python notebook environment. Unlike Jupyter, marimo noteboo
 
 The killer features for us:
 
-- **Notebooks are .py files** -- they diff cleanly in git, they run as CLI scripts, they import like normal modules
-- **Reactive execution** -- cells auto-update when their dependencies change, like a spreadsheet but for code
-- **Script mode** -- the same notebook runs headless (for cron jobs or batch experiments) or interactively (in the browser)
-- **WASM deployment** -- notebooks can run entirely in the client's browser via Pyodide, zero server cost
+- **Notebooks are .py files**; they diff cleanly in git, they run as CLI scripts, they import like normal modules
+- **Reactive execution**; cells auto-update when their dependencies change, like a spreadsheet but for code
+- **Script mode**; the same notebook runs headless (for cron jobs or batch experiments) or interactively (in the browser)
+- **WASM deployment**; notebooks can run entirely in the client's browser via Pyodide, zero server cost
 
 ---
 
@@ -2849,7 +2849,7 @@ We now have a pipeline:
 
 The implications:
 
-**For research**: We don't just read papers -- we *instrument* them. Every paper in our KB can have a live demo attached. This makes the knowledge actionable, not just archived.
+**For research**: We don't just read papers; we *instrument* them. Every paper in our KB can have a live demo attached. This makes the knowledge actionable, also not only archived.
 
 **For clients**: We can build interactive dashboards and training tools in marimo instead of Streamlit or custom web apps. The same notebook that trains a model can become the client's monitoring dashboard with zero extra work.
 
@@ -2861,9 +2861,9 @@ The implications:
 
 We're building demos for three more paper categories:
 
-- **Direct Preference Optimization (DPO)** -- skip the reward model, optimize directly from preferences. The math is clean and the comparison to RLHF is visually striking.
-- **Group Relative Policy Optimization (GRPO)** -- DeepSeek's approach to reasoning without a critic. The core insight (group rewards replace individual value estimates) is perfect for a toy grid-world demo.
-- **Self-Evolving Agent Memory** -- population-based memory broadcast without weight updates. Relevant to our swarm's memory architecture.
+- **Direct Preference Optimization (DPO)**; skip the reward model, optimize directly from preferences. The math is clean and the comparison to RLHF is visually striking.
+- **Group Relative Policy Optimization (GRPO)**; DeepSeek's approach to reasoning without a critic. The core insight (group rewards replace individual value estimates) is perfect for a toy grid-world demo.
+- **Self-Evolving Agent Memory**; population-based memory broadcast without weight updates. Relevant to our swarm's memory architecture.
 
 Each demo is a .py file that runs standalone, lives in our vault, and links back to the paper metadata via ChromaDB.
 
@@ -2887,7 +2887,7 @@ The source repo has the full set of skills we use to build these demos automatic
 
 ---
 
-**Bottom line:** Research shouldn't be read-only. Every paper that matters to your work should have a live, interactive demo attached. marimo makes that practical at scale.
+**The point:** Research shouldn't be read-only. Every paper that matters to your work should have a live, interactive demo attached. marimo makes that practical at scale.
     `.trim(),
   },
   ...newPosts,

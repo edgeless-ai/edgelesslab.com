@@ -16,6 +16,10 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
     "relatedProject" in experiment &&
     experiment.relatedProject != null &&
     typeof experiment.relatedProject === "object";
+  const hasRelatedFieldNote =
+    "relatedFieldNote" in experiment &&
+    experiment.relatedFieldNote != null &&
+    typeof experiment.relatedFieldNote === "object";
   const hasStack = "stack" in experiment && Array.isArray(experiment.stack);
   const hasHighlights =
     "highlights" in experiment && Array.isArray(experiment.highlights);
@@ -161,6 +165,23 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                     </p>
                   </div>
                 )}
+                {experiment.slug === "chladni-visualizer" && (
+                  <div
+                    className="mb-10"
+                    style={{ animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.18s both" }}
+                  >
+                    <iframe
+                      src="/chladni-visualizer/"
+                      title="Chladni Visualizer live preview"
+                      className="block w-full rounded-md"
+                      style={{
+                        minHeight: "760px",
+                        border: "1px solid var(--border-subtle)",
+                        background: "var(--bg-surface)",
+                      }}
+                    />
+                  </div>
+                )}
 
                 {/* Long description paragraphs */}
                 {hasLongDescription && (
@@ -302,6 +323,43 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                             relatedProject: { title: string; href: string };
                           }
                         ).relatedProject.title
+                      }
+                    </Link>
+                  </div>
+                )}
+
+                {/* Related field note cross-link */}
+                {hasRelatedFieldNote && (
+                  <div
+                    className="rounded-xl border p-6"
+                    style={{
+                      background: "var(--bg-surface)",
+                      borderColor: "var(--border-subtle)",
+                    }}
+                  >
+                    <h2
+                      className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
+                      style={{ color: "var(--text-tertiary)" }}
+                    >
+                      Field Note
+                    </h2>
+                    <Link
+                      href={
+                        (
+                          experiment as {
+                            relatedFieldNote: { title: string; href: string };
+                          }
+                        ).relatedFieldNote.href
+                      }
+                      className="text-[13px] hover:text-white transition-colors"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {
+                        (
+                          experiment as {
+                            relatedFieldNote: { title: string; href: string };
+                          }
+                        ).relatedFieldNote.title
                       }
                     </Link>
                   </div>

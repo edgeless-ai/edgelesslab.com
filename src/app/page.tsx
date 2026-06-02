@@ -52,7 +52,7 @@ const capabilities = [
     snippet: `$ hook: damage-control
   blocked: rm -rf /
   reason: destructive operation
-✓ 0 incidents this week`,
+✓ safety hooks armed`,
   },
   {
     label: "Knowledge Pipelines",

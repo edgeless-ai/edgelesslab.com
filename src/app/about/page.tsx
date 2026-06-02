@@ -19,7 +19,7 @@ export const metadata = createPageMetadata({
 
 const stats = [
   { label: "Products live", value: "18" },
-  { label: "Services 24/7", value: "4" },
+  { label: "Services monitored", value: "4" },
   { label: "Vault docs indexed", value: "6,300+" },
   { label: "MCP servers in prod", value: "4" },
 ];

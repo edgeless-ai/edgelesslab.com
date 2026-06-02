@@ -1,7 +1,7 @@
 # Pen Plotter Autoresearch — Editorial
 
-A field journal for an autonomous loop running on 22 generative pen-plotter factories.
-Twenty-one thousand seven hundred and seventy specimens, scored by six algorithmic
+A field journal for an autonomous loop running on 40 generative pen-plotter factories.
+Forty-one thousand five hundred and seventy-two specimens, scored by six algorithmic
 signals and five vision-language judges.
 
 **Live**: https://edgelesslab.com/pen-plotter/
@@ -63,7 +63,7 @@ After new specimens land in `../autoresearch/output/`:
 
 ```bash
 python3.11 make_catalog.py              # curated 1,296 grid (80px thumbs + 720px lightbox mediums)
-python3.11 make_catalog.py --addendum   # full ~20,845 addendum (40px mass grid)
+python3.11 make_catalog.py --addendum   # full 39,414 addendum (40px mass grid)
 ```
 
 The script reads `../autoresearch/experiments.tsv`, filters `kept=yes`, sorts by

@@ -45,16 +45,20 @@
     .app {
       min-height: 100vh;
       display: grid;
-      grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) minmax(310px, 380px);
     }
 
     .rail {
-      border-right: var(--hm-line) solid var(--hm-carbon);
+      grid-column: 2;
+      grid-row: 1;
+      border-left: var(--hm-line) solid var(--hm-carbon);
       padding: 22px;
       display: flex;
       flex-direction: column;
       gap: 18px;
       background: rgba(244, 240, 231, .94);
+      max-height: 100vh;
+      overflow: auto;
     }
 
     .brand {
@@ -140,7 +144,8 @@
     }
 
     .field input,
-    .field select {
+    .field select,
+    .field button {
       width: 100%;
       border: 2px solid var(--hm-carbon);
       border-radius: var(--hm-radius-tight);
@@ -148,6 +153,25 @@
       color: var(--hm-carbon);
       min-height: 38px;
       padding: 7px 9px;
+    }
+
+    .field input[type="range"] {
+      padding: 0;
+      accent-color: var(--hm-signal-blue);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .readout {
+      font-family: var(--hm-font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
     }
 
     .buttons {
@@ -191,11 +215,13 @@
     }
 
     .stage {
+      grid-column: 1;
+      grid-row: 1;
       position: relative;
       min-height: 100vh;
       display: grid;
       place-items: center;
-      padding: 28px;
+      padding: 22px;
       overflow: hidden;
       background:
         linear-gradient(90deg, rgba(19,60,255,.09), transparent 28%, rgba(23,140,88,.10)),
@@ -212,7 +238,7 @@
     }
 
     .scope {
-      width: min(86vh, 86vw);
+      width: min(94vh, calc(100vw - 430px));
       aspect-ratio: 1;
       border: 2px solid var(--hm-paper);
       position: relative;
@@ -254,20 +280,27 @@
       pointer-events: none;
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 1080px) {
       .app {
         grid-template-columns: 1fr;
       }
       .rail {
-        border-right: 0;
+        grid-column: 1;
+        grid-row: auto;
+        order: 2;
+        max-height: none;
+        border-left: 0;
         border-bottom: 2px solid var(--hm-carbon);
       }
       .stage {
-        min-height: 62vh;
+        grid-column: 1;
+        grid-row: auto;
+        order: 1;
+        min-height: 78vh;
         padding: 16px;
       }
       .scope {
-        width: min(92vw, 62vh);
+        width: min(92vw, 78vh);
       }
     }
   </style>
@@ -283,10 +316,18 @@
         <h1>Chladni Visualizer</h1>
       </section>
 
-      <label class="drop" id="dropzone">
-        <input id="file" type="file" accept="audio/*">
-        <strong>Drop audio / select file</strong>
-      </label>
+      <section class="panel">
+        <h2><span>Source</span><span>MP3 / MP4</span></h2>
+        <label class="drop" id="dropzone">
+          <input id="file" type="file" accept="audio/*,video/mp4">
+          <strong>Drop audio / select file</strong>
+        </label>
+        <div class="field" style="margin-top: 18px;">
+          <label for="sourceUrl">Remote media URL</label>
+          <input id="sourceUrl" placeholder="https://.../track.mp3 or .mp4">
+        </div>
+        <button class="btn" id="loadUrl">Load URL</button>
+      </section>
 
       <section class="panel">
         <h2><span>Route Controls</span><span id="modeReadout">M5 N4</span></h2>
@@ -298,6 +339,26 @@
             <option value="album">Album Art</option>
             <option value="social">Social Clip</option>
           </select>
+        </div>
+        <div class="split">
+          <div class="field">
+            <label for="modeM">Mode M</label>
+            <input id="modeM" type="range" min="1" max="12" step="1" value="5">
+          </div>
+          <div class="field">
+            <label for="modeN">Mode N</label>
+            <input id="modeN" type="range" min="1" max="12" step="1" value="4">
+          </div>
+        </div>
+        <div class="split">
+          <div class="field">
+            <label for="warmth">Hue</label>
+            <input id="warmth" type="range" min="0" max="359" step="1" value="205">
+          </div>
+          <div class="field">
+            <label for="sharpness">Sharpness</label>
+            <input id="sharpness" type="range" min="0.8" max="4.5" step="0.1" value="1.8">
+          </div>
         </div>
         <div class="field">
           <label for="style">Style</label>
@@ -315,6 +376,33 @@
           <label for="artist">Artist</label>
           <input id="artist" value="Edgeless Lab">
         </div>
+        <button class="btn" id="savePreset">Save Preset</button>
+      </section>
+
+      <section class="panel">
+        <h2><span>Timeline</span><span id="timeReadout">0.0 / 0.0s</span></h2>
+        <div class="field">
+          <label for="seek">Song position</label>
+          <input id="seek" type="range" min="0" max="0" step="0.01" value="0" disabled>
+        </div>
+        <div class="split">
+          <div class="field">
+            <label for="recordStart">Record start</label>
+            <input id="recordStart" type="number" min="0" step="0.1" value="0">
+          </div>
+          <div class="field">
+            <label for="recordEnd">Record end</label>
+            <input id="recordEnd" type="number" min="0" step="0.1" value="0">
+          </div>
+        </div>
+        <div class="readout">
+          <span>Segment capture</span>
+          <span id="segmentReadout">full track</span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2><span>Export</span><span>Canvas</span></h2>
         <div class="buttons">
           <button class="btn" id="play" disabled data-fill="true">Play</button>
           <button class="btn" id="png">PNG</button>
@@ -343,14 +431,26 @@
     const ctx = canvas.getContext("2d");
     const fileInput = document.getElementById("file");
     const dropzone = document.getElementById("dropzone");
+    const sourceUrlInput = document.getElementById("sourceUrl");
+    const loadUrlButton = document.getElementById("loadUrl");
     const playButton = document.getElementById("play");
     const pngButton = document.getElementById("png");
     const recordButton = document.getElementById("record");
     const resetButton = document.getElementById("reset");
     const presetInput = document.getElementById("preset");
+    const modeMInput = document.getElementById("modeM");
+    const modeNInput = document.getElementById("modeN");
+    const warmthInput = document.getElementById("warmth");
+    const sharpnessInput = document.getElementById("sharpness");
     const styleInput = document.getElementById("style");
     const titleInput = document.getElementById("title");
     const artistInput = document.getElementById("artist");
+    const savePresetButton = document.getElementById("savePreset");
+    const seekInput = document.getElementById("seek");
+    const timeReadout = document.getElementById("timeReadout");
+    const recordStartInput = document.getElementById("recordStart");
+    const recordEndInput = document.getElementById("recordEnd");
+    const segmentReadout = document.getElementById("segmentReadout");
     const statusEl = document.getElementById("status");
     const modeReadout = document.getElementById("modeReadout");
     const trackMeta = document.getElementById("trackMeta");
@@ -363,6 +463,14 @@
       album: { m: 4, n: 6, warmth: 240, sharpness: 1.5 },
       social: { m: 6, n: 3, warmth: 28, sharpness: 2.8 }
     };
+    const customPresets = JSON.parse(localStorage.getItem("chladniCustomPresets") || "{}");
+    Object.assign(presets, customPresets);
+    for (const key of Object.keys(customPresets)) {
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = customPresets[key].label || key.replace(/^custom:/, "");
+      presetInput.appendChild(option);
+    }
 
     let audioContext;
     let buffer;
@@ -375,6 +483,8 @@
     let raf = 0;
     let recorder;
     let chunks = [];
+    let recordingSegmentEnd = 0;
+    let recordStopTimer = 0;
 
     function status(text) {
       statusEl.innerHTML = text;
@@ -389,8 +499,42 @@
       return (h >>> 0).toString(16).slice(0, 4).toUpperCase();
     }
 
+    function currentPreset() {
+      return {
+        m: Number(modeMInput.value),
+        n: Number(modeNInput.value),
+        warmth: Number(warmthInput.value),
+        sharpness: Number(sharpnessInput.value)
+      };
+    }
+
+    function syncPresetControls() {
+      const preset = presets[presetInput.value] || presets.classic;
+      modeMInput.value = preset.m;
+      modeNInput.value = preset.n;
+      warmthInput.value = preset.warmth;
+      sharpnessInput.value = preset.sharpness;
+      drawPattern(.45, .35, .42, .55, .15);
+    }
+
+    function playbackTime() {
+      if (!buffer) return 0;
+      return isPlaying ? Math.min(buffer.duration, audioContext.currentTime - startedAt) : pausedAt;
+    }
+
+    function updateTimeline() {
+      const duration = buffer ? buffer.duration : 0;
+      const now = playbackTime();
+      seekInput.max = duration.toFixed(2);
+      seekInput.value = String(Math.min(now, duration));
+      timeReadout.textContent = `${now.toFixed(1)} / ${duration.toFixed(1)}s`;
+      const start = Math.max(0, Number(recordStartInput.value) || 0);
+      const end = Math.min(duration || start, Number(recordEndInput.value) || duration || 0);
+      segmentReadout.textContent = duration ? `${start.toFixed(1)}s to ${end.toFixed(1)}s` : "full track";
+    }
+
     function drawPattern(level = 0.35, centroid = 0.35, bass = 0.4, treble = 0.5, beat = 0) {
-      const preset = presets[presetInput.value];
+      const preset = currentPreset();
       const style = styleInput.value;
       const w = canvas.width;
       const h = canvas.height;
@@ -467,19 +611,45 @@
       return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
     }
 
-    async function loadFile(file) {
+    async function loadArrayBuffer(data, name) {
       if (!audioContext) audioContext = new AudioContext();
-      const data = await file.arrayBuffer();
       buffer = await audioContext.decodeAudioData(data);
       analyser = audioContext.createAnalyser();
       analyser.fftSize = 1024;
       dataArray = new Uint8Array(analyser.frequencyBinCount);
       playButton.disabled = false;
       recordButton.disabled = false;
-      trackMeta.textContent = `${file.name} / ${buffer.duration.toFixed(1)}S`;
-      checksum.textContent = `CHK ${hashName(file.name)}`;
-      status(`STATUS: AUDIO READY<br>ROUTE: ${file.name.toUpperCase()}`);
+      seekInput.disabled = false;
+      seekInput.max = buffer.duration.toFixed(2);
+      recordStartInput.value = "0";
+      recordEndInput.value = buffer.duration.toFixed(1);
+      pausedAt = 0;
+      trackMeta.textContent = `${name} / ${buffer.duration.toFixed(1)}S`;
+      checksum.textContent = `CHK ${hashName(name)}`;
+      status(`STATUS: AUDIO READY<br>ROUTE: ${name.toUpperCase()}`);
+      updateTimeline();
       drawPattern(.45, .35, .42, .55, .15);
+    }
+
+    async function loadFile(file) {
+      const data = await file.arrayBuffer();
+      await loadArrayBuffer(data, file.name);
+    }
+
+    async function loadRemoteUrl() {
+      const url = sourceUrlInput.value.trim();
+      if (!url) return;
+      status("STATUS: FETCHING URL<br>ROUTE: REMOTE MEDIA");
+      try {
+        const response = await fetch(url, { mode: "cors" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.arrayBuffer();
+        const name = decodeURIComponent((new URL(url)).pathname.split("/").pop() || "remote-media");
+        await loadArrayBuffer(data, name);
+      } catch (error) {
+        status(`STATUS: URL LOAD FAILED<br>ROUTE: CORS OR FORMAT BLOCKED`);
+        console.error(error);
+      }
     }
 
     function connectSource(offset = 0) {
@@ -488,7 +658,7 @@
       source.connect(analyser);
       analyser.connect(audioContext.destination);
       source.onended = () => {
-        if (isPlaying && audioContext.currentTime - startedAt >= buffer.duration - .05) stopPlayback();
+        if (isPlaying) stopPlayback(true);
       };
       source.start(0, offset);
       startedAt = audioContext.currentTime - offset;
@@ -516,16 +686,26 @@
       const centroid = Math.min(1, (mid * .45 + high * .85));
       const beat = Math.max(0, low - .55) * 1.8;
       drawPattern(level, centroid, low, high, beat);
+      updateTimeline();
+      if (recordingSegmentEnd && playbackTime() >= recordingSegmentEnd) {
+        if (recorder && recorder.state === "recording") recorder.stop();
+        stopPlayback(true);
+        recordingSegmentEnd = 0;
+      }
       raf = requestAnimationFrame(animate);
     }
 
-    function stopPlayback() {
-      if (source) source.stop();
-      source = null;
+    function stopPlayback(ended = false) {
+      if (source) {
+        const oldSource = source;
+        source = null;
+        try { oldSource.stop(); } catch {}
+      }
       isPlaying = false;
-      pausedAt = Math.max(0, audioContext.currentTime - startedAt);
+      pausedAt = ended ? Math.min(buffer ? buffer.duration : 0, playbackTime()) : Math.max(0, playbackTime());
       playButton.textContent = "Play";
       cancelAnimationFrame(raf);
+      updateTimeline();
       status("STATUS: PAUSED<br>ROUTE: LOCAL PREVIEW");
     }
 
@@ -545,6 +725,20 @@
       animate();
     }
 
+    function seekTo(time) {
+      if (!buffer) return;
+      const wasPlaying = isPlaying;
+      if (source) {
+        const oldSource = source;
+        source = null;
+        try { oldSource.stop(); } catch {}
+      }
+      pausedAt = Math.max(0, Math.min(buffer.duration, time));
+      if (wasPlaying) connectSource(pausedAt);
+      updateTimeline();
+      drawPattern(.45, .35, .42, .55, .15);
+    }
+
     function savePng() {
       const a = document.createElement("a");
       a.href = canvas.toDataURL("image/png");
@@ -556,9 +750,14 @@
       if (recorder && recorder.state === "recording") {
         recorder.stop();
         recordButton.textContent = "WebM";
+        recordingSegmentEnd = 0;
+        clearTimeout(recordStopTimer);
         return;
       }
       chunks = [];
+      const start = buffer ? Math.max(0, Number(recordStartInput.value) || 0) : 0;
+      const end = buffer ? Math.min(buffer.duration, Number(recordEndInput.value) || buffer.duration) : 0;
+      recordingSegmentEnd = end > start ? end : 0;
       const stream = canvas.captureStream(30);
       recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
       recorder.ondataavailable = (event) => chunks.push(event.data);
@@ -569,10 +768,18 @@
         a.download = "chladni-preview.webm";
         a.click();
         URL.revokeObjectURL(a.href);
+        recordButton.textContent = "WebM";
       };
       recorder.start();
       recordButton.textContent = "Stop";
       status("STATUS: RECORDING WEBM<br>ROUTE: CANVAS CAPTURE");
+      if (buffer && !isPlaying) {
+        seekTo(start);
+        togglePlay();
+      }
+      if (recordingSegmentEnd && !buffer) {
+        recordStopTimer = setTimeout(() => recorder.stop(), 6000);
+      }
     }
 
     fileInput.addEventListener("change", (event) => {
@@ -597,17 +804,41 @@
       if (file) loadFile(file);
     });
 
+    loadUrlButton.addEventListener("click", loadRemoteUrl);
     playButton.addEventListener("click", togglePlay);
     pngButton.addEventListener("click", savePng);
     recordButton.addEventListener("click", toggleRecord);
     resetButton.addEventListener("click", () => {
       pausedAt = 0;
+      updateTimeline();
       drawPattern(.45, .35, .42, .55, .15);
     });
-    [presetInput, styleInput, titleInput, artistInput].forEach((el) => {
+    presetInput.addEventListener("change", syncPresetControls);
+    [styleInput, titleInput, artistInput, modeMInput, modeNInput, warmthInput, sharpnessInput].forEach((el) => {
       el.addEventListener("input", () => drawPattern(.45, .35, .42, .55, .15));
     });
+    [seekInput, recordStartInput, recordEndInput].forEach((el) => {
+      el.addEventListener("input", updateTimeline);
+    });
+    seekInput.addEventListener("change", () => seekTo(Number(seekInput.value) || 0));
+    savePresetButton.addEventListener("click", () => {
+      const label = prompt("Preset name", "Custom Plate");
+      if (!label) return;
+      const key = `custom:${label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "plate"}`;
+      customPresets[key] = { ...currentPreset(), label };
+      localStorage.setItem("chladniCustomPresets", JSON.stringify(customPresets));
+      if (!presets[key]) {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = label;
+        presetInput.appendChild(option);
+      }
+      presets[key] = customPresets[key];
+      presetInput.value = key;
+      status(`STATUS: PRESET SAVED<br>ROUTE: ${label.toUpperCase()}`);
+    });
 
+    syncPresetControls();
     drawPattern(.4, .32, .5, .45, .1);
   </script>
 </body>

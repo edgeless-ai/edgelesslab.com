@@ -12,7 +12,9 @@ type PageMetadataOptions = {
 };
 
 function absoluteUrl(path: string) {
-  return new URL(path, SITE_URL).toString();
+  // Ensure trailing slash for all pages except root (consistent with next.config trailingSlash: true)
+  const canonicalPath = path === '/' ? path : (path.endsWith('/') ? path : `${path}/`);
+  return new URL(canonicalPath, SITE_URL).toString();
 }
 
 export function createPageMetadata({

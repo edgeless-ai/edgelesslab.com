@@ -132,6 +132,18 @@ export function Nav() {
                     {link.label}
                   </Link>
                 ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    openCommandPalette();
+                  }}
+                  className="text-left rounded-2xl px-4 py-3 text-sm transition-colors hover:text-white flex items-center gap-1.5 bg-transparent border-none cursor-pointer"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  <Search size={14} />
+                  Search
+                </button>
                 <a
                   href="https://github.com/edgeless-ai"
                   target="_blank"

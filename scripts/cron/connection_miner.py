@@ -460,16 +460,40 @@ def _score_connection(
 
 
 # LLM validation provider — OpenAI-compatible chat completions.
-# Default is Cerebras (free tier, fast, swarm-standard). Replaced hardcoded
-# Gemini, which kept hitting Google's account-wide 429 quota and validated
-# nothing. Override endpoint/model/key-env via CONNECTION_MINER_LLM_* to swap
-# providers (e.g. Fireworks) without code changes.
+# Default is the Nous portal serving StepFun 3.7 free (replaced Gemini, which
+# hit Google's account-wide 429, then Cerebras, whose key was dead). Override
+# endpoint/model/key-env via CONNECTION_MINER_LLM_* to swap providers.
 _VALIDATION_ENDPOINT = os.environ.get(
     "CONNECTION_MINER_LLM_ENDPOINT",
-    "https://api.cerebras.ai/v1/chat/completions",
+    "https://inference-api.nousresearch.com/v1/chat/completions",
 )
-_VALIDATION_MODEL = os.environ.get("CONNECTION_MINER_LLM_MODEL", "llama-3.3-70b")
-_VALIDATION_KEY_ENV = os.environ.get("CONNECTION_MINER_LLM_KEY_ENV", "CEREBRAS_API_KEY")
+_VALIDATION_MODEL = os.environ.get(
+    "CONNECTION_MINER_LLM_MODEL", "stepfun/step-3.7-flash:free"
+)
+_VALIDATION_KEY_ENV = os.environ.get("CONNECTION_MINER_LLM_KEY_ENV", "NOUS_API_KEY")
+# StepFun 3.7 is a reasoning model: it emits chain-of-thought before the answer,
+# so the validation call needs enough budget to finish reasoning AND produce the
+# JSON (content is null if it runs out mid-reasoning). 100 tokens was far too low.
+_VALIDATION_MAX_TOKENS = int(os.environ.get("CONNECTION_MINER_LLM_MAX_TOKENS", "3000"))
+# Nous portal keys live in ~/.hermes/auth.json (JWT), not an env var.
+_HERMES_AUTH = Path.home() / ".hermes" / "auth.json"
+
+
+def _resolve_validation_key() -> str:
+    """Return the LLM validation key: env var first, else the Nous agent_key
+    from ~/.hermes/auth.json (providers.nous, falling back to credential_pool)."""
+    env_key = os.environ.get(_VALIDATION_KEY_ENV, "")
+    if env_key:
+        return env_key
+    try:
+        auth = json.loads(_HERMES_AUTH.read_text())
+    except (OSError, json.JSONDecodeError):
+        return ""
+    nous = (auth.get("providers") or {}).get("nous") or {}
+    if not isinstance(nous, dict) or not nous.get("agent_key"):
+        pool = ((auth.get("credential_pool") or {}).get("nous") or [])
+        nous = pool[0] if pool and isinstance(pool[0], dict) else {}
+    return nous.get("agent_key") or nous.get("access_token") or ""
 
 
 def _validate_with_llm(
@@ -481,9 +505,14 @@ def _validate_with_llm(
     Returns the candidates sorted by score, with ``llm_score``/``llm_reason``/
     ``validated``/``accepted`` set on those validated (accepted when score >= 4).
     """
-    api_key = os.environ.get(_VALIDATION_KEY_ENV, "")
+    api_key = _resolve_validation_key()
     if not api_key:
-        logger.warning("%s not set; skipping LLM validation", _VALIDATION_KEY_ENV)
+        logger.warning(
+            "No LLM validation key (env %s unset and no Nous agent_key in %s); "
+            "skipping validation",
+            _VALIDATION_KEY_ENV,
+            _HERMES_AUTH,
+        )
         return candidates
 
     calls_made = 0
@@ -508,7 +537,7 @@ def _validate_with_llm(
                 "model": _VALIDATION_MODEL,
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.1,
-                "max_tokens": 100,
+                "max_tokens": _VALIDATION_MAX_TOKENS,
                 "response_format": {"type": "json_object"},
             }
         ).encode("utf-8")
@@ -524,16 +553,22 @@ def _validate_with_llm(
         )
 
         try:
-            with urllib.request.urlopen(req, timeout=20) as resp:
+            with urllib.request.urlopen(req, timeout=90) as resp:
                 response_data = json.loads(resp.read().decode("utf-8"))
             calls_made += 1
 
-            text = (
-                response_data.get("choices", [{}])[0]
-                .get("message", {})
-                .get("content", "")
-                .strip()
-            )
+            # Reasoning models (e.g. StepFun 3.7) put thinking in `reasoning` and
+            # the answer in `content`; content is null if they run out of tokens
+            # mid-reasoning. `.get("content", "")` returns None (not "") for an
+            # explicit null, so coerce with `or ""` and skip empties.
+            message = response_data.get("choices", [{}])[0].get("message", {}) or {}
+            text = (message.get("content") or "").strip()
+            if not text:
+                logger.warning(
+                    "LLM returned empty content (reasoning ran out of tokens?); "
+                    "skipping candidate"
+                )
+                continue
 
             # Strip markdown code fences if present
             if text.startswith("```"):

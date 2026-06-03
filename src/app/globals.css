@@ -407,9 +407,9 @@ h1, h2, h3 {
 /* Utility: char-reveal for hero headline (replaces AnimatedText) */
 @keyframes char-reveal {
   from {
-    opacity: 0;
-    transform: translateY(0.5em) scale(0.9);
-    filter: blur(4px);
+    opacity: 1;
+    transform: translateY(0.3em) scale(0.95);
+    filter: blur(3px);
   }
   to {
     opacity: 1;

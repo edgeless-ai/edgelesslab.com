@@ -439,8 +439,16 @@ def _score_connection(
     domain_b: str,
     pair_already_exists: bool,
 ) -> float:
-    """Compute connection score."""
-    similarity = max(0.0, 1.0 - distance)
+    """Compute connection score.
+
+    Uses a metric-agnostic similarity ``1/(1+distance)`` rather than
+    ``1-distance``. Chroma collections here default to L2 space, where distances
+    routinely exceed 1.0 (observed 1.76-1.93); ``1-distance`` then goes negative
+    and clamps to 0, which silently zeroed every connection score. ``1/(1+d)``
+    is bounded (0, 1], monotonically decreasing, and correct for any
+    non-negative distance metric (L2 or cosine).
+    """
+    similarity = 1.0 / (1.0 + max(0.0, distance))
     domain_distance = 0.3 if domain_a == domain_b else 1.0
     novelty_penalty = 0.0 if pair_already_exists else 1.0
     return similarity * domain_distance * novelty_penalty

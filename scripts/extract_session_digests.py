@@ -82,9 +82,10 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--output",
-        choices=["markdown", "json", "working-memory"],
+        choices=["markdown", "json", "working-memory", "store"],
         default="markdown",
-        help="Output format: markdown (write to vault), json (stdout), or working-memory (json stdout).",
+        help="Output: markdown (vault), json (stdout), working-memory (json stdout), "
+        "or store (write into the shared WorkingMemoryStore).",
     )
     p.add_argument(
         "--state-file",
@@ -166,6 +167,46 @@ def _output_working_memory(digests: list[SessionDigest]) -> None:
     print(json.dumps(all_entries, indent=2))
 
 
+def _output_store(
+    digests: list[SessionDigest],
+    extractor: SessionDigestExtractor,
+    dry_run: bool,
+) -> None:
+    """Write working-memory entries directly into the shared WorkingMemoryStore.
+
+    This is the canonical write path the circulation pipeline was missing: it
+    persists each digest's entries (dedup-on-write handles repeats) and marks the
+    sessions digested so subsequent runs are incremental.
+    """
+    from src.kernel.shared_memory.working_memory import WorkingMemoryStore
+
+    store = WorkingMemoryStore()
+    written = 0
+    digested_ids: list[str] = []
+    for digest in digests:
+        entries = digest_to_working_memory_entries(digest)
+        for e in entries:
+            if dry_run:
+                continue
+            store.write_observation(
+                source_agent=e["source_agent"],
+                source_session=e["source_session"],
+                content=e["content"],
+                task_ref=e.get("task_ref"),
+                confidence=e.get("confidence", 0.5),
+                importance=e.get("importance", 0.5),
+                tags=e.get("tags") or None,
+            )
+        written += len(entries)
+        digested_ids.append(digest.session_id)
+
+    if dry_run:
+        print(f"DRY RUN: would write {written} entries from {len(digests)} session(s).")
+        return
+    extractor.mark_digested(digested_ids)
+    print(f"Wrote {written} entries from {len(digests)} session(s); marked digested.")
+
+
 def _output_markdown(
     digests: list[SessionDigest],
     extractor: SessionDigestExtractor,
@@ -223,6 +264,8 @@ def main(argv: list[str] | None = None) -> int:
         _output_json(digests)
     elif args.output == "working-memory":
         _output_working_memory(digests)
+    elif args.output == "store":
+        _output_store(digests, extractor, dry_run=args.dry_run)
     else:
         _output_markdown(digests, extractor, vault_dir, dry_run=args.dry_run)
 

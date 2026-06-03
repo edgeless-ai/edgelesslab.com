@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
@@ -11,6 +13,20 @@ from uuid import uuid4
 from .config import DEFAULT_SHARED_MEMORY_DB_PATH
 
 TIER_ORDER = ("observation", "decision", "lesson", "policy")
+
+_WS_RE = re.compile(r"\s+")
+
+
+def _content_hash(content: str) -> str:
+    """Stable hash of normalized content for write-time dedup.
+
+    Normalizes case and whitespace so trivially-different restatements of the
+    same observation collapse to one hash. Scoped per source_agent at the call
+    site, so two different agents independently noting the same thing are both
+    kept (a convergence signal the connection miner can link).
+    """
+    normalized = _WS_RE.sub(" ", content.strip().lower())
+    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
 
 _CREATE_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS working_memories (
@@ -50,6 +66,20 @@ class WorkingMemoryStore:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as conn:
             conn.executescript(_CREATE_TABLE_SQL)
+            # Migrate: add sign_off column if missing (idempotent)
+            try:
+                conn.execute("ALTER TABLE working_memories ADD COLUMN sign_off TEXT")
+            except sqlite3.OperationalError:
+                pass
+            # Migrate: add content_hash column + index for write-time dedup (idempotent)
+            try:
+                conn.execute("ALTER TABLE working_memories ADD COLUMN content_hash TEXT")
+            except sqlite3.OperationalError:
+                pass
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_wm_agent_hash "
+                "ON working_memories(source_agent, content_hash)"
+            )
 
     def _connect(self) -> sqlite3.Connection:
         """Open a connection with Row factory."""
@@ -71,21 +101,38 @@ class WorkingMemoryStore:
         sensitivity: str,
         provenance: str,
         promoted_from: str | None = None,
+        dedup: bool = True,
     ) -> str:
-        """Write a single row; return its ID."""
-        entry_id = str(uuid4())
+        """Write a single row; return its ID.
+
+        When ``dedup`` is True (the default), an entry whose normalized content
+        already exists for the same ``source_agent`` is skipped and the existing
+        ID is returned. This keeps the table append-only in spirit (no
+        overwrites) while preventing one agent from re-logging the same
+        observation — the cause of the corpus's near-50% duplication.
+        """
+        chash = _content_hash(content)
         now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         tags_json = json.dumps(tags or [])
         with self._connect() as conn:
+            if dedup:
+                existing = conn.execute(
+                    "SELECT id FROM working_memories "
+                    "WHERE source_agent = ? AND content_hash = ? LIMIT 1",
+                    (source_agent, chash),
+                ).fetchone()
+                if existing is not None:
+                    return existing["id"]
+            entry_id = str(uuid4())
             conn.execute(
                 """
                 INSERT INTO working_memories (
                     id, source_agent, source_session, task_ref,
                     timestamp, content, tier, confidence, importance,
                     ttl_hours, provenance, sensitivity, tags,
-                    promoted_from, created_at
+                    promoted_from, created_at, content_hash
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     entry_id,
@@ -103,6 +150,7 @@ class WorkingMemoryStore:
                     tags_json,
                     promoted_from,
                     now,
+                    chash,
                 ),
             )
         return entry_id
@@ -164,10 +212,20 @@ class WorkingMemoryStore:
 
     # --- PROMOTE ---
 
-    def promote(self, entry_id: str, new_tier: str, promoted_by: str) -> bool:
-        """Promote an entry to a higher tier. Only upward. Returns True on success."""
+    def promote(self, entry_id: str, new_tier: str, promoted_by: str, sign_off: str | None = None) -> bool:
+        """Promote an entry to a higher tier. Only upward. Returns True on success.
+
+        Policy-tier promotions require a recorded sign-off (e.g. autoreason verdict
+        or human approval) to prevent self-improvement loops from unilaterally
+        minting top-tier policy.
+        """
         if new_tier not in TIER_ORDER:
             raise ValueError(f"Unknown tier '{new_tier}'. Valid: {TIER_ORDER}")
+        if new_tier == "policy" and not sign_off:
+            raise ValueError(
+                "Policy-tier promotion requires a recorded sign_off "
+                "(e.g. 'autoreason:verdict' or 'david:telegram')."
+            )
         with self._connect() as conn:
             row = conn.execute(
                 "SELECT tier FROM working_memories WHERE id = ?",
@@ -186,10 +244,10 @@ class WorkingMemoryStore:
             result = conn.execute(
                 """
                 UPDATE working_memories
-                SET tier = ?, promoted_by = ?, promoted_at = ?
+                SET tier = ?, promoted_by = ?, promoted_at = ?, sign_off = ?
                 WHERE id = ? AND tier = ?
                 """,
-                (new_tier, promoted_by, now, entry_id, current_tier),
+                (new_tier, promoted_by, now, sign_off, entry_id, current_tier),
             )
         return result.rowcount > 0
 

@@ -571,7 +571,7 @@ class SessionDigestExtractor:
 
         messages: list[dict] = []
         timestamps: list[float] = []
-        agent = "claude_code"
+        agent = f"claude_code:{_claude_code_project_label(path.parent.name)}"
         branch = ""
 
         for raw_line in lines:
@@ -634,6 +634,25 @@ class SessionDigestExtractor:
 # ---------------------------------------------------------------------------
 # Content extraction helpers
 # ---------------------------------------------------------------------------
+
+
+_CC_PATH_NOISE = {"users", "djm", "private", "tmp", "var", "home", ""}
+
+
+def _claude_code_project_label(dir_name: str) -> str:
+    """Derive a short project label from a Claude Code project directory name.
+
+    Claude Code encodes the project path as the transcript's parent directory,
+    e.g. ``-Users-djm-claude-projects`` or ``-private-tmp-mirofish-claude-lane``.
+    Strip common path-prefix noise and keep the trailing, meaningful segments so
+    entries attribute to ``claude_code:claude-projects``,
+    ``claude_code:mirofish-claude-lane``, etc. Falls back to ``unknown``.
+    """
+    segments = [s for s in dir_name.split("-") if s.lower() not in _CC_PATH_NOISE]
+    if not segments:
+        return "unknown"
+    # Keep up to the last 3 segments to stay readable but distinct.
+    return "-".join(segments[-3:])
 
 
 def _extract_text_from_content(content: object) -> str:

@@ -524,7 +524,7 @@ def _search_existing_issue(label: str) -> bool:
     """Return True if an open issue matching label already exists."""
     # URL-encode the search term minimally (spaces -> %20)
     search_term = label[:40].replace(" ", "%20").replace("/", "%2F")
-    path = f"/issues?company_id={PAPERCLIP_COMPANY}&search={search_term}"
+    path = f"/api/companies/{PAPERCLIP_COMPANY}/issues?search={search_term}"
     response = _paperclip_get(path)
     if response is None:
         return False
@@ -575,16 +575,18 @@ def _create_paperclip_issues(
             body = {
                 "title": title,
                 "description": description,
-                "company_id": PAPERCLIP_COMPANY,
                 "labels": ["auto-generated", "memory-pattern"],
             }
-            response = _paperclip_post("/issues", body)
+            response = _paperclip_post(f"/api/companies/{PAPERCLIP_COMPANY}/issues", body)
             if response is None:
                 logger.error("Failed to create Paperclip issue for '%s'.", label)
                 continue
             issue_id = response.get("id") or (
                 response.get("data", {}).get("id") if isinstance(response.get("data"), dict) else None
             )
+            if not issue_id:
+                logger.warning("Paperclip returned 200 but no issue id for '%s' — possible 404 or validation error.", label)
+                continue
             logger.info("Created Paperclip issue %s for '%s'.", issue_id, label)
         else:
             issue_id = "dry-run"

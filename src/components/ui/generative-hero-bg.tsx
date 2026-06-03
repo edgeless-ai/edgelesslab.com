@@ -196,8 +196,13 @@ export function GenerativeHeroBackground() {
     const w = canvas.width;
     const h = canvas.height;
 
+    // Adaptive particle count: fewer on mobile / low-DPR devices
+    const dpr = window.devicePixelRatio || 1;
+    const isMobile = w < 768;
+    const particleCount = isMobile ? 150 : dpr > 1.5 ? 300 : 400;
+
     stateRef.current = {
-      particles: createParticles(600, w, h, rng),
+      particles: createParticles(particleCount, w, h, rng),
       type,
       seed,
       rng,
@@ -220,7 +225,7 @@ export function GenerativeHeroBackground() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: false });
     if (!ctx) return;
 
     let cssW = 0;
@@ -237,11 +242,23 @@ export function GenerativeHeroBackground() {
       init(canvas);
     };
 
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     resize();
 
-    const draw = () => {
+    let lastFrameTime = 0;
+    const targetFrameInterval = 1000 / 30; // 30fps cap for hero background
+
+    const draw = (timestamp: number) => {
       const state = stateRef.current;
       if (!state) return;
+
+      // Frame skipping for slow devices
+      if (!prefersReducedMotion && timestamp - lastFrameTime < targetFrameInterval) {
+        animRef.current = requestAnimationFrame(draw);
+        return;
+      }
+      lastFrameTime = timestamp;
 
       state.time++;
 

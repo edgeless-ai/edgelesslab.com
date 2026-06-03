@@ -2,28 +2,26 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import type posthog from "posthog-js";
 
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 
 let initialized = false;
+let initPromise: Promise<typeof posthog | null> | null = null;
 
-export function PostHogProvider({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+function getCurrentUrl(pathname: string | null) {
+  if (typeof window === "undefined") return undefined;
+  return window.origin + (pathname || window.location.pathname);
+}
 
-  // Dynamically import posthog-js on first user interaction or after LCP
-  useEffect(() => {
-    async function initPostHog() {
-      if (initialized) return;
-      initialized = true;
+async function ensurePostHog() {
+  if (!POSTHOG_KEY) return null;
+  if (initPromise) return initPromise;
 
-      // Wait for LCP window to pass
-      await new Promise((r) => requestIdleCallback ? requestIdleCallback(r) : setTimeout(r, 2000));
-
-      const { default: ph } = await import("posthog-js");
-
-      if (!POSTHOG_KEY) return;
-
+  initPromise = (async () => {
+    const { default: ph } = await import("posthog-js");
+    if (!initialized) {
       const options: Parameters<typeof ph.init>[1] & { web_vitals?: boolean } = {
         api_host: POSTHOG_HOST,
         person_profiles: "identified_only",
@@ -34,17 +32,35 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
         web_vitals: false,
       };
       ph.init(POSTHOG_KEY, options);
+      initialized = true;
+    }
+    return ph;
+  })();
 
-      // Capture initial pageview after lazy init
-      const url = window.origin + (pathname || location.pathname);
-      ph.capture("$pageview", { $current_url: url });
+  return initPromise;
+}
+
+export function PostHogProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  // Dynamically import posthog-js on first user interaction or after LCP
+  useEffect(() => {
+    async function capturePageview() {
+      const ph = await ensurePostHog();
+      if (!ph) return;
+      ph.capture("$pageview", { $current_url: getCurrentUrl(pathname) });
+    }
+
+    if (initialized) {
+      capturePageview();
+      return;
     }
 
     // Defer until interaction (guarantees LCP isn't blocked)
     const onInteraction = () => {
       window.removeEventListener("pointerdown", onInteraction);
       window.removeEventListener("keydown", onInteraction);
-      initPostHog();
+      capturePageview();
     };
     window.addEventListener("pointerdown", onInteraction, { once: true });
     window.addEventListener("keydown", onInteraction, { once: true });
@@ -53,7 +69,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     const fallback = setTimeout(() => {
       window.removeEventListener("pointerdown", onInteraction);
       window.removeEventListener("keydown", onInteraction);
-      initPostHog();
+      capturePageview();
     }, 8000);
 
     return () => clearTimeout(fallback);

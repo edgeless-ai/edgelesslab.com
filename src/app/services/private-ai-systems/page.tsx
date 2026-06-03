@@ -2,6 +2,7 @@ import { ArrowRight, Check, Cpu, KeyRound, Mail, Server, ShieldCheck, Wrench } f
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
+import { ServiceCtaLink } from "@/components/service-cta-link";
 import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
@@ -146,8 +147,9 @@ export default function PrivateAiSystemsPage() {
               </p>
 
               <div className="flex flex-wrap items-center gap-3">
-                <a
+                <ServiceCtaLink
                   href="mailto:david@edgelesslab.com?subject=Private%20AI%20system"
+                  name="private_ai_start_build"
                   className="inline-flex h-11 items-center gap-2 rounded-full border px-5 font-mono text-xs uppercase tracking-[0.1em] transition-all hover:brightness-110"
                   style={{
                     color: "var(--text-primary)",
@@ -157,7 +159,7 @@ export default function PrivateAiSystemsPage() {
                 >
                   <Mail size={14} />
                   Start a build
-                </a>
+                </ServiceCtaLink>
                 <a
                   href="#pricing"
                   className="inline-flex h-11 items-center gap-2 rounded-full px-5 font-mono text-xs uppercase tracking-[0.1em] transition-colors hover:text-white"
@@ -324,8 +326,9 @@ export default function PrivateAiSystemsPage() {
                 local models, or a recommendation. I will tell you honestly if it is a fit or if a simpler
                 tool is the better answer.
               </p>
-              <a
+              <ServiceCtaLink
                 href="mailto:david@edgelesslab.com?subject=Private%20AI%20system&body=What%20I%20want%20to%20automate%3A%0A%0ATools%20involved%3A%0A%0AAPI%20keys%2C%20local%20LLM%2C%20or%20not%20sure%3A%0A"
+                name="private_ai_email_workflow"
                 className="inline-flex h-11 items-center gap-2 rounded-full border px-5 font-mono text-xs uppercase tracking-[0.1em]"
                 style={{
                   color: "var(--green)",
@@ -335,7 +338,7 @@ export default function PrivateAiSystemsPage() {
               >
                 Email the workflow
                 <ArrowRight size={14} />
-              </a>
+              </ServiceCtaLink>
             </div>
           </div>
         </section>

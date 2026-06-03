@@ -11,7 +11,9 @@
     "lint": "eslint && node scripts/lint-experiments.mjs && npm run lint:voice",
     "lint:blog-links": "node scripts/lint-blog-links.mjs",
     "lint:experiments": "node scripts/lint-experiments.mjs",
-    "lint:voice": "../scripts/lint-voice.sh src/lib/data.ts && ../scripts/lint-voice.sh src/lib/product-content.ts && ../scripts/lint-voice.sh src/lib/blog.ts"
+    "lint:voice": "../scripts/lint-voice.sh src/lib/data.ts && ../scripts/lint-voice.sh src/lib/product-content.ts && ../scripts/lint-voice.sh src/lib/blog.ts",
+    "worker:ingest:dev": "npx wrangler dev --config workers/ingest/wrangler.toml",
+    "worker:ingest:deploy": "npx wrangler deploy --config workers/ingest/wrangler.toml"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.3",

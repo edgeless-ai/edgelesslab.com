@@ -407,10 +407,38 @@ export const knowledgeEntries: KnowledgeEntry[] = [
     tags: ["obsidian", "ui", "knowledge-management"],
     date: "2026-01",
   },
+  // ── Research: 2026-06 additions ──────────────────────────
+  {
+    id: "rs-robust-shielding",
+    title: "Robust Shielding for Safe Reinforcement Learning",
+    summary:
+      "Shielding for Robust MDPs (RMDPs) with PAC-learned transition probabilities. LTL safety guarantees under worst-case adversary. Sound and optimal: every admissible policy is safe, every safe policy is admissible. Three domains: GridWorld, Pacman, Streaming. Submissions from Manchester, Oxford, Imperial.",
+    source: "Research",
+    tags: ["safe-rl", "shielding", "robust-mdps", "LTL", "formal-verification"],
+    date: "2026-05",
+  },
+  {
+    id: "rs-feedback-distillation",
+    title: "Distilling LLM Feedback for Lean Theorem Proving",
+    summary:
+      "Feedback Distillation (FD) for formal theorem-proving LLMs: student matches token-level distribution of EMA-smoothed teacher conditioned on privileged LLM feedback about failed proof attempts. On Lean4, FD maintains trajectory diversity and better pass@k than GRPO alone. FAIR Meta + Inria + Sorbonne + ENS/PSL.",
+    source: "Research",
+    tags: ["theorem-proving", "knowledge-distillation", "lean", "formal-methods", "reinforcement-learning"],
+    date: "2026-05",
+  },
+  {
+    id: "rs-interactive-reasoning-benchmark",
+    title: "Evaluating Interactive Reasoning in LLMs — Executable Games Benchmark",
+    summary:
+      "Multi-turn interactive reasoning evaluation: 474 executable games across 5 difficulty levels (2,370 configurations). LLMs receive only task rules, must issue targeted queries, integrate observations, and decide when to answer. Metacognitive revision is the weakest capability across frontier models.",
+    source: "Research",
+    tags: ["LLM-evaluation", "interactive-reasoning", "benchmarking", "metacognition"],
+    date: "2026-05",
+  },
 ];
 
 export const KNOWLEDGE_STATS = {
-  totalDocuments: knowledgeEntries.length,
+  totalDocuments: knowledgeEntries.length, // auto-calculated, was 41 now 44
   collections: 4,
   sources: ["YouTube", "Research", "Tools"] as const,
 };

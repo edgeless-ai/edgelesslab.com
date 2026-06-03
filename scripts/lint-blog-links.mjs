@@ -40,9 +40,13 @@ function collectSlugs(src, exportName) {
 
 function addKnownRoutes() {
   const blogSrc = read("src/lib/blog.ts");
+  const blogNewPostsSrc = read("src/lib/blog-new-posts.ts");
   const dataSrc = read("src/lib/data.ts");
 
   for (const slug of collectSlugs(blogSrc, "posts")) {
+    appRoutes.add(`/blog/${slug}`);
+  }
+  for (const slug of collectSlugs(blogNewPostsSrc, "newPosts")) {
     appRoutes.add(`/blog/${slug}`);
   }
   for (const slug of collectSlugs(dataSrc, "products")) {

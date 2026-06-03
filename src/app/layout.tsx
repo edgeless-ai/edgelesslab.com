@@ -4,6 +4,7 @@ import "./globals.css";
 import { JsonLd } from "@/components/json-ld";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { PerformancePreload } from "@/components/performance-preload";
+import { CommandPalette } from "@/components/command-palette";
 
 const geistSans = localFont({
   src: "../fonts/Geist[wght].woff2",
@@ -110,6 +111,7 @@ export default function RootLayout({
         <PostHogProvider>
           {children}
         </PostHogProvider>
+        <CommandPalette />
       </body>
     </html>
   );

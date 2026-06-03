@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, X, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { openCommandPalette } from "@/lib/command-palette-events";
 
 const navLinks = [
   { label: "Projects", href: "/projects" },
@@ -67,6 +68,21 @@ export function Nav() {
                   {link.label}
                 </Link>
               ))}
+              <button
+                type="button"
+                onClick={() => openCommandPalette()}
+                className="text-[13px] hover:text-white transition-colors flex items-center gap-1.5 bg-transparent border-none cursor-pointer"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                <Search size={13} />
+                <kbd
+                  className="text-[10px] font-mono px-1 py-0.5 rounded hidden lg:inline"
+                  style={{ color: "var(--text-tertiary)", background: "var(--bg-surface)" }}
+                >
+                  &#8984;K
+                </kbd>
+                <span className="sr-only">Search</span>
+              </button>
               <a
                 href="https://github.com/edgeless-ai"
                 target="_blank"

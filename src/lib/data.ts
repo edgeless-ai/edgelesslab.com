@@ -15,7 +15,24 @@ export interface Product {
    * Products without a slug link directly to Gumroad from the products grid.
    */
   slug?: string;
+  /**
+   * Product category for section grouping in the grid.
+   */
+  category: string;
+  /**
+   * Visual tag annotations for the card (braille-style scoring dimensions).
+   * Each tag is a { label, score } pair displayed as dot annotations.
+   */
+  scoreTags?: Array<{ label: string; score: 1 | 2 | 3 }>;
 }
+
+/** Braille-dot annotation presets */
+export const TAG_ESSENTIAL = { label: "Essential", score: 3 as const };
+export const TAG_RECOMMENDED = { label: "Recommended", score: 2 as const };
+export const TAG_SPECIALIZED = { label: "Specialized", score: 1 as const };
+export const TAG_BEGINNER = { label: "Beginner", score: 2 as const };
+export const TAG_INTERMEDIATE = { label: "Intermediate", score: 2 as const };
+export const TAG_ADVANCED = { label: "Advanced", score: 3 as const };
 
 const UTM = "utm_source=edgelesslab&utm_medium=website&utm_campaign=products";
 
@@ -33,6 +50,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/kszapk?${UTM}`,
     badge: "Free",
+    category: "Agent Config",
+    scoreTags: [TAG_ESSENTIAL, TAG_BEGINNER],
   },
   {
     name: "Quick Reference Cards",
@@ -47,6 +66,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/dihxts?${UTM}`,
     badge: "Free",
+  category: "Reference Docs",
+  scoreTags: [TAG_BEGINNER],
   },
   {
     name: "Claude Code Cheat Sheet",
@@ -62,6 +83,8 @@ export const products: Product[] = [
     href: `https://edgelessai.gumroad.com/l/claude-code-cheat-sheet?${UTM}`,
     badge: "Free",
     slug: "claude-code-cheat-sheet",
+  category: "Agent Config",
+  scoreTags: [TAG_BEGINNER],
   },
   {
     name: "Claude Memory Kit",
@@ -77,6 +100,8 @@ export const products: Product[] = [
     href: "https://github.com/edgeless-ai/claude-memory-kit?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
     badge: "Free",
     repoUrl: "https://github.com/edgeless-ai/claude-memory-kit",
+  category: "Agent Config",
+  scoreTags: [TAG_ESSENTIAL, TAG_BEGINNER],
   },
   {
     name: "Edgeless Stack",
@@ -92,6 +117,8 @@ export const products: Product[] = [
     href: "https://github.com/edgeless-ai/edgeless-stack?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
     badge: "Free",
     repoUrl: "https://github.com/edgeless-ai/edgeless-stack",
+  category: "Agent Infrastructure",
+  scoreTags: [TAG_ESSENTIAL, TAG_ADVANCED],
   },
   {
     name: "Multi-Agent Orchestration Blueprint",
@@ -108,6 +135,8 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "multi-agent-blueprint",
+  category: "Agent Infrastructure",
+  scoreTags: [TAG_RECOMMENDED, TAG_ADVANCED],
   },
   {
     name: "The Agent Cookbook",
@@ -122,6 +151,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/plbzo?${UTM}`,
     badge: null,
+  category: "Agent Infrastructure",
+  scoreTags: [TAG_RECOMMENDED, TAG_INTERMEDIATE],
   },
   {
     name: "Claude Memory Kit Pro",
@@ -136,6 +167,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/claude-memory-kit?${UTM}`,
     badge: "Popular",
+  category: "Agent Config",
+  scoreTags: [TAG_RECOMMENDED, TAG_INTERMEDIATE],
   },
   {
     name: "The Prompt Engineering OS",
@@ -150,6 +183,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/prompt-engineering-os?${UTM}`,
     badge: null,
+  category: "Reference Docs",
+  scoreTags: [TAG_ESSENTIAL, TAG_INTERMEDIATE],
   },
   {
     name: "Generative Art Starter Kit",
@@ -166,6 +201,8 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "gen-art-starter",
+  category: "Creative Kits",
+  scoreTags: [TAG_SPECIALIZED, TAG_INTERMEDIATE],
   },
   {
     name: "Always-On Agent Deployment Kit",
@@ -182,6 +219,8 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: true,
     slug: "always-on-agent",
+  category: "Agent Infrastructure",
+  scoreTags: [TAG_RECOMMENDED, TAG_ADVANCED],
   },
   {
     name: "Production MCP Server Kit",
@@ -198,6 +237,8 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "production-mcp-kit",
+  category: "Developer Kits",
+  scoreTags: [TAG_RECOMMENDED, TAG_ADVANCED],
   },
   {
     name: "AI Code Review Playbook",
@@ -212,6 +253,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/uacjr?${UTM}`,
     badge: null,
+  category: "Safety & Quality",
+  scoreTags: [TAG_RECOMMENDED, TAG_INTERMEDIATE],
   },
   {
     name: "Digital Product Launch Toolkit",
@@ -228,6 +271,8 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "launch-toolkit",
+  category: "Creative Kits",
+  scoreTags: [TAG_SPECIALIZED, TAG_BEGINNER],
   },
   {
     name: "n8n AI Workflow Templates",
@@ -244,6 +289,8 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "n8n-ai-workflows",
+  category: "Developer Kits",
+  scoreTags: [TAG_SPECIALIZED, TAG_INTERMEDIATE],
   },
   {
     name: "MCP Server Starter Kit",
@@ -258,6 +305,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/lixicg?${UTM}`,
     badge: null,
+  category: "Developer Kits",
+  scoreTags: [TAG_BEGINNER],
   },
   {
     name: "Obsidian + Claude Code Setup Kit",
@@ -272,6 +321,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/fyuwpn?${UTM}`,
     badge: null,
+  category: "Agent Config",
+  scoreTags: [TAG_SPECIALIZED, TAG_BEGINNER],
   },
   {
     name: "Prompt Testing Framework",
@@ -286,6 +337,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/yrail?${UTM}`,
     badge: null,
+  category: "Safety & Quality",
+  scoreTags: [TAG_SPECIALIZED, TAG_ADVANCED],
   },
   {
     name: "Autonomous Agent Safety Patterns",
@@ -302,6 +355,8 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "agent-safety-patterns",
+  category: "Safety & Quality",
+  scoreTags: [TAG_ESSENTIAL, TAG_ADVANCED],
   },
   {
     name: "Claude Code Hooks Deep Dive",
@@ -318,6 +373,8 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "hooks-deep-dive",
+  category: "Safety & Quality",
+  scoreTags: [TAG_RECOMMENDED, TAG_ADVANCED],
   },
   {
     name: "Edgeless Agent Starter Kit",
@@ -337,6 +394,8 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "agent-starter-kit",
+  category: "Agent Infrastructure",
+  scoreTags: [TAG_ESSENTIAL, TAG_INTERMEDIATE],
   },
   {
     name: "Hooks Library",
@@ -351,6 +410,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/ztaflt?${UTM}`,
     badge: null,
+  category: "Developer Kits",
+  scoreTags: [TAG_RECOMMENDED, TAG_INTERMEDIATE],
   },
 ];
 

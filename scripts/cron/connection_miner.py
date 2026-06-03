@@ -459,20 +459,33 @@ def _score_connection(
 # ---------------------------------------------------------------------------
 
 
-def _validate_with_gemini(
+# LLM validation provider — OpenAI-compatible chat completions.
+# Default is Cerebras (free tier, fast, swarm-standard). Replaced hardcoded
+# Gemini, which kept hitting Google's account-wide 429 quota and validated
+# nothing. Override endpoint/model/key-env via CONNECTION_MINER_LLM_* to swap
+# providers (e.g. Fireworks) without code changes.
+_VALIDATION_ENDPOINT = os.environ.get(
+    "CONNECTION_MINER_LLM_ENDPOINT",
+    "https://api.cerebras.ai/v1/chat/completions",
+)
+_VALIDATION_MODEL = os.environ.get("CONNECTION_MINER_LLM_MODEL", "llama-3.3-70b")
+_VALIDATION_KEY_ENV = os.environ.get("CONNECTION_MINER_LLM_KEY_ENV", "CEREBRAS_API_KEY")
+
+
+def _validate_with_llm(
     candidates: list[dict],
     max_calls: int,
 ) -> list[dict]:
-    """Validate top candidates with Gemini. Returns updated list."""
-    api_key = os.environ.get("GEMINI_API_KEY", "")
+    """Validate top candidates with an OpenAI-compatible LLM (default: Cerebras).
+
+    Returns the candidates sorted by score, with ``llm_score``/``llm_reason``/
+    ``validated``/``accepted`` set on those validated (accepted when score >= 4).
+    """
+    api_key = os.environ.get(_VALIDATION_KEY_ENV, "")
     if not api_key:
-        logger.warning("GEMINI_API_KEY not set; skipping LLM validation")
+        logger.warning("%s not set; skipping LLM validation", _VALIDATION_KEY_ENV)
         return candidates
 
-    endpoint = (
-        f"https://generativelanguage.googleapis.com/v1beta/models/"
-        f"gemini-2.0-flash:generateContent?key={api_key}"
-    )
     calls_made = 0
 
     # Sort by score descending, validate top N
@@ -492,31 +505,33 @@ def _validate_with_gemini(
 
         body = json.dumps(
             {
-                "contents": [{"parts": [{"text": prompt}]}],
-                "generationConfig": {
-                    "temperature": 0.1,
-                    "maxOutputTokens": 100,
-                },
+                "model": _VALIDATION_MODEL,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.1,
+                "max_tokens": 100,
+                "response_format": {"type": "json_object"},
             }
         ).encode("utf-8")
 
         req = urllib.request.Request(
-            endpoint,
+            _VALIDATION_ENDPOINT,
             data=body,
-            headers={"Content-Type": "application/json"},
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+            },
             method="POST",
         )
 
         try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            with urllib.request.urlopen(req, timeout=20) as resp:
                 response_data = json.loads(resp.read().decode("utf-8"))
             calls_made += 1
 
             text = (
-                response_data.get("candidates", [{}])[0]
-                .get("content", {})
-                .get("parts", [{}])[0]
-                .get("text", "")
+                response_data.get("choices", [{}])[0]
+                .get("message", {})
+                .get("content", "")
                 .strip()
             )
 
@@ -536,15 +551,15 @@ def _validate_with_gemini(
             candidate["accepted"] = 1 if score >= 4 else 0
 
         except urllib.error.URLError as exc:
-            logger.warning("Gemini API network error: %s", exc)
+            logger.warning("LLM validation network error (%s): %s", _VALIDATION_MODEL, exc)
             # Don't increment calls_made; stop trying
             break
         except (json.JSONDecodeError, KeyError, IndexError, ValueError) as exc:
-            logger.warning("Failed to parse Gemini response: %s", exc)
+            logger.warning("Failed to parse LLM validation response: %s", exc)
             calls_made += 1  # Still used a call even if parse failed
             continue
 
-    logger.info("Gemini validation: %d calls made", calls_made)
+    logger.info("LLM validation (%s): %d calls made", _VALIDATION_MODEL, calls_made)
     return sorted_candidates
 
 
@@ -897,7 +912,7 @@ def main(args: argparse.Namespace) -> int:
 
     # LLM validation
     if above_threshold and not args.dry_run:
-        above_threshold = _validate_with_gemini(above_threshold, max_calls=MAX_LLM_CALLS)
+        above_threshold = _validate_with_llm(above_threshold, max_calls=MAX_LLM_CALLS)
     elif above_threshold and args.dry_run:
         logger.info("[dry-run] Skipping LLM validation for %d candidates", len(above_threshold))
 

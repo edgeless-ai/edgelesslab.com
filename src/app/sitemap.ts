@@ -32,6 +32,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: 'https://edgelesslab.com/services/private-ai-systems/',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
       url: 'https://edgelesslab.com/blog/',
       lastModified: new Date(),
       changeFrequency: 'weekly',

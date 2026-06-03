@@ -9,6 +9,7 @@ import { openCommandPalette } from "@/lib/command-palette-events";
 const navLinks = [
   { label: "Projects", href: "/projects" },
   { label: "Products", href: "/products" },
+  { label: "Services", href: "/services/private-ai-systems" },
   { label: "Lab", href: "/lab" },
   { label: "Agents", href: "/agents" },
   { label: "Blog", href: "/blog" },

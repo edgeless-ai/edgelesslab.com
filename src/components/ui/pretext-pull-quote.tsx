@@ -8,7 +8,6 @@ import {
   type CSSProperties,
 } from "react";
 import { usePreText } from "@/hooks/use-pretext";
-import type { Obstacle } from "@/components/ui/pretext-block";
 
 interface PullQuote {
   text: string;

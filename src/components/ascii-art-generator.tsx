@@ -20,11 +20,9 @@ const DENSITY_CHARS = {
 };
 
 export function ASCIIArtGenerator() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [ascii, setAscii] = useState<string>("");
-  const [isGenerating, setIsGenerating] = useState(false);
   const [settings, setSettings] = useState<ASCIISettings>({
     density: "detailed",
     fontSize: 8,

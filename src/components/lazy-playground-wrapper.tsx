@@ -1,7 +1,7 @@
 "use client";
 
 import { lazy, Suspense, useState } from "react";
-import { ChevronDown, Play } from "lucide-react";
+import { Play } from "lucide-react";
 
 // Lazy load the heavy canvas components
 const LabPlayground = lazy(() => import("@/components/lab-playground").then(m => ({ default: m.LabPlayground })));

@@ -225,7 +225,6 @@ export function avvatar(options: AvvatarOptions = {}): string {
     gridSize = 5,
     padding = 0.15,
     symmetric = true,
-    optimized = false,
     patternType,
     shape = 'rect',
     foreground,

@@ -7,7 +7,6 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import { GlowingCard } from "@/components/ui/glowing-card";
 import { KineticPreText } from "@/components/ui/kinetic-pretext";
-import { StaggerReveal } from "@/components/ui/pretext-stagger-reveal";
 import { PreTextRichFlow, type RichFlowSegment } from "@/components/ui/pretext-rich-flow";
 import { PreTextOrbs } from "@/components/ui/pretext-orbs";
 import { useShrinkWrap } from "@/hooks/use-shrink-wrap";

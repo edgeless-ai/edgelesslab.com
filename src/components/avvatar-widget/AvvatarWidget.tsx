@@ -1,5 +1,6 @@
 'use client'
 
+import Image from "next/image"
 import { useState, useCallback, useEffect } from 'react'
 import {
   avvatar,
@@ -82,9 +83,11 @@ export default function AvvatarWidget() {
         }}
       >
         {dataUri && (
-          <img
+          <Image
             src={dataUri}
             alt="Generated avvatar"
+            width={512}
+            height={512}
             className="w-full h-full object-contain p-8"
             style={{ imageRendering: 'auto' }}
           />

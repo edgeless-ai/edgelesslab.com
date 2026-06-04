@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useCallback } from "react";
+import { useDeferredMount } from "@/hooks/use-deferred-mount";
 
 /**
  * Fully procedural hero background — unique every visit.
@@ -187,6 +188,7 @@ export function GenerativeHeroBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const stateRef = useRef<SimState | null>(null);
+  const deferred = useDeferredMount(1500); // Defer 1.5s to let LCP settle first
 
   const init = useCallback((canvas: HTMLCanvasElement) => {
     const seed = (Date.now() ^ (Math.random() * 0xffffffff)) >>> 0;
@@ -223,7 +225,7 @@ export function GenerativeHeroBackground() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !deferred) return;
 
     const ctx = canvas.getContext("2d", { willReadFrequently: false });
     if (!ctx) return;
@@ -323,7 +325,7 @@ export function GenerativeHeroBackground() {
       cancelAnimationFrame(animRef.current);
       window.removeEventListener("resize", resize);
     };
-  }, [init]);
+  }, [init, deferred]);
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -336,12 +338,14 @@ export function GenerativeHeroBackground() {
           backgroundSize: "64px 64px",
         }}
       />
-      {/* Particle canvas — full procedural, unique every visit */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full"
-        style={{ opacity: 0.55 }}
-      />
+      {/* Particle canvas — full procedural, unique every visit — deferred until after LCP */}
+      {deferred && (
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full"
+          style={{ opacity: 0.55 }}
+        />
+      )}
       {/* Vignette for text readability */}
       <div
         className="absolute inset-0"

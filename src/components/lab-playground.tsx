@@ -137,7 +137,7 @@ export function LabPlayground() {
       window.removeEventListener("resize", resize);
       cancelAnimationFrame(animationRef.current);
     };
-  }, [isPlaying, params]);
+  }, [isPlaying, params, getFlowAngle]);
 
   const handleDownload = () => {
     const canvas = canvasRef.current;

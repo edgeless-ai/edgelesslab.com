@@ -5,6 +5,7 @@ import { ArrowUpRight, Menu, X, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { openCommandPalette } from "@/lib/command-palette-events";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navLinks = [
   { label: "Projects", href: "/projects" },
@@ -38,7 +39,7 @@ export function Nav() {
           <div
             className="flex items-center justify-between h-12 px-5 rounded-full border backdrop-blur-xl"
             style={{
-              background: "rgba(17, 17, 19, 0.7)",
+              background: "var(--bg-glass)",
               borderColor: "var(--border-subtle)",
             }}
           >
@@ -94,6 +95,7 @@ export function Nav() {
                 GitHub <ArrowUpRight size={12} />
                 <span className="sr-only">(opens in new tab)</span>
               </a>
+              <ThemeToggle />
             </div>
             <button
               type="button"
@@ -111,7 +113,7 @@ export function Nav() {
             <div
               className="mt-3 rounded-[1.5rem] border p-3 backdrop-blur-xl md:hidden"
               style={{
-                background: "rgba(17, 17, 19, 0.92)",
+                background: "var(--bg-glass-solid)",
                 borderColor: "var(--border-subtle)",
               }}
             >
@@ -156,6 +158,9 @@ export function Nav() {
                   GitHub <ArrowUpRight size={12} />
                   <span className="sr-only">(opens in new tab)</span>
                 </a>
+                <div className="px-4 py-2">
+                  <ThemeToggle />
+                </div>
               </div>
             </div>
           )}

@@ -25,7 +25,7 @@ const GenerativeAscii = dynamic(
 );
 
 const HERO_SUBTITLE =
-  "One developer shipping autonomous agents, MCP servers, and generative art. 18 products, all free. Everything open source.";
+  "One developer shipping autonomous agents, MCP servers, and generative art. 5 free lead magnets, 17 premium toolkits. Everything open source.";
 
 /* ── Hero ────────────────────────────────────────────────── */
 
@@ -126,7 +126,7 @@ export function HeroSection() {
                 style={{ background: "var(--accent)" }}
                 onClick={() => trackCTA("hero_view_products", "/products")}
               >
-                18 free products <ArrowRight size={15} />
+                Free products <ArrowRight size={15} />
               </Link>
               <Link
                 href="/projects"
@@ -151,7 +151,7 @@ export function HeroSection() {
         </div>
 
         {/* Right column: generative ASCII art piece — unique each visit, deferred */}
-        <div className="animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
+        <div className="animate-fade-in-up lg:min-h-[600px]" style={{ animationDelay: "0.5s" }}>
           <div className="hidden lg:block">
             {deferred && <GenerativeAscii />}
           </div>

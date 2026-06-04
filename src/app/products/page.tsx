@@ -87,7 +87,7 @@ export default function ProductsPage() {
               className="text-[11px] font-mono"
               style={{ color: "var(--text-tertiary)" }}
             >
-              all free &middot; instant download
+              5 free lead magnets · instant download
             </span>
           </div>
 

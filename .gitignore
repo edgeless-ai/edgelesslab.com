@@ -10,3 +10,10 @@ out/
 .standalone-stash/
 public/pen-plotter/assets/
 pen-plotter/assets/
+
+# Generated 3D assets — keep only PNGs in repo
+*.glb
+_script.py
+*.glb
+public/renders/_*.py
+public/renders/_*.glb

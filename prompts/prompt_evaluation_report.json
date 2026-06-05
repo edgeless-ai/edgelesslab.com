@@ -1,0 +1,39 @@
+{
+  "date": "2026-06-05T16:34:30.184566",
+  "baseline_completion": 0.15,
+  "optimized_completion": 1.0,
+  "improvement_pct": 566.67,
+  "passed": true,
+  "tasks": [
+    {
+      "id": "TASK-1",
+      "agent": "Kilo",
+      "baseline_completion": 0.15,
+      "optimized_completion": 1.0
+    },
+    {
+      "id": "TASK-2",
+      "agent": "Hive",
+      "baseline_completion": 0.15,
+      "optimized_completion": 1.0
+    },
+    {
+      "id": "TASK-3",
+      "agent": "Scribe",
+      "baseline_completion": 0.15,
+      "optimized_completion": 1.0
+    },
+    {
+      "id": "TASK-4",
+      "agent": "Beau",
+      "baseline_completion": 0.15,
+      "optimized_completion": 1.0
+    },
+    {
+      "id": "TASK-5",
+      "agent": "Edgeless CC",
+      "baseline_completion": 0.15,
+      "optimized_completion": 1.0
+    }
+  ]
+}

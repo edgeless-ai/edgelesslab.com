@@ -1,22 +1,7 @@
+import type { BlogPostMeta } from "./blog-types";
 
-export interface BlogPostMeta {
-  slug: string;
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
-  readTime: string;
-  content: string;
-  productSlug?: string;
-  /** True only for posts that announce a product launch (not editorial posts that happen to link a product). */
-  isLaunch?: boolean;
-  /** Two-column layout with sticky TOC sidebar. For longer, narrative posts. */
-  editorial?: boolean;
-  /** One-line hook for the companion product CTA. Pain-point framing, not generic. */
-  ctaHook?: string;
-  /** Blog post cover image / og:image path */
-  image?: string;
-}
+// Re-exported so existing `@/lib/blog` consumers keep importing the type from here.
+export type { BlogPostMeta };
 
 export const postsMeta: BlogPostMeta[] = [
   {
@@ -372,5 +357,4 @@ export const postsMeta: BlogPostMeta[] = [
     readTime: "6 min",
     content: "",
   },
-  ...newPosts,
 ];

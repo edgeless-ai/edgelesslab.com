@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "ignorePatterns": [
+    "public/tartanism/app/assets/**",
+    "tartanism/app/assets/**",
+    "**/*.bundle.js",
+    "**/*.chunk.js",
+    "public/flow-viz/**",
+    "_next/**",
+    "docs/source-refs/**",
+    "**/*.min.js",
+    "**/*.map"
+  ],
+  "entry": [
+    "src/**/index.{ts,tsx,js,jsx}",
+    "src/**/page.{ts,tsx}",
+    "src/**/layout.{ts,tsx}"
+  ]
+}

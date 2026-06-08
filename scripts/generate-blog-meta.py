@@ -52,12 +52,20 @@ def strip_content(text: str) -> str:
 
 stripped = strip_content(content)
 
-# Change interface name
-stripped = stripped.replace("export interface BlogPost", "export interface BlogPostMeta")
+# Source the shared type from blog-types.ts (single source of truth) rather than
+# redeclaring the interface. blog.ts imports + re-exports BlogPost; mirror that
+# here as BlogPostMeta (a structural alias defined in blog-types.ts).
+stripped = stripped.replace(
+    'import type { BlogPost } from "./blog-types";',
+    'import type { BlogPostMeta } from "./blog-types";',
+)
+stripped = stripped.replace("export type { BlogPost };", "export type { BlogPostMeta };")
 stripped = stripped.replace("export const posts: BlogPost[]", "export const postsMeta: BlogPostMeta[]")
 
-# Remove the import line
-stripped = re.sub(r'^import \{ newPosts \} from "\.\/blog-new-posts";\n', '', stripped)
+# Remove the blog-new-posts import (meta is derived from blog.ts only) and the
+# trailing `...newPosts` spread that referenced it.
+stripped = re.sub(r'^import \{ newPosts \} from "\.\/blog-new-posts";\n', '', stripped, flags=re.MULTILINE)
+stripped = re.sub(r'^\s*\.\.\.newPosts.*\n', '', stripped, flags=re.MULTILINE)
 
 META.write_text(stripped)
 print(f"Generated {META} ({len(stripped)} bytes)")

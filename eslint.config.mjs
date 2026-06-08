@@ -15,7 +15,6 @@ const eslintConfig = defineConfig([
     "docs/source-refs/**",
     "out/**",
     "build/**",
-    "flow-viz/**",
     "public/flow-viz/**",
     "public/tartanism/**",
     "tartanism/**",

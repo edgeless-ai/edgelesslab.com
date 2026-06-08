@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-06-06",
+  "commitsSince": "2026-06-01",
+  "items": [
+    {
+      "id": "dashboard-v1",
+      "kind": "post",
+      "date": "2026-06-06",
+      "title": "Add living content dashboard to edgelesslab.com",
+      "href": "/blog/living-content-dashboard",
+      "meta": "EDGA-8210",
+      "kindLabel": "launch"
+    },
+    {
+      "id": "commerce-core-2026-06-05",
+      "kind": "commit",
+      "date": "2026-06-06",
+      "title": "Add commerce product listing + checkout state to homepage flow",
+      "href": "https://github.com/edgeless-ai/edgelesslab.com/commit/HEAD",
+      "meta": "dev",
+      "kindLabel": "commit"
+    }
+  ]
+}

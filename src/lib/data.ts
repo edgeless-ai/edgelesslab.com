@@ -21,6 +21,21 @@ const UTM = "utm_source=edgelesslab&utm_medium=website&utm_campaign=products";
 
 export const products: Product[] = [
   {
+    name: "Claude Code Cheat Sheet",
+    price: "Free",
+    description:
+      "Quick-start reference for Claude Code. Commands, shortcuts, hook patterns, and MCP setup in one printable sheet.",
+    features: [
+      "All slash commands and keyboard shortcuts",
+      "Hook configuration patterns with examples",
+      "MCP server setup cheatsheet",
+      "CLAUDE.md template and memory system quick-start",
+    ],
+    href: `https://edgelessai.gumroad.com/l/claude-code-cheat-sheet?${UTM}`,
+    badge: "Free",
+    slug: "claude-code-cheat-sheet",
+  },
+  {
     name: "CLAUDE.md Template Pack",
     price: "Free",
     description:
@@ -47,21 +62,6 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/dihxts?${UTM}`,
     badge: "Free",
-  },
-  {
-    name: "Claude Code Cheat Sheet",
-    price: "Free",
-    description:
-      "Quick-start reference for Claude Code. Commands, shortcuts, hook patterns, and MCP setup in one printable sheet.",
-    features: [
-      "All slash commands and keyboard shortcuts",
-      "Hook configuration patterns with examples",
-      "MCP server setup cheatsheet",
-      "CLAUDE.md template and memory system quick-start",
-    ],
-    href: `https://edgelessai.gumroad.com/l/claude-code-cheat-sheet?${UTM}`,
-    badge: "Free",
-    slug: "claude-code-cheat-sheet",
   },
   {
     name: "Claude Memory Kit",
@@ -320,6 +320,20 @@ export const products: Product[] = [
     slug: "hooks-deep-dive",
   },
   {
+    name: "Hooks Library",
+    price: "Free",
+    description:
+      "24 production-ready hooks across 6 categories. Drop in, configure, ship.",
+    features: [
+      "Quality hooks: linting, testing, secrets detection",
+      "Safety hooks: damage control, backup, force-push guard",
+      "Integration hooks: Slack, Telegram, Linear, Obsidian",
+      "AI hooks: context preload, completion verify, cost tracking",
+    ],
+    href: `https://edgelessai.gumroad.com/l/ztaflt?${UTM}`,
+    badge: null,
+  },
+  {
     name: "Edgeless Agent Starter Kit",
     price: "$29",
     description:
@@ -337,20 +351,6 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "agent-starter-kit",
-  },
-  {
-    name: "Hooks Library",
-    price: "Free",
-    description:
-      "24 production-ready hooks across 6 categories. Drop in, configure, ship.",
-    features: [
-      "Quality hooks: linting, testing, secrets detection",
-      "Safety hooks: damage control, backup, force-push guard",
-      "Integration hooks: Slack, Telegram, Linear, Obsidian",
-      "AI hooks: context preload, completion verify, cost tracking",
-    ],
-    href: `https://edgelessai.gumroad.com/l/ztaflt?${UTM}`,
-    badge: null,
   },
 ];
 

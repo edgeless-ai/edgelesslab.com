@@ -17,12 +17,12 @@ import { posts } from "@/lib/blog";
 /* ── Dynamic imports for heavy client-side visual components ── */
 const GenerativeHeroBackground = dynamic(
   () => import("@/components/ui/generative-hero-bg").then(m => m.GenerativeHeroBackground),
-  { ssr: false }
+  { ssr: false, loading: () => null }
 );
 
 const GenerativeAscii = dynamic(
   () => import("@/components/generative-ascii").then(m => m.GenerativeAscii),
-  { ssr: false }
+  { ssr: false, loading: () => null }
 );
 
 const HERO_SUBTITLE =

@@ -3,7 +3,7 @@ import { projects, experiments, products } from '@/lib/data';
 import { posts } from '@/lib/blog';
 import { productContent } from '@/lib/product-content';
 
-const dynamic = 'force-static';
+export const dynamic = 'force-static';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [

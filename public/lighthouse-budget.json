@@ -1,0 +1,11 @@
+{
+  "title": "Homepage performance budget",
+  "targets": {
+    "First Contentful Paint": ">= 1.6",
+    "Largest Contentful Paint": "<= 2.5",
+    "Total Blocking Time": "<= 350",
+    "Cumulative Layout Shift": "<= 0.15",
+    "Speed Index": "<= 3.4",
+    "Performance": ">= 0.92"
+  }
+}

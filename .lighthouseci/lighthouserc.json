@@ -1,0 +1,18 @@
+{
+  "ci": {
+    "collect": {
+      "numberOfRuns": 1,
+      "settings": {
+        "onlyCategories": ["performance"],
+        "formFactor": "mobile",
+        "throttlingMethod": "simulate",
+        "screenEmulation": { "mobile": true, "width": 375, "height": 667, "deviceScaleFactor": 2, "disabled": false }
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": { "error": null, "warn": null, "minScore": 0.85 }
+      }
+    }
+  }
+}

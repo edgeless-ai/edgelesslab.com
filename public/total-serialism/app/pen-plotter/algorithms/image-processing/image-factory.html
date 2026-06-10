@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Image Factory - Pen Plotter Art</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <script src="https://unpkg.com/p5.js-svg@1.5.1"></script>
+    <script src="../../shared/export-utils.js"></script>
+    <link rel="stylesheet" href="../../shared/algorithm.css">
+    <style>
+        :root {
+            --ts-bg-deep: #0a0a0f;
+            --ts-bg-base: #12121a;
+            --ts-bg-panel: #1a1a24;
+            --ts-bg-elevated: #24242f;
+            --ts-border-subtle: #2a2a3a;
+            --ts-border-default: #3a3a4a;
+            --ts-text-primary: #e8e8ed;
+            --ts-text-secondary: #a0a0b0;
+            --ts-text-muted: #606070;
+            --ts-text-inverse: #0a0a0f;
+            --ts-accent-primary: #6366f1;
+            --ts-accent-hover: #818cf8;
+            --ts-accent-muted: rgba(99, 102, 241, 0.15);
+            --ts-accent-danger: #ef4444;
+            --ts-accent-success: #22c55e;
+            --ts-accent-warning: #f59e0b;
+        }
+        body {
+            margin: 0;
+            display: flex;
+            background: var(--ts-bg-deep);
+            color: var(--ts-text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+        #canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            background: var(--ts-bg-base);
+        }
+        #controls {
+            width: 380px;
+            padding: 20px;
+            background: var(--ts-bg-panel);
+            height: 100vh;
+            overflow-y: auto;
+            box-sizing: border-box;
+            border-left: 1px solid var(--ts-border-subtle);
+        }
+        canvas {
+            border: 1px solid var(--ts-border-subtle);
+        }
+        h2 {
+            margin: 0 0 20px 0;
+            color: var(--ts-accent-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        h3 {
+            font-size: 0.8rem;
+            margin: 24px 0 12px 0;
+            color: var(--ts-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 500;
+            border-bottom: 1px solid var(--ts-border-subtle);
+            padding-bottom: 6px;
+        }
+        .control-group {
+            margin-bottom: 14px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--ts-text-secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 4px;
+            accent-color: var(--ts-accent-primary);
+        }
+        input[type="number"], select, input[type="color"] {
+            width: 100%;
+            background: var(--ts-bg-elevated);
+            border: 1px solid var(--ts-border-subtle);
+            color: var(--ts-text-primary);
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            box-sizing: border-box;
+        }
+        input[type="color"] {
+            padding: 2px;
+            height: 32px;
+            cursor: pointer;
+        }
+        .value-display {
+            font-size: 11px;
+            color: var(--ts-accent-primary);
+            text-align: right;
+            display: block;
+            margin-top: 2px;
+        }
+        .button-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        button {
+            flex: 1;
+            background: var(--ts-accent-primary);
+            color: var(--ts-text-inverse);
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: var(--ts-accent-hover);
+        }
+        button.secondary {
+            background: var(--ts-bg-elevated);
+            color: var(--ts-text-primary);
+            border: 1px solid var(--ts-border-default);
+        }
+        button.secondary:hover {
+            background: var(--ts-border-subtle);
+        }
+        button.danger {
+            background: var(--ts-accent-danger);
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            accent-color: var(--ts-accent-primary);
+        }
+        .checkbox-group label {
+            margin: 0;
+            text-transform: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .info-badge {
+            display: inline-block;
+            background: var(--ts-accent-muted);
+            color: var(--ts-accent-primary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-bottom: 12px;
+        }
+        .upload-zone {
+            border: 2px dashed var(--ts-border-default);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            color: var(--ts-text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .upload-zone:hover {
+            border-color: var(--ts-accent-primary);
+        }
+        .upload-zone input {
+            display: none;
+        }
+        .char-preview {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            line-height: 1;
+            background: var(--ts-bg-deep);
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--ts-border-subtle);
+            max-height: 120px;
+            overflow: auto;
+            white-space: pre;
+            color: var(--ts-accent-primary);
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <div id="canvas-wrapper"></div>
+    </div>
+
+    <div id="controls">
+        <h2>Image Factory</h2>
+        <div class="info-badge">ASCII-based | 5 image systems</div>
+
+        <h3>Factory Mode</h3>
+        <div class="control-group">
+            <label for="mode">Algorithm</label>
+            <select id="mode">
+                <option value="ascii">ASCII Art (Text)</option>
+                <option value="contour">Contour Lines (Threshold)</option>
+                <option value="dither">Dithering (Bayer)</option>
+                <option value="hatch">Flow Hatching (Lines)</option>
+                <option value="halftone">Halftone (Dots)</option>
+            </select>
+        </div>
+
+        <h3>Image Input</h3>
+        <div class="control-group">
+            <div class="upload-zone" id="upload-zone">
+                <input type="file" id="image-upload" accept="image/*">
+                <span id="upload-text">Drop image or click to upload</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <button id="use-procedural" class="secondary">Use Procedural Source</button>
+        </div>
+
+        <h3>Canvas</h3>
+        <div class="control-group">
+            <label for="paperSize">Paper Size</label>
+            <select id="paperSize">
+                <option value="A4_landscape">A4 Landscape</option>
+                <option value="A4_portrait">A4 Portrait</option>
+                <option value="A3_landscape">A3 Landscape</option>
+                <option value="A3_portrait">A3 Portrait</option>
+                <option value="square_medium">Square Medium</option>
+                <option value="square_large">Square Large</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="bgColor">Background</label>
+            <input type="color" id="bgColor" value="#000000">
+        </div>
+        <div class="control-group">
+            <label for="strokeColor">Stroke Color</label>
+            <input type="color" id="strokeColor" value="#ffffff">
+        </div>
+        <div class="control-group">
+            <label for="accentColor">Accent Color</label>
+            <input type="color" id="accentColor" value="#6366f1">
+        </div>
+
+        <h3>Core Parameters</h3>
+        <div class="control-group">
+            <label for="resolution">Resolution <span class="value-display" id="resolution-val">60</span></label>
+            <input type="range" id="resolution" min="10" max="200" step="5" value="60">
+        </div>
+        <div class="control-group">
+            <label for="threshold">Threshold <span class="value-display" id="threshold-val">128</span></label>
+            <input type="range" id="threshold" min="0" max="255" step="1" value="128">
+        </div>
+        <div class="control-group">
+            <label for="contrast">Contrast <span class="value-display" id="contrast-val">1.0</span></label>
+            <input type="range" id="contrast" min="0.5" max="3.0" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label for="invert">Invert</label>
+            <select id="invert">
+                <option value="false">Normal</option>
+                <option value="true">Inverted</option>
+            </select>
+        </div>
+
+        <h3>Mode-Specific</h3>
+        <div class="control-group">
+            <label for="charSet">Character Set</label>
+            <select id="charSet">
+                <option value="standard">Standard: .:-=+*#%@</option>
+                <option value="blocks">Blocks:  ░▒▓█</option>
+                <option value="binary">Binary: 01</option>
+                <option value="minimal">Minimal: . #</option>
+                <option value="braille">Braille: ⣿⣶⣦⣤⣄⣀</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="lineSpacing">Line Spacing <span class="value-display" id="lineSpacing-val">1.0</span></label>
+            <input type="range" id="lineSpacing" min="0.5" max="3.0" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label for="detail">Detail Level <span class="value-display" id="detail-val">0.5</span></label>
+            <input type="range" id="detail" min="0.1" max="1.0" step="0.05" value="0.5">
+        </div>
+
+        <h3>Render</h3>
+        <div class="checkbox-group">
+            <input type="checkbox" id="showGrid">
+            <label for="showGrid">Show Grid</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="plotterOptimized" checked>
+            <label for="plotterOptimized">Plotter Optimized</label>
+        </div>
+
+        <h3>Seed</h3>
+        <div class="control-group">
+            <label>Seed: <span id="seed-display">-</span></label>
+            <input type="number" id="seed" min="1" max="999999" style="width:100%;">
+        </div>
+
+        <h3>Actions</h3>
+        <div class="button-row">
+            <button id="regenerate">Regenerate</button>
+            <button id="randomize" class="secondary">Randomize</button>
+        </div>
+
+        <h3>Export</h3>
+        <div class="button-row">
+            <button id="exportSVG" class="secondary">SVG</button>
+            <button id="exportPNG" class="secondary">PNG</button>
+        </div>
+        <div class="button-row">
+            <button id="exportTXT" class="secondary">TXT</button>
+        </div>
+
+        <h3>ASCII Preview</h3>
+        <div class="char-preview" id="ascii-preview"></div>
+    </div>
+
+    <script>
+        // ==========================================
+        // IMAGE FACTORY - Core Parameter Space
+        // ==========================================
+
+        let params = {
+            mode: 'ascii',
+            paperSize: 'A4_landscape',
+            bgColor: '#000000',
+            strokeColor: '#ffffff',
+            accentColor: '#6366f1',
+            resolution: 60,
+            threshold: 128,
+            contrast: 1.0,
+            invert: false,
+            charSet: 'standard',
+            lineSpacing: 1.0,
+            detail: 0.5,
+            showGrid: false,
+            plotterOptimized: true,
+            seed: Math.floor(Math.random() * 1000000),
+            procedural: true
+        };
+
+        const paperSizes = {
+            'A4_landscape': { width: 842, height: 595 },
+            'A4_portrait': { width: 595, height: 842 },
+            'A3_landscape': { width: 1191, height: 842 },
+            'A3_portrait': { width: 842, height: 1191 },
+            'square_medium': { width: 600, height: 600 },
+            'square_large': { width: 800, height: 800 }
+        };
+
+        const charSets = {
+            standard: ' .:-=+*#%@',
+            blocks: ' \u2591\u2592\u2593\u2588',
+            binary: ' 01',
+            minimal: ' .#',
+            braille: ' \u2800\u2840\u28C0\u28E0\u28F0\u28F4\u28F6\u28F7\u28FF'
+        };
+
+        let canvasWidth, canvasHeight;
+        let seedRandom;
+        let paths = [];
+        let uploadedImage = null;
+        let imgGraphics = null;
+        let asciiOutput = '';
+
+        function setSeed(s) {
+            params.seed = s;
+            document.getElementById('seed-display').textContent = s;
+            document.getElementById('seed').value = s;
+            let _s = s;
+            seedRandom = () => {
+                _s |= 0;
+                _s = _s + 0x6D2B79F5 | 0;
+                let t = Math.imul(_s ^ _s >>> 15, 1 | _s);
+                t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+                return ((t ^ t >>> 14) >>> 0) / 4294967296;
+            };
+        }
+
+        function setup() {
+            updateCanvasSize();
+            const c = createCanvas(canvasWidth, canvasHeight);
+            c.parent('canvas-wrapper');
+            noLoop();
+            setSeed(params.seed);
+            setupControls();
+            regenerate();
+        }
+
+        function updateCanvasSize() {
+            const size = paperSizes[params.paperSize];
+            const maxW = window.innerWidth - 400;
+            const maxH = window.innerHeight - 40;
+            const scale = Math.min(maxW / size.width, maxH / size.height, 1);
+            canvasWidth = Math.floor(size.width * scale);
+            canvasHeight = Math.floor(size.height * scale);
+        }
+
+        function windowResized() {
+            updateCanvasSize();
+            resizeCanvas(canvasWidth, canvasHeight);
+            regenerate();
+        }
+
+        // ==========================================
+        // Procedural Image Source
+        // ==========================================
+        function generateProceduralImage(w, h) {
+            const g = createGraphics(w, h);
+            g.background(255);
+            const s = params.seed;
+            setSeed(s);
+
+            // Generate abstract composition
+            const numShapes = 20 + Math.floor(seedRandom() * 50);
+            for (let i = 0; i < numShapes; i++) {
+                const x = seedRandom() * w;
+                const y = seedRandom() * h;
+                const r = 10 + seedRandom() * 80;
+                const gray = Math.floor(seedRandom() * 255);
+                g.noStroke();
+                g.fill(gray);
+
+                if (seedRandom() < 0.5) {
+                    g.ellipse(x, y, r, r);
+                } else {
+                    g.rect(x - r/2, y - r/2, r, r);
+                }
+            }
+
+            // Gradient overlay
+            for (let y = 0; y < h; y += 2) {
+                const gray = Math.floor((y / h) * 200 + 55);
+                g.stroke(gray, 80);
+                g.line(0, y, w, y);
+            }
+
+            return g;
+        }
+
+        // ==========================================
+        // Get Pixel Brightness
+        // ==========================================
+        function getBrightness(g, x, y) {
+            const c = g.get(x, y);
+            return (red(c) + green(c) + blue(c)) / 3;
+        }
+
+        // ==========================================
+        // Main Draw
+        // ==========================================
+        function draw() {
+            background(params.bgColor);
+            paths = [];
+            asciiOutput = '';
+
+            // Create source image
+            if (params.procedural || !uploadedImage) {
+                if (!imgGraphics || imgGraphics.width !== width || imgGraphics.height !== height) {
+                    imgGraphics = generateProceduralImage(width, height);
+                }
+            } else {
+                imgGraphics = createGraphics(width, height);
+                imgGraphics.background(255);
+                imgGraphics.image(uploadedImage, 0, 0, width, height);
+            }
+
+            switch (params.mode) {
+                case 'ascii': drawASCII(); break;
+                case 'contour': drawContour(); break;
+                case 'dither': drawDither(); break;
+                case 'hatch': drawHatch(); break;
+                case 'halftone': drawHalftone(); break;
+            }
+
+            if (params.plotterOptimized && paths.length > 0) {
+                drawPathsOptimized();
+            }
+
+            if (params.showGrid) {
+                drawGrid();
+            }
+
+            document.getElementById('ascii-preview').textContent = asciiOutput.substring(0, 2000);
+        }
+
+        // ==========================================
+        // ASCII Art
+        // ==========================================
+        function drawASCII() {
+            const chars = charSets[params.charSet] || charSets.standard;
+            const cols = params.resolution;
+            const rows = Math.floor(cols * (height / width));
+            const cellW = width / cols;
+            const cellH = height / rows;
+
+            let textLines = [];
+
+            for (let y = 0; y < rows; y++) {
+                let line = '';
+                for (let x = 0; x < cols; x++) {
+                    const px = Math.floor(x * cellW + cellW / 2);
+                    const py = Math.floor(y * cellH + cellH / 2);
+                    let brightness = getBrightness(imgGraphics, px, py);
+
+                    brightness = (brightness - 128) * params.contrast + 128;
+                    brightness = params.invert ? 255 - brightness : brightness;
+                    brightness = Math.max(0, Math.min(255, brightness));
+
+                    const idx = Math.floor((brightness / 255) * (chars.length - 1));
+                    const ch = chars[Math.max(0, Math.min(chars.length - 1, idx))];
+                    line += ch;
+
+                    // Plotter: draw dots for non-space chars
+                    if (ch !== ' ' && params.plotterOptimized) {
+                        const cx = x * cellW + cellW / 2;
+                        const cy = y * cellH + cellH / 2;
+                        const path = [];
+                        const r = cellW * 0.2;
+                        const segs = 6;
+                        for (let s = 0; s <= segs; s++) {
+                            const a = (s / segs) * TWO_PI;
+                            path.push({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r });
+                        }
+                        paths.push(path);
+                    }
+                }
+                textLines.push(line);
+            }
+
+            asciiOutput = textLines.join('\n');
+
+            // Canvas preview
+            if (!params.plotterOptimized) {
+                fill(params.strokeColor);
+                noStroke();
+                textAlign(LEFT, TOP);
+                const fontSize = cellW * params.lineSpacing;
+                textFont('Courier New', fontSize);
+                for (let y = 0; y < rows; y++) {
+                    text(textLines[y], 0, y * cellH);
+                }
+            }
+        }
+
+        // ==========================================
+        // Contour Lines
+        // ==========================================
+        function drawContour() {
+            const step = Math.max(4, Math.floor(20 / params.detail));
+            const levels = Math.floor(params.resolution / 10);
+
+            for (let level = 0; level < levels; level++) {
+                const threshold = (level / levels) * 255;
+                const path = [];
+                let drawing = false;
+
+                for (let y = 0; y < height; y += step) {
+                    for (let x = 0; x < width; x += step) {
+                        let brightness = getBrightness(imgGraphics, x, y);
+                        brightness = (brightness - 128) * params.contrast + 128;
+                        brightness = params.invert ? 255 - brightness : brightness;
+
+                        const isAbove = brightness >= threshold;
+                        const nextX = x + step;
+                        const nextY = y + step;
+                        const nextBright = nextX < width ? getBrightness(imgGraphics, nextX, y) : brightness;
+                        const nextBrightY = nextY < height ? getBrightness(imgGraphics, x, nextY) : brightness;
+
+                        if (isAbove !== (nextBright >= threshold) && nextX < width) {
+                            if (drawing) {
+                                path.push({ x: x + step / 2, y });
+                            } else {
+                                path.push({ x: x + step / 2, y });
+                                drawing = true;
+                            }
+                        } else if (drawing) {
+                            paths.push([...path]);
+                            path.length = 0;
+                            drawing = false;
+                        }
+
+                        if (isAbove !== (nextBrightY >= threshold) && nextY < height) {
+                            if (drawing) {
+                                path.push({ x, y: y + step / 2 });
+                            } else {
+                                path.push({ x, y: y + step / 2 });
+                                drawing = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!params.plotterOptimized) {
+                stroke(params.strokeColor);
+                strokeWeight(1);
+                noFill();
+                paths.forEach(path => {
+                    if (path.length < 2) return;
+                    beginShape();
+                    path.forEach(p => vertex(p.x, p.y));
+                    endShape();
+                });
+            }
+        }
+
+        // ==========================================
+        // Dithering (Bayer)
+        // ==========================================
+        function drawDither() {
+            const bayer = [
+                [0, 8, 2, 10],
+                [12, 4, 14, 6],
+                [3, 11, 1, 9],
+                [15, 7, 13, 5]
+            ];
+            const step = Math.max(2, Math.floor(8 / params.detail));
+
+            for (let y = 0; y < height; y += step) {
+                for (let x = 0; x < width; x += step) {
+                    let brightness = getBrightness(imgGraphics, x, y);
+                    brightness = (brightness - 128) * params.contrast + 128;
+                    brightness = params.invert ? 255 - brightness : brightness;
+
+                    const bx = (x / step) % 4;
+                    const by = (y / step) % 4;
+                    const threshold = (bayer[by][bx] / 16) * 255;
+
+                    if (brightness > threshold) {
+                        if (params.plotterOptimized) {
+                            const path = [];
+                            const r = step * 0.4;
+                            const segs = 6;
+                            for (let s = 0; s <= segs; s++) {
+                                const a = (s / segs) * TWO_PI;
+                                path.push({ x: x + step/2 + Math.cos(a) * r, y: y + step/2 + Math.sin(a) * r });
+                            }
+                            paths.push(path);
+                        } else {
+                            fill(params.strokeColor);
+                            noStroke();
+                            rect(x, y, step, step);
+                        }
+                    }
+                }
+            }
+        }
+
+        // ==========================================
+        // Flow Hatching
+        // ==========================================
+        function drawHatch() {
+            const spacing = Math.max(4, Math.floor(15 / params.detail));
+            const lineLength = spacing * 3;
+
+            for (let y = 0; y < height; y += spacing) {
+                const path = [];
+                for (let x = 0; x < width; x += spacing) {
+                    let brightness = getBrightness(imgGraphics, x, y);
+                    brightness = (brightness - 128) * params.contrast + 128;
+                    brightness = params.invert ? 255 - brightness : brightness;
+
+                    const density = brightness / 255;
+                    if (density > 0.3 && seedRandom() < density) {
+                        const angle = noise(x * 0.01, y * 0.01) * TWO_PI;
+                        const x1 = x + Math.cos(angle) * lineLength * 0.5;
+                        const y1 = y + Math.sin(angle) * lineLength * 0.5;
+                        const x2 = x - Math.cos(angle) * lineLength * 0.5;
+                        const y2 = y - Math.sin(angle) * lineLength * 0.5;
+
+                        paths.push([{ x: x1, y: y1 }, { x: x2, y: y2 }]);
+
+                        if (!params.plotterOptimized) {
+                            stroke(params.strokeColor);
+                            strokeWeight(0.5);
+                            line(x1, y1, x2, y2);
+                        }
+                    }
+                }
+            }
+        }
+
+        // ==========================================
+        // Halftone
+        // ==========================================
+        function drawHalftone() {
+            const spacing = Math.max(4, Math.floor(20 / params.detail));
+            const maxRadius = spacing * 0.45;
+
+            for (let y = 0; y < height; y += spacing) {
+                for (let x = 0; x < width; x += spacing) {
+                    let brightness = getBrightness(imgGraphics, x, y);
+                    brightness = (brightness - 128) * params.contrast + 128;
+                    brightness = params.invert ? 255 - brightness : brightness;
+
+                    const density = brightness / 255;
+                    const radius = maxRadius * density;
+
+                    if (radius > 0.5) {
+                        if (params.plotterOptimized) {
+                            const path = [];
+                            const segs = Math.max(6, Math.floor(radius * 2));
+                            for (let s = 0; s <= segs; s++) {
+                                const a = (s / segs) * TWO_PI;
+                                path.push({ x: x + spacing/2 + Math.cos(a) * radius, y: y + spacing/2 + Math.sin(a) * radius });
+                            }
+                            paths.push(path);
+                        } else {
+                            fill(params.strokeColor);
+                            noStroke();
+                            ellipse(x + spacing/2, y + spacing/2, radius * 2, radius * 2);
+                        }
+                    }
+                }
+            }
+        }
+
+        // ==========================================
+        // Helpers
+        // ==========================================
+        function drawPathsOptimized() {
+            stroke(params.strokeColor);
+            strokeWeight(1);
+            noFill();
+            paths.forEach(path => {
+                if (path.length < 2) return;
+                beginShape();
+                path.forEach(p => vertex(p.x, p.y));
+                endShape();
+            });
+        }
+
+        function drawGrid() {
+            push();
+            stroke(red(params.strokeColor), green(params.strokeColor), blue(params.strokeColor), 30);
+            strokeWeight(0.5);
+            const step = 40;
+            for (let x = 0; x < width; x += step) {
+                line(x, 0, x, height);
+            }
+            for (let y = 0; y < height; y += step) {
+                line(0, y, width, y);
+            }
+            pop();
+        }
+
+        // ==========================================
+        // Controls
+        // ==========================================
+        function setupControls() {
+            const inputs = ['resolution', 'threshold', 'contrast', 'lineSpacing', 'detail'];
+            inputs.forEach(key => {
+                const el = document.getElementById(key);
+                if (el) {
+                    el.addEventListener('input', (e) => {
+                        params[key] = parseFloat(e.target.value);
+                        document.getElementById(key + '-val').textContent = params[key];
+                        if (key === 'resolution') imgGraphics = null;
+                        regenerate();
+                    });
+                }
+            });
+
+            const selects = ['mode', 'paperSize', 'charSet', 'invert'];
+            selects.forEach(key => {
+                const el = document.getElementById(key);
+                if (el) {
+                    el.addEventListener('change', (e) => {
+                        params[key] = e.target.value === 'true' ? true : e.target.value === 'false' ? false : e.target.value;
+                        if (key === 'paperSize') {
+                            updateCanvasSize();
+                            resizeCanvas(canvasWidth, canvasHeight);
+                        }
+                        imgGraphics = null;
+                        regenerate();
+                    });
+                }
+            });
+
+            const colors = ['bgColor', 'strokeColor', 'accentColor'];
+            colors.forEach(key => {
+                const el = document.getElementById(key);
+                if (el) {
+                    el.addEventListener('input', (e) => {
+                        params[key] = e.target.value;
+                        regenerate();
+                    });
+                }
+            });
+
+            const checkboxes = ['showGrid', 'plotterOptimized'];
+            checkboxes.forEach(key => {
+                const el = document.getElementById(key);
+                if (el) {
+                    el.addEventListener('change', (e) => {
+                        params[key] = e.target.checked;
+                        regenerate();
+                    });
+                }
+            });
+
+            document.getElementById('regenerate').addEventListener('click', regenerate);
+            document.getElementById('randomize').addEventListener('click', () => {
+                setSeed(Math.floor(Math.random() * 1000000));
+                params.resolution = 20 + Math.floor(seedRandom() * 180);
+                params.threshold = Math.floor(seedRandom() * 255);
+                params.contrast = 0.5 + seedRandom() * 2.5;
+                params.lineSpacing = 0.5 + seedRandom() * 2.5;
+                params.detail = 0.1 + seedRandom() * 0.9;
+                params.invert = seedRandom() > 0.5;
+                imgGraphics = null;
+                updateUI();
+                regenerate();
+            });
+
+            document.getElementById('seed').addEventListener('change', (e) => {
+                setSeed(parseInt(e.target.value) || Math.floor(Math.random() * 1000000));
+                imgGraphics = null;
+                regenerate();
+            });
+
+            document.getElementById('exportSVG').addEventListener('click', exportSVG);
+            document.getElementById('exportPNG').addEventListener('click', exportPNG);
+            document.getElementById('exportTXT').addEventListener('click', exportTXT);
+
+            // Image upload
+            const uploadZone = document.getElementById('upload-zone');
+            const uploadInput = document.getElementById('image-upload');
+            uploadZone.addEventListener('click', () => uploadInput.click());
+            uploadInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        loadImage(event.target.result, (img) => {
+                            uploadedImage = img;
+                            params.procedural = false;
+                            imgGraphics = null;
+                            document.getElementById('upload-text').textContent = file.name;
+                            regenerate();
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            document.getElementById('use-procedural').addEventListener('click', () => {
+                params.procedural = true;
+                uploadedImage = null;
+                imgGraphics = null;
+                document.getElementById('upload-text').textContent = 'Drop image or click to upload';
+                regenerate();
+            });
+        }
+
+        function updateUI() {
+            const inputs = ['resolution', 'threshold', 'contrast', 'lineSpacing', 'detail'];
+            inputs.forEach(key => {
+                const el = document.getElementById(key);
+                const val = document.getElementById(key + '-val');
+                if (el) el.value = params[key];
+                if (val) val.textContent = params[key];
+            });
+            document.getElementById('mode').value = params.mode;
+            document.getElementById('paperSize').value = params.paperSize;
+            document.getElementById('charSet').value = params.charSet;
+            document.getElementById('invert').value = params.invert ? 'true' : 'false';
+            document.getElementById('bgColor').value = params.bgColor;
+            document.getElementById('strokeColor').value = params.strokeColor;
+            document.getElementById('accentColor').value = params.accentColor;
+            document.getElementById('showGrid').checked = params.showGrid;
+            document.getElementById('plotterOptimized').checked = params.plotterOptimized;
+        }
+
+        function regenerate() {
+            setSeed(params.seed);
+            paths = [];
+            redraw();
+        }
+
+        // ==========================================
+        // Export
+        // ==========================================
+        function exportSVG() {
+            const svg = generateSVG();
+            TSExport.downloadSVG(svg, `image-factory-${params.mode}`);
+        }
+
+        function exportPNG() {
+            TSExport.downloadPNG(canvas, `image-factory-${params.mode}`);
+        }
+
+        function exportTXT() {
+            const blob = new Blob([asciiOutput], { type: 'text/plain' });
+            TSExport.triggerDownload(blob, `image-factory-${params.mode}-${params.seed}.txt`, 'text/plain');
+        }
+
+        function generateSVG() {
+            const size = paperSizes[params.paperSize];
+            let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size.width} ${size.height}" width="${size.width}" height="${size.height}">\n`;
+            svg += `<rect width="${size.width}" height="${size.height}" fill="${params.bgColor}"/>\n`;
+
+            const sx = size.width / width;
+            const sy = size.height / height;
+
+            paths.forEach(path => {
+                if (path.length < 2) return;
+                const pts = path.map(p => `${p.x * sx},${p.y * sy}`).join(' ');
+                svg += `<polyline points="${pts}" fill="none" stroke="${params.strokeColor}" stroke-width="1"/>\n`;
+            });
+
+            svg += '</svg>';
+            return svg;
+        }
+    </script>
+</body>
+</html>

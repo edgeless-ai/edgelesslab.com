@@ -578,7 +578,7 @@ export const experiments = [
     stack: ["JavaScript", "p5.js", "Canvas", "SVG"],
     category: "Generative",
     status: "Live",
-    href: "/total-serialism/field-notes/",
+    href: "/total-serialism/app/",
   },
   {
     slug: "tartanism",

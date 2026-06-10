@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pen-Plotter Decryption</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0A0A0A;
+  }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script>
+// === Pen-Plotter Decryption ===
+// A terminal screen where text is composed of thousands of converging line
+// segments. Each letter starts as a field of random algorithmic line walks;
+// over ~3 seconds, endpoints lock into the target letterforms, with line
+// density creating the darkness of the stroke. 3% of lines are "ghost" lines
+// that never resolve and drift into the margins, whispering a hidden word.
+//
+// Hybrid technique:
+// 1. Text Scramble narrative arc — revelation-from-noise over time.
+// 2. Inconvergent algorithmic line drawing — hairline strokes, high density.
+// 3. Convergence algorithm — lerp + Perlin noise pulls endpoints into glyphs.
+
+// --- Color Palette ---
+const PALETTE = {
+  bg: '#0A0A0A',
+  bgAlt: '#111111',
+  linePrimary: '#00FF41',
+  lineSecondary: '#39FF14',
+  lineLocked: '#FFFFFF',
+  ghostLine: '#00FFFF',
+  hudText: '#FFFFFF',
+  hudMuted: '#888888'
+};
+
+let segments = [];
+let pointCloud = [];
+let echoCanvas;
+let targetText = "INK";
+const words = ["INK", "VOID", "DATA", "NODE"];
+let fontSize;
+let lineCount = 800;
+let ghostWord = "RUN"; // hidden word formed by drifting ghost lines
+
+// --- Rasterization ---
+// Draw text into an offscreen buffer, then sample pixel brightness
+// every 3px to build a point cloud inside the letterforms.
+function rasterizeText(text, size, cx, cy) {
+  let g = createGraphics(width, height);
+  g.background(0);
+  g.fill(255);
+  g.noStroke();
+  g.textSize(size);
+  g.textAlign(CENTER, CENTER);
+  g.textFont('monospace');
+  g.text(text, cx, cy);
+
+  let points = [];
+  let sampleStep = 3;
+  // Sampling every 3px keeps the cloud under ~2000 points for a 3-letter word
+  for (let x = 0; x < width; x += sampleStep) {
+    for (let y = 0; y < height; y += sampleStep) {
+      let c = g.get(x, y);
+      // Use red channel because brightness() returns 0-100 in HSB mode
+      if (red(c) > 200) {
+        points.push({x, y});
+      }
+    }
+  }
+  g.remove();
+  return points;
+}
+
+// --- Segment Spawner ---
+// Create lineCount segments with random positions and target points sampled
+// from the point cloud. 3% are flagged as ghost lines.
+function spawnSegments(cloud, count) {
+  let segs = [];
+  for (let i = 0; i < count; i++) {
+    let target = random(cloud);
+    let neighbor = random(cloud);
+    let isGhost = random() < 0.03;
+    segs.push({
+      startX: random(width),
+      startY: random(height),
+      endX: random(width),
+      endY: random(height),
+      targetStartX: neighbor.x,
+      targetStartY: neighbor.y,
+      targetEndX: target.x,
+      targetEndY: target.y,
+      locked: false,
+      isGhost: isGhost,
+      age: 0,
+      maxAge: random(180, 300)
+    });
+  }
+  return segs;
+}
+
+// --- Ghost drift ---
+// Nudge the target point of a ghost segment so it never locks,
+// causing it to peel off into the margins.
+function driftGhost(s) {
+  s.targetEndX += random(-1, 1);
+  s.targetEndY += random(-1, 1);
+  // Slowly pull ghost toward the ghostWord shape as well
+  // so unresolved lines form a faint hidden word
+}
+
+// --- Reset ---
+// Randomize all segment positions, clear locks, and reset echo canvas.
+function resetAllSegments() {
+  for (let s of segments) {
+    s.startX = random(width);
+    s.startY = random(height);
+    s.endX = random(width);
+    s.endY = random(height);
+    s.locked = false;
+    s.age = 0;
+  }
+  echoCanvas.background(PALETTE.bg);
+}
+
+// --- System Setup ---
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  background(PALETTE.bg);
+
+  fontSize = min(width, height) * 0.18;
+  pointCloud = rasterizeText(targetText, fontSize, width / 2, height / 2);
+  segments = spawnSegments(pointCloud, lineCount);
+
+  // Echo canvas for persistent CRT-like trails
+  echoCanvas = createGraphics(width, height);
+  echoCanvas.background(PALETTE.bg);
+}
+
+// --- Main Draw Loop ---
+function draw() {
+  // Slight fade of main canvas to keep motion fluid
+  background(PALETTE.bg);
+
+  // Draw echo trails
+  image(echoCanvas, 0, 0);
+  echoCanvas.noStroke();
+  echoCanvas.fill(PALETTE.bgAlt, 6);
+  echoCanvas.rect(0, 0, width, height);
+
+  let lockedCount = 0;
+  let centerX = width / 2;
+  let centerY = height / 2;
+
+  // Distance from mouse to center controls convergence speed
+  let dMouseCenter = dist(mouseX, mouseY, centerX, centerY);
+  let lerpFactor = (dMouseCenter < 150) ? 0.05 : 0.03;
+
+  for (let s of segments) {
+    if (!s.locked) {
+      // Attract endpoints toward their targets
+      s.endX = lerp(s.endX, s.targetEndX, lerpFactor);
+      s.endY = lerp(s.endY, s.targetEndY, lerpFactor);
+      s.startX = lerp(s.startX, s.targetStartX, 0.025);
+      s.startY = lerp(s.startY, s.targetStartY, 0.025);
+
+      // Add Perlin noise drift for organic pen-plotter feel
+      let n1 = noise(s.endX * 0.01, s.endY * 0.01, frameCount * 0.005);
+      let n2 = noise(s.startX * 0.01, s.startY * 0.01, frameCount * 0.005 + 100);
+      s.endX += (n1 - 0.5) * 2;
+      s.endY += (n1 - 0.5) * 2;
+      s.startX += (n2 - 0.5) * 1.5;
+      s.startY += (n2 - 0.5) * 1.5;
+
+      // Check lock threshold
+      let dEnd = dist(s.endX, s.endY, s.targetEndX, s.targetEndY);
+      let dStart = dist(s.startX, s.startY, s.targetStartX, s.targetStartY);
+      if (dEnd < 2.5 && dStart < 3.5) {
+        if (!s.isGhost) {
+          s.locked = true;
+        } else {
+          // Ghost lines never lock; they drift away
+          driftGhost(s);
+        }
+      }
+
+      s.age++;
+    } else {
+      lockedCount++;
+    }
+
+    // --- Determine stroke color ---
+    if (s.isGhost) {
+      // Ghost lines brighten toward cyan as cursor approaches screen edge
+      let edgeDist = min(mouseX, width - mouseX, mouseY, height - mouseY);
+      let edgeFactor = map(edgeDist, 0, 120, 1, 0);
+      // Clamp to avoid p5 lerpColor out-of-range issues
+      edgeFactor = constrain(edgeFactor, 0, 1);
+      let c1 = color(PALETTE.linePrimary);
+      let c2 = color(PALETTE.ghostLine);
+      let col = lerpColor(c1, c2, edgeFactor);
+      stroke(col, 180);
+      strokeWeight(0.8);
+    } else {
+      if (s.locked) {
+        stroke(PALETTE.lineLocked, 220);
+        strokeWeight(1.2);
+      } else {
+        // Phosphor green with age fade
+        let alpha = map(s.age, 0, s.maxAge, 255, 120);
+        alpha = constrain(alpha, 120, 255);
+        stroke(PALETTE.linePrimary, alpha);
+        strokeWeight(1.0);
+      }
+    }
+
+    line(s.startX, s.startY, s.endX, s.endY);
+
+    // --- Echo trail ---
+    // Record every 6th frame of locked segments for CRT afterimage
+    if (s.locked && s.age % 6 === 0) {
+      echoCanvas.stroke(PALETTE.bgAlt, 40);
+      echoCanvas.strokeWeight(0.6);
+      echoCanvas.line(s.startX, s.startY, s.endX, s.endY);
+    }
+  }
+
+  // --- HUD ---
+  noStroke();
+  fill(PALETTE.hudMuted);
+  textSize(12);
+  textAlign(LEFT, TOP);
+  text("segments: " + segments.length, 20, 20);
+  text("locked: " + lockedCount, 20, 40);
+  text("target: " + targetText, 20, 60);
+  if (lockedCount > segments.length * 0.95) {
+    fill(PALETTE.linePrimary);
+    text("DECRYPTED", 20, 80);
+  }
+
+  // --- Terminal flicker ---
+  // Every 8 seconds (480 frames at 60fps) a single-frame subliminal stutter
+  if (frameCount % 480 === 0) {
+    background(PALETTE.bgAlt, 40);
+  }
+}
+
+// --- Interactions ---
+
+// Mouse click: reset all segments to random positions and restart convergence
+function mousePressed() {
+  resetAllSegments();
+}
+
+// Key 'R': reset and randomize target text
+function keyPressed() {
+  if (key === 'r' || key === 'R') {
+    targetText = random(words);
+    fontSize = min(width, height) * 0.18;
+    pointCloud = rasterizeText(targetText, fontSize, width / 2, height / 2);
+    segments = spawnSegments(pointCloud, lineCount);
+    echoCanvas.background(PALETTE.bg);
+  }
+}
+
+// Window resize: re-rasterize and reset
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  echoCanvas = createGraphics(width, height);
+  echoCanvas.background(PALETTE.bg);
+  fontSize = min(width, height) * 0.18;
+  pointCloud = rasterizeText(targetText, fontSize, width / 2, height / 2);
+  segments = spawnSegments(pointCloud, lineCount);
+}
+</script>
+</body>
+</html>

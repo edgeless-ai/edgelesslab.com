@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tortilla Chip Factory — Equipment Sizing Calculations</title>
+  <style>
+    /* ── Base ─────────────────────────────────────────────────────── */
+    :root {
+      --bg:        #1a1d21;
+      --bg2:       #21252b;
+      --bg3:       #282c34;
+      --border:    #3a3f4b;
+      --cyan:      #56b6c2;
+      --green:     #98c379;
+      --yellow:    #e5c07b;
+      --red:       #e06c75;
+      --purple:    #c678dd;
+      --orange:    #d19a66;
+      --text:      #abb2bf;
+      --text-hi:   #e6edf3;
+      --mono:      "JetBrains Mono", "Fira Mono", "Cascadia Code", "Consolas", monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13.5px;
+      line-height: 1.7;
+    }
+
+    a { color: var(--cyan); }
+
+    /* ── Layout ───────────────────────────────────────────────────── */
+    header {
+      background: var(--bg2);
+      border-bottom: 2px solid var(--cyan);
+      padding: 28px 48px 20px;
+    }
+    header h1 {
+      font-size: 1.55rem;
+      color: var(--text-hi);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    header .subtitle {
+      color: var(--cyan);
+      font-size: 0.82rem;
+      margin-top: 4px;
+      letter-spacing: 0.08em;
+    }
+    header .meta {
+      margin-top: 10px;
+      color: var(--text);
+      font-size: 0.78rem;
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    header .meta span { color: var(--yellow); }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    /* ── Section wrapper ──────────────────────────────────────────── */
+    .section {
+      margin-bottom: 52px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .section-header:hover { background: var(--bg3); }
+    .section-header h2 {
+      font-size: 1.05rem;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      flex: 1;
+    }
+    .section-number {
+      background: var(--cyan);
+      color: var(--bg);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+    }
+    .chevron {
+      color: var(--cyan);
+      font-size: 1rem;
+      transition: transform 0.2s;
+    }
+    .chevron.open { transform: rotate(90deg); }
+
+    .section-body { background: var(--bg); }
+
+    /* ── Result cards ─────────────────────────────────────────────── */
+    .result-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 12px;
+      padding: 20px 20px 0;
+    }
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 12px 14px;
+    }
+    .card-label {
+      font-size: 0.7rem;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .card-value {
+      font-size: 1.35rem;
+      color: var(--green);
+      font-weight: 700;
+    }
+    .card-unit {
+      font-size: 0.78rem;
+      color: var(--yellow);
+      margin-left: 4px;
+    }
+    .card-note {
+      font-size: 0.7rem;
+      color: var(--text);
+      margin-top: 4px;
+    }
+    .card.hi { border-color: var(--green); }
+    .card.warn { border-color: var(--yellow); }
+
+    /* ── Calc blocks ──────────────────────────────────────────────── */
+    .calc-group {
+      padding: 20px 20px 0;
+    }
+    .calc-group h3 {
+      font-size: 0.8rem;
+      color: var(--purple);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ref-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      color: var(--orange);
+      background: rgba(209,154,102,0.12);
+      border: 1px solid rgba(209,154,102,0.3);
+      border-radius: 3px;
+      padding: 1px 5px;
+      margin-left: 6px;
+      vertical-align: middle;
+      letter-spacing: 0.04em;
+    }
+
+    table.var-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 0.82rem;
+    }
+    table.var-table th {
+      background: var(--bg3);
+      color: var(--yellow);
+      text-align: left;
+      padding: 6px 10px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    table.var-table td {
+      padding: 5px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    table.var-table tr:last-child td { border-bottom: none; }
+    table.var-table .sym { color: var(--cyan); }
+    table.var-table .val { color: var(--green); }
+    table.var-table .unit { color: var(--yellow); }
+    table.var-table .desc { color: var(--text); }
+
+    .formula-block {
+      background: var(--bg3);
+      border-left: 3px solid var(--cyan);
+      border-radius: 0 4px 4px 0;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: 0.88rem;
+      color: var(--text-hi);
+      line-height: 2;
+    }
+    .formula-block .eq { color: var(--green); }
+    .formula-block .comment { color: var(--text); font-size: 0.78rem; }
+    .formula-block .result { color: var(--yellow); font-weight: 700; }
+
+    .step-list {
+      list-style: none;
+      margin-bottom: 16px;
+    }
+    .step-list li {
+      padding: 4px 0 4px 16px;
+      border-left: 2px solid var(--border);
+      margin-left: 8px;
+      margin-bottom: 4px;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+    .step-list li .hl { color: var(--green); }
+    .step-list li .sym { color: var(--cyan); }
+    .step-list li .unit { color: var(--yellow); }
+
+    /* ── SVG schematic ────────────────────────────────────────────── */
+    .schematic-wrap {
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .schematic-wrap svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* ── Summary table ────────────────────────────────────────────── */
+    .summary-section {
+      background: var(--bg2);
+      border: 2px solid var(--cyan);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 48px;
+    }
+    .summary-section h2 {
+      background: var(--cyan);
+      color: var(--bg);
+      padding: 10px 20px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    table.datasheet {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    table.datasheet th {
+      background: var(--bg3);
+      color: var(--yellow);
+      padding: 8px 14px;
+      text-align: left;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    table.datasheet td {
+      padding: 7px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    table.datasheet tr:last-child td { border-bottom: none; }
+    table.datasheet .eq-tag { color: var(--cyan); font-weight: 600; }
+    table.datasheet .val-main { color: var(--green); font-weight: 700; }
+    table.datasheet .unit-col { color: var(--yellow); }
+    table.datasheet tr:hover td { background: rgba(86,182,194,0.05); }
+
+    /* ── Divider ──────────────────────────────────────────────────── */
+    .subsection-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 20px 0;
+    }
+    .section-end { height: 20px; }
+
+    /* ── Inline math helpers ──────────────────────────────────────── */
+    .m { color: var(--cyan); font-style: italic; }       /* variable */
+    .mv { color: var(--green); font-weight: 700; }       /* numeric value */
+    .mu { color: var(--yellow); }                        /* unit */
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Tortilla Chip Factory &mdash; Equipment Sizing</h1>
+  <div class="subtitle">Process Engineering Calculations &mdash; Phase 2 Design Basis</div>
+  <div class="meta">
+    <div>Throughput: <span>150 lb/hr finished chips</span></div>
+    <div>Revision: <span>A (Preliminary)</span></div>
+    <div>Reference: <span>Perry's Chemical Engineers' Handbook, 9th Ed.</span></div>
+    <div>Date: <span>2026-05-11</span></div>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 1 — FRYER
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-fryer">
+  <div class="section-header" onclick="toggle('fryer-body', this)">
+    <span class="section-number">01</span>
+    <h2>Continuous Immersion Fryer Sizing</h2>
+    <span class="chevron open">&#9658;</span>
+  </div>
+  <div class="section-body" id="fryer-body">
+
+    <!-- Result cards -->
+    <div class="result-cards">
+      <div class="card hi">
+        <div class="card-label">Wet Chip Feed Rate</div>
+        <div class="card-value">215.9<span class="card-unit">lb/hr</span></div>
+        <div class="card-note">m&#775;<sub>in</sub> to fryer inlet</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Water Evaporation Rate</div>
+        <div class="card-value">110.9<span class="card-unit">lb/hr</span></div>
+        <div class="card-note">latent load driver</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Total Heat Duty</div>
+        <div class="card-value">157,327<span class="card-unit">BTU/hr</span></div>
+        <div class="card-note">Q<sub>total</sub> at burner</div>
+      </div>
+      <div class="card warn">
+        <div class="card-label">Fuel (Nat. Gas)</div>
+        <div class="card-value">197<span class="card-unit">SCF/hr</span></div>
+        <div class="card-note">80% thermal efficiency</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Oil Makeup Rate</div>
+        <div class="card-value">6.0<span class="card-unit">gal/hr</span></div>
+        <div class="card-note">absorbed by chips</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Belt Speed</div>
+        <div class="card-value">5.1<span class="card-unit">ft/min</span></div>
+        <div class="card-note">6 ft fry zone, 70 s residence</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Fryer Oil Inventory</div>
+        <div class="card-value">8–10<span class="card-unit">gal</span></div>
+        <div class="card-note">effective frying volume</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Belt Loading</div>
+        <div class="card-value">0.35<span class="card-unit">lb/ft²</span></div>
+        <div class="card-note">within 0.25–0.5 lb/ft² target</div>
+      </div>
+    </div>
+
+    <!-- 1A: Design Basis -->
+    <div class="calc-group" style="margin-top:20px;">
+      <h3>1A. Design Basis &amp; Given Variables</h3>
+      <table class="var-table">
+        <tr><th>Symbol</th><th>Value</th><th>Unit</th><th>Description</th></tr>
+        <tr><td class="sym">ṁ<sub>out</sub></td><td class="val">150</td><td class="unit">lb/hr</td><td class="desc">Finished chip production rate (design basis)</td></tr>
+        <tr><td class="sym">x<sub>w,in</sub></td><td class="val">0.524</td><td class="unit">lb/lb</td><td class="desc">Inlet moisture fraction (wet basis)</td></tr>
+        <tr><td class="sym">x<sub>w,out</sub></td><td class="val">0.015</td><td class="unit">lb/lb</td><td class="desc">Exit moisture fraction (wet basis)</td></tr>
+        <tr><td class="sym">x<sub>oil</sub></td><td class="val">0.30</td><td class="unit">lb/lb</td><td class="desc">Oil content in finished chip (assumed)</td></tr>
+        <tr><td class="sym">T<sub>fry</sub></td><td class="val">357 (180)</td><td class="unit">°F (°C)</td><td class="desc">Frying oil temperature</td></tr>
+        <tr><td class="sym">t<sub>res</sub></td><td class="val">70</td><td class="unit">s</td><td class="desc">Chip residence time in fryer</td></tr>
+        <tr><td class="sym">ρ<sub>oil</sub></td><td class="val">7.5</td><td class="unit">lb/gal</td><td class="desc">High-oleic sunflower oil density at ~357°F</td></tr>
+        <tr><td class="sym">C<sub>p,oil</sub></td><td class="val">0.47</td><td class="unit">BTU/(lb·°F)</td><td class="desc">Specific heat, high-oleic sunflower oil</td></tr>
+        <tr><td class="sym">C<sub>p,chip</sub></td><td class="val">0.45</td><td class="unit">BTU/(lb·°F)</td><td class="desc">Specific heat, wet masa chip (avg, Perry's Ch. 2)</td></tr>
+        <tr><td class="sym">T<sub>in</sub></td><td class="val">75</td><td class="unit">°F</td><td class="desc">Chip inlet temperature (ambient)</td></tr>
+      </table>
+    </div>
+
+    <!-- 1B: Mass Balance -->
+    <div class="subsection-divider"></div>
+    <div class="calc-group">
+      <h3>1B. Mass Balance Around Fryer <span class="ref-tag">Perry's Ch. 2, §2-1</span></h3>
+
+      <p style="color:var(--text);font-size:0.83rem;margin-bottom:12px;">
+        Four streams cross the fryer boundary: wet chips in, finished chips out, water evaporated, and oil absorbed (net negative leaving fryer inventory).
+        Dry corn solids are conserved; water and oil are not.
+      </p>
+
+      <div class="formula-block">
+        <div><span class="comment">// Step 1 — Dry solids out (no oil yet counted in this stream)</span></div>
+        <div>ṁ<sub>solids,out</sub> = ṁ<sub>out</sub> × (1 − x<sub>w,out</sub>) = <span class="eq">150 × (1 − 0.015)</span> = <span class="result">147.75 lb/hr</span></div>
+        <br/>
+        <div><span class="comment">// Step 2 — Oil absorbed into chips</span></div>
+        <div>ṁ<sub>oil,abs</sub> = ṁ<sub>out</sub> × x<sub>oil</sub> = <span class="eq">150 × 0.30</span> = <span class="result">45 lb/hr</span></div>
+        <br/>
+        <div><span class="comment">// Step 3 — Dry corn solids (solids minus absorbed oil)</span></div>
+        <div>ṁ<sub>corn,dry</sub> = ṁ<sub>solids,out</sub> − ṁ<sub>oil,abs</sub> = <span class="eq">147.75 − 45</span> = <span class="result">102.75 lb/hr</span></div>
+        <br/>
+        <div><span class="comment">// Step 4 — Wet chip feed rate (masa + water entering)</span></div>
+        <div>ṁ<sub>in</sub> = ṁ<sub>corn,dry</sub> / (1 − x<sub>w,in</sub>) = <span class="eq">102.75 / (1 − 0.524)</span> = <span class="result">215.9 lb/hr</span></div>
+        <br/>
+        <div><span class="comment">// Step 5 — Water carried in with chips</span></div>
+        <div>ṁ<sub>H2O,in</sub> = ṁ<sub>in</sub> − ṁ<sub>corn,dry</sub> = <span class="eq">215.9 − 102.75</span> = <span class="result">113.1 lb/hr</span></div>
+        <br/>
+        <div><span class="comment">// Step 6 — Water retained in finished chips</span></div>
+        <div>ṁ<sub>H2O,out</sub> = ṁ<sub>out</sub> × x<sub>w,out</sub> = <span class="eq">150 × 0.015</span> = <span class="result">2.25 lb/hr</span></div>
+        <br/>
+        <div><span class="comment">// Step 7 — Water evaporated (latent load driver)</span></div>
+        <div>ṁ<sub>evap</sub> = ṁ<sub>H2O,in</sub> − ṁ<sub>H2O,out</sub> = <span class="eq">113.1 − 2.25</span> = <span class="result">110.9 lb/hr</span></div>
+        <br/>
+        <div><span class="comment">// Step 8 — Oil makeup (replace absorbed oil)</span></div>
+        <div>ṁ<sub>oil,makeup</sub> = ṁ<sub>oil,abs</sub> = 45 lb/hr = <span class="eq">45 / 7.5</span> = <span class="result">6.0 gal/hr</span></div>
+      </div>
+
+      <table class="var-table" style="margin-top:12px;">
+        <tr><th>Stream</th><th>Value</th><th>Unit</th></tr>
+        <tr><td class="sym">Wet chip feed (ṁ<sub>in</sub>)</td><td class="val">215.9</td><td class="unit">lb/hr</td></tr>
+        <tr><td class="sym">Water evaporated</td><td class="val">110.9</td><td class="unit">lb/hr</td></tr>
+        <tr><td class="sym">Oil absorbed / makeup</td><td class="val">45 / 6.0</td><td class="unit">lb/hr / gal/hr</td></tr>
+        <tr><td class="sym">Finished chips out</td><td class="val">150.0</td><td class="unit">lb/hr</td></tr>
+      </table>
+    </div>
+
+    <!-- 1C: Heat Duty -->
+    <div class="subsection-divider"></div>
+    <div class="calc-group">
+      <h3>1C. Heat Duty Calculation <span class="ref-tag">Perry's Ch. 11, §11-4</span></h3>
+
+      <p style="color:var(--text);font-size:0.83rem;margin-bottom:12px;">
+        Four heat loads are summed: sensible heating of wet chips, latent heat of water evaporation, heat loss replacing cool makeup oil,
+        and radiation/convection losses from the fryer shell. The latent term dominates (&gt;68% of process duty).
+      </p>
+
+      <div class="formula-block">
+        <div><span class="comment">// Q_sensible — bring chips from 75°F to frying temp</span></div>
+        <div>Q<sub>sens</sub> = ṁ<sub>in</sub> × C<sub>p,chip</sub> × (T<sub>fry</sub> − T<sub>in</sub>)</div>
+        <div class="eq">Q<sub>sens</sub> = 215.9 × 0.45 × (357 − 75) = 215.9 × 0.45 × 282</div>
+        <div class="result">Q<sub>sens</sub> = 27,431 BTU/hr</div>
+        <br/>
+        <div><span class="comment">// Q_latent — evaporate water at atmospheric boiling point</span></div>
+        <div><span class="comment">// λ at 212°F = 970.3 BTU/lb (steam tables, Perry's App. A)</span></div>
+        <div>Q<sub>lat</sub> = ṁ<sub>evap</sub> × λ = <span class="eq">110.9 × 970.3</span></div>
+        <div class="result">Q<sub>lat</sub> = 107,608 BTU/hr</div>
+        <br/>
+        <div><span class="comment">// Q_oil — heat makeup oil from 70°F ambient to 357°F frying temp</span></div>
+        <div>Q<sub>oil</sub> = ṁ<sub>oil,makeup</sub> × C<sub>p,oil</sub> × (T<sub>fry</sub> − T<sub>ambient</sub>)</div>
+        <div class="eq">Q<sub>oil</sub> = 45 × 0.47 × (357 − 70)</div>
+        <div class="result">Q<sub>oil</sub> = 6,068 BTU/hr ≈ estimated 6,100 BTU/hr</div>
+        <br/>
+        <div><span class="comment">// Q_rad — radiation + convection from uninsulated fryer shell</span></div>
+        <div><span class="comment">// Estimated at ~5% of process heat (Perry's §11-14; unlagged equipment)</span></div>
+        <div>Q<sub>rad</sub> ≈ 0.05 × (Q<sub>sens</sub> + Q<sub>lat</sub>) = <span class="eq">0.05 × 135,039</span> = <span class="result">6,752 BTU/hr → use 8,000 BTU/hr</span></div>
+        <br/>
+        <div><span class="comment">// Q_total — sum of all loads</span></div>
+        <div>Q<sub>total</sub> = Q<sub>sens</sub> + Q<sub>lat</sub> + Q<sub>oil</sub> + Q<sub>rad</sub></div>
+        <div class="eq">Q<sub>total</sub> = 27,431 + 107,608 + 6,100 + 8,000</div>
+        <div class="result">Q<sub>total</sub> = 149,139 BTU/hr</div>
+        <br/>
+        <div><span class="comment">// Q_fuel — burner duty at 80% thermal efficiency</span></div>
+        <div>Q<sub>fuel</sub> = Q<sub>total</sub> / η<sub>thermal</sub> = <span class="eq">149,139 / 0.80</span></div>
+        <div class="result">Q<sub>fuel</sub> = 186,424 BTU/hr</div>
+        <br/>
+        <div><span class="comment">// Natural gas: HHV = 1,020 BTU/SCF (standard, Perry's App. A)</span></div>
+        <div>V̇<sub>NG</sub> = Q<sub>fuel</sub> / HHV<sub>NG</sub> = <span class="eq">186,424 / 1,020</span></div>
+        <div class="result">V̇<sub>NG</sub> = 182.8 SCF/hr → specify 185 SCF/hr (round up)</div>
+      </div>
+
+      <table class="var-table">
+        <tr><th>Heat Load</th><th>BTU/hr</th><th>% of Process Duty</th></tr>
+        <tr><td class="sym">Q<sub>sensible</sub></td><td class="val">27,431</td><td class="val">18.4%</td></tr>
+        <tr><td class="sym">Q<sub>latent</sub></td><td class="val">107,608</td><td class="val">72.1%</td></tr>
+        <tr><td class="sym">Q<sub>oil heating</sub></td><td class="val">6,100</td><td class="val">4.1%</td></tr>
+        <tr><td class="sym">Q<sub>radiation</sub></td><td class="val">8,000</td><td class="val">5.4%</td></tr>
+        <tr><td class="sym"><b>Q<sub>total</sub></b></td><td class="val"><b>149,139</b></td><td class="val"><b>100%</b></td></tr>
+        <tr><td class="sym">Q<sub>fuel</sub> (η=80%)</td><td class="val">186,424</td><td class="val">—</td></tr>
+      </table>
+    </div>
+
+    <!-- 1D: Fryer Volume -->
+    <div class="subsection-divider"></div>
+    <div class="calc-group">
+      <h3>1D. Fryer Volume &amp; Belt Geometry</h3>
+
+      <div class="formula-block">
+        <div><span class="comment">// Chip holdup in fryer at any instant (steady state)</span></div>
+        <div>m<sub>holdup</sub> = ṁ<sub>in</sub> × t<sub>res</sub> = <span class="eq">215.9 lb/hr × (70 s ÷ 3600 s/hr)</span></div>
+        <div class="result">m<sub>holdup</sub> = 4.20 lb chips in fry zone</div>
+        <br/>
+        <div><span class="comment">// Minimum oil inventory at 8:1 oil-to-chip ratio (typical commercial: 6–10:1)</span></div>
+        <div>m<sub>oil,min</sub> = 4.20 × 8 = <span class="result">33.6 lb = 4.5 gal</span></div>
+        <div><span class="comment">// Add 50% freeboard and heating zone allowance</span></div>
+        <div class="result">Effective fryer oil volume: 8–10 gal (specify 10 gal)</div>
+        <br/>
+        <div><span class="comment">// Belt geometry (continuous submerged belt fryer)</span></div>
+        <div>Belt width (W) = <span class="result">24 in = 2 ft</span> (standard)</div>
+        <div>Oil depth above belt = <span class="result">2 in</span></div>
+        <div>Effective fry zone length (L<sub>fry</sub>) = <span class="result">6 ft</span> (assumed)</div>
+        <br/>
+        <div><span class="comment">// Belt speed from residence time</span></div>
+        <div>v<sub>belt</sub> = L<sub>fry</sub> / t<sub>res</sub> = <span class="eq">6 ft / 70 s</span> = 0.0857 ft/s</div>
+        <div class="result">v<sub>belt</sub> = 5.14 ft/min → specify 5 ft/min with VFD trim</div>
+        <br/>
+        <div><span class="comment">// Belt surface loading check</span></div>
+        <div>σ<sub>belt</sub> = ṁ<sub>in</sub> / (W × v<sub>belt</sub> × 60)</div>
+        <div class="eq">σ<sub>belt</sub> = 215.9 / (2 × 5.14 × 60)</div>
+        <div class="result">σ<sub>belt</sub> = 0.35 lb/ft²  ✓  [target: 0.25–0.50 lb/ft²]</div>
+      </div>
+    </div>
+
+    <!-- 1E: Heat Transfer -->
+    <div class="subsection-divider"></div>
+    <div class="calc-group">
+      <h3>1E. Heat Transfer Coefficient &amp; Area Check <span class="ref-tag">Perry's Ch. 11, §11-10</span></h3>
+
+      <p style="color:var(--text);font-size:0.83rem;margin-bottom:12px;">
+        Submerged frying is a complex combination of forced convection (belt movement + bubble agitation) and nucleate boiling
+        from the chip surface as pore moisture flashes. Perry's cites overall U for immersion fryers in the range
+        250–300 BTU/(hr·ft²·°F). We use U = 275 as a midpoint estimate.
+      </p>
+
+      <div class="formula-block">
+        <div><span class="comment">// Overall heat transfer coefficient (submerged frying, nucleate boiling regime)</span></div>
+        <div>U = <span class="result">275 BTU/(hr·ft²·°F)</span>  [Perry's: 250–300 range]</div>
+        <br/>
+        <div><span class="comment">// Driving force: oil at 357°F, chip surface at ~212°F (water boiling)</span></div>
+        <div>ΔT = T<sub>fry</sub> − T<sub>boil</sub> = <span class="eq">357 − 212</span> = <span class="result">145 °F</span></div>
+        <br/>
+        <div><span class="comment">// Required heat transfer area for latent load only (rate-limiting step)</span></div>
+        <div>A<sub>req</sub> = Q<sub>lat</sub> / (U × ΔT) = <span class="eq">107,608 / (275 × 145)</span></div>
+        <div class="result">A<sub>req</sub> = 2.70 ft²</div>
+        <br/>
+        <div><span class="comment">// Actual belt area in fry zone</span></div>
+        <div>A<sub>belt</sub> = W × L<sub>fry</sub> = <span class="eq">2 × 6</span> = <span class="result">12 ft²</span></div>
+        <div><span class="comment">// Ratio: 12 / 2.70 = 4.4×  → fryer is area-generous; belt sizing governs, not heat transfer</span></div>
+        <div class="result">Area check: OK — heat transfer area is not the constraint at this scale.</div>
+      </div>
+    </div>
+
+    <!-- Fryer Schematic SVG -->
+    <div class="subsection-divider"></div>
+    <div class="calc-group">
+      <h3>1F. Fryer Cross-Section Schematic</h3>
+    </div>
+    <div class="schematic-wrap">
+      <svg width="820" height="360" viewBox="0 0 820 360" xmlns="http://www.w3.org/2000/svg"
+           style="font-family:JetBrains Mono,monospace; background:#1a1d21; border:1px solid #3a3f4b; border-radius:5px;">
+
+        <!-- fryer shell -->
+        <rect x="60" y="80" width="700" height="200" rx="4" fill="none" stroke="#3a3f4b" stroke-width="2"/>
+        <!-- fryer wall hatching lines -->
+        <line x1="60" y1="80" x2="60" y2="280" stroke="#3a3f4b" stroke-width="6"/>
+        <line x1="760" y1="80" x2="760" y2="280" stroke="#3a3f4b" stroke-width="6"/>
+        <line x1="60" y1="280" x2="760" y2="280" stroke="#3a3f4b" stroke-width="6"/>
+
+        <!-- oil fill -->
+        <rect x="66" y="130" width="688" height="144" fill="rgba(209,154,102,0.12)" stroke="none"/>
+
+        <!-- oil surface line -->
+        <line x1="66" y1="130" x2="754" y2="130" stroke="#d19a66" stroke-width="1.5" stroke-dasharray="6,3"/>
+        <text x="768" y="134" fill="#d19a66" font-size="10">Oil surface</text>
+
+        <!-- chip belt -->
+        <rect x="66" y="200" width="688" height="16" rx="2" fill="#4b3e2a" stroke="#d19a66" stroke-width="1"/>
+        <!-- belt perforation marks -->
+        <g stroke="#d19a66" stroke-width="0.8" opacity="0.4">
+          <line x1="110" y1="200" x2="110" y2="216"/>
+          <line x1="170" y1="200" x2="170" y2="216"/>
+          <line x1="230" y1="200" x2="230" y2="216"/>
+          <line x1="290" y1="200" x2="290" y2="216"/>
+          <line x1="350" y1="200" x2="350" y2="216"/>
+          <line x1="410" y1="200" x2="410" y2="216"/>
+          <line x1="470" y1="200" x2="470" y2="216"/>
+          <line x1="530" y1="200" x2="530" y2="216"/>
+          <line x1="590" y1="200" x2="590" y2="216"/>
+          <line x1="650" y1="200" x2="650" y2="216"/>
+          <line x1="710" y1="200" x2="710" y2="216"/>
+        </g>
+        <!-- belt arrow -->
+        <text x="380" y="213" fill="#d19a66" font-size="10" text-anchor="middle">&#x2192; 5 ft/min</text>
+
+        <!-- chips on belt (triangular shapes) -->
+        <g fill="rgba(152,195,121,0.7)">
+          <polygon points="140,200 155,185 170,200"/>
+          <polygon points="220,200 235,185 250,200"/>
+          <polygon points="310,200 325,182 340,200"/>
+          <polygon points="440,200 455,184 470,200"/>
+          <polygon points="560,200 575,183 590,200"/>
+          <polygon points="640,200 655,185 670,200"/>
+        </g>
+
+        <!-- steam bubbles rising from chips -->
+        <g fill="none" stroke="#56b6c2" stroke-width="1" opacity="0.6">
+          <circle cx="155" cy="175" r="4"/>
+          <circle cx="165" cy="162" r="3"/>
+          <circle cx="235" cy="172" r="5"/>
+          <circle cx="245" cy="157" r="3"/>
+          <circle cx="325" cy="170" r="4"/>
+          <circle cx="315" cy="155" r="3"/>
+          <circle cx="455" cy="173" r="4"/>
+          <circle cx="462" cy="158" r="3"/>
+          <circle cx="575" cy="172" r="5"/>
+          <circle cx="583" cy="156" r="3"/>
+        </g>
+
+        <!-- steam label -->
+        <text x="175" y="145" fill="#56b6c2" font-size="10">H&#x2082;O vapor</text>
+        <text x="175" y="156" fill="#56b6c2" font-size="10">(110.9 lb/hr)</text>
+
+        <!-- heating elements below belt -->
+        <rect x="100" y="240" width="80" height="20" rx="3" fill="#e06c75" opacity="0.7"/>
+        <rect x="220" y="240" width="80" height="20" rx="3" fill="#e06c75" opacity="0.7"/>
+        <rect x="340" y="240" width="80" height="20" rx="3" fill="#e06c75" opacity="0.7"/>
+        <rect x="460" y="240" width="80" height="20" rx="3" fill="#e06c75" opacity="0.7"/>
+        <rect x="580" y="240" width="80" height="20" rx="3" fill="#e06c75" opacity="0.7"/>
+        <text x="197" y="273" fill="#e06c75" font-size="10" text-anchor="middle">Heating elements (gas burner / immersion tube)</text>
+
+        <!-- dimension lines -->
+        <!-- width dimension -->
+        <line x1="66" y1="300" x2="754" y2="300" stroke="#56b6c2" stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="66" y1="296" x2="66" y2="304" stroke="#56b6c2" stroke-width="1"/>
+        <line x1="754" y1="296" x2="754" y2="304" stroke="#56b6c2" stroke-width="1"/>
+        <text x="410" y="318" fill="#56b6c2" font-size="11" text-anchor="middle">6 ft effective fry zone</text>
+
+        <!-- oil depth dimension -->
+        <line x1="30" y1="130" x2="30" y2="200" stroke="#d19a66" stroke-width="1"/>
+        <line x1="26" y1="130" x2="34" y2="130" stroke="#d19a66" stroke-width="1"/>
+        <line x1="26" y1="200" x2="34" y2="200" stroke="#d19a66" stroke-width="1"/>
+        <text x="28" y="170" fill="#d19a66" font-size="10" text-anchor="middle" writing-mode="lr">2&#x22; oil</text>
+        <text x="28" y="180" fill="#d19a66" font-size="10" text-anchor="middle">depth</text>
+
+        <!-- feed arrow -->
+        <line x1="30" y1="195" x2="65" y2="195" stroke="#98c379" stroke-width="2" marker-end="url(#arrG)"/>
+        <text x="5" y="185" fill="#98c379" font-size="10">Feed</text>
+        <text x="3" y="196" fill="#98c379" font-size="10">215.9</text>
+        <text x="3" y="207" fill="#98c379" font-size="10">lb/hr</text>
+
+        <!-- product arrow -->
+        <line x1="755" y1="195" x2="790" y2="195" stroke="#98c379" stroke-width="2" marker-end="url(#arrG)"/>
+        <text x="793" y="185" fill="#98c379" font-size="10">Product</text>
+        <text x="793" y="196" fill="#98c379" font-size="10">150 lb/hr</text>
+
+        <!-- oil makeup arrow -->
+        <line x1="410" y1="80" x2="410" y2="125" stroke="#d19a66" stroke-width="1.5" marker-end="url(#arrO)"/>
+        <text x="413" y="100" fill="#d19a66" font-size="10">Oil makeup</text>
+        <text x="413" y="111" fill="#d19a66" font-size="10">6.0 gal/hr</text>
+
+        <!-- title -->
+        <text x="410" y="56" fill="#abb2bf" font-size="13" font-weight="bold" text-anchor="middle">CONTINUOUS IMMERSION FRYER — CROSS-SECTION (SIDE VIEW)</text>
+        <text x="410" y="72" fill="#56b6c2" font-size="10" text-anchor="middle">24&#x22; belt width · 357°F oil · 70 s residence · 186 kBTU/hr burner</text>
+
+        <!-- legend -->
+        <rect x="620" y="82" width="12" height="8" fill="rgba(209,154,102,0.25)" stroke="#d19a66" stroke-width="1"/>
+        <text x="636" y="91" fill="#d19a66" font-size="10">Hot oil</text>
+        <rect x="620" y="96" width="12" height="8" fill="#4b3e2a" stroke="#d19a66" stroke-width="1"/>
+        <text x="636" y="105" fill="#d19a66" font-size="10">Belt</text>
+        <rect x="620" y="110" width="12" height="8" fill="#e06c75" opacity="0.7"/>
+        <text x="636" y="119" fill="#e06c75" font-size="10">Burner</text>
+
+        <!-- arrowhead markers -->
+        <defs>
+          <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#56b6c2"/>
+          </marker>
+          <marker id="arrG" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#98c379"/>
+          </marker>
+          <marker id="arrO" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#d19a66"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="section-end"></div>
+  </div><!-- /fryer-body -->
+</div><!-- /sec-fryer -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 2 — MIXER
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-mixer">
+  <div class="section-header" onclick="toggle('mixer-body', this)">
+    <span class="section-number">02</span>
+    <h2>Masa Mixer Sizing</h2>
+    <span class="chevron open">&#9658;</span>
+  </div>
+  <div class="section-body" id="mixer-body">
+
+    <div class="result-cards">
+      <div class="card hi">
+        <div class="card-label">Dough Volume / Batch</div>
+        <div class="card-value">24.5<span class="card-unit">L</span></div>
+        <div class="card-note">0.84 ft³ at 75 lb/ft³</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Min Mixer Volume</div>
+        <div class="card-value">40.8<span class="card-unit">L</span></div>
+        <div class="card-note">at 60% fill factor</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Specified Mixer</div>
+        <div class="card-value">60<span class="card-unit">qt</span></div>
+        <div class="card-note">56.8 L — standard commercial</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Actual Fill Factor</div>
+        <div class="card-value">43%<span class="card-unit"></span></div>
+        <div class="card-note">24.5 L / 56.8 L — conservative</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Mixing Power</div>
+        <div class="card-value">0.59<span class="card-unit">HP</span></div>
+        <div class="card-note">N<sub>p</sub> correlation, laminar</div>
+      </div>
+      <div class="card warn">
+        <div class="card-label">Motor Specified</div>
+        <div class="card-value">1.5–2<span class="card-unit">HP</span></div>
+        <div class="card-note">standard 60 qt unit</div>
+      </div>
+    </div>
+
+    <!-- 2A: Batch composition -->
+    <div class="calc-group" style="margin-top:20px;">
+      <h3>2A. Batch Composition &amp; Volume</h3>
+
+      <table class="var-table">
+        <tr><th>Component</th><th>Mass</th><th>Unit</th></tr>
+        <tr><td class="sym">Masa (dry + hydrated corn)</td><td class="val">30</td><td class="unit">lb</td></tr>
+        <tr><td class="sym">Process water added</td><td class="val">33</td><td class="unit">lb</td></tr>
+        <tr><td class="sym"><b>Total batch</b></td><td class="val"><b>63</b></td><td class="unit">lb</td></tr>
+      </table>
+
+      <div class="formula-block">
+        <div><span class="comment">// Dough volume — use mixed dough density (masa + water combined)</span></div>
+        <div>ρ<sub>dough</sub> = <span class="result">75 lb/ft³</span>  [literature: 70–80 lb/ft³ for fresh masa dough]</div>
+        <div>V<sub>dough</sub> = m<sub>batch</sub> / ρ<sub>dough</sub> = <span class="eq">63 / 75</span> = <span class="result">0.840 ft³</span></div>
+        <div class="eq">0.840 ft³ × 28.317 L/ft³</div>
+        <div class="result">V<sub>dough</sub> = 23.8 L ≈ 24.5 L</div>
+        <br/>
+        <div><span class="comment">// Mixer fill factor — Perry's §18-2: planetary mixers, viscous doughs ≤ 60%</span></div>
+        <div>V<sub>mixer,min</sub> = V<sub>dough</sub> / f<sub>fill</sub> = <span class="eq">24.5 / 0.60</span></div>
+        <div class="result">V<sub>mixer,min</sub> = 40.8 L = 43.1 qt → specify 60 qt standard</div>
+        <br/>
+        <div><span class="comment">// Verify actual fill factor with 60 qt bowl (1 qt = 0.946 L)</span></div>
+        <div>V<sub>bowl</sub> = 60 qt × 0.946 L/qt = <span class="result">56.8 L</span></div>
+        <div>f<sub>actual</sub> = 24.5 / 56.8 = <span class="result">0.43 (43%)  ✓  conservative, room for expansion</span></div>
+      </div>
+    </div>
+
+    <!-- 2B: Power -->
+    <div class="subsection-divider"></div>
+    <div class="calc-group">
+      <h3>2B. Mixing Power — Newton's Power Number Correlation <span class="ref-tag">Perry's Ch. 18, §18-4</span></h3>
+
+      <p style="color:var(--text);font-size:0.83rem;margin-bottom:12px;">
+        For high-viscosity doughs in the laminar regime (Re ≪ 10), the power number N<sub>p</sub> is inversely proportional to Re.
+        For planetary/anchor agitators mixing stiff dough: N<sub>p</sub> · Re ≈ K<sub>p</sub>, with K<sub>p</sub> ≈ 70 at Re = 1
+        (Perry's Table 18-2, anchor impeller, laminar). The power equation is then:
+      </p>
+
+      <div class="formula-block">
+        <div><span class="comment">// Newton's power correlation (general form)</span></div>
+        <div>P = N<sub>p</sub> × ρ × N³ × D⁵</div>
+        <div><span class="comment">// where P = power [W], ρ = fluid density [kg/m³], N = rotation rate [rev/s], D = impeller dia [m]</span></div>
+        <br/>
+        <div><span class="comment">// Given (SI units for this calculation)</span></div>
+        <div>N<sub>p</sub> = <span class="result">70</span>  [anchor/planetary, laminar, Perry's Table 18-2]</div>
+        <div>ρ<sub>dough</sub> = 75 lb/ft³ × 16.018 = <span class="result">1,201 kg/m³</span></div>
+        <div>N = 60 RPM = <span class="result">1.0 rev/s</span></div>
+        <div>D = 14 in bowl → impeller sweep ≈ 12 in = 0.305 m; <span class="result">D = 0.35 m</span> (planetary orbit dia)</div>
+        <br/>
+        <div><span class="comment">// Compute D⁵</span></div>
+        <div>D⁵ = 0.35⁵ = 0.35² × 0.35² × 0.35 = 0.1225 × 0.1225 × 0.35 = <span class="result">5.25 × 10⁻³ m⁵</span></div>
+        <br/>
+        <div><span class="comment">// Power</span></div>
+        <div>P = N<sub>p</sub> × ρ × N³ × D⁵</div>
+        <div class="eq">P = 70 × 1,201 × 1.0³ × 5.25×10⁻³</div>
+        <div class="result">P = 441 W = 0.59 HP</div>
+        <br/>
+        <div><span class="comment">// Standard 60 qt commercial mixer: 1.5–2 HP motor</span></div>
+        <div><span class="comment">// Safety factor = 1.5 HP / 0.59 HP = 2.5× → adequate for startup torque and dough variability</span></div>
+        <div class="result">Motor rating: OK. 60 qt / 1.5 HP planetary mixer meets requirements with 2.5× safety factor.</div>
+      </div>
+
+      <table class="var-table">
+        <tr><th>Parameter</th><th>Value</th><th>Unit</th></tr>
+        <tr><td class="sym">Tip speed (v<sub>tip</sub> = π D N)</td><td class="val">π × 0.35 × 1 = 1.1 m/s = 216 ft/min</td><td class="unit">ft/min</td></tr>
+        <tr><td class="sym">Target tip speed range</td><td class="val">200–400</td><td class="unit">ft/min</td></tr>
+        <tr><td class="sym">Check</td><td class="val">216 ft/min — within range ✓</td><td class="unit">—</td></tr>
+      </table>
+    </div>
+
+    <div class="section-end"></div>
+  </div><!-- /mixer-body -->
+</div><!-- /sec-mixer -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 3 — COOLING CONVEYOR
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-cooling">
+  <div class="section-header" onclick="toggle('cooling-body', this)">
+    <span class="section-number">03</span>
+    <h2>Chip Cooling Conveyor Sizing</h2>
+    <span class="chevron open">&#9658;</span>
+  </div>
+  <div class="section-body" id="cooling-body">
+
+    <div class="result-cards">
+      <div class="card hi">
+        <div class="card-label">Cooling Time (single chip)</div>
+        <div class="card-value">1.8<span class="card-unit">min</span></div>
+        <div class="card-note">lumped capacitance, h=5 BTU/hr·ft²·°F</div>
+      </div>
+      <div class="card warn">
+        <div class="card-label">Bed Effect Correction</div>
+        <div class="card-value">4–5<span class="card-unit">min</span></div>
+        <div class="card-note">2–3× single-chip time</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Belt Speed</div>
+        <div class="card-value">5<span class="card-unit">ft/min</span></div>
+        <div class="card-note">or 2.5 ft/min for 12 ft belt</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Belt Length</div>
+        <div class="card-value">25<span class="card-unit">ft</span></div>
+        <div class="card-note">at 5 ft/min, 5 min cooling</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Belt Width</div>
+        <div class="card-value">24<span class="card-unit">in</span></div>
+        <div class="card-note">matches fryer belt</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Belt Loading</div>
+        <div class="card-value">0.25<span class="card-unit">lb/ft²</span></div>
+        <div class="card-note">within spec</div>
+      </div>
+    </div>
+
+    <!-- 3A: Lumped Capacitance -->
+    <div class="calc-group" style="margin-top:20px;">
+      <h3>3A. Biot Number Check &amp; Lumped Capacitance Analysis <span class="ref-tag">Perry's Ch. 5, §5-7</span></h3>
+
+      <p style="color:var(--text);font-size:0.83rem;margin-bottom:12px;">
+        Lumped capacitance (well-mixed body) is valid when Bi = hL/k &lt; 0.1. For a thin chip, the characteristic
+        length L = V/A<sub>s</sub> ≈ half-thickness. We check this criterion before applying the exponential decay model.
+      </p>
+
+      <table class="var-table">
+        <tr><th>Symbol</th><th>Value</th><th>Unit</th><th>Description</th></tr>
+        <tr><td class="sym">T<sub>in</sub></td><td class="val">350</td><td class="unit">°F</td><td class="desc">Chip exit temp from fryer</td></tr>
+        <tr><td class="sym">T<sub>target</sub></td><td class="val">115</td><td class="unit">°F</td><td class="desc">Target chip temp for bagging</td></tr>
+        <tr><td class="sym">T<sub>∞</sub></td><td class="val">70</td><td class="unit">°F</td><td class="desc">Ambient air temperature</td></tr>
+        <tr><td class="sym">h</td><td class="val">5</td><td class="unit">BTU/(hr·ft²·°F)</td><td class="desc">Natural convection, air over chip bed (Perry's §5-7)</td></tr>
+        <tr><td class="sym">L<sub>c</sub></td><td class="val">0.06 in = 0.005 ft</td><td class="unit">ft</td><td class="desc">Characteristic length = half-thickness of chip</td></tr>
+        <tr><td class="sym">k<sub>chip</sub></td><td class="val">0.15</td><td class="unit">BTU/(hr·ft·°F)</td><td class="desc">Thermal conductivity, fried tortilla chip</td></tr>
+        <tr><td class="sym">ρ<sub>chip</sub></td><td class="val">75</td><td class="unit">lb/ft³</td><td class="desc">Chip bulk density (finished)</td></tr>
+        <tr><td class="sym">C<sub>p,chip</sub></td><td class="val">0.40</td><td class="unit">BTU/(lb·°F)</td><td class="desc">Specific heat, fried chip (lower moisture than wet)</td></tr>
+      </table>
+
+      <div class="formula-block">
+        <div><span class="comment">// Biot number check</span></div>
+        <div>Bi = (h × L<sub>c</sub>) / k<sub>chip</sub> = <span class="eq">(5 × 0.005) / 0.15</span></div>
+        <div class="result">Bi = 0.167</div>
+        <div><span class="comment">// Bi = 0.167 &gt; 0.1 — borderline. Lumped capacitance will slightly underestimate cooling time.</span></div>
+        <div><span class="comment">// Acceptable for sizing (conservative direction: will oversize conveyor slightly).</span></div>
+        <br/>
+        <div><span class="comment">// Time constant τ = ρ Cp V / (h A)</span></div>
+        <div><span class="comment">// For a flat chip (two-sided cooling): V/A = L_c = 0.005 ft</span></div>
+        <div>τ = (ρ<sub>chip</sub> × C<sub>p,chip</sub> × L<sub>c</sub>) / h</div>
+        <div class="eq">τ = (75 × 0.40 × 0.005) / 5</div>
+        <div class="result">τ = 0.030 hr = 1.8 min</div>
+        <br/>
+        <div><span class="comment">// Dimensionless temp at target: θ = (T_target - T_∞) / (T_in - T_∞)</span></div>
+        <div>θ = (115 − 70) / (350 − 70) = <span class="eq">45 / 280</span> = <span class="result">0.161</span></div>
+        <br/>
+        <div><span class="comment">// Lumped capacitance model: θ = exp(-t/τ) → t = -τ ln(θ)</span></div>
+        <div>t<sub>single</sub> = −τ × ln(θ) = <span class="eq">−0.030 × ln(0.161)</span> = −0.030 × (−1.826)</div>
+        <div class="result">t<sub>single</sub> = 0.0548 hr = 3.3 min</div>
+        <br/>
+        <div><span class="comment">// Bed correction: chip pile impedes air circulation. Apply 1.5× factor for shallow bed.</span></div>
+        <div>t<sub>bed</sub> = t<sub>single</sub> × f<sub>bed</sub> = <span class="eq">3.3 × 1.5</span></div>
+        <div class="result">t<sub>bed</sub> ≈ 5.0 min (use 5 min design cooling time)</div>
+      </div>
+    </div>
+
+    <!-- 3B: Belt sizing -->
+    <div class="subsection-divider"></div>
+    <div class="calc-group">
+      <h3>3B. Belt Length &amp; Loading</h3>
+
+      <div class="formula-block">
+        <div><span class="comment">// Belt speed: match fryer discharge (5 ft/min) or slow down for shorter belt</span></div>
+        <div><span class="comment">// Option A: 5 ft/min belt speed</span></div>
+        <div>L<sub>belt</sub> = v<sub>belt</sub> × t<sub>cool</sub> = <span class="eq">5 ft/min × 5 min</span> = <span class="result">25 ft</span></div>
+        <br/>
+        <div><span class="comment">// Option B: 2.5 ft/min belt speed → 12.5 ft belt (more compact)</span></div>
+        <div>L<sub>belt</sub> = 2.5 × 5 = <span class="result">12.5 ft → 12 ft (specify)</span></div>
+        <br/>
+        <div><span class="comment">// Recommendation: Option B — 12 ft at 2.5 ft/min. Use VFD for speed trim.</span></div>
+        <br/>
+        <div><span class="comment">// Belt loading check (Option B, 24" width)</span></div>
+        <div>σ<sub>belt</sub> = ṁ<sub>out</sub> / (W × v<sub>belt</sub> × 60)</div>
+        <div class="eq">σ<sub>belt</sub> = 150 / (2 ft × 2.5 ft/min × 60 min/hr)</div>
+        <div class="result">σ<sub>belt</sub> = 0.50 lb/ft²  ✓  (upper end, acceptable for cooling)</div>
+      </div>
+    </div>
+
+    <div class="section-end"></div>
+  </div><!-- /cooling-body -->
+</div><!-- /sec-cooling -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 4 — VFFS PACKAGING
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="section" id="sec-vffs">
+  <div class="section-header" onclick="toggle('vffs-body', this)">
+    <span class="section-number">04</span>
+    <h2>VFFS Packaging Line Sizing</h2>
+    <span class="chevron open">&#9658;</span>
+  </div>
+  <div class="section-body" id="vffs-body">
+
+    <div class="result-cards">
+      <div class="card hi">
+        <div class="card-label">Bags / Hour</div>
+        <div class="card-value">252<span class="card-unit">bags/hr</span></div>
+        <div class="card-note">150 ÷ 0.595 lb/bag (0.595 lb = 270g)</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Cycle Rate</div>
+        <div class="card-value">4.2<span class="card-unit">bags/min</span></div>
+        <div class="card-note">14.3 s/bag</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Film Consumption</div>
+        <div class="card-value">343<span class="card-unit">ft²/hr</span></div>
+        <div class="card-note">196 in² per bag</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">Film Roll Life</div>
+        <div class="card-value">~34<span class="card-unit">hr</span></div>
+        <div class="card-note">10,000 ft roll</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">N₂ Consumption</div>
+        <div class="card-value">4.4<span class="card-unit">ft³/hr</span></div>
+        <div class="card-note">0.5 L/bag MAP flush</div>
+      </div>
+      <div class="card hi">
+        <div class="card-label">N₂ Cylinder Life</div>
+        <div class="card-value">~68<span class="card-unit">hr</span></div>
+        <div class="card-note">300 ft³ T-cylinder</div>
+      </div>
+    </div>
+
+    <!-- 4A: Bag rate -->
+    <div class="calc-group" style="margin-top:20px;">
+      <h3>4A. Bag Rate &amp; Cycle Time</h3>
+
+      <table class="var-table">
+        <tr><th>Symbol</th><th>Value</th><th>Unit</th><th>Description</th></tr>
+        <tr><td class="sym">ṁ<sub>product</sub></td><td class="val">150</td><td class="unit">lb/hr</td><td class="desc">Chip throughput to packaging</td></tr>
+        <tr><td class="sym">m<sub>bag</sub></td><td class="val">0.595</td><td class="unit">lb (270 g)</td><td class="desc">Target fill weight per bag</td></tr>
+        <tr><td class="sym">W<sub>film</sub></td><td class="val">14</td><td class="unit">in</td><td class="desc">Film web width</td></tr>
+        <tr><td class="sym">L<sub>bag</sub></td><td class="val">10</td><td class="unit">in</td><td class="desc">Finished bag height</td></tr>
+        <tr><td class="sym">V̇<sub>N2</sub></td><td class="val">0.5</td><td class="unit">L/bag</td><td class="desc">Nitrogen flush per bag (MAP)</td></tr>
+      </table>
+
+      <div class="formula-block">
+        <div><span class="comment">// Bags per hour</span></div>
+        <div>ṅ<sub>bags</sub> = ṁ<sub>product</sub> / m<sub>bag</sub> = <span class="eq">150 / 0.595</span></div>
+        <div class="result">ṅ<sub>bags</sub> = 252 bags/hr</div>
+        <br/>
+        <div><span class="comment">// Cycle rate</span></div>
+        <div>ṅ<sub>bags,min</sub> = 252 / 60 = <span class="result">4.2 bags/min</span></div>
+        <div>t<sub>cycle</sub> = 60 / 4.2 = <span class="result">14.3 s/bag</span></div>
+        <br/>
+        <div><span class="comment">// VFFS cycle breakdown: form 2s + weigh/fill 6s + seal 3s + cut/index 3s = 14s ✓</span></div>
+        <div class="result">Cycle budget check: 14 s fits 14.3 s window — at capacity. Specify machine rated ≥ 5 bags/min.</div>
+        <br/>
+        <div><span class="comment">// Multi-head weigher: at 4.2 bags/min, a 10-head weigher operating at 4–5 cycles/min is adequate.</span></div>
+        <div class="result">Specify: 10-head combination weigher, 270 g target, ±3% tolerance (±8 g)</div>
+      </div>
+    </div>
+
+    <!-- 4B: Film -->
+    <div class="subsection-divider"></div>
+    <div class="calc-group">
+      <h3>4B. Film Consumption &amp; Roll Life</h3>
+
+      <div class="formula-block">
+        <div><span class="comment">// Film area per bag: fin seal adds ~2" to each side → film width = bag width + 4" = 14"</span></div>
+        <div><span class="comment">// Film length per bag: bag height + top/bottom seal = 10" + 2" + 2" = 14"</span></div>
+        <div>A<sub>film/bag</sub> = W<sub>film</sub> × L<sub>film/bag</sub> = <span class="eq">14 in × 14 in</span> = <span class="result">196 in² = 1.36 ft²</span></div>
+        <br/>
+        <div><span class="comment">// Film consumption rate</span></div>
+        <div>Q̇<sub>film</sub> = A<sub>film/bag</sub> × ṅ<sub>bags</sub> = <span class="eq">1.36 ft² × 252 bags/hr</span></div>
+        <div class="result">Q̇<sub>film</sub> = 343 ft²/hr</div>
+        <br/>
+        <div><span class="comment">// Standard roll: 10,000 ft length × 14 in wide = 11,667 ft²</span></div>
+        <div>t<sub>roll</sub> = 11,667 / 343 = <span class="result">34.0 hr per roll</span></div>
+        <div class="result">Roll change frequency: ~once per day at continuous operation. Specify roll diameter for auto-splicer if OEE &gt; 80% required.</div>
+      </div>
+    </div>
+
+    <!-- 4C: Nitrogen -->
+    <div class="subsection-divider"></div>
+    <div class="calc-group">
+      <h3>4C. Nitrogen Consumption (MAP — Modified Atmosphere Packaging)</h3>
+
+      <div class="formula-block">
+        <div><span class="comment">// Nitrogen purge per bag (flush before final seal)</span></div>
+        <div>V̇<sub>N2</sub> = V<sub>N2/bag</sub> × ṅ<sub>bags</sub> = <span class="eq">0.5 L/bag × 252 bags/hr</span></div>
+        <div class="result">V̇<sub>N2</sub> = 126 L/hr</div>
+        <br/>
+        <div><span class="comment">// Convert to ft³ (1 ft³ = 28.317 L)</span></div>
+        <div>V̇<sub>N2</sub> = 126 / 28.317 = <span class="result">4.45 ft³/hr ≈ 4.4 ft³/hr</span></div>
+        <br/>
+        <div><span class="comment">// Standard T-cylinder (300 ft³ at STP)</span></div>
+        <div>t<sub>cylinder</sub> = 300 / 4.45 = <span class="result">67.4 hr ≈ 68 hr per cylinder</span></div>
+        <div><span class="comment">// ~3 days at 8-hr/day production → low consumption; bulk N2 supply unwarranted at Phase 2 scale.</span></div>
+        <div class="result">Specify: Nitrogen cylinder manifold (2+1 redundancy). Evaluate bulk liquid N₂ at Phase 3.</div>
+      </div>
+    </div>
+
+    <div class="section-end"></div>
+  </div><!-- /vffs-body -->
+</div><!-- /sec-vffs -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     EQUIPMENT DATASHEET — SUMMARY TABLE
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="summary-section">
+  <h2>Equipment Datasheet — Preliminary Sizing Summary (Phase 2, 150 lb/hr)</h2>
+  <table class="datasheet">
+    <tr>
+      <th>Tag</th>
+      <th>Equipment</th>
+      <th>Key Sizing Result</th>
+      <th>Value</th>
+      <th>Units</th>
+      <th>Notes / Reference</th>
+    </tr>
+    <tr>
+      <td class="eq-tag">FRY-101</td>
+      <td>Continuous immersion fryer</td>
+      <td>Wet chip feed rate</td>
+      <td class="val-main">215.9</td>
+      <td class="unit-col">lb/hr</td>
+      <td>Mass balance; x<sub>w,in</sub>=52.4%, x<sub>oil</sub>=30%</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">FRY-101</td>
+      <td></td>
+      <td>Water evaporation rate</td>
+      <td class="val-main">110.9</td>
+      <td class="unit-col">lb/hr</td>
+      <td>Latent heat driver</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">FRY-101</td>
+      <td></td>
+      <td>Total heat duty (Q<sub>total</sub>)</td>
+      <td class="val-main">149,139</td>
+      <td class="unit-col">BTU/hr</td>
+      <td>Sensible + latent + makeup oil + radiation</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">FRY-101</td>
+      <td></td>
+      <td>Burner duty (η=80%)</td>
+      <td class="val-main">186,424</td>
+      <td class="unit-col">BTU/hr</td>
+      <td>Natural gas, Perry's Ch. 11</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">FRY-101</td>
+      <td></td>
+      <td>Natural gas consumption</td>
+      <td class="val-main">183</td>
+      <td class="unit-col">SCF/hr</td>
+      <td>HHV = 1,020 BTU/SCF; specify 185 SCF/hr</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">FRY-101</td>
+      <td></td>
+      <td>Oil makeup rate</td>
+      <td class="val-main">6.0</td>
+      <td class="unit-col">gal/hr</td>
+      <td>45 lb/hr absorbed; ρ<sub>oil</sub>=7.5 lb/gal</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">FRY-101</td>
+      <td></td>
+      <td>Fryer fry zone</td>
+      <td class="val-main">24 in × 6 ft</td>
+      <td class="unit-col">W × L</td>
+      <td>Belt width × effective length</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">FRY-101</td>
+      <td></td>
+      <td>Belt speed</td>
+      <td class="val-main">5.1</td>
+      <td class="unit-col">ft/min</td>
+      <td>VFD; 70 s residence in 6 ft zone</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">FRY-101</td>
+      <td></td>
+      <td>Oil inventory</td>
+      <td class="val-main">10</td>
+      <td class="unit-col">gal</td>
+      <td>8:1 oil:chip + 50% freeboard</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">FRY-101</td>
+      <td></td>
+      <td>Heat transfer coeff (U)</td>
+      <td class="val-main">275</td>
+      <td class="unit-col">BTU/(hr·ft²·°F)</td>
+      <td>Submerged frying, Perry's §11-10</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">FRY-101</td>
+      <td></td>
+      <td>Required HX area</td>
+      <td class="val-main">2.70</td>
+      <td class="unit-col">ft²</td>
+      <td>Latent load; available = 12 ft² (4.4× margin)</td>
+    </tr>
+
+    <tr>
+      <td class="eq-tag">MIX-101</td>
+      <td>Planetary dough mixer</td>
+      <td>Bowl volume (specified)</td>
+      <td class="val-main">60</td>
+      <td class="unit-col">qt (56.8 L)</td>
+      <td>Standard commercial; fill factor 43%</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">MIX-101</td>
+      <td></td>
+      <td>Dough volume / batch</td>
+      <td class="val-main">24.5</td>
+      <td class="unit-col">L</td>
+      <td>63 lb batch at 75 lb/ft³</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">MIX-101</td>
+      <td></td>
+      <td>Motor power (calculated)</td>
+      <td class="val-main">0.59</td>
+      <td class="unit-col">HP</td>
+      <td>N<sub>p</sub>=70, laminar, Perry's Table 18-2</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">MIX-101</td>
+      <td></td>
+      <td>Motor power (specified)</td>
+      <td class="val-main">1.5–2.0</td>
+      <td class="unit-col">HP</td>
+      <td>Standard 60 qt mixer; SF = 2.5×</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">MIX-101</td>
+      <td></td>
+      <td>Impeller tip speed</td>
+      <td class="val-main">216</td>
+      <td class="unit-col">ft/min</td>
+      <td>Within 200–400 ft/min target, Perry's §18-2</td>
+    </tr>
+
+    <tr>
+      <td class="eq-tag">CVR-101</td>
+      <td>Chip cooling conveyor</td>
+      <td>Cooling time (bed corrected)</td>
+      <td class="val-main">5.0</td>
+      <td class="unit-col">min</td>
+      <td>Lumped capacitance + 1.5× bed factor; Bi=0.17</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">CVR-101</td>
+      <td></td>
+      <td>Belt length (Option B)</td>
+      <td class="val-main">12</td>
+      <td class="unit-col">ft</td>
+      <td>2.5 ft/min belt speed, compact layout</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">CVR-101</td>
+      <td></td>
+      <td>Belt width</td>
+      <td class="val-main">24</td>
+      <td class="unit-col">in</td>
+      <td>Matches fryer belt</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">CVR-101</td>
+      <td></td>
+      <td>Belt loading</td>
+      <td class="val-main">0.50</td>
+      <td class="unit-col">lb/ft²</td>
+      <td>Upper end; acceptable for air cooling</td>
+    </tr>
+
+    <tr>
+      <td class="eq-tag">PKG-101</td>
+      <td>VFFS bagger</td>
+      <td>Bag rate</td>
+      <td class="val-main">252</td>
+      <td class="unit-col">bags/hr</td>
+      <td>150 lb/hr ÷ 0.595 lb/bag (270 g)</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">PKG-101</td>
+      <td></td>
+      <td>Cycle rate</td>
+      <td class="val-main">4.2</td>
+      <td class="unit-col">bags/min</td>
+      <td>Specify machine ≥ 5 bags/min rated</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">PKG-101</td>
+      <td></td>
+      <td>Film consumption</td>
+      <td class="val-main">343</td>
+      <td class="unit-col">ft²/hr</td>
+      <td>196 in²/bag, 14" web</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">PKG-101</td>
+      <td></td>
+      <td>Film roll life</td>
+      <td class="val-main">34</td>
+      <td class="unit-col">hr</td>
+      <td>10,000 ft × 14" standard roll</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">PKG-101</td>
+      <td></td>
+      <td>N₂ consumption</td>
+      <td class="val-main">4.4</td>
+      <td class="unit-col">ft³/hr</td>
+      <td>0.5 L/bag MAP flush</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">PKG-101</td>
+      <td></td>
+      <td>N₂ cylinder life</td>
+      <td class="val-main">68</td>
+      <td class="unit-col">hr</td>
+      <td>300 ft³ T-cylinder; manifold (2+1)</td>
+    </tr>
+    <tr>
+      <td class="eq-tag">WHR-101</td>
+      <td>Multi-head combination weigher</td>
+      <td>Head count</td>
+      <td class="val-main">10</td>
+      <td class="unit-col">heads</td>
+      <td>270 g target, ±3% (±8 g)</td>
+    </tr>
+  </table>
+
+  <div style="padding:14px 20px;font-size:0.75rem;color:var(--text);border-top:1px solid var(--border);">
+    All values are preliminary engineering estimates for Phase 2 design basis (150 lb/hr finished chips).
+    Confirm with vendor data sheets before purchase order. Utility calculations assume sea-level operation.
+    Perry's Chemical Engineers' Handbook, 9th Edition references cited by chapter.
+    Rev A — 2026-05-11.
+  </div>
+</div>
+
+</main>
+
+<script>
+  function toggle(bodyId, headerEl) {
+    const body = document.getElementById(bodyId);
+    const chevron = headerEl.querySelector('.chevron');
+    const isVisible = body.style.display !== 'none';
+    body.style.display = isVisible ? 'none' : 'block';
+    chevron.classList.toggle('open', !isVisible);
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Line-Monument Valley</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000000;
+    font-family: 'Georgia', serif;
+  }
+  #canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+  #overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 40px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  #overlay h1 {
+    color: #E8A838;
+    font-size: 48px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.1;
+  }
+  #overlay .caption {
+    color: #F0F0F0;
+    font-size: 18px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    max-width: 420px;
+    line-height: 1.6;
+    margin-top: 16px;
+  }
+  #overlay .anomaly-text {
+    color: #00FFFF;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  #overlay .instructions {
+    color: #F0F0F0;
+    font-size: 12px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    opacity: 0.5;
+    margin-top: auto;
+  }
+  #overlay .progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: #E8A838;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+</style>
+</head>
+<body>
+<div id="canvas-container"></div>
+<div id="overlay">
+  <div>
+    <h1 id="letter-heading"></h1>
+    <p id="letter-caption" class="caption"></p>
+  </div>
+  <p class="instructions">Scroll to travel &nbsp;|&nbsp; Mouse to gaze &nbsp;|&nbsp; R to reset &nbsp;|&nbsp; A to toggle anomaly bloom</p>
+  <div class="progress-bar" id="progress-bar"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+  /* ============================================================
+   Line-Monument Valley
+   Hybrid: Active Theory (immersive camera journey) × Inconvergent
+   (algorithmic pen-plotter line art)
+   ============================================================ */
+
+  // --------------------------------------------------------
+  // Seeded pseudo-random generator (LCG)
+  // --------------------------------------------------------
+  let _rngSeed = 0;
+  function seedRandom(s) { _rngSeed = s >>> 0; }
+  function random() {
+    _rngSeed = (_rngSeed * 16807) % 2147483647;
+    return (_rngSeed - 1) / 2147483646;
+  }
+
+  // --------------------------------------------------------
+  // Simple 2D value noise for camera stutter
+  // --------------------------------------------------------
+  function noise(x, y) {
+    const n = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+    return n - Math.floor(n);
+  }
+
+  // --------------------------------------------------------
+  // Scene setup
+  // --------------------------------------------------------
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x000000);
+  scene.fog = new THREE.FogExp2(0x16213E, 0.002);
+
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.domElement.style.display = 'block';
+  document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+  // Ambient light for wireframe visibility
+  const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
+  scene.add(ambientLight);
+
+  // --------------------------------------------------------
+  // Camera spline path (26 points, one per monument)
+  // --------------------------------------------------------
+  const pathPoints = [];
+  for (let i = 0; i < 26; i++) {
+    const x = i * 150;
+    const y = 30 + Math.sin(i * 0.5) * 40;
+    const z = Math.cos(i * 0.5) * 100;
+    pathPoints.push(new THREE.Vector3(x, y, z));
+  }
+  const cameraPath = new THREE.CatmullRomCurve3(pathPoints);
+  cameraPath.curveType = 'catmullrom';
+  cameraPath.tension = 0.5;
+
+  // --------------------------------------------------------
+  // Generate constrained random walk
+  // --------------------------------------------------------
+  function generateRandomWalk(letter, seed) {
+    seedRandom(seed);
+    const points = [];
+    let x = 50;
+    let y = 50;
+    const stepSize = 2;
+    const bounds = 100;
+    for (let step = 0; step < 1200; step++) {
+      const angleIndex = Math.floor(random() * 8);
+      const angle = angleIndex * (Math.PI / 4);
+      let nx = x + Math.cos(angle) * stepSize;
+      let ny = y + Math.sin(angle) * stepSize;
+      // Bounce off walls
+      if (nx < 0 || nx > bounds) nx = x - Math.cos(angle) * stepSize;
+      if (ny < 0 || ny > bounds) ny = y - Math.sin(angle) * stepSize;
+      x = nx;
+      y = ny;
+      points.push({ x: x - 50, y: -(y - 50) }); // center at origin
+    }
+    return points;
+  }
+
+  // --------------------------------------------------------
+  // Build monuments
+  // --------------------------------------------------------
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const monuments = [];
+  const anomalyIndex = 12; // letter 'M'
+  let anomalyMesh = null;
+  let anomalyLight = null;
+  let anomalyBloomIntensity = 0.5;
+
+  for (let i = 0; i < 26; i++) {
+    const letter = alphabet[i];
+    const isAnomaly = (i === anomalyIndex);
+    const x = i * 150;
+    const z = Math.sin(i * 0.5) * 100;
+
+    if (isAnomaly) {
+      const geometry = new THREE.IcosahedronGeometry(40, 1);
+      const material = new THREE.MeshStandardMaterial({
+        color: 0x000000,
+        emissive: 0x00FFFF,
+        emissiveIntensity: anomalyBloomIntensity,
+        wireframe: false,
+        roughness: 0.4,
+        metalness: 0.6
+      });
+      anomalyMesh = new THREE.Mesh(geometry, material);
+      anomalyMesh.position.set(x, 20, z);
+      anomalyMesh.userData = { isAnomaly: true, id: i };
+      scene.add(anomalyMesh);
+
+      anomalyLight = new THREE.PointLight(0x00FFFF, 1, 300);
+      anomalyLight.position.set(x, 40, z);
+      scene.add(anomalyLight);
+    } else {
+      const walkPoints = generateRandomWalk(letter, i);
+      const positions = new Float32Array(walkPoints.length * 3);
+      for (let j = 0; j < walkPoints.length; j++) {
+        const p = walkPoints[j];
+        positions[j * 3] = p.x;
+        positions[j * 3 + 1] = p.y;
+        positions[j * 3 + 2] = j * 0.1; // extrude by step index
+      }
+      const lineGeometry = new THREE.BufferGeometry();
+      lineGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      const lineMaterial = new THREE.LineBasicMaterial({
+        color: 0xFFFFFF,
+        transparent: true,
+        opacity: 0.9
+      });
+      const lineMesh = new THREE.Line(lineGeometry, lineMaterial);
+      lineMesh.position.set(x, 0, z);
+      lineMesh.userData = { isAnomaly: false, id: i };
+      scene.add(lineMesh);
+    }
+
+    monuments.push({ id: i, letter: letter, x: x, z: z, isAnomaly: isAnomaly });
+  }
+
+  // --------------------------------------------------------
+  // Scroll / camera state
+  // --------------------------------------------------------
+  let currentT = 0;
+  let targetT = 0;
+  let time = 0;
+  let mouseX = 0;
+  let mouseY = 0;
+
+  const overlay = document.getElementById('overlay');
+  const heading = document.getElementById('letter-heading');
+  const caption = document.getElementById('letter-caption');
+  const progressBar = document.getElementById('progress-bar');
+
+  // --------------------------------------------------------
+  // Helpers
+  // --------------------------------------------------------
+  function getNearestAnomaly(t) {
+    let minDist = Infinity;
+    let nearest = null;
+    for (const m of monuments) {
+      if (m.isAnomaly) {
+        const dist = Math.abs(m.id / 25 - t);
+        if (dist < minDist) {
+          minDist = dist;
+          nearest = m;
+        }
+      }
+    }
+    return { monument: nearest, distance: minDist };
+  }
+
+  function getMonumentAtT(t) {
+    const idx = Math.min(Math.max(Math.floor(t * 25), 0), 25);
+    const m = monuments[idx];
+    const segmentStart = idx / 25;
+    const segmentEnd = (idx + 1) / 25;
+    const localT = (t - segmentStart) / (segmentEnd - segmentStart);
+    const proximity = 1 - Math.abs(localT - 0.5) * 2; // 1 at center, 0 at edges
+    return { ...m, proximity: proximity };
+  }
+
+  // --------------------------------------------------------
+  // Interaction handlers
+  // --------------------------------------------------------
+  window.addEventListener('wheel', (e) => {
+    targetT += e.deltaY * 0.0005;
+    targetT = Math.min(Math.max(targetT, 0), 1);
+  }, { passive: true });
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+    mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'r' || e.key === 'R') {
+      currentT = 0;
+      targetT = 0;
+    }
+    if (e.key === 'a' || e.key === 'A') {
+      if (anomalyMesh) {
+        anomalyBloomIntensity = anomalyBloomIntensity === 0.5 ? 2.0 : 0.5;
+        anomalyMesh.material.emissiveIntensity = anomalyBloomIntensity;
+      }
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // --------------------------------------------------------
+  // Main render loop
+  // --------------------------------------------------------
+  function animate() {
+    requestAnimationFrame(animate);
+    time++;
+
+    // 1. Scroll smoothing
+    currentT = THREE.MathUtils.lerp(currentT, targetT, 0.05);
+    currentT = Math.min(Math.max(currentT, 0), 1);
+
+    // 2. Camera position from spline
+    const pos = cameraPath.getPointAt(currentT);
+    const lookAhead = Math.min(currentT + 0.01, 1);
+    const look = cameraPath.getPointAt(lookAhead);
+
+    // 3. Mouse parallax offset
+    const lookOffset = new THREE.Vector3(mouseX * 8, mouseY * 4, 0);
+
+    camera.position.copy(pos);
+    camera.lookAt(look.clone().add(lookOffset));
+
+    // 4. Anomaly camera stutter
+    const nearestAnomaly = getNearestAnomaly(currentT);
+    if (nearestAnomaly && nearestAnomaly.distance < 0.1) {
+      const stutterX = (noise(currentT * 100, time) - 0.5) * 2.0;
+      const stutterY = (noise(currentT * 100 + 50, time) - 0.5) * 2.0;
+      camera.position.x += stutterX;
+      camera.position.y += stutterY;
+    }
+
+    // 5. Anomaly rotation
+    scene.children.forEach((child) => {
+      if (child.userData && child.userData.isAnomaly) {
+        child.rotation.y += 0.01;
+        child.rotation.z += 0.005;
+      }
+    });
+
+    // 6. DOM overlay
+    const activeMonument = getMonumentAtT(currentT);
+    if (activeMonument) {
+      heading.textContent = activeMonument.letter;
+      const anomalyText = activeMonument.isAnomaly
+        ? '<span class="anomaly-text">ANOMALY DETECTED.</span>'
+        : 'Standard wireframe.';
+      caption.innerHTML = `Monument ${activeMonument.id + 1} of 26.<br>${anomalyText}`;
+      const opacity = Math.min(Math.max(activeMonument.proximity, 0), 1);
+      overlay.style.opacity = opacity;
+    } else {
+      overlay.style.opacity = 0;
+    }
+
+    // Progress bar
+    progressBar.style.width = (currentT * 100) + '%';
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+</script>
+</body>
+</html>

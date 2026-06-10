@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sashiko Weather — Binary Embroidery Flow Field</title>
+  <style>
+    /* Full-bleed canvas with zero margins to maximize the indigo field. */
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #1A237E;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+</head>
+<body>
+<script>
+// =============================================================================
+// SASHIKO WEATHER — Binary Embroidery Flow Field
+// =============================================================================
+// A centuries-old Japanese textile repair craft (sashiko) is repurposed as the
+// coordinate system for a fluid-dynamics simulation. A 16×16 binary stitch grid
+// becomes a vector field. Particles advect through the grid like wind through a
+// woven screen, leaving faint white trails. The binary strings evolve with a
+// simulated sine-wave "weather" model; mouseX shifts the wave phase, and mouseY
+// modulates particle speed.
+// =============================================================================
+
+// Editable binary strings: one digit per row (horizontal) and per column (vertical).
+// The simulation continuously overwrites these, but they are exposed here for tuning.
+let h = '0000000000000000';
+let v = '0000000000000000';
+
+// Particle reservoir and grid constants.
+let particles = [];
+let cellSize;      // width / 16, computed once in setup
+let num = 16;      // 16×16 grid
+let count = 1200;  // fixed particle count per spec
+
+// =============================================================================
+// SETUP — Create canvas, seed particles, lock cell size.
+// =============================================================================
+function setup() {
+  createCanvas(800, 800);
+  cellSize = width / num;
+
+  // Spawn particles at random positions across the indigo field.
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: random(width),
+      y: random(height)
+    });
+  }
+}
+
+// =============================================================================
+// DRAW — Fade trails, update weather-driven stitch grid, advect particles.
+// =============================================================================
+function draw() {
+  // ---------------------------------------------------------------------------
+  // TRAIL FADE
+  // Each frame we draw a semi-transparent rectangle in the indigo background
+  // colour over the entire canvas. This multiplies the existing pixel values by
+  // ~0.92, causing previous particle positions to fade out slowly. The result
+  // is the long, ghostly white streamlines characteristic of wind-map visualisations.
+  // ---------------------------------------------------------------------------
+  noStroke();
+  fill(26, 35, 126, 20);   // #1A237E with low alpha (≈ 8 % opacity)
+  rect(0, 0, width, height);
+
+  // ---------------------------------------------------------------------------
+  // WEATHER SIMULATION — Sine-wave drives binary stitch values
+  // A base travelling wave (frameCount * 0.01) is phase-shifted per row/column
+  // (index * 0.3). MouseX adds a global phase offset, letting the user "push"
+  // the weather pattern across the grid in real time.
+  // ---------------------------------------------------------------------------
+  let phase = mouseX * 0.01;
+  let base = frameCount * 0.01;
+  let newH = '';
+  let newV = '';
+  for (let i = 0; i < num; i++) {
+    // Horizontal row i: positive sine → '1', negative → '0'
+    let bitH = sin(base + i * 0.3 + phase) > 0 ? '1' : '0';
+    // Vertical column i: same wave but with a π offset so h and v are not identical
+    let bitV = sin(base + i * 0.3 + phase + PI) > 0 ? '1' : '0';
+    newH += bitH;
+    newV += bitV;
+  }
+  h = newH;
+  v = newV;
+
+  // ---------------------------------------------------------------------------
+  // STITCH GRID — Draw dashed white lines at binary-determined offsets
+  // Each row/column uses its binary digit to choose the line position:
+  //   '0' → line sits on the cell boundary (i * cellSize)
+  //   '1' → line sits at the cell centre (i * cellSize + cellSize/2)
+  // The dashed pattern mimics traditional sashiko running stitches.
+  // ---------------------------------------------------------------------------
+  stroke(255);
+  strokeWeight(1.5);
+  drawingContext.setLineDash([12, 8]); // 12 px stitch, 8 px gap
+
+  for (let i = 0; i < num; i++) {
+    let y = i * cellSize + (h[i] === '1' ? cellSize / 2 : 0);
+    line(0, y, width, y);
+  }
+  for (let j = 0; j < num; j++) {
+    let x = j * cellSize + (v[j] === '1' ? cellSize / 2 : 0);
+    line(x, 0, x, height);
+  }
+  drawingContext.setLineDash([]); // restore solid stroke for particles
+
+  // ---------------------------------------------------------------------------
+  // PARTICLE ADVECTION — 1,200 particles sample the stitch field for velocity
+  // For each particle we find the nearest horizontal and vertical stitch lines.
+  // Influence falls off linearly with distance; within a small radius the stitch
+  // acts as a "velocity corridor". At intersections (near both lines) the two
+  // components sum, producing diagonal vectors and rotational eddies where the
+  // direction signs differ. The binary digit itself determines the sign of the
+  // velocity: '0' flows right/down, '1' flows left/up, so the pattern flips as
+  // the weather simulation evolves.
+  // ---------------------------------------------------------------------------
+  let baseSpeed = 2.0;
+  let speed = baseSpeed * map(mouseY, 0, height, 0.2, 3.0); // mouseY modulates speed
+  let radius = cellSize * 0.3; // corridor width
+
+  // Precompute line positions to avoid repeated string parsing inside the loop.
+  let hLines = [];
+  let vLines = [];
+  for (let i = 0; i < num; i++) {
+    hLines.push(i * cellSize + (h[i] === '1' ? cellSize / 2 : 0));
+    vLines.push(i * cellSize + (v[i] === '1' ? cellSize / 2 : 0));
+  }
+
+  stroke(255, 200);
+  strokeWeight(1);
+  for (let p of particles) {
+    // Nearest horizontal stitch line
+    let minDy = height;
+    let hi = 0;
+    for (let i = 0; i < num; i++) {
+      let d = abs(p.y - hLines[i]);
+      if (d < minDy) { minDy = d; hi = i; }
+    }
+
+    // Nearest vertical stitch line
+    let minDx = width;
+    let vi = 0;
+    for (let j = 0; j < num; j++) {
+      let d = abs(p.x - vLines[j]);
+      if (d < minDx) { minDx = d; vi = j; }
+    }
+
+    // Linear falloff: 1.0 exactly on the line, 0.0 at radius distance.
+    let hInf = constrain(1 - minDy / radius, 0, 1);
+    let vInf = constrain(1 - minDx / radius, 0, 1);
+
+    // Direction sign derived from the binary digit itself (dynamic with weather).
+    let vx = (h[hi] === '0' ? 1 : -1) * hInf * speed;
+    let vy = (v[vi] === '0' ? 1 : -1) * vInf * speed;
+
+    p.x += vx;
+    p.y += vy;
+
+    // Wrap around edges so the field appears continuous.
+    if (p.x < 0) p.x += width;
+    if (p.x > width) p.x -= width;
+    if (p.y < 0) p.y += height;
+    if (p.y > height) p.y -= height;
+
+    point(p.x, p.y);
+  }
+}
+</script>
+</body>
+</html>

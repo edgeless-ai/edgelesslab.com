@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Phonetic Flow Field</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000011;
+      color: #ccc;
+      font-family: monospace;
+    }
+    #controls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 10;
+    }
+    #controls label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    #threshold {
+      width: 200px;
+      accent-color: #00ffff;
+    }
+    #stats {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 12px;
+      z-index: 10;
+      line-height: 1.6;
+    }
+    #outlier {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 12px;
+      z-index: 10;
+      color: #FF3333;
+      opacity: 0;
+      transition: opacity 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <label>Social Bias: <span id="val">30</span>%</label>
+    <input type="range" id="threshold" min="0" max="100" value="30">
+  </div>
+  <div id="stats">
+    <div>Agents: <span id="agentCount">0</span></div>
+    <div>Audio: <span id="audioState">OFF</span></div>
+    <div>Click = spawn colony &nbsp;|&nbsp; Drag = repel &nbsp;|&nbsp; S = toggle audio &nbsp;|&nbsp; R = reset</div>
+  </div>
+  <div id="outlier">OUTLIER ACTIVE</div>
+
+  <script>
+    // ============================================
+    // PHONETIC FLOW FIELD
+    // ============================================
+
+    // --- Constants ---
+    const NUM_AGENTS = 500;
+    const FLOW_SCALE = 0.006;
+    const BASE_SPEED = 1.5;
+    const CELL_SIZE = 50;
+    const FONT_SIZE = 14;
+    const OUTLIER_INTERVAL = 900; // 15 seconds @ 60fps
+    const OUTLIER_DURATION = 600; // 10 seconds @ 60fps
+
+    // --- Phonetic Class Mapping ---
+    const PHONETIC = {
+      a: 'vowel', e: 'vowel', i: 'vowel', o: 'vowel', u: 'vowel',
+      b: 'plosive', p: 'plosive', d: 'plosive', t: 'plosive', g: 'plosive', k: 'plosive',
+      c: 'fricative', f: 'fricative', h: 'fricative', j: 'fricative',
+      s: 'fricative', v: 'fricative', x: 'fricative', z: 'fricative',
+      m: 'nasal', n: 'nasal', q: 'nasal',
+      l: 'liquid', r: 'liquid', w: 'liquid', y: 'liquid'
+    };
+
+    const COLORS = {
+      vowel: '#00FFFF',
+      plosive: '#FF00FF',
+      fricative: '#FFFFFF',
+      nasal: '#008080',
+      liquid: '#001F3F'
+    };
+
+    const NOTES = {
+      vowel: [261.63, 293.66, 329.63, 392.00, 440.00],      // C4, D4, E4, G4, A4
+      plosive: [65.41, 73.42, 82.41, 87.31, 98.00],         // C2, D2, E2, F2, G2
+      nasal: [130.81, 146.83, 164.81],                       // C3, D3, E3
+      liquid: [65.41, 73.42, 82.41]                          // C2, D2, E2
+    };
+
+    const DURATIONS = {
+      vowel: 0.12,
+      plosive: 0.06,
+      fricative: 0.08,
+      nasal: 0.15,
+      liquid: 0.20
+    };
+
+    const OSC_TYPES = {
+      vowel: 'sine',
+      plosive: 'triangle',
+      fricative: 'sine',
+      nasal: 'square',
+      liquid: 'sine'
+    };
+
+    // --- Globals ---
+    let agents = [];
+    let threshold = 0.30;
+    let audioEnabled = false;
+    let audioCtx = null;
+    let masterGain = null;
+    let outlier = null;
+    let grid = {};
+
+    // ============================================
+    // AUDIO SYSTEM
+    // ============================================
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = 0.3;
+        masterGain.connect(audioCtx.destination);
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(cls, speed) {
+      if (!audioEnabled || !audioCtx || !masterGain) return;
+      const dur = DURATIONS[cls];
+      const freq = random(NOTES[cls]);
+      const gain = audioCtx.createGain();
+      gain.connect(masterGain);
+
+      const vol = 0.3 * min(speed / 2, 1);
+
+      if (cls === 'fricative') {
+        // White noise through bandpass (2kHz–4kHz)
+        const bufferSize = audioCtx.sampleRate * dur;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        const bandpass = audioCtx.createBiquadFilter();
+        bandpass.type = 'bandpass';
+        bandpass.frequency.value = 3000;
+        bandpass.Q.value = 1;
+        noise.connect(bandpass);
+        bandpass.connect(gain);
+        gain.gain.setValueAtTime(vol * 0.5, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+        noise.start();
+        noise.stop(audioCtx.currentTime + dur);
+        return;
+      }
+
+      const osc = audioCtx.createOscillator();
+      osc.type = OSC_TYPES[cls];
+      osc.frequency.value = freq;
+      osc.connect(gain);
+
+      if (cls === 'nasal') {
+        const lfo = audioCtx.createOscillator();
+        const lfoGain = audioCtx.createGain();
+        lfo.frequency.value = 6;
+        lfoGain.gain.value = 3;
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+        lfo.start();
+        lfo.stop(audioCtx.currentTime + dur);
+      }
+
+      if (cls === 'liquid') {
+        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      } else {
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      }
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + dur);
+    }
+
+    function playOutlierTone() {
+      if (!audioEnabled || !audioCtx || !masterGain) return;
+      const freq = random([220, 261.63, 329.63]);
+      const gain = audioCtx.createGain();
+      gain.connect(masterGain);
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      osc1.type = 'sawtooth';
+      osc2.type = 'sawtooth';
+      osc1.frequency.value = freq;
+      osc2.frequency.value = freq * 1.05946; // minor second
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+      osc1.start();
+      osc2.start();
+      osc1.stop(audioCtx.currentTime + 0.15);
+      osc2.stop(audioCtx.currentTime + 0.15);
+    }
+
+    // ============================================
+    // AGENT CLASS
+    // ============================================
+    class Agent {
+      constructor(x, y, cls) {
+        const chars = Object.keys(PHONETIC).filter(c => PHONETIC[c] === cls);
+        this.char = random(chars);
+        this.phoneticClass = cls;
+        this.x = x;
+        this.y = y;
+        this.vx = 0;
+        this.vy = 0;
+        this.satisfied = true;
+        this.wasSatisfied = true;
+        this.socialForce = createVector(0, 0);
+      }
+
+      update() {
+        // 1. Sample flow field
+        const angle = noise(this.x * FLOW_SCALE, this.y * FLOW_SCALE, frameCount * 0.002) * TWO_PI;
+        const flowVx = cos(angle) * BASE_SPEED;
+        const flowVy = sin(angle) * BASE_SPEED;
+
+        // 2. Evaluate social satisfaction (every 10 frames)
+        if (frameCount % 10 === 0) {
+          const cx = floor(this.x / CELL_SIZE);
+          const cy = floor(this.y / CELL_SIZE);
+          let neighbors = [];
+
+          for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+              const key = (cx + i) + ',' + (cy + j);
+              if (grid[key]) {
+                for (let other of grid[key]) {
+                  if (other === this) continue;
+                  const d = dist(this.x, this.y, other.x, other.y);
+                  if (d < 150) {
+                    neighbors.push({ agent: other, dist: d });
+                  }
+                }
+              }
+            }
+          }
+
+          neighbors.sort((a, b) => a.dist - b.dist);
+          neighbors = neighbors.slice(0, 20);
+          const same = neighbors.filter(n => n.agent.phoneticClass === this.phoneticClass).length;
+          const ratio = neighbors.length > 0 ? same / neighbors.length : 0;
+          this.satisfied = ratio >= threshold;
+
+          if (!this.satisfied) {
+            const sameNeighbors = neighbors.filter(n => n.agent.phoneticClass === this.phoneticClass);
+            if (sameNeighbors.length > 0) {
+              let sx = 0, sy = 0;
+              for (let n of sameNeighbors) {
+                sx += n.agent.x;
+                sy += n.agent.y;
+              }
+              const centroidX = sx / sameNeighbors.length;
+              const centroidY = sy / sameNeighbors.length;
+              this.socialForce = createVector(centroidX - this.x, centroidY - this.y).normalize().mult(2);
+            } else {
+              let nearest = null;
+              let minD = Infinity;
+              for (let a of agents) {
+                if (a !== this && a.phoneticClass === this.phoneticClass) {
+                  const d = dist(this.x, this.y, a.x, a.y);
+                  if (d < minD) {
+                    minD = d;
+                    nearest = a;
+                  }
+                }
+              }
+              if (nearest) {
+                this.socialForce = createVector(nearest.x - this.x, nearest.y - this.y).normalize().mult(2);
+              } else {
+                this.socialForce = createVector(0, 0);
+              }
+            }
+          } else {
+            this.socialForce = createVector(0, 0);
+          }
+
+          if (this.satisfied && !this.wasSatisfied) {
+            const speed = mag(this.vx, this.vy);
+            playTone(this.phoneticClass, speed);
+          }
+          this.wasSatisfied = this.satisfied;
+        }
+
+        // 3. Blend velocities
+        this.vx = lerp(this.vx, flowVx + this.socialForce.x, 0.05);
+        this.vy = lerp(this.vy, flowVy + this.socialForce.y, 0.05);
+
+        // 4. Mouse drag repulsion
+        if (mouseIsPressed) {
+          const d = dist(this.x, this.y, mouseX, mouseY);
+          if (d < 100 && d > 0) {
+            const repel = createVector(this.x - mouseX, this.y - mouseY);
+            repel.normalize().mult(300 / (d * d));
+            this.vx += repel.x;
+            this.vy += repel.y;
+          }
+        }
+
+        // 5. Update position
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // 6. Wrap edges
+        if (this.x < 0) this.x += width;
+        if (this.x > width) this.x -= width;
+        if (this.y < 0) this.y += height;
+        if (this.y > height) this.y -= height;
+
+        // 7. Outlier proximity tone
+        if (outlier === this && audioEnabled && audioCtx) {
+          let near = false;
+          for (let a of agents) {
+            if (a !== this && dist(this.x, this.y, a.x, a.y) < 50) {
+              near = true;
+              break;
+            }
+          }
+          if (near && frameCount % 10 === 0) {
+            playOutlierTone();
+          }
+        }
+      }
+
+      display() {
+        let col = COLORS[this.phoneticClass];
+        let displayClass = this.phoneticClass;
+
+        // Outlier glitch
+        if (outlier === this) {
+          const flicker = (frameCount % 15) < 8; // ~4Hz
+          if (flicker) {
+            const classes = Object.keys(COLORS);
+            displayClass = random(classes.filter(c => c !== this.phoneticClass));
+            col = COLORS[displayClass];
+          }
+        }
+
+        noStroke();
+        if (!this.satisfied) {
+          const pulse = map(sin(frameCount * 0.1), -1, 1, 0, 100);
+          fill(255, 51, 51, 150 + pulse);
+        } else {
+          const c = color(col);
+          if (outlier === this) {
+            red(c); green(c); blue(c);
+            fill(red(c), green(c), blue(c), 220);
+          } else {
+            fill(c);
+          }
+        }
+
+        textSize(FONT_SIZE);
+        textFont('monospace');
+        textAlign(CENTER, CENTER);
+        text(this.char, this.x, this.y);
+      }
+    }
+
+    // ============================================
+    // P5.JS LIFECYCLE
+    // ============================================
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      textFont('monospace');
+      for (let i = 0; i < NUM_AGENTS; i++) {
+        spawnAgent(random(width), random(height));
+      }
+      document.getElementById('threshold').addEventListener('input', (e) => {
+        threshold = e.target.value / 100;
+        document.getElementById('val').textContent = e.target.value;
+      });
+    }
+
+    function spawnAgent(x, y, cls) {
+      if (!cls) {
+        const classes = Object.keys(COLORS);
+        cls = random(classes);
+      }
+      agents.push(new Agent(x, y, cls));
+    }
+
+    function draw() {
+      // Trail fade (Nullschool-style screen-wide rect)
+      noStroke();
+      fill(0, 0, 17, 20);
+      rect(0, 0, width, height);
+
+      // Build spatial grid
+      grid = {};
+      for (let a of agents) {
+        const cx = floor(a.x / CELL_SIZE);
+        const cy = floor(a.y / CELL_SIZE);
+        const key = cx + ',' + cy;
+        if (!grid[key]) grid[key] = [];
+        grid[key].push(a);
+      }
+
+      // Outlier management
+      if (outlier === null && frameCount % OUTLIER_INTERVAL === 0) {
+        outlier = random(agents);
+        document.getElementById('outlier').style.opacity = 1;
+      }
+      if (outlier && frameCount % OUTLIER_INTERVAL === OUTLIER_DURATION) {
+        outlier = null;
+        document.getElementById('outlier').style.opacity = 0;
+      }
+
+      // Update and display agents
+      for (let a of agents) {
+        a.update();
+        a.display();
+      }
+
+      // Update stats
+      document.getElementById('agentCount').textContent = agents.length;
+    }
+
+    function mousePressed() {
+      // Initialize audio on first interaction
+      if (!audioEnabled) {
+        audioEnabled = true;
+        initAudio();
+        document.getElementById('audioState').textContent = 'ON';
+      }
+      // Spawn colony
+      const classes = Object.keys(COLORS);
+      const cls = random(classes);
+      for (let i = 0; i < 20; i++) {
+        spawnAgent(mouseX + random(-20, 20), mouseY + random(-20, 20), cls);
+      }
+    }
+
+    function keyPressed() {
+      if (key === 's' || key === 'S') {
+        audioEnabled = !audioEnabled;
+        if (audioEnabled) {
+          initAudio();
+          document.getElementById('audioState').textContent = 'ON';
+        } else {
+          document.getElementById('audioState').textContent = 'OFF';
+        }
+      }
+      if (key === 'r' || key === 'R') {
+        agents = [];
+        for (let i = 0; i < NUM_AGENTS; i++) {
+          spawnAgent(random(width), random(height));
+        }
+        outlier = null;
+      }
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+    }
+  </script>
+</body>
+</html>

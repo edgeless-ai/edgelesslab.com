@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tortilla Chip Factory — Capacity Planning</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #f0f2f5;
+    --card: #ffffff;
+    --shadow: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+    --text: #1a1a2e;
+    --text-secondary: #6b7280;
+    --border: #e5e7eb;
+    --primary: #4a6cf7;
+    --primary-light: #eef0fe;
+    --primary-dark: #3a5bd9;
+    --danger: #e74c3c;
+    --danger-light: #fef2f2;
+    --success: #22c55e;
+    --success-light: #f0fdf4;
+    --warning: #f59e0b;
+    --warning-light: #fffbeb;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .site-header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    height: 64px;
+  }
+  .header-logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px;
+    flex-shrink: 0;
+  }
+  .header-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+  .header-spacer { flex: 1; }
+
+  /* Phase selector in header */
+  .phase-pills {
+    display: flex;
+    gap: 6px;
+    background: var(--bg);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .phase-pill {
+    padding: 6px 18px;
+    border-radius: 7px;
+    border: none;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    color: var(--text-secondary);
+    background: transparent;
+  }
+  .phase-pill.active {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(74,108,247,0.3);
+  }
+  .phase-pill:not(.active):hover {
+    background: var(--card);
+    color: var(--text);
+  }
+
+  .live-clock {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Layout ── */
+  .container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* ── KPI Row ── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+  }
+  .kpi-tile {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border: 1px solid var(--border);
+  }
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-secondary);
+  }
+  .kpi-value {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    width: fit-content;
+  }
+  .kpi-delta.green { background: var(--success-light); color: #16a34a; }
+  .kpi-delta.red { background: var(--danger-light); color: #dc2626; }
+  .kpi-delta.yellow { background: var(--warning-light); color: #d97706; }
+  .kpi-delta.blue { background: var(--primary-light); color: var(--primary-dark); }
+
+  /* ── Main Grid ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-section-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+    background: var(--primary-light);
+    border-radius: 6px;
+    padding: 2px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .card-subtitle {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-left: auto;
+  }
+  .card-body { padding: 24px; }
+
+  /* ── Section labels ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+
+  /* ── Inputs/Sliders ── */
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 16px;
+  }
+  .input-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(74,108,247,0.4);
+    border: 2px solid #fff;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(74,108,247,0.4);
+  }
+  .slider-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    min-width: 80px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="number"], input[type="text"], select {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 8px 12px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type="number"]:focus, input[type="text"]:focus, select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(74,108,247,0.1);
+  }
+
+  /* ── Shift pattern buttons ── */
+  .shift-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .shift-btn {
+    padding: 10px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    color: var(--text-secondary);
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .shift-btn .shift-btn-sub {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    display: block;
+    margin-top: 2px;
+  }
+  .shift-btn.active {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary-dark);
+  }
+  .shift-btn.active .shift-btn-sub { color: var(--primary); }
+  .shift-btn:not(.active):hover { border-color: #c7d2fe; background: #f8f9ff; }
+
+  /* ── Stat rows ── */
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-row-label { color: var(--text-secondary); }
+  .stat-row-value { font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+
+  /* ── Util bars ── */
+  .util-bar-wrap { margin: 6px 0; }
+  .util-bar-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+  }
+  .util-bar-header .pct { font-weight: 700; }
+  .util-bar-track {
+    height: 10px;
+    background: var(--bg);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .util-bar-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.4s ease, background 0.4s ease;
+  }
+
+  /* ── Status banner ── */
+  .status-banner {
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s;
+    margin-top: 16px;
+  }
+  .status-banner.green { background: var(--success-light); color: #16a34a; border: 1px solid #bbf7d0; }
+  .status-banner.yellow { background: var(--warning-light); color: #d97706; border: 1px solid #fde68a; }
+  .status-banner.red { background: var(--danger-light); color: #dc2626; border: 1px solid #fecaca; }
+  .status-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: blink 2s infinite;
+  }
+  .status-banner.green .status-dot { background: #22c55e; }
+  .status-banner.yellow .status-dot { background: #f59e0b; }
+  .status-banner.red .status-dot { background: #ef4444; }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── Chart containers ── */
+  .chart-wrap { position: relative; }
+  .chart-wrap.h260 { height: 260px; }
+  .chart-wrap.h300 { height: 300px; }
+  .chart-wrap.h340 { height: 340px; }
+
+  /* ── Formula box ── */
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary-dark);
+    margin-bottom: 18px;
+    font-variant-numeric: tabular-nums;
+  }
+  .formula-box .formula-note {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-top: 3px;
+  }
+
+  /* ── Six-tenths ── */
+  .calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .equip-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .equip-table th {
+    background: var(--bg);
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 9px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .equip-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .equip-table tr:nth-child(even) td { background: #fafbfc; }
+  .equip-table tr:hover td { background: var(--primary-light); }
+  .equip-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .equip-table .blue { color: var(--primary-dark); font-weight: 700; }
+  .equip-table .green { color: #16a34a; font-weight: 700; }
+
+  /* ── Bottleneck bars ── */
+  .bn-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .bn-row:last-child { border-bottom: none; }
+  .bn-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    width: 100px;
+    flex-shrink: 0;
+  }
+  .bn-track {
+    flex: 1;
+    height: 22px;
+    background: var(--bg);
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .bn-fill {
+    height: 100%;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    transition: width 0.4s ease;
+  }
+  .bn-cap {
+    font-size: 12px;
+    font-weight: 700;
+    width: 80px;
+    text-align: right;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .bn-row.is-bottleneck .bn-track {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 2px rgba(231,76,60,0.15);
+  }
+
+  /* ── Legend pills ── */
+  .legend-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .legend-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── Gantt ── */
+  .gantt-wrap { overflow-x: auto; }
+  .gantt-phase-header {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 20px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--primary-light);
+  }
+  .gantt-grid {
+    display: grid;
+    gap: 5px;
+    min-width: 720px;
+  }
+  .gantt-header-row {
+    display: grid;
+    grid-template-columns: 200px repeat(7, 1fr);
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .gantt-row {
+    display: grid;
+    grid-template-columns: 200px repeat(7, 1fr);
+    align-items: center;
+    gap: 3px;
+  }
+  .gantt-task-name {
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding-right: 10px;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .gantt-cell { height: 24px; }
+  .gantt-bar {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    white-space: nowrap;
+    overflow: hidden;
+    border-radius: 5px;
+  }
+  .gantt-empty {
+    height: 24px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+  }
+  .gantt-milestone {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--warning);
+  }
+  .gantt-milestone::before { content: '◆'; font-size: 10px; }
+
+  /* ── Financial Gates ── */
+  .gates-banner {
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+  }
+  .gates-banner.green { background: var(--success-light); color: #16a34a; border: 1px solid #bbf7d0; }
+  .gates-banner.yellow { background: var(--warning-light); color: #d97706; border: 1px solid #fde68a; }
+  .gates-banner.red { background: var(--danger-light); color: #dc2626; border: 1px solid #fecaca; }
+
+  .gates-table { width: 100%; border-collapse: collapse; }
+  .gates-table th {
+    background: var(--bg);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .gates-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .gates-table tr:last-child td { border-bottom: none; }
+  .gates-table tr:nth-child(even) td { background: #fafbfc; }
+
+  .gate-input-name {
+    width: 100%;
+    font-size: 13px;
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: 6px;
+    padding: 5px 8px;
+    transition: all 0.15s;
+  }
+  .gate-input-name:hover, .gate-input-name:focus {
+    border-color: var(--border);
+    background: var(--card);
+  }
+  .gate-input-thresh {
+    width: 100%;
+    font-size: 12px;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: 6px;
+    padding: 5px 8px;
+    transition: all 0.15s;
+  }
+  .gate-input-thresh:hover, .gate-input-thresh:focus {
+    border-color: var(--border);
+    background: var(--card);
+    color: var(--text);
+  }
+  .gate-status-select {
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 20px;
+    padding: 4px 10px;
+    border: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    text-align: center;
+    min-width: 100px;
+  }
+  .gate-status-select.status-not-met { background: var(--danger-light); color: #dc2626; }
+  .gate-status-select.status-in-progress { background: var(--warning-light); color: #d97706; }
+  .gate-status-select.status-met { background: var(--success-light); color: #16a34a; }
+
+  .btn-delete-gate {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .btn-delete-gate:hover { background: var(--danger-light); color: #dc2626; border-color: #fecaca; }
+
+  .btn-add-gate {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 9px 16px;
+    border: 1px dashed var(--primary);
+    border-radius: var(--radius-sm);
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    width: fit-content;
+  }
+  .btn-add-gate:hover { background: #e0e7ff; }
+
+  /* ── Production Calendar ── */
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .cal-day-header {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-bottom: 4px;
+  }
+  .cal-day {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--card);
+    min-height: 90px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+  .cal-day:hover { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(74,108,247,0.1); }
+  .cal-day.active { border-color: var(--primary); background: var(--primary-light); }
+  .cal-day.inactive { background: var(--bg); opacity: 0.6; }
+  .cal-day-num {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    padding: 8px 10px 4px;
+    text-align: right;
+  }
+  .cal-day.inactive .cal-day-num { color: var(--text-secondary); }
+  .cal-shift-block {
+    margin: 2px 6px;
+    border-radius: 4px;
+    padding: 2px 5px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cal-off-badge {
+    margin: auto 6px 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 5px;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-align: center;
+    align-self: center;
+  }
+  .cal-summary {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .cal-stat-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 2px; }
+  .cal-stat-value { font-size: 20px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+
+  /* ── Divider ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0 14px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ── Phase toggle buttons (bottleneck) ── */
+  .toggle-group {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 18px;
+    width: fit-content;
+  }
+  .toggle-btn {
+    padding: 8px 18px;
+    border: none;
+    background: var(--card);
+    color: var(--text-secondary);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-right: 1px solid var(--border);
+  }
+  .toggle-btn:last-child { border-right: none; }
+  .toggle-btn.active { background: var(--primary); color: #fff; }
+  .toggle-btn:not(.active):hover { background: var(--bg); }
+
+  /* ── Crew badge ── */
+  .crew-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 1100px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 700px) {
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+    .container { padding: 16px; }
+    .site-header { padding: 0 16px; flex-wrap: wrap; height: auto; padding-top: 10px; padding-bottom: 10px; }
+    .calc-grid { grid-template-columns: 1fr 1fr; }
+    .shift-grid { grid-template-columns: repeat(2, 1fr); }
+    .cal-grid { grid-template-columns: repeat(7, 1fr); gap: 3px; }
+    .cal-day { min-height: 60px; }
+    .cal-summary { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="site-header">
+  <div class="header-logo">🏭</div>
+  <div>
+    <div class="header-title">Tortilla Chip Factory — Capacity Planning</div>
+    <div class="header-sub">Manufacturing Execution System · Perry's Chemical Engineers' Handbook</div>
+  </div>
+  <div class="header-spacer"></div>
+  <div class="phase-pills" role="group" aria-label="Active phase">
+    <button class="phase-pill active" id="global-ph1" onclick="setGlobalPhase(1)">Phase 1</button>
+    <button class="phase-pill" id="global-ph2" onclick="setGlobalPhase(2)">Phase 2</button>
+    <button class="phase-pill" id="global-ph3" onclick="setGlobalPhase(3)">Phase 3</button>
+  </div>
+  <div class="live-clock" id="live-clock">00:00:00</div>
+</header>
+
+<div class="container">
+
+<!-- ── KPI ROW ── -->
+<div class="kpi-row">
+  <div class="kpi-tile">
+    <div class="kpi-label">Current Utilization</div>
+    <div class="kpi-value" id="kpi-util">—</div>
+    <div class="kpi-delta green" id="kpi-util-badge">— of phase max</div>
+  </div>
+  <div class="kpi-tile">
+    <div class="kpi-label">Weekly Capacity</div>
+    <div class="kpi-value" id="kpi-capacity">—</div>
+    <div class="kpi-delta blue" id="kpi-capacity-badge">bags / week</div>
+  </div>
+  <div class="kpi-tile">
+    <div class="kpi-label">Weeks to Trigger</div>
+    <div class="kpi-value" id="kpi-weeks">—</div>
+    <div class="kpi-delta yellow" id="kpi-weeks-badge">at current growth</div>
+  </div>
+  <div class="kpi-tile">
+    <div class="kpi-label">Annual Operating Hours</div>
+    <div class="kpi-value" id="kpi-annual-hrs">—</div>
+    <div class="kpi-delta blue" id="kpi-annual-badge">hrs / year</div>
+  </div>
+  <div class="kpi-tile">
+    <div class="kpi-label">Estimated OEE</div>
+    <div class="kpi-value" id="kpi-oee">—</div>
+    <div class="kpi-delta green" id="kpi-oee-badge">A × P × Q</div>
+  </div>
+</div>
+
+<!-- ── MAIN 2-COL GRID ── -->
+<div class="main-grid">
+
+  <!-- LEFT: UTILIZATION MODEL -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-section-num">§1</span>
+      <span class="card-title">Utilization Model</span>
+      <span class="card-subtitle">Live Calculation</span>
+    </div>
+    <div class="card-body">
+
+      <div class="formula-box">
+        Utilization = Output ÷ Capacity × 100%
+        <div class="formula-note">Capacity = shifts/day × effective hrs/shift × bags/hr × operating days</div>
+      </div>
+
+      <!-- Shift Pattern Selector -->
+      <div class="section-label">Shift Pattern</div>
+      <div class="shift-grid" id="shift-btns">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Sliders -->
+      <div class="input-group">
+        <div class="input-label">Current Weekly Bag Output</div>
+        <div class="slider-row">
+          <input type="range" id="sl-output" min="0" max="20000" value="500" step="10">
+          <div class="slider-value"><span id="v-output">500</span> bags</div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Weekly Growth Rate (bags/week/week)</div>
+        <div class="slider-row">
+          <input type="range" id="sl-growth" min="0" max="400" value="20" step="1">
+          <div class="slider-value"><span id="v-growth">20</span> bags/wk</div>
+        </div>
+      </div>
+
+      <!-- Crew & schedule info -->
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:18px;display:flex;flex-direction:column;gap:8px;">
+        <div class="stat-row"><span class="stat-row-label">Crews required</span><span class="stat-row-value" id="stat-crews">—</span></div>
+        <div class="stat-row"><span class="stat-row-label">Weekly production hours</span><span class="stat-row-value" id="stat-prod-hrs">—</span></div>
+        <div class="stat-row"><span class="stat-row-label">Overtime factor</span><span class="stat-row-value" id="stat-ot">—</span></div>
+        <div class="stat-row"><span class="stat-row-label">Phase capacity (bags/wk)</span><span class="stat-row-value" id="stat-phase-cap">—</span></div>
+      </div>
+
+      <!-- OEE Estimation -->
+      <div class="divider">OEE — Overall Equipment Effectiveness</div>
+      <div class="formula-box" style="margin-bottom:14px;font-size:12px;">
+        OEE = Availability × Performance × Quality
+        <div class="formula-note">World-class OEE ≥ 85% (A:90% × P:95% × Q:99.9%). Effective capacity = theoretical capacity × OEE.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px;">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+            <span class="input-label" style="margin:0;font-size:11px;">Availability</span>
+            <span style="font-size:13px;font-weight:700;color:var(--text);" id="v-oee-a">90</span><span style="font-size:11px;color:var(--text-secondary);">%</span>
+          </div>
+          <input type="range" id="sl-oee-a" min="50" max="100" value="90" step="1" style="width:100%;">
+          <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">Uptime vs scheduled time</div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+            <span class="input-label" style="margin:0;font-size:11px;">Performance</span>
+            <span style="font-size:13px;font-weight:700;color:var(--text);" id="v-oee-p">95</span><span style="font-size:11px;color:var(--text-secondary);">%</span>
+          </div>
+          <input type="range" id="sl-oee-p" min="50" max="100" value="95" step="1" style="width:100%;">
+          <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">Actual vs ideal cycle time</div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+            <span class="input-label" style="margin:0;font-size:11px;">Quality</span>
+            <span style="font-size:13px;font-weight:700;color:var(--text);" id="v-oee-q">99</span><span style="font-size:11px;color:var(--text-secondary);">%</span>
+          </div>
+          <input type="range" id="sl-oee-q" min="80" max="100" value="99" step="0.5" style="width:100%;">
+          <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">Good bags vs total produced</div>
+        </div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+        <div class="stat-row" style="flex:1;min-width:140px;"><span class="stat-row-label">OEE</span><span class="stat-row-value" id="stat-oee" style="font-size:16px;">—</span></div>
+        <div class="stat-row" style="flex:1;min-width:140px;"><span class="stat-row-label">Effective capacity</span><span class="stat-row-value" id="stat-eff-cap">—</span></div>
+        <div class="stat-row" style="flex:1;min-width:140px;"><span class="stat-row-label">OEE loss</span><span class="stat-row-value" id="stat-oee-loss" style="color:var(--danger);">—</span></div>
+      </div>
+
+      <!-- Utilization bars -->
+      <div class="divider">Utilization vs Phase Capacity</div>
+
+      <div class="util-bar-wrap">
+        <div class="util-bar-header">
+          <span id="bar-label-1">Phase 1 Utilization</span>
+          <span class="pct" id="bar-pct-1" style="color:var(--success);">—%</span>
+        </div>
+        <div class="util-bar-track">
+          <div class="util-bar-fill" id="bar-fill-1" style="width:0%;background:var(--success);"></div>
+        </div>
+      </div>
+      <div class="util-bar-wrap" style="margin-top:10px;">
+        <div class="util-bar-header">
+          <span id="bar-label-2">Trigger Threshold (70%)</span>
+          <span class="pct" id="bar-pct-2" style="color:var(--primary);">—%</span>
+        </div>
+        <div class="util-bar-track">
+          <div class="util-bar-fill" id="bar-fill-2" style="width:0%;background:var(--primary);"></div>
+        </div>
+      </div>
+
+      <div class="status-banner green" id="status-banner">
+        <div class="status-dot"></div>
+        <div id="status-text">Loading...</div>
+      </div>
+
+      <!-- Projection chart -->
+      <div style="margin-top:20px;">
+        <div class="section-label" style="margin-bottom:12px;">26-Week Output Projection</div>
+        <div class="chart-wrap h260">
+          <canvas id="util-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: PRODUCTION CALENDAR + BOTTLENECK -->
+  <div style="display:flex;flex-direction:column;gap:24px;">
+
+    <!-- Production Plan Calendar -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-section-num">§6</span>
+        <span class="card-title">Production Plan Calendar</span>
+        <span class="card-subtitle">Click days to toggle production</span>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <span style="font-size:12px;color:var(--text-secondary);">Week of:</span>
+          <span style="font-size:13px;font-weight:700;color:var(--text);" id="cal-week-label">—</span>
+        </div>
+        <div class="cal-grid" id="cal-day-headers">
+          <!-- Day headers populated by JS -->
+        </div>
+        <div class="cal-grid" id="cal-days">
+          <!-- Day cells populated by JS -->
+        </div>
+        <div class="cal-summary">
+          <div>
+            <div class="cal-stat-label">Production hours</div>
+            <div class="cal-stat-value" id="cal-prod-hrs">—</div>
+          </div>
+          <div>
+            <div class="cal-stat-label">Bags capacity</div>
+            <div class="cal-stat-value" id="cal-bags-cap">—</div>
+          </div>
+          <div>
+            <div class="cal-stat-label">% of phase max</div>
+            <div class="cal-stat-value" id="cal-pct-max">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottleneck Analysis -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-section-num">§3</span>
+        <span class="card-title">Bottleneck Analysis</span>
+        <span class="card-subtitle">lb/hr throughput</span>
+      </div>
+      <div class="card-body">
+
+        <div class="toggle-group" id="bn-phase-toggle">
+          <button class="toggle-btn active" id="btn-bn-p1" onclick="setBottleneckPhase(1)">Phase 1</button>
+          <button class="toggle-btn" id="btn-bn-p2" onclick="setBottleneckPhase(2)">Phase 2</button>
+          <button class="toggle-btn" id="btn-bn-p3" onclick="setBottleneckPhase(3)">Phase 3</button>
+        </div>
+
+        <div class="input-group">
+          <div class="input-label">Throughput Requirement (lb/hr)</div>
+          <div class="slider-row">
+            <input type="range" id="sl-throughput" min="10" max="350" value="47" step="1">
+            <div class="slider-value"><span id="v-throughput">47</span> lb/hr</div>
+          </div>
+        </div>
+
+        <div id="bottleneck-bars" style="margin-bottom:12px;"></div>
+
+        <div class="legend-row">
+          <div class="legend-pill"><div class="legend-dot" style="background:#22c55e;"></div>&gt;120% req</div>
+          <div class="legend-pill"><div class="legend-dot" style="background:#f59e0b;"></div>100-120% req</div>
+          <div class="legend-pill"><div class="legend-dot" style="background:#ef4444;"></div>&lt;100% (bottleneck)</div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <div class="section-label" style="margin-bottom:10px;">Capacity vs Requirement</div>
+          <div class="chart-wrap h300">
+            <canvas id="bottleneck-chart"></canvas>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;font-size:12px;color:var(--text-secondary);line-height:1.7;">
+          <strong style="color:var(--text);">Basis:</strong> 10 oz bag ≈ 0.625 lb finished chip · Yield ~80% (dough→fried) ·
+          Mixer: 63 lb batch / 20 min = 3 batches/hr = 189 lb/hr · P1 pkg: 75 bags/hr × 0.625 = 47 lb/hr ·
+          P2 pkg: 210 bags/hr × 0.625 = 131 lb/hr · P3 pkg: 427 bags/hr × 0.625 = 267 lb/hr
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 2: SIX-TENTHS RULE (FULL WIDTH) ── -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-section-num">§2</span>
+    <span class="card-title">Six-Tenths Rule Scaling</span>
+    <span class="card-subtitle">Perry's Ch. 28 · C₂ = C₁ × (Q₂/Q₁)^n</span>
+  </div>
+  <div class="card-body">
+
+    <div class="formula-box">
+      C₂ = C₁ × (Q₂ / Q₁)^n
+      <div class="formula-note">C = cost, Q = capacity, n = scaling exponent (typically 0.6 for most equipment)</div>
+    </div>
+
+    <!-- Calculator -->
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;margin-bottom:22px;">
+      <div class="section-label">Custom Calculator</div>
+      <div class="calc-grid">
+        <div class="input-group" style="margin-bottom:0;">
+          <div class="input-label">Base Capacity Q₁</div>
+          <input type="number" id="calc-q1" value="200" min="1">
+        </div>
+        <div class="input-group" style="margin-bottom:0;">
+          <div class="input-label">Base Cost C₁ ($)</div>
+          <input type="number" id="calc-c1" value="35000" min="1">
+        </div>
+        <div class="input-group" style="margin-bottom:0;">
+          <div class="input-label">Scaling Exponent n</div>
+          <input type="number" id="calc-n" value="0.62" min="0.1" max="1.0" step="0.01">
+        </div>
+        <div class="input-group" style="margin-bottom:0;">
+          <div class="input-label">Target Capacity Q₂</div>
+          <input type="number" id="calc-q2" value="400" min="1">
+        </div>
+        <div style="grid-column:span 2; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px;">
+          <div class="kpi-label" style="margin-bottom:6px;">Estimated Cost C₂</div>
+          <div style="font-size:28px;font-weight:700;color:#16a34a;font-variant-numeric:tabular-nums;" id="calc-result">—</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;" id="calc-formula-display">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Equipment table -->
+    <div style="overflow-x:auto;margin-bottom:24px;">
+      <table class="equip-table">
+        <thead>
+          <tr>
+            <th>Equipment</th>
+            <th>Base Cap (Q₁)</th>
+            <th>Base Cost (C₁)</th>
+            <th>Exponent (n)</th>
+            <th>Target Q₂ <span style="font-weight:400;text-transform:none;">(edit)</span></th>
+            <th>Est. Cost C₂</th>
+            <th>Scale Factor</th>
+          </tr>
+        </thead>
+        <tbody id="equip-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Log-log chart -->
+    <div class="section-label" style="margin-bottom:10px;">Log-Log Chart: Capacity vs Cost (Scaling Curves)</div>
+    <div class="chart-wrap h340">
+      <canvas id="sixtenths-chart"></canvas>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── SECTION 4: GANTT (FULL WIDTH) ── -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-section-num">§4</span>
+    <span class="card-title">Expansion Timeline</span>
+    <span class="card-subtitle">Gantt · Phase 1→2 and Phase 2→3</span>
+  </div>
+  <div class="card-body">
+    <div class="gantt-wrap">
+      <div class="gantt-phase-header">Phase 1 → Phase 2 (trigger: ~600 bags/wk sustained)</div>
+      <div class="gantt-grid" id="gantt-p12"></div>
+      <div class="gantt-milestone">Phase 2 Operational · Target: Month 6</div>
+
+      <div class="gantt-phase-header" style="margin-top:28px;">Phase 2 → Phase 3 (trigger: ~6,000 bags/wk sustained)</div>
+      <div class="gantt-grid" id="gantt-p23"></div>
+      <div class="gantt-milestone">Phase 3 Operational · Target: Month 6</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 5: FINANCIAL GATES (FULL WIDTH) ── -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-section-num">§5</span>
+    <span class="card-title">Financial Gates</span>
+    <span class="card-subtitle">Expansion Decision Criteria · Editable · Auto-saved</span>
+  </div>
+  <div class="card-body">
+
+    <div class="gates-banner green" id="gates-banner">
+      <div class="status-dot" style="width:10px;height:10px;border-radius:50%;background:#22c55e;animation:blink 2s infinite;flex-shrink:0;"></div>
+      <span id="gates-banner-text">Computing gate status...</span>
+    </div>
+
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;background:var(--warning-light);border:1px solid #fde68a;border-radius:var(--radius-sm);padding:11px 14px;">
+      All gates must be satisfied simultaneously before committing capex. Partial satisfaction = monitor, not act.
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="gates-table">
+        <thead>
+          <tr>
+            <th style="width:220px;">Gate Criterion</th>
+            <th style="width:200px;">Phase 1→2 Threshold</th>
+            <th style="width:200px;">Phase 2→3 Threshold</th>
+            <th style="width:130px;text-align:center;">Status</th>
+            <th style="width:48px;"></th>
+          </tr>
+        </thead>
+        <tbody id="gates-tbody"></tbody>
+      </table>
+    </div>
+    <button class="btn-add-gate" onclick="addGate()">+ Add Gate</button>
+
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONSTANTS & STATE
+// ═══════════════════════════════════════════════════════════════
+
+const PHASE_BAGS_PER_HR = { 1: 47, 2: 133, 3: 267 };
+const PHASE_MAX = { 1: 47*40, 2: 133*60, 3: 267*84 }; // rough max weekly bags (overridden by live calc)
+const PHASE_TRIGGER = { 1: 600, 2: 6000, 3: null };
+
+const SHIFT_PATTERNS = [
+  { key: '1x8',     label: '1×8',     sub: '1 shift/day',    shiftsPerDay: 1, hoursPerShift: 8,  effectiveHrs: 6,  operatingDays: null, crewsNeeded: 1, otFactor: 'None' },
+  { key: '2x8',     label: '2×8',     sub: '2 shifts/day',   shiftsPerDay: 2, hoursPerShift: 8,  effectiveHrs: 6,  operatingDays: null, crewsNeeded: 2, otFactor: 'Low' },
+  { key: '3x8-5',   label: '3×8 (5d)',sub: '24/5',           shiftsPerDay: 3, hoursPerShift: 8,  effectiveHrs: 6,  operatingDays: 5,    crewsNeeded: 4, otFactor: 'Moderate' },
+  { key: '3x8-7',   label: '3×8 (7d)',sub: '24/7',           shiftsPerDay: 3, hoursPerShift: 8,  effectiveHrs: 6,  operatingDays: 7,    crewsNeeded: 4, otFactor: 'Moderate' },
+  { key: '2x12',    label: '2×12',    sub: '24/7 rotating',  shiftsPerDay: 2, hoursPerShift: 12, effectiveHrs: 10, operatingDays: 7,    crewsNeeded: 3, otFactor: 'None (flex)' },
+  { key: 'panama',  label: 'Panama',  sub: '4×12 rotating',  shiftsPerDay: 2, hoursPerShift: 12, effectiveHrs: 10, operatingDays: 7,    crewsNeeded: 4, otFactor: 'None (flex)' },
+];
+
+// Days where operating days are user-selectable (null)
+const SELECTABLE_DAYS_PATTERNS = new Set(['1x8', '2x8']);
+
+let globalPhase = 1;
+let selectedShiftKey = '1x8';
+let userOperatingDays = 3; // used for selectable patterns
+let calActiveDays = [1,2,3,4,5]; // Mon-Fri active by default
+
+let utilChart = null;
+let bottleneckChart = null;
+let sixChart = null;
+let currentBnPhase = 1;
+
+// OEE defaults (world-class: 90×95×99.9 = 85.1%)
+let oeeAvailability = 90;
+let oeePerformance = 95;
+let oeeQuality = 99;
+
+function getOEE() {
+  return (oeeAvailability / 100) * (oeePerformance / 100) * (oeeQuality / 100);
+}
+
+function getOEEPct() {
+  return getOEE() * 100;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════
+
+function fmt(n, dec=1) { return Number(n).toFixed(dec); }
+function fmtNum(n) { return Math.round(n).toLocaleString(); }
+function fmtK(n) { return n >= 1000 ? '$' + (n/1000).toFixed(1) + 'K' : '$' + Math.round(n).toLocaleString(); }
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+// Live clock
+function updateClock() {
+  const el = document.getElementById('live-clock');
+  if (el) el.textContent = new Date().toLocaleTimeString('en-US', {hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ═══════════════════════════════════════════════════════════════
+// GLOBAL PHASE SELECTOR
+// ═══════════════════════════════════════════════════════════════
+
+function setGlobalPhase(p) {
+  globalPhase = p;
+  [1,2,3].forEach(i => {
+    const el = document.getElementById(`global-ph${i}`);
+    el.classList.toggle('active', i === p);
+  });
+  // Sync bottleneck
+  setBottleneckPhase(p);
+  updateUtil();
+  updateCalendar();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SHIFT PATTERN LOGIC
+// ═══════════════════════════════════════════════════════════════
+
+function buildShiftButtons() {
+  const container = document.getElementById('shift-btns');
+  container.innerHTML = '';
+  SHIFT_PATTERNS.forEach(sp => {
+    const btn = document.createElement('button');
+    btn.className = 'shift-btn' + (sp.key === selectedShiftKey ? ' active' : '');
+    btn.dataset.key = sp.key;
+    btn.innerHTML = `${sp.label}<span class="shift-btn-sub">${sp.sub}</span>`;
+    btn.onclick = () => selectShift(sp.key);
+    container.appendChild(btn);
+  });
+}
+
+function selectShift(key) {
+  selectedShiftKey = key;
+  document.querySelectorAll('.shift-btn').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+  updateUtil();
+  updateCalendar();
+  saveState();
+}
+
+function getShiftPattern() {
+  return SHIFT_PATTERNS.find(s => s.key === selectedShiftKey) || SHIFT_PATTERNS[0];
+}
+
+function getOperatingDays(sp) {
+  return sp.operatingDays !== null ? sp.operatingDays : userOperatingDays;
+}
+
+function getWeeklyProductionHours(sp) {
+  const days = getOperatingDays(sp);
+  return sp.shiftsPerDay * sp.effectiveHrs * days;
+}
+
+function getWeeklyCapacityBags(sp, phase) {
+  const bph = PHASE_BAGS_PER_HR[phase] || 47;
+  return getWeeklyProductionHours(sp) * bph;
+}
+
+function getAnnualHours(sp) {
+  const days = getOperatingDays(sp);
+  return sp.shiftsPerDay * sp.effectiveHrs * days * 52;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SECTION 1: UTILIZATION MODEL
+// ═══════════════════════════════════════════════════════════════
+
+function initUtilChart() {
+  const ctx = document.getElementById('util-chart').getContext('2d');
+  utilChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Projected Output', data: [], borderColor: '#4a6cf7', backgroundColor: 'rgba(74,108,247,0.08)', borderWidth: 2, fill: true, tension: 0.3, pointRadius: 0 },
+        { label: 'Phase Max', data: [], borderColor: '#e74c3c', borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, fill: false },
+        { label: 'Trigger (70% max)', data: [], borderColor: '#f59e0b', borderWidth: 1, borderDash: [3,4], pointRadius: 0, fill: false },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { intersect: false, mode: 'index' },
+      plugins: {
+        legend: { labels: { color: '#6b7280', font: { family: "'Inter', sans-serif", size: 11 }, boxWidth: 20, padding: 14 } },
+        tooltip: { backgroundColor: '#fff', borderColor: '#e5e7eb', borderWidth: 1, titleColor: '#1a1a2e', bodyColor: '#6b7280', titleFont: { family: "'Inter', sans-serif", size: 12, weight: '700' }, bodyFont: { family: "'Inter', sans-serif", size: 12 }, padding: 10 }
+      },
+      scales: {
+        x: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { color: '#f0f2f5' }, title: { display: true, text: 'Weeks from Now', color: '#9ca3af', font: { size: 10 } } },
+        y: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { color: '#f0f2f5' }, title: { display: true, text: 'Bags / Week', color: '#9ca3af', font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+function updateUtil() {
+  const output = parseInt(document.getElementById('sl-output').value) || 0;
+  const growth = parseInt(document.getElementById('sl-growth').value) || 0;
+  const sp = getShiftPattern();
+  const phase = globalPhase;
+  const bph = PHASE_BAGS_PER_HR[phase];
+
+  document.getElementById('v-output').textContent = fmtNum(output);
+  document.getElementById('v-growth').textContent = fmtNum(growth);
+
+  const weeklyProdHrs = getWeeklyProductionHours(sp);
+  const theoreticalCapacity = weeklyProdHrs * bph;
+  const oee = getOEE();
+  const oeePct = getOEEPct();
+  const weeklyCapacity = theoreticalCapacity * oee;  // effective capacity after OEE
+  const annualHrs = getAnnualHours(sp);
+  const days = getOperatingDays(sp);
+
+  // OEE slider readbacks
+  document.getElementById('v-oee-a').textContent = oeeAvailability;
+  document.getElementById('v-oee-p').textContent = oeePerformance;
+  document.getElementById('v-oee-q').textContent = fmt(oeeQuality, 1);
+
+  // OEE stats
+  document.getElementById('stat-oee').textContent = fmt(oeePct, 1) + '%';
+  document.getElementById('stat-eff-cap').textContent = `${fmtNum(weeklyCapacity)} bags/wk`;
+  document.getElementById('stat-oee-loss').textContent = `−${fmtNum(theoreticalCapacity - weeklyCapacity)} bags/wk`;
+
+  // Crew logic
+  let crewText = `${sp.crewsNeeded} crew${sp.crewsNeeded > 1 ? 's' : ''}`;
+  document.getElementById('stat-crews').textContent = crewText;
+  document.getElementById('stat-prod-hrs').textContent = `${fmt(weeklyProdHrs, 1)} hrs`;
+  document.getElementById('stat-ot').textContent = sp.otFactor;
+  document.getElementById('stat-phase-cap').textContent = `${fmtNum(theoreticalCapacity)} bags (theoretical)`;
+
+  // Utilization (against OEE-adjusted capacity)
+  const util = weeklyCapacity > 0 ? (output / weeklyCapacity) * 100 : 0;
+  const trigger = weeklyCapacity * 0.70;
+
+  // KPI tiles
+  document.getElementById('kpi-util').textContent = fmt(util, 1) + '%';
+  document.getElementById('kpi-capacity').textContent = fmtNum(weeklyCapacity);
+  document.getElementById('kpi-annual-hrs').textContent = fmtNum(annualHrs);
+
+  // OEE KPI tile
+  document.getElementById('kpi-oee').textContent = fmt(oeePct, 1) + '%';
+  const oeeBadge = document.getElementById('kpi-oee-badge');
+  if (oeePct >= 85) {
+    oeeBadge.textContent = 'World-class';
+    oeeBadge.className = 'kpi-delta green';
+  } else if (oeePct >= 60) {
+    oeeBadge.textContent = 'Typical';
+    oeeBadge.className = 'kpi-delta yellow';
+  } else {
+    oeeBadge.textContent = 'Below average';
+    oeeBadge.className = 'kpi-delta red';
+  }
+
+  const utilBadge = document.getElementById('kpi-util-badge');
+  utilBadge.textContent = util < 60 ? 'Low utilization' : util < 80 ? 'Planning zone' : 'Critical — expand';
+  utilBadge.className = 'kpi-delta ' + (util < 60 ? 'green' : util < 80 ? 'yellow' : 'red');
+
+  const trigger_phase = PHASE_TRIGGER[phase];
+  let weeksToTrigger;
+  if (!trigger_phase) { weeksToTrigger = '—'; document.getElementById('kpi-weeks-badge').textContent = 'Final phase'; }
+  else if (growth <= 0) { weeksToTrigger = '∞'; document.getElementById('kpi-weeks-badge').textContent = 'No growth'; }
+  else if (output >= trigger_phase) { weeksToTrigger = '0'; document.getElementById('kpi-weeks-badge').textContent = 'Trigger already hit'; }
+  else {
+    const wks = Math.ceil((trigger_phase - output) / growth);
+    weeksToTrigger = wks.toLocaleString();
+    document.getElementById('kpi-weeks-badge').textContent = `at +${growth} bags/wk`;
+  }
+  document.getElementById('kpi-weeks').textContent = weeksToTrigger;
+
+  // Utilization bars
+  const pct1 = clamp(util, 0, 100);
+  const pct2 = clamp((output / Math.max(weeklyCapacity * 0.70, 1)) * 100, 0, 100);
+  const barColor = util < 60 ? '#22c55e' : util < 80 ? '#f59e0b' : '#ef4444';
+
+  document.getElementById('bar-label-1').textContent = `Phase ${phase} Utilization (${fmtNum(weeklyCapacity)} bags/wk effective)`;
+  document.getElementById('bar-fill-1').style.width = pct1 + '%';
+  document.getElementById('bar-fill-1').style.background = barColor;
+  document.getElementById('bar-pct-1').textContent = fmt(util, 1) + '%';
+  document.getElementById('bar-pct-1').style.color = barColor;
+
+  document.getElementById('bar-fill-2').style.width = pct2 + '%';
+  document.getElementById('bar-pct-2').textContent = fmt(Math.min(util / 0.70, 100), 1) + '%';
+
+  // Status banner
+  const banner = document.getElementById('status-banner');
+  const txt = document.getElementById('status-text');
+  banner.className = 'status-banner';
+  if (util < 60) {
+    banner.classList.add('green');
+    txt.textContent = `OPTIMIZE — Utilization ${fmt(util,1)}% < 60% threshold. Focus on cost reduction and margin improvement.`;
+  } else if (util < 80) {
+    banner.classList.add('yellow');
+    txt.textContent = `PLANNING — ${fmt(util,1)}% in 60-80% zone. Begin Phase ${phase+1} planning NOW (3-6 month lead time required).`;
+  } else {
+    banner.classList.add('red');
+    txt.textContent = `CRITICAL — ${fmt(util,1)}% > 80%. Phase ${phase+1} expansion is capacity-constrained. Initiate immediately.`;
+  }
+
+  // Chart projection (26 weeks)
+  const phaseMax = weeklyCapacity;
+  const weeks = Array.from({length: 27}, (_, i) => i);
+  const projOut = weeks.map(w => Math.min(output + w * growth, phaseMax * 2));
+  if (utilChart) {
+    utilChart.data.labels = weeks.map(w => `W${w}`);
+    utilChart.data.datasets[0].data = projOut;
+    utilChart.data.datasets[1].data = weeks.map(() => phaseMax);
+    utilChart.data.datasets[2].data = weeks.map(() => phaseMax * 0.70);
+    utilChart.data.datasets[0].label = 'Projected Output';
+    utilChart.data.datasets[1].label = `Phase ${phase} Max (${fmtNum(phaseMax)})`;
+    utilChart.data.datasets[2].label = `70% Trigger (${fmtNum(phaseMax * 0.70)})`;
+    utilChart.update('none');
+  }
+}
+
+['sl-output','sl-growth'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => { updateUtil(); updateCalendar(); });
+});
+
+// OEE sliders
+document.getElementById('sl-oee-a').addEventListener('input', e => { oeeAvailability = Number(e.target.value); updateUtil(); updateCalendar(); saveState(); });
+document.getElementById('sl-oee-p').addEventListener('input', e => { oeePerformance = Number(e.target.value); updateUtil(); updateCalendar(); saveState(); });
+document.getElementById('sl-oee-q').addEventListener('input', e => { oeeQuality = Number(e.target.value); updateUtil(); updateCalendar(); saveState(); });
+
+// ═══════════════════════════════════════════════════════════════
+// SECTION 6: PRODUCTION PLAN CALENDAR
+// ═══════════════════════════════════════════════════════════════
+
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const SHIFT_COLORS = ['#4a6cf7','#7c3aed','#059669'];
+
+function buildCalendarHeaders() {
+  const hdr = document.getElementById('cal-day-headers');
+  hdr.innerHTML = '';
+  DAY_NAMES.forEach(d => {
+    const div = document.createElement('div');
+    div.className = 'cal-day-header';
+    div.textContent = d;
+    hdr.appendChild(div);
+  });
+}
+
+function updateCalendar() {
+  const sp = getShiftPattern();
+  const phase = globalPhase;
+  const bph = PHASE_BAGS_PER_HR[phase];
+  const phaseMax = getWeeklyCapacityBags(sp, phase);
+
+  // Week label
+  const today = new Date();
+  const dow = today.getDay();
+  const sunday = new Date(today);
+  sunday.setDate(today.getDate() - dow);
+  const saturday = new Date(sunday);
+  saturday.setDate(sunday.getDate() + 6);
+  const fmt2 = d => d.toLocaleDateString('en-US', {month:'short',day:'numeric'});
+  document.getElementById('cal-week-label').textContent = `${fmt2(sunday)} – ${fmt2(saturday)}`;
+
+  const container = document.getElementById('cal-days');
+  container.innerHTML = '';
+
+  // Compute effective active days based on pattern
+  let activeDayIndices;
+  if (SELECTABLE_DAYS_PATTERNS.has(sp.key)) {
+    activeDayIndices = calActiveDays.slice(); // user-toggled
+  } else {
+    // For fixed patterns use the operating days count
+    const ops = getOperatingDays(sp);
+    if (ops === 7) activeDayIndices = [0,1,2,3,4,5,6];
+    else if (ops === 5) activeDayIndices = [1,2,3,4,5];
+    else activeDayIndices = [1,2,3,4,5].slice(0, ops);
+  }
+
+  let totalProdHrs = 0;
+  const isSelectable = SELECTABLE_DAYS_PATTERNS.has(sp.key);
+
+  for (let d = 0; d < 7; d++) {
+    const isActive = activeDayIndices.includes(d);
+    const dayDate = new Date(sunday);
+    dayDate.setDate(sunday.getDate() + d);
+
+    const cell = document.createElement('div');
+    cell.className = 'cal-day' + (isActive ? ' active' : ' inactive');
+    if (isSelectable) {
+      cell.style.cursor = 'pointer';
+      cell.onclick = () => toggleCalDay(d);
+    } else {
+      cell.style.cursor = 'default';
+    }
+
+    const dayNum = document.createElement('div');
+    dayNum.className = 'cal-day-num';
+    dayNum.textContent = dayDate.getDate();
+    cell.appendChild(dayNum);
+
+    if (isActive) {
+      // Draw shift blocks
+      for (let s = 0; s < sp.shiftsPerDay; s++) {
+        const block = document.createElement('div');
+        block.className = 'cal-shift-block';
+        block.style.background = SHIFT_COLORS[s % SHIFT_COLORS.length];
+        const startHr = s * sp.hoursPerShift;
+        const endHr = startHr + sp.hoursPerShift;
+        block.textContent = `${startHr.toString().padStart(2,'0')}:00–${endHr.toString().padStart(2,'0')}:00`;
+        cell.appendChild(block);
+      }
+      totalProdHrs += sp.shiftsPerDay * sp.effectiveHrs;
+    } else {
+      const off = document.createElement('div');
+      off.className = 'cal-off-badge';
+      off.textContent = 'OFF';
+      cell.appendChild(off);
+    }
+
+    container.appendChild(cell);
+  }
+
+  // Summary (apply OEE to effective bags)
+  const bagsThisWeekTheoretical = totalProdHrs * bph;
+  const bagsThisWeek = bagsThisWeekTheoretical * getOEE();
+  const pctOfMax = phaseMax > 0 ? (bagsThisWeek / (phaseMax * getOEE()) * 100) : 0;
+  document.getElementById('cal-prod-hrs').textContent = `${totalProdHrs} hrs`;
+  document.getElementById('cal-bags-cap').textContent = `${fmtNum(bagsThisWeek)} (eff.)`;
+  document.getElementById('cal-pct-max').textContent = fmt(pctOfMax, 1) + '%';
+}
+
+function toggleCalDay(dayIndex) {
+  const idx = calActiveDays.indexOf(dayIndex);
+  if (idx >= 0) {
+    calActiveDays.splice(idx, 1);
+  } else {
+    calActiveDays.push(dayIndex);
+    calActiveDays.sort();
+  }
+  userOperatingDays = calActiveDays.length;
+  updateUtil();
+  updateCalendar();
+  saveState();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SECTION 2: SIX-TENTHS RULE
+// ═══════════════════════════════════════════════════════════════
+
+const EQUIPMENT = [
+  { name: 'Batch Fryer',      unit: 'lb/hr',   q1: 50,  c1: 8000,  n: 0.53, q2default: 100 },
+  { name: 'Continuous Fryer', unit: 'lb/hr',   q1: 200, c1: 35000, n: 0.62, q2default: 400 },
+  { name: 'Mixer',            unit: 'qt',      q1: 60,  c1: 5000,  n: 0.55, q2default: 120 },
+  { name: 'VFFS Packager',    unit: 'bag/min', q1: 15,  c1: 20000, n: 0.68, q2default: 30  },
+  { name: 'Stone Mill',       unit: 'lb/hr',   q1: 100, c1: 15000, n: 0.58, q2default: 250 },
+  { name: 'Cooling Conveyor', unit: 'ft',      q1: 10,  c1: 8000,  n: 0.72, q2default: 20  },
+];
+
+function sixCost(c1, q1, q2, n) { return c1 * Math.pow(q2 / q1, n); }
+
+function buildEquipTable() {
+  const tbody = document.getElementById('equip-tbody');
+  tbody.innerHTML = '';
+  EQUIPMENT.forEach((eq, i) => {
+    const c2 = sixCost(eq.c1, eq.q1, eq.q2default, eq.n);
+    const scale = c2 / eq.c1;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${eq.name}</td>
+      <td class="num">${eq.q1} ${eq.unit}</td>
+      <td class="num">$${eq.c1.toLocaleString()}</td>
+      <td class="num">${eq.n.toFixed(2)}</td>
+      <td class="num">
+        <input type="number" id="eq-q2-${i}" value="${eq.q2default}" min="1"
+          style="width:90px;font-size:13px;text-align:right;"
+          oninput="updateEquipRow(${i})">
+        <span style="font-size:11px;color:var(--text-secondary);">${eq.unit}</span>
+      </td>
+      <td class="num blue" id="eq-c2-${i}">${fmtK(c2)}</td>
+      <td class="num green" id="eq-scale-${i}">${scale.toFixed(2)}×</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateEquipRow(i) {
+  const eq = EQUIPMENT[i];
+  const q2 = parseFloat(document.getElementById(`eq-q2-${i}`).value) || eq.q1;
+  const c2 = sixCost(eq.c1, eq.q1, q2, eq.n);
+  const scale = c2 / eq.c1;
+  document.getElementById(`eq-c2-${i}`).textContent = fmtK(c2);
+  const scEl = document.getElementById(`eq-scale-${i}`);
+  scEl.textContent = scale.toFixed(2) + '×';
+  scEl.style.color = scale > 2 ? '#d97706' : '#16a34a';
+  if (sixChart) sixChart.update('none');
+}
+
+function updateCalcSixtenths() {
+  const q1 = parseFloat(document.getElementById('calc-q1').value) || 1;
+  const c1 = parseFloat(document.getElementById('calc-c1').value) || 1;
+  const q2 = parseFloat(document.getElementById('calc-q2').value) || 1;
+  const n  = parseFloat(document.getElementById('calc-n').value) || 0.6;
+  const c2 = sixCost(c1, q1, q2, n);
+  document.getElementById('calc-result').textContent = '$' + Math.round(c2).toLocaleString();
+  document.getElementById('calc-formula-display').textContent =
+    `$${c1.toLocaleString()} × (${q2}/${q1})^${n.toFixed(2)} = $${Math.round(c2).toLocaleString()}`;
+}
+
+['calc-q1','calc-c1','calc-q2','calc-n'].forEach(id =>
+  document.getElementById(id).addEventListener('input', () => { updateCalcSixtenths(); })
+);
+
+function initSixChart() {
+  const ctx = document.getElementById('sixtenths-chart').getContext('2d');
+  const colors = ['#4a6cf7','#22c55e','#f59e0b','#e74c3c','#7c3aed','#ec4899'];
+  const datasets = EQUIPMENT.map((eq, i) => {
+    const pts = [];
+    for (let mult = 0.25; mult <= 5; mult += 0.125) {
+      const q = eq.q1 * mult;
+      const c = sixCost(eq.c1, eq.q1, q, eq.n);
+      pts.push({ x: Math.log10(q / eq.q1), y: Math.log10(c / eq.c1) });
+    }
+    return { label: eq.name, data: pts, borderColor: colors[i], backgroundColor: 'transparent', borderWidth: 2, pointRadius: 0, tension: 0.2 };
+  });
+
+  sixChart = new Chart(ctx, {
+    type: 'scatter',
+    data: { datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#6b7280', font: { family: "'Inter', sans-serif", size: 11 }, boxWidth: 20, padding: 14 } },
+        tooltip: {
+          backgroundColor: '#fff', borderColor: '#e5e7eb', borderWidth: 1, titleColor: '#1a1a2e', bodyColor: '#6b7280',
+          callbacks: { label: ctx => `log₁₀(Q/Q₁)=${ctx.parsed.x.toFixed(2)}, log₁₀(C/C₁)=${ctx.parsed.y.toFixed(2)}` }
+        }
+      },
+      scales: {
+        x: { type: 'linear', ticks: { color: '#9ca3af', font: { size: 10 }, callback: v => `${Math.pow(10,v).toFixed(1)}× Q₁` }, grid: { color: '#f0f2f5' }, title: { display: true, text: 'log₁₀(Q₂/Q₁) — Capacity Ratio', color: '#9ca3af', font: { size: 10 } } },
+        y: { type: 'linear', ticks: { color: '#9ca3af', font: { size: 10 }, callback: v => `${Math.pow(10,v).toFixed(1)}× C₁` }, grid: { color: '#f0f2f5' }, title: { display: true, text: 'log₁₀(C₂/C₁) — Cost Ratio', color: '#9ca3af', font: { size: 10 } } }
+      },
+      showLine: true,
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SECTION 3: BOTTLENECK ANALYSIS
+// ═══════════════════════════════════════════════════════════════
+
+// lb/hr capacities per stage per phase
+const STAGES = {
+  1: [
+    { name: 'Mixer',     cap: 189, note: '63 lb/batch × 3 batches/hr' },
+    { name: 'Sheeter',   cap: 120, note: '120 lb/hr dough throughput' },
+    { name: 'Fryer',     cap: 80,  note: 'Batch fryer ~80 lb/hr wet' },
+    { name: 'Cooling',   cap: 200, note: 'Conveyor, rarely constrained' },
+    { name: 'Seasoning', cap: 300, note: 'Tumbler, rarely constrained' },
+    { name: 'Packaging', cap: 47,  note: 'Manual: 75 bags/hr × 0.625 lb' },
+  ],
+  2: [
+    { name: 'Mixer',     cap: 189, note: '63 lb/batch × 3 batches/hr' },
+    { name: 'Sheeter',   cap: 120, note: '120 lb/hr dough throughput' },
+    { name: 'Fryer',     cap: 258, note: 'Continuous fryer ~250 lb/hr wet' },
+    { name: 'Cooling',   cap: 200, note: 'Conveyor, rarely constrained' },
+    { name: 'Seasoning', cap: 300, note: 'Tumbler, rarely constrained' },
+    { name: 'Packaging', cap: 131, note: 'VFFS: 210 bags/hr × 0.625 lb' },
+  ],
+  3: [
+    { name: 'Nixtamal', cap: 400, note: 'Full nixtamal line' },
+    { name: 'Mixer',    cap: 350, note: 'High-cap dough mixer' },
+    { name: 'Sheeter',  cap: 350, note: 'Industrial sheeter' },
+    { name: 'Fryer',    cap: 400, note: 'Dual continuous fryer' },
+    { name: 'Cooling',  cap: 400, note: 'Extended conveyor' },
+    { name: 'Packaging',cap: 267, note: 'Multi-lane VFFS: 427 bags/hr × 0.625' },
+  ]
+};
+
+function setBottleneckPhase(p) {
+  currentBnPhase = p;
+  [1,2,3].forEach(i => {
+    const btn = document.getElementById(`btn-bn-p${i}`);
+    if (btn) btn.classList.toggle('active', i === p);
+  });
+  updateBottleneck();
+}
+
+function updateBottleneck() {
+  const reqLbHr = parseInt(document.getElementById('sl-throughput').value) || 47;
+  document.getElementById('v-throughput').textContent = reqLbHr;
+
+  const stages = STAGES[currentBnPhase] || STAGES[1];
+  const minCap = Math.min(...stages.map(s => s.cap));
+
+  // Bars
+  const barsEl = document.getElementById('bottleneck-bars');
+  barsEl.innerHTML = '';
+  stages.forEach(s => {
+    const ratio = (s.cap / reqLbHr) * 100;
+    const isBottle = s.cap === minCap && s.cap < reqLbHr;
+    const barColor = ratio >= 120 ? '#22c55e' : ratio >= 100 ? '#f59e0b' : '#ef4444';
+    const pct = clamp(ratio, 0, 100);
+
+    const row = document.createElement('div');
+    row.className = 'bn-row' + (isBottle ? ' is-bottleneck' : '');
+    row.innerHTML = `
+      <div class="bn-label">${s.name}</div>
+      <div class="bn-track">
+        <div class="bn-fill" style="width:${pct}%;background:${barColor};">
+          ${ratio < 150 ? ratio.toFixed(0) + '%' : ''}
+        </div>
+      </div>
+      <div class="bn-cap" style="color:${barColor};">${s.cap} lb/hr</div>
+    `;
+    barsEl.appendChild(row);
+  });
+
+  // Chart
+  if (bottleneckChart) bottleneckChart.destroy();
+  const ctx = document.getElementById('bottleneck-chart').getContext('2d');
+  const bgColors = stages.map(s => {
+    const r = (s.cap / reqLbHr) * 100;
+    return r >= 120 ? 'rgba(34,197,94,0.75)' : r >= 100 ? 'rgba(245,158,11,0.75)' : 'rgba(239,68,68,0.75)';
+  });
+
+  bottleneckChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: stages.map(s => s.name),
+      datasets: [
+        { label: 'Stage Capacity (lb/hr)', data: stages.map(s => s.cap), backgroundColor: bgColors, borderRadius: 6, borderSkipped: false },
+        { label: 'Requirement (lb/hr)', data: stages.map(() => reqLbHr), type: 'line', borderColor: '#e74c3c', borderWidth: 2, borderDash: [6,4], pointRadius: 0, fill: false, order: 0 }
+      ]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#6b7280', font: { size: 11 }, boxWidth: 20, padding: 14 } },
+        tooltip: {
+          backgroundColor: '#fff', borderColor: '#e5e7eb', borderWidth: 1, titleColor: '#1a1a2e', bodyColor: '#6b7280',
+          callbacks: { afterLabel: ctx => { const s = stages[ctx.dataIndex]; return s ? s.note : ''; } }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { color: '#f0f2f5' }, title: { display: true, text: 'Capacity (lb/hr)', color: '#9ca3af', font: { size: 10 } } },
+        y: { ticks: { color: '#6b7280', font: { size: 12, weight: '600' } }, grid: { color: '#f9fafb' } }
+      }
+    }
+  });
+}
+
+document.getElementById('sl-throughput').addEventListener('input', updateBottleneck);
+
+// ═══════════════════════════════════════════════════════════════
+// SECTION 4: GANTT
+// ═══════════════════════════════════════════════════════════════
+
+const GANTT_P12 = [
+  { label: 'Decision to Expand',        start: 0, end: 1, color: '#4a6cf7' },
+  { label: 'Site Search + Lease Neg.',  start: 0, end: 1, color: '#7c3aed' },
+  { label: 'Facility Design + Permits', start: 1, end: 2, color: '#22c55e' },
+  { label: 'Build-Out',                 start: 2, end: 4, color: '#f59e0b' },
+  { label: 'Equipment Procurement',     start: 3, end: 5, color: '#e74c3c' },
+  { label: 'Install + Commission + ODA',start: 5, end: 6, color: '#ec4899' },
+];
+
+const GANTT_P23 = [
+  { label: 'Nixtamal Equip Sourcing',     start: 0, end: 2, color: '#4a6cf7' },
+  { label: 'Facility Expansion/Reloc.',   start: 2, end: 3, color: '#22c55e' },
+  { label: 'Equipment Installation',      start: 3, end: 5, color: '#f59e0b' },
+  { label: 'Water Treatment Setup',       start: 3, end: 5, color: '#e74c3c' },
+  { label: 'Process Dev + Reformulation', start: 4, end: 6, color: '#7c3aed' },
+];
+
+function buildGantt(tasks, containerId) {
+  const el = document.getElementById(containerId);
+  const COLS = 7;
+
+  const header = document.createElement('div');
+  header.className = 'gantt-header-row';
+  header.innerHTML = '<div style="text-align:right;padding-right:8px;font-size:10px;color:var(--text-secondary);">Task</div>' +
+    Array.from({length: COLS}, (_, i) => `<div>M${i}</div>`).join('');
+  el.appendChild(header);
+
+  tasks.forEach(task => {
+    const row = document.createElement('div');
+    row.className = 'gantt-row';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'gantt-task-name';
+    lbl.textContent = task.label;
+    lbl.title = task.label;
+    row.appendChild(lbl);
+
+    for (let m = 0; m < COLS; m++) {
+      const cell = document.createElement('div');
+      cell.className = 'gantt-cell';
+      if (m >= task.start && m < task.end) {
+        const isFirst = m === task.start;
+        const isLast = m === task.end - 1;
+        const bar = document.createElement('div');
+        bar.className = 'gantt-bar';
+        bar.style.cssText = `background:${task.color};border-radius:${isFirst?'5px':'0'} ${isLast?'5px':'0'} ${isLast?'5px':'0'} ${isFirst?'5px':'0'};`;
+        bar.textContent = isFirst ? task.label.slice(0,6) + '..' : '';
+        cell.appendChild(bar);
+      } else {
+        const empty = document.createElement('div');
+        empty.className = 'gantt-empty';
+        cell.appendChild(empty);
+      }
+      row.appendChild(cell);
+    }
+    el.appendChild(row);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SECTION 5: FINANCIAL GATES (EDITABLE + LOCALSTORAGE)
+// ═══════════════════════════════════════════════════════════════
+
+const DEFAULT_GATES = [
+  { id: 'g1', name: 'Sustained utilization', p12: '>70% for 4 consecutive weeks', p23: '>70% for 4 consecutive weeks', status: 'not-met' },
+  { id: 'g2', name: 'Cash reserve',          p12: '3 months opex ($15–27K)',       p23: '6 months opex ($120–210K)',     status: 'not-met' },
+  { id: 'g3', name: 'Gross margin',          p12: '>55% sustained',                p23: '>60% sustained',                status: 'not-met' },
+  { id: 'g4', name: 'Confirmed accounts',    p12: '5+ retail locations',           p23: '15+ retail + 1 distributor',    status: 'not-met' },
+  { id: 'g5', name: 'Capital available',     p12: '$80–150K',                      p23: '$150–300K',                     status: 'not-met' },
+  { id: 'g6', name: 'Payback period',        p12: '<18 months on capex',           p23: '<24 months on capex',           status: 'not-met' },
+  { id: 'g7', name: 'Owner salary',          p12: 'Drawing $3K+/month',            p23: 'Drawing $6K+/month',            status: 'not-met' },
+  { id: 'g8', name: 'Product-market fit',    p12: '<5% return, 60%+ repeat',       p23: '≥80th percentile velocity',     status: 'not-met' },
+];
+
+let gates = [];
+let gateIdCounter = 100;
+
+function loadGates() {
+  try {
+    const saved = localStorage.getItem('tcf-gates-v2');
+    if (saved) {
+      gates = JSON.parse(saved);
+      gateIdCounter = gates.reduce((max, g) => Math.max(max, parseInt(g.id.replace('g','')) || 0), gateIdCounter) + 1;
+      return;
+    }
+  } catch(e) {}
+  gates = JSON.parse(JSON.stringify(DEFAULT_GATES));
+}
+
+function saveGates() {
+  try { localStorage.setItem('tcf-gates-v2', JSON.stringify(gates)); } catch(e) {}
+}
+
+function renderGates() {
+  const tbody = document.getElementById('gates-tbody');
+  tbody.innerHTML = '';
+  gates.forEach((gate, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input class="gate-input-name" type="text" value="${escHtml(gate.name)}"
+        onchange="updateGateField(${idx},'name',this.value)" placeholder="Gate name"></td>
+      <td><input class="gate-input-thresh" type="text" value="${escHtml(gate.p12)}"
+        onchange="updateGateField(${idx},'p12',this.value)" placeholder="Phase 1→2 threshold"></td>
+      <td><input class="gate-input-thresh" type="text" value="${escHtml(gate.p23)}"
+        onchange="updateGateField(${idx},'p23',this.value)" placeholder="Phase 2→3 threshold"></td>
+      <td style="text-align:center;">
+        <select class="gate-status-select status-${gate.status}"
+          onchange="updateGateStatus(${idx},this)">
+          <option value="not-met" ${gate.status==='not-met'?'selected':''}>Not Met</option>
+          <option value="in-progress" ${gate.status==='in-progress'?'selected':''}>In Progress</option>
+          <option value="met" ${gate.status==='met'?'selected':''}>Met</option>
+        </select>
+      </td>
+      <td style="text-align:center;">
+        <button class="btn-delete-gate" onclick="deleteGate(${idx})" title="Remove gate">✕</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  updateGatesBanner();
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function updateGateField(idx, field, val) {
+  gates[idx][field] = val;
+  saveGates();
+}
+
+function updateGateStatus(idx, sel) {
+  const val = sel.value;
+  gates[idx].status = val;
+  sel.className = 'gate-status-select status-' + val;
+  saveGates();
+  updateGatesBanner();
+}
+
+function deleteGate(idx) {
+  if (!confirm(`Remove gate "${gates[idx].name}"?`)) return;
+  gates.splice(idx, 1);
+  saveGates();
+  renderGates();
+}
+
+function addGate() {
+  gates.push({ id: 'g' + (gateIdCounter++), name: 'New Gate', p12: '', p23: '', status: 'not-met' });
+  saveGates();
+  renderGates();
+  // Scroll to bottom of table
+  const tbody = document.getElementById('gates-tbody');
+  const lastRow = tbody.lastElementChild;
+  if (lastRow) lastRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  // Focus name input
+  const nameInput = lastRow && lastRow.querySelector('input');
+  if (nameInput) { nameInput.focus(); nameInput.select(); }
+}
+
+function updateGatesBanner() {
+  const total = gates.length;
+  const met = gates.filter(g => g.status === 'met').length;
+  const pct = total > 0 ? met / total : 0;
+  const banner = document.getElementById('gates-banner');
+  const text = document.getElementById('gates-banner-text');
+  banner.className = 'gates-banner';
+  if (pct === 1) {
+    banner.classList.add('green');
+    text.textContent = `EXPANSION APPROVED — All ${total} gates passed`;
+  } else if (pct >= 0.6) {
+    banner.classList.add('yellow');
+    text.textContent = `MONITOR — ${met} of ${total} gates met (${Math.round(pct*100)}%)`;
+  } else {
+    banner.classList.add('red');
+    text.textContent = `HOLD — ${met} of ${total} gates met. Insufficient readiness for expansion.`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOCALSTORAGE STATE
+// ═══════════════════════════════════════════════════════════════
+
+function saveState() {
+  try {
+    localStorage.setItem('tcf-state-v2', JSON.stringify({
+      shiftKey: selectedShiftKey,
+      globalPhase,
+      calActiveDays,
+      userOperatingDays,
+      oeeAvailability,
+      oeePerformance,
+      oeeQuality,
+    }));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('tcf-state-v2');
+    if (saved) {
+      const s = JSON.parse(saved);
+      if (s.shiftKey) selectedShiftKey = s.shiftKey;
+      if (s.globalPhase) globalPhase = s.globalPhase;
+      if (s.calActiveDays) calActiveDays = s.calActiveDays;
+      if (s.userOperatingDays) userOperatingDays = s.userOperatingDays;
+      if (s.oeeAvailability != null) oeeAvailability = s.oeeAvailability;
+      if (s.oeePerformance != null) oeePerformance = s.oeePerformance;
+      if (s.oeeQuality != null) oeeQuality = s.oeeQuality;
+    }
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadState();
+  loadGates();
+
+  // Apply loaded global phase to header
+  [1,2,3].forEach(i => {
+    const el = document.getElementById(`global-ph${i}`);
+    if (el) el.classList.toggle('active', i === globalPhase);
+  });
+
+  // Sync OEE sliders with loaded state
+  document.getElementById('sl-oee-a').value = oeeAvailability;
+  document.getElementById('sl-oee-p').value = oeePerformance;
+  document.getElementById('sl-oee-q').value = oeeQuality;
+
+  buildShiftButtons();
+  buildCalendarHeaders();
+
+  initUtilChart();
+  updateUtil();
+  updateCalendar();
+
+  buildEquipTable();
+  initSixChart();
+  updateCalcSixtenths();
+
+  setBottleneckPhase(globalPhase);
+
+  buildGantt(GANTT_P12, 'gantt-p12');
+  buildGantt(GANTT_P23, 'gantt-p23');
+
+  renderGates();
+});
+</script>
+</body>
+</html>

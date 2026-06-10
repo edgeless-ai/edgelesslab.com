@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scroll-Chromatic Excavation</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #0A0A0A;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<script>
+// ============================================================
+// Scroll-Chromatic Excavation
+// ============================================================
+
+const BG_COLOR = [10, 10, 10];
+const TEXT_DARK = [5, 5, 5];
+const REVEAL_COLOR = [245, 245, 240];
+const REBEL_COLOR = [210, 180, 140];
+const SCROLL_IND_COLOR = [51, 51, 51];
+const TEXT_HEIGHT = 2000;
+const MAX_AGENTS = 1000;
+const REBEL_RATE = 0.03;
+
+let textMask;
+let scrollY = 0;
+let targetScrollY = 0;
+let scrollVelocity = 0;
+let agents = [];
+let rebelTrails = [];
+let showScrollIndicator = true;
+let hiddenText;
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  pixelDensity(1);
+  noCursor();
+
+  // Build hidden text buffer
+  textMask = createGraphics(width, TEXT_HEIGHT);
+  textMask.background(10);
+  textMask.textSize(48);
+  textMask.textFont('Helvetica Neue, Arial, sans-serif');
+  textMask.textAlign(LEFT, TOP);
+  textMask.textWrap(WORD);
+  textMask.fill(5);
+  textMask.noStroke();
+
+  // Generate long text to fill 2000px
+  const line = "The quick brown fox jumps over the lazy dog. ";
+  const paragraphs = [
+    "Scroll through the void to excavate what lies beneath. " +
+    "Each motion births a thousand microscopic archaeologists. " +
+    "They descend into darkness, biased toward the coldest pixels. " +
+    "Where they find the hidden glyphs, they burn them into light. ",
+
+    "The text was never meant to be read. It was buried deliberately, " +
+    "rendered in a color so close to black that no eye could discern it. " +
+    "Only the agents know where the words are. They feel the faint chill " +
+    "of five against ten. They swarm toward it. They consume the dark. ",
+
+    "But scroll is a double-edged force. For every ninety-seven builders, " +
+    "three are rebels. Tan-gold vandals that walk toward the light. " +
+    "They do not excavate. They erase. They leave palimpsest holes " +
+    "in the manuscript. The text is written and unwritten in the same breath. ",
+
+    "The faster you scroll, the more agents flood the viewport. " +
+    "Inertia carries them. The mouse repels them like a god-hand. " +
+    "Click to spawn a riot. Press R to bury everything again. " +
+    "Press S to hide the indicator of your descent. ",
+
+    "This is the excavation engine. The scroll is the spade. " +
+    "The agents are the workers. The rebels are the entropy. " +
+    "The text is the artifact. The darkness is the medium. " +
+    "The revelation is the purpose. The erosion is the cost. "
+  ];
+
+  let fullText = paragraphs.join("\n\n");
+  // Pad with more text if needed
+  while (fullText.length < 4000) {
+    fullText += " " + line;
+  }
+
+  textMask.text(fullText, 40, 80, width - 80, TEXT_HEIGHT - 80);
+}
+
+function draw() {
+  // 1. Scroll physics
+  scrollVelocity = (targetScrollY - scrollY) * 0.08;
+  scrollY += scrollVelocity;
+
+  let maxScroll = TEXT_HEIGHT - height;
+  if (maxScroll < 0) maxScroll = 0;
+
+  // Elastic snap at bounds
+  if (scrollY < 0) {
+    scrollY += (0 - scrollY) * 0.2;
+  }
+  if (scrollY > maxScroll) {
+    scrollY += (maxScroll - scrollY) * 0.2;
+  }
+
+  // 2. Spawn agents based on scroll velocity
+  let sv = abs(scrollVelocity);
+  if (sv > 2) {
+    let spawnCount = floor(sv / 2);
+    for (let i = 0; i < spawnCount; i++) {
+      spawnAgent(random(width), random(height), REBEL_RATE);
+    }
+  }
+
+  // Cap agent count
+  while (agents.length > MAX_AGENTS) {
+    agents.shift();
+  }
+
+  // 3. Load pixels for direct manipulation
+  textMask.loadPixels();
+
+  // 4. Update agents
+  for (let i = agents.length - 1; i >= 0; i--) {
+    let a = agents[i];
+    a.life--;
+    if (a.life <= 0) {
+      agents.splice(i, 1);
+      continue;
+    }
+
+    // Mouse repel
+    let d = dist(a.x, a.y, mouseX, mouseY);
+    if (d < 100 && d > 0.1) {
+      a.x += (a.x - mouseX) / d * 5;
+      a.y += (a.y - mouseY) / d * 5;
+    }
+
+    // Clamp to screen
+    a.x = constrain(a.x, 0, width);
+    a.y = constrain(a.y, 0, height);
+
+    // 3x3 neighborhood bias
+    let maskX = floor(a.x);
+    let maskY = floor(a.y + scrollY);
+    let target = getTargetPixel(maskX, maskY, a.isRebel);
+
+    if (target) {
+      let tx = target.x;
+      let tyScreen = target.y - scrollY;
+      a.x += (tx - a.x) * 0.3 + random(-1, 1);
+      a.y += (tyScreen - a.y) * 0.3 + random(-1, 1);
+    }
+
+    // Paint into mask
+    let px = floor(a.x);
+    let py = floor(a.y + scrollY);
+    if (px >= 0 && px < width && py >= 0 && py < TEXT_HEIGHT) {
+      let idx = (px + py * width) * 4;
+      if (a.isRebel) {
+        // Erase: set to background
+        textMask.pixels[idx] = 10;
+        textMask.pixels[idx + 1] = 10;
+        textMask.pixels[idx + 2] = 10;
+        // Rebel trail
+        rebelTrails.push({ x: a.x, y: a.y, alpha: 25, life: 60 });
+      } else {
+        // Reveal: set to off-white
+        textMask.pixels[idx] = 245;
+        textMask.pixels[idx + 1] = 245;
+        textMask.pixels[idx + 2] = 240;
+      }
+    }
+  }
+
+  textMask.updatePixels();
+
+  // 5. Draw background + text mask
+  background(10);
+  image(textMask, 0, -scrollY);
+
+  // 6. Draw agents
+  noStroke();
+  for (let a of agents) {
+    if (a.isRebel) {
+      fill(210, 180, 140);
+    } else {
+      fill(245, 245, 240);
+    }
+    ellipse(a.x, a.y, 2);
+  }
+
+  // 7. Draw rebel trails
+  for (let i = rebelTrails.length - 1; i >= 0; i--) {
+    let t = rebelTrails[i];
+    t.alpha -= 0.4;
+    t.life--;
+    if (t.life <= 0 || t.alpha <= 0) {
+      rebelTrails.splice(i, 1);
+    } else {
+      fill(210, 180, 140, t.alpha);
+      ellipse(t.x, t.y, 2);
+    }
+  }
+
+  // 8. Scroll indicator
+  if (showScrollIndicator && maxScroll > 0) {
+    let h = map(scrollY, 0, maxScroll, 0, height);
+    h = constrain(h, 0, height);
+    fill(51);
+    rect(width - 4, 0, 4, h);
+  }
+}
+
+function spawnAgent(x, y, rebelRate) {
+  let isRebel = random() < rebelRate;
+  agents.push({
+    x: x,
+    y: y,
+    isRebel: isRebel,
+    life: 300
+  });
+}
+
+function getTargetPixel(mx, my, isRebel) {
+  let bestX = mx;
+  let bestY = my;
+  let bestVal = isRebel ? -1 : 1000;
+
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      let nx = mx + dx;
+      let ny = my + dy;
+      if (nx < 0 || nx >= width || ny < 0 || ny >= TEXT_HEIGHT) continue;
+
+      let idx = (nx + ny * width) * 4;
+      let brightness = (textMask.pixels[idx] + textMask.pixels[idx + 1] + textMask.pixels[idx + 2]) / 3;
+
+      if (isRebel) {
+        if (brightness > bestVal) {
+          bestVal = brightness;
+          bestX = nx;
+          bestY = ny;
+        }
+      } else {
+        if (brightness < bestVal) {
+          bestVal = brightness;
+          bestX = nx;
+          bestY = ny;
+        }
+      }
+    }
+  }
+
+  // Only return a target if it's different from current position
+  if (bestX === mx && bestY === my) return null;
+  return { x: bestX, y: bestY };
+}
+
+function mouseWheel(event) {
+  targetScrollY += event.delta * 1.5;
+  return false;
+}
+
+function mousePressed() {
+  // Click spawns 50 agents with 50% rebel chance
+  for (let i = 0; i < 50; i++) {
+    spawnAgent(mouseX + random(-20, 20), mouseY + random(-20, 20), 0.5);
+  }
+}
+
+function keyPressed() {
+  if (key === 'r' || key === 'R') {
+    // Reset: clear all revealed text
+    textMask.background(10);
+    textMask.textSize(48);
+    textMask.textFont('Helvetica Neue, Arial, sans-serif');
+    textMask.textAlign(LEFT, TOP);
+    textMask.textWrap(WORD);
+    textMask.fill(5);
+    textMask.noStroke();
+
+    const line = "The quick brown fox jumps over the lazy dog. ";
+    const paragraphs = [
+      "Scroll through the void to excavate what lies beneath. " +
+      "Each motion births a thousand microscopic archaeologists. " +
+      "They descend into darkness, biased toward the coldest pixels. " +
+      "Where they find the hidden glyphs, they burn them into light. ",
+
+      "The text was never meant to be read. It was buried deliberately, " +
+      "rendered in a color so close to black that no eye could discern it. " +
+      "Only the agents know where the words are. They feel the faint chill " +
+      "of five against ten. They swarm toward it. They consume the dark. ",
+
+      "But scroll is a double-edged force. For every ninety-seven builders, " +
+      "three are rebels. Tan-gold vandals that walk toward the light. " +
+      "They do not excavate. They erase. They leave palimpsest holes " +
+      "in the manuscript. The text is written and unwritten in the same breath. ",
+
+      "The faster you scroll, the more agents flood the viewport. " +
+      "Inertia carries them. The mouse repels them like a god-hand. " +
+      "Click to spawn a riot. Press R to bury everything again. " +
+      "Press S to hide the indicator of your descent. ",
+
+      "This is the excavation engine. The scroll is the spade. " +
+      "The agents are the workers. The rebels are the entropy. " +
+      "The text is the artifact. The darkness is the medium. " +
+      "The revelation is the purpose. The erosion is the cost. "
+    ];
+
+    let fullText = paragraphs.join("\n\n");
+    while (fullText.length < 4000) {
+      fullText += " " + line;
+    }
+    textMask.text(fullText, 40, 80, width - 80, TEXT_HEIGHT - 80);
+
+    // Clear agents and trails
+    agents = [];
+    rebelTrails = [];
+  }
+
+  if (key === 's' || key === 'S') {
+    showScrollIndicator = !showScrollIndicator;
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Percussive Archaeology</title>
+  <style>
+    body { margin: 0; padding: 0; overflow: hidden; background: #FAF0E6; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <script>
+    let cellSize = 40;
+    let cols, rows;
+    let grid = [];
+    let agents = [];
+    let segments = [];
+    let markers = [];
+    let shockwaves = [];
+    let nextId = 1;
+    const maxAgents = 500;
+    let gravityBias = null;
+    let audioContext = null;
+    let masterGain = null;
+    let muted = false;
+    let activeOscillators = [];
+
+    const phoneticMap = {
+      'a':'vowel','e':'vowel','i':'vowel','o':'vowel','u':'vowel','y':'vowel',
+      'b':'plosive','p':'plosive','d':'plosive','t':'plosive','g':'plosive','k':'plosive','q':'plosive',
+      'f':'fricative','v':'fricative','s':'fricative','z':'fricative','h':'fricative','c':'fricative','x':'fricative',
+      'm':'nasal','n':'nasal',
+      'l':'liquid','r':'liquid','w':'liquid','j':'liquid',
+      '0':'plosive','1':'plosive','2':'plosive','3':'plosive','4':'plosive','5':'plosive','6':'plosive','7':'plosive','8':'plosive','9':'plosive'
+    };
+
+    const palette = {
+      vowel: '#FF4136',
+      plosive: '#0074D9',
+      fricative: '#2ECC40',
+      nasal: '#FFDC00',
+      liquid: '#B10DC9'
+    };
+
+    const notePools = {
+      vowel: ['C4','D4','E4','G4','A4'],
+      plosive: ['C2','D2','E2','G2','A2'],
+      fricative: [2000, 2500, 3000, 3500, 4000],
+      nasal: ['C3','D3','E3','G3','A3'],
+      liquid: ['C2','D2','E2','G2','A2']
+    };
+
+    const noteFreqs = {
+      'C2':65.41,'D2':73.42,'E2':82.41,'G2':98.00,'A2':110.00,
+      'C3':130.81,'D3':146.83,'E3':164.81,'G3':196.00,'A3':220.00,
+      'C4':261.63,'D4':293.66,'E4':329.63,'G4':392.00,'A4':440.00
+    };
+
+    const waveforms = {
+      vowel: 'sine',
+      plosive: 'triangle',
+      fricative: 'sawtooth',
+      nasal: 'square',
+      liquid: 'sine'
+    };
+
+    const durations = {
+      vowel: 150,
+      plosive: 80,
+      fricative: 100,
+      nasal: 180,
+      liquid: 220
+    };
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      cellSize = 40;
+      cols = floor(width / cellSize);
+      rows = floor(height / cellSize);
+      initGrid();
+      background(250, 240, 230);
+    }
+
+    function initGrid() {
+      grid = [];
+      for (let c = 0; c < cols; c++) {
+        grid[c] = [];
+        for (let r = 0; r < rows; r++) {
+          grid[c][r] = null;
+        }
+      }
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      cols = floor(width / cellSize);
+      rows = floor(height / cellSize);
+      initGrid();
+      agents = [];
+      segments = [];
+      markers = [];
+      shockwaves = [];
+      background(250, 240, 230);
+    }
+
+    function draw() {
+      background(250, 240, 230);
+      updateAgents();
+      updateRipples();
+
+      for (let seg of segments) {
+        drawSegment(seg);
+      }
+
+      fill(47, 47, 47);
+      noStroke();
+      for (let m of markers) {
+        ellipse(m.x, m.y, 4, 4);
+      }
+
+      for (let i = shockwaves.length - 1; i >= 0; i--) {
+        let sw = shockwaves[i];
+        let age = frameCount - sw.startFrame;
+        if (age > 150) {
+          shockwaves.splice(i, 1);
+          continue;
+        }
+        if (age <= 3) {
+          fill(255, 255, 255, 76);
+          noStroke();
+          ellipse(sw.x, sw.y, 20, 20);
+        }
+        if (age <= 120) {
+          let radius = age * 3.3;
+          noFill();
+          stroke(255, 255, 255, map(age, 0, 120, 200, 0));
+          strokeWeight(2);
+          ellipse(sw.x, sw.y, radius * 2, radius * 2);
+        }
+      }
+    }
+
+    function updateAgents() {
+      let now = millis();
+      for (let agent of agents) {
+        if (agent.state !== 'GROWING') continue;
+        if (now < agent.nextMove) continue;
+        agent.nextMove = now + 15;
+
+        let nextCol = agent.col + agent.dirX;
+        let nextRow = agent.row + agent.dirY;
+
+        if (nextCol < 0 || nextCol >= cols || nextRow < 0 || nextRow >= rows) {
+          stopAgent(agent, true);
+          continue;
+        }
+
+        if (grid[nextCol][nextRow]) {
+          stopAgent(agent, false);
+          continue;
+        }
+
+        let x1 = agent.col * cellSize + cellSize/2;
+        let y1 = agent.row * cellSize + cellSize/2;
+        let x2 = nextCol * cellSize + cellSize/2;
+        let y2 = nextRow * cellSize + cellSize/2;
+
+        grid[nextCol][nextRow] = agent.id;
+        agent.col = nextCol;
+        agent.row = nextRow;
+        agent.cells.push({col: nextCol, row: nextRow});
+
+        if (!agent.isGhost) {
+          segments.push({
+            x1, y1, x2, y2,
+            color: agent.color,
+            agentId: agent.id,
+            isGhost: false,
+            rippleOffset: 0
+          });
+        }
+      }
+    }
+
+    function stopAgent(agent, boundary) {
+      agent.state = 'STOPPED';
+      if (agent.isGhost) return;
+
+      let mx, my;
+      if (boundary) {
+        mx = (agent.col + agent.dirX * 0.5) * cellSize + cellSize/2;
+        my = (agent.row + agent.dirY * 0.5) * cellSize + cellSize/2;
+      } else {
+        mx = (agent.col + agent.dirX) * cellSize + cellSize/2;
+        my = (agent.row + agent.dirY) * cellSize + cellSize/2;
+      }
+      markers.push({x: mx, y: my});
+
+      playTone(noteToFreq(agent.note), waveforms[agent.class], durations[agent.class], agent.class);
+    }
+
+    function updateRipples() {
+      for (let seg of segments) {
+        let totalOffset = 0;
+        let affected = false;
+        for (let sw of shockwaves) {
+          let age = frameCount - sw.startFrame;
+          if (age > 120 || age < 0) continue;
+          let radius = age * 3.3;
+          let mx = (seg.x1 + seg.x2) / 2;
+          let my = (seg.y1 + seg.y2) / 2;
+          let d = dist(mx, my, sw.x, sw.y);
+          if (d < radius) {
+            let offset = sin(d * 0.1 - frameCount * 0.2) * 8;
+            totalOffset += offset;
+            affected = true;
+          }
+        }
+        if (affected) {
+          seg.rippleOffset = totalOffset;
+        } else {
+          seg.rippleOffset *= 0.85;
+          if (abs(seg.rippleOffset) < 0.1) seg.rippleOffset = 0;
+        }
+      }
+    }
+
+    function drawSegment(seg) {
+      if (seg.isGhost) return;
+      let dx = seg.x2 - seg.x1;
+      let dy = seg.y2 - seg.y1;
+      let len = dist(seg.x1, seg.y1, seg.x2, seg.y2);
+      if (len < 0.001) return;
+      let px = -dy / len;
+      let py = dx / len;
+      let ox = px * seg.rippleOffset;
+      let oy = py * seg.rippleOffset;
+      stroke(seg.color);
+      strokeWeight(2);
+      line(seg.x1 + ox, seg.y1 + oy, seg.x2 + ox, seg.y2 + oy);
+    }
+
+    function spawnAgent(cls, color, note) {
+      let attempts = 0;
+      let col, row;
+      while (attempts < 100) {
+        col = floor(random(cols));
+        row = floor(random(rows));
+        if (!grid[col][row]) break;
+        attempts++;
+      }
+      if (attempts >= 100) return;
+
+      if (agents.length >= maxAgents) {
+        let oldestIdx = agents.findIndex(a => a.state === 'STOPPED');
+        if (oldestIdx > -1) {
+          removeAgent(oldestIdx);
+        } else {
+          return;
+        }
+      }
+
+      let isGhost = random() < 0.03;
+      let dir = pickDirection();
+      let agent = {
+        id: nextId++,
+        col: col,
+        row: row,
+        dirX: dir[0],
+        dirY: dir[1],
+        class: cls,
+        color: color,
+        note: note,
+        state: 'GROWING',
+        isGhost: isGhost,
+        nextMove: millis() + 15,
+        cells: [{col: col, row: row}]
+      };
+      grid[col][row] = agent.id;
+      agents.push(agent);
+    }
+
+    function pickDirection() {
+      const dirs = [[0,-1],[0,1],[-1,0],[1,0]];
+      if (gravityBias) {
+        if (random() < 0.6) {
+          return [gravityBias.x, gravityBias.y];
+        }
+      }
+      return random(dirs);
+    }
+
+    function removeAgent(idx) {
+      let agent = agents[idx];
+      for (let cell of agent.cells) {
+        if (cell.col >= 0 && cell.col < cols && cell.row >= 0 && cell.row < rows && grid[cell.col][cell.row] === agent.id) {
+          grid[cell.col][cell.row] = null;
+        }
+      }
+      segments = segments.filter(s => s.agentId !== agent.id);
+      agents.splice(idx, 1);
+    }
+
+    function spawnShockwaveAt(x, y) {
+      shockwaves.push({
+        x: x,
+        y: y,
+        startFrame: frameCount
+      });
+    }
+
+    function keyPressed() {
+      initAudio();
+      if (key === ' ') {
+        spawnShockwaveAt(mouseX, mouseY);
+        return false;
+      }
+      if (key === 'r' || key === 'R') {
+        reset();
+        return false;
+      }
+      if (key === 'm' || key === 'M') {
+        muted = !muted;
+        return false;
+      }
+      if (keyCode === UP_ARROW) {
+        gravityBias = {x: 0, y: -1};
+        return false;
+      }
+      if (keyCode === DOWN_ARROW) {
+        gravityBias = {x: 0, y: 1};
+        return false;
+      }
+      if (keyCode === LEFT_ARROW) {
+        gravityBias = {x: -1, y: 0};
+        return false;
+      }
+      if (keyCode === RIGHT_ARROW) {
+        gravityBias = {x: 1, y: 0};
+        return false;
+      }
+
+      let k = key.toLowerCase();
+      let cls = phoneticMap[k];
+      if (cls) {
+        spawnAgent(cls, palette[cls], random(notePools[cls]));
+      }
+      return false;
+    }
+
+    function mousePressed() {
+      initAudio();
+      spawnShockwaveAt(mouseX, mouseY);
+      return false;
+    }
+
+    function reset() {
+      initGrid();
+      agents = [];
+      segments = [];
+      markers = [];
+      shockwaves = [];
+      background(250, 240, 230);
+    }
+
+    function initAudio() {
+      if (!audioContext) {
+        let AC = window.AudioContext || window.webkitAudioContext;
+        audioContext = new AC();
+        masterGain = audioContext.createGain();
+        masterGain.gain.value = 0.25;
+        masterGain.connect(audioContext.destination);
+      }
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+    }
+
+    function playTone(freq, waveform, duration, cls) {
+      if (muted) return;
+      if (activeOscillators.length >= 12) {
+        let old = activeOscillators.shift();
+        try { old.stop(); } catch(e) {}
+      }
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      osc.type = waveform;
+      osc.frequency.value = freq;
+
+      if (cls === 'fricative') {
+        const filter = audioContext.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = freq;
+        filter.Q.value = 2;
+        osc.connect(filter).connect(gain).connect(masterGain);
+      } else {
+        osc.connect(gain).connect(masterGain);
+      }
+
+      const now = audioContext.currentTime;
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration/1000);
+      osc.start(now);
+      osc.stop(now + duration/1000);
+      activeOscillators.push(osc);
+      osc.onended = () => {
+        let idx = activeOscillators.indexOf(osc);
+        if (idx > -1) activeOscillators.splice(idx, 1);
+      };
+    }
+
+    function noteToFreq(note) {
+      if (typeof note === 'number') return note;
+      return noteFreqs[note] || 440;
+    }
+  </script>
+</head>
+<body></body>
+</html>

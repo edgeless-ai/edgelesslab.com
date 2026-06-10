@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flow Field Typography</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #F5F5F0;
+  }
+  #grain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  canvas {
+    display: block;
+  }
+</style>
+</head>
+<body>
+<canvas id="grain"></canvas>
+<script>
+let angleGrid = [];
+let cols, rows;
+let gridRes = 20;
+let noiseScale = 0.005;
+let particles = [];
+let maxParticles = 500;
+let mask;
+let grainCanvas;
+let spawnPaused = false;
+let scrollBoost = 0;
+let removeBatch = 0;
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  noFill();
+
+  mask = createGraphics(width, height);
+  mask.background(0);
+  mask.fill(255);
+  mask.noStroke();
+  mask.textSize(min(width, height) * 0.25);
+  mask.textAlign(CENTER, CENTER);
+  mask.text("INK", width / 2, height / 2);
+
+  regenerateFlowField();
+
+  grainCanvas = document.getElementById('grain');
+  grainCanvas.width = width;
+  grainCanvas.height = height;
+  fillGrainCanvas(grainCanvas, '#E8E4D9', 0.05);
+
+  textFont('sans-serif');
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  mask.resizeCanvas(width, height);
+  mask.background(0);
+  mask.fill(255);
+  mask.noStroke();
+  mask.textSize(min(width, height) * 0.25);
+  mask.textAlign(CENTER, CENTER);
+  mask.text("INK", width / 2, height / 2);
+  regenerateFlowField();
+  grainCanvas.width = width;
+  grainCanvas.height = height;
+  fillGrainCanvas(grainCanvas, '#E8E4D9', 0.05);
+}
+
+function regenerateFlowField() {
+  cols = ceil(width / gridRes);
+  rows = ceil(height / gridRes);
+  angleGrid = [];
+  for (let x = 0; x < cols; x++) {
+    angleGrid[x] = [];
+    for (let y = 0; y < rows; y++) {
+      angleGrid[x][y] = noise(x * noiseScale, y * noiseScale) * TWO_PI * 2;
+    }
+  }
+}
+
+function draw() {
+  background('#F5F5F0');
+
+  let baseRate = 2;
+  if (scrollBoost > 0) {
+    baseRate = 8;
+    scrollBoost--;
+  }
+
+  if (!spawnPaused) {
+    for (let i = 0; i < baseRate; i++) {
+      if (particles.length < maxParticles) {
+        spawnParticle();
+      }
+    }
+  }
+
+  removeBatch++;
+  let removeIndices = [];
+
+  for (let i = 0; i < particles.length; i++) {
+    let p = particles[i];
+
+    if (p.finished) {
+      p.ghostAge++;
+      if (p.ghostAge > 300) {
+        removeIndices.push(i);
+      }
+      continue;
+    }
+
+    if (p.isRebel) {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.path.push({x: p.x, y: p.y});
+      if (p.x < 0 || p.x > width || p.y < 0 || p.y > height || p.path.length > 80) {
+        p.finished = true;
+      }
+    } else {
+      let gx = floor(p.x / gridRes);
+      let gy = floor(p.y / gridRes);
+      if (gx >= 0 && gx < cols && gy >= 0 && gy < rows) {
+        let angle = angleGrid[gx][gy];
+        p.vx += cos(angle) * 0.15;
+        p.vy += sin(angle) * 0.15;
+        p.vx *= 0.85;
+        p.vy *= 0.85;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.path.push({x: p.x, y: p.y});
+      }
+      if (p.path.length > 120 || p.x < 0 || p.x > width || p.y < 0 || p.y > height) {
+        p.finished = true;
+      }
+    }
+
+    let revealLen = min(p.path.length, floor(p.age * p.speed));
+    drawPolyline(p.path.slice(0, revealLen), p.color, p.isRebel ? 1.2 : 1.2);
+    p.age++;
+  }
+
+  if (removeBatch >= 10 && removeIndices.length > 0) {
+    for (let i = removeIndices.length - 1; i >= 0; i--) {
+      particles.splice(removeIndices[i], 1);
+    }
+    removeBatch = 0;
+  }
+
+  // HUD
+  noStroke();
+  fill('#1A1A1A');
+  textSize(12);
+  textAlign(LEFT, BASELINE);
+  text("particles: " + particles.length, 20, 30);
+  text("rebel threads: " + countRebels(), 20, 50);
+  text("noise scale: " + noiseScale.toFixed(3), 20, 70);
+  text("[click] burst  [R] reset  [P] pause  [↑/↓] noise", 20, height - 20);
+}
+
+function spawnParticle() {
+  let x = random(width);
+  let y = random(height);
+  let c = mask.get(x, y);
+  let brightnessVal = (c[0] + c[1] + c[2]) / 3;
+  if (brightnessVal > 128) {
+    let isRebel = (random() < 0.03);
+    let vx, vy, col;
+    if (isRebel) {
+      let dir = floor(random(4)) * HALF_PI;
+      vx = cos(dir) * 2.5;
+      vy = sin(dir) * 2.5;
+      col = '#B5651D';
+    } else {
+      vx = 0;
+      vy = 0;
+      col = '#1A1A1A';
+    }
+    particles.push({
+      x: x,
+      y: y,
+      vx: vx,
+      vy: vy,
+      path: [{x: x, y: y}],
+      age: 0,
+      speed: random(2, 5),
+      finished: false,
+      ghostAge: 0,
+      isRebel: isRebel,
+      color: col
+    });
+  }
+}
+
+function drawPolyline(points, col, weight) {
+  if (points.length < 2) return;
+  noFill();
+  stroke(col);
+  strokeWeight(weight);
+  beginShape();
+  for (let pt of points) {
+    curveVertex(pt.x, pt.y);
+  }
+  endShape();
+}
+
+function countRebels() {
+  let count = 0;
+  for (let p of particles) {
+    if (p.isRebel) count++;
+  }
+  return count;
+}
+
+function fillGrainCanvas(canvas, color, opacity) {
+  let ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = color;
+  ctx.globalAlpha = opacity;
+  for (let i = 0; i < 10000; i++) {
+    ctx.fillRect(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 2, 2);
+  }
+  ctx.globalAlpha = 1.0;
+}
+
+function mousePressed() {
+  if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > height) return;
+  let c = mask.get(mouseX, mouseY);
+  let brightnessVal = (c[0] + c[1] + c[2]) / 3;
+  if (brightnessVal > 128) {
+    for (let i = 0; i < 20; i++) {
+      if (particles.length < maxParticles) {
+        spawnParticleAt(mouseX, mouseY);
+      }
+    }
+  }
+}
+
+function spawnParticleAt(mx, my) {
+  let x = mx + random(-10, 10);
+  let y = my + random(-10, 10);
+  if (x < 0 || x > width || y < 0 || y > height) return;
+  let c = mask.get(x, y);
+  let brightnessVal = (c[0] + c[1] + c[2]) / 3;
+  if (brightnessVal > 128) {
+    let isRebel = (random() < 0.03);
+    let vx, vy, col;
+    if (isRebel) {
+      let dir = floor(random(4)) * HALF_PI;
+      vx = cos(dir) * 2.5;
+      vy = sin(dir) * 2.5;
+      col = '#B5651D';
+    } else {
+      vx = 0;
+      vy = 0;
+      col = '#1A1A1A';
+    }
+    particles.push({
+      x: x,
+      y: y,
+      vx: vx,
+      vy: vy,
+      path: [{x: x, y: y}],
+      age: 0,
+      speed: random(2, 5),
+      finished: false,
+      ghostAge: 0,
+      isRebel: isRebel,
+      color: col
+    });
+  }
+}
+
+function keyPressed() {
+  if (key === 'r' || key === 'R') {
+    particles = [];
+  }
+  if (key === 'p' || key === 'P') {
+    spawnPaused = !spawnPaused;
+  }
+  if (keyCode === UP_ARROW) {
+    noiseScale += 0.001;
+    regenerateFlowField();
+  }
+  if (keyCode === DOWN_ARROW) {
+    noiseScale = max(0.001, noiseScale - 0.001);
+    regenerateFlowField();
+  }
+}
+
+function mouseWheel(event) {
+  scrollBoost = 30;
+  return false;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volumetric Liquid Glyph Loop</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #0A0A0A;
+    }
+    canvas {
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+<body>
+  <!-- Vertex Shader: passes texture coordinates and transforms position -->
+  <script id="vert" type="x-shader/x-vertex">
+    attribute vec3 aPosition;
+    attribute vec2 aTexCoord;
+    varying vec2 vTexCoord;
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+
+    void main() {
+      vTexCoord = aTexCoord;
+      gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
+    }
+  </script>
+
+  <!-- Fragment Shader: liquid sine distortion on odd slices, cyan tint, transparent alpha -->
+  <script id="frag" type="x-shader/x-fragment">
+    precision highp float;
+    varying vec2 vTexCoord;
+    uniform sampler2D uTexture;
+    uniform float uTime;
+    uniform float uIsOdd;
+    uniform float uVolatility;
+    uniform vec3 uColor;
+    uniform float uAlpha;
+
+    void main() {
+      vec2 uv = vTexCoord;
+      float distort = 0.0;
+
+      // Apply liquid sine distortion ONLY to odd-numbered slices
+      if (uIsOdd > 0.5) {
+        distort = sin(uv.y * 20.0 + uTime * 3.0) * uVolatility;
+        uv.x += distort;
+      }
+
+      // Sample the text texture (alpha only — the shader supplies color)
+      float alpha = texture2D(uTexture, uv).a;
+
+      // Base emissive color from uniform
+      vec3 finalColor = uColor;
+
+      // Add cyan refract tint (#00FFFF) to distorted odd slices
+      if (uIsOdd > 0.5) {
+        finalColor += vec3(0.0, 0.8, 0.8) * abs(distort) * 5.0;
+      }
+
+      // Output with per-slice transparency
+      gl_FragColor = vec4(finalColor, alpha * uAlpha);
+    }
+  </script>
+
+  <!-- p5.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+
+  <script>
+    let myShader;
+    let textGfx;    // White "WAVE" on transparent background
+    let mirrorGfx;  // Miniature inverted dark-gray "WAVE" on transparent background
+
+    function setup() {
+      // 800×600 WEBGL canvas
+      createCanvas(800, 600, WEBGL);
+
+      // Orthographic projection — no perspective foreshortening
+      ortho(-width / 2, width / 2, -height / 2, height / 2, 0, 1000);
+
+      // Lock camera to an isometric angle (equal X, Y, Z offsets looking at origin)
+      camera(400, 400, 400, 0, 0, 0, 0, 1, 0);
+
+      // Build the custom shader from inline source strings
+      let vertSrc = document.getElementById('vert').textContent;
+      let fragSrc = document.getElementById('frag').textContent;
+      myShader = createShader(vertSrc, fragSrc);
+
+      // Create off-screen buffers for text and mirror textures
+      textGfx = createGraphics(320, 80);
+      mirrorGfx = createGraphics(320, 80);
+    }
+
+    function draw() {
+      // 4-second loop: 120 frames @ 30fps → t ranges 0..1 and resets seamlessly
+      let t = (frameCount % 120) / 120.0;
+
+      // ---- Pre-render textures (2D buffers) before any 3D drawing ----
+
+      // 1. Main text texture: white "WAVE", bold, transparent background
+      textGfx.clear();
+      textGfx.textAlign(CENTER, CENTER);
+      textGfx.textSize(80);
+      textGfx.textStyle(BOLD);
+      textGfx.fill(255); // #FFFFFF
+      textGfx.noStroke();
+      textGfx.text("WAVE", 160, 40);
+
+      // 2. Mirror texture: miniature, inverted-Y, dark-gray ghost reflection
+      mirrorGfx.clear();
+      mirrorGfx.textAlign(CENTER, CENTER);
+      mirrorGfx.textSize(80);
+      mirrorGfx.textStyle(BOLD);
+      mirrorGfx.fill(51); // #333333
+      mirrorGfx.noStroke();
+      mirrorGfx.push();
+      mirrorGfx.translate(160, 40);
+      // Flip Y and scale down to create the miniature mirror effect
+      mirrorGfx.scale(0.5, -0.5);
+      mirrorGfx.text("WAVE", 0, 0);
+      mirrorGfx.pop();
+
+      // ---- 3D Scene ----
+
+      // Background from Blotter.js palette
+      background('#0A0A0A');
+
+      // Activate our custom shader
+      shader(myShader);
+
+      // Global figure-8 rotation container — loop-perfect because sin/cos are periodic
+      push();
+      rotateX(PI * 0.25 * sin(t * TWO_PI));
+      rotateY(PI * 0.25 * cos(t * TWO_PI));
+
+      // Draw 12 transparent slices stacked in Z, back-to-front for correct alpha blending
+      // z ranges from -24 (backmost) to +20 (frontmost)
+      for (let i = 0; i < 12; i++) {
+        let z = (i - 6) * 4;
+
+        // Odd slices get liquid distortion; even slices stay crisp
+        let isOdd = (i % 2 === 1) ? 1.0 : 0.0;
+        let volatility = (isOdd > 0.5) ? 0.03 : 0.0;
+
+        // The backmost slice (i === 0, z = -24) is the mirror reflection
+        let isMirror = (i === 0);
+        let tex = isMirror ? mirrorGfx : textGfx;
+        let col = isMirror ? [0.2, 0.2, 0.2] : [1.0, 1.0, 1.0];
+        let alpha = isMirror ? 0.15 : 0.85; // ghostly mirror vs. glass-like text
+
+        // Push shader uniforms per slice
+        // uTime is locked to the loop period (t * 4.0 seconds) so the distortion
+        // is perfectly periodic with the figure-8 rotation, achieving a seamless loop.
+        myShader.setUniform('uTexture', tex);
+        myShader.setUniform('uTime', t * 4.0);
+        myShader.setUniform('uIsOdd', isOdd);
+        myShader.setUniform('uVolatility', volatility);
+        myShader.setUniform('uColor', col);
+        myShader.setUniform('uAlpha', alpha);
+
+        // Draw the textured plane at its Z depth
+        push();
+        translate(0, 0, z);
+        plane(320, 80);
+        pop();
+      }
+
+      pop();
+      resetShader();
+    }
+  </script>
+</body>
+</html>

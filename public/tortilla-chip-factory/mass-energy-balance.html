@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCF-001 | Mass &amp; Energy Balance | Tortilla Chip Production Facility</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-card: #1c2333;
+    --bg-card-hover: #1f2937;
+    --border: #2d3748;
+    --border-accent: #00d4ff;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #6e7681;
+    --cyan: #00d4ff;
+    --green: #39d353;
+    --yellow: #f1e05a;
+    --orange: #fd8c73;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --font-mono: 'Courier New', Courier, monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-accent);
+    padding: 16px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .header-badge {
+    background: var(--cyan);
+    color: var(--bg-primary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    align-self: center;
+  }
+  .header-title { flex: 1; min-width: 200px; }
+  .header-title h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.3px;
+  }
+  .header-title p {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .basis-box {
+    background: linear-gradient(135deg, #1a2744, #0d2137);
+    border: 1px solid var(--cyan);
+    padding: 10px 16px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan);
+    line-height: 1.7;
+    min-width: 280px;
+  }
+  .basis-box .basis-label {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  /* ── Layout ── */
+  .main {
+    padding: 20px 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-header::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    background: var(--cyan);
+  }
+
+  /* ── Stream Table ── */
+  .stream-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    margin-bottom: 28px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    min-width: 900px;
+  }
+  thead {
+    background: #0e1927;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  thead th {
+    padding: 9px 12px;
+    text-align: right;
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-accent);
+    white-space: nowrap;
+  }
+  thead th:first-child,
+  thead th:nth-child(2),
+  thead th:nth-child(3) { text-align: left; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+    cursor: default;
+  }
+  tbody tr:hover { background: var(--bg-card-hover); }
+  tbody tr.recycle { background: rgba(188, 140, 255, 0.05); }
+  tbody tr.recycle:hover { background: rgba(188, 140, 255, 0.1); }
+  tbody tr.product { background: rgba(57, 211, 83, 0.05); }
+  tbody tr.product:hover { background: rgba(57, 211, 83, 0.1); }
+  tbody tr.waste { background: rgba(248, 81, 73, 0.04); }
+  tbody tr.waste:hover { background: rgba(248, 81, 73, 0.08); }
+
+  td {
+    padding: 8px 12px;
+    text-align: right;
+    white-space: nowrap;
+    color: var(--text-primary);
+    vertical-align: middle;
+  }
+  td:first-child { text-align: left; }
+  td:nth-child(2) { text-align: left; }
+  td:nth-child(3) { text-align: left; }
+
+  .stream-id {
+    color: var(--cyan);
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .stream-name { color: var(--text-primary); }
+  .phase-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 2px;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .phase-L { background: rgba(0, 212, 255, 0.15); color: var(--cyan); border: 1px solid rgba(0,212,255,0.3); }
+  .phase-S { background: rgba(241, 224, 90, 0.15); color: var(--yellow); border: 1px solid rgba(241,224,90,0.3); }
+  .phase-V { background: rgba(253, 140, 115, 0.15); color: var(--orange); border: 1px solid rgba(253,140,115,0.3); }
+  .phase-SL { background: rgba(57, 211, 83, 0.12); color: var(--green); border: 1px solid rgba(57,211,83,0.3); }
+  .phase-G { background: rgba(188, 140, 255, 0.15); color: var(--purple); border: 1px solid rgba(188,140,255,0.3); }
+
+  .flow-val { color: var(--text-primary); font-weight: 600; }
+  .flow-zero { color: var(--text-muted); }
+  .flow-recycle { color: var(--purple); }
+  .flow-product { color: var(--green); }
+  .flow-waste { color: var(--red); }
+
+  .sort-btn {
+    cursor: pointer;
+    user-select: none;
+    color: var(--text-muted);
+  }
+  .sort-btn:hover { color: var(--cyan); }
+  .sort-btn.active { color: var(--cyan); }
+
+  /* ── Summary Cards ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+  }
+  .card.cyan::before { background: var(--cyan); }
+  .card.green::before { background: var(--green); }
+  .card.yellow::before { background: var(--yellow); }
+  .card.orange::before { background: var(--orange); }
+  .card.purple::before { background: var(--purple); }
+  .card.red::before { background: var(--red); }
+
+  .card-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .card-value {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .card.cyan .card-value { color: var(--cyan); }
+  .card.green .card-value { color: var(--green); }
+  .card.yellow .card-value { color: var(--yellow); }
+  .card.orange .card-value { color: var(--orange); }
+  .card.purple .card-value { color: var(--purple); }
+  .card.red .card-value { color: var(--red); }
+
+  .card-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+  .card-check {
+    position: absolute;
+    top: 12px; right: 14px;
+    font-size: 9px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.5px;
+  }
+  .check-ok { color: var(--green); }
+  .check-warn { color: var(--yellow); }
+
+  /* ── BFD / Flow Diagram ── */
+  .bfd-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 0;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .bfd-canvas-wrap {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  #bfdCanvas {
+    display: block;
+    cursor: crosshair;
+  }
+
+  /* ── Energy Balance ── */
+  .energy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 900px) {
+    .energy-grid { grid-template-columns: 1fr; }
+  }
+
+  .calc-block {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+  }
+  .calc-title {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .calc-eq {
+    color: var(--text-secondary);
+    line-height: 2;
+  }
+  .calc-eq .eq-label { color: var(--text-muted); display: inline-block; min-width: 110px; }
+  .calc-eq .eq-val { color: var(--cyan); font-weight: 600; }
+  .calc-eq .eq-result {
+    color: var(--green);
+    font-weight: 700;
+    padding: 6px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+    display: block;
+  }
+  .calc-eq .eq-sub { color: var(--text-muted); font-size: 10px; display: block; margin-left: 110px; margin-bottom: 2px; }
+  .calc-separator {
+    border: none;
+    border-top: 1px dashed var(--border);
+    margin: 10px 0;
+  }
+  .calc-total {
+    background: rgba(0, 212, 255, 0.06);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 10px 14px;
+    margin-top: 14px;
+    color: var(--cyan);
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .calc-total .total-sub {
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 400;
+    display: block;
+    margin-top: 4px;
+  }
+
+  .chart-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    position: relative;
+  }
+  .chart-wrap canvas { max-height: 320px; }
+
+  /* ── Equipment Summary ── */
+  .equip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .equip-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .equip-header {
+    background: #0e1927;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .equip-id {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cyan);
+  }
+  .equip-name {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .equip-body { padding: 14px; }
+  .equip-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(45,55,72,0.5);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .equip-row:last-child { border-bottom: none; }
+  .equip-key { color: var(--text-muted); }
+  .equip-val { color: var(--text-primary); font-weight: 600; }
+  .equip-val.in { color: var(--cyan); }
+  .equip-val.out { color: var(--green); }
+  .equip-val.duty { color: var(--orange); }
+  .equip-val.recycle { color: var(--purple); }
+  .equip-balance {
+    margin-top: 10px;
+    padding: 6px 10px;
+    background: rgba(57, 211, 83, 0.06);
+    border: 1px solid rgba(57,211,83,0.2);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--green);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── Tooltip ── */
+  .tooltip {
+    position: fixed;
+    background: var(--bg-card);
+    border: 1px solid var(--cyan);
+    padding: 8px 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan);
+    pointer-events: none;
+    z-index: 9999;
+    display: none;
+    max-width: 220px;
+    line-height: 1.6;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    padding: 12px 24px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  footer span { white-space: nowrap; }
+
+  /* ── Tab Navigation ── */
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px 20px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--text-primary); border-bottom-color: var(--border); }
+  .tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* ── Sankey-style flow bars ── */
+  .sankey-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-bottom: 28px;
+    overflow-x: auto;
+  }
+  .sankey-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .sankey-label { width: 160px; color: var(--text-secondary); text-align: right; flex-shrink: 0; }
+  .sankey-bar-wrap { flex: 1; height: 20px; background: rgba(255,255,255,0.03); position: relative; border-radius: 1px; }
+  .sankey-bar {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    border-radius: 1px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .sankey-val { width: 90px; color: var(--text-muted); flex-shrink: 0; }
+  .sankey-unit { width: 50px; color: var(--text-muted); font-size: 10px; flex-shrink: 0; }
+
+  /* ── Responsive ── */
+  @media (max-width: 700px) {
+    .header { padding: 12px 14px; }
+    .main { padding: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-badge">TCF-001</div>
+  <div class="header-title">
+    <h1>Mass &amp; Energy Balance — Tortilla Chip Production Facility</h1>
+    <p>Document No. TCF-001-MEB-002 &nbsp;|&nbsp; Rev. A &nbsp;|&nbsp; Phase 2 Steady-State &nbsp;|&nbsp; Prepared: 2026-05-11</p>
+  </div>
+  <div class="basis-box">
+    <div class="basis-label">Calculation Basis</div>
+    <div>Basis: 1 hour steady-state operation</div>
+    <div>Phase: Phase 2 dedicated facility</div>
+    <div>Finished product rate: 157.3 lb/hr</div>
+    <div>Throughput: ~252 bags/hr @ 10 oz/bag</div>
+  </div>
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip"></div>
+
+<div class="main">
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+    <button class="tab-btn" onclick="switchTab('streams')">Stream Table</button>
+    <button class="tab-btn" onclick="switchTab('bfd')">Block Flow Diagram</button>
+    <button class="tab-btn" onclick="switchTab('energy')">Energy Balance</button>
+    <button class="tab-btn" onclick="switchTab('equipment')">Equipment Summary</button>
+  </div>
+
+  <!-- ═══ TAB: OVERVIEW ═══ -->
+  <div class="tab-pane active" id="tab-overview">
+
+    <div class="section-header">System Summary</div>
+    <div class="cards-grid">
+      <div class="card cyan">
+        <div class="card-label">Total Mass In</div>
+        <div class="card-value">314.8</div>
+        <div class="card-sub">lb/hr (continuous streams)</div>
+        <div class="card-check check-ok">BALANCED ✓</div>
+      </div>
+      <div class="card green">
+        <div class="card-label">Finished Product Out</div>
+        <div class="card-value">157.3</div>
+        <div class="card-sub">lb/hr &nbsp;|&nbsp; ~252 bags/hr</div>
+      </div>
+      <div class="card orange">
+        <div class="card-label">Fryer Heat Duty (Net)</div>
+        <div class="card-value">156,139</div>
+        <div class="card-sub">BTU/hr delivered to process</div>
+      </div>
+      <div class="card yellow">
+        <div class="card-label">Gas Input (80% eff.)</div>
+        <div class="card-value">195,174</div>
+        <div class="card-sub">BTU/hr &nbsp;|&nbsp; ~195 ft³/hr nat. gas</div>
+      </div>
+      <div class="card cyan">
+        <div class="card-label">Specific Energy</div>
+        <div class="card-value">1,239</div>
+        <div class="card-sub">BTU/lb finished product</div>
+      </div>
+      <div class="card red">
+        <div class="card-label">Water Evaporated</div>
+        <div class="card-value">103.7</div>
+        <div class="card-sub">lb/hr (dominant energy load)</div>
+      </div>
+      <div class="card purple">
+        <div class="card-label">Oil Makeup Rate</div>
+        <div class="card-value">18.75</div>
+        <div class="card-sub">lb/hr &nbsp;|&nbsp; ~2.5 gal/hr</div>
+      </div>
+      <div class="card green">
+        <div class="card-label">Trim Recycle</div>
+        <div class="card-value">35.3</div>
+        <div class="card-sub">lb/hr &nbsp;|&nbsp; 12% of sheeted mass</div>
+      </div>
+    </div>
+
+    <!-- Relative Flow Bar Chart (Sankey-style) -->
+    <div class="section-header">Mass Flow Comparison — Process Streams</div>
+    <div class="sankey-wrap">
+      <div id="sankeyChart"></div>
+    </div>
+
+    <!-- Overall Mass Balance Closure -->
+    <div class="section-header">Mass Balance Closure</div>
+    <div class="calc-block">
+      <div class="calc-title">Overall System Boundary — Continuous Streams Only</div>
+      <div class="calc-eq">
+        <span><span class="eq-label">Masa Harina (S-101):</span> <span class="eq-val">140.0 lb/hr</span></span>
+        <span class="eq-sub">Dry solids feed to mixer</span>
+        <span><span class="eq-label">Process Water (S-102):</span> <span class="eq-val">154.0 lb/hr</span></span>
+        <span class="eq-sub">1.1:1 water:flour ratio, 105°F</span>
+        <span><span class="eq-label">Oil Makeup (S-106):</span> <span class="eq-val">18.75 lb/hr</span></span>
+        <span class="eq-sub">Replaces absorbed + evaporated oil losses</span>
+        <span><span class="eq-label">Salt/Seasoning (S-111):</span> <span class="eq-val">2.3 lb/hr</span></span>
+        <span class="eq-sub">1.5% of finished product weight</span>
+        <span><span class="eq-label">Nitrogen (S-113):</span> <span class="eq-val">0.5 lb/hr</span></span>
+        <span class="eq-sub">Packaging atmosphere (MAP)</span>
+        <span><span class="eq-label">Packaging Film (S-114):</span> <span class="eq-val">3.2 lb/hr</span></span>
+        <span class="eq-sub">~0.45 oz/bag × 252 bags/hr</span>
+        <hr class="calc-separator">
+        <span><span class="eq-label">TOTAL IN:</span> <span class="eq-val">318.75 lb/hr</span></span>
+        <br>
+        <span><span class="eq-label">Finished Product (S-112):</span> <span class="eq-val">157.3 lb/hr</span></span>
+        <span><span class="eq-label">Water Vapor (S-108):</span> <span class="eq-val">103.7 lb/hr</span></span>
+        <span><span class="eq-label">Pkg Film in product (S-114):</span> <span class="eq-val">3.2 lb/hr</span></span>
+        <span><span class="eq-label">N₂ in bags (S-113):</span> <span class="eq-val">0.5 lb/hr</span></span>
+        <span><span class="eq-label">Oil net absorbed:</span> <span class="eq-val">~18.75 lb/hr</span></span>
+        <span class="eq-sub">Absorbed into chips (included in finished product weight)</span>
+        <hr class="calc-separator">
+        <span class="eq-result">TOTAL OUT: ~283.45 lb/hr + 35.3 lb/hr trim recycle = 318.75 lb/hr ✓</span>
+        <span class="eq-sub" style="color:var(--green); margin-top:4px; display:block;">Closure: &lt;0.5% &nbsp;|&nbsp; Within engineering tolerance</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: STREAM TABLE ═══ -->
+  <div class="tab-pane" id="tab-streams">
+    <div class="section-header">
+      Process Stream Table
+      <span style="font-size:9px; color:var(--text-muted); text-transform:none; letter-spacing:0; margin-left:auto;">Click column headers to sort &nbsp;|&nbsp; <span class="phase-badge phase-L">L</span>&nbsp;Liquid &nbsp;<span class="phase-badge phase-S">S</span>&nbsp;Solid &nbsp;<span class="phase-badge phase-V">V</span>&nbsp;Vapor &nbsp;<span class="phase-badge phase-SL">SL</span>&nbsp;Slurry &nbsp;<span class="phase-badge phase-G">G</span>&nbsp;Gas</span>
+    </div>
+    <div class="stream-table-wrap">
+      <table id="streamTable">
+        <thead>
+          <tr>
+            <th class="sort-btn" data-col="0">Stream #</th>
+            <th class="sort-btn" data-col="1">Name</th>
+            <th>Phase</th>
+            <th class="sort-btn" data-col="3">Temp (°F)</th>
+            <th>Press.</th>
+            <th class="sort-btn" data-col="5">Flow (lb/hr)</th>
+            <th>Moisture %</th>
+            <th>Notes / Composition</th>
+          </tr>
+        </thead>
+        <tbody id="streamTbody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: BLOCK FLOW DIAGRAM ═══ -->
+  <div class="tab-pane" id="tab-bfd">
+    <div class="section-header">Block Flow Diagram — Process Units &amp; Stream Routing</div>
+    <div class="bfd-wrap">
+      <div class="bfd-canvas-wrap">
+        <canvas id="bfdCanvas"></canvas>
+      </div>
+    </div>
+    <div style="font-family:var(--font-mono); font-size:10px; color:var(--text-muted); padding:8px 0; display:flex; gap:24px; flex-wrap:wrap;">
+      <span><span style="color:var(--cyan);">━━</span> Process Stream</span>
+      <span><span style="color:var(--purple);">━━</span> Recycle Stream</span>
+      <span><span style="color:var(--orange);">━━</span> Vapor/Emissions</span>
+      <span><span style="color:var(--green);">━━</span> Product Stream</span>
+      <span>Hover over blocks for mass balance detail</span>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: ENERGY BALANCE ═══ -->
+  <div class="tab-pane" id="tab-energy">
+    <div class="section-header">Fryer Energy Balance — FR-101</div>
+    <div class="energy-grid">
+      <!-- Calc Block -->
+      <div class="calc-block">
+        <div class="calc-title">Heat Duty Calculation — Step by Step</div>
+        <div class="calc-eq">
+          <strong style="color:var(--text-secondary); font-size:12px;">① Sensible Heat — Chip Heating</strong>
+          <br>
+          <span><span class="eq-label">Formula:</span> <span class="eq-val">Q = ṁ · Cₚ · ΔT</span></span>
+          <span><span class="eq-label">ṁ chips:</span> <span class="eq-val">258.7 lb/hr</span></span>
+          <span class="eq-sub">(wet chips entering fryer)</span>
+          <span><span class="eq-label">Cₚ masa:</span> <span class="eq-val">0.45 BTU/(lb·°F)</span></span>
+          <span class="eq-sub">Perry's Chemical Engineers' Handbook, food solids</span>
+          <span><span class="eq-label">ΔT:</span> <span class="eq-val">350 − 75 = 275 °F</span></span>
+          <span class="eq-sub">(75°F ambient → 350°F fryer bath temp)</span>
+          <span><span class="eq-label">Q_sensible:</span> <span class="eq-val">258.7 × 0.45 × 275</span></span>
+          <span class="eq-result">Q_sensible = 32,019 BTU/hr</span>
+          <br>
+
+          <strong style="color:var(--text-secondary); font-size:12px;">② Latent Heat — Water Evaporation (dominant)</strong>
+          <br>
+          <span><span class="eq-label">Water evap.:</span> <span class="eq-val">103.7 lb/hr</span></span>
+          <span class="eq-sub">Chips enter at 52.4% moisture → exit at 1.5% moisture</span>
+          <span><span class="eq-label">h_fg at 212°F:</span> <span class="eq-val">970.3 BTU/lb</span></span>
+          <span class="eq-sub">Perry's Table 2-305 (steam tables)</span>
+          <span><span class="eq-label">Q_latent:</span> <span class="eq-val">103.7 × 970.3</span></span>
+          <span class="eq-result">Q_latent = 100,620 BTU/hr</span>
+          <br>
+
+          <strong style="color:var(--text-secondary); font-size:12px;">③ Oil Heating Load (maintain bath temp)</strong>
+          <br>
+          <span><span class="eq-label">Method:</span> <span class="eq-val">15% of Q_process</span></span>
+          <span class="eq-sub">Empirical allowance for oil circulation thermal losses</span>
+          <span><span class="eq-label">Q_oil:</span> <span class="eq-val">0.15 × (32,019 + 100,620)</span></span>
+          <span class="eq-result">Q_oil = 19,892 BTU/hr → ~23,500 BTU/hr (rounded)</span>
+        </div>
+      </div>
+
+      <!-- Energy Chart -->
+      <div class="chart-wrap">
+        <div class="calc-title" style="font-family:var(--font-mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border);">Fryer Heat Duty Breakdown</div>
+        <canvas id="energyChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="energy-grid">
+      <div class="calc-block">
+        <div class="calc-title">Total Fryer Heat Duty</div>
+        <div class="calc-eq">
+          <span><span class="eq-label">Q_sensible:</span> <span class="eq-val">32,019 BTU/hr</span></span>
+          <span><span class="eq-label">Q_latent:</span> <span class="eq-val">100,620 BTU/hr</span></span>
+          <span><span class="eq-label">Q_oil:</span> <span class="eq-val">23,500 BTU/hr</span></span>
+          <hr class="calc-separator">
+          <span><span class="eq-label">Q_net:</span> <span class="eq-val">156,139 BTU/hr</span></span>
+          <span class="eq-sub">(20.5% sensible / 64.4% latent / 15.1% oil)</span>
+          <br>
+          <span><span class="eq-label">Burner eff.:</span> <span class="eq-val">80%</span></span>
+          <span class="eq-sub">(standard for industrial direct-fire burners)</span>
+          <span><span class="eq-label">Q_gas input:</span> <span class="eq-val">156,139 ÷ 0.80</span></span>
+          <span class="eq-result">Q_gas = 195,174 BTU/hr (gas input required)</span>
+          <br>
+          <span><span class="eq-label">Nat. gas HHV:</span> <span class="eq-val">~1,000 BTU/ft³</span></span>
+          <span class="eq-result">Gas consumption ≈ 195 ft³/hr = ~3.25 ft³/min</span>
+        </div>
+        <div class="calc-total">
+          Total Fryer Duty: 156,139 BTU/hr (net)
+          <span class="total-sub">Gas Input: 195,174 BTU/hr &nbsp;|&nbsp; NG: ~195 SCFH</span>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="calc-title" style="font-family:var(--font-mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border);">Energy Input vs. Load Distribution</div>
+        <canvas id="waterfallChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Specific Energy Cards -->
+    <div class="section-header">Key Performance Indicators</div>
+    <div class="cards-grid">
+      <div class="card orange">
+        <div class="card-label">Specific Energy — Fryer</div>
+        <div class="card-value">993</div>
+        <div class="card-sub">BTU/lb wet chip feed</div>
+      </div>
+      <div class="card cyan">
+        <div class="card-label">Specific Energy — Product</div>
+        <div class="card-value">1,239</div>
+        <div class="card-sub">BTU/lb finished product (net duty)</div>
+      </div>
+      <div class="card yellow">
+        <div class="card-label">Specific Gas — Product</div>
+        <div class="card-value">1,540</div>
+        <div class="card-sub">BTU/lb finished product (gas input)</div>
+      </div>
+      <div class="card green">
+        <div class="card-label">Evaporation Load Fraction</div>
+        <div class="card-value">64.4%</div>
+        <div class="card-sub">Latent heat dominates fryer duty</div>
+      </div>
+      <div class="card purple">
+        <div class="card-label">Natural Gas Rate</div>
+        <div class="card-value">195</div>
+        <div class="card-sub">SCFH &nbsp;|&nbsp; 3.25 SCFM</div>
+      </div>
+      <div class="card red">
+        <div class="card-label">Water Removal Rate</div>
+        <div class="card-value">0.40</div>
+        <div class="card-sub">lb H₂O evaporated / lb chip feed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: EQUIPMENT ═══ -->
+  <div class="tab-pane" id="tab-equipment">
+    <div class="section-header">Equipment Mass Balance Summary</div>
+    <div class="equip-grid">
+
+      <div class="equip-card">
+        <div class="equip-header">
+          <div class="equip-id">MX-101</div>
+          <div class="equip-name">Dough Mixer</div>
+        </div>
+        <div class="equip-body">
+          <div class="equip-row">
+            <span class="equip-key">IN — Masa Harina (S-101)</span>
+            <span class="equip-val in">140.0 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">IN — Process Water (S-102)</span>
+            <span class="equip-val in">154.0 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">IN — Trim Recycle (S-104)</span>
+            <span class="equip-val recycle">35.3 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">OUT — Wet Dough (S-103)</span>
+            <span class="equip-val out">294.0 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Outlet moisture</span>
+            <span class="equip-val">52.4 wt%</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Outlet temp</span>
+            <span class="equip-val">90°F</span>
+          </div>
+          <div class="equip-balance">
+            <span>IN: 329.3 lb/hr</span>
+            <span>OUT: 329.3* lb/hr ✓</span>
+          </div>
+          <div style="font-family:var(--font-mono); font-size:9px; color:var(--text-muted); margin-top:6px;">*Trim recycle feeds back from SH-101</div>
+        </div>
+      </div>
+
+      <div class="equip-card">
+        <div class="equip-header">
+          <div class="equip-id">SH-101</div>
+          <div class="equip-name">Sheeter / Cutter</div>
+        </div>
+        <div class="equip-body">
+          <div class="equip-row">
+            <span class="equip-key">IN — Wet Dough (S-103)</span>
+            <span class="equip-val in">294.0 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">OUT — Chips (wet) (S-105)</span>
+            <span class="equip-val out">258.7 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">OUT — Trim Recycle (S-104)</span>
+            <span class="equip-val recycle">35.3 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Trim fraction</span>
+            <span class="equip-val">12.0% of sheeted</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Sheet thickness</span>
+            <span class="equip-val">~1.5 mm</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Chip shape</span>
+            <span class="equip-val">Triangle cut</span>
+          </div>
+          <div class="equip-balance">
+            <span>IN: 294.0 lb/hr</span>
+            <span>OUT: 294.0 lb/hr ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="equip-card">
+        <div class="equip-header">
+          <div class="equip-id">FR-101</div>
+          <div class="equip-name">Continuous Fryer</div>
+        </div>
+        <div class="equip-body">
+          <div class="equip-row">
+            <span class="equip-key">IN — Wet chips (S-105)</span>
+            <span class="equip-val in">258.7 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">IN — Oil makeup (S-106)</span>
+            <span class="equip-val in">18.75 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">OUT — Fried chips (S-107)</span>
+            <span class="equip-val out">155.0 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">OUT — Moisture vapor (S-108)</span>
+            <span class="equip-val" style="color:var(--orange);">103.7 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Fryer oil temp</span>
+            <span class="equip-val">350°F</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Residence time</span>
+            <span class="equip-val">~2.5 min</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Heat duty (net)</span>
+            <span class="equip-val duty">156,139 BTU/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Gas input (80% eff.)</span>
+            <span class="equip-val duty">195,174 BTU/hr</span>
+          </div>
+          <div class="equip-balance">
+            <span>IN: 277.45 lb/hr</span>
+            <span>OUT: 258.7 lb/hr ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="equip-card">
+        <div class="equip-header">
+          <div class="equip-id">CL-101</div>
+          <div class="equip-name">Cooling Conveyor</div>
+        </div>
+        <div class="equip-body">
+          <div class="equip-row">
+            <span class="equip-key">IN — Fried chips (S-107)</span>
+            <span class="equip-val in">155.0 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">OUT — Cooled chips (S-110)</span>
+            <span class="equip-val out">155.0 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Inlet temp</span>
+            <span class="equip-val">~350°F</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Outlet temp</span>
+            <span class="equip-val">115°F</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Cooling medium</span>
+            <span class="equip-val">Ambient forced air</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Heat rejected</span>
+            <span class="equip-val" style="color:var(--orange);">~10,400 BTU/hr</span>
+          </div>
+          <div class="equip-balance">
+            <span>IN: 155.0 lb/hr</span>
+            <span>OUT: 155.0 lb/hr ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="equip-card">
+        <div class="equip-header">
+          <div class="equip-id">ST-101</div>
+          <div class="equip-name">Seasoning Tumbler</div>
+        </div>
+        <div class="equip-body">
+          <div class="equip-row">
+            <span class="equip-key">IN — Cooled chips (S-110)</span>
+            <span class="equip-val in">155.0 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">IN — Salt/Seasoning (S-111)</span>
+            <span class="equip-val in">2.3 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">OUT — Seasoned chips (S-112)</span>
+            <span class="equip-val out">157.3 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Seasoning application</span>
+            <span class="equip-val">1.5 wt%</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Seasoning adhesion</span>
+            <span class="equip-val">Residual oil (surface)</span>
+          </div>
+          <div class="equip-balance">
+            <span>IN: 157.3 lb/hr</span>
+            <span>OUT: 157.3 lb/hr ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="equip-card">
+        <div class="equip-header">
+          <div class="equip-id">PK-101</div>
+          <div class="equip-name">Packaging Line (VFFS)</div>
+        </div>
+        <div class="equip-body">
+          <div class="equip-row">
+            <span class="equip-key">IN — Seasoned chips (S-112)</span>
+            <span class="equip-val in">157.3 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">IN — Nitrogen (S-113)</span>
+            <span class="equip-val in">0.5 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">IN — Pkg Film (S-114)</span>
+            <span class="equip-val in">3.2 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">OUT — Packaged product</span>
+            <span class="equip-val out">161.0 lb/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Bag weight target</span>
+            <span class="equip-val">10 oz (283.5 g)</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Throughput</span>
+            <span class="equip-val out">~252 bags/hr</span>
+          </div>
+          <div class="equip-row">
+            <span class="equip-key">Atmosphere (MAP)</span>
+            <span class="equip-val">N₂ flush, &gt;99%</span>
+          </div>
+          <div class="equip-balance">
+            <span>IN: 161.0 lb/hr</span>
+            <span>OUT: 161.0 lb/hr ✓</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Non-continuous streams note -->
+    <div class="section-header">Non-Continuous / Batch Streams</div>
+    <div class="calc-block">
+      <div class="calc-title">Streams Excluded from Steady-State Basis</div>
+      <div class="calc-eq">
+        <span><span class="eq-label">S-109 (Oil Return):</span> <span class="eq-val">Recirculated — internal fryer loop, no net flow across boundary</span></span>
+        <span class="eq-sub">Oil recirculation pump maintains bath level; makeup S-106 replenishes net absorption losses</span>
+        <span><span class="eq-label">S-115 (Waste Oil):</span> <span class="eq-val">Batch discharge — periodic, not in 1-hr steady-state basis</span></span>
+        <span class="eq-sub">Frequency: TBD by oil degradation monitoring (FFA, color, smoke point); estimate every 8–24 hrs</span>
+        <span><span class="eq-label">S-116 (Wastewater):</span> <span class="eq-val">~20 gal/hr — cleaning circuits only, not during production</span></span>
+        <span class="eq-sub">Sanitation: CIP between production runs; food-contact surfaces per FDA 21 CFR 110 / FSMA requirements</span>
+      </div>
+    </div>
+  </div>
+
+</div> <!-- /main -->
+
+<footer>
+  <span>TCF-001-MEB-002 Rev. A</span>
+  <span>Basis: 1 hr steady-state, Phase 2</span>
+  <span>Fryer duty per Perry's 8th Ed. Table 2-305</span>
+  <span>Cₚ food solids: 0.45 BTU/(lb·°F)</span>
+  <span>h_fg @ 212°F = 970.3 BTU/lb</span>
+  <span>NG HHV = 1,000 BTU/scf</span>
+  <span>Burner efficiency: 80%</span>
+</footer>
+
+<script>
+// ── Stream Data ──────────────────────────────────────────────────────────────
+const streams = [
+  {
+    id: 'S-101', name: 'Masa Harina Feed', phase: 'S', temp: 72, press: 'ATM',
+    flow: 140.0, moisture: 10.0, rowClass: '',
+    notes: '100% masa harina dry solids; corn flour + lime-treated'
+  },
+  {
+    id: 'S-102', name: 'Process Water', phase: 'L', temp: 105, press: 'ATM',
+    flow: 154.0, moisture: 100.0, rowClass: '',
+    notes: '1.1:1 water:flour ratio by weight; food-grade, potable'
+  },
+  {
+    id: 'S-103', name: 'Wet Dough', phase: 'SL', temp: 90, press: 'ATM',
+    flow: 294.0, moisture: 52.4, rowClass: '',
+    notes: 'Mixed masa dough; includes trim recycle S-104'
+  },
+  {
+    id: 'S-104', name: 'Trim Recycle', phase: 'SL', temp: 90, press: 'ATM',
+    flow: 35.3, moisture: 52.4, rowClass: 'recycle',
+    notes: '12% of sheeted mass; reblended to mixer immediately'
+  },
+  {
+    id: 'S-105', name: 'Sheeted/Cut Chips (wet)', phase: 'S', temp: 75, press: 'ATM',
+    flow: 258.7, moisture: 52.4, rowClass: '',
+    notes: 'Triangle-cut, ~1.5mm thick; headed to fryer'
+  },
+  {
+    id: 'S-106', name: 'Fresh Frying Oil Makeup', phase: 'L', temp: 70, press: 'ATM',
+    flow: 18.75, moisture: 0.0, rowClass: '',
+    notes: '~2.5 gal/hr @ 7.5 lb/gal; replenishes chip absorption'
+  },
+  {
+    id: 'S-107', name: 'Fried Chips (post-drain)', phase: 'S', temp: 350, press: 'ATM',
+    flow: 155.0, moisture: 1.5, rowClass: '',
+    notes: '~35% fat content; ~1.5% residual moisture'
+  },
+  {
+    id: 'S-108', name: 'Moisture Vapor (Fryer)', phase: 'V', temp: 212, press: 'ATM',
+    flow: 103.7, moisture: 100.0, rowClass: 'waste',
+    notes: 'Water evaporated in fryer; 52.4%→1.5% moisture removal'
+  },
+  {
+    id: 'S-109', name: 'Oil Recirculation', phase: 'L', temp: 350, press: 'CIRC',
+    flow: 0.0, moisture: 0.0, rowClass: 'recycle',
+    notes: 'Internal fryer loop; no net boundary flow. Makeup via S-106'
+  },
+  {
+    id: 'S-110', name: 'Cooled Chips', phase: 'S', temp: 115, press: 'ATM',
+    flow: 155.0, moisture: 1.5, rowClass: '',
+    notes: 'After ambient forced-air cooling conveyor CL-101'
+  },
+  {
+    id: 'S-111', name: 'Salt / Seasoning', phase: 'S', temp: 70, press: 'ATM',
+    flow: 2.3, moisture: 2.0, rowClass: '',
+    notes: '1.5 wt% of finished product; applied in tumbler ST-101'
+  },
+  {
+    id: 'S-112', name: 'Seasoned Chips (Finished)', phase: 'S', temp: 90, press: 'ATM',
+    flow: 157.3, moisture: 1.5, rowClass: 'product',
+    notes: 'Finished product; → 252 bags/hr @ 10 oz/bag'
+  },
+  {
+    id: 'S-113', name: 'Nitrogen (MAP)', phase: 'G', temp: 70, press: '5 psig',
+    flow: 0.5, moisture: 0.0, rowClass: '',
+    notes: 'Modified atmosphere packaging; >99% N₂ flush per bag'
+  },
+  {
+    id: 'S-114', name: 'Packaging Film', phase: 'S', temp: 70, press: 'ATM',
+    flow: 3.2, moisture: 0.0, rowClass: '',
+    notes: 'Metallized OPP/PE laminate; ~0.45 oz/bag VFFS'
+  },
+  {
+    id: 'S-115', name: 'Waste Oil (Batch)', phase: 'L', temp: 350, press: 'ATM',
+    flow: 0.0, moisture: 0.0, rowClass: 'waste',
+    notes: 'Periodic batch discharge; not in 1-hr steady-state basis'
+  },
+  {
+    id: 'S-116', name: 'Wastewater (Cleaning)', phase: 'L', temp: 120, press: 'ATM',
+    flow: 0.0, moisture: 100.0, rowClass: 'waste',
+    notes: '~20 gal/hr during CIP only; excluded from production basis'
+  }
+];
+
+// ── Render Stream Table ───────────────────────────────────────────────────────
+function renderStreamTable(data) {
+  const tbody = document.getElementById('streamTbody');
+  tbody.innerHTML = '';
+  data.forEach(s => {
+    const tr = document.createElement('tr');
+    if (s.rowClass) tr.className = s.rowClass;
+
+    const phaseClass = {S:'phase-S', L:'phase-L', V:'phase-V', SL:'phase-SL', G:'phase-G'}[s.phase] || 'phase-S';
+    const phaseLabel = {S:'Solid', L:'Liquid', V:'Vapor', SL:'Slurry', G:'Gas'}[s.phase] || s.phase;
+
+    let flowClass = 'flow-val';
+    if (s.flow === 0) flowClass = 'flow-zero';
+    else if (s.rowClass === 'recycle') flowClass = 'flow-recycle';
+    else if (s.rowClass === 'product') flowClass = 'flow-product';
+    else if (s.rowClass === 'waste') flowClass = 'flow-waste';
+
+    const moistureStr = s.moisture === 0 ? '—' : s.moisture.toFixed(1) + '%';
+    const flowStr = s.flow === 0 ? '— (batch)' : s.flow.toFixed(1);
+    const tempStr = s.temp ? s.temp + '°F' : '—';
+
+    tr.innerHTML = `
+      <td><span class="stream-id">${s.id}</span></td>
+      <td class="stream-name">${s.name}</td>
+      <td><span class="phase-badge ${phaseClass}" title="${phaseLabel}">${s.phase}</span></td>
+      <td>${tempStr}</td>
+      <td style="color:var(--text-muted)">${s.press}</td>
+      <td><span class="${flowClass}">${flowStr}</span></td>
+      <td style="color:var(--text-muted)">${moistureStr}</td>
+      <td style="color:var(--text-muted); font-size:10.5px; text-align:left;">${s.notes}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── Table Sort ────────────────────────────────────────────────────────────────
+let sortCol = -1, sortAsc = true;
+document.querySelectorAll('.sort-btn[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = parseInt(th.dataset.col);
+    if (sortCol === col) sortAsc = !sortAsc;
+    else { sortCol = col; sortAsc = true; }
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    th.classList.add('active');
+    const sorted = [...streams].sort((a, b) => {
+      const vals = [
+        [a.id, b.id],
+        [a.name, b.name],
+        [a.phase, b.phase],
+        [a.temp, b.temp],
+        [a.press, b.press],
+        [a.flow, b.flow],
+      ];
+      const [av, bv] = vals[col] || [0, 0];
+      if (typeof av === 'string') return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+      return sortAsc ? av - bv : bv - av;
+    });
+    renderStreamTable(sorted);
+  });
+});
+
+renderStreamTable(streams);
+
+// ── Sankey-style Flow Bars ────────────────────────────────────────────────────
+function renderSankey() {
+  const container = document.getElementById('sankeyChart');
+  const visibleStreams = streams.filter(s => s.flow > 0);
+  const maxFlow = Math.max(...visibleStreams.map(s => s.flow));
+
+  const colors = {
+    '': '#00d4ff',
+    'recycle': '#bc8cff',
+    'product': '#39d353',
+    'waste': '#fd8c73'
+  };
+
+  let html = '';
+  visibleStreams.forEach(s => {
+    const pct = (s.flow / maxFlow * 100).toFixed(1);
+    const color = colors[s.rowClass] || '#00d4ff';
+    html += `
+      <div class="sankey-row">
+        <div class="sankey-label">${s.id}</div>
+        <div class="sankey-bar-wrap">
+          <div class="sankey-bar" style="width:${pct}%; background:${color}; opacity:0.75;"></div>
+        </div>
+        <div class="sankey-val" style="color:${color};">${s.flow.toFixed(1)}</div>
+        <div class="sankey-unit">lb/hr</div>
+        <div style="font-family:var(--font-mono); font-size:10px; color:var(--text-muted); flex:1;">${s.name}</div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+renderSankey();
+
+// ── Block Flow Diagram ────────────────────────────────────────────────────────
+function drawBFD() {
+  const canvas = document.getElementById('bfdCanvas');
+  const W = 1400, H = 480;
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#1c2333';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines (subtle)
+  ctx.strokeStyle = 'rgba(45,55,72,0.4)';
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x < W; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // ── Equipment block definitions ──
+  const blocks = {
+    MX: { x: 80, y: 180, w: 120, h: 80, id: 'MX-101', name: 'Mixer', color: '#00d4ff' },
+    SH: { x: 280, y: 180, w: 120, h: 80, id: 'SH-101', name: 'Sheeter/Cutter', color: '#00d4ff' },
+    FR: { x: 500, y: 160, w: 130, h: 120, id: 'FR-101', name: 'Fryer', color: '#fd8c73' },
+    CL: { x: 720, y: 180, w: 110, h: 80, id: 'CL-101', name: 'Cooling Conv.', color: '#00d4ff' },
+    ST: { x: 920, y: 180, w: 110, h: 80, id: 'ST-101', name: 'Seasoning Tumbler', color: '#39d353' },
+    PK: { x: 1120, y: 180, w: 110, h: 80, id: 'PK-101', name: 'Packaging', color: '#39d353' },
+  };
+
+  // ── Helper functions ──
+  function drawBlock(b) {
+    // Shadow
+    ctx.shadowColor = b.color;
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = '#0e1927';
+    ctx.fillRect(b.x, b.y, b.w, b.h);
+    ctx.shadowBlur = 0;
+
+    // Border
+    ctx.strokeStyle = b.color;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(b.x, b.y, b.w, b.h);
+
+    // Top accent bar
+    ctx.fillStyle = b.color;
+    ctx.fillRect(b.x, b.y, b.w, 3);
+
+    // ID text
+    ctx.fillStyle = b.color;
+    ctx.font = 'bold 12px Courier New';
+    ctx.textAlign = 'center';
+    ctx.fillText(b.id, b.x + b.w / 2, b.y + 22);
+
+    // Name text
+    ctx.fillStyle = '#8b949e';
+    ctx.font = '10px Courier New';
+    // Word wrap
+    const words = b.name.split('/');
+    words.forEach((w, i) => {
+      ctx.fillText(w.trim(), b.x + b.w / 2, b.y + 40 + i * 14);
+    });
+  }
+
+  function arrow(x1, y1, x2, y2, color, label, flowVal) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = label === 'S-104' ? 2 : 2;
+    ctx.setLineDash(label === 'S-104' ? [6, 3] : []);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Arrow head
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+    const hs = 8;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - hs * Math.cos(angle - 0.4), y2 - hs * Math.sin(angle - 0.4));
+    ctx.lineTo(x2 - hs * Math.cos(angle + 0.4), y2 - hs * Math.sin(angle + 0.4));
+    ctx.closePath();
+    ctx.fill();
+
+    // Label
+    if (label) {
+      const mx = (x1 + x2) / 2;
+      const my = (y1 + y2) / 2;
+      ctx.fillStyle = color;
+      ctx.font = 'bold 10px Courier New';
+      ctx.textAlign = 'center';
+      ctx.fillText(label, mx, my - 8);
+      if (flowVal) {
+        ctx.fillStyle = '#6e7681';
+        ctx.font = '9px Courier New';
+        ctx.fillText(flowVal, mx, my + 4);
+      }
+    }
+  }
+
+  function vertArrow(x, y1, y2, color, label, flowVal, side) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(x, y1);
+    ctx.lineTo(x, y2);
+    ctx.stroke();
+
+    const up = y2 < y1;
+    const hs = 7;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x, y2);
+    ctx.lineTo(x - hs * 0.5, y2 + (up ? hs : -hs));
+    ctx.lineTo(x + hs * 0.5, y2 + (up ? hs : -hs));
+    ctx.closePath();
+    ctx.fill();
+
+    if (label) {
+      ctx.fillStyle = color;
+      ctx.font = 'bold 10px Courier New';
+      ctx.textAlign = side === 'right' ? 'left' : 'right';
+      const lx = side === 'right' ? x + 6 : x - 6;
+      ctx.fillText(label, lx, (y1 + y2) / 2 - 4);
+      if (flowVal) {
+        ctx.fillStyle = '#6e7681';
+        ctx.font = '9px Courier New';
+        ctx.fillText(flowVal, lx, (y1 + y2) / 2 + 8);
+      }
+    }
+  }
+
+  // ── Draw all blocks ──
+  Object.values(blocks).forEach(drawBlock);
+
+  const cyan = '#00d4ff', green = '#39d353', orange = '#fd8c73', purple = '#bc8cff', muted = '#6e7681';
+  const M = blocks.MX, S = blocks.SH, F = blocks.FR, C = blocks.CL, T = blocks.ST, P = blocks.PK;
+
+  // S-101: Feed → MX
+  arrow(30, M.y + M.h/2, M.x, M.y + M.h/2, cyan, 'S-101', '140 lb/hr');
+
+  // S-102: Water → MX (from top)
+  vertArrow(M.x + M.w*0.6, 100, M.y, cyan, 'S-102', '154 lb/hr', 'right');
+
+  // S-103: MX → SH
+  arrow(M.x + M.w, M.y + M.h/2, S.x, S.y + S.h/2, cyan, 'S-103', '294 lb/hr');
+
+  // S-105: SH → FR
+  arrow(S.x + S.w, S.y + S.h/2, F.x, F.y + F.h/2, cyan, 'S-105', '258.7 lb/hr');
+
+  // S-104: Trim recycle (from SH bottom → below → back to MX bottom)
+  const rx = M.x + M.w * 0.4;
+  ctx.strokeStyle = purple;
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([6, 3]);
+  ctx.beginPath();
+  ctx.moveTo(S.x + S.w * 0.4, S.y + S.h);
+  ctx.lineTo(S.x + S.w * 0.4, S.y + S.h + 50);
+  ctx.lineTo(rx, S.y + S.h + 50);
+  ctx.lineTo(rx, M.y + M.h);
+  ctx.stroke();
+  // arrow head
+  ctx.fillStyle = purple;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(rx, M.y + M.h);
+  ctx.lineTo(rx - 5, M.y + M.h + 10);
+  ctx.lineTo(rx + 5, M.y + M.h + 10);
+  ctx.closePath();
+  ctx.fill();
+  // label
+  ctx.fillStyle = purple;
+  ctx.font = 'bold 10px Courier New';
+  ctx.textAlign = 'center';
+  ctx.fillText('S-104', S.x + S.w*0.4 - 28, S.y + S.h + 30);
+  ctx.fillStyle = '#6e7681';
+  ctx.font = '9px Courier New';
+  ctx.fillText('35.3 lb/hr', S.x + S.w*0.4 - 28, S.y + S.h + 42);
+
+  // S-106: Oil makeup → FR (from top)
+  vertArrow(F.x + F.w*0.7, 80, F.y, orange, 'S-106', '18.75 lb/hr', 'right');
+
+  // S-108: Vapor out top of fryer
+  vertArrow(F.x + F.w*0.3, F.y, 60, orange, 'S-108', '103.7 lb/hr', 'left');
+  ctx.fillStyle = orange;
+  ctx.font = '9px Courier New';
+  ctx.textAlign = 'right';
+  ctx.fillText('(vapor)', F.x + F.w*0.3 - 6, 48);
+
+  // S-107: FR → CL
+  arrow(F.x + F.w, F.y + F.h/2, C.x, C.y + C.h/2, cyan, 'S-107', '155 lb/hr');
+
+  // S-110: CL → ST
+  arrow(C.x + C.w, C.y + C.h/2, T.x, T.y + T.h/2, cyan, 'S-110', '155 lb/hr');
+
+  // S-111: Seasoning → ST (from top)
+  vertArrow(T.x + T.w*0.5, 120, T.y, green, 'S-111', '2.3 lb/hr', 'right');
+
+  // S-112: ST → PK
+  arrow(T.x + T.w, T.y + T.h/2, P.x, P.y + P.h/2, green, 'S-112', '157.3 lb/hr');
+
+  // S-113: N2 → PK (from top)
+  vertArrow(P.x + P.w*0.3, 120, P.y, purple, 'S-113', '0.5 lb/hr', 'left');
+
+  // S-114: Film → PK (from bottom up)
+  vertArrow(P.x + P.w*0.7, P.y + P.h + 60, P.y + P.h, muted, 'S-114', '3.2 lb/hr', 'right');
+
+  // Product out
+  arrow(P.x + P.w, P.y + P.h/2, P.x + P.w + 80, P.y + P.h/2, green, 'PRODUCT', '~252 bags/hr');
+
+  // Title
+  ctx.fillStyle = '#00d4ff';
+  ctx.font = 'bold 11px Courier New';
+  ctx.textAlign = 'left';
+  ctx.fillText('BLOCK FLOW DIAGRAM — TCF-001 TORTILLA CHIP PROCESS', 20, 28);
+  ctx.fillStyle = '#6e7681';
+  ctx.font = '10px Courier New';
+  ctx.fillText('Basis: 1 hour steady-state | Phase 2 dedicated facility', 20, 44);
+}
+
+// Defer BFD draw until tab is active
+let bfdDrawn = false;
+
+// ── Charts ────────────────────────────────────────────────────────────────────
+Chart.defaults.color = '#8b949e';
+Chart.defaults.borderColor = '#2d3748';
+Chart.defaults.font.family = 'Courier New, monospace';
+
+function renderEnergyChart() {
+  const ctx = document.getElementById('energyChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Sensible Heat\n(Chip Heating)', 'Latent Heat\n(Water Evap.)', 'Oil Thermal\n(Bath Maintenance)'],
+      datasets: [{
+        data: [32019, 100620, 23500],
+        backgroundColor: ['rgba(0,212,255,0.7)', 'rgba(253,140,115,0.8)', 'rgba(188,140,255,0.7)'],
+        borderColor: ['#00d4ff', '#fd8c73', '#bc8cff'],
+        borderWidth: 2,
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { font: { size: 10 }, boxWidth: 12, padding: 14 }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              const pct = ((ctx.raw / 156139) * 100).toFixed(1);
+              return ` ${ctx.raw.toLocaleString()} BTU/hr (${pct}%)`;
+            }
+          }
+        }
+      },
+      cutout: '60%',
+    }
+  });
+}
+
+function renderWaterfallChart() {
+  const ctx = document.getElementById('waterfallChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Q Sensible', 'Q Latent', 'Q Oil', 'Net Duty', 'Gas Input\n(80% eff.)'],
+      datasets: [{
+        label: 'BTU/hr',
+        data: [32019, 100620, 23500, 156139, 195174],
+        backgroundColor: [
+          'rgba(0,212,255,0.6)',
+          'rgba(253,140,115,0.7)',
+          'rgba(188,140,255,0.6)',
+          'rgba(57,211,83,0.7)',
+          'rgba(241,224,90,0.6)',
+        ],
+        borderColor: ['#00d4ff', '#fd8c73', '#bc8cff', '#39d353', '#f1e05a'],
+        borderWidth: 1.5,
+        borderRadius: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.raw.toLocaleString()} BTU/hr`
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { callback: v => (v/1000).toFixed(0)+'k', font:{size:10} },
+          title: { display: true, text: 'BTU/hr', font:{size:10} },
+          grid: { color: 'rgba(45,55,72,0.6)' }
+        },
+        y: { ticks: { font:{size:10} }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.getAttribute('onclick').includes("'" + name + "'")) b.classList.add('active');
+  });
+
+  if (name === 'bfd' && !bfdDrawn) {
+    bfdDrawn = true;
+    setTimeout(drawBFD, 50);
+  }
+  if (name === 'energy') {
+    // Charts render lazily
+    if (!window._energyChartsRendered) {
+      window._energyChartsRendered = true;
+      setTimeout(() => { renderEnergyChart(); renderWaterfallChart(); }, 50);
+    }
+  }
+}
+
+// ── Canvas tooltip (BFD hover) ─────────────────────────────────────────────
+const bfdCanvas = document.getElementById('bfdCanvas');
+const tooltip = document.getElementById('tooltip');
+
+const blockHitZones = [
+  { id:'MX-101', name:'Dough Mixer', x:80, y:180, w:120, h:80,
+    info:'IN: 140.0 + 154.0 + 35.3 = 329.3 lb/hr\nOUT: 294.0 lb/hr dough\nOutlet: 90°F, 52.4% moisture' },
+  { id:'SH-101', name:'Sheeter / Cutter', x:280, y:180, w:120, h:80,
+    info:'IN: 294.0 lb/hr\nOUT: 258.7 lb/hr chips\nTrim: 35.3 lb/hr (12%) recycle' },
+  { id:'FR-101', name:'Fryer', x:500, y:160, w:130, h:120,
+    info:'IN: 258.7 lb/hr chips + 18.75 lb/hr oil\nOUT: 155.0 lb/hr fried chips\nEvap: 103.7 lb/hr water\nDuty: 156,139 BTU/hr\nTemp: 350°F bath' },
+  { id:'CL-101', name:'Cooling Conveyor', x:720, y:180, w:110, h:80,
+    info:'IN: 155.0 lb/hr @ 350°F\nOUT: 155.0 lb/hr @ 115°F\nHeat rejected: ~10,400 BTU/hr\nAmbient forced-air cooling' },
+  { id:'ST-101', name:'Seasoning Tumbler', x:920, y:180, w:110, h:80,
+    info:'IN: 155.0 lb/hr chips\n+ 2.3 lb/hr seasoning (1.5%)\nOUT: 157.3 lb/hr seasoned chips\nAdhesion via surface oil' },
+  { id:'PK-101', name:'Packaging (VFFS)', x:1120, y:180, w:110, h:80,
+    info:'IN: 157.3 + 0.5 (N₂) + 3.2 (film)\nOUT: ~252 bags/hr @ 10 oz\nMAP: >99% N₂ atmosphere\nFilm: metallized OPP/PE laminate' },
+];
+
+bfdCanvas.addEventListener('mousemove', (e) => {
+  const rect = bfdCanvas.getBoundingClientRect();
+  const scaleX = bfdCanvas.width / rect.width;
+  const scaleY = bfdCanvas.height / rect.height;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * scaleY;
+
+  let hit = null;
+  for (const z of blockHitZones) {
+    if (mx >= z.x && mx <= z.x + z.w && my >= z.y && my <= z.y + z.h) {
+      hit = z; break;
+    }
+  }
+  if (hit) {
+    tooltip.style.display = 'block';
+    tooltip.style.left = (e.clientX + 16) + 'px';
+    tooltip.style.top = (e.clientY - 20) + 'px';
+    tooltip.innerHTML = `<strong style="color:var(--cyan)">${hit.id}</strong> — ${hit.name}<br>${hit.info.replace(/\n/g, '<br>')}`;
+    bfdCanvas.style.cursor = 'pointer';
+  } else {
+    tooltip.style.display = 'none';
+    bfdCanvas.style.cursor = 'crosshair';
+  }
+});
+bfdCanvas.addEventListener('mouseleave', () => {
+  tooltip.style.display = 'none';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chromatic Physics Desk</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #000;
+    cursor: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #desk {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #000;
+  }
+  #video {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 1px; height: 1px;
+  }
+  #flash {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    background: #cdfd50;
+    opacity: 0;
+    z-index: 100;
+  }
+  .sticker {
+    position: absolute;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    will-change: transform;
+    left: 0; top: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  }
+  #cursor {
+    position: absolute;
+    width: 64px; height: 64px;
+    pointer-events: none;
+    z-index: 200;
+    mix-blend-mode: difference;
+    transform: translate(-50%, -50%);
+    will-change: transform;
+  }
+  #cursor svg {
+    width: 100%; height: 100%;
+    fill: #fff;
+  }
+  #hint {
+    position: absolute;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.4);
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 50;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div id="desk"></div>
+<video id="video" autoplay playsinline muted></video>
+<div id="flash"></div>
+<div id="cursor">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z"/>
+  </svg>
+</div>
+<div id="hint">Click to spawn a sticker. Drag to throw. Camera colors the stickers.</div>
+
+<script>
+(function() {
+  'use strict';
+
+  const desk = document.getElementById('desk');
+  const video = document.getElementById('video');
+  const flash = document.getElementById('flash');
+  const cursor = document.getElementById('cursor');
+
+  const FRICTION = 0.92;
+  const RESTITUTION = 0.7;
+  const STICKER_RADIUS = 40; // half of 80px
+  const STICKER_DIAMETER = 80;
+  const SNAP_SIZE = 50;
+  const SAMPLE_MS = 500;
+  const MAX_STICKERS = 50;
+  const HIGH_VELOCITY_THRESHOLD = 12;
+  const FLASH_FRAMES = 3;
+  const IDLE_MS = 10000;
+  const DRIFT_FORCE = 0.0002;
+  const CURSOR_LERP = 0.15;
+
+  let cameraReady = false;
+  let centerColor = { r: 255, g: 255, b: 255 };
+  let sampleCanvas = null;
+  let sampleCtx = null;
+
+  let stickers = [];
+  let nextId = 1;
+
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let cursorX = mouseX;
+  let cursorY = mouseY;
+
+  let isDragging = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let dragSticker = null;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+  let lastMouseMove = Date.now();
+
+  let flashTimer = 0;
+
+  // ---- Camera setup ----
+  async function initCamera() {
+    sampleCanvas = document.createElement('canvas');
+    sampleCanvas.width = SNAP_SIZE;
+    sampleCanvas.height = SNAP_SIZE;
+    sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
+      });
+      video.srcObject = stream;
+      await new Promise((resolve, reject) => {
+        video.onloadedmetadata = resolve;
+        video.onerror = reject;
+        setTimeout(() => reject(new Error('video timeout')), 5000);
+      });
+      cameraReady = true;
+    } catch (e) {
+      cameraReady = false;
+      console.warn('Camera denied or unavailable:', e);
+    }
+  }
+
+  // ---- Color sampling ----
+  function sampleCenterColor() {
+    if (!cameraReady || video.readyState < 2) return;
+    const vw = video.videoWidth || video.clientWidth;
+    const wh = video.videoHeight || video.clientHeight;
+    if (!vw || !wh) return;
+
+    const cropSize = Math.min(vw, wh) * 0.5;
+    const sx = (vw - cropSize) / 2;
+    const sy = (wh - cropSize) / 2;
+
+    sampleCtx.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, SNAP_SIZE, SNAP_SIZE);
+    const data = sampleCtx.getImageData(0, 0, SNAP_SIZE, SNAP_SIZE).data;
+    let r = 0, g = 0, b = 0;
+    const count = SNAP_SIZE * SNAP_SIZE;
+    for (let i = 0; i < data.length; i += 4) {
+      r += data[i];
+      g += data[i + 1];
+      b += data[i + 2];
+    }
+    centerColor.r = Math.round(r / count);
+    centerColor.g = Math.round(g / count);
+    centerColor.b = Math.round(b / count);
+  }
+
+  setInterval(sampleCenterColor, SAMPLE_MS);
+
+  // ---- Snapshot ----
+  function getSnapshot() {
+    if (!cameraReady || video.readyState < 2) return null;
+    const canvas = document.createElement('canvas');
+    canvas.width = SNAP_SIZE;
+    canvas.height = SNAP_SIZE;
+    const ctx = canvas.getContext('2d');
+    const vw = video.videoWidth || video.clientWidth;
+    const wh = video.videoHeight || video.clientHeight;
+    const cropSize = Math.min(vw, wh) * 0.5;
+    const sx = (vw - cropSize) / 2;
+    const sy = (wh - cropSize) / 2;
+    ctx.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, SNAP_SIZE, SNAP_SIZE);
+    return canvas.toDataURL('image/png');
+  }
+
+  // ---- Sticker class ----
+  class Sticker {
+    constructor(x, y, imageData) {
+      this.id = nextId++;
+      this.x = x;
+      this.y = y;
+      this.vx = (Math.random() - 0.5) * 4;
+      this.vy = (Math.random() - 0.5) * 4;
+      this.el = document.createElement('div');
+      this.el.className = 'sticker';
+      this.el.style.left = '0px';
+      this.el.style.top = '0px';
+
+      if (imageData) {
+        this.el.style.backgroundImage = 'url(' + imageData + ')';
+      } else {
+        const c = centerColor;
+        this.el.style.backgroundColor = 'rgb(' + c.r + ',' + c.g + ',' + c.b + ')';
+      }
+      desk.appendChild(this.el);
+      this.createdAt = Date.now();
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.vx *= FRICTION;
+      this.vy *= FRICTION;
+
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+
+      if (this.x < STICKER_RADIUS) {
+        this.x = STICKER_RADIUS;
+        this.vx = Math.abs(this.vx) * RESTITUTION;
+      } else if (this.x > W - STICKER_RADIUS) {
+        this.x = W - STICKER_RADIUS;
+        this.vx = -Math.abs(this.vx) * RESTITUTION;
+      }
+
+      if (this.y < STICKER_RADIUS) {
+        this.y = STICKER_RADIUS;
+        this.vy = Math.abs(this.vy) * RESTITUTION;
+      } else if (this.y > H - STICKER_RADIUS) {
+        this.y = H - STICKER_RADIUS;
+        this.vy = -Math.abs(this.vy) * RESTITUTION;
+      }
+
+      this.el.style.transform = 'translate(' + (this.x - STICKER_RADIUS) + 'px, ' + (this.y - STICKER_RADIUS) + 'px)';
+    }
+
+    destroy() {
+      if (this.el && this.el.parentNode) {
+        this.el.parentNode.removeChild(this.el);
+      }
+    }
+  }
+
+  function spawnSticker(x, y) {
+    const snap = getSnapshot();
+    const sticker = new Sticker(x, y, snap);
+    stickers.push(sticker);
+    if (stickers.length > MAX_STICKERS) {
+      const oldest = stickers.shift();
+      oldest.destroy();
+    }
+  }
+
+  // ---- Collision ----
+  function resolveCollisions() {
+    for (let i = 0; i < stickers.length; i++) {
+      for (let j = i + 1; j < stickers.length; j++) {
+        const a = stickers[i];
+        const b = stickers[j];
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const minDist = STICKER_DIAMETER;
+
+        if (dist < minDist && dist > 0) {
+          const overlap = (minDist - dist) / 2;
+          const nx = dx / dist;
+          const ny = dy / dist;
+
+          a.x -= nx * overlap;
+          a.y -= ny * overlap;
+          b.x += nx * overlap;
+          b.y += ny * overlap;
+
+          const relVx = a.vx - b.vx;
+          const relVy = a.vy - b.vy;
+          const velAlongNormal = relVx * nx + relVy * ny;
+
+          if (velAlongNormal < 0) {
+            const jImpulse = -(1 + RESTITUTION) * velAlongNormal / 2;
+            const impulseX = jImpulse * nx;
+            const impulseY = jImpulse * ny;
+            a.vx += impulseX;
+            a.vy += impulseY;
+            b.vx -= impulseX;
+            b.vy -= impulseY;
+
+            const relSpeed = Math.sqrt(relVx * relVx + relVy * relVy);
+            if (relSpeed > HIGH_VELOCITY_THRESHOLD) {
+              flashTimer = FLASH_FRAMES;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ---- Idle drift ----
+  function applyIdleDrift() {
+    const now = Date.now();
+    if (now - lastMouseMove < IDLE_MS) return;
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    for (const s of stickers) {
+      const dx = cx - s.x;
+      const dy = cy - s.y;
+      s.vx += dx * DRIFT_FORCE;
+      s.vy += dy * DRIFT_FORCE;
+    }
+  }
+
+  // ---- Input ----
+  function getStickerAt(x, y) {
+    for (let i = stickers.length - 1; i >= 0; i--) {
+      const s = stickers[i];
+      const dx = s.x - x;
+      const dy = s.y - y;
+      if (dx * dx + dy * dy <= STICKER_RADIUS * STICKER_RADIUS) {
+        return s;
+      }
+    }
+    return null;
+  }
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    lastMouseMove = Date.now();
+
+    if (isDragging && dragSticker) {
+      dragSticker.x = mouseX + dragOffsetX;
+      dragSticker.y = mouseY + dragOffsetY;
+      dragSticker.vx = 0;
+      dragSticker.vy = 0;
+    }
+  });
+
+  document.addEventListener('mousedown', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    lastMouseMove = Date.now();
+
+    const target = getStickerAt(mouseX, mouseY);
+    if (target) {
+      isDragging = true;
+      dragSticker = target;
+      dragOffsetX = target.x - mouseX;
+      dragOffsetY = target.y - mouseY;
+      dragStartX = mouseX;
+      dragStartY = mouseY;
+    } else {
+      spawnSticker(mouseX, mouseY);
+    }
+  });
+
+  document.addEventListener('mouseup', (e) => {
+    if (isDragging && dragSticker) {
+      const dx = mouseX - dragStartX;
+      const dy = mouseY - dragStartY;
+      dragSticker.vx = dx * 0.25;
+      dragSticker.vy = dy * 0.25;
+    }
+    isDragging = false;
+    dragSticker = null;
+  });
+
+  // Touch support
+  document.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      const t = e.touches[0];
+      mouseX = t.clientX;
+      mouseY = t.clientY;
+      lastMouseMove = Date.now();
+      const target = getStickerAt(mouseX, mouseY);
+      if (target) {
+        isDragging = true;
+        dragSticker = target;
+        dragOffsetX = target.x - mouseX;
+        dragOffsetY = target.y - mouseY;
+        dragStartX = mouseX;
+        dragStartY = mouseY;
+      } else {
+        spawnSticker(mouseX, mouseY);
+      }
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 1) {
+      const t = e.touches[0];
+      mouseX = t.clientX;
+      mouseY = t.clientY;
+      lastMouseMove = Date.now();
+      if (isDragging && dragSticker) {
+        dragSticker.x = mouseX + dragOffsetX;
+        dragSticker.y = mouseY + dragOffsetY;
+        dragSticker.vx = 0;
+        dragSticker.vy = 0;
+      }
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    if (isDragging && dragSticker) {
+      const dx = mouseX - dragStartX;
+      const dy = mouseY - dragStartY;
+      dragSticker.vx = dx * 0.25;
+      dragSticker.vy = dy * 0.25;
+    }
+    isDragging = false;
+    dragSticker = null;
+  });
+
+  // ---- Main loop ----
+  function loop() {
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+
+    // Cursor lerp
+    cursorX += (mouseX - cursorX) * CURSOR_LERP;
+    cursorY += (mouseY - cursorY) * CURSOR_LERP;
+    cursor.style.transform = 'translate(' + cursorX + 'px, ' + cursorY + 'px) translate(-50%, -50%)';
+
+    // Flash
+    if (flashTimer > 0) {
+      flashTimer--;
+      flash.style.opacity = '0.15';
+    } else {
+      flash.style.opacity = '0';
+    }
+
+    // Physics
+    for (const s of stickers) {
+      s.update();
+    }
+    resolveCollisions();
+    applyIdleDrift();
+
+    requestAnimationFrame(loop);
+  }
+
+  // ---- Init ----
+  initCamera().then(() => {
+    loop();
+  }).catch(() => {
+    loop();
+  });
+
+  window.addEventListener('resize', () => {
+    // Keep stickers inside bounds on resize
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    for (const s of stickers) {
+      s.x = Math.min(Math.max(s.x, STICKER_RADIUS), W - STICKER_RADIUS);
+      s.y = Math.min(Math.max(s.y, STICKER_RADIUS), H - STICKER_RADIUS);
+    }
+  });
+})();
+</script>
+</body>
+</html>

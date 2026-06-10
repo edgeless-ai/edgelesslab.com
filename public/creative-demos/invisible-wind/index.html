@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invisible Wind</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; background: #000011; color: #ccc; font-family: Menlo, Consolas, monospace; }
+    #telemetry {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      opacity: 0.6;
+      font-size: 10px;
+      pointer-events: none;
+      z-index: 10;
+      line-height: 1.4;
+    }
+    #hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #333;
+      font-size: 14px;
+      text-align: center;
+      pointer-events: none;
+      z-index: 5;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div id="hint">type to summon words into the wind<br>space / enter = rogue &nbsp; backspace = reverse wind</div>
+  <div id="telemetry"></div>
+
+  <script>
+    // === CONFIGURATION ===
+    const COLS = 80;
+    const ROWS = 60;
+    const NOISE_SCALE = 0.1;
+    const INERTIA = 0.05;
+    const ROGUE_ANGLE_STEP = 0.03;
+    const ROGUE_RADIUS_GROWTH = 1.5;
+    const REVERSE_WIND_FRAMES = 120;
+    const REVERSE_RADIUS = 150;
+    const REVERSE_MULTIPLIER = -1.5;
+    const OPACITY_SPEED_FACTOR = 12;
+    const FADE_INTERVAL = 10;
+    const FADE_ALPHA = 8;
+    const TEXT_SIZE = 18;
+    const TRAIL_LENGTH = 3;
+    const ROGUE_DOT_REPEL_RADIUS = 10;
+    const ROGUE_DOT_REPEL_FORCE = 2;
+    const ROGUE_VORTEX_RADIUS = 75;
+
+    // === PALETTE ===
+    const BG = '#000011';
+    const C_GHOST = '#333333';
+    const C_DARK_BLUE = '#001F3F';
+    const C_CYAN = '#00FFFF';
+    const C_TEAL = '#008080';
+    const C_WHITE = '#FFFFFF';
+    const C_MAGENTA = '#FF00FF';
+
+    // === LETTER RARITY (English frequency, 0–1) ===
+    const RARITY = {
+      'e': 1.00, 't': 0.90, 'a': 0.80, 'o': 0.70, 'i': 0.70, 'n': 0.60,
+      's': 0.60, 'h': 0.55, 'r': 0.55, 'd': 0.50, 'l': 0.45, 'c': 0.45,
+      'u': 0.40, 'm': 0.40, 'w': 0.35, 'f': 0.35, 'g': 0.30, 'y': 0.30,
+      'p': 0.25, 'b': 0.25, 'v': 0.20, 'k': 0.20, 'j': 0.10, 'x': 0.08,
+      'q': 0.06, 'z': 0.05
+    };
+    function getRarity(ch) {
+      const c = ch.toLowerCase();
+      return RARITY[c] !== undefined ? RARITY[c] : 0.3;
+    }
+
+    // === GLOBAL STATE ===
+    let letters = [];
+    let flowField = [];
+    let rogueDots = []; // {x, y} persistent dots
+    let reverseWind = 0;
+    let cellW, cellH;
+    let rogueBuffer;
+    let audioCtx = null;
+    let lastLetter = null;
+    let showHint = true;
+
+    // === AUDIO ===
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+    }
+    function playGrain(char, speed) {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const code = char.charCodeAt(0);
+      const freq = 220 + (code % 12) * 40;
+      const g = Math.min(0.2, Math.max(0.05, speed / 5 * 0.2));
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(g, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    }
+    function playRogueDrone() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(110, now);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.5);
+    }
+
+    // === SETUP ===
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      textFont('Menlo, Consolas, monospace');
+      textSize(TEXT_SIZE);
+      textAlign(CENTER, CENTER);
+      cellW = width / COLS;
+      cellH = height / ROWS;
+      rogueBuffer = createGraphics(width, height);
+      rogueBuffer.clear();
+      flowField = new Array(COLS * ROWS);
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      cellW = width / COLS;
+      cellH = height / ROWS;
+      const newBuffer = createGraphics(width, height);
+      newBuffer.image(rogueBuffer, 0, 0);
+      rogueBuffer = newBuffer;
+    }
+
+    // === FLOW FIELD ===
+    function updateFlowField() {
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          const px = x * cellW + cellW / 2;
+          const py = y * cellH + cellH / 2;
+          let baseAngle = noise(x * NOISE_SCALE, y * NOISE_SCALE, frameCount * 0.002) * TWO_PI * 2;
+
+          // Find nearest letter and apply rarity distortion
+          let nearestDist = Infinity;
+          let nearestRarity = 0.5;
+          let nearestIsRogue = false;
+          for (let i = 0; i < letters.length; i++) {
+            const l = letters[i];
+            const d = dist(px, py, l.x, l.y);
+            if (d < nearestDist) {
+              nearestDist = d;
+              nearestRarity = getRarity(l.char);
+              nearestIsRogue = l.isRogue;
+            }
+          }
+
+          // Rogue dots also influence the field (poison it with counter-vortices)
+          for (let i = 0; i < rogueDots.length; i++) {
+            const d = dist(px, py, rogueDots[i].x, rogueDots[i].y);
+            if (d < nearestDist) {
+              nearestDist = d;
+              nearestRarity = 0.02;
+              nearestIsRogue = true;
+            }
+          }
+
+          // Vortex for rare letters / rogue dots
+          if (nearestRarity < 0.2) {
+            baseAngle += sin(nearestDist / 50) * 2;
+          }
+          // Smoother for common letters
+          if (nearestRarity > 0.7) {
+            baseAngle += cos(nearestDist / 80) * 0.3;
+          }
+
+          // Speed varies by rarity
+          const speed = map(nearestRarity, 0, 1, 2.2, 0.6);
+
+          // Reverse wind handling
+          let vec = createVector(cos(baseAngle) * speed, sin(baseAngle) * speed);
+          if (reverseWind > 0 && dist(px, py, mouseX, mouseY) < REVERSE_RADIUS) {
+            vec.mult(REVERSE_MULTIPLIER);
+          }
+
+          flowField[x + y * COLS] = vec;
+        }
+      }
+    }
+
+    // === COLOR BY SPEED ===
+    function getColor(speed, isRogue) {
+      if (isRogue) return C_MAGENTA;
+      if (speed < 0.5) return C_DARK_BLUE;
+      if (speed < 2.0) return C_CYAN;
+      if (speed < 4.0) return C_TEAL;
+      return C_WHITE;
+    }
+
+    // === DRAW ===
+    function draw() {
+      if (showHint && letters.length > 0) {
+        showHint = false;
+        document.getElementById('hint').style.display = 'none';
+      }
+
+      // Selective fade
+      if (frameCount % FADE_INTERVAL === 0) {
+        push();
+        noStroke();
+        fill(0, 0, 17, FADE_ALPHA);
+        rect(0, 0, width, height);
+        pop();
+      }
+
+      // Draw rogue dots buffer
+      image(rogueBuffer, 0, 0);
+
+      // Update flow field
+      updateFlowField();
+
+      // Update and draw letters
+      for (let i = letters.length - 1; i >= 0; i--) {
+        const l = letters[i];
+        let fieldVec;
+
+        if (l.isRogue) {
+          // Rogue spiral logic
+          l.rogueAngle += ROGUE_ANGLE_STEP;
+          l.rogueRadius += ROGUE_RADIUS_GROWTH;
+          l.x = width / 2 + cos(l.rogueAngle) * l.rogueRadius;
+          l.y = height / 2 + sin(l.rogueAngle) * l.rogueRadius;
+
+          // Draw permanent dot on rogue buffer
+          rogueBuffer.noStroke();
+          rogueBuffer.fill(C_MAGENTA);
+          rogueBuffer.rect(l.x, l.y, 2, 2);
+          rogueDots.push({x: l.x, y: l.y});
+
+          // Keep rogue dots capped
+          if (rogueDots.length > 4000) rogueDots.splice(0, 100);
+
+          l.speed = ROGUE_RADIUS_GROWTH;
+        } else {
+          // Sample flow field
+          const col = floor(constrain(l.x / cellW, 0, COLS - 1));
+          const row = floor(constrain(l.y / cellH, 0, ROWS - 1));
+          fieldVec = flowField[col + row * COLS];
+          if (!fieldVec) fieldVec = createVector(0, 0);
+
+          // Reverse wind localized
+          if (reverseWind > 0 && dist(l.x, l.y, mouseX, mouseY) < REVERSE_RADIUS) {
+            fieldVec = fieldVec.copy().mult(REVERSE_MULTIPLIER);
+          }
+
+          // Rogue dot repulsion
+          for (let d = 0; d < rogueDots.length; d++) {
+            const rd = rogueDots[d];
+            const ddist = dist(l.x, l.y, rd.x, rd.y);
+            if (ddist < ROGUE_DOT_REPEL_RADIUS && ddist > 0) {
+              const repel = createVector(l.x - rd.x, l.y - rd.y);
+              repel.normalize();
+              repel.mult(ROGUE_DOT_REPEL_FORCE);
+              l.vx += repel.x;
+              l.vy += repel.y;
+            }
+          }
+
+          // Inertia advection
+          l.vx = lerp(l.vx, fieldVec.x, INERTIA);
+          l.vy = lerp(l.vy, fieldVec.y, INERTIA);
+          l.x += l.vx;
+          l.y += l.vy;
+          l.speed = sqrt(l.vx * l.vx + l.vy * l.vy);
+
+          // Wrap edges
+          if (l.x < 0) l.x = width;
+          if (l.x > width) l.x = 0;
+          if (l.y < 0) l.y = height;
+          if (l.y > height) l.y = 0;
+        }
+
+        // Visibility
+        l.opacity = constrain(l.speed * OPACITY_SPEED_FACTOR, 0, 255);
+        if (l.opacity < 5) continue;
+
+        const col = getColor(l.speed, l.isRogue);
+        const r = parseInt(col.slice(1, 3), 16);
+        const g = parseInt(col.slice(3, 5), 16);
+        const b = parseInt(col.slice(5, 7), 16);
+
+        // Draw letter
+        noStroke();
+        fill(r, g, b, l.opacity);
+        text(l.char, l.x, l.y);
+
+        // Draw trail streak
+        stroke(r, g, b, l.opacity * 0.5);
+        strokeWeight(2);
+        if (l.isRogue) {
+          line(l.x, l.y, l.x - cos(l.rogueAngle) * TRAIL_LENGTH, l.y - sin(l.rogueAngle) * TRAIL_LENGTH);
+        } else {
+          line(l.x, l.y, l.x - l.vx * TRAIL_LENGTH, l.y - l.vy * TRAIL_LENGTH);
+        }
+      }
+
+      // Decrement reverse wind
+      if (reverseWind > 0) reverseWind--;
+
+      // Draw rogue vortex indicator (subtle)
+      if (reverseWind > 0) {
+        noFill();
+        const rw = map(reverseWind, 0, REVERSE_WIND_FRAMES, 0, 60);
+        stroke(255, 0, 255, rw);
+        strokeWeight(1);
+        ellipse(mouseX, mouseY, REVERSE_RADIUS * 2);
+      }
+
+      // Telemetry
+      updateTelemetry();
+    }
+
+    function updateTelemetry() {
+      const el = document.getElementById('telemetry');
+      let txt = `letters: ${letters.length}  |  rogue dots: ${rogueDots.length}`;
+      if (lastLetter) {
+        txt += `  |  last speed: ${lastLetter.speed.toFixed(2)}  |  opacity: ${lastLetter.opacity.toFixed(0)}`;
+      }
+      if (reverseWind > 0) {
+        txt += `  |  REVERSE WIND: ${reverseWind}f`;
+      }
+      el.innerText = txt;
+    }
+
+    // === INPUT ===
+    function keyTyped() {
+      initAudio();
+      if (key === 'Enter') return;
+      if (key === 'Backspace') return;
+      if (key.length !== 1) return;
+
+      // Sample center flow field for initial velocity
+      const col = floor(constrain(width / 2 / cellW, 0, COLS - 1));
+      const row = floor(constrain(height / 2 / cellH, 0, ROWS - 1));
+      let iv = flowField[col + row * COLS];
+      if (!iv) iv = createVector(1, 0);
+
+      const l = {
+        char: key,
+        x: width / 2,
+        y: height / 2,
+        vx: iv.x + random(-0.5, 0.5),
+        vy: iv.y + random(-0.5, 0.5),
+        speed: 0,
+        opacity: 0,
+        isRogue: false,
+        rogueAngle: 0,
+        rogueRadius: 0,
+        born: frameCount
+      };
+      l.speed = sqrt(l.vx * l.vx + l.vy * l.vy);
+      l.opacity = constrain(l.speed * OPACITY_SPEED_FACTOR, 0, 255);
+      letters.push(l);
+      lastLetter = l;
+      playGrain(key, l.speed);
+    }
+
+    function keyPressed() {
+      initAudio();
+      if (key === 'Backspace') {
+        reverseWind = REVERSE_WIND_FRAMES;
+        return false;
+      }
+      if (key === 'Enter' || key === ' ') {
+        // Pick a random non-rogue letter from the current batch and make it rogue
+        const candidates = letters.filter(l => !l.isRogue);
+        if (candidates.length > 0) {
+          const pick = random(candidates);
+          pick.isRogue = true;
+          pick.rogueAngle = atan2(pick.y - height / 2, pick.x - width / 2);
+          pick.rogueRadius = dist(pick.x, pick.y, width / 2, height / 2);
+          playRogueDrone();
+        }
+        return false;
+      }
+    }
+
+    function mousePressed() {
+      initAudio();
+    }
+  </script>
+</body>
+</html>

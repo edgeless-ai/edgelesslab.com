@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sashiko Wave Weaver</title>
+<style>
+  /* ============================================
+     SASHIKO WAVE WEAVER — CSS Custom Properties
+     ============================================
+     This demo uses CSS Grid + CSS custom properties
+     (variables) to animate 256 DOM elements with
+     zero Canvas or WebGL. The browser's compositor
+     handles all interpolation, making the animation
+     extremely lightweight.
+  =========================================== */
+
+  /* Reset and base layout */
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: #1A237E;           /* Deep indigo — the fabric substrate */
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: monospace;
+    /* Prevent text selection during interaction */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Grid container — 16×16 CSS Grid, square aspect ratio */
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    grid-template-rows: repeat(16, 1fr);
+    width: min(90vw, 90vh);
+    height: min(90vw, 90vh);
+    gap: 0px;
+    position: relative;
+    /* Gold box-shadow flash applied dynamically on click */
+    transition: box-shadow 0.3s ease-out;
+  }
+
+  /* Individual cell — darker indigo background, relative positioning
+     for the absolute stitch line inside. */
+  .cell {
+    position: relative;
+    background: #0D1B4C;             /* Darker indigo — the background fabric */
+    overflow: hidden;
+    /* Each cell holds two CSS variables that the JS wave engine writes
+       every frame. The transition smooths the 60fps updates. */
+    --scale: 1;
+    --opacity: 1;
+    transition: transform 0.1s linear, opacity 0.1s linear;
+  }
+
+  /* The stitch line — a 1px white horizontal line centered vertically.
+     In Sashiko, this represents the white thread running through the fabric. */
+  .stitch {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: #FFFFFF;             /* Sashiko white thread */
+    transform-origin: center;
+    pointer-events: none;
+    /* The wave engine drives scaleY and opacity via CSS variables.
+       Positive wave values expand the stitch; negative values contract it. */
+    transform: scaleY(var(--scale));
+    opacity: var(--opacity);
+    transition: transform 0.1s linear, opacity 0.1s linear;
+  }
+
+  /* The ghost stitch — a rogue coral-red line that breaks free from
+     the binary grid every 60 frames. It ignores the Sashiko pattern
+     and follows its own wave physics. */
+  .ghost-stitch {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;                     /* Slightly thicker than normal stitches */
+    background: #FF6B6B;             /* Coral red — the anomaly */
+    z-index: 10;
+    pointer-events: none;
+    transform-origin: center;
+  }
+
+  /* UI panel — displays current wave frequency and amplitude */
+  #panel {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #F5F5F0;                  /* Warm white */
+    font-family: monospace;
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 16px;
+    border-radius: 8px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 100;
+  }
+
+  /* Instructional hint — fades out after a few seconds */
+  #hint {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #E8EAF6;
+    font-family: monospace;
+    font-size: 12px;
+    opacity: 0.8;
+    pointer-events: none;
+    z-index: 100;
+    text-align: center;
+    transition: opacity 2s ease-out;
+  }
+</style>
+</head>
+<body>
+
+<!-- Accessibility label for the generative textile -->
+<div id="grid" role="img" aria-label="Sashiko wave weaver — a living binary stitch textile animated by sine waves">
+  <!-- 256 cells will be injected here by JavaScript -->
+</div>
+
+<!-- Parameter readout -->
+<div id="panel">freq: 1.00 | amp: 0.50</div>
+
+<!-- Brief usage hint -->
+<div id="hint">Move mouse to shape the wave · Click to randomize pattern</div>
+
+<script>
+  /* ============================================================
+     SASHIKO WAVE WEAVER — VANILLA JS ENGINE
+     ============================================================
+     This script fuses two generative-art techniques:
+
+     1. SASHIKO BINARY STITCH PATTERN
+        A 16×16 grid where each row and column has a binary offset
+        (0 or 1). A stitch appears in a cell if:
+          (x + colOffsets[x]) % 2 === 0  OR  (y + rowOffsets[y]) % 2 === 0
+        The interference between row and column offsets creates
+        emergent geometric motifs (crosses, diamonds, snowflakes).
+        With 2^32 possible patterns, every randomization is unique.
+
+     2. YASAI SINE-WAVE ENGINE
+        Every frame, each cell gets a wave value based on its index
+        and global time:
+          wave = Math.sin(t * frequency + index * 0.1) * amplitude
+        This bipolar value is mapped to CSS custom properties:
+          --scale   (0.2 … 1.5)   — stitch expansion / contraction
+          --opacity (0.3 … 1.0)   — stitch fade in / out
+        The browser's CSS transition engine interpolates between
+        frames, producing organic, breathing motion.
+
+     INTERACTION
+     • Mouse X (0–1)  → wave frequency (0.5 … 4.0)
+     • Mouse Y (0–1)  → wave amplitude (0.2 … 1.0)
+     • Click          → randomize binary offsets + gold flash
+
+     3% WEIRDNESS — THE GHOST STITCH
+     Every ~60 frames a single coral-red stitch detaches from the
+     binary grid. It is always visible (ignores the Sashiko rule),
+     follows its own wave (double frequency), rotates slightly, and
+     fades out over 3 seconds before being removed from the DOM.
+     ============================================================ */
+
+  (function() {
+    'use strict';
+
+    /* --------------------------------------------------------
+       1. DOM REFERENCES
+       -------------------------------------------------------- */
+    const grid = document.getElementById('grid');
+    const panel = document.getElementById('panel');
+    const hint = document.getElementById('hint');
+
+    /* --------------------------------------------------------
+       2. CONFIGURATION & STATE
+       -------------------------------------------------------- */
+    const GRID_SIZE = 16;               // 16×16 Sashiko grid
+    const TOTAL_CELLS = GRID_SIZE * GRID_SIZE;
+
+    // Binary offset arrays — the "DNA" of the Sashiko pattern
+    const rowOffsets = new Array(GRID_SIZE).fill(0);
+    const colOffsets = new Array(GRID_SIZE).fill(0);
+
+    // Mouse-normalized coordinates (0.0 … 1.0)
+    let mouseX = 0.5;
+    let mouseY = 0.5;
+
+    // Wave parameters derived from mouse position
+    let frequency = 1.0;                // cycles per second (roughly)
+    let amplitude = 0.5;                // wave height
+
+    // Ghost stitch state machine
+    const ghost = {
+      active: false,                    // is a ghost currently floating?
+      timer: 0,                         // frame counter since last spawn / since active
+      x: 0,                             // grid column index
+      y: 0,                             // grid row index
+      element: null                     // the temporary DOM node
+    };
+
+    // Animation bookkeeping
+    let frameCount = 0;                 // total frames rendered
+    const cells = [];                   // array of { el, stitch, x, y, index }
+
+    /* --------------------------------------------------------
+       3. SASHIKO PATTERN GENERATOR
+       --------------------------------------------------------
+       Randomizes row and column binary offsets. Each offset is
+       either 0 (no shift) or 1 (shift by half a cell). The
+       interference between row and column shifts creates the
+       emergent geometric pattern. */
+    function randomizePattern() {
+      for (let i = 0; i < GRID_SIZE; i++) {
+        rowOffsets[i] = Math.random() < 0.5 ? 0 : 1;
+        colOffsets[i] = Math.random() < 0.5 ? 0 : 1;
+      }
+    }
+
+    /* --------------------------------------------------------
+       4. GRID RENDERER
+       --------------------------------------------------------
+       Builds 256 CSS Grid cells. Each cell contains a single
+       1px white div (.stitch) that will be scaled and faded
+       by the wave engine. No Canvas — pure DOM. */
+    function buildGrid() {
+      for (let y = 0; y < GRID_SIZE; y++) {
+        for (let x = 0; x < GRID_SIZE; x++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+
+          const stitch = document.createElement('div');
+          stitch.className = 'stitch';
+          cell.appendChild(stitch);
+
+          grid.appendChild(cell);
+
+          cells.push({
+            el: cell,
+            stitch: stitch,
+            x: x,
+            y: y,
+            index: y * GRID_SIZE + x
+          });
+        }
+      }
+    }
+
+    /* --------------------------------------------------------
+       5. WAVE ENGINE
+       --------------------------------------------------------
+       Computes a sine-wave value for every cell and writes it
+       to CSS custom properties --scale and --opacity. The CSS
+       transition on .cell and .stitch handles interpolation. */
+    function updateWave(time) {
+      // Map normalized mouse position to frequency and amplitude
+      frequency = 0.5 + mouseX * 3.5;   // 0.5 … 4.0
+      amplitude = 0.2 + mouseY * 0.8; // 0.2 … 1.0
+
+      // Update UI readout
+      panel.textContent = `freq: ${frequency.toFixed(2)} | amp: ${amplitude.toFixed(2)}`;
+
+      for (let i = 0; i < TOTAL_CELLS; i++) {
+        const c = cells[i];
+
+        // ---- Sashiko binary decision ----
+        // A stitch exists if the cell's parity (with offset) is even
+        // in EITHER its row OR its column. This OR logic is what
+        // produces the rich emergent patterns.
+        const rowOffset = rowOffsets[c.y];
+        const colOffset = colOffsets[c.x];
+        const hasStitch = ((c.x + colOffset) % 2 === 0) || ((c.y + rowOffset) % 2 === 0);
+
+        // ---- Yasai wave computation ----
+        // Phase increases with cell index so the wave travels
+        // diagonally across the grid.
+        const wave = Math.sin(time * frequency + c.index * 0.1) * amplitude;
+
+        // Map bipolar wave [-1, 1] to scale [0.2, 1.5]
+        const scale = 0.2 + (wave + 1) * 0.65;
+        // Map bipolar wave [-1, 1] to opacity [0.3, 1.0]
+        const opacity = 0.3 + (wave + 1) * 0.35;
+
+        if (hasStitch) {
+          // Positive wave = expanded, bright stitch
+          // Negative wave = contracted, dim stitch
+          c.stitch.style.setProperty('--scale', scale.toFixed(3));
+          c.stitch.style.setProperty('--opacity', opacity.toFixed(3));
+        } else {
+          // No stitch in this cell — hide the line completely
+          c.stitch.style.setProperty('--scale', '0');
+          c.stitch.style.setProperty('--opacity', '0');
+        }
+      }
+    }
+
+    /* --------------------------------------------------------
+       6. GHOST STITCH CONTROLLER
+       --------------------------------------------------------
+       The 3% weirdness: every 60 frames a rogue coral stitch
+       spawns inside a random cell. It ignores the binary pattern,
+       follows its own wave (double frequency), rotates, and
+       fades out over 3 seconds before being removed from the DOM. */
+    function updateGhost(time) {
+      ghost.timer++;
+
+      // Spawn trigger: every 60 frames (~1 second at 60fps)
+      if (ghost.timer > 60 && !ghost.active) {
+        ghost.active = true;
+        ghost.timer = 0;
+        ghost.x = Math.floor(Math.random() * GRID_SIZE);
+        ghost.y = Math.floor(Math.random() * GRID_SIZE);
+
+        // Create the temporary rogue element
+        const el = document.createElement('div');
+        el.className = 'ghost-stitch';
+        // Append to the chosen cell so it inherits the cell's
+        // coordinate space (position: absolute inside position: relative)
+        cells[ghost.y * GRID_SIZE + ghost.x].el.appendChild(el);
+        ghost.element = el;
+      }
+
+      if (ghost.active) {
+        ghost.timer++;
+
+        // Independent wave: double frequency, different phase offset
+        const ghostWave = Math.sin(time * frequency * 2 + ghost.x * 0.5) * amplitude;
+        const ghostScale = 0.5 + (ghostWave + 1) * 0.75;
+        const rotation = ghostWave * 20; // ±20 degrees
+
+        // Fade out linearly over 180 frames (~3 seconds)
+        const fade = 0.8 - (ghost.timer / 180) * 0.8;
+        const clampedFade = Math.max(0, fade);
+
+        ghost.element.style.transform = `scaleY(${ghostScale.toFixed(3)}) rotate(${rotation.toFixed(2)}deg)`;
+        ghost.element.style.opacity = clampedFade.toFixed(3);
+
+        // Despawn after 180 frames
+        if (ghost.timer > 180) {
+          ghost.element.remove();
+          ghost.active = false;
+          ghost.timer = 0;
+          ghost.element = null;
+        }
+      }
+    }
+
+    /* --------------------------------------------------------
+       7. MAIN ANIMATION LOOP
+       -------------------------------------------------------- */
+    function animate() {
+      const t = performance.now() / 1000; // elapsed seconds
+      frameCount++;
+
+      updateWave(t);
+      updateGhost(t);
+
+      requestAnimationFrame(animate);
+    }
+
+    /* --------------------------------------------------------
+       8. EVENT HANDLERS
+       -------------------------------------------------------- */
+    function onMouseMove(e) {
+      mouseX = e.clientX / window.innerWidth;
+      mouseY = e.clientY / window.innerHeight;
+    }
+
+    function onClick() {
+      randomizePattern();
+
+      // Gold flash feedback — momentary box-shadow on the grid
+      grid.style.boxShadow = '0 0 60px #D4AF37';
+      setTimeout(() => {
+        grid.style.boxShadow = 'none';
+      }, 300);
+    }
+
+    /* --------------------------------------------------------
+       9. INITIALIZATION
+       -------------------------------------------------------- */
+    function init() {
+      randomizePattern();
+      buildGrid();
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('click', onClick);
+
+      // Fade out the hint after a short delay
+      setTimeout(() => {
+        hint.style.opacity = '0';
+      }, 4000);
+
+      requestAnimationFrame(animate);
+    }
+
+    init();
+  })();
+</script>
+</body>
+</html>

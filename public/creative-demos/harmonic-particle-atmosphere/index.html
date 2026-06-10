@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harmonic Particle Atmosphere</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { overflow: hidden; background: #0B0F19; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <script>
+    let particles = [];
+    let ghostParticles = [];
+    let s = 0;
+    let sSpeed = 0.003;
+    let baseFreq1 = 2;
+    let baseFreq2 = 3;
+    let currentFreq1 = baseFreq1;
+    let currentFreq2 = baseFreq2;
+    let amp1 = 120;
+    let amp2 = 80;
+    let phase1 = 0;
+    let phase2 = Math.PI / 4;
+    let mouseInfluenceRadius = 200;
+    let echoCanvas;
+    let maxParticles = 600;
+    let maxGhostParticles = 60;
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      background(11, 15, 25);
+      echoCanvas = createGraphics(width, height);
+      echoCanvas.background(11, 15, 25);
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      echoCanvas = createGraphics(width, height);
+      echoCanvas.background(11, 15, 25);
+      particles = [];
+      ghostParticles = [];
+    }
+
+    function R(f, p, a, s) {
+      let phi = (s * f + p) * TWO_PI;
+      return { x: a * cos(phi), y: a * sin(phi) };
+    }
+
+    function computePenTip(s) {
+      let v1 = R(currentFreq1, phase1, amp1, s);
+      let v2 = R(currentFreq2, phase2, amp2, s);
+      return { x: width / 2 + v1.x + v2.x, y: height / 2 + v1.y + v2.y };
+    }
+
+    function pickColor(r) {
+      if (r < 0.75) return "white";
+      else if (r < 0.92) return "blue";
+      else return "gold";
+    }
+
+    function draw() {
+      // Base background
+      background(11, 15, 25);
+
+      // Draw echo trail
+      image(echoCanvas, 0, 0);
+
+      // Fade echo canvas
+      echoCanvas.noStroke();
+      echoCanvas.fill(11, 15, 25, 4);
+      echoCanvas.rect(0, 0, width, height);
+
+      // Update frequency drift toward cursor
+      let targetFreq1 = baseFreq1 + map(mouseX, 0, width, -0.4, 0.4);
+      let targetFreq2 = baseFreq2 + map(mouseY, 0, height, -0.3, 0.3);
+      targetFreq1 = constrain(targetFreq1, 0.5, 8.0);
+      targetFreq2 = constrain(targetFreq2, 0.5, 8.0);
+      currentFreq1 = constrain(lerp(currentFreq1, targetFreq1, 0.02), 0.5, 8.0);
+      currentFreq2 = constrain(lerp(currentFreq2, targetFreq2, 0.02), 0.5, 8.0);
+
+      // Advance harmonograph
+      s += sSpeed;
+      if (s > 1) {
+        s -= 1;
+        phase1 += 0.01;
+        phase2 += 0.007;
+      }
+
+      let penTip = computePenTip(s);
+
+      // Spawn particles at pen tip
+      let spawnCount = 3;
+      for (let i = 0; i < spawnCount; i++) {
+        let isGhost = (random() < 0.03);
+        let p = {
+          x: penTip.x + random(-2, 2),
+          y: penTip.y + random(-2, 2),
+          vx: random(-0.5, 0.5),
+          vy: random(-0.5, 0.5),
+          life: random(120, 180),
+          maxLife: random(120, 180),
+          size: random(1.5, 3.5),
+          isGhost: isGhost,
+          color: isGhost ? null : pickColor(random())
+        };
+        if (isGhost) {
+          ghostParticles.push(p);
+        } else {
+          particles.push(p);
+        }
+      }
+
+      // Cap arrays
+      if (particles.length > maxParticles) {
+        particles.splice(0, particles.length - maxParticles);
+      }
+      if (ghostParticles.length > maxGhostParticles) {
+        ghostParticles.splice(0, ghostParticles.length - maxGhostParticles);
+      }
+
+      // Repulsion from ghost particles
+      for (let g = 0; g < ghostParticles.length; g++) {
+        let gp = ghostParticles[g];
+        for (let p = 0; p < particles.length; p++) {
+          let pt = particles[p];
+          let dx = pt.x - gp.x;
+          let dy = pt.y - gp.y;
+          let dist = sqrt(dx * dx + dy * dy);
+          if (dist < 60 && dist > 0) {
+            let force = 2.0 / dist;
+            pt.vx += (dx / dist) * force;
+            pt.vy += (dy / dist) * force;
+          }
+        }
+      }
+
+      // Cursor repulsion
+      for (let p = 0; p < particles.length; p++) {
+        let pt = particles[p];
+        let dx = pt.x - mouseX;
+        let dy = pt.y - mouseY;
+        let dist = sqrt(dx * dx + dy * dy);
+        if (dist < mouseInfluenceRadius && dist > 0) {
+          let force = 80.0 / (dist * dist);
+          pt.vx += (dx / dist) * force;
+          pt.vy += (dy / dist) * force;
+        }
+      }
+
+      // Update and draw particles
+      for (let p = 0; p < particles.length; p++) {
+        let pt = particles[p];
+        // Brownian drift
+        pt.vx += random(-0.15, 0.15);
+        pt.vy += random(-0.15, 0.15);
+        // Damping
+        pt.vx *= 0.96;
+        pt.vy *= 0.96;
+        // Move
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        pt.life--;
+
+        // Draw
+        let alpha = map(pt.life, 0, pt.maxLife, 0, 255);
+        let sw = pt.size * map(pt.life, 0, pt.maxLife, 0.3, 1);
+        strokeWeight(sw);
+        if (pt.color === "gold") {
+          stroke(212, 175, 55, alpha);
+        } else if (pt.color === "blue") {
+          stroke(168, 208, 230, alpha);
+        } else {
+          stroke(255, 255, 255, alpha);
+        }
+        point(pt.x, pt.y);
+
+        // Draw echo on echoCanvas
+        if (pt.life % 8 === 0) {
+          echoCanvas.stroke(26, 35, 50, 40);
+          echoCanvas.strokeWeight(pt.size * 0.5);
+          echoCanvas.point(pt.x, pt.y);
+        }
+      }
+
+      // Remove dead particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        if (particles[i].life <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+
+      // Ghost particles: invisible, but draw faint bloom where they exist
+      for (let g = 0; g < ghostParticles.length; g++) {
+        let gp = ghostParticles[g];
+        gp.life--;
+        noStroke();
+        fill(255, 107, 107, 8);
+        ellipse(gp.x, gp.y, 12, 12);
+      }
+      for (let i = ghostParticles.length - 1; i >= 0; i--) {
+        if (ghostParticles[i].life <= 0) {
+          ghostParticles.splice(i, 1);
+        }
+      }
+
+      // Draw HUD
+      fill(255, 255, 255, 160);
+      noStroke();
+      textSize(12);
+      textFont('monospace');
+      text("symmetry: " + floor(currentFreq1 + currentFreq2), 20, 30);
+      text("particles: " + particles.length, 20, 50);
+      text("cursor: magnet", 20, 70);
+    }
+
+    function mousePressed() {
+      phase1 = random(TWO_PI);
+      phase2 = random(TWO_PI);
+      currentFreq1 = baseFreq1;
+      currentFreq2 = baseFreq2;
+      echoCanvas.background(11, 15, 25);
+      particles = [];
+      ghostParticles = [];
+    }
+  </script>
+</body>
+</html>

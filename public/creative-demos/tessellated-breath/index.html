@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tessellated Breath — Recursive Kinetic Typography</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0A0A0A;
+    font-family: sans-serif;
+  }
+  #info {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+    pointer-events: none;
+    user-select: none;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+</head>
+<body>
+<div id="info">Type to add letters • Hover to deepen • Click to reshuffle</div>
+<script>
+/* ========================================================================
+   Tessellated Breath — Recursive Kinetic Typography Demo
+   ------------------------------------------------------------------------
+   Technique:
+   1. Each typed character is converted to a vector skeleton using
+      p5.js textToPoints() with the default system font.
+   2. The bounding box of the glyph is recursively subdivided into
+      geometric tiles (binary split, axis alternates by noise) up to a
+      parametric depth of 6.
+   3. Each leaf tile is colored from a 6-color palette with depth-based
+      selection to avoid visual clutter.
+   4. Tile vertices receive a 2D simplex noise displacement (2–3% range)
+      for an organic, handmade texture.
+   5. Tiles "breathe" — their scale oscillates via a global sine field
+      mapped to per-tile phase offsets.
+   6. The canvas is clipped to the letter outline so tiles only appear
+      inside the glyph, preserving recognisability.
+   ------------------------------------------------------------------------
+   Palette: #0A0A0A (bg), #7B2D8E, #FF00FF, #FFD700, #FF6B6B, #FFFFFF
+   ======================================================================== */
+
+const PALETTE = [
+  '#7B2D8E', // purple accent
+  '#FF00FF', // magenta
+  '#FFD700', // gold
+  '#FF6B6B', // coral
+  '#FFFFFF', // white
+  '#0A0A0A'  // near-black (rare deep tile)
+];
+
+let letters = [];
+let word = "BREATHE";
+let time = 0;
+let myFont;
+
+function preload() {
+  myFont = loadFont('https://cdn.jsdelivr.net/npm/open-sans-all@0.1.3/fonts/open-sans-800.ttf');
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  textFont(myFont);
+  textSize(140);
+  textAlign(CENTER, CENTER);
+  initLetters();
+}
+
+function initLetters() {
+  letters = [];
+  let spacing = 24;
+  let totalWidth = 0;
+  let data = [];
+
+  // Build skeletons and measure widths
+  for (let i = 0; i < word.length; i++) {
+    let ch = word[i];
+    if (ch === ' ') {
+      totalWidth += 60;
+      continue;
+    }
+    let pts = myFont.textToPoints(ch, 0, 0, 140, { sampleFactor: 0.25, simplifyThreshold: 0 });
+    if (pts.length === 0) continue;
+    let bbox = getBBox(pts);
+    // Center the skeleton around its own centroid so tiles and clip align
+    let cx = (bbox.minX + bbox.maxX) / 2;
+    let cy = (bbox.minY + bbox.maxY) / 2;
+    for (let p of pts) { p.x -= cx; p.y -= cy; }
+    let w = bbox.maxX - bbox.minX;
+    let h = bbox.maxY - bbox.minY;
+    data.push({ char: ch, points: pts, w: w, h: h });
+    totalWidth += w + spacing;
+  }
+
+  if (data.length === 0) return;
+  totalWidth -= spacing; // remove trailing spacing
+
+  let cursorX = (width - totalWidth) / 2;
+  let cy = height / 2;
+
+  for (let d of data) {
+    let x = cursorX + d.w / 2;
+    cursorX += d.w + spacing;
+
+    let letter = {
+      char: d.char,
+      points: d.points,
+      x: x,
+      y: cy,
+      w: d.w,
+      h: d.h,
+      targetDepth: 4,
+      currentDepth: 4,
+      palette: shuffle(PALETTE.slice()),
+      tiles: [],
+      reseed: 0, // 0..1 shrink animation on palette reshuffle
+      phase: random(1000)
+    };
+    // Precompute full subdivision tree to depth 6
+    letter.tiles = subdivide(letter, x - d.w / 2, cy - d.h / 2, d.w, d.h, 0, 6);
+    letters.push(letter);
+  }
+}
+
+function getBBox(pts) {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (let p of pts) {
+    minX = min(minX, p.x);
+    minY = min(minY, p.y);
+    maxX = max(maxX, p.x);
+    maxY = max(maxY, p.y);
+  }
+  return { minX, minY, maxX, maxY };
+}
+
+/* Recursive binary subdivision with noise-driven split offsets.
+   Axis alternates based on aspect ratio and a noise threshold
+   so the tessellation looks irregular and organic. */
+function subdivide(letter, x, y, w, h, depth, maxDepth) {
+  let tiles = [];
+  if (depth >= maxDepth || w < 10 || h < 10) {
+    tiles.push({
+      x: x, y: y, w: w, h: h,
+      depth: depth,
+      color: letter.palette[depth % letter.palette.length],
+      phase: noise(x * 0.05, y * 0.05, letter.phase) * TWO_PI
+    });
+    return tiles;
+  }
+
+  let splitVertical = w >= h;
+  // 30% chance to flip axis for irregularity
+  if (random() < 0.3) splitVertical = !splitVertical;
+
+  if (splitVertical) {
+    let mid = x + w * 0.5;
+    let offset = (noise(x * 0.01, letter.y * 0.01, letter.phase) - 0.5) * w * 0.35;
+    mid += offset;
+    mid = constrain(mid, x + w * 0.2, x + w * 0.8);
+    tiles.push(...subdivide(letter, x, y, mid - x, h, depth + 1, maxDepth));
+    tiles.push(...subdivide(letter, mid, y, x + w - mid, h, depth + 1, maxDepth));
+  } else {
+    let mid = y + h * 0.5;
+    let offset = (noise(letter.x * 0.01, y * 0.01, letter.phase) - 0.5) * h * 0.35;
+    mid += offset;
+    mid = constrain(mid, y + h * 0.2, y + h * 0.8);
+    tiles.push(...subdivide(letter, x, y, w, mid - y, depth + 1, maxDepth));
+    tiles.push(...subdivide(letter, x, mid, w, y + h - mid, depth + 1, maxDepth));
+  }
+  return tiles;
+}
+
+function draw() {
+  background(10);
+  time += 0.015;
+
+  for (let letter of letters) {
+    // Smooth depth transition (hover lerp)
+    letter.currentDepth = lerp(letter.currentDepth, letter.targetDepth, 0.12);
+
+    // Hit-test: is mouse inside this letter's bounding box?
+    let mx = mouseX - letter.x;
+    let my = mouseY - letter.y;
+    let hovering = abs(mx) < letter.w / 2 && abs(my) < letter.h / 2;
+    letter.targetDepth = hovering ? 6 : 4;
+
+    // Decay reseed animation
+    if (letter.reseed > 0) letter.reseed -= 0.03;
+
+    // --- Clip to letter outline so tiles only render inside the glyph ---
+    push();
+    drawingContext.save();
+    drawingContext.beginPath();
+    let pts = letter.points;
+    drawingContext.moveTo(pts[0].x + letter.x, pts[0].y + letter.y);
+    for (let i = 1; i < pts.length; i++) {
+      drawingContext.lineTo(pts[i].x + letter.x, pts[i].y + letter.y);
+    }
+    drawingContext.closePath();
+    drawingContext.clip();
+
+    // Draw tiles
+    for (let t of letter.tiles) {
+      if (t.depth > floor(letter.currentDepth)) continue;
+
+      let breath = 1.0 + sin(time * 2.0 + t.phase) * 0.05;
+      // Reseed shrink effect: tiles briefly collapse when palette changes
+      if (letter.reseed > 0) breath *= (1.0 - letter.reseed);
+
+      let dw = t.w * breath;
+      let dh = t.h * breath;
+      let dx = t.x + (t.w - dw) * 0.5;
+      let dy = t.y + (t.h - dh) * 0.5;
+
+      // Organic noise displacement (2–3% of tile size)
+      let nx = (noise(t.x * 0.02, t.y * 0.02, time) - 0.5) * 3.0;
+      let ny = (noise(t.x * 0.02 + 100, t.y * 0.02, time) - 0.5) * 3.0;
+
+      fill(t.color);
+      noStroke();
+      rect(dx + nx, dy + ny, dw, dh);
+    }
+
+    drawingContext.restore();
+    pop();
+  }
+}
+
+/* Clicking a letter reshuffles its palette and triggers a brief
+   0.5-second re-subdivision animation where tiles shrink to zero
+   and regrow with new colors. */
+function mousePressed() {
+  for (let letter of letters) {
+    let mx = mouseX - letter.x;
+    let my = mouseY - letter.y;
+    if (abs(mx) < letter.w / 2 && abs(my) < letter.h / 2) {
+      letter.palette = shuffle(PALETTE.slice());
+      letter.reseed = 1.0;
+      // Reassign colors without rebuilding the tree
+      for (let t of letter.tiles) {
+        t.color = letter.palette[t.depth % letter.palette.length];
+      }
+    }
+  }
+}
+
+function keyTyped() {
+  if (key.length === 1 && key !== ' ') {
+    word += key.toUpperCase();
+    initLetters();
+  }
+}
+
+function keyPressed() {
+  if (keyCode === BACKSPACE && word.length > 0) {
+    word = word.slice(0, -1);
+    initLetters();
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  initLetters();
+}
+</script>
+</body>
+</html>

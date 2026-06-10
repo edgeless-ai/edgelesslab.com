@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glassmorphism Data Atlas</title>
+  <!-- D3.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <!-- Google Fonts: Inter + Space Mono (stand-in for Apercu Mono) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================
+       GLASSMORPHISM DATA ATLAS — GLOBAL STYLES
+       ============================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #050505;
+      color: #F2F2F2;
+      font-family: 'Inter', 'Helvetica Neue', sans-serif;
+      /* 900vh scroll runway for narrative waypoints */
+      height: 900vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Fixed D3.js SVG background layer */
+    #atlas-svg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none; /* zoom is attached but we drive it via scroll */
+    }
+
+    /* Glassmorphism panel base class */
+    .glass-panel {
+      position: sticky;
+      top: 35vh;
+      width: 420px;
+      max-width: 90vw;
+      margin: 0 auto;
+      padding: 28px 32px;
+      backdrop-filter: blur(36px);
+      -webkit-backdrop-filter: blur(36px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.02) 100%);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      color: #F2F2F2;
+      font-family: 'Inter', 'Helvetica Neue', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      z-index: 1;
+      transition: opacity 0.4s ease, transform 0.4s ease, backdrop-filter 0.1s linear;
+      opacity: 0;
+      transform: translateY(20px);
+      will-change: transform, opacity, backdrop-filter;
+    }
+
+    .glass-panel h2 {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      line-height: 1.2;
+      margin: 0 0 12px 0;
+      background: linear-gradient(135deg, #D4AF37 0%, #FFFFFF 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      /* fallback for browsers without background-clip:text */
+      -webkit-text-fill-color: transparent;
+    }
+
+    .glass-panel p {
+      color: #A3A3A3;
+      font-family: 'Space Mono', 'Courier New', monospace;
+      font-size: 13px;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* Scroll spacer that holds each sticky panel */
+    .panel-spacer {
+      height: 150vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Gold vein overlay canvas */
+    #vein-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Light theme leak band */
+    #leak-band {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 0px;
+      background: #FAFAF9;
+      z-index: 0;
+      transition: none;
+      pointer-events: none;
+    }
+
+    /* Axis styling inside SVG */
+    .axis path,
+    .axis line {
+      stroke: #444444;
+    }
+    .axis text {
+      fill: #A3A3A3;
+      font-family: 'Space Mono', 'Courier New', monospace;
+      font-size: 11px;
+    }
+    .axis-label {
+      fill: #A3A3A3;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Data points */
+    .data-point {
+      transition: r 0.3s ease;
+    }
+
+    /* Intro title card */
+    .title-card {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+
+    .title-card h1 {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      margin: 0 0 16px 0;
+      background: linear-gradient(135deg, #D4AF37 0%, #FFFFFF 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      letter-spacing: -0.02em;
+    }
+
+    .title-card p {
+      font-family: 'Space Mono', 'Courier New', monospace;
+      color: #A3A3A3;
+      font-size: 14px;
+      margin: 0;
+      text-align: center;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: #666;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    /* Mirror point visual inside panel (optional debug/art) */
+    .mirror-orb {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #00FFFF;
+      opacity: 0.4;
+      pointer-events: none;
+      box-shadow: 0 0 8px #00FFFF;
+      transition: opacity 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fixed title card that fades as user scrolls -->
+  <div class="title-card" id="title-card">
+    <h1>Glassmorphism Data Atlas</h1>
+    <p>Hip-hop vocabulary plotted beneath frosted glass</p>
+    <div class="scroll-hint">Scroll to explore ↓</div>
+  </div>
+
+  <!-- D3.js SVG background (fixed, z-index 0) -->
+  <svg id="atlas-svg"></svg>
+
+  <!-- Gold vein overlay canvas (pointer-events none, z-index 2) -->
+  <canvas id="vein-canvas"></canvas>
+
+  <!-- Light theme leak band (fixed bottom, z-index 0) -->
+  <div id="leak-band"></div>
+
+  <!-- Panels and spacers are injected by JS -->
+
+  <script>
+    /* ============================================
+       GLASSMORPHISM DATA ATLAS — CORE SCRIPT
+       ============================================ */
+
+    // --------------------------------------------------
+    // 1. CONFIGURATION & DATASET
+    // --------------------------------------------------
+    const CONFIG = {
+      pointCount: 150,
+      mirrorPercent: 0.03,
+      margin: { top: 40, right: 40, bottom: 60, left: 80 },
+      colors: {
+        A: '#FF00FF', // Neon pink
+        B: '#00AAFF', // Electric blue
+        C: '#FFDD00', // Warm yellow
+        D: '#00FF41', // Green (bonus genre)
+        mirror: '#00FFFF',
+        gold: '#D4AF37',
+        axis: '#444444',
+        textPrimary: '#F2F2F2',
+        textSecondary: '#A3A3A3'
+      }
+    };
+
+    const NAMES = [
+      "Rakim", "Jay-Z", "Nas", "Andre 3000", "Eminem", "Kendrick", "Ghostface",
+      "Black Thought", "MF DOOM", "Biggie", "Tupac", "Wayne", "Scarface", "Lupe",
+      "Common", "Mos Def", "Q-Tip", "GZA", "Redman", "Method Man", "Busta",
+      "Big Boi", "Jadakiss", "Camron", "Pusha T", "Kanye", "Drake", "J. Cole",
+      "Travis", "Future", "Snoop", "Ice Cube", "Dr. Dre", "Lil Baby", "Megan",
+      "Cardi", "Nicki", "Denzel", "Freddie", "Run", "DMC", "LL Cool J", "KRS-One",
+      "Big Daddy", "Slick Rick", "Talib", "Phonte", "Elzhi", "Rapsody", "JPEG"
+    ];
+
+    function generateDataset(count) {
+      const data = [];
+      for (let i = 0; i < count; i++) {
+        const name = NAMES[Math.floor(Math.random() * NAMES.length)] + " " + Math.floor(Math.random() * 99);
+        const uniqueWords = Math.floor(1500 + Math.random() * 7500);
+        const albums = Math.floor(1 + Math.random() * 24);
+        const genre = ['A', 'B', 'C', 'D'][Math.floor(Math.random() * 4)];
+        data.push({ name, uniqueWords, albums, genre });
+      }
+      return data;
+    }
+
+    const dataset = generateDataset(CONFIG.pointCount);
+
+    // --------------------------------------------------
+    // 2. SCALES & SVG SETUP
+    // --------------------------------------------------
+    const svg = d3.select("#atlas-svg");
+    let W = window.innerWidth;
+    let H = window.innerHeight;
+    svg.attr("width", W).attr("height", H);
+
+    let plotW = W - CONFIG.margin.left - CONFIG.margin.right;
+    let plotH = H - CONFIG.margin.top - CONFIG.margin.bottom;
+
+    const xScale = d3.scaleLinear().domain([1500, 9000]).range([0, plotW]);
+    const yScale = d3.scaleLinear().domain([0, 25]).range([plotH, 0]);
+
+    const g = svg.append("g")
+      .attr("transform", `translate(${CONFIG.margin.left},${CONFIG.margin.top})`);
+
+    // Grid lines via axis ticks
+    const xAxis = d3.axisBottom(xScale)
+      .ticks(5)
+      .tickSize(-plotH)
+      .tickPadding(10);
+    const yAxis = d3.axisLeft(yScale)
+      .ticks(5)
+      .tickSize(-plotW)
+      .tickPadding(10);
+
+    const gx = g.append("g")
+      .attr("class", "axis")
+      .attr("transform", `translate(0,${plotH})`)
+      .call(xAxis);
+    gx.selectAll("line").attr("stroke", "#1a1a1a"); // subtle grid
+    gx.selectAll("text").attr("fill", "#A3A3A3");
+    gx.select(".domain").attr("stroke", "#444444");
+
+    const gy = g.append("g")
+      .attr("class", "axis")
+      .call(yAxis);
+    gy.selectAll("line").attr("stroke", "#1a1a1a");
+    gy.selectAll("text").attr("fill", "#A3A3A3");
+    gy.select(".domain").attr("stroke", "#444444");
+
+    // Axis labels
+    g.append("text")
+      .attr("class", "axis-label")
+      .attr("x", plotW / 2)
+      .attr("y", plotH + 48)
+      .attr("text-anchor", "middle")
+      .text("Unique Words");
+
+    g.append("text")
+      .attr("class", "axis-label")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -plotH / 2)
+      .attr("y", -56)
+      .attr("text-anchor", "middle")
+      .text("Albums");
+
+    // Data points
+    const points = g.selectAll("circle.data-point")
+      .data(dataset)
+      .enter()
+      .append("circle")
+      .attr("class", "data-point")
+      .attr("cx", d => xScale(d.uniqueWords))
+      .attr("cy", d => yScale(d.albums))
+      .attr("r", 4)
+      .attr("fill", d => CONFIG.colors[d.genre])
+      .attr("opacity", 0.85);
+
+    // Zoom behavior
+    const zoom = d3.zoom()
+      .scaleExtent([0.5, 5])
+      .on("zoom", (event) => {
+        g.attr("transform", event.transform);
+        // Keep axes visually anchored by NOT transforming them.
+        // In a full production app we'd redraw axes; here we keep it minimal.
+      });
+    svg.call(zoom);
+
+    // --------------------------------------------------
+    // 3. NARRATIVE WAYPOINTS
+    // --------------------------------------------------
+    const waypoints = [
+      { t: 0.00, tx: 0,    ty: 0,   k: 1.0,  text: "Hip-hop vocabulary, plotted." },
+      { t: 0.18, tx: -200, ty: 100, k: 1.8,  text: "East Coast: dense words, tight clusters." },
+      { t: 0.38, tx: 100,  ty: -50, k: 2.2,  text: "West Coast: wide spread, high volume." },
+      { t: 0.58, tx: -100, ty: 150, k: 1.6,  text: "South: more albums, fewer unique words." },
+      { t: 0.78, tx: 50,   ty: 0,   k: 1.4,  text: "Midwest: the middle ground." },
+      { t: 0.95, tx: 0,    ty: 0,   k: 1.0,  text: "The full picture." }
+    ];
+
+    // --------------------------------------------------
+    // 4. GLASS PANELS
+    // --------------------------------------------------
+    const panels = [];
+    const panelSpacers = document.createDocumentFragment();
+
+    waypoints.forEach((wp, idx) => {
+      const spacer = document.createElement("div");
+      spacer.className = "panel-spacer";
+
+      const panel = document.createElement("div");
+      panel.className = "glass-panel";
+      panel.dataset.index = idx;
+
+      const h2 = document.createElement("h2");
+      h2.textContent = wp.text;
+      panel.appendChild(h2);
+
+      const p = document.createElement("p");
+      p.textContent = "Scroll to explore the data. The glass panels respond to your velocity.";
+      panel.appendChild(p);
+
+      // Hover events for gold veins
+      panel.addEventListener("mouseenter", () => {
+        veinCanvas.style.opacity = "1";
+      });
+      panel.addEventListener("mouseleave", () => {
+        veinCanvas.style.opacity = "0";
+      });
+
+      spacer.appendChild(panel);
+      panelSpacers.appendChild(spacer);
+      panels.push({ panel, spacer, t: wp.t, tx: wp.tx, ty: wp.ty, k: wp.k });
+    });
+
+    document.body.appendChild(panelSpacers);
+
+    // --------------------------------------------------
+    // 5. MIRROR POINTS (~3% of dataset)
+    // --------------------------------------------------
+    const mirrorCount = Math.max(1, Math.floor(dataset.length * CONFIG.mirrorPercent));
+    const mirrorPoints = [];
+    for (let i = 0; i < mirrorCount; i++) {
+      const d = dataset[Math.floor(Math.random() * dataset.length)];
+      mirrorPoints.push({
+        data: d,
+        panelIndex: Math.floor(Math.random() * waypoints.length),
+        x: 0.1 + Math.random() * 0.8,
+        y: 0.1 + Math.random() * 0.8,
+        vx: (Math.random() - 0.5) * 0.002,
+        vy: (Math.random() - 0.5) * 0.002,
+        reflected: false,
+        reflectionAge: 0,
+        reflectionElement: null,
+        orbEl: null
+      });
+    }
+
+    // Create tiny DOM orbs inside each panel for mirror points
+    mirrorPoints.forEach(mp => {
+      const orb = document.createElement("div");
+      orb.className = "mirror-orb";
+      mp.orbEl = orb;
+      panels[mp.panelIndex].panel.appendChild(orb);
+    });
+
+    // --------------------------------------------------
+    // 6. GOLD VEIN CANVAS
+    // --------------------------------------------------
+    const veinCanvas = document.getElementById("vein-canvas");
+    const veinCtx = veinCanvas.getContext("2d");
+    veinCanvas.width = W;
+    veinCanvas.height = H;
+
+    // --------------------------------------------------
+    // 7. LIGHT LEAK BAND
+    // --------------------------------------------------
+    const leakBand = document.getElementById("leak-band");
+    let leakProgress = 0; // 0 → 1, irreversible
+
+    // --------------------------------------------------
+    // 8. SCROLL & ANIMATION LOOP
+    // --------------------------------------------------
+    let maxScroll = document.body.scrollHeight - window.innerHeight;
+    let lastScrollY = window.scrollY;
+    let scrollDelta = 0;
+    let decayTimer = 0;
+
+    const titleCard = document.getElementById("title-card");
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function findBracket(t) {
+      for (let i = 0; i < waypoints.length - 1; i++) {
+        if (t >= waypoints[i].t && t <= waypoints[i + 1].t) return i;
+      }
+      return waypoints.length - 1;
+    }
+
+    function interpolateZoom(t) {
+      const i = findBracket(t);
+      if (i >= waypoints.length - 1) {
+        const wp = waypoints[i];
+        return d3.zoomIdentity.translate(wp.tx, wp.ty).scale(wp.k);
+      }
+      const a = waypoints[i];
+      const b = waypoints[i + 1];
+      const range = b.t - a.t;
+      const localT = range === 0 ? 0 : (t - a.t) / range;
+      const tx = lerp(a.tx, b.tx, localT);
+      const ty = lerp(a.ty, b.ty, localT);
+      const k = lerp(a.k, b.k, localT);
+      return d3.zoomIdentity.translate(tx, ty).scale(k);
+    }
+
+    // Convert data-space coordinates to screen coords via current zoom
+    function dataToScreen(d) {
+      const transform = d3.zoomTransform(svg.node());
+      const sx = transform.applyX(xScale(d.uniqueWords)) + CONFIG.margin.left;
+      const sy = transform.applyY(yScale(d.albums)) + CONFIG.margin.top;
+      return { x: sx, y: sy };
+    }
+
+    function drawFrame() {
+      const scrollY = window.scrollY;
+      const t = Math.max(0, Math.min(1, scrollY / maxScroll));
+
+      // --- Title card fade ---
+      if (t < 0.05) {
+        titleCard.style.opacity = 1 - (t / 0.05);
+      } else {
+        titleCard.style.opacity = 0;
+      }
+
+      // --- 1. Zoom interpolation ---
+      const targetTransform = interpolateZoom(t);
+      // We apply directly each frame (smoothness from per-frame interpolation)
+      svg.call(zoom.transform, targetTransform);
+
+      // --- 2. Panel visibility ---
+      panels.forEach(p => {
+        const dist = Math.abs(t - p.t);
+        if (dist < 0.08) {
+          const opacity = 1 - (dist / 0.08);
+          p.panel.style.opacity = opacity;
+          p.panel.style.transform = "translateY(0)";
+        } else {
+          p.panel.style.opacity = "0";
+          p.panel.style.transform = "translateY(20px)";
+        }
+      });
+
+      // --- 3. Scroll velocity blur ---
+      scrollDelta = Math.abs(scrollY - lastScrollY);
+      lastScrollY = scrollY;
+      decayTimer++;
+      if (decayTimer > 10) {
+        scrollDelta = 0; // reset after idle
+        decayTimer = 0;
+      }
+      const extraBlur = Math.min(scrollDelta * 2, 36);
+      const blurAmount = 36 + extraBlur;
+      panels.forEach(p => {
+        p.panel.style.backdropFilter = `blur(${blurAmount}px)`;
+        p.panel.style.webkitBackdropFilter = `blur(${blurAmount}px)`;
+      });
+
+      // --- 4. Mirror points ---
+      mirrorPoints.forEach(mp => {
+        const panel = panels[mp.panelIndex].panel;
+        const rect = panel.getBoundingClientRect();
+        const pw = rect.width;
+        const ph = rect.height;
+
+        // Drift
+        mp.x += mp.vx;
+        mp.y += mp.vy;
+        // Bounce inside panel
+        if (mp.x < 0.05 || mp.x > 0.95) mp.vx *= -1;
+        if (mp.y < 0.05 || mp.y > 0.95) mp.vy *= -1;
+        // Clamp
+        mp.x = Math.max(0.05, Math.min(0.95, mp.x));
+        mp.y = Math.max(0.05, Math.min(0.95, mp.y));
+
+        // Position the orb inside the panel
+        if (mp.orbEl) {
+          mp.orbEl.style.left = (mp.x * pw) + "px";
+          mp.orbEl.style.top = (mp.y * ph) + "px";
+        }
+
+        // Edge touch → reflection
+        const nearEdge = (mp.x < 0.06 || mp.x > 0.94 || mp.y < 0.06 || mp.y > 0.94);
+        if (!mp.reflected && nearEdge) {
+          mp.reflected = true;
+          mp.reflectionAge = 300; // ~5 seconds at 60fps
+          const screenPos = dataToScreen(mp.data);
+          const refl = g.append("circle")
+            .attr("cx", xScale(mp.data.uniqueWords))
+            .attr("cy", yScale(mp.data.albums))
+            .attr("r", 0)
+            .attr("fill", "none")
+            .attr("stroke", CONFIG.colors.mirror)
+            .attr("stroke-width", 2)
+            .attr("opacity", 0.8);
+          // Animate entrance
+          refl.transition().duration(600).attr("r", 8);
+          mp.reflectionElement = refl;
+        }
+
+        if (mp.reflected) {
+          mp.reflectionAge--;
+          if (mp.reflectionAge <= 0) {
+            mp.reflectionElement.transition().duration(400)
+              .attr("opacity", 0)
+              .attr("r", 0)
+              .remove()
+              .on("end", () => { mp.reflected = false; });
+            mp.reflected = false;
+          }
+        }
+      });
+
+      // --- 5. Gold veins ---
+      veinCtx.clearRect(0, 0, veinCanvas.width, veinCanvas.height);
+      const veinOpacity = parseFloat(veinCanvas.style.opacity) || 0;
+      if (veinOpacity > 0.01) {
+        panels.forEach(p => {
+          const panelOpacity = parseFloat(p.panel.style.opacity) || 0;
+          if (panelOpacity > 0.3) {
+            const rect = p.panel.getBoundingClientRect();
+            // Find points whose screen projection falls within panel rect
+            const visible = dataset.filter(d => {
+              const s = dataToScreen(d);
+              return s.x > rect.left && s.x < rect.right && s.y > rect.top && s.y < rect.bottom;
+            });
+            if (visible.length > 1) {
+              veinCtx.strokeStyle = "rgba(212, 175, 55, 0.08)";
+              veinCtx.lineWidth = 1;
+              veinCtx.beginPath();
+              for (let i = 0; i < visible.length - 1; i++) {
+                const s1 = dataToScreen(visible[i]);
+                const s2 = dataToScreen(visible[i + 1]);
+                veinCtx.moveTo(s1.x, s1.y);
+                veinCtx.lineTo(s2.x, s2.y);
+              }
+              veinCtx.stroke();
+            }
+          }
+        });
+      }
+
+      // --- 6. Light leak (irreversible) ---
+      if (t > 0.85) {
+        const targetLeak = (t - 0.85) * 6.67;
+        if (targetLeak > leakProgress) leakProgress = targetLeak;
+      }
+      const leakHeight = leakProgress * H;
+      leakBand.style.height = leakHeight + "px";
+      // When light leaks, panels become slightly more opaque
+      if (leakProgress > 0.01) {
+        const panelAlpha = 0.08 + leakProgress * 0.04; // 0.08 → 0.12
+        panels.forEach(p => {
+          p.panel.style.background = `linear-gradient(180deg, rgba(255,255,255,${0.15 + leakProgress * 0.02}) 0%, rgba(255,255,255,${panelAlpha}) 100%)`;
+        });
+      }
+
+      requestAnimationFrame(drawFrame);
+    }
+
+    // --------------------------------------------------
+    // 9. RESIZE HANDLER
+    // --------------------------------------------------
+    window.addEventListener("resize", () => {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      svg.attr("width", W).attr("height", H);
+      plotW = W - CONFIG.margin.left - CONFIG.margin.right;
+      plotH = H - CONFIG.margin.top - CONFIG.margin.bottom;
+      xScale.range([0, plotW]);
+      yScale.range([plotH, 0]);
+      points.attr("cx", d => xScale(d.uniqueWords)).attr("cy", d => yScale(d.albums));
+      maxScroll = document.body.scrollHeight - window.innerHeight;
+      veinCanvas.width = W;
+      veinCanvas.height = H;
+      // Re-render axes
+      gx.attr("transform", `translate(0,${plotH})`).call(xAxis);
+      gy.call(yAxis);
+    });
+
+    // --------------------------------------------------
+    // 10. INIT
+    // --------------------------------------------------
+    maxScroll = document.body.scrollHeight - window.innerHeight;
+    requestAnimationFrame(drawFrame);
+
+    // Expose a small API for console debugging
+    window.Atlas = {
+      dataset,
+      mirrorPoints,
+      waypoints,
+      panels,
+      zoomTo(t) { window.scrollTo(0, t * maxScroll); }
+    };
+  </script>
+</body>
+</html>

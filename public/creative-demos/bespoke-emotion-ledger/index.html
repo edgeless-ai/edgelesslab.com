@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bespoke Emotion Ledger</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #E8E4D9;
+      font-family: Georgia, serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #1A1A1A;
+      margin-top: 20px;
+      font-size: 24px;
+      letter-spacing: 0.5px;
+    }
+    #canvas-container {
+      margin: 10px auto;
+      box-shadow: 0 4px 20px rgba(26, 26, 26, 0.15);
+    }
+    #sr-summary {
+      width: 900px;
+      max-width: 95vw;
+      margin: 10px auto 30px;
+      padding: 15px;
+      background: #C2B280;
+      color: #1A1A1A;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    #instructions {
+      width: 900px;
+      max-width: 95vw;
+      margin: 0 auto 10px;
+      color: #1A1A1A;
+      font-size: 13px;
+      text-align: center;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bespoke Emotion Ledger</h1>
+  <div id="instructions">Click the canvas to manually advance a round. The simulation auto-plays every 2 seconds. Watch for the ghost every 10 rounds.</div>
+  <div id="canvas-container"></div>
+  <div id="sr-summary" aria-live="polite" aria-atomic="true">
+    Initializing the Bespoke Emotion Ledger. Five characters are arranged on a warm postcard canvas. Click the canvas or wait for auto-play to begin.
+  </div>
+
+<script>
+// ============================
+// Bespoke Emotion Ledger
+// ============================
+// A hand-drawn game-theory trust simulation fusing:
+//   - Dear Data (bespoke visual encoding, wobbly pen lines)
+//   - The Evolution of Trust (Prisoner's Dilemma state machine)
+//
+// Built with p5.js 1.9.0 from CDN. Single file, no build step.
+
+let characters = [];
+let round = 1;
+let maxRounds = 50;
+let encodingMode = 0;
+let encodingModes = ["line density", "dot scatter", "concentric circles", "spiral tightness"];
+let ghost = { active: false, timer: 0, x: 0, y: 0, targetX: 0, targetY: 0, hasAppearedForRound: false };
+let lastManualAdvance = -1;
+let confusedRound = false;
+
+function setup() {
+  let canvas = createCanvas(900, 700);
+  canvas.parent('canvas-container');
+  canvas.attribute('aria-label', 'Bespoke emotion ledger — a hand-drawn game-theory trust simulation');
+  background('#F5F5F0');
+  frameRate(30);
+  textFont('Georgia, serif');
+
+  characters = [
+    { name: "Copycat",    strategy: "copycat",         x: 150, y: 200, trust: 5, memory: [], emotion: "neutral",  color: '#4ECDC4' },
+    { name: "Cheater",    strategy: "always_cheat",    x: 350, y: 200, trust: 0, memory: [], emotion: "angry",    color: '#FF6B6B' },
+    { name: "Cooperator", strategy: "always_cooperate", x: 550, y: 200, trust: 5, memory: [], emotion: "happy",    color: '#4ECDC4' },
+    { name: "Grudge",     strategy: "grudge",          x: 250, y: 450, trust: 5, memory: [], emotion: "neutral",  color: '#FFD93D' },
+    { name: "Detective",  strategy: "detective",       x: 450, y: 450, trust: 3, memory: [], emotion: "neutral",  color: '#9B59B6' }
+  ];
+
+  updateSummary();
+}
+
+function draw() {
+  background('#F5F5F0');
+
+  // 1. Legend
+  drawLegend(encodingMode);
+
+  // 2. Connections (wobbly lines between every pair of characters)
+  for (let i = 0; i < characters.length; i++) {
+    for (let j = i + 1; j < characters.length; j++) {
+      drawWobblyLine(characters[i].x, characters[i].y, characters[j].x, characters[j].y, '#8B7355', 1);
+    }
+  }
+
+  // 3. Characters
+  for (let c of characters) {
+    drawCharacter(c, encodingMode);
+  }
+
+  // 4. Ghost
+  if (ghost.active) {
+    drawGhost();
+  }
+
+  // 5. Round info
+  fill('#1A1A1A');
+  textSize(18);
+  textAlign(LEFT, TOP);
+  text("Round " + round + " / " + maxRounds, 20, 20);
+  text("Encoding: " + encodingModes[encodingMode], 20, 50);
+
+  // 6. Auto-play one round every 2 seconds (60 frames at 30fps)
+  if (frameCount % 60 === 0 && round <= maxRounds && frameCount !== lastManualAdvance) {
+    playRound();
+    round++;
+    encodingMode = (encodingMode + 1) % encodingModes.length;
+    updateSummary();
+  }
+
+  // 7. Ghost activation (every 10th round, once per round)
+  if (round % 10 === 0 && !ghost.active && !ghost.hasAppearedForRound) {
+    ghost.active = true;
+    ghost.hasAppearedForRound = true;
+    ghost.timer = 150; // 5 seconds at 30fps
+  }
+  if (round % 10 !== 0) {
+    ghost.hasAppearedForRound = false;
+  }
+
+  // 8. Ghost timer and movement
+  if (ghost.active) {
+    ghost.timer--;
+    ghost.targetX = mouseX;
+    ghost.targetY = mouseY;
+    ghost.x += (ghost.targetX - ghost.x) * 0.1;
+    ghost.y += (ghost.targetY - ghost.y) * 0.1;
+    if (ghost.timer <= 0) {
+      ghost.active = false;
+      confusedRound = true;
+    }
+  }
+}
+
+function mousePressed() {
+  // Manual round advance on click
+  if (round <= maxRounds) {
+    playRound();
+    round++;
+    encodingMode = (encodingMode + 1) % encodingModes.length;
+    lastManualAdvance = frameCount;
+    updateSummary();
+  }
+}
+
+// ============================
+// Game Engine
+// ============================
+
+function playRound() {
+  // Pairwise Prisoner's Dilemma
+  for (let i = 0; i < characters.length; i++) {
+    for (let j = i + 1; j < characters.length; j++) {
+      let a = characters[i];
+      let b = characters[j];
+      let moveA = getMove(a, b);
+      let moveB = getMove(b, a);
+
+      // Update memory
+      a.memory.push({ opponent: b.name, move: moveB, myMove: moveA });
+      b.memory.push({ opponent: a.name, move: moveA, myMove: moveB });
+      if (a.memory.length > 5) a.memory.shift();
+      if (b.memory.length > 5) b.memory.shift();
+
+      // Update emotions and trust
+      if (moveA === "cooperate" && moveB === "cooperate") {
+        a.emotion = "happy";
+        b.emotion = "happy";
+        a.trust = min(a.trust + 1, 10);
+        b.trust = min(b.trust + 1, 10);
+      } else if (moveA === "cooperate" && moveB === "cheat") {
+        a.emotion = "angry";
+        b.emotion = "happy";
+        a.trust = max(a.trust - 2, 0);
+        b.trust = min(b.trust + 1, 10);
+      } else if (moveA === "cheat" && moveB === "cooperate") {
+        a.emotion = "happy";
+        b.emotion = "angry";
+        a.trust = min(a.trust + 1, 10);
+        b.trust = max(b.trust - 2, 0);
+      } else {
+        a.emotion = "neutral";
+        b.emotion = "neutral";
+      }
+    }
+  }
+
+  // If a confused round is pending, overwrite emotions with random values
+  if (confusedRound) {
+    confuseCharacters();
+    confusedRound = false;
+  }
+}
+
+function getMove(character, opponent) {
+  if (character.strategy === "always_cooperate") return "cooperate";
+  if (character.strategy === "always_cheat") return "cheat";
+
+  if (character.strategy === "copycat") {
+    if (character.memory.length === 0) return "cooperate";
+    let last = character.memory.filter(m => m.opponent === opponent.name);
+    if (last.length === 0) return "cooperate";
+    return last[last.length - 1].move;
+  }
+
+  if (character.strategy === "grudge") {
+    let wasCheated = character.memory.some(m => m.opponent === opponent.name && m.move === "cheat");
+    return wasCheated ? "cheat" : "cooperate";
+  }
+
+  if (character.strategy === "detective") {
+    if (character.memory.length === 0) return "cheat"; // test first
+    let last = character.memory.filter(m => m.opponent === opponent.name);
+    if (last.length === 0) return "cooperate";
+    return last[last.length - 1].move;
+  }
+
+  return "cooperate";
+}
+
+function confuseCharacters() {
+  for (let c of characters) {
+    c.emotion = random(["happy", "angry", "neutral", "grateful"]);
+    c.trust = floor(random(0, 11));
+  }
+}
+
+// ============================
+// Rendering
+// ============================
+
+function drawCharacter(c, mode) {
+  push();
+  translate(c.x, c.y);
+
+  // Name label
+  fill('#1A1A1A');
+  textSize(14);
+  textAlign(CENTER, CENTER);
+  text(c.name, 0, -80);
+
+  // Visual encoding based on current mode
+  if (mode === 0) {
+    // Line density = trust level
+    let density = map(c.trust, 0, 10, 2, 20);
+    stroke(c.color);
+    for (let i = 0; i < density; i++) {
+      let yOff = map(i, 0, density, -40, 40);
+      wobblyLine(-30, yOff, 30, yOff);
+    }
+  } else if (mode === 1) {
+    // Dot scatter = memory length
+    let count = c.memory.length;
+    fill(c.color);
+    noStroke();
+    for (let i = 0; i < count; i++) {
+      let dx = random(-35, 35);
+      let dy = random(-35, 35);
+      circle(dx, dy, 4);
+    }
+  } else if (mode === 2) {
+    // Concentric circles = anger level
+    let anger = c.emotion === "angry" ? 10 : 3;
+    noFill();
+    stroke(c.color);
+    for (let r = 10; r <= anger * 4; r += 4) {
+      wobblyCircle(0, 0, r);
+    }
+  } else if (mode === 3) {
+    // Spiral tightness = happiness
+    let tightness = c.emotion === "happy" ? 0.1 : 0.3;
+    stroke(c.color);
+    noFill();
+    beginShape();
+    for (let a = 0; a <= TWO_PI * 6; a += 0.1) {
+      let r = a * tightness;
+      let x = cos(a) * r;
+      let y = sin(a) * r;
+      vertex(x + noise(x * 0.1, y * 0.1) * 2, y + noise(x * 0.1, y * 0.1) * 2);
+    }
+    endShape();
+  }
+
+  // Emotion indicator (small wobbly star)
+  drawEmotionStar(c.emotion, 0, 55);
+
+  pop();
+}
+
+function drawEmotionStar(emotion, x, y) {
+  push();
+  translate(x, y);
+  let colors = { happy: '#4ECDC4', angry: '#FF6B6B', neutral: '#FFD93D', grateful: '#9B59B6' };
+  fill(colors[emotion] || '#1A1A1A');
+  noStroke();
+  beginShape();
+  for (let a = 0; a < TWO_PI; a += PI / 4) {
+    let r = (a % (PI / 2) === 0) ? 8 : 4;
+    let vx = cos(a) * r + noise(a) * 2;
+    let vy = sin(a) * r + noise(a + 1) * 2;
+    vertex(vx, vy);
+  }
+  endShape(CLOSE);
+  pop();
+}
+
+function drawGhost() {
+  push();
+  translate(ghost.x, ghost.y);
+  noStroke();
+  fill('#E8DCC4');
+
+  // Set global alpha to 10% for faint ghost appearance
+  drawingContext.globalAlpha = 0.1;
+
+  // Faint wobbly circle
+  beginShape();
+  for (let a = 0; a < TWO_PI; a += 0.3) {
+    let r = 30 + noise(a, frameCount * 0.01) * 5;
+    vertex(cos(a) * r, sin(a) * r);
+  }
+  endShape(CLOSE);
+
+  // Faint label
+  fill('#E8DCC4');
+  textSize(12);
+  textAlign(CENTER, CENTER);
+  text("?", 0, 0);
+
+  // Reset alpha
+  drawingContext.globalAlpha = 1.0;
+  pop();
+}
+
+function drawLegend(mode) {
+  push();
+  fill('#C2B280');
+  noStroke();
+  rect(width / 2 - 200, height - 80, 400, 60, 8);
+  fill('#1A1A1A');
+  textSize(14);
+  textAlign(CENTER, CENTER);
+  if (mode === 0) {
+    text("LEGEND: line density = trust level (0–10)", width / 2, height - 65);
+    text("more lines = more trust", width / 2, height - 45);
+  } else if (mode === 1) {
+    text("LEGEND: dot scatter = memory length (0–5)", width / 2, height - 65);
+    text("more dots = longer memory", width / 2, height - 45);
+  } else if (mode === 2) {
+    text("LEGEND: concentric circles = anger level", width / 2, height - 65);
+    text("more rings = more anger", width / 2, height - 45);
+  } else if (mode === 3) {
+    text("LEGEND: spiral tightness = happiness", width / 2, height - 65);
+    text("tighter spiral = happier", width / 2, height - 45);
+  }
+  pop();
+}
+
+function drawWobblyLine(x1, y1, x2, y2, col, sw) {
+  stroke(col);
+  strokeWeight(sw);
+  wobblyLine(x1, y1, x2, y2);
+}
+
+function wobblyLine(x1, y1, x2, y2) {
+  let steps = 10;
+  let dx = (x2 - x1) / steps;
+  let dy = (y2 - y1) / steps;
+  beginShape();
+  noFill();
+  strokeWeight(random(1.5, 2.5));
+  for (let i = 0; i <= steps; i++) {
+    let px = x1 + dx * i + noise(i * 0.5, frameCount * 0.01) * 3;
+    let py = y1 + dy * i + noise(i * 0.5 + 1, frameCount * 0.01) * 3;
+    vertex(px, py);
+  }
+  endShape();
+}
+
+function wobblyCircle(cx, cy, r) {
+  beginShape();
+  noFill();
+  strokeWeight(random(1.5, 2.5));
+  for (let a = 0; a < TWO_PI; a += 0.2) {
+    let px = cx + cos(a) * r + noise(a, frameCount * 0.01) * 2;
+    let py = cy + sin(a) * r + noise(a + 1, frameCount * 0.01) * 2;
+    vertex(px, py);
+  }
+  endShape(CLOSE);
+}
+
+// ============================
+// Accessibility / Screen Reader
+// ============================
+
+function updateSummary() {
+  let el = document.getElementById('sr-summary');
+  let status = `Round ${round} of ${maxRounds}. Current encoding: ${encodingModes[encodingMode]}. `;
+  let charStates = characters.map(c => `${c.name} is ${c.emotion} (trust ${c.trust})`).join('. ');
+  if (ghost.active) {
+    status += "A ghost participant is present. ";
+  }
+  if (confusedRound) {
+    status += "The characters are confused. ";
+  }
+  el.textContent = status + charStates;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paper Atmosphere</title>
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    background: #F5F5F0;
+    cursor: none;
+    overflow-x: hidden;
+  }
+  #atmosphere {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+  article {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 80vh 20px;
+    color: #1A1A1A;
+    font-family: Georgia, serif;
+    line-height: 1.6;
+    pointer-events: auto;
+  }
+  article h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  article p {
+    margin-bottom: 1.5rem;
+    font-size: 1.05rem;
+  }
+  article .divider {
+    width: 60px;
+    height: 1px;
+    background: #C2B280;
+    margin: 2rem 0;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="atmosphere"></canvas>
+
+<article>
+  <h1>The Subconscious Memory of Paper</h1>
+  <p>
+    There is a quiet belief that paper remembers what was written upon it. Not the words themselves, but the weight of the hand, the pause between sentences, the small tremor of uncertainty. The page holds these invisible forces the way a room holds the silence after a conversation has ended.
+  </p>
+  <div class="divider"></div>
+  <p>
+    Scroll through this page and you will disturb the dust. Thousands of motes drift in the warm air, each one carrying a fragment of something almost legible. They settle at the bottom, accumulating into a soft grain, as if the paper itself is trying to grow a texture from patience alone.
+  </p>
+  <p>
+    Move your cursor across the surface and you become an eraser, a desk wipe, a hand sweeping crumbs from a table. The dust vanishes under your attention, revealing the smooth paper beneath. But look closely: some of the motes are darker than the rest. They are ink, not dust, and they spell tiny letters that dissolve before they can form words.
+  </p>
+  <div class="divider"></div>
+  <p>
+    The paper has a subconscious memory of typography that it can almost articulate, but never quite remembers. Press <strong>R</strong> to clear the accumulation and begin again. Press <strong>P</strong> to pause the atmosphere, holding the dust in stasis.
+  </p>
+  <p>
+    Every ten seconds, the ink motes release themselves from the grain and float upward, returning to the air. The page forgets, then remembers, then forgets again. It is not a cycle of loss, but a cycle of generosity. The paper gives the letters back to the air so they can fall again, perhaps in a different order, perhaps in no order at all.
+  </p>
+  <div class="divider"></div>
+  <p>
+    The warm color of the background is not white. It is the color of old correspondence, of cream envelopes, of the inside pages of a book that has been read many times. The beige divider is the color of dried wheat, of faded ribbon, of the thin edge of a bookmark that has spent decades pressed between the same two chapters.
+  </p>
+  <p>
+    This is an atmosphere, not a document. It is meant to be felt rather than read. The text is here to give you permission to stay, to scroll, to watch the dust respond to your presence. The page is alive in the slowest possible way, and it has been waiting for you.
+  </p>
+</article>
+
+<script>
+(function() {
+  'use strict';
+
+  const mainCanvas = document.getElementById('atmosphere');
+  const mainCtx = mainCanvas.getContext('2d');
+
+  const accCanvas = document.createElement('canvas');
+  const accCtx = accCanvas.getContext('2d');
+
+  const PARTICLE_COUNT = 3000;
+  const chars = ['a','e','i','o','t','s','n','r'];
+  const particles = [];
+
+  let cursor = { x: -100, y: -100 };
+  let scrollDelta = 0;
+  let lastScrollY = window.scrollY;
+  let isPaused = false;
+  let animationId = null;
+
+  function random(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  function resize() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const sh = Math.max(document.body.scrollHeight, h * 2);
+
+    if (mainCanvas.width !== w || mainCanvas.height !== h) {
+      mainCanvas.width = w;
+      mainCanvas.height = h;
+    }
+
+    if (accCanvas.width !== w || accCanvas.height !== sh) {
+      // Preserve existing accumulation when resizing width, but clip/extend height
+      const oldW = accCanvas.width;
+      const oldH = accCanvas.height;
+      const temp = document.createElement('canvas');
+      const tempCtx = temp.getContext('2d');
+      temp.width = oldW;
+      temp.height = oldH;
+      if (oldW > 0 && oldH > 0) {
+        tempCtx.drawImage(accCanvas, 0, 0);
+      }
+      accCanvas.width = w;
+      accCanvas.height = sh;
+      if (oldW > 0 && oldH > 0) {
+        accCtx.drawImage(temp, 0, 0);
+      }
+    }
+  }
+
+  function initParticles() {
+    particles.length = 0;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const isInk = Math.random() < 0.03;
+      const isWhite = !isInk && Math.random() < 0.15;
+      particles.push({
+        x: random(0, w),
+        y: random(0, h),
+        vx: random(-0.4, 0.4),
+        vy: random(-0.4, 0.4),
+        radius: random(1, 2.5),
+        stuck: false,
+        isInk: isInk,
+        isWhite: isWhite,
+        char: chars[Math.floor(Math.random() * chars.length)],
+        opacity: random(0.2, 0.7),
+        stickTime: 0
+      });
+    }
+  }
+
+  function setup() {
+    resize();
+    initParticles();
+  }
+
+  function draw() {
+    if (isPaused) {
+      animationId = requestAnimationFrame(draw);
+      return;
+    }
+
+    resize();
+
+    const w = mainCanvas.width;
+    const h = mainCanvas.height;
+
+    // Clear main canvas
+    mainCtx.fillStyle = '#F5F5F0';
+    mainCtx.fillRect(0, 0, w, h);
+
+    // Draw accumulation layer
+    if (accCanvas.width > 0 && accCanvas.height > 0) {
+      mainCtx.drawImage(accCanvas, 0, 0);
+    }
+
+    // Update particles
+    const now = performance.now();
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const p = particles[i];
+      if (!p.stuck) {
+        // Brownian motion
+        p.vx += random(-0.04, 0.04);
+        p.vy += random(-0.04, 0.04);
+        p.vx *= 0.96;
+        p.vy *= 0.96;
+
+        // Scroll impulse
+        p.vy += scrollDelta * 0.008;
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Wrap horizontally
+        if (p.x < -5) p.x = w + 5;
+        if (p.x > w + 5) p.x = -5;
+
+        // Stick if near bottom
+        if (p.y > h * 0.88) {
+          p.stuck = true;
+          p.stickTime = now;
+          // Draw onto accumulation canvas
+          accCtx.globalAlpha = 0.03;
+          if (p.isInk) {
+            accCtx.fillStyle = '#1A1A1A';
+            accCtx.font = '8px serif';
+            accCtx.textAlign = 'center';
+            accCtx.textBaseline = 'middle';
+            accCtx.fillText(p.char, p.x, p.y);
+          } else {
+            if (p.isWhite) {
+              accCtx.fillStyle = '#FFFFFF';
+            } else {
+              accCtx.fillStyle = '#E8E4D9';
+            }
+            accCtx.beginPath();
+            accCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            accCtx.fill();
+          }
+          accCtx.globalAlpha = 1;
+        }
+      } else {
+        // Ink motes fade after 10 seconds
+        if (p.isInk && (now - p.stickTime) > 10000) {
+          p.stuck = false;
+          p.y = -10;
+          p.vy = random(0.2, 0.8);
+          // Erase old ink from accumulation canvas (approximate)
+          accCtx.globalCompositeOperation = 'destination-out';
+          accCtx.beginPath();
+          accCtx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+          accCtx.fill();
+          accCtx.globalCompositeOperation = 'source-over';
+        }
+      }
+    }
+
+    // Decay scroll impulse
+    scrollDelta *= 0.85;
+
+    // Draw unstuck particles
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const p = particles[i];
+      if (!p.stuck) {
+        mainCtx.globalAlpha = p.opacity;
+        if (p.isInk) {
+          mainCtx.fillStyle = '#1A1A1A';
+        } else if (p.isWhite) {
+          mainCtx.fillStyle = '#FFFFFF';
+        } else {
+          mainCtx.fillStyle = '#E8E4D9';
+        }
+        mainCtx.beginPath();
+        mainCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        mainCtx.fill();
+      }
+    }
+    mainCtx.globalAlpha = 1;
+
+    // Draw eraser cursor
+    mainCtx.globalAlpha = 0.15;
+    mainCtx.strokeStyle = '#C2B280';
+    mainCtx.lineWidth = 2;
+    mainCtx.beginPath();
+    mainCtx.arc(cursor.x, cursor.y, 40, 0, Math.PI * 2);
+    mainCtx.stroke();
+    mainCtx.globalAlpha = 1;
+
+    // Erase accumulation under cursor
+    if (cursor.x > -50 && cursor.y > -50) {
+      accCtx.globalCompositeOperation = 'destination-out';
+      accCtx.beginPath();
+      accCtx.arc(cursor.x, cursor.y, 42, 0, Math.PI * 2);
+      accCtx.fill();
+      accCtx.globalCompositeOperation = 'source-over';
+    }
+
+    animationId = requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('scroll', function() {
+    const currentScrollY = window.scrollY;
+    scrollDelta = currentScrollY - lastScrollY;
+    lastScrollY = currentScrollY;
+  }, { passive: true });
+
+  window.addEventListener('mousemove', function(e) {
+    cursor.x = e.clientX;
+    cursor.y = e.clientY;
+  });
+
+  window.addEventListener('touchmove', function(e) {
+    if (e.touches.length > 0) {
+      cursor.x = e.touches[0].clientX;
+      cursor.y = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchstart', function(e) {
+    if (e.touches.length > 0) {
+      cursor.x = e.touches[0].clientX;
+      cursor.y = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  window.addEventListener('keydown', function(e) {
+    if (e.key === 'r' || e.key === 'R') {
+      accCtx.clearRect(0, 0, accCanvas.width, accCanvas.height);
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const p = particles[i];
+        p.stuck = false;
+        p.y = random(-50, h * 0.5);
+        p.x = random(0, w);
+        p.vx = random(-0.4, 0.4);
+        p.vy = random(-0.4, 0.4);
+      }
+    }
+    if (e.key === 'p' || e.key === 'P') {
+      isPaused = !isPaused;
+    }
+  });
+
+  window.addEventListener('resize', function() {
+    resize();
+  });
+
+  setup();
+  animationId = requestAnimationFrame(draw);
+})();
+</script>
+
+</body>
+</html>

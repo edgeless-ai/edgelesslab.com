@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monolith Drummer</title>
+<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+<style>
+  body { margin: 0; overflow: hidden; background: #E0E0E0; font-family: sans-serif; }
+</style>
+</head>
+<body>
+<script>
+// ========================
+// Monolith Drummer — Prompt 06
+// ========================
+
+// --- Color Palette ---
+const PALETTE = {
+  background: '#E0E0E0',
+  grid: '#D0D0D0',
+  topFace: '#C0C0C0',
+  sideFace: '#808080',
+  textColor: '#2F2F2F',
+  scarColor: '#2F2F2F',
+  cannibalGlow: '#FF4136',
+  vowel: '#FF4136',
+  plosive: '#0074D9',
+  fricative: '#2ECC40',
+  nasal: '#FFDC00',
+  liquid: '#B10DC9',
+};
+
+// --- Note Maps ---
+const NOTE_MAP = {
+  vowel: ['C4','E4','G4','B4'],
+  plosive: ['C2','G2','C3'],
+  fricative: ['D3','F3','A3'],
+  nasal: ['C3','E3','G3'],
+  liquid: ['C2','E2','G2','B2'],
+};
+
+const NOTE_FREQ = {
+  'C1': 32.70, 'D1': 36.71, 'E1': 41.20, 'F1': 43.65, 'G1': 49.00, 'A1': 55.00, 'B1': 61.74,
+  'C2': 65.41, 'D2': 73.42, 'E2': 82.41, 'F2': 87.31, 'G2': 98.00, 'A2': 110.00, 'B2': 123.47,
+  'C3': 130.81, 'D3': 146.83, 'E3': 164.81, 'F3': 174.61, 'G3': 196.00, 'A3': 220.00, 'B3': 246.94,
+  'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
+};
+
+const WAVEFORM_MAP = {
+  vowel: 'sine',
+  plosive: 'square',
+  fricative: 'sawtooth',
+  nasal: 'triangle',
+  liquid: 'sine',
+};
+
+const PULSE_RATE = {
+  vowel: 0.05,
+  plosive: 0.25,
+  fricative: 0.15,
+  nasal: 0.10,
+  liquid: 0.08,
+};
+
+// --- State ---
+let blocks = [];
+let scars = [];
+let cameraX = 0;
+let cameraVelocity = 0;
+let muted = false;
+let audioContext;
+let masterGainNode;
+
+// ========================
+// Helpers
+// ========================
+
+function getPhoneticClass(char) {
+  const c = char.toLowerCase();
+  if ('aeiouy'.includes(c)) return 'vowel';
+  if ('ptkbdg'.includes(c)) return 'plosive';
+  if ('fvszhx'.includes(c)) return 'fricative';
+  if ('mn'.includes(c)) return 'nasal';
+  if ('lr'.includes(c)) return 'liquid';
+  return 'vowel'; // default for numbers etc.
+}
+
+function randomNote(cls) {
+  const notes = NOTE_MAP[cls];
+  return notes[Math.floor(Math.random() * notes.length)];
+}
+
+function dropOctave(noteStr) {
+  const match = noteStr.match(/^([A-G])([0-9])$/);
+  if (match) {
+    const octave = parseInt(match[2]);
+    if (octave > 1) return match[1] + (octave - 1);
+  }
+  return noteStr;
+}
+
+function initAudio() {
+  if (!audioContext) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioContext = new AudioContext();
+    masterGainNode = audioContext.createGain();
+    masterGainNode.gain.value = 0.3;
+    masterGainNode.connect(audioContext.destination);
+  }
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
+}
+
+function playTone(note, waveform, durationMs, gain = 0.2) {
+  if (muted) return;
+  initAudio();
+  const freq = typeof note === 'string' ? NOTE_FREQ[note] : note;
+  if (!freq) return;
+
+  const now = audioContext.currentTime;
+  const osc = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+
+  osc.type = waveform || 'sine';
+  osc.frequency.setValueAtTime(freq, now);
+
+  gainNode.gain.setValueAtTime(0, now);
+  gainNode.gain.linearRampToValueAtTime(gain, now + 0.01);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, now + durationMs / 1000);
+
+  osc.connect(gainNode);
+  gainNode.connect(masterGainNode);
+
+  osc.start(now);
+  osc.stop(now + durationMs / 1000 + 0.05);
+}
+
+function findNearestSameClass(predator, blockList) {
+  let nearest = null;
+  let minDist = Infinity;
+  for (let b of blockList) {
+    if (b !== predator && b.class === predator.class && !b.isCannibal && b.state === 'RESTING' && !b.dead) {
+      const d = dist(predator.x, predator.y, b.x, b.y);
+      if (d < minDist) {
+        minDist = d;
+        nearest = b;
+      }
+    }
+  }
+  return nearest;
+}
+
+function consume(predator, prey) {
+  predator.size += prey.size * 0.2;
+  predator.pulseOverride = 1.5;
+  predator.pulseOverrideDecay = 0.03;
+  predator.note = dropOctave(predator.note);
+  scars.push({ x: prey.x, y: prey.y, size: prey.size, alpha: 80 });
+  prey.dead = true;
+  cameraVelocity += (predator.x - width / 2 - cameraX) * 0.02;
+  playTone(predator.note, 'sawtooth', 300, 0.3);
+}
+
+function resolveCollision(a, b) {
+  const angle = Math.atan2(b.y - a.y, b.x - a.x);
+  const force = 2;
+  a.x -= Math.cos(angle) * force;
+  a.y -= Math.sin(angle) * force;
+  b.x += Math.cos(angle) * force;
+  b.y += Math.sin(angle) * force;
+}
+
+function drawIsometricBlock(block) {
+  push();
+  translate(block.x, block.y);
+  scale(block.pulse);
+
+  const s = block.size;
+
+  // Top face
+  fill(PALETTE.topFace);
+  noStroke();
+  quad(
+    -s / 2, -s / 2,
+    s / 2, -s / 2,
+    s / 2 - 8, -s / 2 - 8,
+    -s / 2 - 8, -s / 2 - 8
+  );
+
+  // Side face
+  fill(PALETTE.sideFace);
+  quad(
+    s / 2, -s / 2,
+    s / 2, s / 2,
+    s / 2 - 8, s / 2 - 8,
+    s / 2 - 8, -s / 2 - 8
+  );
+
+  // Front face
+  fill(block.color);
+  rect(-s / 2, -s / 2, s, s);
+
+  // Text
+  fill(PALETTE.textColor);
+  textAlign(CENTER, CENTER);
+  textSize(s * 0.5);
+  text(block.char, 0, 0);
+
+  // Cannibal glow
+  if (block.isCannibal) {
+    noFill();
+    stroke(PALETTE.cannibalGlow);
+    strokeWeight(2);
+    ellipse(0, 0, s * 1.5);
+  }
+
+  pop();
+}
+
+// ========================
+// p5.js Hooks
+// ========================
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  textFont('sans-serif');
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+function draw() {
+  background(PALETTE.background);
+
+  // Subtle grid
+  stroke(PALETTE.grid);
+  strokeWeight(1);
+  for (let x = 0; x < width; x += 40) {
+    line(x, 0, x, height);
+  }
+  for (let y = 0; y < height; y += 40) {
+    line(0, y, width, y);
+  }
+
+  // Camera physics (back-ease overshoot)
+  let targetCameraX = 0;
+  if (blocks.length > 0) {
+    let avg = 0;
+    for (let b of blocks) avg += b.x;
+    avg /= blocks.length;
+    targetCameraX = avg - width / 2;
+  }
+  cameraVelocity += (targetCameraX - cameraX) * 0.05;
+  cameraX += cameraVelocity;
+  if (Math.abs(cameraVelocity) > 5) {
+    cameraX += cameraVelocity * 0.3;
+  }
+  cameraX = lerp(cameraX, targetCameraX, 0.02);
+
+  push();
+  translate(-cameraX, 0);
+
+  // Draw scars
+  noStroke();
+  for (let i = scars.length - 1; i >= 0; i--) {
+    const s = scars[i];
+    fill(47, 47, 47, s.alpha);
+    ellipse(s.x, s.y, s.size);
+    s.alpha -= 0.5;
+    if (s.alpha <= 0) {
+      scars.splice(i, 1);
+    }
+  }
+
+  // Update and draw blocks
+  for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i];
+
+    // Spawn overshoot
+    if (b.state === 'SPAWNING') {
+      b.x += (b.targetX - b.x) * 0.12;
+      b.y += (b.targetY - b.y) * 0.12;
+      if (Math.abs(b.x - b.targetX) < 1 && Math.abs(b.y - b.targetY) < 1) {
+        b.state = 'RESTING';
+        b.x = b.targetX;
+        b.y = b.targetY;
+      }
+    }
+
+    // Cannibal drift
+    if (b.isCannibal && b.state === 'RESTING') {
+      const prey = findNearestSameClass(b, blocks);
+      if (prey) {
+        b.x += (prey.x - b.x) * 0.015;
+        b.y += (prey.y - b.y) * 0.015;
+        if (dist(b.x, b.y, prey.x, prey.y) < b.size * 0.6) {
+          consume(b, prey);
+        }
+      }
+    }
+
+    // Metabolic pulse + forced pulse override
+    let basePulse = Math.sin(frameCount * b.pulseRate) * 0.08 + 1;
+    if (b.pulseOverride > 1.0) {
+      b.pulse = b.pulseOverride;
+      b.pulseOverride -= b.pulseOverrideDecay;
+      if (b.pulseOverride < 1.0) b.pulseOverride = 1.0;
+    } else {
+      b.pulse = basePulse;
+    }
+
+    // Collision detection (simple circle)
+    for (let j = i + 1; j < blocks.length; j++) {
+      const other = blocks[j];
+      if (dist(b.x, b.y, other.x, other.y) < (b.size + other.size) * 0.5) {
+        if (b.state === 'RESTING' && other.state === 'RESTING') {
+          resolveCollision(b, other);
+          if (frameCount % 5 === 0) {
+            playTone(b.note, 'sine', 80, 0.15);
+            playTone(other.note, 'sine', 80, 0.15);
+          }
+        }
+      }
+    }
+
+    drawIsometricBlock(b);
+  }
+
+  // Remove dead blocks
+  blocks = blocks.filter(b => !b.dead);
+
+  pop();
+
+  // HUD
+  noStroke();
+  fill(47, 47, 47);
+  textSize(14);
+  textAlign(LEFT, BASELINE);
+  text("blocks: " + blocks.length, 20, 30);
+  text("cannibals: " + blocks.filter(b => b.isCannibal).length, 20, 50);
+  text("muted: " + muted, 20, 70);
+  text("type letters to spawn  |  space = drum  |  click = kick  |  drag = repel  |  R = reset  |  M = mute", 20, height - 20);
+}
+
+function keyPressed() {
+  if (key === ' ') {
+    // Global drum hit
+    for (let b of blocks) {
+      b.pulseOverride = 1.4;
+      b.pulseOverrideDecay = 0.02;
+    }
+    playTone(NOTE_FREQ['C2'], 'square', 200, 0.4);
+    return;
+  }
+
+  if (key === 'r' || key === 'R') {
+    blocks = [];
+    scars = [];
+    cameraX = 0;
+    cameraVelocity = 0;
+    return;
+  }
+
+  if (key === 'm' || key === 'M') {
+    muted = !muted;
+    return;
+  }
+
+  if (key.length === 1 && key.match(/[a-zA-Z0-9]/)) {
+    const cls = getPhoneticClass(key);
+    const color = PALETTE[cls];
+    const note = randomNote(cls);
+    const isCannibal = random() < 0.03;
+    const targetX = random(width * 0.2, width * 0.8) + cameraX;
+    const targetY = random(height * 0.2, height * 0.8);
+
+    textSize(20);
+    const tw = textWidth(key);
+    const size = 40 + tw;
+
+    blocks.push({
+      char: key,
+      class: cls,
+      color: color,
+      note: note,
+      x: targetX,
+      y: targetY - 100,
+      targetX: targetX,
+      targetY: targetY,
+      size: size,
+      state: 'SPAWNING',
+      isCannibal: isCannibal,
+      pulseRate: PULSE_RATE[cls],
+      pulse: 1,
+      pulseOverride: 1,
+      pulseOverrideDecay: 0,
+      dead: false,
+    });
+
+    playTone(note, WAVEFORM_MAP[cls], 120, 0.2);
+
+    // Cap at 200 blocks
+    if (blocks.length > 200) {
+      const idx = blocks.findIndex(b => b.state === 'RESTING');
+      if (idx !== -1) blocks.splice(idx, 1);
+    }
+  }
+}
+
+function mousePressed() {
+  const mx = mouseX + cameraX;
+  const my = mouseY;
+  for (let b of blocks) {
+    if (dist(mx, my, b.x, b.y) < b.size * 0.5) {
+      b.y -= 30;
+      b.x += random(-10, 10);
+      b.pulseOverride = 1.3;
+      b.pulseOverrideDecay = 0.02;
+      break;
+    }
+  }
+}
+
+function mouseDragged() {
+  const mx = mouseX + cameraX;
+  const my = mouseY;
+  for (let b of blocks) {
+    const d = dist(mx, my, b.x, b.y);
+    if (d < 100 && d > 0) {
+      const angle = Math.atan2(b.y - my, b.x - mx);
+      const force = (100 - d) * 0.05;
+      b.x += Math.cos(angle) * force;
+      b.y += Math.sin(angle) * force;
+    }
+  }
+}
+</script>
+</body>
+</html>

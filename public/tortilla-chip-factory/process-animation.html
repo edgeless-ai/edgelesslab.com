@@ -1,0 +1,2813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tortilla Chip Production Line — Edgeless Lab</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d1a;
+    --bg2: #1a1a2e;
+    --bg3: #16213e;
+    --cyan: #00d4ff;
+    --amber: #ff9500;
+    --green: #00e676;
+    --red: #ff4444;
+    --gray: #888;
+    --text: #e8e8f0;
+    --text-dim: #8888aa;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+
+  #app {
+    width: 100vw; height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #stage-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stage {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
+  .stage.active { opacity: 1; pointer-events: auto; }
+
+  /* Controls */
+  #controls {
+    height: 64px;
+    background: #111122;
+    border-top: 1px solid #222240;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 16px;
+    z-index: 100;
+  }
+
+  #play-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan);
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  #play-btn:hover { background: rgba(0,212,255,0.1); }
+  #play-btn svg { fill: var(--cyan); }
+
+  #progress-track {
+    flex: 1;
+    height: 6px;
+    background: #222240;
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+  }
+  #progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cyan), var(--amber));
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  /* Stage markers on progress bar */
+  .stage-marker {
+    position: absolute;
+    top: -4px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #333355;
+    border: 2px solid #444466;
+    transform: translateX(-50%);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .stage-marker:hover, .stage-marker.passed { background: var(--cyan); border-color: var(--cyan); }
+  .stage-marker .marker-label {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 10px;
+    color: var(--text-dim);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .stage-marker:hover .marker-label { opacity: 1; }
+
+  #time-display {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    width: 80px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ============================================================
+     SHARED COMPONENTS
+  ============================================================ */
+  .stage-title {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.5s 0.2s, transform 0.5s 0.2s;
+  }
+  .stage.active .stage-title { opacity: 1; transform: translateY(0); }
+
+  .stage-heading {
+    font-size: clamp(24px, 3.5vw, 48px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 40px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.5s 0.35s, transform 0.5s 0.35s;
+  }
+  .stage.active .stage-heading { opacity: 1; transform: translateY(0); }
+
+  .callout {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: 3px solid var(--cyan);
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .callout.amber { border-left-color: var(--amber); }
+  .callout.green { border-left-color: var(--green); }
+  .callout.red { border-left-color: var(--red); }
+  .callout.visible { opacity: 1; transform: translateX(0); }
+
+  .callout-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .callout-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .callout-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .warning-pulse {
+    color: var(--amber);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ============================================================
+     STAGE 0: TITLE
+  ============================================================ */
+  #s0 {
+    background: radial-gradient(ellipse at center, #16213e 0%, #0d0d1a 70%);
+  }
+
+  .title-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeInUp 0.8s 0.3s forwards;
+  }
+
+  .title-main {
+    font-size: clamp(32px, 5.5vw, 76px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    text-align: center;
+    background: linear-gradient(135deg, var(--text) 40%, var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0;
+    animation: fadeInUp 0.9s 0.5s forwards;
+    margin-bottom: 16px;
+  }
+
+  .title-sub {
+    font-size: clamp(14px, 1.8vw, 22px);
+    color: var(--amber);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    opacity: 0;
+    animation: fadeInUp 0.8s 0.8s forwards;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .title-specs {
+    font-size: clamp(11px, 1.2vw, 14px);
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    opacity: 0;
+    animation: fadeInUp 0.8s 1.1s forwards;
+    text-align: center;
+  }
+
+  .title-line {
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    margin: 24px auto;
+    opacity: 0;
+    animation: fadeIn 1s 1.4s forwards;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ============================================================
+     STAGE 1: RAW MATERIALS
+  ============================================================ */
+  #s1 {
+    background: radial-gradient(ellipse at top left, #16213e 0%, #0d0d1a 60%);
+  }
+
+  .s1-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 60px;
+    padding: 20px;
+    max-width: 1100px;
+    width: 100%;
+  }
+
+  .silo-group {
+    display: flex;
+    gap: 40px;
+    align-items: flex-end;
+  }
+
+  .silo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .silo-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .silo-svg { display: block; }
+
+  .silo-fill {
+    transform-origin: bottom;
+    transform: scaleY(0);
+    transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .s1-arrows {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding-top: 60px;
+  }
+
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+  .flow-arrow.visible { opacity: 1; }
+
+  .flow-line {
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), transparent);
+    position: relative;
+    overflow: visible;
+  }
+
+  .pulse-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--cyan);
+    position: absolute;
+    top: -3px;
+    animation: flowRight 1.5s linear infinite;
+  }
+
+  @keyframes flowRight {
+    from { left: 0%; opacity: 1; }
+    to { left: 100%; opacity: 0.2; }
+  }
+
+  .s1-callouts {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    padding-top: 60px;
+  }
+
+  /* ============================================================
+     STAGE 2: MIXING
+  ============================================================ */
+  #s2 {
+    background: radial-gradient(ellipse at center, #0f1e30 0%, #0d0d1a 70%);
+  }
+
+  .s2-layout {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    max-width: 1100px;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .mixer-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .mixer-svg { display: block; }
+
+  .agitator {
+    transform-origin: 50% 50%;
+    animation: rotate 2s linear infinite;
+  }
+
+  .stream-particle {
+    animation: streamFlow 1.2s linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes streamFlow {
+    0% { opacity: 0; transform: translateY(0); }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(40px); }
+  }
+
+  .s2-callouts {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+  }
+
+  /* ============================================================
+     STAGE 3: SHEETING & CUTTING
+  ============================================================ */
+  #s3 {
+    background: radial-gradient(ellipse at bottom, #1a1200 0%, #0d0d1a 60%);
+  }
+
+  .s3-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 50px;
+    max-width: 1100px;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .sheeter-wrap { flex-shrink: 0; }
+
+  .roller {
+    transform-origin: center;
+    animation: rotate 1.5s linear infinite;
+  }
+
+  .chip-triangle {
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .chip-triangle.popped { opacity: 1; transform: scale(1); }
+
+  .recycle-arrow {
+    opacity: 0;
+    stroke-dasharray: 6 4;
+    stroke-dashoffset: 0;
+    animation: dashMove 1s linear infinite;
+    transition: opacity 0.5s;
+  }
+  .recycle-arrow.visible { opacity: 1; }
+
+  @keyframes dashMove {
+    to { stroke-dashoffset: -20; }
+  }
+
+  .s3-callouts {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    padding-top: 20px;
+  }
+
+  /* ============================================================
+     STAGE 4: FRYING (HERO)
+  ============================================================ */
+  #s4 {
+    background: radial-gradient(ellipse at bottom, #2a1000 0%, #0d0d1a 65%);
+  }
+
+  .s4-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 50px;
+    max-width: 1200px;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .fryer-wrap {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .fryer-canvas {
+    border-radius: 8px;
+    display: block;
+  }
+
+  .s4-callouts {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    padding-top: 10px;
+  }
+
+  .heat-bar-wrap {
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .heat-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+  }
+  .heat-bar-fill {
+    height: 12px;
+    border-radius: 2px;
+    width: 0%;
+    transition: width 1s ease;
+  }
+  .heat-bar-label { color: var(--text-dim); width: 120px; }
+
+  /* ============================================================
+     STAGE 5: COOLING
+  ============================================================ */
+  #s5 {
+    background: radial-gradient(ellipse at top right, #001a2a 0%, #0d0d1a 65%);
+  }
+
+  .s5-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 50px;
+    max-width: 1100px;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .cooling-canvas { border-radius: 8px; display: block; }
+
+  .s5-callouts {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    padding-top: 20px;
+  }
+
+  /* ============================================================
+     STAGE 6: SEASONING
+  ============================================================ */
+  #s6 {
+    background: radial-gradient(ellipse at center, #1a0d2e 0%, #0d0d1a 65%);
+  }
+
+  .s6-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 50px;
+    max-width: 1000px;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .drum-wrap { flex-shrink: 0; }
+
+  .drum-body {
+    transform-origin: center;
+    animation: rotateDrum 3s linear infinite;
+  }
+
+  @keyframes rotateDrum {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .salt-particle {
+    animation: saltFall linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes saltFall {
+    0% { opacity: 0; transform: translateY(0); }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(60px); }
+  }
+
+  .s6-callouts {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    padding-top: 20px;
+  }
+
+  /* ============================================================
+     STAGE 7: PACKAGING
+  ============================================================ */
+  #s7 {
+    background: radial-gradient(ellipse at bottom left, #001a10 0%, #0d0d1a 65%);
+  }
+
+  .s7-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 50px;
+    max-width: 1100px;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .vffs-wrap { flex-shrink: 0; }
+
+  .film-spool {
+    transform-origin: center;
+    animation: rotate 4s linear infinite;
+  }
+
+  .fill-dot {
+    animation: fillDrop 1.8s ease-in infinite;
+    opacity: 0;
+  }
+
+  @keyframes fillDrop {
+    0% { opacity: 0; transform: translateY(0); }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(50px); }
+  }
+
+  .bag-seal {
+    transform-origin: center;
+    animation: sealPulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes sealPulse {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+  }
+
+  .detector-light {
+    animation: detectorFlash 1.8s ease-in-out infinite;
+  }
+
+  @keyframes detectorFlash {
+    0%, 100% { fill: #003300; }
+    80% { fill: #003300; }
+    85% { fill: #00ff88; }
+    95% { fill: #00ff88; }
+  }
+
+  .s7-callouts {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    padding-top: 10px;
+  }
+
+  /* ============================================================
+     STAGE 8: SUMMARY
+  ============================================================ */
+  #s8 {
+    background: radial-gradient(ellipse at center, #0d1a0d 0%, #0d0d1a 70%);
+    padding: 20px;
+  }
+
+  .summary-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 40px;
+    opacity: 0;
+    transition: opacity 0.8s 0.3s;
+  }
+  .summary-flow.visible { opacity: 1; }
+
+  .sf-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sf-icon {
+    width: 52px; height: 52px;
+    border-radius: 10px;
+    border: 2px solid;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    background: rgba(0,0,0,0.3);
+  }
+
+  .sf-label {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: center;
+    max-width: 70px;
+  }
+
+  .sf-arrow {
+    width: 32px; height: 2px;
+    background: rgba(255,255,255,0.15);
+    position: relative;
+    margin: 0 -4px;
+    margin-top: -20px;
+  }
+  .sf-arrow::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: -4px;
+    border: 5px solid transparent;
+    border-left-color: rgba(255,255,255,0.15);
+  }
+
+  .summary-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 1000px;
+    width: 100%;
+  }
+
+  .metric-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s, transform 0.5s;
+  }
+  .metric-card.visible { opacity: 1; transform: translateY(0); }
+
+  .metric-number {
+    font-size: clamp(18px, 2.5vw, 28px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .metric-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .edgeless-badge {
+    position: absolute;
+    bottom: 76px;
+    right: 24px;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    opacity: 0;
+    transition: opacity 1s 2s;
+    text-transform: uppercase;
+  }
+  #s8.active .edgeless-badge { opacity: 1; }
+
+  /* ============================================================
+     UTILITY ANIMATIONS
+  ============================================================ */
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 8px var(--amber); }
+    50% { box-shadow: 0 0 20px var(--amber), 0 0 40px rgba(255,149,0,0.3); }
+  }
+
+  .warning-box {
+    border-left-color: var(--amber) !important;
+    animation: glowPulse 2s ease-in-out infinite;
+  }
+
+  /* ============================================================
+     STAGE OV: PROCESS OVERVIEW
+  ============================================================ */
+  #overviewCanvas {
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+  }
+  .ov-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .ov-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ov-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage-container">
+
+    <!-- ========== STAGE 0: TITLE ========== -->
+    <div class="stage active" id="s0">
+      <div class="title-eyebrow">Edgeless Lab — Portland, OR</div>
+      <div class="title-main">TORTILLA CHIP<br>PRODUCTION LINE</div>
+      <div class="title-line"></div>
+      <div class="title-sub">Phase 2 — Dedicated Facility</div>
+      <div class="title-specs">Basis: 157 lb/hr finished product &nbsp;|&nbsp; Chemical Engineering Process Analysis</div>
+    </div>
+
+    <!-- ========== STAGE OV: PROCESS OVERVIEW ========== -->
+    <div class="stage" id="sOV">
+      <div class="stage-title">Process Overview</div>
+      <div class="stage-heading">Complete Production Line</div>
+      <canvas id="overviewCanvas" style="width:100%;max-width:1200px;flex:1;max-height:60vh;"></canvas>
+      <div class="ov-legend" id="ov-legend"></div>
+    </div>
+
+    <!-- ========== STAGE 1: RAW MATERIALS ========== -->
+    <div class="stage" id="s1">
+      <div class="stage-title">Stage 1</div>
+      <div class="stage-heading">Raw Materials</div>
+      <div class="s1-layout">
+        <!-- Silos -->
+        <div class="silo-group">
+          <div class="silo-wrap">
+            <div class="silo-label">V-101<br>White Corn</div>
+            <svg class="silo-svg" width="80" height="160" viewBox="0 0 80 160">
+              <defs>
+                <clipPath id="siloClip1">
+                  <rect x="10" y="20" width="60" height="120" rx="4"/>
+                </clipPath>
+              </defs>
+              <!-- Silo body -->
+              <path d="M10,40 Q10,20 40,20 Q70,20 70,40 L70,150 Q70,155 40,155 Q10,155 10,150 Z" fill="#1a1a3a" stroke="var(--cyan)" stroke-width="1.5"/>
+              <!-- Silo dome -->
+              <path d="M10,45 Q40,10 70,45" fill="none" stroke="var(--cyan)" stroke-width="1.5"/>
+              <!-- Fill -->
+              <g clip-path="url(#siloClip1)">
+                <rect class="silo-fill" id="silo1-fill" x="10" y="30" width="60" height="125" fill="rgba(220,200,100,0.5)" rx="2"/>
+              </g>
+              <!-- Level marks -->
+              <line x1="10" y1="70" x2="15" y2="70" stroke="var(--cyan)" stroke-width="1" opacity="0.4"/>
+              <line x1="10" y1="100" x2="15" y2="100" stroke="var(--cyan)" stroke-width="1" opacity="0.4"/>
+              <line x1="10" y1="130" x2="15" y2="130" stroke="var(--cyan)" stroke-width="1" opacity="0.4"/>
+            </svg>
+          </div>
+          <div class="silo-wrap">
+            <div class="silo-label">V-102<br>Blue Corn</div>
+            <svg class="silo-svg" width="80" height="160" viewBox="0 0 80 160">
+              <defs>
+                <clipPath id="siloClip2">
+                  <rect x="10" y="20" width="60" height="120" rx="4"/>
+                </clipPath>
+              </defs>
+              <path d="M10,40 Q10,20 40,20 Q70,20 70,40 L70,150 Q70,155 40,155 Q10,155 10,150 Z" fill="#1a1a3a" stroke="#8866ff" stroke-width="1.5"/>
+              <path d="M10,45 Q40,10 70,45" fill="none" stroke="#8866ff" stroke-width="1.5"/>
+              <g clip-path="url(#siloClip2)">
+                <rect class="silo-fill" id="silo2-fill" x="10" y="30" width="60" height="125" fill="rgba(100,80,180,0.5)" rx="2"/>
+              </g>
+              <line x1="10" y1="70" x2="15" y2="70" stroke="#8866ff" stroke-width="1" opacity="0.4"/>
+              <line x1="10" y1="100" x2="15" y2="100" stroke="#8866ff" stroke-width="1" opacity="0.4"/>
+              <line x1="10" y1="130" x2="15" y2="130" stroke="#8866ff" stroke-width="1" opacity="0.4"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Flow arrows -->
+        <div class="s1-arrows">
+          <div class="flow-arrow" id="s1-arrow1">
+            <svg width="120" height="20" viewBox="0 0 120 20">
+              <line x1="0" y1="10" x2="105" y2="10" stroke="var(--cyan)" stroke-width="2"/>
+              <polygon points="110,10 100,6 100,14" fill="var(--cyan)"/>
+              <circle class="pulse-dot" r="4" cx="10" cy="10" fill="var(--cyan)"/>
+            </svg>
+          </div>
+          <div style="font-size:10px; color: var(--text-dim); letter-spacing:0.1em; text-align:center; margin-top:4px;">TO MIXER</div>
+        </div>
+
+        <!-- Callouts -->
+        <div class="s1-callouts">
+          <div class="callout" id="s1c1">
+            <div class="callout-label">Masa Harina Feed Rate</div>
+            <div class="callout-value">140 lb/hr</div>
+          </div>
+          <div class="callout" id="s1c2">
+            <div class="callout-label">Process Water</div>
+            <div class="callout-value">154 lb/hr</div>
+            <div class="callout-sub">@ 105°F supply temperature</div>
+          </div>
+          <div class="callout amber" id="s1c3">
+            <div class="callout-label">Oil Inventory</div>
+            <div class="callout-value">50 lb &nbsp;<span style="color:var(--text-dim);font-size:13px;">( 6.7 gal )</span></div>
+          </div>
+          <div class="callout green" id="s1c4">
+            <div class="callout-label">Finished Product Basis</div>
+            <div class="callout-value">157 lb/hr</div>
+            <div class="callout-sub">10 oz bags — 252 bags/hr</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== STAGE 2: MIXING ========== -->
+    <div class="stage" id="s2">
+      <div class="stage-title">Stage 2</div>
+      <div class="stage-heading">Mixing</div>
+      <div class="s2-layout">
+        <!-- Mixer SVG -->
+        <div class="mixer-wrap">
+          <svg class="mixer-svg" width="220" height="240" viewBox="0 0 220 240">
+            <defs>
+              <clipPath id="bowlClip">
+                <path d="M30,80 Q30,220 110,220 Q190,220 190,80 Z"/>
+              </clipPath>
+              <!-- Animated streams -->
+            </defs>
+            <!-- Masa stream in (left) -->
+            <line x1="20" y1="20" x2="80" y2="75" stroke="rgba(220,200,100,0.6)" stroke-width="3" stroke-dasharray="4 3"/>
+            <text x="5" y="15" fill="rgba(220,200,100,0.8)" font-size="9" font-family="sans-serif">Masa</text>
+            <!-- Water stream in (right) -->
+            <line x1="200" y1="20" x2="140" y2="75" stroke="rgba(0,180,255,0.6)" stroke-width="3" stroke-dasharray="4 3"/>
+            <text x="165" y="15" fill="rgba(0,180,255,0.8)" font-size="9" font-family="sans-serif">H₂O</text>
+
+            <!-- Animated stream particles (masa) -->
+            <circle class="stream-particle" cx="50" cy="47" r="4" fill="rgba(220,200,100,0.9)" style="animation-delay:0s; animation-duration:1.0s;"/>
+            <circle class="stream-particle" cx="38" cy="35" r="3" fill="rgba(220,200,100,0.6)" style="animation-delay:0.3s; animation-duration:1.0s;"/>
+            <!-- Animated stream particles (water) -->
+            <circle class="stream-particle" cx="170" cy="47" r="4" fill="rgba(0,180,255,0.9)" style="animation-delay:0.15s; animation-duration:1.0s;"/>
+            <circle class="stream-particle" cx="182" cy="35" r="3" fill="rgba(0,180,255,0.6)" style="animation-delay:0.45s; animation-duration:1.0s;"/>
+
+            <!-- Bowl body -->
+            <path d="M30,80 Q30,220 110,220 Q190,220 190,80 Z" fill="#1a1a3a" stroke="var(--cyan)" stroke-width="2"/>
+            <!-- Bowl top rim -->
+            <ellipse cx="110" cy="80" rx="80" ry="18" fill="#222244" stroke="var(--cyan)" stroke-width="2"/>
+
+            <!-- Dough fill (slightly translucent) -->
+            <g clip-path="url(#bowlClip)">
+              <path d="M30,150 Q30,220 110,220 Q190,220 190,150 Z" fill="rgba(210,185,130,0.35)"/>
+            </g>
+
+            <!-- Agitator shaft -->
+            <line x1="110" y1="30" x2="110" y2="80" stroke="#aaa" stroke-width="3"/>
+
+            <!-- Agitator paddle (rotating) -->
+            <g class="agitator" style="transform-origin:110px 150px;">
+              <rect x="50" y="145" width="120" height="10" rx="5" fill="none" stroke="var(--amber)" stroke-width="2.5"/>
+              <rect x="105" y="100" width="10" height="100" rx="5" fill="none" stroke="var(--amber)" stroke-width="2"/>
+              <rect x="60" y="120" width="8" height="60" rx="4" fill="none" stroke="var(--amber)" stroke-width="1.5" transform="rotate(-30,64,150)"/>
+              <rect x="152" y="120" width="8" height="60" rx="4" fill="none" stroke="var(--amber)" stroke-width="1.5" transform="rotate(30,156,150)"/>
+            </g>
+
+            <!-- Output arrow -->
+            <line x1="190" y1="180" x2="215" y2="180" stroke="var(--green)" stroke-width="2.5"/>
+            <polygon points="220,180 212,175 212,185" fill="var(--green)"/>
+            <text x="220" y="176" fill="var(--green)" font-size="8" font-family="sans-serif">OUT</text>
+          </svg>
+          <div style="font-size:10px; color: var(--text-dim); letter-spacing:0.1em; text-align:center;">MX-101 — 60 QT HOBART MIXER</div>
+        </div>
+
+        <!-- Callouts -->
+        <div class="s2-callouts">
+          <div class="callout" id="s2c1">
+            <div class="callout-label">Batch Composition</div>
+            <div class="callout-value">30 lb masa + 33 lb water</div>
+            <div class="callout-sub">Hydration ratio: 1.10 (water/masa)</div>
+          </div>
+          <div class="callout" id="s2c2">
+            <div class="callout-label">Mix Protocol</div>
+            <div class="callout-value">5 min @ Speed 1–2</div>
+          </div>
+          <div class="callout green" id="s2c3">
+            <div class="callout-label">Dough Output Rate</div>
+            <div class="callout-value">294 lb/hr</div>
+            <div class="callout-sub">@ 90°F exit temperature</div>
+          </div>
+          <div class="callout amber" id="s2c4">
+            <div class="callout-label">Agitation Power</div>
+            <div class="callout-value">0.59 HP</div>
+            <div class="callout-sub">Power number Np = 70 (paddle regime)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== STAGE 3: SHEETING & CUTTING ========== -->
+    <div class="stage" id="s3">
+      <div class="stage-title">Stage 3</div>
+      <div class="stage-heading">Sheeting &amp; Cutting</div>
+      <div class="s3-layout">
+        <!-- Sheeter SVG -->
+        <div class="sheeter-wrap">
+          <svg width="320" height="300" viewBox="0 0 320 300">
+            <!-- Dough in (thick) -->
+            <rect x="0" y="55" width="70" height="30" rx="6" fill="rgba(210,185,130,0.5)" stroke="rgba(210,185,130,0.4)" stroke-width="1"/>
+            <text x="5" y="50" fill="rgba(210,185,130,0.7)" font-size="9" font-family="sans-serif">DOUGH IN</text>
+
+            <!-- Top roller -->
+            <circle cx="120" cy="65" r="28" fill="#1a1a3a" stroke="var(--cyan)" stroke-width="2"/>
+            <g class="roller" style="transform-origin:120px 65px;">
+              <line x1="120" y1="40" x2="120" y2="90" stroke="rgba(0,212,255,0.3)" stroke-width="1.5"/>
+              <line x1="95" y1="65" x2="145" y2="65" stroke="rgba(0,212,255,0.3)" stroke-width="1.5"/>
+              <line x1="102" y1="46" x2="138" y2="84" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+              <line x1="138" y1="46" x2="102" y2="84" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+            </g>
+            <text x="113" y="69" fill="var(--cyan)" font-size="8" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle">R1</text>
+
+            <!-- Bottom roller -->
+            <circle cx="120" cy="105" r="28" fill="#1a1a3a" stroke="var(--cyan)" stroke-width="2"/>
+            <g class="roller" style="transform-origin:120px 105px; animation-direction:reverse;">
+              <line x1="120" y1="80" x2="120" y2="130" stroke="rgba(0,212,255,0.3)" stroke-width="1.5"/>
+              <line x1="95" y1="105" x2="145" y2="105" stroke="rgba(0,212,255,0.3)" stroke-width="1.5"/>
+              <line x1="102" y1="86" x2="138" y2="124" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+              <line x1="138" y1="86" x2="102" y2="124" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+            </g>
+            <text x="113" y="109" fill="var(--cyan)" font-size="8" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle">R2</text>
+
+            <!-- Dough sheet out (thin) -->
+            <rect x="148" y="82" width="80" height="6" rx="2" fill="rgba(210,185,130,0.6)"/>
+            <text x="148" y="78" fill="rgba(210,185,130,0.7)" font-size="9" font-family="sans-serif">1.5mm SHEET</text>
+
+            <!-- Thickness callout -->
+            <line x1="148" y1="95" x2="228" y2="95" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3 2"/>
+            <line x1="148" y1="100" x2="228" y2="100" stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-dasharray="3 2"/>
+
+            <!-- Cutting die area -->
+            <rect x="148" y="115" width="100" height="70" rx="6" fill="rgba(255,149,0,0.08)" stroke="var(--amber)" stroke-width="1.5"/>
+            <text x="198" y="108" fill="var(--amber)" font-size="9" font-family="sans-serif" text-anchor="middle">CUT DIE</text>
+
+            <!-- Chip triangles appearing -->
+            <polygon class="chip-triangle" id="chip1" points="165,125 185,155 145,155" fill="rgba(255,200,80,0.7)" stroke="var(--amber)" stroke-width="1"/>
+            <polygon class="chip-triangle" id="chip2" points="200,125 220,155 180,155" fill="rgba(255,200,80,0.7)" stroke="var(--amber)" stroke-width="1"/>
+            <polygon class="chip-triangle" id="chip3" points="235,125 255,155 215,155" fill="rgba(255,200,80,0.7)" stroke="var(--amber)" stroke-width="1"/>
+            <polygon class="chip-triangle" id="chip4" points="167,158 187,185 147,185" fill="rgba(255,200,80,0.5)" stroke="var(--amber)" stroke-width="1"/>
+            <polygon class="chip-triangle" id="chip5" points="202,158 222,185 182,185" fill="rgba(255,200,80,0.5)" stroke="var(--amber)" stroke-width="1"/>
+
+            <!-- Trim recycle loop -->
+            <path class="recycle-arrow" id="recycleArrow" d="M 230 185 Q 290 185 290 85 Q 290 20 200 20 Q 120 20 70 55" fill="none" stroke="var(--text-dim)" stroke-width="2"/>
+            <polygon id="recycleHead" points="65,55 78,48 76,60" fill="var(--text-dim)" opacity="0" id="recycle-poly"/>
+            <text x="285" y="110" fill="var(--text-dim)" font-size="8" font-family="sans-serif" text-anchor="middle" transform="rotate(90,285,110)" opacity="0" id="recycleLabel">TRIM RECYCLE: 35 lb/hr (12%)</text>
+          </svg>
+        </div>
+
+        <!-- Callouts -->
+        <div class="s3-callouts">
+          <div class="callout" id="s3c1">
+            <div class="callout-label">Equipment</div>
+            <div class="callout-value">SH-101 Motorized Sheeter</div>
+          </div>
+          <div class="callout" id="s3c2">
+            <div class="callout-label">Sheet Thickness</div>
+            <div class="callout-value">1.5 mm ± 0.2 mm</div>
+          </div>
+          <div class="callout green" id="s3c3">
+            <div class="callout-label">Dough Throughput</div>
+            <div class="callout-value">250 lb/hr</div>
+          </div>
+          <div class="callout warning-box" id="s3c4">
+            <div class="callout-label">Status</div>
+            <div class="warning-pulse">⚠ PHASE 1 BOTTLENECK</div>
+            <div class="callout-sub" style="color:rgba(255,149,0,0.7);">Sheeter capacity limits to ~250 lb/hr dough</div>
+          </div>
+          <div class="callout" id="s3c5">
+            <div class="callout-label">Trim Recycle</div>
+            <div class="callout-value">35 lb/hr (12%)</div>
+            <div class="callout-sub">Returns to mixer — mass balance closure</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== STAGE 4: FRYING (HERO) ========== -->
+    <div class="stage" id="s4">
+      <div class="stage-title">Stage 4 — Process Hero</div>
+      <div class="stage-heading">Continuous Frying</div>
+      <div class="s4-layout">
+        <div class="fryer-wrap">
+          <canvas class="fryer-canvas" id="fryerCanvas" width="380" height="260"></canvas>
+          <div style="font-size:10px; color: var(--text-dim); letter-spacing:0.1em; text-align:center; margin-top:8px;">FR-101 — CONTINUOUS BELT FRYER &nbsp;|&nbsp; HIGH-OLEIC SUNFLOWER OIL</div>
+        </div>
+        <div class="s4-callouts">
+          <div class="callout amber" id="s4c1">
+            <div class="callout-label">Oil Temperature</div>
+            <div class="callout-value">350°F</div>
+            <div class="callout-sub">High-oleic sunflower — smoke point 450°F</div>
+          </div>
+          <div class="callout" id="s4c2">
+            <div class="callout-label">Fry Time</div>
+            <div class="callout-value">70 seconds</div>
+          </div>
+          <div class="callout amber" id="s4c3">
+            <div class="callout-label">Total Heat Duty</div>
+            <div class="callout-value">157,327 BTU/hr</div>
+            <div class="heat-bar-wrap" id="heatBars">
+              <div class="heat-bar-row">
+                <span class="heat-bar-label">Latent (steam)</span>
+                <div class="heat-bar-fill" id="hbar-latent" style="background:var(--amber); width:0%"></div>
+                <span style="color:var(--amber);">108K BTU (68%)</span>
+              </div>
+              <div class="heat-bar-row">
+                <span class="heat-bar-label">Losses</span>
+                <div class="heat-bar-fill" id="hbar-loss" style="background:var(--gray); width:0%"></div>
+                <span style="color:var(--gray);">24K BTU (15%)</span>
+              </div>
+              <div class="heat-bar-row">
+                <span class="heat-bar-label">Sensible</span>
+                <div class="heat-bar-fill" id="hbar-sens" style="background:var(--cyan); width:0%"></div>
+                <span style="color:var(--cyan);">27K BTU (17%)</span>
+              </div>
+            </div>
+          </div>
+          <div class="callout red" id="s4c4">
+            <div class="callout-label">Steam Exhaust</div>
+            <div class="callout-value">111 lb/hr H₂O evaporated</div>
+          </div>
+          <div class="callout" id="s4c5">
+            <div class="callout-label">Natural Gas Consumption</div>
+            <div class="callout-value">197 SCFH</div>
+          </div>
+          <div class="callout amber" id="s4c6">
+            <div class="callout-label">Oil Absorbed</div>
+            <div class="callout-value">45 lb/hr</div>
+            <div class="callout-sub">30% of chip weight | Exit moisture: 1.5%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== STAGE 5: COOLING ========== -->
+    <div class="stage" id="s5">
+      <div class="stage-title">Stage 5</div>
+      <div class="stage-heading">Cooling</div>
+      <div class="s5-layout">
+        <div>
+          <canvas class="cooling-canvas" id="coolingCanvas" width="420" height="240"></canvas>
+          <div style="font-size:10px; color: var(--text-dim); letter-spacing:0.1em; text-align:center; margin-top:8px;">CL-101 — MESH BELT CONVEYOR &nbsp;|&nbsp; 25 FT @ 5 FT/MIN</div>
+        </div>
+        <div class="s5-callouts">
+          <div class="callout amber" id="s5c1">
+            <div class="callout-label">Temperature Drop</div>
+            <div class="callout-value">350°F → 115°F</div>
+          </div>
+          <div class="callout" id="s5c2">
+            <div class="callout-label">Residence Time</div>
+            <div class="callout-value">5 minutes</div>
+            <div class="callout-sub">Belt: 25 ft @ 5 ft/min</div>
+          </div>
+          <div class="callout" id="s5c3">
+            <div class="callout-label">Heat Transfer Model</div>
+            <div class="callout-value">Bi = 0.17</div>
+            <div class="callout-sub">Lumped capacitance valid (Bi &lt; 0.1 at bulk level)</div>
+          </div>
+          <div class="callout green" id="s5c4">
+            <div class="callout-label">Chip Integrity</div>
+            <div class="callout-value">Oil sets, texture locks</div>
+            <div class="callout-sub">Crystallization of surface fats begins below 140°F</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== STAGE 6: SEASONING ========== -->
+    <div class="stage" id="s6">
+      <div class="stage-title">Stage 6</div>
+      <div class="stage-heading">Seasoning</div>
+      <div class="s6-layout">
+        <div class="drum-wrap">
+          <svg width="260" height="280" viewBox="0 0 260 280">
+            <!-- Hopper -->
+            <polygon points="90,0 170,0 155,50 105,50" fill="#1a1a3a" stroke="#8866ff" stroke-width="1.5"/>
+            <text x="130" y="28" fill="#8866ff" font-size="10" font-family="sans-serif" text-anchor="middle">SALT HOPPER</text>
+            <!-- Hopper outlet -->
+            <rect x="118" y="50" width="24" height="16" fill="#111130" stroke="#8866ff" stroke-width="1"/>
+
+            <!-- Salt particles falling from hopper -->
+            <circle class="salt-particle" cx="122" cy="55" r="3" fill="#cccccc" style="animation-duration:0.8s; animation-delay:0s;"/>
+            <circle class="salt-particle" cx="130" cy="60" r="2.5" fill="#dddddd" style="animation-duration:0.8s; animation-delay:0.15s;"/>
+            <circle class="salt-particle" cx="138" cy="58" r="2" fill="#bbbbbb" style="animation-duration:0.8s; animation-delay:0.3s;"/>
+            <circle class="salt-particle" cx="126" cy="63" r="2" fill="#cccccc" style="animation-duration:0.8s; animation-delay:0.45s;"/>
+
+            <!-- Drum -->
+            <ellipse cx="130" cy="175" rx="90" ry="30" fill="#0d0d1a" stroke="var(--cyan)" stroke-width="1.5"/>
+            <rect x="40" y="145" width="180" height="60" fill="#1a1a3a" stroke="var(--cyan)" stroke-width="1.5"/>
+            <ellipse cx="130" cy="205" rx="90" ry="30" fill="#1a1a3a" stroke="var(--cyan)" stroke-width="2"/>
+
+            <!-- Drum body rotating marks -->
+            <g class="drum-body" style="transform-origin:130px 175px;">
+              <line x1="40" y1="175" x2="220" y2="175" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+              <line x1="130" y1="145" x2="130" y2="205" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+              <ellipse cx="130" cy="175" rx="55" ry="18" fill="none" stroke="rgba(0,212,255,0.1)" stroke-width="1"/>
+            </g>
+
+            <!-- Chips (amber dots) inside drum -->
+            <circle cx="80" cy="185" r="5" fill="rgba(255,200,80,0.6)"/>
+            <circle cx="100" cy="195" r="4" fill="rgba(255,200,80,0.5)"/>
+            <circle cx="120" cy="190" r="6" fill="rgba(255,200,80,0.6)"/>
+            <circle cx="145" cy="185" r="5" fill="rgba(255,200,80,0.5)"/>
+            <circle cx="165" cy="193" r="4" fill="rgba(255,200,80,0.6)"/>
+            <circle cx="185" cy="182" r="5" fill="rgba(255,200,80,0.5)"/>
+
+            <!-- Salt particles inside drum -->
+            <circle class="salt-particle" cx="95" cy="175" r="2" fill="white" style="animation-duration:1.2s; animation-delay:0.2s;"/>
+            <circle class="salt-particle" cx="150" cy="178" r="2" fill="white" style="animation-duration:1.2s; animation-delay:0.6s;"/>
+            <circle class="salt-particle" cx="130" cy="172" r="1.5" fill="white" style="animation-duration:1.2s; animation-delay:0.9s;"/>
+
+            <!-- Support structure -->
+            <line x1="50" y1="205" x2="50" y2="250" stroke="#333355" stroke-width="4"/>
+            <line x1="210" y1="205" x2="210" y2="250" stroke="#333355" stroke-width="4"/>
+            <line x1="30" y1="250" x2="230" y2="250" stroke="#333355" stroke-width="4"/>
+
+            <!-- Drive motor symbol -->
+            <circle cx="210" cy="175" r="14" fill="#111130" stroke="var(--amber)" stroke-width="1.5"/>
+            <text x="210" y="179" fill="var(--amber)" font-size="9" font-family="sans-serif" text-anchor="middle">M</text>
+
+            <!-- Output -->
+            <line x1="220" y1="200" x2="255" y2="200" stroke="var(--green)" stroke-width="2.5"/>
+            <polygon points="260,200 250,195 250,205" fill="var(--green)"/>
+          </svg>
+          <div style="font-size:10px; color: var(--text-dim); letter-spacing:0.1em; text-align:center; margin-top:4px;">ST-101 — ROTATING DRUM TUMBLER</div>
+        </div>
+
+        <div class="s6-callouts">
+          <div class="callout" id="s6c1">
+            <div class="callout-label">Salt Application Rate</div>
+            <div class="callout-value">1.5% by weight</div>
+            <div class="callout-sub">2.3 lb/hr at 157 lb/hr throughput</div>
+          </div>
+          <div class="callout" id="s6c2">
+            <div class="callout-label">Tumble Conditions</div>
+            <div class="callout-value">30 sec @ 20 RPM</div>
+          </div>
+          <div class="callout green" id="s6c3">
+            <div class="callout-label">Adhesion Target</div>
+            <div class="callout-value">&gt; 90%</div>
+            <div class="callout-sub">Residual surface oil from fryer aids adhesion</div>
+          </div>
+          <div class="callout amber" id="s6c4">
+            <div class="callout-label">Seasoning Window</div>
+            <div class="callout-value">115–140°F chip surface</div>
+            <div class="callout-sub">Must season before fat crystallization locks surface</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== STAGE 7: PACKAGING ========== -->
+    <div class="stage" id="s7">
+      <div class="stage-title">Stage 7</div>
+      <div class="stage-heading">Packaging</div>
+      <div class="s7-layout">
+        <div class="vffs-wrap">
+          <svg width="300" height="340" viewBox="0 0 300 340">
+            <!-- Film spool -->
+            <circle cx="150" cy="25" r="20" fill="#1a1a3a" stroke="var(--text-dim)" stroke-width="2"/>
+            <g class="film-spool" style="transform-origin:150px 25px;">
+              <line x1="150" y1="8" x2="150" y2="42" stroke="rgba(200,200,200,0.2)" stroke-width="1.5"/>
+              <line x1="133" y1="25" x2="167" y2="25" stroke="rgba(200,200,200,0.2)" stroke-width="1.5"/>
+              <circle cx="150" cy="25" r="8" fill="none" stroke="rgba(200,200,200,0.15)" stroke-width="1.5"/>
+            </g>
+            <text x="150" y="7" fill="var(--text-dim)" font-size="8" font-family="sans-serif" text-anchor="middle">FILM SPOOL</text>
+
+            <!-- Film path down (vertical forming tube) -->
+            <line x1="130" y1="45" x2="130" y2="85" stroke="rgba(150,150,150,0.4)" stroke-width="2"/>
+            <line x1="170" y1="45" x2="170" y2="85" stroke="rgba(150,150,150,0.4)" stroke-width="2"/>
+
+            <!-- Forming collar -->
+            <path d="M110,85 Q150,100 190,85" fill="none" stroke="var(--text-dim)" stroke-width="2.5"/>
+            <rect x="125" y="85" width="50" height="8" rx="2" fill="#222244" stroke="var(--text-dim)" stroke-width="1.5"/>
+            <text x="150" y="81" fill="var(--text-dim)" font-size="8" font-family="sans-serif" text-anchor="middle">FORMING TUBE</text>
+
+            <!-- Tube body (bag forming) -->
+            <rect x="125" y="93" width="50" height="90" fill="#111130" stroke="rgba(150,150,150,0.3)" stroke-width="1.5"/>
+
+            <!-- N2 flush label -->
+            <text x="105" y="130" fill="var(--cyan)" font-size="9" font-family="sans-serif" text-anchor="middle">N₂</text>
+            <line x1="115" y1="128" x2="125" y2="128" stroke="var(--cyan)" stroke-width="1.5" stroke-dasharray="3 2"/>
+
+            <!-- Chips falling into bag (animated dots) -->
+            <circle class="fill-dot" cx="142" cy="100" r="4" fill="rgba(255,200,80,0.8)" style="animation-duration:1.6s; animation-delay:0s;"/>
+            <circle class="fill-dot" cx="155" cy="105" r="3.5" fill="rgba(255,200,80,0.7)" style="animation-duration:1.6s; animation-delay:0.2s;"/>
+            <circle class="fill-dot" cx="148" cy="112" r="3" fill="rgba(255,200,80,0.8)" style="animation-duration:1.6s; animation-delay:0.4s;"/>
+            <circle class="fill-dot" cx="163" cy="108" r="4" fill="rgba(255,200,80,0.7)" style="animation-duration:1.6s; animation-delay:0.6s;"/>
+            <circle class="fill-dot" cx="138" cy="115" r="3" fill="rgba(255,200,80,0.6)" style="animation-duration:1.6s; animation-delay:0.8s;"/>
+
+            <!-- Horizontal seal jaw (top) -->
+            <rect class="bag-seal" x="118" y="183" width="64" height="10" rx="3" fill="rgba(255,149,0,0.4)" stroke="var(--amber)" stroke-width="1.5"/>
+            <text x="150" y="205" fill="var(--amber)" font-size="8" font-family="sans-serif" text-anchor="middle">SEAL JAW</text>
+
+            <!-- Completed bag (below) -->
+            <rect x="125" y="215" width="50" height="70" rx="4" fill="#111130" stroke="rgba(150,150,150,0.4)" stroke-width="1.5"/>
+            <!-- Bag seal top -->
+            <rect x="120" y="213" width="60" height="6" rx="2" fill="rgba(150,150,150,0.3)" stroke="rgba(150,150,150,0.4)" stroke-width="1"/>
+            <!-- Chip contents -->
+            <circle cx="138" cy="235" r="5" fill="rgba(255,200,80,0.5)"/>
+            <circle cx="155" cy="240" r="4" fill="rgba(255,200,80,0.4)"/>
+            <circle cx="145" cy="250" r="5" fill="rgba(255,200,80,0.5)"/>
+            <circle cx="163" cy="244" r="4" fill="rgba(255,200,80,0.4)"/>
+            <circle cx="133" cy="255" r="4" fill="rgba(255,200,80,0.4)"/>
+            <text x="150" y="275" fill="var(--text-dim)" font-size="8" font-family="sans-serif" text-anchor="middle">10 oz</text>
+
+            <!-- Metal detector gate -->
+            <rect x="190" y="225" width="60" height="70" rx="4" fill="rgba(0,30,0,0.5)" stroke="rgba(0,150,0,0.4)" stroke-width="1.5"/>
+            <text x="220" y="218" fill="var(--green)" font-size="8" font-family="sans-serif" text-anchor="middle">METAL DET.</text>
+            <!-- Detector light -->
+            <circle class="detector-light" cx="220" cy="260" r="12" fill="#003300"/>
+            <text x="220" y="264" fill="var(--green)" font-size="10" font-family="sans-serif" text-anchor="middle">✓</text>
+
+            <!-- Belt/conveyor line -->
+            <line x1="100" y1="320" x2="280" y2="320" stroke="rgba(100,100,100,0.5)" stroke-width="3"/>
+            <circle cx="110" cy="320" r="6" fill="#222" stroke="rgba(100,100,100,0.5)" stroke-width="1.5"/>
+            <circle cx="270" cy="320" r="6" fill="#222" stroke="rgba(100,100,100,0.5)" stroke-width="1.5"/>
+
+            <!-- Arrow from bag to detector -->
+            <line x1="175" y1="260" x2="188" y2="260" stroke="var(--green)" stroke-width="1.5"/>
+            <polygon points="190,260 184,256 184,264" fill="var(--green)"/>
+          </svg>
+          <div style="font-size:10px; color: var(--text-dim); letter-spacing:0.1em; text-align:center; margin-top:4px;">PK-101 — VFFS + MULTI-HEAD WEIGHER</div>
+        </div>
+
+        <div class="s7-callouts">
+          <div class="callout green" id="s7c1">
+            <div class="callout-label">Package Rate</div>
+            <div class="callout-value">252 bags/hr &nbsp;<span style="color:var(--text-dim);font-size:12px;">(4.2/min)</span></div>
+          </div>
+          <div class="callout" id="s7c2">
+            <div class="callout-label">Fill Weight</div>
+            <div class="callout-value">10 oz ± 3%</div>
+          </div>
+          <div class="callout cyan" id="s7c3">
+            <div class="callout-label">Nitrogen Flush</div>
+            <div class="callout-value">&lt; 3% residual O₂</div>
+            <div class="callout-sub">N₂ MAP — extends oxidative shelf life</div>
+          </div>
+          <div class="callout amber" id="s7c4">
+            <div class="callout-label">Metal Detection</div>
+            <div class="callout-value">Fe: 1.5mm / SS: 2.5mm</div>
+          </div>
+          <div class="callout green" id="s7c5">
+            <div class="callout-label">Shelf Life</div>
+            <div class="callout-value">90 days</div>
+            <div class="callout-sub">FIFO rotation, cool dark storage</div>
+          </div>
+          <div class="callout" id="s7c6">
+            <div class="callout-label">Downstream</div>
+            <div class="callout-value">Case pack → palletize → 3PL</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== STAGE 8: SUMMARY ========== -->
+    <div class="stage" id="s8">
+      <div class="stage-title">Process Summary</div>
+      <div class="stage-heading" style="margin-bottom:24px;">Mass &amp; Energy Balance</div>
+
+      <!-- Mini flow diagram -->
+      <div class="summary-flow" id="summaryFlow">
+        <div class="sf-node">
+          <div class="sf-icon" style="border-color:var(--cyan); color:var(--cyan);">🌽</div>
+          <div class="sf-label">Raw Materials</div>
+        </div>
+        <div class="sf-arrow"></div>
+        <div class="sf-node">
+          <div class="sf-icon" style="border-color:var(--cyan); color:var(--cyan);">⚙️</div>
+          <div class="sf-label">Mix</div>
+        </div>
+        <div class="sf-arrow"></div>
+        <div class="sf-node">
+          <div class="sf-icon" style="border-color:var(--cyan); color:var(--cyan);">📐</div>
+          <div class="sf-label">Sheet &amp; Cut</div>
+        </div>
+        <div class="sf-arrow"></div>
+        <div class="sf-node">
+          <div class="sf-icon" style="border-color:var(--amber); color:var(--amber);">🔥</div>
+          <div class="sf-label">Fry</div>
+        </div>
+        <div class="sf-arrow"></div>
+        <div class="sf-node">
+          <div class="sf-icon" style="border-color:var(--cyan); color:var(--cyan);">❄️</div>
+          <div class="sf-label">Cool</div>
+        </div>
+        <div class="sf-arrow"></div>
+        <div class="sf-node">
+          <div class="sf-icon" style="border-color:#8866ff; color:#8866ff;">🧂</div>
+          <div class="sf-label">Season</div>
+        </div>
+        <div class="sf-arrow"></div>
+        <div class="sf-node">
+          <div class="sf-icon" style="border-color:var(--green); color:var(--green);">📦</div>
+          <div class="sf-label">Package</div>
+        </div>
+      </div>
+
+      <!-- Key metrics grid -->
+      <div class="summary-metrics">
+        <div class="metric-card" id="m1">
+          <div class="metric-number" style="color:var(--cyan);">140 lb/hr IN<br><span style="font-size:20px;color:var(--text-dim);">→</span><br>157 lb/hr OUT</div>
+          <div class="metric-label">Mass Balance (oil absorbed)</div>
+        </div>
+        <div class="metric-card" id="m2">
+          <div class="metric-number" style="color:var(--amber);">157,327</div>
+          <div class="metric-label">BTU/hr Heat Duty (Fryer)</div>
+        </div>
+        <div class="metric-card" id="m3">
+          <div class="metric-number" style="color:var(--red);">111 lb/hr</div>
+          <div class="metric-label">Water Evaporated (Steam)</div>
+        </div>
+        <div class="metric-card" id="m4">
+          <div class="metric-number" style="color:var(--green);">252 bags/hr</div>
+          <div class="metric-label">Finished Goods Rate</div>
+        </div>
+        <div class="metric-card" id="m5">
+          <div class="metric-number" style="color:var(--amber);">$1.38/bag</div>
+          <div class="metric-label">COGS — Phase 2 Dedicated Facility</div>
+        </div>
+        <div class="metric-card" id="m6">
+          <div class="metric-number" style="color:var(--green);">455 bags/wk</div>
+          <div class="metric-label">Breakeven Volume</div>
+        </div>
+      </div>
+
+      <div class="edgeless-badge">EDGELESS LAB — PORTLAND, OR — PHASE 2 FEASIBILITY</div>
+    </div>
+
+  </div><!-- /#stage-container -->
+
+  <!-- Controls -->
+  <div id="controls">
+    <button id="play-btn" title="Play/Pause (Space)">
+      <svg id="play-icon" width="16" height="16" viewBox="0 0 16 16"><polygon points="4,2 14,8 4,14"/></svg>
+    </button>
+    <div id="progress-track">
+      <div id="progress-fill"></div>
+      <!-- Stage markers injected by JS -->
+    </div>
+    <div id="time-display">0:00 / 1:47</div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ============================================================
+// TIMING CONFIGURATION (seconds)
+// ============================================================
+const TOTAL = 107;
+const STAGES = [
+  { id: 's0',  label: 'Title',          start: 0,   end: 5   },
+  { id: 'sOV', label: 'Overview',       start: 5,   end: 22  },
+  { id: 's1',  label: 'Raw Materials',  start: 22,  end: 32  },
+  { id: 's2',  label: 'Mixing',         start: 32,  end: 42  },
+  { id: 's3',  label: 'Sheeting',       start: 42,  end: 52  },
+  { id: 's4',  label: 'Frying',         start: 52,  end: 67  },
+  { id: 's5',  label: 'Cooling',        start: 67,  end: 74  },
+  { id: 's6',  label: 'Seasoning',      start: 74,  end: 82  },
+  { id: 's7',  label: 'Packaging',      start: 82,  end: 95  },
+  { id: 's8',  label: 'Summary',        start: 95,  end: 107 },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentTime = 0;
+let playing = false;
+let lastTimestamp = null;
+let currentStageIdx = -1;
+let animFrameId = null;
+
+// Fryer canvas state
+let fryerBubbles = [];
+let fryerChips = [];
+let fryerSteam = [];
+
+// Cooling canvas state
+let coolingChips = [];
+
+// Overview canvas state
+let ovParticles = [];
+let ovTime = 0;
+
+// ============================================================
+// DOM REFS
+// ============================================================
+const playBtn  = document.getElementById('play-btn');
+const playIcon = document.getElementById('play-icon');
+const progFill = document.getElementById('progress-fill');
+const progTrack= document.getElementById('progress-track');
+const timeDisp = document.getElementById('time-display');
+const fryerCanvas    = document.getElementById('fryerCanvas');
+const coolingCanvas  = document.getElementById('coolingCanvas');
+const overviewCanvas = document.getElementById('overviewCanvas');
+const fryCtx   = fryerCanvas   ? fryerCanvas.getContext('2d')   : null;
+const coolCtx  = coolingCanvas ? coolingCanvas.getContext('2d')  : null;
+const ovCtx    = overviewCanvas ? overviewCanvas.getContext('2d') : null;
+
+// ============================================================
+// BUILD PROGRESS MARKERS
+// ============================================================
+function buildMarkers() {
+  STAGES.forEach((s, i) => {
+    const pct = (s.start / TOTAL) * 100;
+    const marker = document.createElement('div');
+    marker.className = 'stage-marker';
+    marker.style.left = pct + '%';
+    marker.title = s.label;
+    const lbl = document.createElement('span');
+    lbl.className = 'marker-label';
+    lbl.textContent = s.label;
+    marker.appendChild(lbl);
+    marker.addEventListener('click', e => {
+      e.stopPropagation();
+      seekTo(s.start + 0.01);
+    });
+    progTrack.appendChild(marker);
+  });
+}
+
+// ============================================================
+// PLAY / PAUSE
+// ============================================================
+function setPlaying(val) {
+  playing = val;
+  if (playing) {
+    playIcon.innerHTML = '<rect x="3" y="2" width="4" height="12" rx="1"/><rect x="9" y="2" width="4" height="12" rx="1"/>';
+    lastTimestamp = null;
+    animFrameId = requestAnimationFrame(tick);
+  } else {
+    playIcon.innerHTML = '<polygon points="4,2 14,8 4,14"/>';
+    if (animFrameId) cancelAnimationFrame(animFrameId);
+  }
+}
+
+function seekTo(t) {
+  currentTime = Math.max(0, Math.min(TOTAL, t));
+  updateUI();
+}
+
+// ============================================================
+// MAIN TICK
+// ============================================================
+function tick(ts) {
+  if (!playing) return;
+  if (lastTimestamp !== null) {
+    const dt = (ts - lastTimestamp) / 1000;
+    currentTime += dt;
+    if (currentTime >= TOTAL) {
+      currentTime = TOTAL;
+      updateUI();
+      setPlaying(false);
+      return;
+    }
+  }
+  lastTimestamp = ts;
+  updateUI();
+  animFrameId = requestAnimationFrame(tick);
+}
+
+// ============================================================
+// UPDATE UI
+// ============================================================
+function updateUI() {
+  // Progress bar
+  const pct = (currentTime / TOTAL) * 100;
+  progFill.style.width = pct + '%';
+
+  // Time display
+  const mins = Math.floor(currentTime / 60);
+  const secs = Math.floor(currentTime % 60);
+  timeDisp.textContent = `${mins}:${secs.toString().padStart(2,'0')} / 1:47`;
+
+  // Update markers
+  document.querySelectorAll('.stage-marker').forEach((m, i) => {
+    if (STAGES[i].start <= currentTime) m.classList.add('passed');
+    else m.classList.remove('passed');
+  });
+
+  // Determine active stage
+  let newIdx = 0;
+  for (let i = STAGES.length - 1; i >= 0; i--) {
+    if (currentTime >= STAGES[i].start) { newIdx = i; break; }
+  }
+
+  if (newIdx !== currentStageIdx) {
+    // Deactivate old
+    if (currentStageIdx >= 0) {
+      const old = document.getElementById(STAGES[currentStageIdx].id);
+      if (old) old.classList.remove('active');
+    }
+    currentStageIdx = newIdx;
+    const next = document.getElementById(STAGES[currentStageIdx].id);
+    if (next) next.classList.add('active');
+    onStageEnter(currentStageIdx);
+  }
+
+  // Per-stage continuous updates
+  const localT = currentTime - STAGES[currentStageIdx].start;
+  updateStage(currentStageIdx, localT);
+}
+
+// ============================================================
+// STAGE ENTER — trigger animations
+// ============================================================
+function onStageEnter(idx) {
+  // Reset all callout visibility for the incoming stage
+  const stage = document.getElementById(STAGES[idx].id);
+  if (!stage) return;
+  stage.querySelectorAll('.callout').forEach(c => c.classList.remove('visible'));
+
+  switch(idx) {
+    case 1: onEnterOverview(); break;
+    case 2: onEnterRawMaterials(); break;
+    case 3: onEnterMixing(); break;
+    case 4: onEnterSheeting(); break;
+    case 5: onEnterFrying(); break;
+    case 6: onEnterCooling(); break;
+    case 7: onEnterSeasoning(); break;
+    case 8: onEnterPackaging(); break;
+    case 9: onEnterSummary(); break;
+  }
+}
+
+function revealCallout(id, delay) {
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('visible');
+  }, delay);
+}
+
+// --- Stage OV: Process Overview ---
+function onEnterOverview() {
+  setupOverviewCanvas();
+  ovParticles = [];
+  ovTime = 0;
+  initOverviewParticles();
+  initAuxParticles();
+
+  // Populate legend
+  const legend = document.getElementById('ov-legend');
+  if (legend) {
+    const items = [
+      { label: 'Corn',           color: '#ddc840' },
+      { label: 'Dough',          color: '#c8a060' },
+      { label: 'Chips',          color: '#d4820a' },
+      { label: 'Water',          color: '#4488ff' },
+      { label: 'Oil / Gas',      color: '#ff9500' },
+      { label: 'Steam',          color: 'rgba(255,255,255,0.7)' },
+      { label: 'Heat Out',       color: '#ff6666' },
+      { label: 'Finished',       color: '#00e676' },
+    ];
+    legend.innerHTML = items.map(it =>
+      `<div class="ov-legend-item">` +
+        `<div class="ov-legend-dot" style="background:${it.color};"></div>` +
+        `<span>${it.label}</span>` +
+      `</div>`
+    ).join('');
+  }
+}
+
+function setupOverviewCanvas() {
+  if (!overviewCanvas) return;
+  const rect = overviewCanvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  overviewCanvas.width  = rect.width  * dpr;
+  overviewCanvas.height = rect.height * dpr;
+  ovCtx.scale(dpr, dpr);
+  overviewCanvas._w = rect.width;
+  overviewCanvas._h = rect.height;
+}
+
+// Equipment layout (fractional coords, resolved at draw time)
+const OV_UNITS = [
+  { id: 'silo',     label: ['Corn Silo', 'V-101'],     x: 0.06, y: 0.45, w: 0.06, h: 0.25, color: '#00d4ff', tag: '140 lb/hr'      },
+  { id: 'mixer',    label: ['Mixer', 'MX-201'],         x: 0.19, y: 0.45, w: 0.07, h: 0.20, color: '#00d4ff', tag: '251 lb/hr'      },
+  { id: 'sheeter',  label: ['Sheeter', 'SH-301'],       x: 0.32, y: 0.45, w: 0.08, h: 0.15, color: '#00d4ff', tag: '251 lb/hr'      },
+  { id: 'fryer',    label: ['Fryer', 'FR-401'],         x: 0.46, y: 0.40, w: 0.10, h: 0.28, color: '#ff9500', tag: '157,327 BTU/hr' },
+  { id: 'cooler',   label: ['Cooling', 'CV-501'],       x: 0.60, y: 0.50, w: 0.10, h: 0.10, color: '#00d4ff', tag: '350→100°F'      },
+  { id: 'seasoner', label: ['Seasoning', 'TU-601'],     x: 0.73, y: 0.42, w: 0.07, h: 0.22, color: '#8866ff', tag: '5% wt add'      },
+  { id: 'vffs',     label: ['VFFS', 'PK-701'],          x: 0.85, y: 0.38, w: 0.06, h: 0.30, color: '#00e676', tag: '252 bags/hr'    },
+  { id: 'pallet',   label: ['Palletizer', ''],          x: 0.95, y: 0.50, w: 0.04, h: 0.15, color: '#00e676', tag: '21 cases/hr'    },
+];
+
+// Stream definitions: from unit output to next unit input
+const OV_STREAMS = [
+  { from: 'silo',     to: 'mixer',    color: '#ddc840',              label: 'Corn'          },
+  { from: 'mixer',    to: 'sheeter',  color: '#c8a060',              label: 'Masa Dough'    },
+  { from: 'sheeter',  to: 'fryer',    color: '#c8a060',              label: 'Cut Triangles' },
+  { from: 'fryer',    to: 'cooler',   color: '#d4820a',              label: 'Fried Chips'   },
+  { from: 'cooler',   to: 'seasoner', color: '#d4820a',              label: null            },
+  { from: 'seasoner', to: 'vffs',     color: '#e8a030',              label: 'Seasoned'      },
+  { from: 'vffs',     to: 'pallet',   color: '#00e676',              label: 'Bags'          },
+];
+
+// Auxiliary streams: inputs from outside and waste/energy outputs
+// dir: 'down' = enters from above, 'up' = exits upward, 'down-out' = exits downward
+const OV_AUX = [
+  // RAW MATERIAL RECEIVING
+  { unit: 'silo',     dir: 'down',     offset:  0.0,  color: '#ddc840', label: 'Corn Bags',       tag: '50 lb bags',   particleCount: 2, shape: 'square' },
+  // INPUTS (entering units from above)
+  { unit: 'mixer',    dir: 'down',     offset: -0.3,  color: '#4488ff', label: 'Water',           tag: '111 lb/hr',    particleCount: 3 },
+  { unit: 'fryer',    dir: 'down',     offset: -0.25, color: '#ff9500', label: 'Frying Oil',      tag: '17 lb/hr makeup', particleCount: 2 },
+  { unit: 'fryer',    dir: 'down',     offset:  0.25, color: '#ff4444', label: 'Natural Gas',     tag: '157K BTU/hr',  particleCount: 2 },
+  { unit: 'seasoner', dir: 'down',     offset:  0.0,  color: '#cc88ff', label: 'Season Blend',    tag: '8.3 lb/hr',    particleCount: 2 },
+  { unit: 'vffs',     dir: 'down',     offset: -0.2,  color: '#88ddaa', label: 'Film + N₂',       tag: null,           particleCount: 2 },
+  { unit: 'pallet',   dir: 'down',     offset:  0.0,  color: '#88bbaa', label: 'Cases',           tag: 'corrugated',   particleCount: 2, shape: 'square' },
+  // OUTPUTS (exiting units upward — waste/energy)
+  { unit: 'fryer',    dir: 'up',       offset:  0.0,  color: '#ffffff', label: 'Steam',           tag: '111 lb/hr H₂O', particleCount: 4 },
+  { unit: 'cooler',   dir: 'up',       offset:  0.0,  color: '#ff6666', label: 'Heat Rejection',  tag: '~40K BTU/hr',  particleCount: 3 },
+  { unit: 'sheeter',  dir: 'down-out', offset:  0.0,  color: '#c8a060', label: 'Trim Recycle',    tag: '~5% recycle',  particleCount: 2 },
+  // FINISHED GOODS OUT (exiting right from palletizer)
+  { unit: 'pallet',   dir: 'right-out', offset: 0.0,  color: '#00e676', label: 'Pallets Out',     tag: '~3 pallets/day', particleCount: 3, shape: 'square' },
+];
+
+let ovAuxParticles = [];
+
+function initAuxParticles() {
+  ovAuxParticles = [];
+  OV_AUX.forEach((aux, ai) => {
+    for (let i = 0; i < aux.particleCount; i++) {
+      ovAuxParticles.push({
+        auxIdx: ai,
+        t: i / aux.particleCount,
+        speed: 0.4 + Math.random() * 0.2,
+        r: 2 + Math.random() * 1,
+        drift: (Math.random() - 0.5) * 4,
+      });
+    }
+  });
+}
+
+function unitRect(u, W, H) {
+  return {
+    x: u.x * W,
+    y: u.y * H,
+    w: u.w * W,
+    h: u.h * H,
+  };
+}
+
+function unitOutputX(u, W, H) { const r = unitRect(u, W, H); return r.x + r.w; }
+function unitOutputY(u, W, H) { const r = unitRect(u, W, H); return r.y + r.h * 0.5; }
+function unitInputX(u, W, H)  { const r = unitRect(u, W, H); return r.x; }
+function unitInputY(u, W, H)  { const r = unitRect(u, W, H); return r.y + r.h * 0.5; }
+
+function initOverviewParticles() {
+  OV_STREAMS.forEach((stream, si) => {
+    const fromU = OV_UNITS.find(u => u.id === stream.from);
+    const toU   = OV_UNITS.find(u => u.id === stream.to);
+    if (!fromU || !toU) return;
+    const count = 6 + si;
+    for (let i = 0; i < count; i++) {
+      ovParticles.push({
+        streamIdx: si,
+        t: i / count,           // 0–1 along the path
+        speed: 0.06 + Math.random() * 0.04,
+        color: stream.color,
+        r: 2.5 + Math.random() * 1.5,
+        jitter: (Math.random() - 0.5) * 6,
+      });
+    }
+  });
+}
+
+function getParticlePos(p, W, H) {
+  const stream = OV_STREAMS[p.streamIdx];
+  const fromU  = OV_UNITS.find(u => u.id === stream.from);
+  const toU    = OV_UNITS.find(u => u.id === stream.to);
+  const x0 = unitOutputX(fromU, W, H);
+  const y0 = unitOutputY(fromU, W, H);
+  const x1 = unitInputX(toU, W, H);
+  const y1 = unitInputY(toU, W, H);
+  const x = x0 + (x1 - x0) * p.t;
+  const y = y0 + (y1 - y0) * p.t + p.jitter * Math.sin(p.t * Math.PI);
+  return { x, y };
+}
+
+function drawOverview(localT) {
+  if (!overviewCanvas || !ovCtx) return;
+  const W = overviewCanvas._w || overviewCanvas.width;
+  const H = overviewCanvas._h || overviewCanvas.height;
+  const dt = 1 / 60;
+  ovTime += dt;
+
+  const fadeAlpha = localT < 2 ? localT / 2 : 1;
+
+  ovCtx.clearRect(0, 0, W, H);
+  ovCtx.save();
+  ovCtx.globalAlpha = fadeAlpha;
+
+  // --- Draw pipe connections ---
+  OV_STREAMS.forEach(stream => {
+    const fromU = OV_UNITS.find(u => u.id === stream.from);
+    const toU   = OV_UNITS.find(u => u.id === stream.to);
+    if (!fromU || !toU) return;
+    const x0 = unitOutputX(fromU, W, H);
+    const y0 = unitOutputY(fromU, W, H);
+    const x1 = unitInputX(toU, W, H);
+    const y1 = unitInputY(toU, W, H);
+
+    ovCtx.strokeStyle = stream.color;
+    ovCtx.globalAlpha = fadeAlpha * 0.35;
+    ovCtx.lineWidth = 2;
+    ovCtx.setLineDash([5, 4]);
+    ovCtx.beginPath();
+    ovCtx.moveTo(x0, y0);
+    // Mid-point jog
+    const mx = (x0 + x1) / 2;
+    ovCtx.lineTo(mx, y0);
+    ovCtx.lineTo(mx, y1);
+    ovCtx.lineTo(x1, y1);
+    ovCtx.stroke();
+    ovCtx.setLineDash([]);
+    ovCtx.globalAlpha = fadeAlpha;
+
+    // Stream label on the pipe mid-segment
+    if (stream.label) {
+      const labelX = mx;
+      const labelY = Math.min(y0, y1) - 5;
+      ovCtx.fillStyle = stream.color;
+      ovCtx.globalAlpha = fadeAlpha * 0.7;
+      ovCtx.font = 'bold 9px system-ui, sans-serif';
+      ovCtx.textAlign = 'center';
+      ovCtx.fillText(stream.label, labelX, labelY);
+      ovCtx.globalAlpha = fadeAlpha;
+    }
+  });
+
+  // --- Draw equipment blocks ---
+  OV_UNITS.forEach(u => {
+    const r = unitRect(u, W, H);
+
+    // Box fill
+    ovCtx.fillStyle = '#111130';
+    ovCtx.strokeStyle = u.color;
+    ovCtx.lineWidth = 1.5;
+    ovCtx.beginPath();
+    ovCtx.roundRect(r.x, r.y, r.w, r.h, 4);
+    ovCtx.fill();
+    ovCtx.stroke();
+
+    // Label lines
+    const lineH = r.h > 40 ? 11 : 9;
+    const fontSize = r.h > 40 ? 10 : 8;
+    ovCtx.fillStyle = '#e8e8f0';
+    ovCtx.font = `bold ${fontSize}px system-ui, sans-serif`;
+    ovCtx.textAlign = 'center';
+    const cx = r.x + r.w / 2;
+
+    if (r.h > 40) {
+      const totalTextH = u.label.length * lineH;
+      const startY = r.y + (r.h - totalTextH) / 2 + lineH * 0.8;
+      u.label.forEach((line, li) => {
+        if (li === 1) {
+          ovCtx.fillStyle = u.color;
+          ovCtx.font = `${fontSize - 1}px system-ui, sans-serif`;
+        }
+        ovCtx.fillText(line, cx, startY + li * lineH);
+      });
+    } else {
+      // Small block — just draw the first label line
+      ovCtx.fillStyle = '#e8e8f0';
+      ovCtx.fillText(u.label[0], cx, r.y + r.h / 2 + fontSize * 0.35);
+    }
+
+    // Tag below block
+    ovCtx.fillStyle = u.color;
+    ovCtx.globalAlpha = fadeAlpha * 0.65;
+    ovCtx.font = '8px system-ui, sans-serif';
+    ovCtx.textAlign = 'center';
+    ovCtx.fillText(u.tag, r.x + r.w / 2, r.y + r.h + 10);
+    ovCtx.globalAlpha = fadeAlpha;
+  });
+
+  // --- Animate equipment internals ---
+  OV_UNITS.forEach(u => {
+    const r = unitRect(u, W, H);
+    const cx = r.x + r.w / 2;
+    const cy = r.y + r.h / 2;
+
+    if (u.id === 'silo') {
+      // Corn kernels falling from bottom
+      for (let k = 0; k < 4; k++) {
+        const phase = (ovTime * 1.2 + k * 0.7) % 1;
+        const kx = r.x + r.w * (0.2 + k * 0.2);
+        const ky = r.y + r.h * 0.7 + phase * r.h * 0.3;
+        if (ky < r.y + r.h) {
+          ovCtx.fillStyle = '#ddc840';
+          ovCtx.globalAlpha = fadeAlpha * (1 - phase * 0.5);
+          ovCtx.beginPath();
+          ovCtx.arc(kx, ky, 2, 0, Math.PI * 2);
+          ovCtx.fill();
+          ovCtx.globalAlpha = fadeAlpha;
+        }
+      }
+    } else if (u.id === 'mixer') {
+      // Rotating agitator line
+      const angle = ovTime * 3;
+      ovCtx.save();
+      ovCtx.translate(cx, cy);
+      ovCtx.rotate(angle);
+      ovCtx.strokeStyle = '#ff9500';
+      ovCtx.lineWidth = 1.5;
+      ovCtx.beginPath();
+      ovCtx.moveTo(-r.w * 0.35, 0);
+      ovCtx.lineTo(r.w * 0.35, 0);
+      ovCtx.stroke();
+      ovCtx.restore();
+    } else if (u.id === 'sheeter') {
+      // Two counter-rotating rollers
+      const rollerY1 = r.y + r.h * 0.35;
+      const rollerY2 = r.y + r.h * 0.65;
+      [rollerY1, rollerY2].forEach((ry, ri) => {
+        ovCtx.save();
+        ovCtx.translate(cx, ry);
+        ovCtx.rotate(ovTime * (ri === 0 ? 2 : -2));
+        ovCtx.strokeStyle = '#00d4ff';
+        ovCtx.lineWidth = 1;
+        ovCtx.beginPath();
+        ovCtx.arc(0, 0, r.w * 0.3, 0, Math.PI * 2);
+        ovCtx.stroke();
+        // Cross hair to show rotation
+        ovCtx.beginPath();
+        ovCtx.moveTo(-r.w * 0.3, 0);
+        ovCtx.lineTo(r.w * 0.3, 0);
+        ovCtx.stroke();
+        ovCtx.restore();
+      });
+    } else if (u.id === 'fryer') {
+      // Oil bubbles rising inside fryer
+      const bubbleCount = 8;
+      for (let b = 0; b < bubbleCount; b++) {
+        const phase = (ovTime * 0.8 + b * 0.37) % 1;
+        const bx = r.x + r.w * (0.15 + (b / bubbleCount) * 0.7);
+        const by = r.y + r.h * (0.85 - phase * 0.55);
+        if (by > r.y + r.h * 0.3) {
+          ovCtx.fillStyle = 'rgba(255,200,50,0.5)';
+          ovCtx.globalAlpha = fadeAlpha * (0.4 + 0.3 * Math.sin(phase * Math.PI));
+          ovCtx.beginPath();
+          ovCtx.arc(bx, by, 2 + Math.sin(b * 1.7) * 1, 0, Math.PI * 2);
+          ovCtx.fill();
+          ovCtx.globalAlpha = fadeAlpha;
+        }
+      }
+      // Steam wisps from top
+      for (let s = 0; s < 3; s++) {
+        const phase = (ovTime * 0.6 + s * 0.5) % 1;
+        const sx = r.x + r.w * (0.25 + s * 0.25);
+        const sy = r.y - phase * r.h * 0.4;
+        ovCtx.strokeStyle = `rgba(255,255,255,${0.3 * (1 - phase)})`;
+        ovCtx.lineWidth = 1;
+        ovCtx.beginPath();
+        ovCtx.moveTo(sx, r.y);
+        ovCtx.bezierCurveTo(sx + 4, sy + r.h * 0.1, sx - 4, sy + r.h * 0.2, sx, sy);
+        ovCtx.stroke();
+      }
+    } else if (u.id === 'cooler') {
+      // 3 small chips sliding along conveyor
+      for (let c = 0; c < 3; c++) {
+        const phase = (ovTime * 0.5 + c * 0.33) % 1;
+        const chipX = r.x + r.w * phase;
+        const chipY = cy;
+        if (chipX < r.x + r.w) {
+          ovCtx.fillStyle = '#d4820a';
+          ovCtx.beginPath();
+          ovCtx.moveTo(chipX, chipY - 3);
+          ovCtx.lineTo(chipX + 3, chipY + 3);
+          ovCtx.lineTo(chipX - 3, chipY + 3);
+          ovCtx.closePath();
+          ovCtx.fill();
+        }
+      }
+    } else if (u.id === 'seasoner') {
+      // Rotating drum — slight oscillation
+      const wobble = Math.sin(ovTime * 2) * 0.08;
+      ovCtx.save();
+      ovCtx.translate(cx, cy);
+      ovCtx.rotate(wobble);
+      ovCtx.strokeStyle = '#8866ff';
+      ovCtx.lineWidth = 1.5;
+      ovCtx.beginPath();
+      ovCtx.ellipse(0, 0, r.w * 0.4, r.h * 0.35, 0, 0, Math.PI * 2);
+      ovCtx.stroke();
+      ovCtx.restore();
+    } else if (u.id === 'vffs') {
+      // Bag filling and dropping — 2s cycle
+      const bagCycle = (ovTime % 2) / 2;
+      const bagH = r.h * 0.25 * bagCycle;
+      const bagTop = cy - bagH / 2;
+      ovCtx.fillStyle = 'rgba(0,230,118,0.2)';
+      ovCtx.strokeStyle = '#00e676';
+      ovCtx.lineWidth = 1;
+      ovCtx.beginPath();
+      ovCtx.roundRect(cx - r.w * 0.3, bagTop, r.w * 0.6, bagH, 2);
+      ovCtx.fill();
+      ovCtx.stroke();
+      // Drop when full
+      if (bagCycle > 0.85) {
+        const dropAmt = (bagCycle - 0.85) / 0.15;
+        ovCtx.globalAlpha = fadeAlpha * (1 - dropAmt);
+        ovCtx.fillStyle = 'rgba(0,230,118,0.3)';
+        ovCtx.beginPath();
+        ovCtx.roundRect(cx - r.w * 0.3, bagTop + dropAmt * r.h * 0.3, r.w * 0.6, r.h * 0.25, 2);
+        ovCtx.fill();
+        ovCtx.stroke();
+        ovCtx.globalAlpha = fadeAlpha;
+      }
+    } else if (u.id === 'pallet') {
+      // Stacking boxes — accumulate up to 3
+      const boxCount = Math.min(3, Math.floor((ovTime % 6) / 2) + 1);
+      const boxH = r.h * 0.28;
+      const boxW = r.w * 0.8;
+      for (let b = 0; b < boxCount; b++) {
+        const by = r.y + r.h - (b + 1) * boxH;
+        ovCtx.fillStyle = 'rgba(0,230,118,0.15)';
+        ovCtx.strokeStyle = '#00e676';
+        ovCtx.lineWidth = 1;
+        ovCtx.beginPath();
+        ovCtx.rect(cx - boxW / 2, by, boxW, boxH - 2);
+        ovCtx.fill();
+        ovCtx.stroke();
+      }
+    }
+  });
+
+  // --- Draw auxiliary streams (inputs/outputs/waste/energy) ---
+  const auxPipeLen = H * 0.18;
+  OV_AUX.forEach(aux => {
+    const u = OV_UNITS.find(un => un.id === aux.unit);
+    if (!u) return;
+    const r = unitRect(u, W, H);
+    const px = r.x + r.w * (0.5 + aux.offset);
+
+    const isHoriz = aux.dir === 'right-out';
+
+    if (isHoriz) {
+      // Horizontal pipe exiting right from unit
+      const x0 = r.x + r.w;
+      const x1 = r.x + r.w + auxPipeLen;
+      const py = r.y + r.h * (0.5 + aux.offset);
+
+      ovCtx.strokeStyle = aux.color;
+      ovCtx.globalAlpha = fadeAlpha * 0.3;
+      ovCtx.lineWidth = 1.5;
+      ovCtx.setLineDash([4, 3]);
+      ovCtx.beginPath();
+      ovCtx.moveTo(x0, py);
+      ovCtx.lineTo(x1, py);
+      ovCtx.stroke();
+      ovCtx.setLineDash([]);
+
+      // Arrow head pointing right
+      ovCtx.globalAlpha = fadeAlpha * 0.5;
+      ovCtx.fillStyle = aux.color;
+      ovCtx.beginPath();
+      ovCtx.moveTo(x1, py);
+      ovCtx.lineTo(x1 - 6, py - 3);
+      ovCtx.lineTo(x1 - 6, py + 3);
+      ovCtx.closePath();
+      ovCtx.fill();
+
+      // Label above pipe
+      ovCtx.globalAlpha = fadeAlpha * 0.7;
+      ovCtx.font = 'bold 8px system-ui, sans-serif';
+      ovCtx.textAlign = 'center';
+      ovCtx.fillStyle = aux.color;
+      ovCtx.fillText(aux.label, (x0 + x1) / 2, py - 8);
+      if (aux.tag) {
+        ovCtx.globalAlpha = fadeAlpha * 0.45;
+        ovCtx.font = '7px system-ui, sans-serif';
+        ovCtx.fillText(aux.tag, (x0 + x1) / 2, py - 17);
+      }
+      ovCtx.globalAlpha = fadeAlpha;
+    } else {
+      // Vertical pipes (existing logic)
+      let y0, y1;
+      if (aux.dir === 'down') {
+        y0 = r.y - auxPipeLen;
+        y1 = r.y;
+      } else if (aux.dir === 'up') {
+        y0 = r.y;
+        y1 = r.y - auxPipeLen;
+      } else {
+        y0 = r.y + r.h;
+        y1 = r.y + r.h + auxPipeLen * 0.6;
+      }
+
+      ovCtx.strokeStyle = aux.color;
+      ovCtx.globalAlpha = fadeAlpha * 0.3;
+      ovCtx.lineWidth = 1.5;
+      ovCtx.setLineDash([4, 3]);
+      ovCtx.beginPath();
+      ovCtx.moveTo(px, y0);
+      ovCtx.lineTo(px, y1);
+      ovCtx.stroke();
+      ovCtx.setLineDash([]);
+
+      // Arrow head
+      ovCtx.globalAlpha = fadeAlpha * 0.5;
+      ovCtx.fillStyle = aux.color;
+      const arrowY = aux.dir === 'down' ? y1 : (aux.dir === 'up' ? y1 : y1);
+      const arrowDir = aux.dir === 'down' ? 1 : (aux.dir === 'up' ? -1 : 1);
+      ovCtx.beginPath();
+      ovCtx.moveTo(px, arrowY);
+      ovCtx.lineTo(px - 3, arrowY - 6 * arrowDir);
+      ovCtx.lineTo(px + 3, arrowY - 6 * arrowDir);
+      ovCtx.closePath();
+      ovCtx.fill();
+
+      // Label
+      ovCtx.globalAlpha = fadeAlpha * 0.7;
+      ovCtx.font = 'bold 8px system-ui, sans-serif';
+      ovCtx.textAlign = 'center';
+      ovCtx.fillStyle = aux.color;
+      const labelY = aux.dir === 'down' ? y0 - 2 : (aux.dir === 'up' ? y1 - 6 : y1 + 10);
+      ovCtx.fillText(aux.label, px, labelY);
+
+      if (aux.tag) {
+        ovCtx.globalAlpha = fadeAlpha * 0.45;
+        ovCtx.font = '7px system-ui, sans-serif';
+        ovCtx.fillText(aux.tag, px, labelY + (aux.dir === 'down-out' ? 9 : -9));
+      }
+      ovCtx.globalAlpha = fadeAlpha;
+    }
+  });
+
+  // --- Animate auxiliary particles ---
+  ovAuxParticles.forEach(p => {
+    const aux = OV_AUX[p.auxIdx];
+    const u = OV_UNITS.find(un => un.id === aux.unit);
+    if (!u) return;
+    const r = unitRect(u, W, H);
+
+    p.t += p.speed * dt;
+    if (p.t > 1) p.t = 0;
+
+    let drawX, drawY;
+
+    if (aux.dir === 'right-out') {
+      // Horizontal: move right from unit edge
+      drawX = (r.x + r.w) + p.t * auxPipeLen;
+      drawY = r.y + r.h * (0.5 + aux.offset) + p.drift * Math.sin(p.t * Math.PI * 2);
+    } else {
+      // Vertical streams
+      drawX = r.x + r.w * (0.5 + aux.offset) + p.drift * Math.sin(p.t * Math.PI * 2);
+      if (aux.dir === 'down') {
+        drawY = (r.y - auxPipeLen) + p.t * auxPipeLen;
+      } else if (aux.dir === 'up') {
+        drawY = r.y - p.t * auxPipeLen;
+      } else {
+        drawY = (r.y + r.h) + p.t * auxPipeLen * 0.6;
+      }
+    }
+
+    ovCtx.fillStyle = aux.color;
+    ovCtx.globalAlpha = fadeAlpha * (aux.dir === 'up' ? (0.7 * (1 - p.t * 0.6)) : 0.7);
+
+    if (aux.shape === 'square') {
+      // Draw as small square/box for bags, cases, pallets
+      const sz = p.r * 1.8;
+      ovCtx.fillRect(drawX - sz, drawY - sz, sz * 2, sz * 2);
+      ovCtx.strokeStyle = aux.color;
+      ovCtx.lineWidth = 0.5;
+      ovCtx.strokeRect(drawX - sz, drawY - sz, sz * 2, sz * 2);
+    } else if (aux.label === 'Steam' || aux.label === 'Heat Rejection') {
+      // Wispy circles for steam/heat
+      ovCtx.beginPath();
+      ovCtx.arc(drawX, drawY, p.r * 1.3, 0, Math.PI * 2);
+      ovCtx.fill();
+    } else {
+      ovCtx.beginPath();
+      ovCtx.arc(drawX, drawY, p.r, 0, Math.PI * 2);
+      ovCtx.fill();
+    }
+    ovCtx.globalAlpha = fadeAlpha;
+  });
+
+  // --- Animate particles along streams ---
+  ovParticles.forEach(p => {
+    p.t += p.speed * dt;
+    if (p.t > 1) p.t = 0;
+
+    const pos = getParticlePos(p, W, H);
+    ovCtx.fillStyle = p.color;
+    ovCtx.globalAlpha = fadeAlpha * 0.85;
+    ovCtx.beginPath();
+    ovCtx.arc(pos.x, pos.y, p.r, 0, Math.PI * 2);
+    ovCtx.fill();
+    ovCtx.globalAlpha = fadeAlpha;
+  });
+
+  ovCtx.restore();
+}
+
+// --- Stage 1: Raw Materials ---
+function onEnterRawMaterials() {
+  // Animate silo fill
+  setTimeout(() => {
+    const f1 = document.getElementById('silo1-fill');
+    const f2 = document.getElementById('silo2-fill');
+    if (f1) f1.style.transform = 'scaleY(1)';
+    if (f2) f2.style.transform = 'scaleY(1)';
+  }, 300);
+
+  // Show flow arrow
+  setTimeout(() => {
+    const a = document.getElementById('s1-arrow1');
+    if (a) a.classList.add('visible');
+  }, 1200);
+
+  revealCallout('s1c1', 1500);
+  revealCallout('s1c2', 2200);
+  revealCallout('s1c3', 3000);
+  revealCallout('s1c4', 3800);
+}
+
+// --- Stage 2: Mixing ---
+function onEnterMixing() {
+  revealCallout('s2c1', 600);
+  revealCallout('s2c2', 1400);
+  revealCallout('s2c3', 2400);
+  revealCallout('s2c4', 3400);
+}
+
+// --- Stage 3: Sheeting ---
+function onEnterSheeting() {
+  revealCallout('s3c1', 400);
+  revealCallout('s3c2', 1200);
+  revealCallout('s3c3', 2000);
+  revealCallout('s3c4', 2800);
+  revealCallout('s3c5', 4000);
+
+  // Pop chips
+  const delays = [800, 1000, 1200, 1800, 2200];
+  ['chip1','chip2','chip3','chip4','chip5'].forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('popped');
+    }, delays[i]);
+  });
+
+  // Show recycle arrow
+  setTimeout(() => {
+    const ra = document.getElementById('recycleArrow');
+    const rh = document.getElementById('recycleHead');
+    const rl = document.getElementById('recycleLabel');
+    if (ra) ra.classList.add('visible');
+    if (rh) { rh.style.transition='opacity 0.5s'; rh.style.opacity='1'; }
+    if (rl) { rl.style.transition='opacity 0.5s'; rl.style.opacity='1'; }
+  }, 4500);
+}
+
+// --- Stage 4: Frying ---
+function onEnterFrying() {
+  // Initialize fryer particles
+  fryerBubbles = [];
+  fryerChips = [];
+  fryerSteam = [];
+  initFryerParticles();
+
+  revealCallout('s4c1', 500);
+  revealCallout('s4c2', 1500);
+  revealCallout('s4c3', 2500);
+  revealCallout('s4c4', 4000);
+  revealCallout('s4c5', 5500);
+  revealCallout('s4c6', 7000);
+
+  // Animate heat bars
+  setTimeout(() => {
+    const hl = document.getElementById('hbar-latent');
+    const hs = document.getElementById('hbar-sens');
+    const hg = document.getElementById('hbar-loss');
+    if (hl) hl.style.width = '68%';
+    if (hs) hs.style.width = '17%';
+    if (hg) hg.style.width = '15%';
+  }, 3200);
+}
+
+// --- Stage 5: Cooling ---
+function onEnterCooling() {
+  coolingChips = [];
+  initCoolingChips();
+  revealCallout('s5c1', 500);
+  revealCallout('s5c2', 1500);
+  revealCallout('s5c3', 2500);
+  revealCallout('s5c4', 3500);
+}
+
+// --- Stage 6: Seasoning ---
+function onEnterSeasoning() {
+  revealCallout('s6c1', 600);
+  revealCallout('s6c2', 1600);
+  revealCallout('s6c3', 2600);
+  revealCallout('s6c4', 3600);
+}
+
+// --- Stage 7: Packaging ---
+function onEnterPackaging() {
+  revealCallout('s7c1', 500);
+  revealCallout('s7c2', 1300);
+  revealCallout('s7c3', 2100);
+  revealCallout('s7c4', 3100);
+  revealCallout('s7c5', 4100);
+  revealCallout('s7c6', 5100);
+}
+
+// --- Stage 8: Summary ---
+function onEnterSummary() {
+  const flow = document.getElementById('summaryFlow');
+  if (flow) flow.classList.add('visible');
+
+  ['m1','m2','m3','m4','m5','m6'].forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('visible');
+    }, 800 + i * 300);
+  });
+}
+
+// ============================================================
+// PER-FRAME STAGE UPDATES (canvas animations)
+// ============================================================
+function updateStage(idx, localT) {
+  if (idx === 1 && ovCtx) drawOverview(localT);
+  if (idx === 5 && fryCtx) drawFryer(localT);
+  if (idx === 6 && coolCtx) drawCooling(localT);
+}
+
+// ============================================================
+// FRYER CANVAS
+// ============================================================
+function initFryerParticles() {
+  const W = fryerCanvas.width, H = fryerCanvas.height;
+  // Chips on belt
+  for (let i = 0; i < 14; i++) {
+    fryerChips.push({
+      x: (i / 14) * (W - 80) + 40,
+      y: 155 + Math.sin(i * 1.3) * 8,
+      size: 8 + Math.random() * 6,
+      speed: 18 + Math.random() * 5,
+    });
+  }
+  // Bubbles
+  for (let i = 0; i < 40; i++) {
+    fryerBubbles.push(newBubble(W));
+  }
+  // Steam wisps
+  for (let i = 0; i < 12; i++) {
+    fryerSteam.push(newSteam(W));
+  }
+}
+
+function newBubble(W) {
+  return {
+    x: 50 + Math.random() * (W - 100),
+    y: 150 + Math.random() * 50,
+    r: 2 + Math.random() * 4,
+    speed: 20 + Math.random() * 40,
+    phase: Math.random() * Math.PI * 2,
+  };
+}
+
+function newSteam(W) {
+  return {
+    x: 60 + Math.random() * (W - 120),
+    y: 60,
+    vy: -(15 + Math.random() * 25),
+    vx: (Math.random() - 0.5) * 10,
+    life: 0,
+    maxLife: 1.5 + Math.random(),
+    size: 8 + Math.random() * 12,
+    phase: Math.random() * Math.PI * 2,
+  };
+}
+
+let fryerTime = 0;
+let lastFryerTs = null;
+
+function drawFryer(localT) {
+  const W = fryerCanvas.width, H = fryerCanvas.height;
+  const ctx = fryCtx;
+  const dt = 1/60; // approximate
+
+  fryerTime += dt;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Fryer vessel background
+  const grad = ctx.createLinearGradient(0, 60, 0, H - 20);
+  grad.addColorStop(0, '#1a0800');
+  grad.addColorStop(0.3, '#2a1200');
+  grad.addColorStop(1, '#1a0800');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.roundRect(30, 60, W - 60, H - 90, 8);
+  ctx.fill();
+
+  // Fryer border
+  ctx.strokeStyle = 'rgba(255,149,0,0.6)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(30, 60, W - 60, H - 90, 8);
+  ctx.stroke();
+
+  // Oil surface (wavy)
+  ctx.fillStyle = 'rgba(180, 100, 0, 0.25)';
+  ctx.beginPath();
+  ctx.moveTo(30, 120);
+  for (let x = 30; x <= W - 30; x += 4) {
+    const wave = Math.sin((x * 0.04) + fryerTime * 2) * 4 + Math.sin((x * 0.02) + fryerTime * 1.3) * 3;
+    ctx.lineTo(x, 120 + wave);
+  }
+  ctx.lineTo(W - 30, H - 30);
+  ctx.lineTo(30, H - 30);
+  ctx.closePath();
+  ctx.fill();
+
+  // Oil surface glow line
+  ctx.strokeStyle = 'rgba(255,149,0,0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let x = 30; x <= W - 30; x += 4) {
+    const wave = Math.sin((x * 0.04) + fryerTime * 2) * 4 + Math.sin((x * 0.02) + fryerTime * 1.3) * 3;
+    if (x === 30) ctx.moveTo(x, 120 + wave);
+    else ctx.lineTo(x, 120 + wave);
+  }
+  ctx.stroke();
+
+  // Mesh belt
+  ctx.strokeStyle = 'rgba(100,100,120,0.4)';
+  ctx.lineWidth = 1;
+  for (let x = 40; x < W - 40; x += 20) {
+    ctx.beginPath();
+    ctx.moveTo(x, 148);
+    ctx.lineTo(x, 168);
+    ctx.stroke();
+  }
+  ctx.beginPath();
+  ctx.moveTo(35, 148); ctx.lineTo(W - 35, 148); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(35, 168); ctx.lineTo(W - 35, 168); ctx.stroke();
+
+  // Chips on belt (moving right)
+  fryerChips.forEach(chip => {
+    chip.x += chip.speed * dt;
+    if (chip.x > W - 30) chip.x = 30;
+
+    ctx.save();
+    ctx.translate(chip.x, chip.y);
+    // Chip (triangle shape)
+    ctx.fillStyle = 'rgba(220,160,60,0.85)';
+    ctx.strokeStyle = 'rgba(200,130,40,0.6)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, -chip.size / 2);
+    ctx.lineTo(chip.size / 2, chip.size / 2);
+    ctx.lineTo(-chip.size / 2, chip.size / 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // Bubbles rising from chips
+  fryerBubbles.forEach(b => {
+    b.y -= b.speed * dt;
+    b.x += Math.sin(fryerTime * 1.5 + b.phase) * 0.8;
+    if (b.y < 115) {
+      // Pop! reset
+      b.y = 150 + Math.random() * 30;
+      b.x = 50 + Math.random() * (W - 100);
+      b.r = 2 + Math.random() * 4;
+    }
+
+    const alpha = Math.min(1, (150 - b.y) / 30);
+    ctx.strokeStyle = `rgba(200,200,255,${alpha * 0.7})`;
+    ctx.fillStyle = `rgba(200,220,255,${alpha * 0.08})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  // Steam plumes rising above oil
+  fryerSteam.forEach(s => {
+    s.life += dt;
+    if (s.life >= s.maxLife) {
+      Object.assign(s, newSteam(W));
+      s.life = 0;
+    }
+    const progress = s.life / s.maxLife;
+    const alpha = progress < 0.2 ? progress / 0.2 : 1 - (progress - 0.2) / 0.8;
+    const sy = s.y + s.vy * s.life;
+    const sx = s.x + s.vx * s.life;
+    const r = s.size * (0.5 + progress);
+
+    ctx.fillStyle = `rgba(200,210,255,${alpha * 0.12})`;
+    ctx.beginPath();
+    ctx.arc(sx, sy, r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Major steam arrow (top)
+  const steamAlpha = 0.7 + Math.sin(fryerTime * 2) * 0.3;
+  ctx.fillStyle = `rgba(180,200,255,${steamAlpha * 0.15})`;
+  ctx.strokeStyle = `rgba(180,200,255,${steamAlpha * 0.6})`;
+  ctx.lineWidth = 2;
+  // Arrow body
+  ctx.beginPath();
+  ctx.moveTo(W / 2 - 18, 60);
+  ctx.lineTo(W / 2 - 12, 20);
+  ctx.lineTo(W / 2 - 22, 20);
+  ctx.lineTo(W / 2, 0);
+  ctx.lineTo(W / 2 + 22, 20);
+  ctx.lineTo(W / 2 + 12, 20);
+  ctx.lineTo(W / 2 + 18, 60);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Steam label
+  ctx.fillStyle = `rgba(180,200,255,${steamAlpha})`;
+  ctx.font = 'bold 11px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('STEAM', W / 2, H - 40);
+  ctx.font = '10px system-ui, sans-serif';
+  ctx.fillText('111 lb/hr H₂O', W / 2, H - 25);
+
+  // Temperature display
+  const glow = 0.5 + Math.sin(fryerTime * 3) * 0.5;
+  ctx.fillStyle = `rgba(255, ${Math.floor(100 + glow * 50)}, 0, 0.9)`;
+  ctx.font = 'bold 20px system-ui, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('350°F', 38, 100);
+
+  // Oil recirculation indicator (bottom)
+  ctx.strokeStyle = 'rgba(255,149,0,0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.arc(W / 2, H - 15, 20, Math.PI, 0, false);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Entry arrow (left)
+  ctx.fillStyle = 'rgba(0,212,255,0.7)';
+  ctx.beginPath();
+  ctx.moveTo(30, 158);
+  ctx.lineTo(44, 152);
+  ctx.lineTo(44, 164);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = 'rgba(0,212,255,0.5)';
+  ctx.font = '9px system-ui, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('CHIPS IN', 5, 162);
+
+  // Exit arrow (right)
+  ctx.fillStyle = 'rgba(0,230,118,0.7)';
+  ctx.beginPath();
+  ctx.moveTo(W - 30, 158);
+  ctx.lineTo(W - 44, 152);
+  ctx.lineTo(W - 44, 164);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = 'rgba(0,230,118,0.5)';
+  ctx.font = '9px system-ui, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('CHIPS OUT', W - 5, 162);
+}
+
+// ============================================================
+// COOLING CANVAS
+// ============================================================
+function initCoolingChips() {
+  const W = coolingCanvas.width, H = coolingCanvas.height;
+  for (let i = 0; i < 20; i++) {
+    coolingChips.push({
+      x: (i / 20) * (W - 80) + 40,
+      y: 120,
+      size: 7 + Math.random() * 5,
+      speed: 12 + Math.random() * 4,
+      temp: 350 - (i / 20) * 235, // 350°F to 115°F across belt
+    });
+  }
+}
+
+let coolingTime = 0;
+
+function drawCooling(localT) {
+  const W = coolingCanvas.width, H = coolingCanvas.height;
+  const ctx = coolCtx;
+  const dt = 1/60;
+  coolingTime += dt;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Belt
+  const beltGrad = ctx.createLinearGradient(0, 100, W, 100);
+  beltGrad.addColorStop(0, 'rgba(255,50,0,0.12)');
+  beltGrad.addColorStop(0.5, 'rgba(255,149,0,0.08)');
+  beltGrad.addColorStop(1, 'rgba(0,212,255,0.05)');
+  ctx.fillStyle = beltGrad;
+  ctx.fillRect(20, 108, W - 40, 28);
+
+  ctx.strokeStyle = 'rgba(100,100,120,0.3)';
+  ctx.lineWidth = 1;
+  for (let x = 20; x <= W - 20; x += 16) {
+    ctx.beginPath();
+    ctx.moveTo(x, 108);
+    ctx.lineTo(x, 136);
+    ctx.stroke();
+  }
+  ctx.beginPath(); ctx.moveTo(20,108); ctx.lineTo(W-20,108); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(20,136); ctx.lineTo(W-20,136); ctx.stroke();
+
+  // Belt rollers
+  [25, W-25].forEach(cx => {
+    ctx.fillStyle = '#222244';
+    ctx.strokeStyle = 'rgba(0,212,255,0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(cx, 122, 14, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  // Chips moving (color goes from hot orange to cool cyan)
+  coolingChips.forEach(chip => {
+    chip.x += chip.speed * dt;
+    if (chip.x > W - 20) chip.x = 20;
+
+    // Temperature interpolation based on position
+    const progress = (chip.x - 20) / (W - 40);
+    const temp = 350 - progress * 235;
+
+    // Color: hot = orange/red, cool = cyan/blue
+    let r, g, b;
+    if (progress < 0.5) {
+      r = 255; g = Math.floor(50 + progress * 2 * 150); b = 0;
+    } else {
+      const p2 = (progress - 0.5) * 2;
+      r = Math.floor(255 * (1 - p2)); g = Math.floor(200 + p2 * 55); b = Math.floor(p2 * 255);
+    }
+
+    ctx.save();
+    ctx.translate(chip.x, 118);
+    ctx.fillStyle = `rgba(${r},${g},${b},0.85)`;
+    ctx.strokeStyle = `rgba(${r},${g},${b},0.4)`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, -chip.size/2);
+    ctx.lineTo(chip.size/2, chip.size/2);
+    ctx.lineTo(-chip.size/2, chip.size/2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    // Heat waves above hot chips (early section only)
+    if (progress < 0.4) {
+      const intensity = 1 - progress / 0.4;
+      for (let w = 0; w < 2; w++) {
+        const wy = 80 + Math.sin(coolingTime * 3 + chip.x * 0.1 + w) * 4;
+        ctx.strokeStyle = `rgba(255,100,0,${intensity * 0.2})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(chip.x - 8 + w * 8, 105);
+        ctx.bezierCurveTo(
+          chip.x - 4 + w * 4, 90,
+          chip.x + 4 + w * 4, 85,
+          chip.x + w * 6, wy
+        );
+        ctx.stroke();
+      }
+    }
+  });
+
+  // Direction arrow
+  ctx.fillStyle = 'rgba(0,230,118,0.6)';
+  ctx.beginPath();
+  ctx.moveTo(W - 30, 122);
+  ctx.lineTo(W - 45, 116);
+  ctx.lineTo(W - 45, 128);
+  ctx.closePath();
+  ctx.fill();
+
+  // Temperature gradient legend
+  const lgGrad = ctx.createLinearGradient(20, 0, W - 20, 0);
+  lgGrad.addColorStop(0, 'rgba(255,50,0,0.6)');
+  lgGrad.addColorStop(0.5, 'rgba(255,149,0,0.4)');
+  lgGrad.addColorStop(1, 'rgba(0,212,255,0.5)');
+  ctx.fillStyle = lgGrad;
+  ctx.fillRect(20, 155, W - 40, 6);
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(20, 155, W - 40, 6);
+
+  ctx.fillStyle = 'rgba(255,80,0,0.9)';
+  ctx.font = 'bold 12px system-ui, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('350°F', 20, 178);
+
+  ctx.fillStyle = 'rgba(0,212,255,0.9)';
+  ctx.textAlign = 'right';
+  ctx.fillText('115°F', W - 20, 178);
+
+  ctx.fillStyle = 'rgba(200,200,200,0.5)';
+  ctx.font = '10px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('COOLING DIRECTION →', W / 2, 195);
+
+  // Thermometer graphic
+  const thermX = W / 2;
+  const thermY = 60;
+  const tempProgress = Math.min(1, localT / 7);
+  const curTemp = 350 - tempProgress * 235;
+  const normTemp = (curTemp - 115) / (350 - 115);
+
+  // Thermometer body
+  ctx.fillStyle = '#111130';
+  ctx.strokeStyle = 'rgba(200,200,200,0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.roundRect(thermX - 6, 20, 12, 70, 6);
+  ctx.fill();
+  ctx.stroke();
+
+  // Thermometer fill
+  const fillH = 64 * normTemp;
+  const fillColor = normTemp > 0.5 ? `rgba(255,${Math.floor(100*(1-normTemp))},0,0.9)` : `rgba(0,${Math.floor(100+155*normTemp)},255,0.9)`;
+  const tGrad = ctx.createLinearGradient(0, 90 - fillH, 0, 90);
+  tGrad.addColorStop(0, normTemp > 0.5 ? 'rgba(255,100,0,0.9)' : 'rgba(0,180,255,0.9)');
+  tGrad.addColorStop(1, normTemp > 0.5 ? 'rgba(255,0,0,0.9)' : 'rgba(0,100,255,0.9)');
+  ctx.fillStyle = tGrad;
+  ctx.beginPath();
+  ctx.roundRect(thermX - 5, 90 - fillH, 10, fillH, 4);
+  ctx.fill();
+
+  // Bulb
+  ctx.fillStyle = normTemp > 0.5 ? 'rgba(255,50,0,0.9)' : 'rgba(0,150,255,0.9)';
+  ctx.beginPath();
+  ctx.arc(thermX, 94, 10, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.font = 'bold 14px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(Math.round(curTemp) + '°F', thermX, 12);
+}
+
+// ============================================================
+// PROGRESS BAR CLICK
+// ============================================================
+progTrack.addEventListener('click', e => {
+  const rect = progTrack.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  seekTo(pct * TOTAL);
+});
+
+// ============================================================
+// PLAY BUTTON
+// ============================================================
+playBtn.addEventListener('click', () => setPlaying(!playing));
+
+// SPACEBAR
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' && e.target === document.body) {
+    e.preventDefault();
+    setPlaying(!playing);
+  }
+});
+
+// ============================================================
+// INIT
+// ============================================================
+buildMarkers();
+updateUI();
+// Auto-start after brief pause
+setTimeout(() => setPlaying(true), 800);
+
+// Keep canvas animations running even when paused (for active stage)
+function alwaysDraw() {
+  if (!playing && currentStageIdx >= 0) {
+    const localT = currentTime - STAGES[currentStageIdx].start;
+    updateStage(currentStageIdx, localT);
+  }
+  requestAnimationFrame(alwaysDraw);
+}
+requestAnimationFrame(alwaysDraw);
+
+</script>
+</body>
+</html>

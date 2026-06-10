@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghost Sashiko Weaver</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a1a;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    color: #ccc;
+  }
+  #canvas-container {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+  }
+  #ui {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: rgba(10, 10, 30, 0.85);
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    z-index: 10;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  #ui label { font-size: 12px; color: #aaa; }
+  #ui input[type="text"] {
+    background: #111;
+    border: 1px solid #444;
+    color: #ddd;
+    padding: 4px 8px;
+    font-family: inherit;
+    font-size: 13px;
+    width: 240px;
+    border-radius: 4px;
+  }
+  #ui button {
+    background: #1a237e;
+    border: 1px solid #333;
+    color: #ccc;
+    padding: 5px 14px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  #ui button:hover { background: #283593; }
+  #status {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    font-size: 12px;
+    color: #888;
+    z-index: 10;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div id="canvas-container"></div>
+<div id="status">Ghost Sashiko Weaver — stitch <span id="stitch-count">0</span> / <span id="total-stitches">0</span></div>
+<div id="ui">
+  <label>h:</label>
+  <input type="text" id="h-input" value="10101010101010101010101010" />
+  <label>v:</label>
+  <input type="text" id="v-input" value="01010101010101010101010101" />
+  <button id="rand-btn">Random</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  /* =========================================================
+     Ashima Arts 2D Simplex Noise (standard implementation)
+     ========================================================= */
+  const simplexShaderChunk = `
+    vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+    vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+    vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+    float snoise(vec2 v) {
+      const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+                          -0.577350269189626, 0.024390243902439);
+      vec2 i  = floor(v + dot(v, C.yy));
+      vec2 x0 = v -   i + dot(i, C.xx);
+      vec2 i1;
+      i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+      vec4 x12 = x0.xyxy + C.xxzz;
+      x12.xy -= i1;
+      i = mod289(i);
+      vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
+        + i.x + vec3(0.0, i1.x, 1.0 ));
+      vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+      m = m*m;
+      m = m*m;
+      vec3 x = 2.0 * fract(p * C.www) - 1.0;
+      vec3 h = abs(x) - 0.5;
+      vec3 ox = floor(x + 0.5);
+      vec3 a0 = x - ox;
+      m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+      vec3 g;
+      g.x  = a0.x  * x0.x  + h.x  * x0.y;
+      g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+      return 130.0 * dot(m, g);
+    }
+  `;
+
+  /* =========================================================
+     Post-process fragment shader
+     ========================================================= */
+  const postFrag = `
+    precision mediump float;
+    uniform sampler2D tDiffuse;
+    uniform vec2 uResolution;
+    uniform float uTime;
+    uniform vec2 uMouse;
+    varying vec2 vUv;
+
+    ${simplexShaderChunk}
+
+    void main() {
+      vec2 uv = vUv;
+
+      // Simplex noise UV perturbation
+      float n1 = snoise(uv * 3.0 + uTime * 0.15);
+      float n2 = snoise(uv * 3.0 + uTime * 0.15 + 10.0);
+      uv += vec2(n1, n2) * 0.003;
+
+      // Mouse bias (pull toward cursor)
+      vec2 mouseUV = uMouse / uResolution;
+      vec2 toMouse = mouseUV - uv;
+      float mouseDist = length(toMouse);
+      uv += toMouse * 0.002 * smoothstep(0.5, 0.0, mouseDist);
+
+      vec4 col = texture2D(tDiffuse, uv);
+
+      // Frayed-edge decay: center 0.97, edge 0.99
+      vec2 center = abs(uv - 0.5) * 2.0;
+      float edge = max(center.x, center.y);
+      float decay = mix(0.97, 0.99, smoothstep(0.0, 1.0, edge));
+      col.rgb *= decay;
+
+      gl_FragColor = col;
+    }
+  `;
+
+  const postVert = `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `;
+
+  /* =========================================================
+     Globals
+     ========================================================= */
+  const STITCH = 20;
+  const LEADING = 80;
+  const MARGIN = 44;
+  const GRID = 28;
+  const CANVAS_SIZE = 800;
+  const AUDIO_EVERY = 8;
+
+  let scene, camera, renderer;
+  let fabricMesh, stitchMesh;
+  let stitchCanvas, stitchCtx, stitchTexture;
+  let rtA, rtB, postScene, postCamera, postMaterial;
+  let mouseX = 0, mouseY = 0;
+  let clock = new THREE.Clock();
+
+  let hStr = '10101010101010101010101010';
+  let vStr = '01010101010101010101010101';
+  let stitchQueue = [];
+  let currentStitch = 0;
+  let isPaused = false;
+  let pauseTimer = 0;
+  let audioCtx = null;
+
+  const hInput = document.getElementById('h-input');
+  const vInput = document.getElementById('v-input');
+  const randBtn = document.getElementById('rand-btn');
+  const countEl = document.getElementById('stitch-count');
+  const totalEl = document.getElementById('total-stitches');
+
+  /* =========================================================
+     Init
+     ========================================================= */
+  function init() {
+    const container = document.getElementById('canvas-container');
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    renderer = new THREE.WebGLRenderer({ antialias: false });
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.autoClearColor = false;
+    container.appendChild(renderer.domElement);
+
+    scene = new THREE.Scene();
+
+    const aspect = w / h;
+    const viewSize = 900;
+    camera = new THREE.OrthographicCamera(
+      -viewSize * aspect, viewSize * aspect,
+      viewSize, -viewSize,
+      0.1, 1000
+    );
+    camera.position.z = 10;
+
+    // Fabric background mesh at z = -0.1
+    const fabricTexture = makeFabricTexture();
+    const fabricGeo = new THREE.PlaneBufferGeometry(CANVAS_SIZE * 1.2, CANVAS_SIZE * 1.2);
+    const fabricMat = new THREE.MeshBasicMaterial({ map: fabricTexture });
+    fabricMesh = new THREE.Mesh(fabricGeo, fabricMat);
+    fabricMesh.position.z = -0.1;
+    scene.add(fabricMesh);
+
+    // Stitch mesh (canvas texture)
+    stitchCanvas = document.createElement('canvas');
+    stitchCanvas.width = CANVAS_SIZE;
+    stitchCanvas.height = CANVAS_SIZE;
+    stitchCtx = stitchCanvas.getContext('2d');
+    clearStitchCanvas();
+
+    stitchTexture = new THREE.CanvasTexture(stitchCanvas);
+    stitchTexture.minFilter = THREE.LinearFilter;
+    stitchTexture.magFilter = THREE.LinearFilter;
+
+    const stitchGeo = new THREE.PlaneBufferGeometry(CANVAS_SIZE, CANVAS_SIZE);
+    const stitchMat = new THREE.MeshBasicMaterial({
+      map: stitchTexture,
+      transparent: true,
+      opacity: 0.95,
+      blending: THREE.NormalBlending
+    });
+    stitchMesh = new THREE.Mesh(stitchGeo, stitchMat);
+    stitchMesh.position.z = 0;
+    scene.add(stitchMesh);
+
+    // Post-processing render targets
+    rtA = new THREE.WebGLRenderTarget(w, h, {
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      format: THREE.RGBAFormat,
+      type: THREE.UnsignedByteType
+    });
+    rtB = new THREE.WebGLRenderTarget(w, h, {
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      format: THREE.RGBAFormat,
+      type: THREE.UnsignedByteType
+    });
+
+    // Post-processing quad
+    postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    postScene = new THREE.Scene();
+    postMaterial = new THREE.ShaderMaterial({
+      vertexShader: postVert,
+      fragmentShader: postFrag,
+      uniforms: {
+        tDiffuse: { value: null },
+        uResolution: { value: new THREE.Vector2(w, h) },
+        uTime: { value: 0 },
+        uMouse: { value: new THREE.Vector2(0, 0) }
+      }
+    });
+    const postQuad = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), postMaterial);
+    postScene.add(postQuad);
+
+    // Events
+    window.addEventListener('resize', onResize);
+    document.addEventListener('mousemove', onMouseMove);
+    hInput.addEventListener('change', onInputChange);
+    vInput.addEventListener('change', onInputChange);
+    hInput.addEventListener('keyup', onInputChange);
+    vInput.addEventListener('keyup', onInputChange);
+    randBtn.addEventListener('click', randomizeInputs);
+
+    buildStitchQueue();
+    animate();
+  }
+
+  /* =========================================================
+     Fabric texture (Canvas 2D noise: #1A237E + #00008B)
+     ========================================================= */
+  function makeFabricTexture() {
+    const c = document.createElement('canvas');
+    c.width = 512;
+    c.height = 512;
+    const ctx = c.getContext('2d');
+
+    // Base fill
+    ctx.fillStyle = '#1A237E';
+    ctx.fillRect(0, 0, 512, 512);
+
+    // Noise rectangles
+    for (let i = 0; i < 6000; i++) {
+      const x = Math.random() * 512;
+      const y = Math.random() * 512;
+      const w = 1 + Math.random() * 4;
+      const h = 1 + Math.random() * 3;
+      ctx.fillStyle = Math.random() > 0.5 ? '#1A237E' : '#00008B';
+      ctx.globalAlpha = 0.3 + Math.random() * 0.4;
+      ctx.fillRect(x, y, w, h);
+    }
+    ctx.globalAlpha = 1.0;
+
+    // Cross-hatch weave lines
+    ctx.strokeStyle = '#00008B';
+    ctx.globalAlpha = 0.15;
+    for (let i = 0; i < 512; i += 3) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, 512);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(512, i);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1.0;
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(2, 2);
+    return tex;
+  }
+
+  /* =========================================================
+     Stitch queue generation
+     ========================================================= */
+  function buildStitchQueue() {
+    stitchQueue = [];
+    const hBits = padBinary(hInput.value, GRID);
+    const vBits = padBinary(vInput.value, GRID);
+
+    for (let row = 0; row < GRID; row++) {
+      for (let col = 0; col < GRID; col++) {
+        const hOffset = (hBits[col] === '1') ? STITCH : 0;
+        const vOffset = (vBits[row] === '1') ? STITCH : 0;
+
+        const baseX = MARGIN + col * LEADING;
+        const baseY = MARGIN + row * LEADING;
+
+        // Horizontal stitch (row line, offset by h bit)
+        stitchQueue.push({
+          x1: baseX + hOffset,
+          y1: baseY,
+          x2: baseX + hOffset + STITCH,
+          y2: baseY,
+          type: 'h'
+        });
+
+        // Vertical stitch (column line, offset by v bit)
+        stitchQueue.push({
+          x1: baseX,
+          y1: baseY + vOffset,
+          x2: baseX,
+          y2: baseY + vOffset + STITCH,
+          type: 'v'
+        });
+      }
+    }
+
+    currentStitch = 0;
+    isPaused = false;
+    pauseTimer = 0;
+    totalEl.textContent = stitchQueue.length;
+    countEl.textContent = 0;
+    clearStitchCanvas();
+  }
+
+  function padBinary(str, len) {
+    let s = str.replace(/[^01]/g, '');
+    if (s.length < len) s = s + s.repeat(Math.ceil(len / s.length));
+    return s.slice(0, len);
+  }
+
+  function clearStitchCanvas() {
+    stitchCtx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  }
+
+  /* =========================================================
+     Audio
+     ========================================================= */
+  function playNeedleClick() {
+    if (!audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      audioCtx = new AudioContext();
+    }
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1200, now);
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.005);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.005);
+  }
+
+  /* =========================================================
+     Drawing
+     ========================================================= */
+  function drawNextStitch() {
+    if (stitchQueue.length === 0) return;
+    const s = stitchQueue[currentStitch];
+
+    stitchCtx.strokeStyle = 'rgba(220, 220, 235, 0.85)';
+    stitchCtx.lineWidth = 1.5;
+    stitchCtx.lineCap = 'round';
+    stitchCtx.beginPath();
+    stitchCtx.moveTo(s.x1, s.y1);
+    stitchCtx.lineTo(s.x2, s.y2);
+    stitchCtx.stroke();
+
+    // Subtle glow
+    stitchCtx.strokeStyle = 'rgba(220, 220, 235, 0.12)';
+    stitchCtx.lineWidth = 4;
+    stitchCtx.beginPath();
+    stitchCtx.moveTo(s.x1, s.y1);
+    stitchCtx.lineTo(s.x2, s.y2);
+    stitchCtx.stroke();
+
+    stitchTexture.needsUpdate = true;
+
+    currentStitch++;
+    countEl.textContent = currentStitch;
+
+    if (currentStitch % AUDIO_EVERY === 0) {
+      playNeedleClick();
+    }
+  }
+
+  /* =========================================================
+     Auto-loop & randomization
+     ========================================================= */
+  function shuffleQueue() {
+    for (let i = stitchQueue.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [stitchQueue[i], stitchQueue[j]] = [stitchQueue[j], stitchQueue[i]];
+    }
+  }
+
+  function onPatternComplete() {
+    isPaused = true;
+    pauseTimer = 3.0; // 3 seconds
+  }
+
+  function restartPattern() {
+    shuffleQueue();
+    currentStitch = 0;
+    isPaused = false;
+    pauseTimer = 0;
+    countEl.textContent = 0;
+    clearStitchCanvas();
+  }
+
+  /* =========================================================
+     UI handlers
+     ========================================================= */
+  function onInputChange() {
+    hStr = hInput.value;
+    vStr = vInput.value;
+    buildStitchQueue();
+  }
+
+  function randomizeInputs() {
+    let h = '', v = '';
+    for (let i = 0; i < GRID; i++) {
+      h += Math.random() > 0.5 ? '1' : '0';
+      v += Math.random() > 0.5 ? '1' : '0';
+    }
+    hInput.value = h;
+    vInput.value = v;
+    onInputChange();
+  }
+
+  function onResize() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    renderer.setSize(w, h);
+    const aspect = w / h;
+    const viewSize = 900;
+    camera.left = -viewSize * aspect;
+    camera.right = viewSize * aspect;
+    camera.top = viewSize;
+    camera.bottom = -viewSize;
+    camera.updateProjectionMatrix();
+
+    rtA.setSize(w, h);
+    rtB.setSize(w, h);
+    postMaterial.uniforms.uResolution.value.set(w, h);
+  }
+
+  function onMouseMove(e) {
+    mouseX = e.clientX;
+    mouseY = window.innerHeight - e.clientY;
+  }
+
+  /* =========================================================
+     Animation loop
+     ========================================================= */
+  function animate() {
+    requestAnimationFrame(animate);
+
+    const dt = clock.getDelta();
+    const time = clock.getElapsedTime();
+
+    // Handle pause / auto-loop
+    if (isPaused) {
+      pauseTimer -= dt;
+      if (pauseTimer <= 0) {
+        restartPattern();
+      }
+    } else if (currentStitch < stitchQueue.length) {
+      drawNextStitch();
+    } else {
+      onPatternComplete();
+    }
+
+    // Update post uniforms
+    postMaterial.uniforms.uTime.value = time;
+    postMaterial.uniforms.uMouse.value.set(mouseX, mouseY);
+
+    // Render scene to first RT
+    renderer.setRenderTarget(rtA);
+    renderer.render(scene, camera);
+
+    // Ping-pong post-processing
+    let read = rtA;
+    let write = rtB;
+
+    postMaterial.uniforms.tDiffuse.value = read.texture;
+    renderer.setRenderTarget(write);
+    renderer.render(postScene, postCamera);
+
+    // Final blit to screen
+    renderer.setRenderTarget(null);
+    renderer.render(postScene, postCamera);
+
+    // Swap
+    const tmp = rtA;
+    rtA = rtB;
+    rtB = tmp;
+  }
+
+  /* =========================================================
+     Start
+     ========================================================= */
+  init();
+})();
+</script>
+</body>
+</html>

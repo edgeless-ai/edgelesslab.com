@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scroll-Driven Isometric Dissolution</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: #0A0A0A;
+    color: #FFFFFF;
+    overflow-x: hidden;
+  }
+
+  /* ============================================================
+     SCROLL WRAPPER
+     Creates a 500vh tall scrollable area so the user can drive
+     the dissolution effect by scrolling down the page.
+     ============================================================ */
+  .scroll-wrapper {
+    height: 500vh;
+    position: relative;
+  }
+
+  /* ============================================================
+     VIEWPORT
+     Fixed at the center of the screen so the 3D scene stays
+     visible while the user scrolls through the tall wrapper.
+     ============================================================ */
+  .viewport {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* The SVG filter is applied here so it dissolves the entire
+       rendered 3D scene into turbulent chromatic noise. */
+    filter: url(#dissolveFilter);
+  }
+
+  /* ============================================================
+     SCENE
+     3D container with transform-style: preserve-3d and the
+     isometric orthographic projection: rotateX(55deg) rotateZ(45deg).
+     ============================================================ */
+  .scene {
+    position: relative;
+    transform-style: preserve-3d;
+    /* Isometric camera angle — Bees & Bombs orthographic look */
+    transform: rotateX(55deg) rotateZ(45deg);
+  }
+
+  /* ============================================================
+     CUBE
+     Each cube is a 48px × 48px × 48px hollow wireframe.
+     Positioned absolutely within the scene grid.
+     ============================================================ */
+  .cube {
+    position: absolute;
+    transform-style: preserve-3d;
+    width: 48px;
+    height: 48px;
+    backface-visibility: visible;
+  }
+
+  /* ============================================================
+     EDGE
+     Wireframe edges are 1px solid white (#FFFFFF) lines.
+     Each edge is a <div> positioned with 3D transforms.
+     transform-origin: 0 0 ensures rotation happens at the edge
+     starting point so the cube stays closed.
+     ============================================================ */
+  .edge {
+    position: absolute;
+    background: #FFFFFF;
+    transform-origin: 0 0;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  /* Edge oriented along the X axis */
+  .edge-x {
+    width: 48px;
+    height: 1px;
+  }
+
+  /* Edge oriented along the Y axis (rotated into place) */
+  .edge-y {
+    width: 1px;
+    height: 48px;
+  }
+
+  /* Edge oriented along the Z axis (rotated into place) */
+  .edge-z {
+    width: 48px;
+    height: 1px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SVG FILTER CHAIN
+     This hidden SVG defines the dissolution effect applied to the
+     entire viewport via CSS filter: url(#dissolveFilter).
+
+     The filter chain:
+     1. feTurbulence — generates fractal noise (baseFrequency driven
+        by scroll progress, giving a viscous fluid dissolution).
+     2. Three feDisplacementMap branches — one per RGB channel,
+        each with a different scale, creating chromatic aberration.
+     3. feColorMatrix — extracts the single channel from each branch.
+     4. feBlend (screen mode) — merges the RGB fringes.
+     5. feGaussianBlur — progressively blurs the scene to nothing.
+     ============================================================ -->
+<svg style="position: absolute; width: 0; height: 0;">
+  <defs>
+    <filter id="dissolveFilter" x="-50%" y="-50%" width="200%" height="200%">
+      <!-- Turbulent noise — baseFrequency interpolates 0.01 → 0.08 via scroll -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" result="noise" />
+
+      <!-- Red channel: displaced by scrollProgress * 60 -->
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" result="redDisplaced" />
+      <feColorMatrix in="redDisplaced" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red" />
+
+      <!-- Green channel: displaced by scrollProgress * 55 -->
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" result="greenDisplaced" />
+      <feColorMatrix in="greenDisplaced" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green" />
+
+      <!-- Blue channel: displaced by scrollProgress * 50 -->
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" result="blueDisplaced" />
+      <feColorMatrix in="blueDisplaced" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue" />
+
+      <!-- Merge RGB channels with screen blend mode -->
+      <feBlend in="red" in2="green" mode="screen" result="rg" />
+      <feBlend in="rg" in2="blue" mode="screen" result="rgb" />
+
+      <!-- Gaussian blur — stdDeviation interpolates 0 → 6 via scroll -->
+      <feGaussianBlur in="rgb" stdDeviation="0" result="blur" />
+    </filter>
+  </defs>
+</svg>
+
+<div class="scroll-wrapper">
+  <div class="viewport">
+    <div class="scene" id="scene"></div>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // CONFIGURATION
+  // ============================================================
+  const GRID_SIZE = 7;      // 7 × 7 isometric grid
+  const CUBE_SIZE = 48;     // 48 px cube edge length
+  const SPACING = 72;       // 72 px center-to-center spacing
+  const LOOP_PERIOD = 4;    // 4-second loop period
+  const T = 120;            // 120 frames at 30 fps reference
+
+  // ============================================================
+  // PIXEL-ART BITMAP: "HELLO"
+  //
+  // The center 5 columns of the 7×7 grid spell HELLO using a
+  // stylized 1-column-per-letter pixel font. The outer columns
+  // (0 and 6) are always visible as a decorative frame.
+  //
+  // Letter patterns (1 = visible cube, 0 = hidden):
+  //   H = [1,1,1,1,1,1,1]  (full vertical bar)
+  //   E = [1,0,0,1,0,0,1]  (top, middle, bottom bars)
+  //   L = [1,1,1,1,1,1,0]  (full bar, missing bottom)
+  //   L = [1,1,1,1,1,1,0]  (same)
+  //   O = [0,1,1,1,1,1,0]  (hollow — missing top & bottom)
+  // ============================================================
+  const visibilityMap = [
+    // col: 0  1  2  3  4  5  6
+    [    1, 1, 1, 1, 1, 0, 1 ], // Row 0
+    [    1, 1, 0, 1, 1, 1, 1 ], // Row 1
+    [    1, 1, 0, 1, 1, 1, 1 ], // Row 2
+    [    1, 1, 1, 1, 1, 1, 1 ], // Row 3
+    [    1, 1, 0, 1, 1, 1, 1 ], // Row 4
+    [    1, 1, 0, 1, 1, 1, 1 ], // Row 5
+    [    1, 1, 1, 0, 0, 0, 1 ], // Row 6
+  ];
+
+  // ============================================================
+  // SCENE CONSTRUCTION
+  // ============================================================
+  const scene = document.getElementById('scene');
+  const half = CUBE_SIZE / 2;
+  const cubes = [];
+
+  /**
+   * Create a hollow wireframe cube with 12 edge <div>s.
+   *
+   * A cube has 8 vertices and 12 edges. We build it from 12
+   * 1px divs, each positioned with translate3d() and rotated
+   * into the correct axis (X, Y, or Z).
+   *
+   * Front face (z = +half): 4 edges
+   * Back face  (z = -half): 4 edges
+   * Connecting (along Z):   4 edges
+   */
+  function createCube(x, y, phase) {
+    const cube = document.createElement('div');
+    cube.className = 'cube';
+
+    // Helper: create a single edge div
+    function edge(cls, px, py, pz, rot = '') {
+      const el = document.createElement('div');
+      el.className = 'edge ' + cls;
+      let t = `translate3d(${px}px, ${py}px, ${pz}px)`;
+      if (rot) t += ' ' + rot;
+      el.style.transform = t;
+      return el;
+    }
+
+    // --- Front face (z = +half) ---
+    cube.appendChild(edge('edge-x', -half,  half,  half));        // bottom
+    cube.appendChild(edge('edge-x', -half, -half,  half));        // top
+    cube.appendChild(edge('edge-y', -half, -half,  half, 'rotateZ(90deg)'));  // left
+    cube.appendChild(edge('edge-y',  half, -half,  half, 'rotateZ(90deg)'));  // right
+
+    // --- Back face (z = -half) ---
+    cube.appendChild(edge('edge-x', -half,  half, -half));        // bottom
+    cube.appendChild(edge('edge-x', -half, -half, -half));        // top
+    cube.appendChild(edge('edge-y', -half, -half, -half, 'rotateZ(90deg)'));  // left
+    cube.appendChild(edge('edge-y',  half, -half, -half, 'rotateZ(90deg)'));  // right
+
+    // --- Connecting edges (along Z, rotated into place) ---
+    cube.appendChild(edge('edge-z', -half,  half,  half, 'rotateY(90deg)'));  // bottom-left
+    cube.appendChild(edge('edge-z',  half,  half,  half, 'rotateY(90deg)'));  // bottom-right
+    cube.appendChild(edge('edge-z', -half, -half,  half, 'rotateY(90deg)'));  // top-left
+    cube.appendChild(edge('edge-z',  half, -half,  half, 'rotateY(90deg)'));  // top-right
+
+    // Store cube data for animation loop
+    cubes.push({ element: cube, x, y, phase });
+    scene.appendChild(cube);
+  }
+
+  // Generate the 7×7 grid — only visible cubes are created
+  for (let j = 0; j < GRID_SIZE; j++) {
+    for (let i = 0; i < GRID_SIZE; i++) {
+      if (visibilityMap[j][i]) {
+        const x = (i - 3) * SPACING;
+        const y = (j - 3) * SPACING;
+        // Phase offset: φ = (i + j * 7) / 49 (fraction of loop period)
+        const phase = (i + j * GRID_SIZE) / (GRID_SIZE * GRID_SIZE);
+        createCube(x, y, phase);
+      }
+    }
+  }
+
+  // ============================================================
+  // SCROLL TRACKING WITH LERP
+  //
+  // targetScrollProgress  = raw scroll position clamped to [0,1]
+  // currentScrollProgress = lerped value (viscous, fluid feel)
+  // ============================================================
+  let targetScrollProgress = 0;
+  let currentScrollProgress = 0;
+  let lastScrollProgress = -1; // sentinel to force first-frame update
+
+  window.addEventListener('scroll', () => {
+    const maxScroll = document.body.scrollHeight - window.innerHeight;
+    if (maxScroll > 0) {
+      targetScrollProgress = Math.max(0, Math.min(1, window.scrollY / maxScroll));
+    }
+  });
+
+  // ============================================================
+  // FILTER ELEMENT REFERENCES
+  // ============================================================
+  const turbulence = document.querySelector('feTurbulence');
+  const dispMaps = document.querySelectorAll('feDisplacementMap');
+  const redDisp = dispMaps[0];
+  const greenDisp = dispMaps[1];
+  const blueDisp = dispMaps[2];
+  const blur = document.querySelector('feGaussianBlur');
+
+  // ============================================================
+  // ANIMATION LOOP
+  // ============================================================
+  function animate() {
+    // --- Global time loop ---
+    // t = (frame % 120) / 120  at 30fps
+    const elapsed = performance.now() / 1000;
+    const frame = elapsed * 30;
+    const t = (frame % T) / T;
+
+    // --- Update each cube's rotation with phase offset ---
+    // rotateX(90° * sin((t + φ) * 2π)) and
+    // rotateZ(90° * cos((t + φ) * 2π))
+    cubes.forEach(({ element, x, y, phase }) => {
+      const localT = (t + phase) % 1;
+      const angleX = 90 * Math.sin(localT * 2 * Math.PI);
+      const angleZ = 90 * Math.cos(localT * 2 * Math.PI);
+      // Combine base position + live rotation in one transform
+      element.style.transform =
+        `translate3d(${x}px, ${y}px, 0) rotateX(${angleX}deg) rotateZ(${angleZ}deg)`;
+    });
+
+    // --- Lerp scroll progress for smooth filter transitions ---
+    currentScrollProgress += (targetScrollProgress - currentScrollProgress) * 0.1;
+
+    // Only update SVG filter attributes when progress changes enough to matter.
+    // This avoids layout thrashing from setAttribute on every frame.
+    if (Math.abs(currentScrollProgress - lastScrollProgress) > 0.001) {
+      lastScrollProgress = currentScrollProgress;
+
+      // --- Drive filter parameters from lerped scroll ---
+      // baseFrequency: 0.01 → 0.08
+      const bf = 0.01 + currentScrollProgress * 0.07;
+      turbulence.setAttribute('baseFrequency', bf.toFixed(4));
+
+      // RGB displacement scales (chromatic aberration)
+      redDisp.setAttribute('scale', (currentScrollProgress * 60).toFixed(2));
+      greenDisp.setAttribute('scale', (currentScrollProgress * 55).toFixed(2));
+      blueDisp.setAttribute('scale', (currentScrollProgress * 50).toFixed(2));
+
+      // Gaussian blur: 0 → 6
+      blur.setAttribute('stdDeviation', (currentScrollProgress * 6).toFixed(2));
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  // Kick off the render loop
+  requestAnimationFrame(animate);
+</script>
+
+</body>
+</html>

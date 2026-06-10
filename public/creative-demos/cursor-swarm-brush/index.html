@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noise-Shared Cursor Swarm Brush</title>
+<style>
+  /* Reset and full-screen canvas */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    background: #0A0A0A;
+    overflow: hidden;
+    cursor: none; /* hide default cursor for immersive feel */
+  }
+  canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+  }
+  /* Minimal UI hint */
+  #hint {
+    position: absolute;
+    bottom: 12px; left: 12px;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hint">MOVE to herd · FAST to shed · SCROLL to breathe · DOUBLE-CLICK to save</div>
+<script>
+/* ============================================================
+   Noise-Shared Cursor Swarm Brush
+   ============================================================
+   A Canvas 2D implementation of the Prompt 3 concept:
+   - Recursive geometric subdivision background (Manoloide-style)
+   - Shared 2D simplex noise field displaces tile vertices
+   - Cursor-following particle swarm (Raven Kwok-style) lerp-tracks mouse
+   - Fast movement "sheds" particles that stain tiles
+   - Stains are transient (5s lock) before reverting to adjacency harmony
+   - Scroll shifts noise seed; double-click exports PNG
+   ============================================================ */
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+// --- Palette -------------------------------------------------
+const PALETTE = [
+  '#0A0A0A',   // Deep void
+  '#0A192F',   // Navy depth
+  '#7B2D8E',   // Royal purple
+  '#FF00FF',   // Magenta
+  '#FFD700',   // Gold
+  '#00FFFF',   // Cyan
+  '#FF6B6B',   // Coral
+  '#FFFFFF'    // White
+];
+const PALETTE_RGB = PALETTE.map(hex => {
+  const v = parseInt(hex.slice(1), 16);
+  return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
+});
+
+// --- Simplex Noise (lightweight inline implementation) -------
+// Based on standard 2D simplex noise using permutations
+const F2 = 0.5 * (Math.sqrt(3) - 1);
+const G2 = (3 - Math.sqrt(3)) / 6;
+const P = new Uint8Array(512);
+const perm = new Uint8Array(256);
+for (let i = 0; i < 256; i++) perm[i] = i;
+function seedNoise(s) {
+  let seed = s;
+  const rand = () => {
+    seed = (seed * 16807 + 0) % 2147483647;
+    return (seed / 2147483647);
+  };
+  for (let i = 255; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [perm[i], perm[j]] = [perm[j], perm[i]];
+  }
+  for (let i = 0; i < 512; i++) P[i] = perm[i & 255];
+}
+const grad3 = [
+  [1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],
+  [1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],
+  [0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]
+];
+function noise2D(x, y) {
+  let n0, n1, n2;
+  let s = (x + y) * F2;
+  let i = Math.floor(x + s);
+  let j = Math.floor(y + s);
+  let t = (i + j) * G2;
+  let X0 = i - t;
+  let Y0 = j - t;
+  let x0 = x - X0;
+  let y0 = y - Y0;
+  let i1, j1;
+  if (x0 > y0) { i1 = 1; j1 = 0; } else { i1 = 0; j1 = 1; }
+  let x1 = x0 - i1 + G2;
+  let y1 = y0 - j1 + G2;
+  let x2 = x0 - 1 + 2 * G2;
+  let y2 = y0 - 1 + 2 * G2;
+  let ii = i & 255;
+  let jj = j & 255;
+  let gi0 = P[ii + P[jj]] % 12;
+  let gi1 = P[ii + i1 + P[jj + j1]] % 12;
+  let gi2 = P[ii + 1 + P[jj + 1]] % 12;
+  let t0 = 0.5 - x0 * x0 - y0 * y0;
+  if (t0 < 0) n0 = 0; else { t0 *= t0; n0 = t0 * t0 * (grad3[gi0][0] * x0 + grad3[gi0][1] * y0); }
+  let t1 = 0.5 - x1 * x1 - y1 * y1;
+  if (t1 < 0) n1 = 0; else { t1 *= t1; n1 = t1 * t1 * (grad3[gi1][0] * x1 + grad3[gi1][1] * y1); }
+  let t2 = 0.5 - x2 * x2 - y2 * y2;
+  if (t2 < 0) n2 = 0; else { t2 *= t2; n2 = t2 * t2 * (grad3[gi2][0] * x2 + grad3[gi2][1] * y2); }
+  return 70 * (n0 + n1 + n2);
+}
+
+// --- State ---------------------------------------------------
+let W, H, DPR;
+let time = 0;
+let noiseSeed = 42;
+let mouse = { x: 0, y: 0, px: 0, py: 0, vx: 0, vy: 0, down: false };
+let lastMoveTime = 0;
+let tiles = [];
+let swarm = [];
+let shed = [];      // shed particles that seek tiles
+let stains = new Map(); // tileId -> { hueShift, timer, colorIndex }
+
+// --- Recursive Subdivision (Manoloide-style) ----------------
+// We build a quad-tree-like subdivision. Each tile stores vertices,
+// a color index, and depth. Vertices are displaced by the shared
+// noise field every frame.
+const MAX_DEPTH = 5;
+const MIN_SIZE = 80; // minimum tile size in pixels
+
+function buildTiles() {
+  tiles = [];
+  // Start with a single root covering the screen
+  subdivide(0, 0, W, H, 0, -1);
+}
+
+function subdivide(x, y, w, h, depth, parentId) {
+  // Split probability increases with depth and is influenced by noise
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  const n = noise2D(cx * 0.003 + noiseSeed, cy * 0.003 + noiseSeed);
+  const shouldSplit = (depth < MAX_DEPTH && w > MIN_SIZE && h > MIN_SIZE && (n > 0.15 || depth < 2));
+
+  if (!shouldSplit) {
+    const id = tiles.length;
+    // Choose color based on adjacency harmony: use parent color or noise-driven slot
+    let colorIndex;
+    if (parentId >= 0) {
+      const parent = tiles[parentId];
+      // Adjacency constraint: pick a neighbor-friendly color
+      const candidates = [parent.colorIndex, (parent.colorIndex + 1) % PALETTE.length, (parent.colorIndex + 2) % PALETTE.length];
+      colorIndex = candidates[Math.floor(Math.abs(n) * candidates.length) % candidates.length];
+    } else {
+      colorIndex = Math.floor(Math.abs(n) * PALETTE.length) % PALETTE.length;
+    }
+    tiles.push({ id, x, y, w, h, depth, colorIndex, parentId, vx: 0, vy: 0 });
+    return;
+  }
+
+  // Split direction influenced by noise (horizontal vs vertical)
+  const splitVertical = (n > 0.3 || w > h * 1.5);
+  const currentParentId = tiles.length; // placeholder for child reference, not used directly
+  // Recursively subdivide
+  if (splitVertical) {
+    const mid = x + w * (0.4 + 0.2 * n); // slightly off-center for organic feel
+    subdivide(x, y, mid - x, h, depth + 1, -1);
+    subdivide(mid, y, x + w - mid, h, depth + 1, -1);
+  } else {
+    const mid = y + h * (0.4 + 0.2 * n);
+    subdivide(x, y, w, mid - y, depth + 1, -1);
+    subdivide(x, mid, w, y + h - mid, depth + 1, -1);
+  }
+}
+
+// After flat subdivision, compute parent/child references for adjacency
+function resolveAdjacency() {
+  // Simple adjacency: assign color based on spatial neighbors already built
+  for (let i = 0; i < tiles.length; i++) {
+    const t = tiles[i];
+    if (t.parentId === -1) {
+      // Find nearest already-colored tile for harmony
+      let best = -1, bestDist = Infinity;
+      for (let j = 0; j < i; j++) {
+        const o = tiles[j];
+        const dx = (t.x + t.w/2) - (o.x + o.w/2);
+        const dy = (t.y + t.h/2) - (o.y + o.h/2);
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < bestDist) { bestDist = d; best = j; }
+      }
+      if (best >= 0) {
+        const pc = tiles[best].colorIndex;
+        const n = noise2D(t.x * 0.005 + noiseSeed, t.y * 0.005 + noiseSeed);
+        const candidates = [pc, (pc + 1) % PALETTE.length, (pc + 2) % PALETTE.length, (pc + 3) % PALETTE.length];
+        t.colorIndex = candidates[Math.floor(Math.abs(n) * candidates.length) % candidates.length];
+      }
+    }
+  }
+}
+
+// --- Cursor Swarm (Raven Kwok + Zajno hybrid) ---------------
+const SWARM_COUNT = 64;
+const LERP_FACTOR = 0.12;
+const SHED_THRESHOLD = 12; // px/frame speed to trigger shedding
+
+function initSwarm() {
+  swarm = [];
+  for (let i = 0; i < SWARM_COUNT; i++) {
+    swarm.push({
+      x: W / 2, y: H / 2,
+      vx: 0, vy: 0,
+      radius: 1.5 + Math.random() * 2,
+      hue: Math.random() * 360,
+      noiseOffset: Math.random() * 1000,
+      alive: true
+    });
+  }
+}
+
+function updateSwarm(dt) {
+  const targetX = mouse.x;
+  const targetY = mouse.y;
+  const cursorSpeed = Math.sqrt(mouse.vx * mouse.vx + mouse.vy * mouse.vy);
+
+  for (let i = 0; i < swarm.length; i++) {
+    const p = swarm[i];
+    // Lerp toward target
+    p.x += (targetX - p.x) * LERP_FACTOR;
+    p.y += (targetY - p.y) * LERP_FACTOR;
+
+    // Add noise turbulence (swarm-style)
+    const n = noise2D(p.x * 0.008 + time * 0.3 + noiseSeed, p.y * 0.008 + time * 0.3);
+    const nx = noise2D(p.y * 0.008 + time * 0.2, p.x * 0.008 + noiseSeed);
+    p.vx += n * 0.4;
+    p.vy += nx * 0.4;
+    p.vx *= 0.92;
+    p.vy *= 0.92;
+    p.x += p.vx;
+    p.y += p.vy;
+
+    // Idle drift (>3s) => autonomous noise-driven motion
+    const idle = (performance.now() - lastMoveTime) > 3000;
+    if (idle) {
+      const drift = noise2D(p.noiseOffset + time * 0.5, p.noiseOffset + time * 0.3);
+      p.x += Math.cos(drift * Math.PI * 2) * 0.8;
+      p.y += Math.sin(drift * Math.PI * 2) * 0.8;
+    }
+
+    // Shed particles when cursor moves fast
+    if (cursorSpeed > SHED_THRESHOLD && Math.random() < 0.15) {
+      shedParticle(p.x, p.y, p.hue);
+    }
+  }
+}
+
+// --- Shedding & Staining -------------------------------------
+function shedParticle(x, y, hue) {
+  if (shed.length > 80) return; // cap shed particles
+  shed.push({
+    x, y,
+    vx: (Math.random() - 0.5) * 4,
+    vy: (Math.random() - 0.5) * 4,
+    hue,
+    life: 1.0,
+    tileId: -1
+  });
+}
+
+function findNearestTile(x, y) {
+  let best = -1, bestDist = Infinity;
+  for (let i = 0; i < tiles.length; i++) {
+    const t = tiles[i];
+    const cx = t.x + t.w / 2;
+    const cy = t.y + t.h / 2;
+    const dx = x - cx;
+    const dy = y - cy;
+    const d = dx * dx + dy * dy;
+    if (d < bestDist) { bestDist = d; best = i; }
+  }
+  return best >= 0 ? tiles[best].id : -1;
+}
+
+function updateShed(dt) {
+  for (let i = shed.length - 1; i >= 0; i--) {
+    const p = shed[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.05; // slight gravity
+    p.vx *= 0.96;
+    p.vy *= 0.96;
+    p.life -= 0.008;
+
+    // Find tile when close to rest
+    const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+    if (speed < 1.0 && p.tileId < 0) {
+      const tileId = findNearestTile(p.x, p.y);
+      if (tileId >= 0) {
+        stainTile(tileId, p.hue);
+        p.tileId = tileId;
+        p.life = Math.min(p.life, 0.25); // fade quickly after staining
+      }
+    }
+
+    if (p.life <= 0 || p.x < -20 || p.x > W + 20 || p.y < -20 || p.y > H + 20) {
+      shed.splice(i, 1);
+    }
+  }
+}
+
+function stainTile(tileId, hue) {
+  // Pick a palette color shifted by hue
+  const baseIdx = tiles[tileId].colorIndex;
+  const shifted = (baseIdx + 1 + Math.floor(Math.abs(hue) % 3)) % PALETTE.length;
+  stains.set(tileId, { colorIndex: shifted, timer: 5.0 });
+}
+
+function resolveStains(dt) {
+  for (const [id, stain] of stains.entries()) {
+    stain.timer -= dt;
+    if (stain.timer <= 0) {
+      stains.delete(id);
+    }
+  }
+}
+
+// --- Rendering -----------------------------------------------
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = Math.floor(window.innerWidth);
+  H = Math.floor(window.innerHeight);
+  canvas.width = W * DPR;
+  canvas.height = H * DPR;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  buildTiles();
+  resolveAdjacency();
+  initSwarm();
+  mouse.x = W / 2; mouse.y = H / 2;
+  mouse.px = W / 2; mouse.py = H / 2;
+}
+
+function drawTiles() {
+  // Fill background
+  ctx.fillStyle = PALETTE[0];
+  ctx.fillRect(0, 0, W, H);
+
+  // Draw each tile with noise-displaced vertices
+  for (let i = 0; i < tiles.length; i++) {
+    const t = tiles[i];
+    const stain = stains.get(t.id);
+    const colorIndex = stain ? stain.colorIndex : t.colorIndex;
+    const [r, g, b] = PALETTE_RGB[colorIndex];
+
+    // Displace vertices by shared noise field
+    const n0 = noise2D(t.x * 0.004 + time * 0.15 + noiseSeed, t.y * 0.004 + time * 0.15);
+    const n1 = noise2D((t.x + t.w) * 0.004 + time * 0.15 + noiseSeed, t.y * 0.004 + time * 0.15);
+    const n2 = noise2D((t.x + t.w) * 0.004 + time * 0.15 + noiseSeed, (t.y + t.h) * 0.004 + time * 0.15);
+    const n3 = noise2D(t.x * 0.004 + time * 0.15 + noiseSeed, (t.y + t.h) * 0.004 + time * 0.15);
+    const d = 10; // displacement amplitude
+
+    const x0 = t.x + n0 * d;
+    const y0 = t.y + n0 * d;
+    const x1 = t.x + t.w + n1 * d;
+    const y1 = t.y + n1 * d;
+    const x2 = t.x + t.w + n2 * d;
+    const y2 = t.y + t.h + n2 * d;
+    const x3 = t.x + n3 * d;
+    const y3 = t.y + t.h + n3 * d;
+
+    // Glow for stained tiles
+    if (stain) {
+      ctx.save();
+      ctx.shadowColor = PALETTE[colorIndex];
+      ctx.shadowBlur = 18;
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.lineTo(x3, y3);
+    ctx.closePath();
+
+    // Color with subtle depth based on noise
+    const depthAlpha = 0.75 + 0.25 * noise2D(t.x * 0.01 + noiseSeed, t.y * 0.01 + noiseSeed);
+    ctx.fillStyle = `rgba(${r},${g},${b},${Math.max(0.2, Math.min(1, depthAlpha))})`;
+    ctx.fill();
+
+    // Subtle stroke for mosaic definition
+    ctx.strokeStyle = 'rgba(10,10,10,0.35)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    if (stain) ctx.restore();
+  }
+}
+
+function drawSwarm() {
+  for (let i = 0; i < swarm.length; i++) {
+    const p = swarm[i];
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fill();
+  }
+
+  // Draw faint connecting lines for swarm cohesion
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i < swarm.length; i++) {
+    const a = swarm[i];
+    for (let j = i + 1; j < swarm.length; j++) {
+      const b = swarm[j];
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < 60) {
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function drawShed() {
+  for (let i = 0; i < shed.length; i++) {
+    const p = shed[i];
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 2.5 * p.life, 0, Math.PI * 2);
+    const alpha = p.life * 0.9;
+    ctx.fillStyle = `hsla(${p.hue}, 80%, 60%, ${alpha})`;
+    ctx.fill();
+  }
+}
+
+function drawCursor() {
+  // Draw a subtle glow at the actual target point
+  const speed = Math.sqrt(mouse.vx * mouse.vx + mouse.vy * mouse.vy);
+  const radius = 4 + Math.min(speed * 0.5, 12);
+  ctx.beginPath();
+  ctx.arc(mouse.x, mouse.y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(255,255,255,${0.15 + Math.min(speed * 0.02, 0.25)})`;
+  ctx.fill();
+}
+
+function render() {
+  ctx.clearRect(0, 0, W, H);
+  drawTiles();
+  drawSwarm();
+  drawShed();
+  drawCursor();
+}
+
+// --- Interaction ---------------------------------------------
+function onPointerMove(e) {
+  const px = mouse.x;
+  const py = mouse.y;
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+  mouse.px = px;
+  mouse.py = py;
+  mouse.vx = mouse.x - px;
+  mouse.vy = mouse.y - py;
+  lastMoveTime = performance.now();
+}
+
+function onPointerDown(e) {
+  mouse.down = true;
+}
+function onPointerUp(e) {
+  mouse.down = false;
+}
+
+function onWheel(e) {
+  e.preventDefault();
+  noiseSeed += e.deltaY * 0.001;
+  // Rebuild tiles with new seed for breathing reconfiguration
+  buildTiles();
+  resolveAdjacency();
+}
+
+function onDoubleClick(e) {
+  exportCanvas();
+}
+
+function exportCanvas() {
+  const link = document.createElement('a');
+  link.download = `cursor-swarm-brush-${Date.now()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// --- Main Loop -----------------------------------------------
+let lastTime = performance.now();
+function loop() {
+  const now = performance.now();
+  const dt = Math.min((now - lastTime) / 1000, 0.05);
+  lastTime = now;
+  time += dt;
+
+  updateSwarm(dt);
+  updateShed(dt);
+  resolveStains(dt);
+  render();
+
+  requestAnimationFrame(loop);
+}
+
+// --- Bootstrap -----------------------------------------------
+window.addEventListener('resize', resize);
+window.addEventListener('pointermove', onPointerMove);
+window.addEventListener('pointerdown', onPointerDown);
+window.addEventListener('pointerup', onPointerUp);
+window.addEventListener('wheel', onWheel, { passive: false });
+window.addEventListener('dblclick', onDoubleClick);
+
+seedNoise(noiseSeed);
+resize();
+loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinetic Type Physics</title>
+<style>
+  /* Reset and base styles */
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  body {
+    background: #000000;
+    font-family: 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Instruction overlay */
+  #instructions {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #F0F0F0;
+    font-size: 14px;
+    letter-spacing: 1px;
+    opacity: 0.7;
+    pointer-events: none;
+    user-select: none;
+    z-index: 100;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* Each letter is a 60x60px absolutely positioned wrapper */
+  .letter-wrapper {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  /* The actual glyph sits on top of the Lottie shape */
+  .letter-text {
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1;
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    user-select: none;
+  }
+
+  /* Lottie SVG container renders the background animation */
+  .lottie-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+
+  /* Brief collision flash particle */
+  .collision-flash {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #00FF7F;
+    pointer-events: none;
+    opacity: 0.8;
+  }
+</style>
+</head>
+<body aria-label="Kinetic type physics playground">
+<div id="instructions">TYPE TO SPAWN — DRAG TO THROW — CLICK TO RESET</div>
+
+<!-- Matter.js physics engine (CDN) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+<!-- Lottie Web renderer (CDN) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+<!-- Application logic -->
+<script src="index.js"></script>
+</body>
+</html>

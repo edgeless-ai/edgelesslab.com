@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Segregation Engine — Self-Organizing Typography</title>
+  <!-- p5.js loaded from CDN — the only external dependency allowed -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    /* Reset and full-viewport layout so the canvas feels like a full-screen poster */
+    body {
+      margin: 0;
+      padding: 0;
+      background: #222; /* dark border around the grid */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+    /* Container holds the canvas and the absolutely positioned UI overlays */
+    #canvas-container {
+      position: relative;
+      width: 960px;
+      height: 640px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    /* Slider panel fixed to top-left corner, minimal paper-like styling */
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255,255,255,0.92);
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      z-index: 10;
+    }
+    #controls label {
+      display: block;
+      margin-bottom: 4px;
+      color: #333;
+    }
+    #controls input {
+      width: 140px;
+    }
+    /* Bottom caption explaining interaction */
+    #caption {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.92);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #333;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container">
+    <!-- Satisfaction threshold slider — drives the Schelling bias -->
+    <div id="controls">
+      <label for="threshold">satisfaction threshold: <span id="val">30%</span></label>
+      <input type="range" id="threshold" min="0" max="100" value="30">
+    </div>
+    <!-- Interaction hint -->
+    <div id="caption">Click to reshuffle. Drag slider to change bias.</div>
+  </div>
+
+  <script>
+    // ------------------------------------------------------------------
+    // CONFIGURATION — hard-coded grid geometry and palette
+    // ------------------------------------------------------------------
+    const COLS = 24;            // number of columns in the grid
+    const ROWS = 16;            // number of rows in the grid
+    const CELL = 40;            // pixel size of each cell (24×40 = 960, 16×40 = 640)
+    const W = COLS * CELL;      // canvas width in pixels
+    const H = ROWS * CELL;      // canvas height in pixels
+
+    // Two glyph classes: serif (warm yellow) and sans-serif (cool blue)
+    const SERIF_GLYPHS = ['A','E','I','M','Q','U'];
+    const SANS_GLYPHS  = ['B','F','J','N','R','V'];
+
+    // Palette extracted from the prompt spec
+    const C_SERIF = '#F4D03F';  // warm yellow for serif letters
+    const C_SANS  = '#5DADE2';  // cool blue for sans-serif letters
+    const C_PAPER = '#F5F5F5';  // off-white paper background
+
+    // ------------------------------------------------------------------
+    // SIMULATION STATE
+    // ------------------------------------------------------------------
+    let grid = [];              // 1-D array of length COLS*ROWS; each entry is null or a glyph object
+    let threshold = 0.30;       // current satisfaction ratio (0.0 … 1.0)
+    let slider;                 // p5.js DOM wrapper for the HTML range input
+    let valSpan;                // p5.js DOM wrapper for the percentage label
+    let paperLayer;             // off-screen p5.Graphics buffer holding the procedural paper texture
+
+    // ------------------------------------------------------------------
+    // p5.js SETUP — create canvas, generate textures, seed the grid
+    // ------------------------------------------------------------------
+    function setup() {
+      // Create the canvas and attach it to the container so overlays stay on top
+      let c = createCanvas(W, H);
+      c.parent('canvas-container');
+
+      // Grab the slider and its value label from the DOM
+      slider = select('#threshold');
+      valSpan = select('#val');
+      // Whenever the slider moves, update the global threshold
+      slider.input(() => {
+        threshold = slider.value() / 100;
+        valSpan.html(slider.value() + '%');
+      });
+
+      // Build the paper texture once (static background)
+      paperLayer = createGraphics(W, H);
+      generatePaperTexture();
+
+      // Populate the grid with a random mix of serif, sans, and empty cells
+      initGrid();
+    }
+
+    // ------------------------------------------------------------------
+    // PROCEDURAL PAPER TEXTURE
+    // A sparse noise field of tiny grey dots gives the canvas a tactile,
+    // printed quality without loading any external image assets.
+    // ------------------------------------------------------------------
+    function generatePaperTexture() {
+      paperLayer.background(C_PAPER);
+      paperLayer.noStroke();
+      // Drop thousands of faint grey circles across the surface
+      for (let i = 0; i < 4000; i++) {
+        let x = random(W);
+        let y = random(H);
+        let grey = random(180, 220); // light grey values
+        paperLayer.fill(grey, 100);  // low alpha so the texture is subtle
+        paperLayer.circle(x, y, random(1, 2.5));
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // GRID INITIALISATION
+    // Randomly assign each cell to one of three states:
+    //   33 % chance → empty (shows paper texture)
+    //   33 % chance → serif glyph (warm yellow)
+    //   33 % chance → sans-serif glyph (cool blue)
+    // Each glyph stores its current visual (x,y) and target (tx,ty) position
+    // so that swaps can be animated rather than instantaneous.
+    // ------------------------------------------------------------------
+    function initGrid() {
+      grid = [];
+      for (let i = 0; i < COLS * ROWS; i++) {
+        let roll = random();
+        if (roll < 0.33) {
+          // Empty cell — null represents absence
+          grid.push(null);
+        } else {
+          // Decide which class this glyph belongs to
+          let isSerif = roll < 0.66;
+          let pool = isSerif ? SERIF_GLYPHS : SANS_GLYPHS;
+          let ch = random(pool); // pick a random letter from the class pool
+          // Compute pixel coordinates of the cell centre
+          let cx = (i % COLS) * CELL + CELL / 2;
+          let cy = floor(i / COLS) * CELL + CELL / 2;
+          // Glyph object: type, character, current visual position, target position
+          grid.push({
+            type: isSerif ? 'serif' : 'sans',
+            char: ch,
+            x: cx,
+            y: cy,
+            tx: cx,
+            ty: cy
+          });
+        }
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // SHELLING DISSATISFACTION CHECK
+    // A glyph looks at its 8-cell Moore neighbourhood (all adjacent cells).
+    // It counts how many of those neighbours are occupied and, of those, how
+    // many share its own class.  If the ratio of same-class neighbours is
+    // strictly below the global threshold, the glyph is marked dissatisfied.
+    // Glyphs with no occupied neighbours are content (no social pressure).
+    // ------------------------------------------------------------------
+    function isDissatisfied(index) {
+      let col = index % COLS;
+      let row = floor(index / COLS);
+      let g = grid[index];
+      let sameCount = 0;
+      let occupiedCount = 0;
+      // Iterate the 3×3 stencil, skipping the centre cell
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          if (dx === 0 && dy === 0) continue;
+          let nc = col + dx;
+          let nr = row + dy;
+          // Bounds check — edges have fewer neighbours
+          if (nc < 0 || nc >= COLS || nr < 0 || nr >= ROWS) continue;
+          let neighbour = grid[nr * COLS + nc];
+          if (neighbour !== null) {
+            occupiedCount++;
+            if (neighbour.type === g.type) sameCount++;
+          }
+        }
+      }
+      // No occupied neighbours → no basis for dissatisfaction
+      if (occupiedCount === 0) return false;
+      // Classic Schelling rule: same-ratio must be >= threshold to stay put
+      return (sameCount / occupiedCount) < threshold;
+    }
+
+    // ------------------------------------------------------------------
+    // p5.js DRAW LOOP — runs every frame
+    // ------------------------------------------------------------------
+    function draw() {
+      // 1. Render the static paper texture as the background
+      image(paperLayer, 0, 0);
+
+      // 2. EVALUATION PASS
+      // Scan the entire grid and sort cells into two buckets:
+      //    dissatisfied glyphs  (want to move)
+      //    empty cell indices   (potential swap destinations)
+      let dissatisfied = [];
+      let emptySlots = [];
+      for (let i = 0; i < grid.length; i++) {
+        if (grid[i] === null) {
+          emptySlots.push(i);
+        } else if (isDissatisfied(i)) {
+          dissatisfied.push(i);
+        }
+      }
+
+      // 3. SYNCHRONOUS SWAP PASS
+      // All dissatisfied glyphs relocate simultaneously by swapping with
+      // randomly chosen empty cells.  Because the swap is synchronous, a
+      // glyph that moves into an empty cell cannot be displaced again in
+      // the same frame, preserving the Schelling update semantics.
+      for (let idx of dissatisfied) {
+        if (emptySlots.length === 0) break;
+        let swapIdx = random(emptySlots); // pick a random vacant cell
+        let glyph = grid[idx];
+        // Perform the logical swap
+        grid[idx] = null;
+        grid[swapIdx] = glyph;
+        // Update the glyph's target pixel coordinates so the draw loop
+        // will animate the glide instead of teleporting
+        glyph.tx = (swapIdx % COLS) * CELL + CELL / 2;
+        glyph.ty = floor(swapIdx / COLS) * CELL + CELL / 2;
+        // Remove the used empty slot from the pool and add the old slot back
+        let s = emptySlots.indexOf(swapIdx);
+        if (s > -1) emptySlots.splice(s, 1);
+        emptySlots.push(idx);
+      }
+
+      // 4. RENDER PASS
+      // Draw every glyph at its current visual position, lerping toward
+      // its target.  The lerp factor of 0.15 gives a smooth ~20-frame glide.
+      textAlign(CENTER, CENTER);
+      textSize(28);
+      for (let i = 0; i < grid.length; i++) {
+        let g = grid[i];
+        if (g === null) continue; // skip empty cells — let paper texture show through
+        // Spring-like lerp: move 15 % of the remaining distance per frame
+        g.x += (g.tx - g.x) * 0.15;
+        g.y += (g.ty - g.y) * 0.15;
+        // Choose colour based on class
+        let col = (g.type === 'serif') ? C_SERIF : C_SANS;
+        fill(col);
+        noStroke();
+        // Use the browser's default serif or sans-serif family
+        textFont(g.type === 'serif' ? 'serif' : 'sans-serif');
+        text(g.char, g.x, g.y);
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // MOUSE INTERACTION — clicking anywhere on the canvas reshuffles the grid
+    // ------------------------------------------------------------------
+    function mousePressed() {
+      // Guard so the slider does not trigger a reset when clicked
+      if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+        initGrid();
+      }
+    }
+  </script>
+</body>
+</html>

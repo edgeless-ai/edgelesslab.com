@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elastic Shader Type — BEND</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    #canvas-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 2;
+        pointer-events: auto;
+    }
+    #canvas-container canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    .scroll-container {
+        position: relative;
+        z-index: 0;
+        width: 100%;
+    }
+    .section {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 0;
+    }
+    .section-1 { background: #FF6B6B; }
+    .section-2 { background: #4ECDC4; }
+    .section-3 { background: #FFE66D; }
+    .section-4 { background: #1A535C; }
+    .section-label {
+        font-size: 1.2rem;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.5);
+        pointer-events: none;
+        user-select: none;
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .section-1 .section-label { color: rgba(255,255,255,0.6); }
+    .section-2 .section-label { color: rgba(0,0,0,0.3); }
+    .section-3 .section-label { color: rgba(0,0,0,0.3); }
+    .section-4 .section-label { color: rgba(255,255,255,0.4); }
+    .hint {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3;
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.7);
+        text-align: center;
+        pointer-events: none;
+        letter-spacing: 0.05em;
+        mix-blend-mode: difference;
+    }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+<div id="canvas-container"></div>
+<div class="scroll-container">
+    <section class="section section-1" data-letter="0">
+        <span class="section-label">Scroll or click &mdash; B</span>
+    </section>
+    <section class="section section-2" data-letter="1">
+        <span class="section-label">E</span>
+    </section>
+    <section class="section section-3" data-letter="2">
+        <span class="section-label">N</span>
+    </section>
+    <section class="section section-4" data-letter="3">
+        <span class="section-label">D</span>
+    </section>
+</div>
+<div class="hint">Scroll to explore &middot; Click a letter to trigger elastic physics</div>
+
+<script>
+const vertexShader = `
+varying vec2 v_uv;
+void main() {
+    v_uv = uv;
+    gl_Position = vec4(position, 1.0);
+}
+`;
+
+const fragmentShader = `
+precision highp float;
+
+uniform float u_time;
+uniform vec2 u_resolution;
+uniform float u_spacing;
+uniform vec2 u_extrusion;
+uniform float u_twist;
+uniform vec2 u_mouse;
+uniform float u_activeLetter;
+
+varying vec2 v_uv;
+
+float sdSegment(vec2 p, vec2 a, vec2 b) {
+    vec2 pa = p - a;
+    vec2 ba = b - a;
+    float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    return length(pa - ba * h);
+}
+
+float sdCircle(vec2 p, float r) {
+    return length(p) - r;
+}
+
+float sdBox(vec2 p, vec2 b) {
+    vec2 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float sdB(vec2 p) {
+    float d = sdBox(p - vec2(-8.0, 0.0), vec2(8.0, 28.0));
+    d = min(d, sdBox(p - vec2(4.0, 20.0), vec2(16.0, 8.0)));
+    d = min(d, sdBox(p - vec2(4.0, 0.0), vec2(16.0, 8.0)));
+    d = min(d, sdBox(p - vec2(4.0, -20.0), vec2(16.0, 8.0)));
+    d = min(d, sdBox(p - vec2(16.0, 12.0), vec2(4.0, 12.0)));
+    d = min(d, sdBox(p - vec2(16.0, -12.0), vec2(4.0, 12.0)));
+    return d;
+}
+
+float sdE(vec2 p) {
+    float d = sdBox(p - vec2(-8.0, 0.0), vec2(8.0, 28.0));
+    d = min(d, sdBox(p - vec2(4.0, 20.0), vec2(16.0, 8.0)));
+    d = min(d, sdBox(p - vec2(4.0, 0.0), vec2(16.0, 8.0)));
+    d = min(d, sdBox(p - vec2(4.0, -20.0), vec2(16.0, 8.0)));
+    return d;
+}
+
+float sdN(vec2 p) {
+    float d = sdBox(p - vec2(-12.0, 0.0), vec2(8.0, 28.0));
+    d = min(d, sdBox(p - vec2(12.0, 0.0), vec2(8.0, 28.0)));
+    d = min(d, sdSegment(p, vec2(-12.0, -22.0), vec2(12.0, 22.0)) - 8.0);
+    return d;
+}
+
+float sdD(vec2 p) {
+    float d = sdBox(p - vec2(-8.0, 0.0), vec2(8.0, 28.0));
+    float right = sdCircle(p - vec2(4.0, 0.0), 26.0);
+    right = max(right, -sdBox(p - vec2(-22.0, 0.0), vec2(26.0, 30.0)));
+    d = min(d, right);
+    return d;
+}
+
+float sdWord(vec2 p) {
+    float spacing = u_spacing;
+    float centerOffset = -spacing * 1.5;
+    float d = 1e6;
+    d = min(d, sdB(p - vec2(-60.0 + centerOffset + spacing * 0.0, 0.0)));
+    d = min(d, sdE(p - vec2(-20.0 + centerOffset + spacing * 1.0, 0.0)));
+    d = min(d, sdN(p - vec2(20.0 + centerOffset + spacing * 2.0, 0.0)));
+    d = min(d, sdD(p - vec2(60.0 + centerOffset + spacing * 3.0, 0.0)));
+    return d;
+}
+
+void main() {
+    vec2 uv = (v_uv - 0.5) * vec2(u_resolution.x / u_resolution.y, 1.0);
+    
+    // Mouse parallax
+    uv += u_mouse * 0.05;
+    
+    // Twist distortion
+    uv.x += sin(uv.y * 0.1 + u_twist) * u_twist * 10.0;
+    
+    // Extrusion shadow
+    float shadow = sdWord(uv - u_extrusion * 0.5);
+    
+    // Main word
+    float d = sdWord(uv);
+    
+    // Per-letter opacity
+    float x = uv.x;
+    float opacity = 0.3;
+    if (u_activeLetter < 0.5 && x < -40.0) opacity = 1.0;
+    if (u_activeLetter > 0.5 && u_activeLetter < 1.5 && x > -40.0 && x < 0.0) opacity = 1.0;
+    if (u_activeLetter > 1.5 && u_activeLetter < 2.5 && x > 0.0 && x < 40.0) opacity = 1.0;
+    if (u_activeLetter > 2.5 && x > 40.0) opacity = 1.0;
+    
+    // Orbit dot (escaped punctuation) — Lissajous curve
+    vec2 dotPos = vec2(sin(u_time * 1.3) * 80.0, cos(u_time * 0.7) * 40.0);
+    float dotSdf = sdCircle(uv - dotPos, 6.0);
+    
+    // Masks
+    float textMask = smoothstep(0.02, 0.0, d);
+    float edgeMask = smoothstep(0.0, 0.02, abs(d));
+    float shadowMask = smoothstep(0.02, 0.0, shadow) * 0.3;
+    float dotMask = smoothstep(0.02, 0.0, dotSdf);
+    float trailMask = smoothstep(0.0, 0.05, dotSdf) * 0.2;
+    
+    // Composite from back to front using additive accumulation
+    vec3 color = vec3(0.0);
+    float alpha = 0.0;
+    
+    // Shadow
+    color += vec3(0.0, 0.0, 0.0) * shadowMask;
+    alpha += shadowMask;
+    
+    // Trail
+    color += vec3(0.83, 0.69, 0.22) * trailMask;
+    alpha += trailMask;
+    
+    // Text fill
+    color += vec3(1.0, 1.0, 1.0) * textMask * opacity;
+    alpha += textMask;
+    
+    // Text edge
+    color += vec3(0.88, 0.88, 0.88) * edgeMask * opacity;
+    alpha += edgeMask;
+    
+    // Dot
+    color += vec3(0.83, 0.69, 0.22) * dotMask;
+    alpha += dotMask;
+    
+    alpha = min(alpha, 1.0);
+    
+    gl_FragColor = vec4(color, alpha);
+}
+`;
+
+// Three.js setup
+const container = document.getElementById('canvas-container');
+const scene = new THREE.Scene();
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+container.appendChild(renderer.domElement);
+
+const geometry = new THREE.PlaneGeometry(2, 2);
+const material = new THREE.ShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    uniforms: {
+        u_time: { value: 0.0 },
+        u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        u_spacing: { value: 0.0 },
+        u_extrusion: { value: new THREE.Vector2(0.0, 0.0) },
+        u_twist: { value: 0.0 },
+        u_mouse: { value: new THREE.Vector2(0.0, 0.0) },
+        u_activeLetter: { value: 0.0 }
+    },
+    transparent: true
+});
+
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+
+// GSAP elastic tween
+function onLetterClick(letterIndex) {
+    material.uniforms.u_activeLetter.value = letterIndex;
+    
+    // Elastic out tweens
+    gsap.to(material.uniforms.u_spacing, {
+        value: 20.0,
+        duration: 1.2,
+        ease: "elastic.out(1, 0.5)"
+    });
+    gsap.to(material.uniforms.u_extrusion.value, {
+        x: 10.0,
+        y: 5.0,
+        duration: 1.2,
+        ease: "back.out(1.7)"
+    });
+    gsap.to(material.uniforms.u_twist, {
+        value: 0.5,
+        duration: 1.2,
+        ease: "elastic.out(1, 0.3)"
+    });
+    
+    // Return to rest after 2 seconds
+    gsap.to(material.uniforms.u_spacing, {
+        value: 0.0,
+        duration: 1.5,
+        delay: 2.0,
+        ease: "power2.out"
+    });
+    gsap.to(material.uniforms.u_extrusion.value, {
+        x: 0.0,
+        y: 0.0,
+        duration: 1.5,
+        delay: 2.0,
+        ease: "power2.out"
+    });
+    gsap.to(material.uniforms.u_twist, {
+        value: 0.0,
+        duration: 1.5,
+        delay: 2.0,
+        ease: "power2.out"
+    });
+}
+
+// Click on canvas
+renderer.domElement.addEventListener('click', (e) => {
+    const rect = renderer.domElement.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const letterIndex = Math.min(3, Math.floor(x * 4));
+    onLetterClick(letterIndex);
+});
+
+// Mouse parallax
+window.addEventListener('mousemove', (e) => {
+    material.uniforms.u_mouse.value.x = (e.clientX / window.innerWidth - 0.5) * 2;
+    material.uniforms.u_mouse.value.y = (e.clientY / window.innerHeight - 0.5) * 2;
+});
+
+// Scroll section detection
+const sections = document.querySelectorAll('.section');
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const index = Array.from(sections).indexOf(entry.target);
+            material.uniforms.u_activeLetter.value = index;
+            onLetterClick(index);
+        }
+    });
+}, { threshold: 0.5 });
+
+sections.forEach(s => observer.observe(s));
+
+// Resize
+window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    material.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+});
+
+// Animation loop
+function animate() {
+    material.uniforms.u_time.value = performance.now() * 0.001;
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+}
+animate();
+
+// Trigger initial animation for letter 0
+onLetterClick(0);
+</script>
+</body>
+</html>

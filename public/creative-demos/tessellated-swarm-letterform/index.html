@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tessellated Swarm Letterform</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0A0A0A;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+    canvas {
+      display: block;
+    }
+    #hint {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #FFFFFF;
+      font-size: 11px;
+      opacity: 0.35;
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div id="hint">Scroll to re-tessellate &middot; Hover to inject turbulence &middot; Click to export PNG</div>
+  <script>
+    // ============================================================
+    // Tessellated Swarm Letterform
+    // A p5.js demo combining recursive geometric subdivision
+    // (Manoloide-style) with goal-seeking particle swarms
+    // (Raven Kwok-style) inside a single letterform mask.
+    // ============================================================
+
+    const PALETTE = [
+      '#FF00FF', // magenta — primary swarm
+      '#00FFFF', // cyan — secondary swarm
+      '#FFD700', // gold — tertiary swarm
+      '#FF6B6B', // coral — warm accent
+      '#FFFFFF'  // white — typography / UI
+    ];
+    const BG = '#0A0A0A';
+    const LETTER = 'A';
+    const FONT_SIZE = 420;
+    const MAX_DEPTH = 4;
+    const PARTICLES_PER_TILE = 14;
+    const NOISE_SCALE = 0.003;
+    const SEEK_STRENGTH = 0.04;
+    const MAX_SPEED = 3.5;
+    const MAX_FORCE = 0.18;
+    const TURBULENCE_BASE = 0.8;
+    const TURBULENCE_HOVER = 2.8;
+
+    let font;
+    let maskGraphics;
+    let maskPixels;
+    let maskW, maskH;
+    let tiles = [];
+    let particles = [];
+    let globalNoiseZ = 0;
+    let hoverTile = null;
+    let hoverTimer = 0;
+    let letterBounds;
+
+    // --------------------------------------------------------
+    // Load an external TTF so textToPoints() works.
+    // Open Sans 800 gives a bold, clean geometric letterform.
+    // --------------------------------------------------------
+    function preload() {
+      font = loadFont('https://cdn.jsdelivr.net/npm/open-sans-all@0.1.3/fonts/open-sans-800.ttf');
+    }
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      colorMode(HSB, 360, 100, 100, 100);
+      textFont(font);
+      buildMask();
+      subdivideAndSpawn();
+    }
+
+    // --------------------------------------------------------
+    // Build an offscreen mask: white letter on black field.
+    // We then read the pixel array once for fast point-in-letter
+    // tests during subdivision.
+    // --------------------------------------------------------
+    function buildMask() {
+      maskGraphics = createGraphics(width, height);
+      maskGraphics.pixelDensity(1);
+      maskGraphics.background(0);
+      maskGraphics.fill(255);
+      maskGraphics.noStroke();
+      maskGraphics.textAlign(CENTER, CENTER);
+      maskGraphics.textSize(FONT_SIZE);
+      maskGraphics.text(LETTER, width / 2, height / 2);
+      maskGraphics.loadPixels();
+      maskPixels = maskGraphics.pixels;
+      maskW = maskGraphics.width;
+      maskH = maskGraphics.height;
+
+      // Compute tight bounding box of the letter for subdivision root
+      let minX = width, minY = height, maxX = 0, maxY = 0;
+      for (let y = 0; y < maskH; y++) {
+        for (let x = 0; x < maskW; x++) {
+          if (pixelAt(x, y) > 128) {
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+      letterBounds = { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+    }
+
+    // Fast pixel lookup in the mask (red channel).
+    function pixelAt(x, y) {
+      x = Math.floor(constrain(x, 0, maskW - 1));
+      y = Math.floor(constrain(y, 0, maskH - 1));
+      return maskPixels[(y * maskW + x) * 4];
+    }
+
+    // Check whether a tile (rect) overlaps the letter by sampling its center.
+    function tileOverlapsLetter(tile) {
+      const cx = tile.x + tile.w / 2;
+      const cy = tile.y + tile.h / 2;
+      return pixelAt(cx, cy) > 128;
+    }
+
+    // --------------------------------------------------------
+    // Recursive subdivision: divide the letter bounding box into
+    // geometric tiles. A noise-driven stop condition decides
+    // whether to split further or keep the current cell.
+    // --------------------------------------------------------
+    function subdivideRect(x, y, w, h, depth, outTiles) {
+      const n = noise(x * NOISE_SCALE, y * NOISE_SCALE, globalNoiseZ + depth * 0.5);
+      // Stop if depth reached, or noise says "halt", or tile is tiny
+      if (depth >= MAX_DEPTH || n > 0.55 + depth * 0.08 || w < 30 || h < 30) {
+        const tile = { x, y, w, h, depth, color: null };
+        if (tileOverlapsLetter(tile)) {
+          outTiles.push(tile);
+        }
+        return;
+      }
+      // Split direction based on aspect ratio + noise
+      if ((w > h && n < 0.5) || n < 0.25) {
+        const split = w * (0.35 + 0.3 * n);
+        subdivideRect(x, y, split, h, depth + 1, outTiles);
+        subdivideRect(x + split, y, w - split, h, depth + 1, outTiles);
+      } else {
+        const split = h * (0.35 + 0.3 * n);
+        subdivideRect(x, y, w, split, depth + 1, outTiles);
+        subdivideRect(x, y + split, w, h - split, depth + 1, outTiles);
+      }
+    }
+
+    // Assign a palette color to each tile, using noise to avoid
+    // clashing with immediate neighbors (simplified adjacency rule).
+    function assignTileColors(tiles) {
+      for (let i = 0; i < tiles.length; i++) {
+        const t = tiles[i];
+        let idx = Math.floor(noise(t.x * 0.01, t.y * 0.01, 99) * PALETTE.length) % PALETTE.length;
+        // Simplified adjacency check: ensure different from previous tile
+        if (i > 0) {
+          const prev = tiles[i - 1].colorIndex;
+          if (idx === prev) idx = (idx + 1) % PALETTE.length;
+        }
+        t.colorIndex = idx;
+        t.color = color(PALETTE[idx]);
+      }
+    }
+
+    // --------------------------------------------------------
+    // Particle class: born inside a tile, seeks a target on the
+    // tile's perimeter, and is perturbed by a global noise field.
+    // --------------------------------------------------------
+    class Particle {
+      constructor(tile) {
+        this.tile = tile;
+        this.pos = createVector(
+          tile.x + random(tile.w),
+          tile.y + random(tile.h)
+        );
+        this.vel = p5.Vector.random2D().mult(0.5);
+        this.acc = createVector(0, 0);
+        this.target = this.pickTarget(tile);
+        this.maxSpeed = MAX_SPEED + random(-0.5, 0.5);
+        this.maxForce = MAX_FORCE;
+        this.r = random(1.5, 3.5);
+        this.life = 1.0; // fade if tile disappears
+        this.color = tile.color;
+      }
+
+      pickTarget(tile) {
+        // Target is a random point on the tile's perimeter
+        const side = Math.floor(random(4));
+        if (side === 0) return createVector(tile.x + random(tile.w), tile.y);           // top
+        if (side === 1) return createVector(tile.x + tile.w, tile.y + random(tile.h)); // right
+        if (side === 2) return createVector(tile.x + random(tile.w), tile.y + tile.h);   // bottom
+        return createVector(tile.x, tile.y + random(tile.h));                            // left
+      }
+
+      assignTile(tile) {
+        this.tile = tile;
+        this.target = this.pickTarget(tile);
+        this.color = tile.color;
+        this.life = 1.0;
+      }
+
+      update(turbulence) {
+        // Seek force toward perimeter target
+        const desired = p5.Vector.sub(this.target, this.pos);
+        const d = desired.mag();
+        desired.normalize();
+        const speed = d < 50 ? map(d, 0, 50, 0, this.maxSpeed) : this.maxSpeed;
+        desired.mult(speed);
+        const steer = p5.Vector.sub(desired, this.vel);
+        steer.limit(this.maxForce);
+        this.acc.add(steer.mult(SEEK_STRENGTH));
+
+        // Global noise turbulence (curl-like drift)
+        const nx = noise(this.pos.x * NOISE_SCALE, this.pos.y * NOISE_SCALE, globalNoiseZ);
+        const ny = noise(this.pos.x * NOISE_SCALE + 1000, this.pos.y * NOISE_SCALE, globalNoiseZ);
+        const noiseForce = createVector((nx - 0.5) * 2, (ny - 0.5) * 2).mult(turbulence);
+        this.acc.add(noiseForce);
+
+        // Keep inside tile bounds (soft clamp)
+        const margin = 4;
+        if (this.pos.x < this.tile.x + margin) this.acc.add(createVector(0.3, 0));
+        if (this.pos.x > this.tile.x + this.tile.w - margin) this.acc.add(createVector(-0.3, 0));
+        if (this.pos.y < this.tile.y + margin) this.acc.add(createVector(0, 0.3));
+        if (this.pos.y > this.tile.y + this.tile.h - margin) this.acc.add(createVector(0, -0.3));
+
+        this.vel.add(this.acc);
+        this.vel.limit(this.maxSpeed);
+        this.pos.add(this.vel);
+        this.acc.mult(0);
+
+        // Slowly drift target to create living motion
+        if (frameCount % 60 === 0) {
+          this.target = this.pickTarget(this.tile);
+        }
+      }
+
+      draw() {
+        noStroke();
+        const c = this.color;
+        // Convert hex color to HSB for opacity manipulation
+        const col = color(c);
+        col.setAlpha(this.life * 85);
+        fill(col);
+        ellipse(this.pos.x, this.pos.y, this.r * 2);
+      }
+    }
+
+    // --------------------------------------------------------
+    // Build the tile tree and spawn / remap particle swarms.
+    // --------------------------------------------------------
+    function subdivideAndSpawn() {
+      const newTiles = [];
+      if (letterBounds && letterBounds.w > 0 && letterBounds.h > 0) {
+        subdivideRect(letterBounds.x, letterBounds.y, letterBounds.w, letterBounds.h, 0, newTiles);
+      }
+      assignTileColors(newTiles);
+
+      // Remap old particles to new tiles
+      const newParticles = [];
+      for (let i = 0; i < newTiles.length; i++) {
+        const t = newTiles[i];
+        let count = 0;
+        // Try to adopt existing particles that now fall inside this tile
+        for (let j = particles.length - 1; j >= 0; j--) {
+          const p = particles[j];
+          if (
+            p.pos.x >= t.x && p.pos.x <= t.x + t.w &&
+            p.pos.y >= t.y && p.pos.y <= t.y + t.h
+          ) {
+            p.assignTile(t);
+            newParticles.push(p);
+            particles.splice(j, 1);
+            count++;
+            if (count >= PARTICLES_PER_TILE) break;
+          }
+        }
+        // Fill remaining slots with fresh particles
+        while (count < PARTICLES_PER_TILE) {
+          const p = new Particle(t);
+          newParticles.push(p);
+          count++;
+        }
+      }
+      // Let orphaned particles drift toward nearest new tile
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        let nearest = null;
+        let nearestDist = Infinity;
+        for (let j = 0; j < newTiles.length; j++) {
+          const t = newTiles[j];
+          const cx = t.x + t.w / 2;
+          const cy = t.y + t.h / 2;
+          const d = dist(p.pos.x, p.pos.y, cx, cy);
+          if (d < nearestDist) {
+            nearestDist = d;
+            nearest = t;
+          }
+        }
+        if (nearest) {
+          p.assignTile(nearest);
+          p.life = 0.6; // briefly fade during migration
+          newParticles.push(p);
+        }
+      }
+
+      tiles = newTiles;
+      particles = newParticles;
+    }
+
+    function draw() {
+      background(BG);
+
+      // Determine which tile the mouse is over
+      hoverTile = null;
+      for (let t of tiles) {
+        if (mouseX > t.x && mouseX < t.x + t.w && mouseY > t.y && mouseY < t.y + t.h) {
+          hoverTile = t;
+          break;
+        }
+      }
+      hoverTimer = hoverTile ? 60 : max(0, hoverTimer - 1);
+
+      // Draw faint tile boundaries (geometric scaffolding)
+      noFill();
+      stroke(255, 0, 100, 8);
+      strokeWeight(1);
+      for (let t of tiles) {
+        rect(t.x, t.y, t.w, t.h);
+      }
+
+      // Draw particles
+      for (let p of particles) {
+        const isHovered = (hoverTile && p.tile === hoverTile);
+        const turbulence = isHovered ? TURBULENCE_HOVER : TURBULENCE_BASE;
+        p.update(turbulence);
+        p.draw();
+      }
+
+      // Slowly drift global noise
+      globalNoiseZ += 0.0004;
+    }
+
+    // --------------------------------------------------------
+    // Interactions
+    // --------------------------------------------------------
+    function mouseWheel(event) {
+      // Scroll shifts the noise seed and re-subdivides,
+      // causing the letterform to "breathe" and tiles to reconfigure.
+      globalNoiseZ += event.delta * 0.002;
+      subdivideAndSpawn();
+      return false;
+    }
+
+    function mousePressed() {
+      // Click exports a high-resolution PNG of the current state.
+      saveCanvas('tessellated-swarm-letterform', 'png');
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      maskGraphics = null;
+      maskPixels = null;
+      buildMask();
+      subdivideAndSpawn();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scroll-Driven Particle Swarm</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<style>
+  /* Reset and base styles */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: #0A0A0A;
+    color: #FFFFFF;
+    font-family: sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* The p5.js canvas is fixed behind everything */
+  canvas {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    z-index: 0;
+  }
+
+  /* Scroll runway: 800vh tall body so scrollY has range */
+  #scroll-runway {
+    position: relative;
+    z-index: 1;
+    height: 800vh;
+    pointer-events: none; /* let clicks pass through to canvas where needed */
+  }
+
+  /* Sticky text blocks pin in the viewport */
+  .sticky-spacer {
+    height: 150vh;
+    position: relative;
+  }
+  .sticky-block {
+    position: sticky;
+    top: 40vh;
+    z-index: 2;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+    background: rgba(10,10,10,0.85);
+    border: 1px solid #333;
+    border-radius: 6px;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: auto;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+  }
+  .sticky-block.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Genre-specific accent borders on sticky blocks */
+  .sticky-block.genre-a { border-color: #FF00FF; }
+  .sticky-block.genre-b { border-color: #00AAFF; }
+  .sticky-block.genre-c { border-color: #FFDD00; }
+  .sticky-block.genre-d { border-color: #00FF41; }
+
+  /* Whisper text is rendered by canvas, but we keep a hidden aria region for accessibility */
+  .aria-whisper {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Accessibility label for the canvas (injected by p5) -->
+<div class="aria-whisper" aria-live="polite" id="aria-live"></div>
+
+<!-- Scroll runway with sticky narrative blocks -->
+<div id="scroll-runway">
+  <!-- Spacers and sticky blocks will be injected by JS in setup() -->
+</div>
+
+<script>
+// ============================
+// SCROLL-DRIVEN PARTICLE SWARM
+// ============================
+// Hybrid of Tensor Field mutual gravitation + Pudding scrollytelling.
+// Self-contained p5.js demo. No external assets.
+
+// --- Configuration ---
+const PARTICLE_COUNT = 120;
+const GHOST_CHANCE = 0.03; // 3% of particles are narrative ghosts
+const FRICTION = 0.92;
+const FORCE_STRENGTH = 80;
+const FORCE_SCALE = 0.008;
+const INVERSION_FRAMES = 120; // 2 seconds at 60fps
+const MURMURATION_FRAMES = 180; // 3 seconds
+const MOUSE_REPEL_RADIUS = 150;
+const MOUSE_REPEL_MAX = 0.8;
+const PLUCK_RADIUS = 80;
+const PLUCK_IMPULSE = 3;
+const ECHO_MAX_LENGTH = 300;
+const ECHO_FADE_FRAMES = 300; // 5 seconds
+
+// --- Palette ---
+const C_VOID = [10, 10, 10];
+const C_VOID_ALT = [17, 17, 17];
+const C_PARTICLE = [255, 255, 255];
+const C_GENRE_A = [255, 0, 255];   // East Coast
+const C_GENRE_B = [0, 170, 255];   // West Coast
+const C_GENRE_C = [255, 221, 0];   // South
+const C_GENRE_D = [0, 255, 65];    // Midwest
+const C_LEADER = [68, 68, 68];
+const C_ECHO = [102, 102, 102];
+const C_GHOST = [0, 255, 255];
+
+// --- Globals ---
+let particles = [];
+let dataset = [];
+let waypoints = [];
+let echoPath = [];
+let reverseScrollTimer = 0;
+let lastScrollY = 0;
+let maxScroll = 0;
+let runwayEl;
+
+// ============================
+// DATASET GENERATOR
+// ============================
+function generateRapperDataset(count, genreCount) {
+  const names = [
+    "Rakim", "Jay-Z", "Nas", "Andre 3000", "Eminem", "Kendrick", "Ghostface",
+    "Black Thought", "MF DOOM", "Biggie", "Tupac", "Wayne", "Scarface", "Lupe",
+    "Common", "Mos Def", "Q-Tip", "GZA", "Redman", "Method Man", "Busta",
+    "Big Boi", "Jadakiss", "Camron", "Pusha T", "Kanye", "Drake", "J. Cole",
+    "Travis", "Future"
+  ];
+  const data = [];
+  for (let i = 0; i < count; i++) {
+    const name = names[Math.floor(Math.random() * names.length)] + " " + Math.floor(Math.random() * 99);
+    const uniqueWords = Math.floor(2000 + Math.random() * 6000); // 2000–8000
+    const albums = Math.floor(1 + Math.random() * 20); // 1–20
+    const genre = ['A','B','C','D'][Math.floor(Math.random() * genreCount)];
+    data.push({ name, uniqueWords, albums, genre });
+  }
+  return data;
+}
+
+// ============================
+// PARTICLE SPAWNER
+// ============================
+function spawnParticles(data) {
+  const pts = [];
+  for (let i = 0; i < data.length; i++) {
+    const d = data[i];
+    const x = map(d.uniqueWords, 2000, 8000, 0, width);
+    const y = map(d.albums, 1, 20, height, 0);
+    const isGhost = (Math.random() < GHOST_CHANCE);
+    pts.push({
+      x: x,
+      y: y,
+      vx: 0,
+      vy: 0,
+      genre: d.genre,
+      label: d.name,
+      charge: 1,
+      isGhost: isGhost,
+      inversionTimer: 0,
+      murmurationTimer: 0,
+      murmurationCenter: null,
+      murmurationAngle: 0,
+      murmurationRadius: 0,
+      ghostAlpha: 0,
+      ghostState: 'HIDDEN', // HIDDEN, FADING_IN, DRIFTING, WHISPERING
+      settled: false
+    });
+  }
+  return pts;
+}
+
+// ============================
+// GENRE COLOR HELPER
+// ============================
+function genreColor(g) {
+  if (g === 'A') return C_GENRE_A;
+  if (g === 'B') return C_GENRE_B;
+  if (g === 'C') return C_GENRE_C;
+  if (g === 'D') return C_GENRE_D;
+  return C_PARTICLE;
+}
+
+// ============================
+// STICKY TEXT BLOCKS (DOM)
+// ============================
+function createStickyBlocks() {
+  runwayEl = document.getElementById('scroll-runway');
+  const wpData = [
+    { t: 0.00, text: "Every rapper is a point in space.", genre: null },
+    { t: 0.15, text: "East Coast clusters tight — dense vocabulary, fewer albums.", genre: 'A' },
+    { t: 0.35, text: "West Coast spreads wide — high volume, high variety.", genre: 'B' },
+    { t: 0.55, text: "South flips the script: more albums, fewer unique words.", genre: 'C' },
+    { t: 0.75, text: "Midwest finds the middle ground.", genre: 'D' },
+    { t: 0.95, text: "But everyone is here. Even the ones you never counted.", genre: null }
+  ];
+
+  for (let i = 0; i < wpData.length; i++) {
+    const wp = wpData[i];
+    const spacer = document.createElement('div');
+    spacer.className = 'sticky-spacer';
+    // Each spacer is 150vh tall, positioned so waypoint is roughly at t
+    spacer.style.height = (i === wpData.length - 1) ? '200vh' : '150vh';
+    spacer.style.position = 'relative';
+
+    const block = document.createElement('div');
+    block.className = 'sticky-block';
+    if (wp.genre) block.classList.add('genre-' + wp.genre.toLowerCase());
+    block.textContent = wp.text;
+    block.dataset.t = wp.t;
+    block.dataset.genre = wp.genre || '';
+
+    spacer.appendChild(block);
+    runwayEl.appendChild(spacer);
+
+    waypoints.push({
+      t: wp.t,
+      text: wp.text,
+      genre: wp.genre,
+      triggered: false,
+      el: block
+    });
+  }
+}
+
+// ============================
+// CHARGE INVERSION
+// ============================
+function triggerChargeInversion(genre, frames) {
+  // Collect particles in this genre
+  const categoryParticles = particles.filter(p => p.genre === genre && !p.isGhost);
+  const murmurCount = Math.max(1, Math.floor(categoryParticles.length * 0.01));
+
+  // Pick murmuration candidates randomly
+  const murmurIndices = new Set();
+  while (murmurIndices.size < murmurCount && murmurIndices.size < categoryParticles.length) {
+    const idx = Math.floor(Math.random() * categoryParticles.length);
+    murmurIndices.add(idx);
+  }
+
+  // Compute category center of mass for murmuration anchor
+  let cx = 0, cy = 0;
+  for (let p of categoryParticles) {
+    cx += p.x;
+    cy += p.y;
+  }
+  cx /= categoryParticles.length || 1;
+  cy /= categoryParticles.length || 1;
+
+  for (let i = 0; i < categoryParticles.length; i++) {
+    const p = categoryParticles[i];
+    if (murmurIndices.has(i)) {
+      // Enter murmuration instead of inversion
+      p.murmurationTimer = MURMURATION_FRAMES;
+      p.murmurationCenter = { x: cx, y: cy };
+      p.murmurationAngle = Math.random() * TWO_PI;
+      p.murmurationRadius = 0;
+      // Keep charge +1 but ignore forces while murmurating
+    } else {
+      p.charge = -1;
+      p.inversionTimer = frames;
+    }
+  }
+}
+
+// ============================
+// p5.js SETUP
+// ============================
+function setup() {
+  const cnv = createCanvas(windowWidth, windowHeight);
+  cnv.elt.setAttribute('aria-label', 'Data visualization of rapper vocabulary');
+  cnv.elt.style.position = 'fixed';
+  cnv.elt.style.top = '0';
+  cnv.elt.style.left = '0';
+  cnv.elt.style.zIndex = '0';
+
+  background(C_VOID);
+
+  dataset = generateRapperDataset(PARTICLE_COUNT, 4);
+  particles = spawnParticles(dataset);
+  createStickyBlocks();
+
+  // Extend body for scroll runway
+  document.body.style.height = '800vh';
+  maxScroll = document.body.scrollHeight - window.innerHeight;
+
+  lastScrollY = window.scrollY;
+}
+
+// ============================
+// p5.js DRAW
+// ============================
+function draw() {
+  // Motion-blur trail (low-opacity overlay)
+  noStroke();
+  fill(C_VOID[0], C_VOID[1], C_VOID[2], 30);
+  rect(0, 0, width, height);
+
+  // Compute scroll progress
+  maxScroll = document.body.scrollHeight - window.innerHeight;
+  const t = constrain(window.scrollY / maxScroll, 0, 1);
+
+  // Detect reverse scroll
+  if (window.scrollY < lastScrollY) {
+    reverseScrollTimer = ECHO_FADE_FRAMES;
+  }
+  lastScrollY = window.scrollY;
+  if (reverseScrollTimer > 0) reverseScrollTimer--;
+
+  // --- Waypoint triggers & sticky block visibility ---
+  let currentWaypoint = null;
+  for (let wp of waypoints) {
+    const diff = Math.abs(t - wp.t);
+    // Show sticky block when near its waypoint
+    if (diff < 0.06) {
+      wp.el.classList.add('visible');
+    } else {
+      wp.el.classList.remove('visible');
+    }
+    // Trigger charge inversion once per waypoint when very close
+    if (diff < 0.03 && wp.genre && !wp.triggered) {
+      wp.triggered = true;
+      currentWaypoint = wp;
+      triggerChargeInversion(wp.genre, INVERSION_FRAMES);
+    }
+    if (diff < 0.03 && !wp.genre) {
+      currentWaypoint = wp;
+    }
+  }
+
+  // --- Physics update ---
+  for (let p of particles) {
+    // Ghost state machine
+    if (p.isGhost) {
+      if (p.ghostState === 'HIDDEN' && t > 0.90) {
+        p.ghostState = 'FADING_IN';
+      }
+      if (p.ghostState === 'FADING_IN') {
+        p.ghostAlpha += 255 / 60; // fade in over 60 frames
+        if (p.ghostAlpha >= 200) {
+          p.ghostAlpha = 200;
+          p.ghostState = 'DRIFTING';
+        }
+      }
+      if (p.ghostState === 'DRIFTING' && t > 0.95) {
+        p.ghostState = 'WHISPERING';
+      }
+      // Lissajous drift
+      p.x += Math.sin(frameCount * 0.02 + p.y * 0.01) * 0.5;
+      p.y += Math.cos(frameCount * 0.02 + p.x * 0.01) * 0.5;
+      // Ghosts do not participate in mutual gravitation; skip force loop
+      continue;
+    }
+
+    // Murmuration: ignore forces, orbit in Fibonacci spiral
+    if (p.murmurationTimer > 0) {
+      p.murmurationTimer--;
+      const center = p.murmurationCenter;
+      if (center) {
+        p.murmurationAngle += radians(137.5); // golden angle
+        p.murmurationRadius += 0.5;
+        p.x = center.x + Math.cos(p.murmurationAngle) * p.murmurationRadius;
+        p.y = center.y + Math.sin(p.murmurationAngle) * p.murmurationRadius;
+      }
+      if (p.murmurationTimer === 0) {
+        p.murmurationCenter = null;
+        p.murmurationRadius = 0;
+        // Rejoin swarm with gentle velocity
+        p.vx = random(-1, 1);
+        p.vy = random(-1, 1);
+      }
+      continue;
+    }
+
+    // Mutual gravitation (O(n²))
+    let fx = 0, fy = 0;
+    for (let q of particles) {
+      if (p === q) continue;
+      // Ghosts do not exert or feel forces
+      if (q.isGhost) continue;
+      const dx = q.x - p.x;
+      const dy = q.y - p.y;
+      let dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 1) dist = 1;
+      const force = FORCE_STRENGTH / dist;
+      fx += force * (dx / dist) * p.charge * q.charge;
+      fy += force * (dy / dist) * p.charge * q.charge;
+    }
+
+    p.vx += fx * FORCE_SCALE;
+    p.vy += fy * FORCE_SCALE;
+    p.vx *= FRICTION;
+    p.vy *= FRICTION;
+    p.x += p.vx;
+    p.y += p.vy;
+
+    // Boundary wrap
+    if (p.x < 0) p.x = width;
+    if (p.x > width) p.x = 0;
+    if (p.y < 0) p.y = height;
+    if (p.y > height) p.y = 0;
+
+    // Inversion countdown
+    if (p.inversionTimer > 0) {
+      p.inversionTimer--;
+      if (p.inversionTimer === 0) {
+        p.charge = 1;
+      }
+    }
+  }
+
+  // --- Draw particles ---
+  for (let p of particles) {
+    if (p.isGhost) {
+      // Ghosts are invisible until t > 0.90
+      if (t < 0.90) continue;
+      const a = p.ghostAlpha;
+      if (a <= 0) continue;
+      stroke(C_GHOST[0], C_GHOST[1], C_GHOST[2], a);
+      strokeWeight(1.5);
+      point(p.x, p.y);
+      continue;
+    }
+
+    const col = genreColor(p.genre);
+    let alpha = 180;
+    let sw = 1.2;
+    if (p.inversionTimer > 0) {
+      alpha = 255;
+      sw = 2.5;
+    }
+    if (p.murmurationTimer > 0) {
+      // Murmuration particle is white and bold
+      stroke(C_PARTICLE[0], C_PARTICLE[1], C_PARTICLE[2], 255);
+      strokeWeight(2.5);
+      point(p.x, p.y);
+      continue;
+    }
+    stroke(col[0], col[1], col[2], alpha);
+    strokeWeight(sw);
+    point(p.x, p.y);
+  }
+
+  // --- Leader lines for active waypoint genre ---
+  if (currentWaypoint && currentWaypoint.genre) {
+    stroke(C_LEADER[0], C_LEADER[1], C_LEADER[2], 120);
+    strokeWeight(0.8);
+    for (let p of particles) {
+      if (p.genre === currentWaypoint.genre && !p.isGhost) {
+        line(p.x, p.y, width / 2, height / 2);
+      }
+    }
+  }
+
+  // --- Scroll echo path ---
+  // Record current position
+  echoPath.push({ x: t * width, y: (1 - t) * height });
+  if (echoPath.length > ECHO_MAX_LENGTH) echoPath.shift();
+
+  // Draw echo only if reverse scroll timer is active
+  if (reverseScrollTimer > 0 && echoPath.length > 1) {
+    noFill();
+    const echoAlpha = map(reverseScrollTimer, 0, ECHO_FADE_FRAMES, 0, 60);
+    stroke(C_ECHO[0], C_ECHO[1], C_ECHO[2], echoAlpha);
+    strokeWeight(1);
+    beginShape();
+    for (let pt of echoPath) {
+      vertex(pt.x, pt.y);
+    }
+    endShape();
+  }
+
+  // --- Ghost whisper text ---
+  if (t > 0.95) {
+    noStroke();
+    const whisperAlpha = map(t, 0.95, 1.0, 0, 80);
+    fill(C_GHOST[0], C_GHOST[1], C_GHOST[2], whisperAlpha);
+    textSize(14);
+    textFont('monospace');
+    textAlign(RIGHT, BOTTOM);
+    text("EVERYONE ELSE IS HERE", width - 20, height - 20);
+  }
+
+  // --- ARIA live update for accessibility (infrequent) ---
+  if (frameCount % 60 === 0) {
+    const live = document.getElementById('aria-live');
+    if (live && currentWaypoint) {
+      live.textContent = currentWaypoint.text;
+    }
+  }
+}
+
+// ============================
+// MOUSE INTERACTIONS
+// ============================
+function mouseMoved() {
+  // Mouse acts as external repulsor
+  for (let p of particles) {
+    if (p.isGhost) continue;
+    const dx = p.x - mouseX;
+    const dy = p.y - mouseY;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < MOUSE_REPEL_RADIUS && dist > 0) {
+      const force = map(dist, 0, MOUSE_REPEL_RADIUS, MOUSE_REPEL_MAX, 0);
+      p.vx += (dx / dist) * force;
+      p.vy += (dy / dist) * force;
+    }
+  }
+}
+
+function mousePressed() {
+  // Pluck nearby particles
+  for (let p of particles) {
+    if (p.isGhost) continue;
+    const d = Math.sqrt((p.x - mouseX)**2 + (p.y - mouseY)**2);
+    if (d < PLUCK_RADIUS) {
+      p.vx += random(-PLUCK_IMPULSE, PLUCK_IMPULSE);
+      p.vy += random(-PLUCK_IMPULSE, PLUCK_IMPULSE);
+    }
+  }
+}
+
+// ============================
+// RESIZE HANDLER
+// ============================
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  // Remap particle positions proportionally to new canvas size
+  const oldW = width;
+  const oldH = height;
+  // Wait, resizeCanvas updates width/height globals. We need the old values.
+  // p5.js doesn't expose old width/height easily. We'll use the dataset
+  // to re-map coordinates instead, which is robust.
+  for (let i = 0; i < particles.length; i++) {
+    const p = particles[i];
+    const d = dataset[i];
+    p.x = map(d.uniqueWords, 2000, 8000, 0, width);
+    p.y = map(d.albums, 1, 20, height, 0);
+  }
+  maxScroll = document.body.scrollHeight - window.innerHeight;
+}
+
+// ============================
+// SCROLL LISTENER (for reverse-scroll detection outside draw loop)
+// ============================
+window.addEventListener('scroll', () => {
+  if (window.scrollY < lastScrollY) {
+    reverseScrollTimer = ECHO_FADE_FRAMES;
+  }
+});
+</script>
+</body>
+</html>

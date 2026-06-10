@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Corrupted Manuscript</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<style>
+  /* ─── Reset & base ─── */
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    /* Warm cream editorial page base */
+    background: #FAF9F6;
+    color: #222222;
+    font-family: 'Inter', 'Graphik', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* ─── p5.js grain canvas: fixed behind everything ─── */
+  canvas {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ─── Editorial layer above the canvas ─── */
+  main {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+    max-width: 72ch;
+    margin: 0 auto;
+    padding: 6rem 2rem 10rem;
+  }
+
+  /* ─── Section spacing ─── */
+  section {
+    margin-bottom: 8rem;
+    padding: 2rem 0;
+  }
+
+  /* Alternating slightly darker cream for section variation */
+  section:nth-child(even) {
+    background: #F5F5F0;
+    margin-left: -2rem;
+    margin-right: -2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    border-radius: 4px;
+  }
+
+  /* ─── Headlines: classical serif, editorial scale ─── */
+  h1, h2 {
+    font-family: 'Georgia', 'Freight Display', 'Times New Roman', serif;
+    color: #1A1A1A;
+    line-height: 1.1;
+    cursor: pointer;
+    /* Phosphor glow is injected dynamically by JS during scramble */
+    transition: color 0.3s ease;
+    /* Asymmetric left margin for editorial feel */
+    margin-left: -0.5rem;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: 1.2rem;
+    margin-top: 2rem;
+  }
+
+  /* ─── Body text: measure capped at ~65ch via main container ─── */
+  p {
+    font-size: 1.05rem;
+    margin-bottom: 1.4rem;
+    max-width: 65ch;
+  }
+
+  /* ─── Links: muted gold hover ─── */
+  a {
+    color: #1A1A1A;
+    text-decoration: underline;
+    text-decoration-color: #C5A059;
+    text-underline-offset: 3px;
+    transition: color 0.25s ease, text-decoration-color 0.25s ease;
+  }
+
+  a:hover {
+    color: #C5A059;
+    text-decoration-color: #C5A059;
+  }
+
+  /* ─── Braille shadow decorative spans ─── */
+  .braille-shadow {
+    display: inline;
+    color: #8B0000;
+    opacity: 0.15;
+    position: relative;
+    top: 4px;
+    margin-left: 4px;
+    font-family: 'Georgia', 'Freight Display', serif;
+  }
+
+  /* ─── Decorative ornament (editorial touch) ─── */
+  .ornament {
+    text-align: center;
+    color: #C5A059;
+    font-size: 1.2rem;
+    margin: 3rem 0;
+    letter-spacing: 0.5em;
+  }
+</style>
+</head>
+<body>
+
+<main>
+  <!-- Section 1 -->
+  <section>
+    <h1 aria-label="The Art of Longevity">The Art of Longevity</h1>
+    <p>
+      In the quiet corridors of <a href="#">Stripe Press</a>, the editors speak of books as vessels.
+      Each volume is bound not merely in cloth and glue, but in the accumulated attention of its readers.
+      The measure of a book is not how many copies it sells, but how many minds it permanently rearranges.
+    </p>
+    <p>
+      The warm cream pages you now see are a deliberate choice. They resist the sterility of pure white;
+      they invite the eye to linger. Typography is architecture at the scale of the sentence.
+    </p>
+    <div class="ornament">&#8254; &#8254; &#8254;</div>
+  </section>
+
+  <!-- Section 2 -->
+  <section>
+    <h2 aria-label="Noise Before Signal">Noise Before Signal</h2>
+    <p>
+      Every transmission begins in chaos. The radio telescope does not hear the star; it hears the static
+      of the universe, and within that static, the faint periodic pulse of something intentional.
+      Reading is a similar act of extraction: the eye moves across a field of noise and extracts meaning.
+    </p>
+    <p>
+      In the demo above, the headline is that noise field. The characters scramble because meaning is not
+      given—it is <em>earned</em> by attention. Click the headline to re-scramble it. Watch it resolve again.
+    </p>
+  </section>
+
+  <!-- Section 3 -->
+  <section>
+    <h2 aria-label="The Persistence of Errors">The Persistence of Errors</h2>
+    <p>
+      A manuscript is never fully corrected. The errata slip tucked in the back of the first edition
+      is a confession, not a resolution. Three percent of the errors persist through every printing:
+      a comma that becomes a semicolon, a word that refuses to settle into its intended form.
+    </p>
+    <p>
+      Here, the persistence is literal. Braille glyphs linger two seconds longer than the rest of the text.
+      They are the last corruption to fade, leaving behind a faint burgundy shadow—
+      a hidden tactile layer beneath the visible page.
+    </p>
+    <div class="ornament">&#8254; &#8254; &#8254;</div>
+  </section>
+
+  <!-- Section 4 -->
+  <section>
+    <h2 aria-label="Terminal Infection">Terminal Infection</h2>
+    <p>
+      The phosphor glow that bleeds across the headlines during scramble is a terminal-screen property
+      infecting a printed-page layout. It is a momentary glitch: the page forgets that it is paper
+      and remembers that it is, at root, a signal. The moment the last character locks into place,
+      the glow vanishes instantly. No trace remains except the Braille shadows.
+    </p>
+    <p>
+      The background grain is alive. It drifts at two percent opacity per frame—subliminal, metabolic.
+      Stare at the cream for ten seconds and you will sense that the paper is breathing.
+    </p>
+  </section>
+
+  <!-- Section 5 -->
+  <section>
+    <h2 aria-label="Revelation From Noise">Revelation From Noise</h2>
+    <p>
+      The core narrative of this demo is <strong>revelation from noise</strong>.
+      The text arrives as chaos and resolves into meaning. The scramble is not decoration;
+      it is the story of how attention transforms entropy into structure.
+      Scroll down to trigger each headline. Click to re-experience the decryption.
+    </p>
+  </section>
+</main>
+
+<script>
+/**
+ * ============================================================
+ * The Corrupted Manuscript — Core Implementation
+ * ============================================================
+ * Technique: Text Scramble kinetic decryption × Stripe Press editorial layout
+ * Tool: p5.js (background grain canvas) + vanilla DOM (editorial layer)
+ * Palette: Warm cream #FAF9F6, phosphor green #00FF41, burgundy #8B0000
+ *
+ * The page is a printed book that momentarily forgets it is printed.
+ * 3% of the corruption lingers as hidden Braille shadows.
+ * ============================================================
+ */
+
+// ─── p5.js: Grain Canvas Background ───
+// The canvas is fixed behind the DOM. It generates a static grain texture
+// in setup(), then slowly drifts it in draw() via a faint 2% opacity fade.
+let grainGraphics;
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  // Warm cream background
+  background('#FAF9F6');
+  // Off-screen buffer for the grain texture
+  grainGraphics = createGraphics(width, height);
+  generateGrain(grainGraphics, '#E8E4D9', 0.04);
+  noLoop(); // draw() is called manually via loop()
+  loop();
+}
+
+function draw() {
+  // Clear to warm cream each frame
+  background('#FAF9F6');
+  // Draw the grain texture
+  image(grainGraphics, 0, 0);
+  // Slow grain drift: very lightly erase the grain buffer
+  // This creates a subliminal metabolic effect at 2% opacity per frame
+  grainGraphics.noStroke();
+  grainGraphics.fill('#FAF9F6');
+  // Use alpha 5 for a visible but subtle drift (translates to ~2% feel)
+  grainGraphics.fill(250, 249, 246, 5);
+  grainGraphics.rect(0, 0, width, height);
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  grainGraphics.resizeCanvas(windowWidth, windowHeight);
+  generateGrain(grainGraphics, '#E8E4D9', 0.04);
+}
+
+/**
+ * Pre-render the grain texture once.
+ * We draw 5000 random 1×1 rectangles at low opacity.
+ * This is done in setup() / on resize only, not per frame.
+ */
+function generateGrain(g, colorStr, opacity) {
+  g.background('#FAF9F6');
+  g.noStroke();
+  // Parse hex to RGB for p5.js fill
+  const c = color(colorStr);
+  g.fill(red(c), green(c), blue(c), opacity * 255);
+  for (let i = 0; i < 5000; i++) {
+    g.rect(random(width), random(height), 1, 1);
+  }
+}
+
+// ─── Text Scramble Engine ───
+/**
+ * TextScramble manipulates element.textContent directly via requestAnimationFrame.
+ * Each headline holds a target string and a current string that converges toward it.
+ * Unresolved characters are replaced with random symbols from a constrained set.
+ * Each character resolves on a staggered frame schedule, producing a left-to-right
+ * cascading "decryption" rhythm. The easing is exponential ease-out.
+ */
+class TextScramble {
+  constructor(el) {
+    this.el = el;
+    // Dense noise character set (terminal glyphs)
+    this.chars = '!<>-_\\/[]{}—=+*^?#________';
+    // Unicode Braille patterns for the 3% persistence weirdness
+    this.brailleChars = '⠿⠮⠶⠦⠴⠲⠱⠰';
+    this.frame = 0;
+    this.queue = [];
+    this.frameRequest = null;
+    this.update = this.update.bind(this);
+  }
+
+  /**
+   * Build the scramble queue with staggered start/end frames.
+   * 3% of characters are flagged as Braille slots—they persist longer.
+   */
+  scrambleWithBraille(targetText) {
+    const oldText = this.el.innerText || '';
+    const length = Math.max(oldText.length, targetText.length);
+    this.queue = [];
+    for (let i = 0; i < length; i++) {
+      const from = oldText[i] || '';
+      const to = targetText[i] || '';
+      // Random staggered start and end frames create the cascading rhythm
+      const start = Math.floor(Math.random() * 20);
+      const end = start + Math.floor(Math.random() * 20);
+      // 3% chance this character becomes a Braille slot
+      const isBraille = Math.random() < 0.03;
+      this.queue.push({
+        from, to, start, end, isBraille,
+        char: null,
+        settled: false
+      });
+    }
+    this.frame = 0;
+    cancelAnimationFrame(this.frameRequest);
+    this.update();
+  }
+
+  /**
+   * The per-frame update loop. Runs via requestAnimationFrame until all
+   * characters have settled into their target forms.
+   */
+  update() {
+    let output = '';
+    let complete = 0;
+    for (let i = 0; i < this.queue.length; i++) {
+      const q = this.queue[i];
+      if (q.settled) {
+        complete++;
+        output += q.to;
+      } else if (this.frame >= q.end) {
+        // If Braille, it persists for 120 extra frames (~2s @ 60fps)
+        if (q.isBraille && this.frame < q.end + 120) {
+          if (!q.char || Math.random() < 0.28) {
+            q.char = this.randomBraille();
+          }
+          output += q.char;
+        } else {
+          q.settled = true;
+          complete++;
+          output += q.to;
+        }
+      } else if (this.frame >= q.start) {
+        // GLITCHING phase: random glyph, with occasional re-roll
+        if (!q.char || Math.random() < 0.28) {
+          q.char = this.randomChar();
+        }
+        output += q.char;
+      } else {
+        // WAITING phase: show original character
+        output += q.from;
+      }
+    }
+
+    this.el.innerText = output;
+
+    // Phosphor glow during scramble phase: terminal-screen property infecting paper
+    if (complete < this.queue.length) {
+      this.el.style.textShadow = '0 0 8px rgba(0, 255, 65, 0.2)';
+    } else {
+      this.el.style.textShadow = 'none';
+    }
+
+    if (complete === this.queue.length) {
+      // All characters settled — trigger Braille shadow fade for lingering slots
+      fadeBrailleShadow(this.el, this.queue);
+    } else {
+      this.frame++;
+      this.frameRequest = requestAnimationFrame(this.update);
+    }
+  }
+
+  randomChar() {
+    return this.chars[Math.floor(Math.random() * this.chars.length)];
+  }
+
+  randomBraille() {
+    return this.brailleChars[Math.floor(Math.random() * this.brailleChars.length)];
+  }
+}
+
+/**
+ * Braille Shadow Module:
+ * After settlement, any character that was a Braille slot gets a faint burgundy
+ * decorative span appended beneath the headline. This is the hidden tactile layer
+ * that only becomes visible during the corruption event.
+ */
+function fadeBrailleShadow(el, queue) {
+  for (let i = 0; i < queue.length; i++) {
+    const q = queue[i];
+    if (q.isBraille) {
+      const span = document.createElement('span');
+      span.innerText = q.to;
+      span.className = 'braille-shadow';
+      // Append to the headline's parent so it sits beneath as a ghost element
+      // rather than corrupting the headline text node itself
+      el.parentNode.appendChild(span);
+      // Fade out over 3 seconds, then remove
+      setTimeout(() => {
+        span.style.transition = 'opacity 3s ease';
+        span.style.opacity = '0';
+      }, 100);
+      setTimeout(() => {
+        if (span.parentNode) span.remove();
+      }, 3200);
+    }
+  }
+}
+
+// ─── Main DOM Initialization ───
+document.addEventListener('DOMContentLoaded', () => {
+  const headlines = document.querySelectorAll('h1, h2');
+
+  headlines.forEach((headline) => {
+    const targetText = headline.innerText.trim();
+    // Store target for later use; preserve in aria-label for screen readers
+    headline.dataset.target = targetText;
+    headline.dataset.scrambled = 'false';
+
+    // Create a TextScramble instance attached to the headline
+    const scrambler = new TextScramble(headline);
+    headline._scrambler = scrambler;
+
+    // IntersectionObserver: trigger scramble when 50% visible
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && headline.dataset.scrambled === 'false') {
+          headline.dataset.scrambled = 'true';
+          scrambler.scrambleWithBraille(targetText);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    observer.observe(headline);
+
+    // Click to re-scramble: resets the scrambled flag and re-queues the animation
+    headline.addEventListener('click', () => {
+      headline.dataset.scrambled = 'false';
+      // Remove any lingering braille shadow spans before re-scrambling
+      const ghosts = headline.parentNode.querySelectorAll('.braille-shadow');
+      ghosts.forEach((g) => g.remove());
+      scrambler.scrambleWithBraille(headline.dataset.target);
+    });
+  });
+});
+</script>
+</body>
+</html>

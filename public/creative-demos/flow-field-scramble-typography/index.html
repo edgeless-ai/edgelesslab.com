@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flow-Field Scramble Typography</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<style>
+  body { margin: 0; overflow: hidden; background: #F5F5DC; font-family: 'Inter', sans-serif; }
+  #text-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; align-items: center; justify-content: center; }
+  .letter { position: absolute; font-size: 120px; font-weight: 900; color: #2E3B4E; opacity: 0.0; transition: opacity 0.3s; }
+  .letter.resolved { opacity: 1.0; }
+  #theme-toggle { position: absolute; bottom: 20px; left: 20px; background: #36454F; color: #F5F5DC; border: none; padding: 8px 16px; cursor: pointer; font-family: inherit; font-size: 14px; }
+  #theme-toggle.terminal { background: #00FF41; color: #0A0A0A; }
+</style>
+</head>
+<body>
+<div id="text-overlay"></div>
+<button id="theme-toggle">Theme: Paper</button>
+<script>
+let font;
+let particles = [];
+let flowField;
+let cols, rows;
+let resolution = 20;
+let noiseScale = 0.01;
+let targetWord = "WIND";
+let glyphPoints = [];
+let letterElements = [];
+let scrambleState = [];
+let glyphSet = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+let theme = 'paper';
+let textOverlay;
+
+function preload() {
+  font = loadFont('https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-black.ttf');
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  textOverlay = document.getElementById('text-overlay');
+  initWord(targetWord);
+  document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+}
+
+function initWord(word) {
+  targetWord = word;
+  particles = [];
+  letterElements = [];
+  scrambleState = [];
+  textOverlay.innerHTML = '';
+  
+  let totalWidth = 0;
+  let charWidths = [];
+  for (let i = 0; i < word.length; i++) {
+    let w = font.textBounds(word[i], 0, 0, 120).w;
+    charWidths.push(w);
+    totalWidth += w;
+  }
+  let startX = (width - totalWidth) / 2;
+  let y = height / 2;
+  
+  for (let i = 0; i < word.length; i++) {
+    let pts = font.textToPoints(word[i], startX, y, 120, { sampleFactor: 0.3 });
+    glyphPoints.push(pts);
+    let el = document.createElement('span');
+    el.className = 'letter';
+    el.textContent = glyphSet[Math.floor(Math.random() * glyphSet.length)];
+    el.style.left = (startX + (i > 0 ? charWidths[i-1] : 0)) + 'px';
+    el.style.top = (y - 120) + 'px';
+    textOverlay.appendChild(el);
+    letterElements.push(el);
+    scrambleState.push({ target: word[i], current: el.textContent, resolved: false, progress: 0 });
+    startX += charWidths[i];
+    
+    for (let j = 0; j < pts.length; j += 3) {
+      particles.push(new Particle(pts[j].x, pts[j].y, i));
+    }
+  }
+  
+  cols = floor(width / resolution);
+  rows = floor(height / resolution);
+  flowField = new Array(cols * rows);
+  noiseSeed(random(10000));
+}
+
+function toggleTheme() {
+  theme = theme === 'paper' ? 'terminal' : 'paper';
+  let btn = document.getElementById('theme-toggle');
+  if (theme === 'terminal') {
+    document.body.style.background = '#0A0A0A';
+    btn.classList.add('terminal');
+    btn.textContent = 'Theme: Terminal';
+  } else {
+    document.body.style.background = '#F5F5DC';
+    btn.classList.remove('terminal');
+    btn.textContent = 'Theme: Paper';
+  }
+}
+
+function draw() {
+  if (theme === 'paper') {
+    background(245, 245, 220, 20);
+  } else {
+    background(10, 10, 10, 20);
+  }
+  
+  let yoff = 0;
+  for (let y = 0; y < rows; y++) {
+    let xoff = 0;
+    for (let x = 0; x < cols; x++) {
+      let index = x + y * cols;
+      let angle = noise(xoff, yoff, frameCount * 0.002) * TWO_PI * 2;
+      // Add text-derived angle perturbation
+      let tx = floor(x / 5) % targetWord.length;
+      if (!scrambleState[tx].resolved) {
+        let glyph = scrambleState[tx].current;
+        angle += map(glyph.charCodeAt(0), 33, 126, -PI, PI) * 0.3;
+      }
+      flowField[index] = angle;
+      xoff += noiseScale;
+    }
+    yoff += noiseScale;
+  }
+  
+  for (let i = particles.length - 1; i >= 0; i--) {
+    let p = particles[i];
+    p.follow(flowField);
+    p.update();
+    p.show();
+    if (p.finished()) {
+      let li = p.letterIndex;
+      if (!scrambleState[li].resolved) {
+        scrambleState[li].progress += 1;
+        if (scrambleState[li].progress > 5) {
+          scrambleState[li].resolved = true;
+          letterElements[li].textContent = scrambleState[li].target;
+          letterElements[li].classList.add('resolved');
+        } else {
+          letterElements[li].textContent = glyphSet[Math.floor(Math.random() * glyphSet.length)];
+          scrambleState[li].current = letterElements[li].textContent;
+        }
+      }
+      particles.splice(i, 1);
+    }
+  }
+  
+  // Respawn particles from unresolved letters
+  for (let i = 0; i < targetWord.length; i++) {
+    if (!scrambleState[i].resolved && particles.filter(p => p.letterIndex === i).length < 30) {
+      let pts = glyphPoints[i];
+      if (pts.length > 0) {
+        let pt = pts[floor(random(pts.length))];
+        particles.push(new Particle(pt.x, pt.y, i));
+      }
+    }
+  }
+  
+  // Check if all resolved
+  let allResolved = scrambleState.every(s => s.resolved);
+  if (allResolved && particles.length === 0) {
+    setTimeout(() => {
+      let words = ["WIND", "FLOW", "TYPE", "ART", "CODE"];
+      let next = words[floor(random(words.length))];
+      initWord(next);
+    }, 1000);
+  }
+}
+
+function mousePressed() {
+  for (let i = 0; i < scrambleState.length; i++) {
+    scrambleState[i].resolved = false;
+    scrambleState[i].progress = 0;
+    letterElements[i].classList.remove('resolved');
+  }
+  noiseSeed(random(10000));
+}
+
+function keyPressed() {
+  if (key === ' ') {
+    toggleTheme();
+    return false;
+  }
+}
+
+class Particle {
+  constructor(x, y, li) {
+    this.pos = createVector(x, y);
+    this.vel = createVector(0, 0);
+    this.acc = createVector(0, 0);
+    this.maxSpeed = 2;
+    this.lifespan = random(30, 80);
+    this.letterIndex = li;
+    this.history = [];
+  }
+
+  follow(vectors) {
+    let x = floor(this.pos.x / resolution);
+    let y = floor(this.pos.y / resolution);
+    let index = x + y * cols;
+    if (index >= 0 && index < vectors.length) {
+      let force = p5.Vector.fromAngle(vectors[index]);
+      force.setMag(0.5);
+      this.applyForce(force);
+    }
+    // Mouse vortex
+    let mouse = createVector(mouseX, mouseY);
+    let d = p5.Vector.dist(this.pos, mouse);
+    if (d < 150) {
+      let vortex = p5.Vector.sub(this.pos, mouse);
+      vortex.rotate(HALF_PI);
+      vortex.setMag(map(d, 0, 150, 2, 0));
+      this.applyForce(vortex);
+    }
+  }
+
+  applyForce(force) {
+    this.acc.add(force);
+  }
+
+  update() {
+    this.vel.add(this.acc);
+    this.vel.limit(this.maxSpeed);
+    this.pos.add(this.vel);
+    this.acc.mult(0);
+    this.lifespan--;
+    this.history.push(this.pos.copy());
+    if (this.history.length > 10) this.history.shift();
+  }
+
+  show() {
+    if (theme === 'paper') {
+      stroke(54, 69, 79, map(this.lifespan, 0, 80, 0, 200));
+    } else {
+      stroke(0, 255, 65, map(this.lifespan, 0, 80, 0, 200));
+    }
+    strokeWeight(1);
+    noFill();
+    beginShape();
+    for (let i = 0; i < this.history.length; i++) {
+      vertex(this.history[i].x, this.history[i].y);
+    }
+    endShape();
+  }
+
+  finished() {
+    return this.lifespan <= 0 || this.pos.x < 0 || this.pos.x > width || this.pos.y < 0 || this.pos.y > height;
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  initWord(targetWord);
+}
+</script>
+</body>
+</html>

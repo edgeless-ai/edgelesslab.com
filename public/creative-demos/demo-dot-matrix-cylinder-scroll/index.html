@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dot-Matrix Cylinder Scroll</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    overflow-x: hidden;
+  }
+  .scroll-section {
+    height: 300vh;
+    position: relative;
+  }
+  .sticky-wrapper {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    perspective: 70vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .cylinder {
+    position: relative;
+    width: 256px;
+    height: 256px;
+    transform-style: preserve-3d;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .cylinder li {
+    position: absolute;
+    width: 256px;
+    height: 256px;
+    top: 50%;
+    left: 50%;
+    margin: -128px 0 0 -128px;
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    background: rgba(0,0,0,0.8);
+  }
+  .cylinder li canvas {
+    display: block;
+    width: 256px;
+    height: 256px;
+  }
+</style>
+</head>
+<body>
+
+<section class="scroll-section">
+  <div class="sticky-wrapper">
+    <ul class="cylinder" id="cylinder"></ul>
+  </div>
+</section>
+
+<script>
+const formulas = [
+  "sin(t)",
+  "sin(x+t)",
+  "sin(y+t)",
+  "sin(x+y+t)",
+  "sin(sqrt(x*x+y*y)+t)",
+  "sin(t)*cos(x)",
+  "tan(t+i/10)",
+  "sin(x/2)*sin(y+t)",
+  "cos(x+t)*sin(y-t)",
+  "sin(t*2+x)*cos(t+y)",
+  "sin(i/5+t)*cos(t)",
+  "sin(x+t)*sin(y+t)*2"
+];
+
+const GHOST_INDEX = 6;
+const GRID_SIZE = 16;
+const CELL_SIZE = 16;
+const CANVAS_SIZE = 256;
+const TOTAL_ITEMS = 12;
+const SPACING = 180 / TOTAL_ITEMS;
+const PRESETS = formulas.length;
+
+let radius, currentRotation = 0, targetRotation = 0, mouseOffset = 0;
+let t = 0;
+const items = [];
+let video = null, videoCanvas = null, videoCtx = null;
+let webcamActive = false;
+
+const section = document.querySelector('.scroll-section');
+const cylinder = document.getElementById('cylinder');
+
+const formulaCache = new Map();
+
+function init() {
+  radius = Math.min(window.innerWidth, window.innerHeight) * 0.4;
+
+  for (let i = 0; i < TOTAL_ITEMS; i++) {
+    const li = document.createElement('li');
+    const canvas = document.createElement('canvas');
+    canvas.width = CANVAS_SIZE;
+    canvas.height = CANVAS_SIZE;
+    li.appendChild(canvas);
+    cylinder.appendChild(li);
+
+    const ctx = canvas.getContext('2d');
+
+    let presetIndex;
+    if (i < GHOST_INDEX) {
+      presetIndex = i;
+    } else if (i > GHOST_INDEX) {
+      presetIndex = i - 1;
+    } else {
+      presetIndex = -1;
+    }
+
+    const item = {
+      index: i,
+      element: li,
+      canvas: canvas,
+      ctx: ctx,
+      angle: i * SPACING,
+      presetIndex: presetIndex,
+      currentFormula: null,
+      isGhost: i === GHOST_INDEX
+    };
+
+    items.push(item);
+    li.addEventListener('click', () => onClick(item));
+  }
+
+  positionItems();
+  initWebcam();
+  requestAnimationFrame(animate);
+}
+
+function positionItems() {
+  items.forEach(item => {
+    const rad = item.angle * Math.PI / 180;
+    const x = Math.sin(rad) * radius;
+    const z = Math.cos(rad) * radius;
+    item.element.style.transform = `translateX(${x}px) translateZ(${z}px) rotateY(${item.angle}deg)`;
+  });
+}
+
+function initWebcam() {
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+      video = document.createElement('video');
+      video.srcObject = stream;
+      video.play();
+      videoCanvas = document.createElement('canvas');
+      videoCanvas.width = GRID_SIZE;
+      videoCanvas.height = GRID_SIZE;
+      videoCtx = videoCanvas.getContext('2d');
+      webcamActive = true;
+    })
+    .catch(() => {
+      webcamActive = false;
+    });
+}
+
+function normalizeAngle(a) {
+  a = a % 360;
+  if (a > 180) a -= 360;
+  if (a < -180) a += 360;
+  return a;
+}
+
+function getFrontItem() {
+  let minDiff = Infinity;
+  let front = null;
+  items.forEach(item => {
+    const effective = normalizeAngle(currentRotation + mouseOffset + item.angle);
+    const diff = Math.abs(effective);
+    if (diff < minDiff) {
+      minDiff = diff;
+      front = item;
+    }
+  });
+  return front;
+}
+
+function onClick(item) {
+  item.element.style.borderColor = '#cdfd50';
+  setTimeout(() => {
+    item.element.style.borderColor = '';
+  }, 200);
+
+  if (item.isGhost) return;
+
+  const front = getFrontItem();
+  if (!front) return;
+
+  if (front.isGhost) {
+    item.presetIndex = (item.presetIndex + 1) % PRESETS;
+    item.currentFormula = null;
+  } else {
+    item.currentFormula = front.currentFormula !== null ? front.currentFormula : formulas[front.presetIndex];
+  }
+}
+
+function getFormula(item) {
+  if (item.isGhost) return null;
+  const code = item.currentFormula !== null ? item.currentFormula : formulas[item.presetIndex];
+  if (!code) return 0;
+  let fn = formulaCache.get(code);
+  if (!fn) {
+    try {
+      fn = new Function("t", "i", "x", "y", "with(Math){return " + code + "}");
+      formulaCache.set(code, fn);
+    } catch (e) {
+      return 0;
+    }
+  }
+  return fn;
+}
+
+function drawGrid(item) {
+  const ctx = item.ctx;
+  ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+  if (item.isGhost) {
+    if (webcamActive && video && video.readyState >= 2) {
+      videoCtx.drawImage(video, 0, 0, GRID_SIZE, GRID_SIZE);
+      const data = videoCtx.getImageData(0, 0, GRID_SIZE, GRID_SIZE).data;
+      for (let y = 0; y < GRID_SIZE; y++) {
+        for (let x = 0; x < GRID_SIZE; x++) {
+          const idx = (y * GRID_SIZE + x) * 4;
+          const brightness = (data[idx] + data[idx + 1] + data[idx + 2]) / 3;
+          const rad = Math.min(7, (brightness / 255) * 7);
+          if (rad > 0.5) {
+            ctx.beginPath();
+            ctx.arc(x * CELL_SIZE + CELL_SIZE / 2, y * CELL_SIZE + CELL_SIZE / 2, rad, 0, Math.PI * 2);
+            ctx.fillStyle = '#cdfd50';
+            ctx.fill();
+          }
+        }
+      }
+    } else {
+      const val = Math.sin(t);
+      const rad = Math.min(7, Math.abs(val));
+      for (let y = 0; y < GRID_SIZE; y++) {
+        for (let x = 0; x < GRID_SIZE; x++) {
+          ctx.beginPath();
+          ctx.arc(x * CELL_SIZE + CELL_SIZE / 2, y * CELL_SIZE + CELL_SIZE / 2, rad, 0, Math.PI * 2);
+          ctx.fillStyle = '#cdfd50';
+          ctx.fill();
+        }
+      }
+    }
+  } else {
+    const fn = getFormula(item);
+    if (!fn) return;
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        const i = y * GRID_SIZE + x;
+        let val;
+        try {
+          val = fn(t, i, x, y);
+        } catch (e) {
+          val = 0;
+        }
+        const rad = Math.min(7, Math.abs(val));
+        if (rad > 0.1) {
+          ctx.beginPath();
+          ctx.arc(x * CELL_SIZE + CELL_SIZE / 2, y * CELL_SIZE + CELL_SIZE / 2, rad, 0, Math.PI * 2);
+          ctx.fillStyle = val >= 0 ? '#ffffff' : '#FF2244';
+          ctx.fill();
+        }
+      }
+    }
+  }
+}
+
+function animate() {
+  t += 0.05;
+
+  const rect = section.getBoundingClientRect();
+  const scrollTop = -rect.top;
+  const maxScroll = section.offsetHeight - window.innerHeight;
+  const progress = Math.max(0, Math.min(1, scrollTop / maxScroll));
+  targetRotation = progress * 180;
+  currentRotation += (targetRotation - currentRotation) * 0.05;
+
+  cylinder.style.transform = `rotateY(${currentRotation + mouseOffset}deg)`;
+
+  items.forEach(item => drawGrid(item));
+
+  requestAnimationFrame(animate);
+}
+
+window.addEventListener('mousemove', (e) => {
+  mouseOffset = (e.clientX / window.innerWidth - 0.5) * 10;
+});
+
+window.addEventListener('resize', () => {
+  radius = Math.min(window.innerWidth, window.innerHeight) * 0.4;
+  positionItems();
+});
+
+init();
+</script>
+
+</body>
+</html>

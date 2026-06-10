@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liquid Decryption — Type & Stir</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0A0A0A;
+      overflow: hidden;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+    /* Subtle UI overlay with instructions */
+    #ui {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      color: #00FF41;
+      font-size: 12px;
+      opacity: 0.6;
+      pointer-events: none;
+      z-index: 10;
+      line-height: 1.5;
+    }
+    #ui kbd {
+      background: rgba(0,255,65,0.15);
+      border: 1px solid rgba(0,255,65,0.3);
+      border-radius: 3px;
+      padding: 1px 4px;
+      font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div id="ui">
+    Type to spawn glyphs &middot; Mouse to stir &middot; Scroll to boost<br>
+    <kbd>R</kbd> reset &middot; <kbd>S</kbd> toggle trails
+  </div>
+
+  <script>
+    /* ============================================================
+       Liquid Decryption — p5.js Demo
+       Hybrid: Text Scramble Effect × Cuberto-style Fluid Advection
+       Technique: 64×64 pixel fluid grid + particle glyphs + ghost vortices
+       Palette: Terminal phosphor (#0A0A0A, #00FF41, #FFFFFF, #00FFFF, #FF6B6B)
+       ============================================================ */
+
+    // --- Global Constants ---
+    const GRID_SIZE = 64;
+    const MAX_GLYPHS = 300;
+    const MAX_GHOSTS = 10;
+    const SCRAMBLE_SET = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+    const GHOST_CHANCE = 0.03; // 3% weirdness
+    const MOUSE_RADIUS_PX = 150;
+    const VORTEX_RADIUS = 200;
+    const VORTEX_LIFE = 600; // 10 seconds at 60fps
+    const FRICTION = 0.95;
+    const ADVECTION_SCALE = 0.5;
+    const FONT_SIZE = 24;
+
+    // --- Palette ---
+    const C_BG        = '#0A0A0A';
+    const C_SCRAMBLE  = '#00FF41';
+    const C_RESOLVED  = '#FFFFFF';
+    const C_TRAIL     = '#111111';
+    const C_CURSOR    = '#00FFFF';
+    const C_GHOST     = '#FF6B6B';
+
+    // --- State ---
+    let fluidGrid = [];       // 2D array [x][y] of {vx, vy}
+    let glyphParticles = [];  // Array of glyph objects
+    let ghostVortices = [];   // Array of invisible vortex centers
+    let showTrails = true;    // Toggle for fluid trail overlay
+    let time = 0;
+    let scrollBoost = 0;
+    let cellW, cellH;         // Pixel size of each grid cell
+    let scrambleColor, resolvedColor;
+
+    // --- Helper: Random character from scramble set ---
+    function randomChar(set) {
+      return set[floor(random(set.length))];
+    }
+
+    // --- Module: Fluid Grid Initialization ---
+    function initFluidGrid() {
+      fluidGrid = [];
+      for (let x = 0; x < GRID_SIZE; x++) {
+        fluidGrid[x] = [];
+        for (let y = 0; y < GRID_SIZE; y++) {
+          fluidGrid[x][y] = { vx: 0, vy: 0 };
+        }
+      }
+    }
+
+    // --- Module: Fluid Grid Update ---
+    // Multi-octave noise-driven velocity field with mouse injection
+    function updateFluid() {
+      cellW = width / GRID_SIZE;
+      cellH = height / GRID_SIZE;
+
+      for (let x = 0; x < GRID_SIZE; x++) {
+        for (let y = 0; y < GRID_SIZE; y++) {
+          // Multi-octave noise for angle and magnitude
+          // Using two offset noise spaces to create a curl-like field
+          let angle = noise(x * 0.05, y * 0.05, time * 0.001) * TWO_PI;
+          let mag   = noise(x * 0.05 + 100, y * 0.05 + 100, time * 0.001) * (1 + scrollBoost);
+
+          let targetVx = cos(angle) * mag;
+          let targetVy = sin(angle) * mag;
+
+          // Smooth interpolation (temporal coherence)
+          fluidGrid[x][y].vx = lerp(fluidGrid[x][y].vx, targetVx, 0.1);
+          fluidGrid[x][y].vy = lerp(fluidGrid[x][y].vy, targetVy, 0.1);
+        }
+      }
+    }
+
+    // --- Module: Mouse Stir (radial injection) ---
+    // Optimized: only iterate cells within a 5-cell radius of mouse
+    function injectMouseForce() {
+      if (mouseX === 0 && mouseY === 0) return; // No mouse yet
+
+      let mx = floor(mouseX / cellW);
+      let my = floor(mouseY / cellH);
+      let radiusCells = ceil(MOUSE_RADIUS_PX / Math.min(cellW, cellH));
+      // Clamp to 5-cell radius as performance optimization
+      radiusCells = Math.min(radiusCells, 5);
+
+      for (let dx = -radiusCells; dx <= radiusCells; dx++) {
+        for (let dy = -radiusCells; dy <= radiusCells; dy++) {
+          let gx = mx + dx;
+          let gy = my + dy;
+          if (gx < 0 || gx >= GRID_SIZE || gy < 0 || gy >= GRID_SIZE) continue;
+
+          // Pixel-space distance for accurate falloff
+          let px = gx * cellW + cellW / 2;
+          let py = gy * cellH + cellH / 2;
+          let dpx = px - mouseX;
+          let dpy = py - mouseY;
+          let dist = sqrt(dpx * dpx + dpy * dpy);
+          if (dist > MOUSE_RADIUS_PX || dist < 1) continue;
+
+          let force = (MOUSE_RADIUS_PX - dist) / MOUSE_RADIUS_PX * 3.0;
+          fluidGrid[gx][gy].vx += (dpx / dist) * force;
+          fluidGrid[gx][gy].vy += (dpy / dist) * force;
+        }
+      }
+    }
+
+    // --- Module: Trail Renderer ---
+    function drawTrails() {
+      if (!showTrails) return;
+      noStroke();
+      for (let x = 0; x < GRID_SIZE; x++) {
+        for (let y = 0; y < GRID_SIZE; y++) {
+          let cell = fluidGrid[x][y];
+          let speed = sqrt(cell.vx * cell.vx + cell.vy * cell.vy);
+          if (speed > 0.5) {
+            let alpha = map(speed, 0.5, 3, 0, 20);
+            fill(17, 17, 17, alpha);
+            rect(x * cellW, y * cellH, cellW, cellH);
+          }
+        }
+      }
+    }
+
+    // --- Module: Glyph Spawn ---
+    function spawnGlyph(char, isRebel, index) {
+      let g = {
+        x: width / 2 + random(-100, 100),
+        y: height / 2 + random(-100, 100),
+        targetChar: char,
+        currentGlyph: randomChar(SCRAMBLE_SET),
+        decayTimer: index * 5 + random(10, 40),
+        maxDecay: index * 5 + random(10, 40),
+        color: C_SCRAMBLE,
+        vx: 0,
+        vy: 0,
+        isGhost: false,
+        visible: true
+      };
+
+      if (isRebel) {
+        g.isGhost = true;
+        g.visible = false;
+        g.decayTimer = 0;
+        g.currentGlyph = "";
+        g.color = C_RESOLVED;
+        // Plant invisible vortex at spawn location
+        ghostVortices.push({ x: g.x, y: g.y, life: VORTEX_LIFE });
+        if (ghostVortices.length > MAX_GHOSTS) {
+          ghostVortices.shift();
+        }
+      }
+      return g;
+    }
+
+    // --- Module: Scramble Decay ---
+    function updateScramble(g) {
+      if (g.decayTimer > 0) {
+        g.decayTimer--;
+        if (g.decayTimer % 3 === 0) {
+          g.currentGlyph = randomChar(SCRAMBLE_SET);
+        }
+        if (g.decayTimer <= 0) {
+          g.currentGlyph = g.targetChar;
+          g.color = C_RESOLVED;
+        }
+      } else {
+        g.currentGlyph = g.targetChar;
+        g.color = C_RESOLVED;
+      }
+    }
+
+    // --- Module: Advection ---
+    function advectGlyph(g) {
+      let gx = floor(g.x / cellW);
+      let gy = floor(g.y / cellH);
+      gx = constrain(gx, 0, GRID_SIZE - 1);
+      gy = constrain(gy, 0, GRID_SIZE - 1);
+
+      g.vx += fluidGrid[gx][gy].vx * ADVECTION_SCALE;
+      g.vy += fluidGrid[gx][gy].vy * ADVECTION_SCALE;
+
+      g.vx *= FRICTION;
+      g.vy *= FRICTION;
+
+      g.x += g.vx;
+      g.y += g.vy;
+
+      // Edge wrapping
+      if (g.x < 0) g.x = width;
+      if (g.x > width) g.x = 0;
+      if (g.y < 0) g.y = height;
+      if (g.y > height) g.y = 0;
+    }
+
+    // --- Module: Ghost Vortex ---
+    // Applies tangential force to nearby glyphs; faint coral pulse when mouse near
+    function applyVortices() {
+      for (let i = ghostVortices.length - 1; i >= 0; i--) {
+        let v = ghostVortices[i];
+        v.life--;
+
+        // Tangential force on all glyphs within 200px
+        for (let g of glyphParticles) {
+          let dx = g.x - v.x;
+          let dy = g.y - v.y;
+          let dist = sqrt(dx * dx + dy * dy);
+          if (dist < VORTEX_RADIUS && dist > 10) {
+            let tangentX = -dy / dist;
+            let tangentY = dx / dist;
+            let force = 2.0 / dist;
+            g.vx += tangentX * force;
+            g.vy += tangentY * force;
+          }
+        }
+
+        // Faint pulse only when mouse is within 50px
+        let md = dist(mouseX, mouseY, v.x, v.y);
+        if (md < 50) {
+          let alpha = map(v.life, 0, VORTEX_LIFE, 0, 12);
+          fill(255, 107, 107, alpha);
+          noStroke();
+          ellipse(v.x, v.y, 20, 20);
+        }
+
+        if (v.life <= 0) {
+          ghostVortices.splice(i, 1);
+        }
+      }
+    }
+
+    // --- Module: Cursor Glow ---
+    function drawCursorGlow() {
+      fill(0, 255, 255, 15);
+      noStroke();
+      ellipse(mouseX, mouseY, 60, 60);
+    }
+
+    // --- p5.js Setup ---
+    function setup() {
+      let c = createCanvas(windowWidth, windowHeight);
+      c.parent('canvas-container');
+      background(C_BG);
+      textFont('Courier New, monospace');
+      textAlign(CENTER, CENTER);
+      noCursor();
+
+      initFluidGrid();
+      scrambleColor = color(C_SCRAMBLE);
+      resolvedColor = color(C_RESOLVED);
+    }
+
+    // --- p5.js Draw ---
+    function draw() {
+      background(C_BG);
+
+      // 1. Update fluid field
+      updateFluid();
+
+      // 2. Mouse stir
+      if (mouseX !== pmouseX || mouseY !== pmouseY) {
+        injectMouseForce();
+      }
+
+      // 3. Scroll boost decay
+      scrollBoost = lerp(scrollBoost, 0, 0.05);
+
+      // 4. Draw fluid trails (subtle charcoal)
+      drawTrails();
+
+      // 5. Update & draw glyphs
+      for (let g of glyphParticles) {
+        if (!g.isGhost) {
+          updateScramble(g);
+        }
+        advectGlyph(g);
+
+        // Draw
+        if (g.visible) {
+          push();
+          textAlign(CENTER, CENTER);
+          textSize(FONT_SIZE);
+          if (g.decayTimer > 0) {
+            let t = 1 - g.decayTimer / g.maxDecay;
+            let c = lerpColor(scrambleColor, resolvedColor, t);
+            fill(c);
+          } else {
+            fill(g.color);
+          }
+          text(g.currentGlyph, g.x, g.y);
+          pop();
+        }
+      }
+
+      // 6. Apply ghost vortices
+      applyVortices();
+
+      // 7. Cursor glow
+      drawCursorGlow();
+
+      time++;
+    }
+
+    // --- p5.js Events ---
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      cellW = width / GRID_SIZE;
+      cellH = height / GRID_SIZE;
+    }
+
+    function mouseWheel(event) {
+      scrollBoost += abs(event.delta) * 0.005;
+      scrollBoost = constrain(scrollBoost, 0, 8);
+      return false;
+    }
+
+    function keyTyped() {
+      // Toggle trails
+      if (key === 's' || key === 'S') {
+        showTrails = !showTrails;
+        return false;
+      }
+
+      // Reset
+      if (key === 'r' || key === 'R') {
+        glyphParticles = [];
+        ghostVortices = [];
+        initFluidGrid();
+        scrollBoost = 0;
+        time = 0;
+        return false;
+      }
+
+      // Spawn glyph for alphanumeric / punctuation
+      let isPrintable = (key.length === 1 && key.charCodeAt(0) >= 32);
+      if (isPrintable) {
+        let isRebel = (random() < GHOST_CHANCE);
+        let g = spawnGlyph(key, isRebel, glyphParticles.length);
+        glyphParticles.push(g);
+        if (glyphParticles.length > MAX_GLYPHS) {
+          glyphParticles.shift();
+        }
+      }
+      return false;
+    }
+
+    // Prevent default scrolling on the page
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+    }, { passive: false });
+  </script>
+</body>
+</html>

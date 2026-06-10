@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ink-Trails Typewriter</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; overflow: hidden; background: #0A0A0A; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<script>
+// ============================================
+// Ink-Trails Typewriter
+// p5.js generative fluid simulation + kinetic typography demo
+// Single-file, self-contained, no external assets except p5.js CDN.
+// ============================================
+
+let particles = [];
+let glyphPoints = [];
+let spatialGrid;
+let time = 0;
+
+// ============================================
+// Spatial Grid — accelerates nearest-neighbor queries
+// for the magnetic glyph attraction.
+// ============================================
+class SpatialGrid {
+  constructor(cellSize) {
+    this.cellSize = cellSize;
+    this.grid = new Map();
+  }
+
+  clear() {
+    this.grid = new Map();
+  }
+
+  addPoint(x, y) {
+    let cx = Math.floor(x / this.cellSize);
+    let cy = Math.floor(y / this.cellSize);
+    let key = cx + "," + cy;
+    if (!this.grid.has(key)) {
+      this.grid.set(key, []);
+    }
+    this.grid.get(key).push(createVector(x, y));
+  }
+
+  findNearest(px, py) {
+    let cx = Math.floor(px / this.cellSize);
+    let cy = Math.floor(py / this.cellSize);
+    let nearest = null;
+    let bestDist = Infinity;
+
+    // Check 3x3 neighborhood of cells
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        let key = (cx + dx) + "," + (cy + dy);
+        let pts = this.grid.get(key);
+        if (pts) {
+          for (let p of pts) {
+            let d = dist(px, py, p.x, p.y);
+            if (d < bestDist) {
+              bestDist = d;
+              nearest = p;
+            }
+          }
+        }
+      }
+    }
+    return nearest;
+  }
+}
+
+// ============================================
+// Particle — carries position, velocity, life,
+// and color; driven by curl noise + glyph attraction.
+// ============================================
+class Particle {
+  constructor(x, y, vx, vy, col) {
+    this.pos = createVector(x, y);
+    this.vel = createVector(vx, vy);
+    this.life = 1.0;
+    this.col = col;
+    this.baseSize = random(2, 4);
+  }
+
+  update(grid, t) {
+    // 1. Curl-noise velocity field (divergence-free)
+    let curl = curlNoise(this.pos.x, this.pos.y, t);
+    this.vel.add(curl);
+
+    // 2. Magnetic attraction toward nearest glyph point
+    let nearest = grid.findNearest(this.pos.x, this.pos.y);
+    if (nearest) {
+      let dir = createVector(nearest.x - this.pos.x, nearest.y - this.pos.y);
+      let d = dir.mag();
+      if (d > 0) {
+        dir.normalize();
+        // Stronger pull when far away; gentle when close
+        let strength = map(d, 0, 300, 0.02, 0.15, true);
+        this.vel.add(dir.mult(strength));
+      }
+    }
+
+    // 3. Velocity damping
+    this.vel.mult(0.94);
+
+    // 4. Integrate
+    this.pos.add(this.vel);
+
+    // 5. Multiplicative fade → dissolves into smoke
+    this.life *= 0.98;
+  }
+
+  display() {
+    let alpha = this.life * 255;
+    let r = red(this.col);
+    let g = green(this.col);
+    let b = blue(this.col);
+    noStroke();
+    fill(r, g, b, alpha);
+    let s = this.baseSize * (0.5 + 0.5 * this.life);
+    ellipse(this.pos.x, this.pos.y, s);
+  }
+
+  isDead() {
+    return this.life < 0.01;
+  }
+}
+
+// ============================================
+// Glyph — procedural point-cloud for the word "INK".
+// Each letter is rasterized onto a dense grid; points
+// that fall inside the geometric shape are collected.
+// ============================================
+class Glyph {
+  constructor() {
+    this.points = [];
+    this.generatePoints();
+  }
+
+  generatePoints() {
+    let letterW = 110;
+    let letterH = 170;
+    let spacing = 50;
+    let totalW = letterW * 3 + spacing * 2;
+    let startX = (width - totalW) / 2;
+    let startY = (height - letterH) / 2;
+    let step = 5; // grid spacing — yields ~300–400 pts per letter
+
+    // --- Letter I ---
+    for (let x = 0; x <= letterW; x += step) {
+      for (let y = 0; y <= letterH; y += step) {
+        let nx = x / letterW;
+        let ny = y / letterH;
+        if (this.pointInI(nx, ny)) {
+          this.points.push(createVector(startX + x, startY + y));
+        }
+      }
+    }
+
+    // --- Letter N ---
+    let nx0 = startX + letterW + spacing;
+    for (let x = 0; x <= letterW; x += step) {
+      for (let y = 0; y <= letterH; y += step) {
+        let nx = x / letterW;
+        let ny = y / letterH;
+        if (this.pointInN(nx, ny)) {
+          this.points.push(createVector(nx0 + x, startY + y));
+        }
+      }
+    }
+
+    // --- Letter K ---
+    let kx0 = startX + letterW * 2 + spacing * 2;
+    for (let x = 0; x <= letterW; x += step) {
+      for (let y = 0; y <= letterH; y += step) {
+        let nx = x / letterW;
+        let ny = y / letterH;
+        if (this.pointInK(nx, ny)) {
+          this.points.push(createVector(kx0 + x, startY + y));
+        }
+      }
+    }
+  }
+
+  // Geometric fill tests in normalized [0,1] space
+  pointInI(nx, ny) {
+    // Main stem
+    if (nx >= 0.35 && nx <= 0.65 && ny >= 0.1 && ny <= 0.9) return true;
+    // Top and bottom serifs
+    if (nx >= 0.2 && nx <= 0.8 && ny >= 0.05 && ny <= 0.12) return true;
+    if (nx >= 0.2 && nx <= 0.8 && ny >= 0.88 && ny <= 0.95) return true;
+    return false;
+  }
+
+  pointInN(nx, ny) {
+    // Left vertical bar
+    if (nx >= 0.1 && nx <= 0.3 && ny >= 0.1 && ny <= 0.9) return true;
+    // Right vertical bar
+    if (nx >= 0.7 && nx <= 0.9 && ny >= 0.1 && ny <= 0.9) return true;
+    // Diagonal bar
+    let d = this.distToSegment(nx, ny, 0.3, 0.9, 0.7, 0.1);
+    if (d < 0.12) return true;
+    return false;
+  }
+
+  pointInK(nx, ny) {
+    // Left vertical bar
+    if (nx >= 0.1 && nx <= 0.3 && ny >= 0.1 && ny <= 0.9) return true;
+    // Upper diagonal arm
+    let d1 = this.distToSegment(nx, ny, 0.3, 0.5, 0.9, 0.1);
+    if (d1 < 0.12) return true;
+    // Lower diagonal arm
+    let d2 = this.distToSegment(nx, ny, 0.3, 0.5, 0.9, 0.9);
+    if (d2 < 0.12) return true;
+    return false;
+  }
+
+  distToSegment(px, py, x1, y1, x2, y2) {
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    let lenSq = dx * dx + dy * dy;
+    if (lenSq === 0) return dist(px, py, x1, y1);
+    let t = ((px - x1) * dx + (py - y1) * dy) / lenSq;
+    t = constrain(t, 0, 1);
+    let projX = x1 + t * dx;
+    let projY = y1 + t * dy;
+    return dist(px, py, projX, projY);
+  }
+}
+
+// ============================================
+// Curl-noise velocity field
+// Computes a divergence-free flow from the gradient
+// of a 2D Perlin-noise potential.
+// ============================================
+function curlNoise(x, y, t) {
+  let scale = 0.005;
+  let eps = 1.0;
+  let n1 = noise(x * scale, (y + eps) * scale, t);
+  let n2 = noise(x * scale, (y - eps) * scale, t);
+  let n3 = noise((x + eps) * scale, y * scale, t);
+  let n4 = noise((x - eps) * scale, y * scale, t);
+  let dy = (n1 - n2) / (2 * eps);
+  let dx = (n3 - n4) / (2 * eps);
+  return createVector(dy, -dx).mult(1.8);
+}
+
+// ============================================
+// Color selection based on mouse drag speed
+// ============================================
+function getSpawnColor(speed) {
+  if (speed < 4) {
+    return color(0, 255, 255);   // hot cyan
+  } else if (speed < 12) {
+    return color(255, 0, 255);   // magenta
+  } else {
+    return color(255, 255, 0);   // yellow
+  }
+}
+
+// ============================================
+// p5.js lifecycle
+// ============================================
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  background(10, 10, 10);
+
+  let glyph = new Glyph();
+  glyphPoints = glyph.points;
+
+  spatialGrid = new SpatialGrid(40);
+  for (let p of glyphPoints) {
+    spatialGrid.addPoint(p.x, p.y);
+  }
+
+  // Seed a small living system so the canvas isn't empty
+  for (let i = 0; i < 60; i++) {
+    let x = random(width * 0.3, width * 0.7);
+    let y = random(height * 0.3, height * 0.7);
+    let col = random([color(0, 255, 255), color(255, 0, 255), color(255, 255, 0)]);
+    particles.push(new Particle(x, y, random(-1, 1), random(-1, 1), col));
+  }
+}
+
+function draw() {
+  time += 0.01;
+
+  // Trail persistence: semi-transparent background overlay
+  blendMode(BLEND);
+  noStroke();
+  fill(10, 10, 10, 10);
+  rect(0, 0, width, height);
+
+  // Render particles with additive blending for luminous bloom
+  blendMode(ADD);
+  for (let i = particles.length - 1; i >= 0; i--) {
+    let p = particles[i];
+    p.update(spatialGrid, time);
+    p.display();
+    if (p.isDead()) {
+      particles.splice(i, 1);
+    }
+  }
+
+  // Minimal UI hint
+  blendMode(BLEND);
+  fill(255, 255, 255, 120);
+  noStroke();
+  textSize(14);
+  textAlign(LEFT, BOTTOM);
+  text("DRAG TO WRITE   |   INK-TRAILS TYPEWRITER", 20, height - 20);
+}
+
+function mouseDragged() {
+  let speed = dist(mouseX, mouseY, pmouseX, pmouseY);
+  let count = min(12, max(2, floor(speed / 2)));
+  let col = getSpawnColor(speed);
+
+  for (let i = 0; i < count; i++) {
+    let x = mouseX + random(-6, 6);
+    let y = mouseY + random(-6, 6);
+    let vx = (mouseX - pmouseX) * 0.4 + random(-2, 2);
+    let vy = (mouseY - pmouseY) * 0.4 + random(-2, 2);
+    particles.push(new Particle(x, y, vx, vy, col));
+  }
+
+  // Hard cap at 2000 particles for 60fps target
+  if (particles.length > 2000) {
+    particles.splice(0, particles.length - 2000);
+  }
+
+  // Prevent default touch scrolling on mobile
+  return false;
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  background(10, 10, 10);
+
+  // Re-center glyph and rebuild spatial grid
+  let glyph = new Glyph();
+  glyphPoints = glyph.points;
+  spatialGrid.clear();
+  for (let p of glyphPoints) {
+    spatialGrid.addPoint(p.x, p.y);
+  }
+}
+</script>
+</body>
+</html>

@@ -1,12 +1,8 @@
 "use client";
 
-import {
-  useRef,
-  useEffect,
-  type CSSProperties,
-  type ReactNode,
-} from "react";
+import { useRef, useEffect, type CSSProperties, type ReactNode } from "react";
 import { usePreText } from "@/hooks/use-pretext";
+import { useDeferredMount } from "@/hooks/use-deferred-mount";
 import type { Obstacle } from "@/components/ui/pretext-block";
 
 interface KineticPreTextProps {
@@ -38,6 +34,7 @@ export function KineticPreText({
   cursorColor = "var(--accent)",
 }: KineticPreTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const deferred = useDeferredMount(3000);
   const {
     ready,
     prepareWithSegments,
@@ -45,7 +42,7 @@ export function KineticPreText({
   } = usePreText("Geist");
 
   useEffect(() => {
-    if (!ready || !prepareWithSegments || !layoutNextLine || !containerRef.current) return;
+    if (!ready || !deferred || !prepareWithSegments || !layoutNextLine || !containerRef.current) return;
 
     const container = containerRef.current;
     const doLayoutNextLine = layoutNextLine;
@@ -53,14 +50,14 @@ export function KineticPreText({
     if (!preparedResult) return;
     const prepared = preparedResult;
 
-    // ── State ──
+    // State
     let cursorActive = false;
     let cursorX = 0;
     let cursorY = 0;
     let rafId = 0;
-    let baseHeight = 0; // height without obstacles
+    let baseHeight = 0;
 
-    // ── DOM setup ──
+    // DOM setup
     while (container.firstChild) container.removeChild(container.firstChild);
 
     const linePool: HTMLDivElement[] = [];
@@ -105,19 +102,15 @@ export function KineticPreText({
         let indent = 0;
 
         if (obstacle && y + lineHeight > obstacle.y && y < obstacle.y + obstacle.height) {
-          // Obstacle is in this line's band
           const obsLeft = obstacle.x;
           const obsRight = obstacle.x + obstacle.width;
 
           if (obsLeft <= 0) {
-            // Left-side: indent text
             indent = Math.max(0, obsRight + 12);
             availableWidth = maxWidth - indent;
           } else if (obsRight >= maxWidth) {
-            // Right-side: shorten line
             availableWidth = Math.max(60, obsLeft - 12);
           } else {
-            // Middle: use the larger side
             const leftSpace = obsLeft - 12;
             const rightSpace = maxWidth - obsRight - 12;
             if (leftSpace >= rightSpace) {
@@ -160,18 +153,16 @@ export function KineticPreText({
       if (h > 0) container.style.height = `${Math.max(h, baseHeight)}px`;
     }
 
-    // ── Initial layout (no obstacles) ──
     const initialLines = layoutText(null);
     baseHeight = initialLines.length * lineHeight;
     projectLines(initialLines);
 
-    // ── Reveal animation ──
     for (let i = 0; i < linePool.length; i++) {
       linePool[i]!.style.opacity = "0";
       linePool[i]!.style.transition = "opacity 0.4s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)";
     }
     requestAnimationFrame(() => {
-      const stagger = 80; // ms between each line
+      const stagger = 80;
       for (let i = 0; i < initialLines.length; i++) {
         setTimeout(() => {
           if (linePool[i]) linePool[i]!.style.opacity = "1";
@@ -179,7 +170,6 @@ export function KineticPreText({
       }
     });
 
-    // ── Interaction handlers ──
     function onPointerEnter() {
       cursorActive = true;
       orbEl.style.opacity = "0.15";
@@ -191,7 +181,6 @@ export function KineticPreText({
       cursorX = e.clientX - rect.left;
       cursorY = e.clientY - rect.top;
 
-      // Update orb visual immediately (no RAF needed for position)
       orbEl.style.transform = `translate(${cursorX - cursorRadius}px, ${cursorY - cursorRadius}px)`;
 
       if (!cursorActive) {
@@ -204,7 +193,6 @@ export function KineticPreText({
     function onPointerLeave() {
       cursorActive = false;
       orbEl.style.opacity = "0";
-      // Reflow back to normal after a short delay for the visual fade
       setTimeout(() => {
         if (!cursorActive) {
           const lines = layoutText(null);
@@ -225,7 +213,6 @@ export function KineticPreText({
       }
       rafId = requestAnimationFrame(loop);
 
-      // Build obstacle from cursor position
       const pad = 14;
       const obstacle: Obstacle = {
         x: cursorX - cursorRadius - pad,
@@ -249,9 +236,9 @@ export function KineticPreText({
       container.removeEventListener("pointermove", onPointerMove);
       container.removeEventListener("pointerleave", onPointerLeave);
     };
-  }, [ready, text, font, lineHeight, prepareWithSegments, layoutNextLine, cursorRadius, cursorColor]);
+  }, [ready, deferred, text, font, lineHeight, prepareWithSegments, layoutNextLine, cursorRadius, cursorColor]);
 
-  if (!ready) {
+  if (!ready || !deferred) {
     return (
       <div ref={containerRef} className={className} style={style}>
         {fallback ?? text}

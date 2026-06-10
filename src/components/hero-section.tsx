@@ -1,12 +1,35 @@
+"use client";
+
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { HeroGenerative } from "./hero-generative";
-import { HeroKineticText } from "./hero-kinetic-text";
+import { trackCTA } from "@/lib/analytics";
+import { useDeferredMount } from "@/hooks/use-deferred-mount";
+
+const GenerativeHeroBackground = dynamic(
+  () => import("@/components/ui/generative-hero-bg").then(m => m.GenerativeHeroBackground),
+  { ssr: false, loading: () => null }
+);
+
+const GenerativeAscii = dynamic(
+  () => import("@/components/generative-ascii").then(m => m.GenerativeAscii),
+  { ssr: false, loading: () => null }
+);
+
+const KineticPreText = dynamic(
+  () => import("@/components/ui/kinetic-pretext").then(m => m.KineticPreText),
+  { ssr: false }
+);
+
+const HERO_SUBTITLE =
+  "One developer shipping autonomous agents, MCP servers, and generative art. 5 free lead magnets, 17 premium toolkits. Everything open source.";
 
 export function HeroSection() {
+  const deferredAscii = useDeferredMount(2000);
+  const deferredKinetic = useDeferredMount(2000);
   return (
     <section className="relative flex min-h-[92svh] items-center px-6 pb-16 pt-28 md:min-h-screen md:items-end md:pb-24 md:pt-32">
-      <HeroGenerative />
+      <GenerativeHeroBackground />
       <div className="relative max-w-[1280px] w-full mx-auto grid grid-cols-1 gap-12 lg:grid-cols-[1.25fr_1fr] lg:items-end">
         {/* Left column: headline + supporting copy */}
         <div className="min-w-0">
@@ -41,17 +64,31 @@ export function HeroSection() {
             className="text-[clamp(3rem,8vw,7.5rem)] font-bold leading-[0.88] tracking-[-0.04em]"
             style={{ color: "var(--text-primary)" }}
           >
-            <span className="inline-block animate-char-reveal" style={{ animationDelay: "0.1s" }}>Built solo</span>
+            <span className="inline-block">Built solo</span>
             <br />
             <span style={{ color: "var(--accent)" }}>
-              <span className="inline-block animate-char-reveal" style={{ animationDelay: "0.3s" }}>Shipped</span>
+              <span className="inline-block animate-char-reveal">Shipped</span>
             </span>{" "}
             <span className="inline-block animate-char-reveal" style={{ animationDelay: "0.45s" }}>open</span>
           </h1>
 
           <div className="animate-fade-in-up" style={{ animationDelay: "0.7s" }}>
             <div className="mt-8 max-w-xl">
-              <HeroKineticText />
+              {deferredKinetic ? (
+                <KineticPreText
+                  text={HERO_SUBTITLE}
+                  font='300 18px "Geist"'
+                  lineHeight={28}
+                  cursorRadius={36}
+                  cursorColor="var(--accent)"
+                  className="text-lg font-light"
+                  style={{ color: "var(--text-secondary)", lineHeight: 1.55 }}
+                />
+              ) : (
+                <p className="text-lg font-light" style={{ color: "var(--text-secondary)", lineHeight: 1.55 }}>
+                  {HERO_SUBTITLE}
+                </p>
+              )}
             </div>
           </div>
 
@@ -70,7 +107,6 @@ export function HeroSection() {
                 Shipping{" "}
                 <Link
                   href="/products/launch-toolkit"
-                  prefetch={false}
                   className="underline-offset-2 hover:underline transition-colors hover:text-white"
                   style={{ color: "var(--text-secondary)" }}
                 >
@@ -85,20 +121,20 @@ export function HeroSection() {
             <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5">
               <Link
                 href="/products"
-                prefetch={false}
                 className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white rounded-full transition-all hover:brightness-110 hover:scale-[1.02]"
                 style={{ background: "var(--accent)" }}
+                onClick={() => trackCTA("hero_view_products", "/products")}
               >
-                18 free products <ArrowRight size={15} />
+                Free products <ArrowRight size={15} />
               </Link>
               <Link
                 href="/projects"
-                prefetch={false}
                 className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium rounded-full border transition-all hover:brightness-110 hover:scale-[1.02]"
                 style={{
                   color: "var(--text-secondary)",
                   borderColor: "var(--border-subtle)",
                 }}
+                onClick={() => trackCTA("hero_view_projects", "/projects")}
               >
                 See what&rsquo;s running <ArrowRight size={15} />
               </Link>
@@ -113,9 +149,11 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Right column: generative ASCII art piece */}
-        <div className="animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
-          <div className="hidden lg:block" />
+        {/* Right column: generative ASCII art piece — unique each visit, deferred */}
+        <div className="animate-fade-in-up lg:min-h-[600px]" style={{ animationDelay: "0.5s" }}>
+          <div className="hidden lg:block">
+            {deferredAscii && <GenerativeAscii />}
+          </div>
         </div>
       </div>
     </section>

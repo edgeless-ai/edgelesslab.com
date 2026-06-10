@@ -143,6 +143,13 @@
       text-transform: uppercase;
     }
 
+    .field small {
+      color: var(--hm-muted);
+      font-family: var(--hm-font-mono);
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
     .field input,
     .field select,
     .field button {
@@ -325,6 +332,7 @@
         <div class="field" style="margin-top: 18px;">
           <label for="sourceUrl">Remote media URL</label>
           <input id="sourceUrl" placeholder="https://.../track.mp3 or .mp4">
+          <small>Requires CORS-enabled media. Local files are more reliable.</small>
         </div>
         <button class="btn" id="loadUrl">Load URL</button>
       </section>
@@ -406,7 +414,7 @@
         <div class="buttons">
           <button class="btn" id="play" disabled data-fill="true">Play</button>
           <button class="btn" id="png">PNG</button>
-          <button class="btn" id="record" disabled>WebM</button>
+          <button class="btn" id="record" disabled>Silent WebM</button>
           <button class="btn" id="reset">Reset</button>
         </div>
       </section>
@@ -486,8 +494,25 @@
     let recordingSegmentEnd = 0;
     let recordStopTimer = 0;
 
-    function status(text) {
-      statusEl.innerHTML = text;
+    function status(lines) {
+      const parts = Array.isArray(lines) ? lines : String(lines).split("<br>");
+      statusEl.replaceChildren(
+        ...parts.flatMap((part, index) => {
+          const nodes = [];
+          if (index > 0) nodes.push(document.createElement("br"));
+          nodes.push(document.createTextNode(part));
+          return nodes;
+        })
+      );
+    }
+
+    let scheduledDraw = 0;
+    function schedulePreviewDraw() {
+      if (scheduledDraw) cancelAnimationFrame(scheduledDraw);
+      scheduledDraw = requestAnimationFrame(() => {
+        scheduledDraw = 0;
+        drawPattern(.45, .35, .42, .55, .15);
+      });
     }
 
     function hashName(name) {
@@ -514,7 +539,7 @@
       modeNInput.value = preset.n;
       warmthInput.value = preset.warmth;
       sharpnessInput.value = preset.sharpness;
-      drawPattern(.45, .35, .42, .55, .15);
+      schedulePreviewDraw();
     }
 
     function playbackTime() {
@@ -626,7 +651,7 @@
       pausedAt = 0;
       trackMeta.textContent = `${name} / ${buffer.duration.toFixed(1)}S`;
       checksum.textContent = `CHK ${hashName(name)}`;
-      status(`STATUS: AUDIO READY<br>ROUTE: ${name.toUpperCase()}`);
+      status(["STATUS: AUDIO READY", `ROUTE: ${name.toUpperCase()}`]);
       updateTimeline();
       drawPattern(.45, .35, .42, .55, .15);
     }
@@ -639,7 +664,7 @@
     async function loadRemoteUrl() {
       const url = sourceUrlInput.value.trim();
       if (!url) return;
-      status("STATUS: FETCHING URL<br>ROUTE: REMOTE MEDIA");
+      status(["STATUS: FETCHING URL", "ROUTE: REMOTE MEDIA / CORS REQUIRED"]);
       try {
         const response = await fetch(url, { mode: "cors" });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -647,7 +672,7 @@
         const name = decodeURIComponent((new URL(url)).pathname.split("/").pop() || "remote-media");
         await loadArrayBuffer(data, name);
       } catch (error) {
-        status(`STATUS: URL LOAD FAILED<br>ROUTE: CORS OR FORMAT BLOCKED`);
+        status(["STATUS: URL LOAD FAILED", "ROUTE: USE LOCAL FILE OR CORS-ENABLED MEDIA"]);
         console.error(error);
       }
     }
@@ -706,7 +731,7 @@
       playButton.textContent = "Play";
       cancelAnimationFrame(raf);
       updateTimeline();
-      status("STATUS: PAUSED<br>ROUTE: LOCAL PREVIEW");
+      status(["STATUS: PAUSED", "ROUTE: LOCAL PREVIEW"]);
     }
 
     async function togglePlay() {
@@ -721,7 +746,7 @@
       connectSource(pausedAt);
       isPlaying = true;
       playButton.textContent = "Pause";
-      status("STATUS: PLAYING<br>ROUTE: AUDIO TO PLATE");
+      status(["STATUS: PLAYING", "ROUTE: AUDIO TO PLATE"]);
       animate();
     }
 
@@ -736,7 +761,7 @@
       pausedAt = Math.max(0, Math.min(buffer.duration, time));
       if (wasPlaying) connectSource(pausedAt);
       updateTimeline();
-      drawPattern(.45, .35, .42, .55, .15);
+      schedulePreviewDraw();
     }
 
     function savePng() {
@@ -749,7 +774,7 @@
     function toggleRecord() {
       if (recorder && recorder.state === "recording") {
         recorder.stop();
-        recordButton.textContent = "WebM";
+        recordButton.textContent = "Silent WebM";
         recordingSegmentEnd = 0;
         clearTimeout(recordStopTimer);
         return;
@@ -758,6 +783,10 @@
       const start = buffer ? Math.max(0, Number(recordStartInput.value) || 0) : 0;
       const end = buffer ? Math.min(buffer.duration, Number(recordEndInput.value) || buffer.duration) : 0;
       recordingSegmentEnd = end > start ? end : 0;
+      if (!window.MediaRecorder || !MediaRecorder.isTypeSupported("video/webm")) {
+        status(["STATUS: WEBM UNAVAILABLE", "ROUTE: TRY PNG EXPORT OR ANOTHER BROWSER"]);
+        return;
+      }
       const stream = canvas.captureStream(30);
       recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
       recorder.ondataavailable = (event) => chunks.push(event.data);
@@ -768,11 +797,12 @@
         a.download = "chladni-preview.webm";
         a.click();
         URL.revokeObjectURL(a.href);
-        recordButton.textContent = "WebM";
+        recordButton.textContent = "Silent WebM";
+        status(["STATUS: WEBM SAVED", "ROUTE: SILENT CANVAS VIDEO"]);
       };
       recorder.start();
       recordButton.textContent = "Stop";
-      status("STATUS: RECORDING WEBM<br>ROUTE: CANVAS CAPTURE");
+      status(["STATUS: RECORDING WEBM", "ROUTE: SILENT CANVAS CAPTURE"]);
       if (buffer && !isPlaying) {
         seekTo(start);
         togglePlay();
@@ -811,11 +841,11 @@
     resetButton.addEventListener("click", () => {
       pausedAt = 0;
       updateTimeline();
-      drawPattern(.45, .35, .42, .55, .15);
+      schedulePreviewDraw();
     });
     presetInput.addEventListener("change", syncPresetControls);
     [styleInput, titleInput, artistInput, modeMInput, modeNInput, warmthInput, sharpnessInput].forEach((el) => {
-      el.addEventListener("input", () => drawPattern(.45, .35, .42, .55, .15));
+      el.addEventListener("input", schedulePreviewDraw);
     });
     [seekInput, recordStartInput, recordEndInput].forEach((el) => {
       el.addEventListener("input", updateTimeline);
@@ -835,7 +865,7 @@
       }
       presets[key] = customPresets[key];
       presetInput.value = key;
-      status(`STATUS: PRESET SAVED<br>ROUTE: ${label.toUpperCase()}`);
+      status(["STATUS: PRESET SAVED", `ROUTE: ${label.toUpperCase()}`]);
     });
 
     syncPresetControls();

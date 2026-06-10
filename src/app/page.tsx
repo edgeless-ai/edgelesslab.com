@@ -9,6 +9,7 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { experiments, projects } from "@/lib/data";
+import { posts } from "@/lib/blog";
 import ProjectShowcaseSection from "@/components/sections/project-showcase-section";
 import TechShowcaseSection from "@/components/sections/tech-showcase-section";
 import CTASection from "@/components/sections/cta-section";
@@ -52,7 +53,7 @@ const capabilities = [
     snippet: `$ hook: damage-control
   blocked: rm -rf /
   reason: destructive operation
-✓ 0 incidents this week`,
+✓ safety hooks armed`,
   },
   {
     label: "Knowledge Pipelines",
@@ -120,7 +121,7 @@ export default function Home() {
               </Link>
             </div>
 
-            <RecentActivity />
+            <RecentActivity posts={posts} />
           </div>
         </section>
 

@@ -4,6 +4,8 @@ import "./globals.css";
 import { JsonLd } from "@/components/json-ld";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { PerformancePreload } from "@/components/performance-preload";
+import { CommandPalette } from "@/components/command-palette";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = localFont({
   src: "../fonts/Geist[wght].woff2",
@@ -83,6 +85,21 @@ export default function RootLayout({
         <meta httpEquiv="X-Frame-Options" content="SAMEORIGIN" />
         <meta httpEquiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
         {/* Preconnect hints moved to PerformancePreload component for centralized management */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('edgeless-theme');
+                  const resolved = theme === 'light' || theme === 'dark' ? theme
+                    : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+                  document.documentElement.setAttribute('data-theme', resolved);
+                  document.documentElement.style.colorScheme = resolved;
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
       <body className="min-h-full flex flex-col">
         <JsonLd data={{
@@ -108,8 +125,11 @@ export default function RootLayout({
           Skip to main content
         </a>
         <PostHogProvider>
-          {children}
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
         </PostHogProvider>
+        <CommandPalette />
       </body>
     </html>
   );

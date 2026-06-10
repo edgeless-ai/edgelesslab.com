@@ -6,7 +6,6 @@ import {
   useEffect,
   useMemo,
   type CSSProperties,
-  type ReactNode,
 } from "react";
 import { usePreText } from "@/hooks/use-pretext";
 

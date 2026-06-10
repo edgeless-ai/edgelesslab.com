@@ -14,7 +14,7 @@ const toolLinks = [
 const labLinks = [
   { label: "Pen Plotter Art", href: "/lab/pen-plotter-pipeline", external: false },
   { label: "Strange Attractors", href: "/lab/strange-attractors", external: false },
-  { label: "Total Serialism", href: "/total-serialism/field-notes/", external: false },
+  { label: "Total Serialism", href: "/total-serialism/app/", external: false },
   { label: "Excalidraw Diagrams", href: "/lab/excalidraw-diagrams", external: false },
 ];
 

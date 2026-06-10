@@ -38,11 +38,14 @@ export function PerformancePreload() {
 const CRITICAL_CSS = `
 /* CSS Reset & Base */
 *,*::before,*::after{box-sizing:border-box}
-html{color-scheme:dark only}
-body{margin:0;min-height:100vh;font-family:var(--font-geist-sans),system-ui,sans-serif;background:#09090B;color:#FAFAFA;line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+html{color-scheme:dark}
+body{margin:0;min-height:100vh;font-family:var(--font-geist-sans),system-ui,sans-serif;background:var(--bg-base);color:var(--text-primary);line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 
-/* CSS Variables */
-:root{--bg-base:#09090B;--bg-surface:#111113;--bg-surface-hover:#1A1A1F;--bg-elevated:#1E1E23;--border-subtle:rgba(255,255,255,0.08);--border-focus:rgba(255,255,255,0.15);--text-primary:#FAFAFA;--text-secondary:rgba(255,255,255,0.72);--text-tertiary:rgba(255,255,255,0.55);--accent:#818CF8;--accent-hover:#A5B4FC;--accent-muted:rgba(129,140,248,0.12);--green:#34D399;--green-muted:rgba(52,211,153,0.12);--ease-out:cubic-bezier(0.16,1,0.3,1)}
+/* CSS Variables — Dark (default) */
+:root{--bg-base:#09090B;--bg-surface:#111113;--bg-surface-hover:#1A1A1F;--bg-elevated:#1E1E23;--bg-raised:#18181B;--bg-glass:rgba(17,17,19,0.72);--bg-glass-solid:rgba(17,17,19,0.92);--border-subtle:rgba(255,255,255,0.08);--border-focus:rgba(255,255,255,0.15);--border-hover:rgba(255,255,255,0.12);--text-primary:#FAFAFA;--text-secondary:rgba(255,255,255,0.72);--text-tertiary:rgba(255,255,255,0.55);--accent:#818CF8;--accent-hover:#A5B4FC;--accent-muted:rgba(129,140,248,0.12);--green:#34D399;--green-muted:rgba(52,211,153,0.12);--ease-out:cubic-bezier(0.16,1,0.3,1)}
+
+/* CSS Variables — Light (override) */
+[data-theme=light] :root{--bg-base:#FAFAFA;--bg-surface:#FFFFFF;--bg-surface-hover:#F5F5F7;--bg-elevated:#FFFFFF;--bg-raised:#F0F0F2;--bg-glass:rgba(255,255,255,0.72);--bg-glass-solid:rgba(255,255,255,0.92);--border-subtle:rgba(0,0,0,0.08);--border-focus:rgba(0,0,0,0.15);--border-hover:rgba(0,0,0,0.12);--text-primary:#111111;--text-secondary:rgba(0,0,0,0.65);--text-tertiary:rgba(0,0,0,0.50);--accent:#6366F1;--accent-hover:#4F46E5;--accent-muted:rgba(99,102,241,0.10);--green:#10B981;--green-muted:rgba(16,185,129,0.10)}
 
 /* Critical Hero Styles - Above the fold */
 .hero-section{position:relative;display:flex;min-height:92svh;align-items:center;padding:112px 24px 64px}
@@ -53,7 +56,7 @@ body{margin:0;min-height:100vh;font-family:var(--font-geist-sans),system-ui,sans
 .font-mono{font-family:var(--font-geist-mono),ui-monospace,monospace}
 
 /* Status Badge */
-.status-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:32px;padding:6px 12px;border-radius:9999px;border:1px solid rgba(52,211,153,0.25);background:rgba(52,211,153,0.06)}
+.status-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:32px;padding:6px 12px;border-radius:9999px;border:1px solid var(--green-muted);background:var(--green-muted)}
 .status-dot{position:relative;display:flex;height:8px;width:8px}
 .status-dot-inner{position:relative;display:inline-flex;height:100%;width:100%;border-radius:9999px;background:var(--green)}
 .status-dot-ping{position:absolute;display:inline-flex;height:100%;width:100%;border-radius:9999px;background:var(--green);opacity:0.6;animation:ping 1s cubic-bezier(0,0,0.2,1) infinite}
@@ -71,7 +74,7 @@ body{margin:0;min-height:100vh;font-family:var(--font-geist-sans),system-ui,sans
 .cta-primary{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 24px;border-radius:9999px;font-size:14px;font-weight:500;color:white;background:var(--accent);text-decoration:none;transition:all 0.15s var(--ease-out)}
 .cta-primary:hover{filter:brightness(1.1);transform:scale(1.02)}
 .cta-secondary{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 24px;border-radius:9999px;font-size:14px;font-weight:500;color:var(--text-secondary);border:1px solid var(--border-subtle);text-decoration:none;transition:all 0.15s var(--ease-out)}
-.cta-secondary:hover{color:white}
+.cta-secondary:hover{color:var(--text-primary)}
 
 /* Animation keyframes for hero content */
 @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
@@ -83,6 +86,7 @@ body{margin:0;min-height:100vh;font-family:var(--font-geist-sans),system-ui,sans
 
 /* Navigation - Critical for layout stability */
 .nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:16px 24px;background:linear-gradient(to bottom,rgba(9,9,11,0.9),transparent);backdrop-filter:blur(8px)}
+[data-theme=light] .nav{background:linear-gradient(to bottom,rgba(255,255,255,0.9),transparent)}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;max-width:1280px;margin:0 auto}
 .nav-logo{font-size:1.125rem;font-weight:700;color:var(--text-primary);text-decoration:none}
 .nav-links{display:flex;align-items:center;gap:24px}

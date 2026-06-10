@@ -1,13 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, X, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { openCommandPalette } from "@/lib/command-palette-events";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navLinks = [
   { label: "Projects", href: "/projects" },
   { label: "Products", href: "/products" },
+  { label: "Services", href: "/services/private-ai-systems" },
   { label: "Lab", href: "/lab" },
   { label: "Agents", href: "/agents" },
   { label: "Blog", href: "/blog" },
@@ -36,7 +39,7 @@ export function Nav() {
           <div
             className="flex items-center justify-between h-12 px-5 rounded-full border backdrop-blur-xl"
             style={{
-              background: "rgba(17, 17, 19, 0.7)",
+              background: "var(--bg-glass)",
               borderColor: "var(--border-subtle)",
             }}
           >
@@ -67,6 +70,21 @@ export function Nav() {
                   {link.label}
                 </Link>
               ))}
+              <button
+                type="button"
+                onClick={() => openCommandPalette()}
+                className="text-[13px] hover:text-white transition-colors flex items-center gap-1.5 bg-transparent border-none cursor-pointer"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                <Search size={13} />
+                <kbd
+                  className="text-[10px] font-mono px-1 py-0.5 rounded hidden lg:inline"
+                  style={{ color: "var(--text-tertiary)", background: "var(--bg-surface)" }}
+                >
+                  &#8984;K
+                </kbd>
+                <span className="sr-only">Search</span>
+              </button>
               <a
                 href="https://github.com/edgeless-ai"
                 target="_blank"
@@ -77,6 +95,7 @@ export function Nav() {
                 GitHub <ArrowUpRight size={12} />
                 <span className="sr-only">(opens in new tab)</span>
               </a>
+              <ThemeToggle />
             </div>
             <button
               type="button"
@@ -94,7 +113,7 @@ export function Nav() {
             <div
               className="mt-3 rounded-[1.5rem] border p-3 backdrop-blur-xl md:hidden"
               style={{
-                background: "rgba(17, 17, 19, 0.92)",
+                background: "var(--bg-glass-solid)",
                 borderColor: "var(--border-subtle)",
               }}
             >
@@ -116,6 +135,18 @@ export function Nav() {
                     {link.label}
                   </Link>
                 ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    openCommandPalette();
+                  }}
+                  className="text-left rounded-2xl px-4 py-3 text-sm transition-colors hover:text-white flex items-center gap-1.5 bg-transparent border-none cursor-pointer"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  <Search size={14} />
+                  Search
+                </button>
                 <a
                   href="https://github.com/edgeless-ai"
                   target="_blank"
@@ -127,6 +158,9 @@ export function Nav() {
                   GitHub <ArrowUpRight size={12} />
                   <span className="sr-only">(opens in new tab)</span>
                 </a>
+                <div className="px-4 py-2">
+                  <ThemeToggle />
+                </div>
               </div>
             </div>
           )}

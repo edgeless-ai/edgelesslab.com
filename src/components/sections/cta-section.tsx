@@ -1,19 +1,11 @@
-"use client";
+import { ProductHighlight } from "@/components/product-highlight";
+import { AboutBlurb } from "@/components/about-blurb";
 
-import dynamic from "next/dynamic";
-
-const CTASection = dynamic(
-  () =>
-    import("@/components/home-client").then((m) => {
-      const Component: React.FC = () => (
-        <>
-          <m.ProductHighlight />
-          <m.AboutBlurb />
-        </>
-      );
-      return { default: Component };
-    }),
-  { ssr: false }
-);
-
-export default CTASection;
+export default function CTASection() {
+  return (
+    <>
+      <ProductHighlight />
+      <AboutBlurb />
+    </>
+  );
+}

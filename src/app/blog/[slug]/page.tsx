@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { posts } from "@/lib/blog";
 import { products } from "@/lib/data";
 import { notFound } from "next/navigation";
@@ -116,7 +117,7 @@ export default async function BlogPostPage({
           <div className="mb-12 max-w-[680px]">
             {post.image && (
               <div className="mb-6 rounded-lg overflow-hidden border" style={{ borderColor: "var(--border-subtle)" }}>
-                <img src={post.image} alt={post.title} className="w-full h-auto" />
+                <Image src={post.image} alt={post.title} width={1200} height={630} className="w-full h-auto" priority />
               </div>
             )}
             <div className="flex items-center gap-3 mb-4">

@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edgeless Skill Gallery</title>
+<style>
+:root { --bg: #0a1212; --fg: #e0e0e0; --accent: #00E5FF; --muted: #1a2222; --border: #2a3a3a; }
+body { background: var(--bg); color: var(--fg); font-family: 'SF Mono', Monaco, monospace; margin: 0; padding: 2rem; }
+header { border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 2rem; }
+h1 { margin: 0; font-size: 1.5rem; color: var(--accent); }
+.sub { color: #7a8a8a; font-size: 0.85rem; margin-top: 0.5rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+.card { background: var(--muted); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; transition: border-color 0.2s; }
+.card:hover { border-color: var(--accent); }
+.card img { width: 100%; height: 200px; object-fit: cover; display: block; }
+.card .meta { padding: 1rem; }
+.card .name { font-size: 0.9rem; color: var(--accent); margin: 0 0 0.25rem; }
+.card .category { font-size: 0.75rem; color: #7a8a8a; text-transform: uppercase; letter-spacing: 0.05em; }
+.stats { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: #7a8a8a; }
+</style>
+</head>
+<body>
+<header>
+<h1>Edgeless Skill Gallery</h1>
+<div class="sub">166 skills rendered as 3D artifacts. Each generated from SKILL.md frontmatter.</div>
+</header>
+<div class="grid">
+<div class="card">
+<img src="renders/academic_paper.png" alt="academic-paper" loading="lazy">
+<div class="meta">
+<div class="name">academic-paper</div>
+<div class="category">academic_paper</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/academic_research.png" alt="academic-research" loading="lazy">
+<div class="meta">
+<div class="name">academic-research</div>
+<div class="category">academic_research</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/academic_review.png" alt="academic-review" loading="lazy">
+<div class="meta">
+<div class="name">academic-review</div>
+<div class="category">academic_review</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/ios_app_distribution.png" alt="apple_ios-app-distribution" loading="lazy">
+<div class="meta">
+<div class="name">apple_ios-app-distribution</div>
+<div class="category">ios_app_distribution</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/claude_code.png" alt="autonomous-ai-agents_claude-code" loading="lazy">
+<div class="meta">
+<div class="name">autonomous-ai-agents_claude-code</div>
+<div class="category">claude_code</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/codex.png" alt="autonomous-ai-agents_codex" loading="lazy">
+<div class="meta">
+<div class="name">autonomous-ai-agents_codex</div>
+<div class="category">codex</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/compound_orchestrator.png" alt="autonomous-ai-agents_compound-orchestrator" loading="lazy">
+<div class="meta">
+<div class="name">autonomous-ai-agents_compound-orchestrator</div>
+<div class="category">compound_orchestrator</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/goal_loop.png" alt="autonomous-ai-agents_goal-loop" loading="lazy">
+<div class="meta">
+<div class="name">autonomous-ai-agents_goal-loop</div>
+<div class="category">goal_loop</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/hermes_agent.png" alt="autonomous-ai-agents_hermes-agent" loading="lazy">
+<div class="meta">
+<div class="name">autonomous-ai-agents_hermes-agent</div>
+<div class="category">hermes_agent</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/hermes_multi_agent_discord.png" alt="autonomous-ai-agents_hermes-multi-agent-discord" loading="lazy">
+<div class="meta">
+<div class="name">autonomous-ai-agents_hermes-multi-agent-discord</div>
+<div class="category">hermes_multi_agent_discord</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/llms_txt_fleet_sync.png" alt="autonomous-ai-agents_llms-txt-fleet-sync" loading="lazy">
+<div class="meta">
+<div class="name">autonomous-ai-agents_llms-txt-fleet-sync</div>
+<div class="category">llms_txt_fleet_sync</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/opencode.png" alt="autonomous-ai-agents_opencode" loading="lazy">
+<div class="meta">
+<div class="name">autonomous-ai-agents_opencode</div>
+<div class="category">opencode</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/swarm_operations.png" alt="autonomous-ai-agents_swarm-operations" loading="lazy">
+<div class="meta">
+<div class="name">autonomous-ai-agents_swarm-operations</div>
+<div class="category">swarm_operations</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/baoyu_comic_pipeline.png" alt="baoyu-comic-pipeline" loading="lazy">
+<div class="meta">
+<div class="name">baoyu-comic-pipeline</div>
+<div class="category">baoyu_comic_pipeline</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/cli_dashboards.png" alt="cli-dashboards" loading="lazy">
+<div class="meta">
+<div class="name">cli-dashboards</div>
+<div class="category">cli_dashboards</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/coding.png" alt="coding" loading="lazy">
+<div class="meta">
+<div class="name">coding</div>
+<div class="category">coding</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/3d_asset_pipeline.png" alt="creative_3d-asset-pipeline" loading="lazy">
+<div class="meta">
+<div class="name">creative_3d-asset-pipeline</div>
+<div class="category">3d_asset_pipeline</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/blender_3d_pipeline.png" alt="creative_blender-3d-pipeline" loading="lazy">
+<div class="meta">
+<div class="name">creative_blender-3d-pipeline</div>
+<div class="category">blender_3d_pipeline</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/blender_asset_pipeline.png" alt="creative_blender-asset-pipeline" loading="lazy">
+<div class="meta">
+<div class="name">creative_blender-asset-pipeline</div>
+<div class="category">blender_asset_pipeline</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/blender_cad_pipeline.png" alt="creative_blender-cad-pipeline" loading="lazy">
+<div class="meta">
+<div class="name">creative_blender-cad-pipeline</div>
+<div class="category">blender_cad_pipeline</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/brand_voice.png" alt="creative_brand-voice" loading="lazy">
+<div class="meta">
+<div class="name">creative_brand-voice</div>
+<div class="category">brand_voice</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/content_engine.png" alt="creative_content-engine" loading="lazy">
+<div class="meta">
+<div class="name">creative_content-engine</div>
+<div class="category">content_engine</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/creative_deliverables.png" alt="creative_creative-deliverables" loading="lazy">
+<div class="meta">
+<div class="name">creative_creative-deliverables</div>
+<div class="category">creative_deliverables</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/ideation.png" alt="creative_creative-ideation" loading="lazy">
+<div class="meta">
+<div class="name">creative_creative-ideation</div>
+<div class="category">ideation</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/design_system_evaluation.png" alt="creative_design-system-evaluation" loading="lazy">
+<div class="meta">
+<div class="name">creative_design-system-evaluation</div>
+<div class="category">design_system_evaluation</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/design_systems_studio.png" alt="creative_design-systems-studio" loading="lazy">
+<div class="meta">
+<div class="name">creative_design-systems-studio</div>
+<div class="category">design_systems_studio</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/fal_ai_media.png" alt="creative_fal-ai-media" loading="lazy">
+<div class="meta">
+<div class="name">creative_fal-ai-media</div>
+<div class="category">fal_ai_media</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/frontend_slides.png" alt="creative_frontend-slides" loading="lazy">
+<div class="meta">
+<div class="name">creative_frontend-slides</div>
+<div class="category">frontend_slides</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/hermes_aesthetic.png" alt="creative_hermes-aesthetic" loading="lazy">
+<div class="meta">
+<div class="name">creative_hermes-aesthetic</div>
+<div class="category">hermes_aesthetic</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/humanizer.png" alt="creative_humanizer" loading="lazy">
+<div class="meta">
+<div class="name">creative_humanizer</div>
+<div class="category">humanizer</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/nous_girl_content_pipeline.png" alt="creative_nous-girl-content-pipeline" loading="lazy">
+<div class="meta">
+<div class="name">creative_nous-girl-content-pipeline</div>
+<div class="category">nous_girl_content_pipeline</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/patch_generator.png" alt="creative_patch-generator" loading="lazy">
+<div class="meta">
+<div class="name">creative_patch-generator</div>
+<div class="category">patch_generator</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/cron_skill_review.png" alt="cron-skill-review" loading="lazy">
+<div class="meta">
+<div class="name">cron-skill-review</div>
+<div class="category">cron_skill_review</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/jupyter_live_kernel.png" alt="data-science_jupyter-live-kernel" loading="lazy">
+<div class="meta">
+<div class="name">data-science_jupyter-live-kernel</div>
+<div class="category">jupyter_live_kernel</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/multi_source_data_pipeline.png" alt="data-science_multi-source-data-pipeline" loading="lazy">
+<div class="meta">
+<div class="name">data-science_multi-source-data-pipeline</div>
+<div class="category">multi_source_data_pipeline</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/agent_fleet_capability_audit.png" alt="devops_agent-fleet-capability-audit" loading="lazy">
+<div class="meta">
+<div class="name">devops_agent-fleet-capability-audit</div>
+<div class="category">agent_fleet_capability_audit</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/agent_optimization_infrastructure.png" alt="devops_agent-optimization-infrastructure" loading="lazy">
+<div class="meta">
+<div class="name">devops_agent-optimization-infrastructure</div>
+<div class="category">agent_optimization_infrastructure</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/backroom_protocol.png" alt="devops_backroom-protocol" loading="lazy">
+<div class="meta">
+<div class="name">devops_backroom-protocol</div>
+<div class="category">backroom_protocol</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/cron_health_diagnostic.png" alt="devops_cron-health-diagnostic" loading="lazy">
+<div class="meta">
+<div class="name">devops_cron-health-diagnostic</div>
+<div class="category">cron_health_diagnostic</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/cron_skill_review.png" alt="devops_cron-skill-review" loading="lazy">
+<div class="meta">
+<div class="name">devops_cron-skill-review</div>
+<div class="category">cron_skill_review</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/fleet_self_healing_operations.png" alt="devops_fleet-self-healing-operations" loading="lazy">
+<div class="meta">
+<div class="name">devops_fleet-self-healing-operations</div>
+<div class="category">fleet_self_healing_operations</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/mcp_to_skill_proxy.png" alt="devops_mcp-to-skill-proxy" loading="lazy">
+<div class="meta">
+<div class="name">devops_mcp-to-skill-proxy</div>
+<div class="category">mcp_to_skill_proxy</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/nous_portal.png" alt="devops_nous-portal" loading="lazy">
+<div class="meta">
+<div class="name">devops_nous-portal</div>
+<div class="category">nous_portal</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/paperclip_api.png" alt="devops_paperclip-api" loading="lazy">
+<div class="meta">
+<div class="name">devops_paperclip-api</div>
+<div class="category">paperclip_api</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/paperclip_hermes_config_sync.png" alt="devops_paperclip-hermes-config-sync" loading="lazy">
+<div class="meta">
+<div class="name">devops_paperclip-hermes-config-sync</div>
+<div class="category">paperclip_hermes_config_sync</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/skill_library_maintenance.png" alt="devops_skill-library-maintenance" loading="lazy">
+<div class="meta">
+<div class="name">devops_skill-library-maintenance</div>
+<div class="category">skill_library_maintenance</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/subprocess_api_key_patterns.png" alt="devops_subprocess-api-key-patterns" loading="lazy">
+<div class="meta">
+<div class="name">devops_subprocess-api-key-patterns</div>
+<div class="category">subprocess_api_key_patterns</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/swarm_coordination.png" alt="devops_swarm-coordination" loading="lazy">
+<div class="meta">
+<div class="name">devops_swarm-coordination</div>
+<div class="category">swarm_coordination</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/discord_swarm_ombudsman.png" alt="discord-swarm-ombudsman" loading="lazy">
+<div class="meta">
+<div class="name">discord-swarm-ombudsman</div>
+<div class="category">discord_swarm_ombudsman</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/dmux_workflows.png" alt="dmux-workflows" loading="lazy">
+<div class="meta">
+<div class="name">dmux-workflows</div>
+<div class="category">dmux_workflows</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/docs.png" alt="docs" loading="lazy">
+<div class="meta">
+<div class="name">docs</div>
+<div class="category">docs</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/drafting.png" alt="drafting" loading="lazy">
+<div class="meta">
+<div class="name">drafting</div>
+<div class="category">drafting</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/edgeless_guard.png" alt="edgeless-guard" loading="lazy">
+<div class="meta">
+<div class="name">edgeless-guard</div>
+<div class="category">edgeless_guard</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/email_intelligence_engineer.png" alt="email-intelligence-engineer" loading="lazy">
+<div class="meta">
+<div class="name">email-intelligence-engineer</div>
+<div class="category">email_intelligence_engineer</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/eval_harness.png" alt="eval-harness" loading="lazy">
+<div class="meta">
+<div class="name">eval-harness</div>
+<div class="category">eval_harness</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/rss_triage_pipeline.png" alt="feeds_rss-triage-pipeline" loading="lazy">
+<div class="meta">
+<div class="name">feeds_rss-triage-pipeline</div>
+<div class="category">rss_triage_pipeline</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/agent_introspection_debugging.png" alt="general_agent-introspection-debugging" loading="lazy">
+<div class="meta">
+<div class="name">general_agent-introspection-debugging</div>
+<div class="category">agent_introspection_debugging</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/agent_sort.png" alt="general_agent-sort" loading="lazy">
+<div class="meta">
+<div class="name">general_agent-sort</div>
+<div class="category">agent_sort</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/strategic_compact.png" alt="general_strategic-compact" loading="lazy">
+<div class="meta">
+<div class="name">general_strategic-compact</div>
+<div class="category">strategic_compact</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/github_code_review_v2.png" alt="github_github-code-review-v2" loading="lazy">
+<div class="meta">
+<div class="name">github_github-code-review-v2</div>
+<div class="category">github_code_review_v2</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/github_repo_management.png" alt="github_github-repo-management" loading="lazy">
+<div class="meta">
+<div class="name">github_github-repo-management</div>
+<div class="category">github_repo_management</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/graphify.png" alt="graphify" loading="lazy">
+<div class="meta">
+<div class="name">graphify</div>
+<div class="category">graphify</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/incident_response_commander.png" alt="incident-response-commander" loading="lazy">
+<div class="meta">
+<div class="name">incident-response-commander</div>
+<div class="category">incident_response_commander</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/infrastructure_maintainer.png" alt="infrastructure-maintainer" loading="lazy">
+<div class="meta">
+<div class="name">infrastructure-maintainer</div>
+<div class="category">infrastructure_maintainer</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/ios_build_troubleshooting.png" alt="ios-build-troubleshooting" loading="lazy">
+<div class="meta">
+<div class="name">ios-build-troubleshooting</div>
+<div class="category">ios_build_troubleshooting</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/kb_curation.png" alt="kb-curation" loading="lazy">
+<div class="meta">
+<div class="name">kb-curation</div>
+<div class="category">kb_curation</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/fastmcp.png" alt="mcp_fastmcp" loading="lazy">
+<div class="meta">
+<div class="name">mcp_fastmcp</div>
+<div class="category">fastmcp</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/mcp_server_scaffold.png" alt="mcp_mcp-server-scaffold" loading="lazy">
+<div class="meta">
+<div class="name">mcp_mcp-server-scaffold</div>
+<div class="category">mcp_server_scaffold</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/mcporter.png" alt="mcp_mcporter" loading="lazy">
+<div class="meta">
+<div class="name">mcp_mcporter</div>
+<div class="category">mcporter</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/native_mcp.png" alt="mcp_native-mcp" loading="lazy">
+<div class="meta">
+<div class="name">mcp_native-mcp</div>
+<div class="category">native_mcp</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/supadata_skill.png" alt="media_supadata-skill" loading="lazy">
+<div class="meta">
+<div class="name">media_supadata-skill</div>
+<div class="category">supadata_skill</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/video_editing.png" alt="media_video-editing" loading="lazy">
+<div class="meta">
+<div class="name">media_video-editing</div>
+<div class="category">video_editing</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/youtube_likes_pipeline.png" alt="media_youtube-likes-pipeline" loading="lazy">
+<div class="meta">
+<div class="name">media_youtube-likes-pipeline</div>
+<div class="category">youtube_likes_pipeline</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/chroma.png" alt="mlops_chroma" loading="lazy">
+<div class="meta">
+<div class="name">mlops_chroma</div>
+<div class="category">chroma</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/modal_serverless_gpu.png" alt="mlops_cloud_modal" loading="lazy">
+<div class="meta">
+<div class="name">mlops_cloud_modal</div>
+<div class="category">modal_serverless_gpu</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/evaluating_llms_harness.png" alt="mlops_evaluation_lm-evaluation-harness" loading="lazy">
+<div class="meta">
+<div class="name">mlops_evaluation_lm-evaluation-harness</div>
+<div class="category">evaluating_llms_harness</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/weights_and_biases.png" alt="mlops_evaluation_weights-and-biases" loading="lazy">
+<div class="meta">
+<div class="name">mlops_evaluation_weights-and-biases</div>
+<div class="category">weights_and_biases</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/huggingface_hub.png" alt="mlops_huggingface-hub" loading="lazy">
+<div class="meta">
+<div class="name">mlops_huggingface-hub</div>
+<div class="category">huggingface_hub</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/llama_cpp.png" alt="mlops_inference_llama-cpp" loading="lazy">
+<div class="meta">
+<div class="name">mlops_inference_llama-cpp</div>
+<div class="category">llama_cpp</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/obliteratus.png" alt="mlops_inference_obliteratus" loading="lazy">
+<div class="meta">
+<div class="name">mlops_inference_obliteratus</div>
+<div class="category">obliteratus</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/outlines.png" alt="mlops_inference_outlines" loading="lazy">
+<div class="meta">
+<div class="name">mlops_inference_outlines</div>
+<div class="category">outlines</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/serving_llms_vllm.png" alt="mlops_inference_vllm" loading="lazy">
+<div class="meta">
+<div class="name">mlops_inference_vllm</div>
+<div class="category">serving_llms_vllm</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/llm_fine_tuning.png" alt="mlops_llm-fine-tuning" loading="lazy">
+<div class="meta">
+<div class="name">mlops_llm-fine-tuning</div>
+<div class="category">llm_fine_tuning</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/mle_workflow.png" alt="mlops_mle-workflow" loading="lazy">
+<div class="meta">
+<div class="name">mlops_mle-workflow</div>
+<div class="category">mle_workflow</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/audiocraft_audio_generation.png" alt="mlops_models_audiocraft" loading="lazy">
+<div class="meta">
+<div class="name">mlops_models_audiocraft</div>
+<div class="category">audiocraft_audio_generation</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/segment_anything_model.png" alt="mlops_models_segment-anything" loading="lazy">
+<div class="meta">
+<div class="name">mlops_models_segment-anything</div>
+<div class="category">segment_anything_model</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/stable_diffusion_image_generation.png" alt="mlops_models_stable-diffusion" loading="lazy">
+<div class="meta">
+<div class="name">mlops_models_stable-diffusion</div>
+<div class="category">stable_diffusion_image_generation</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/whisper.png" alt="mlops_models_whisper" loading="lazy">
+<div class="meta">
+<div class="name">mlops_models_whisper</div>
+<div class="category">whisper</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/dspy.png" alt="mlops_research_dspy" loading="lazy">
+<div class="meta">
+<div class="name">mlops_research_dspy</div>
+<div class="category">dspy</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/axolotl.png" alt="mlops_training_axolotl" loading="lazy">
+<div class="meta">
+<div class="name">mlops_training_axolotl</div>
+<div class="category">axolotl</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/peft_fine_tuning.png" alt="mlops_training_peft" loading="lazy">
+<div class="meta">
+<div class="name">mlops_training_peft</div>
+<div class="category">peft_fine_tuning</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/pytorch_fsdp.png" alt="mlops_training_pytorch-fsdp-original" loading="lazy">
+<div class="meta">
+<div class="name">mlops_training_pytorch-fsdp-original</div>
+<div class="category">pytorch_fsdp</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/fine_tuning_with_trl.png" alt="mlops_training_trl-fine-tuning" loading="lazy">
+<div class="meta">
+<div class="name">mlops_training_trl-fine-tuning</div>
+<div class="category">fine_tuning_with_trl</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/unsloth.png" alt="mlops_training_unsloth" loading="lazy">
+<div class="meta">
+<div class="name">mlops_training_unsloth</div>
+<div class="category">unsloth</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/monitoring.png" alt="monitoring" loading="lazy">
+<div class="meta">
+<div class="name">monitoring</div>
+<div class="category">monitoring</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/obsidian.png" alt="note-taking_obsidian" loading="lazy">
+<div class="meta">
+<div class="name">note-taking_obsidian</div>
+<div class="category">obsidian</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/nous_portal_gateway.png" alt="nous_nous-portal-gateway" loading="lazy">
+<div class="meta">
+<div class="name">nous_nous-portal-gateway</div>
+<div class="category">nous_portal_gateway</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/ops_alert.png" alt="ops-alert" loading="lazy">
+<div class="meta">
+<div class="name">ops-alert</div>
+<div class="category">ops_alert</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/paperclip_fleet_analyzer.png" alt="paperclip-fleet-analyzer" loading="lazy">
+<div class="meta">
+<div class="name">paperclip-fleet-analyzer</div>
+<div class="category">paperclip_fleet_analyzer</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/planning.png" alt="planning" loading="lazy">
+<div class="meta">
+<div class="name">planning</div>
+<div class="category">planning</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/blog_post_pipeline.png" alt="product_blog-post-pipeline" loading="lazy">
+<div class="meta">
+<div class="name">product_blog-post-pipeline</div>
+<div class="category">blog_post_pipeline</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/indie_product_manufacturing.png" alt="product_indie-product-manufacturing" loading="lazy">
+<div class="meta">
+<div class="name">product_indie-product-manufacturing</div>
+<div class="category">indie_product_manufacturing</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/investor_materials.png" alt="product_investor-materials" loading="lazy">
+<div class="meta">
+<div class="name">product_investor-materials</div>
+<div class="category">investor_materials</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/investor_outreach.png" alt="product_investor-outreach" loading="lazy">
+<div class="meta">
+<div class="name">product_investor-outreach</div>
+<div class="category">investor_outreach</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/product_capability.png" alt="product_product-capability" loading="lazy">
+<div class="meta">
+<div class="name">product_product-capability</div>
+<div class="category">product_capability</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/productized_service_creator.png" alt="product_productized-service-creator" loading="lazy">
+<div class="meta">
+<div class="name">product_productized-service-creator</div>
+<div class="category">productized_service_creator</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/social_media_scheduler.png" alt="product_social-media-scheduler" loading="lazy">
+<div class="meta">
+<div class="name">product_social-media-scheduler</div>
+<div class="category">social_media_scheduler</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/systematic_trading_design.png" alt="product_systematic-trading-design" loading="lazy">
+<div class="meta">
+<div class="name">product_systematic-trading-design</div>
+<div class="category">systematic_trading_design</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/tortillaria_ops.png" alt="product_tortillaria-ops" loading="lazy">
+<div class="meta">
+<div class="name">product_tortillaria-ops</div>
+<div class="category">tortillaria_ops</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/local_backlog_triage.png" alt="productivity_local-backlog-triage" loading="lazy">
+<div class="meta">
+<div class="name">productivity_local-backlog-triage</div>
+<div class="category">local_backlog_triage</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/maps.png" alt="productivity_maps" loading="lazy">
+<div class="meta">
+<div class="name">productivity_maps</div>
+<div class="category">maps</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/send_email.png" alt="productivity_send-email" loading="lazy">
+<div class="meta">
+<div class="name">productivity_send-email</div>
+<div class="category">send_email</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/proof_of_completion.png" alt="proof-of-completion" loading="lazy">
+<div class="meta">
+<div class="name">proof-of-completion</div>
+<div class="category">proof_of_completion</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/recall.png" alt="recall" loading="lazy">
+<div class="meta">
+<div class="name">recall</div>
+<div class="category">recall</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/godmode.png" alt="red-teaming_godmode" loading="lazy">
+<div class="meta">
+<div class="name">red-teaming_godmode</div>
+<div class="category">godmode</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/research.png" alt="research" loading="lazy">
+<div class="meta">
+<div class="name">research</div>
+<div class="category">research</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/cultural_heritage_apis.png" alt="research_cultural-heritage-apis" loading="lazy">
+<div class="meta">
+<div class="name">research_cultural-heritage-apis</div>
+<div class="category">cultural_heritage_apis</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/documentation_lookup.png" alt="research_documentation-lookup" loading="lazy">
+<div class="meta">
+<div class="name">research_documentation-lookup</div>
+<div class="category">documentation_lookup</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/exa_search.png" alt="research_exa-search" loading="lazy">
+<div class="meta">
+<div class="name">research_exa-search</div>
+<div class="category">exa_search</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/market_research.png" alt="research_market-research" loading="lazy">
+<div class="meta">
+<div class="name">research_market-research</div>
+<div class="category">market_research</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/polymarket.png" alt="research_polymarket" loading="lazy">
+<div class="meta">
+<div class="name">research_polymarket</div>
+<div class="category">polymarket</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/research_paper_writing.png" alt="research_research-paper-writing-original" loading="lazy">
+<div class="meta">
+<div class="name">research_research-paper-writing-original</div>
+<div class="category">research_paper_writing</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/tradingview_pine_automation.png" alt="research_tradingview-pine-automation" loading="lazy">
+<div class="meta">
+<div class="name">research_tradingview-pine-automation</div>
+<div class="category">tradingview_pine_automation</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/tradingview_mcp.png" alt="research_tradingview-skill" loading="lazy">
+<div class="meta">
+<div class="name">research_tradingview-skill</div>
+<div class="category">tradingview_mcp</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/review.png" alt="review" loading="lazy">
+<div class="meta">
+<div class="name">review</div>
+<div class="category">review</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/code_simplifier.png" alt="rtk_.claude_skills_code-simplifier" loading="lazy">
+<div class="meta">
+<div class="name">rtk_.claude_skills_code-simplifier</div>
+<div class="category">code_simplifier</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/design_patterns.png" alt="rtk_.claude_skills_design-patterns" loading="lazy">
+<div class="meta">
+<div class="name">rtk_.claude_skills_design-patterns</div>
+<div class="category">design_patterns</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/issue_triage.png" alt="rtk_.claude_skills_issue-triage" loading="lazy">
+<div class="meta">
+<div class="name">rtk_.claude_skills_issue-triage</div>
+<div class="category">issue_triage</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/performance.png" alt="rtk_.claude_skills_performance" loading="lazy">
+<div class="meta">
+<div class="name">rtk_.claude_skills_performance</div>
+<div class="category">performance</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/pr_review.png" alt="rtk_.claude_skills_pr-review" loading="lazy">
+<div class="meta">
+<div class="name">rtk_.claude_skills_pr-review</div>
+<div class="category">pr_review</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/pr_triage.png" alt="rtk_.claude_skills_pr-triage" loading="lazy">
+<div class="meta">
+<div class="name">rtk_.claude_skills_pr-triage</div>
+<div class="category">pr_triage</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/repo_recap.png" alt="rtk_.claude_skills_repo-recap" loading="lazy">
+<div class="meta">
+<div class="name">rtk_.claude_skills_repo-recap</div>
+<div class="category">repo_recap</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/rtk_tdd.png" alt="rtk_.claude_skills_rtk-tdd" loading="lazy">
+<div class="meta">
+<div class="name">rtk_.claude_skills_rtk-tdd</div>
+<div class="category">rtk_tdd</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/rtk_triage.png" alt="rtk_.claude_skills_rtk-triage" loading="lazy">
+<div class="meta">
+<div class="name">rtk_.claude_skills_rtk-triage</div>
+<div class="category">rtk_triage</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/security_guardian.png" alt="rtk_.claude_skills_security-guardian" loading="lazy">
+<div class="meta">
+<div class="name">rtk_.claude_skills_security-guardian</div>
+<div class="category">security_guardian</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/ship.png" alt="rtk_.claude_skills_ship" loading="lazy">
+<div class="meta">
+<div class="name">rtk_.claude_skills_ship</div>
+<div class="category">ship</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/tdd_rust.png" alt="rtk_.claude_skills_tdd-rust" loading="lazy">
+<div class="meta">
+<div class="name">rtk_.claude_skills_tdd-rust</div>
+<div class="category">tdd_rust</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/scrapping.png" alt="scraping-intel" loading="lazy">
+<div class="meta">
+<div class="name">scraping-intel</div>
+<div class="category">scrapping</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/1password.png" alt="security_1password" loading="lazy">
+<div class="meta">
+<div class="name">security_1password</div>
+<div class="category">1password</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/signal_extraction_layer.png" alt="signal-extraction-layer" loading="lazy">
+<div class="meta">
+<div class="name">signal-extraction-layer</div>
+<div class="category">signal_extraction_layer</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/openhue.png" alt="smart-home_openhue" loading="lazy">
+<div class="meta">
+<div class="name">smart-home_openhue</div>
+<div class="category">openhue</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/crosspost.png" alt="social-media_crosspost" loading="lazy">
+<div class="meta">
+<div class="name">social-media_crosspost</div>
+<div class="category">crosspost</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/discord.png" alt="social-media_discord" loading="lazy">
+<div class="meta">
+<div class="name">social-media_discord</div>
+<div class="category">discord</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/x_api.png" alt="social-media_x-api" loading="lazy">
+<div class="meta">
+<div class="name">social-media_x-api</div>
+<div class="category">x_api</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/xitter.png" alt="social-media_xitter" loading="lazy">
+<div class="meta">
+<div class="name">social-media_xitter</div>
+<div class="category">xitter</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/api_design.png" alt="software-development_api-design" loading="lazy">
+<div class="meta">
+<div class="name">software-development_api-design</div>
+<div class="category">api_design</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/backend_patterns.png" alt="software-development_backend-patterns" loading="lazy">
+<div class="meta">
+<div class="name">software-development_backend-patterns</div>
+<div class="category">backend_patterns</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/browser_automation_patterns.png" alt="software-development_browser-automation-patterns" loading="lazy">
+<div class="meta">
+<div class="name">software-development_browser-automation-patterns</div>
+<div class="category">browser_automation_patterns</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/coding_standards.png" alt="software-development_coding-standards" loading="lazy">
+<div class="meta">
+<div class="name">software-development_coding-standards</div>
+<div class="category">coding_standards</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/e2e_testing.png" alt="software-development_e2e-testing" loading="lazy">
+<div class="meta">
+<div class="name">software-development_e2e-testing</div>
+<div class="category">e2e_testing</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/frontend_patterns.png" alt="software-development_frontend-patterns" loading="lazy">
+<div class="meta">
+<div class="name">software-development_frontend-patterns</div>
+<div class="category">frontend_patterns</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/hermes_agent_skill_authoring.png" alt="software-development_hermes-agent-skill-authoring" loading="lazy">
+<div class="meta">
+<div class="name">software-development_hermes-agent-skill-authoring</div>
+<div class="category">hermes_agent_skill_authoring</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/hermes_s6_container_supervision.png" alt="software-development_hermes-s6-container-supervision" loading="lazy">
+<div class="meta">
+<div class="name">software-development_hermes-s6-container-supervision</div>
+<div class="category">hermes_s6_container_supervision</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/proof_of_completion.png" alt="software-development_proof-of-completion" loading="lazy">
+<div class="meta">
+<div class="name">software-development_proof-of-completion</div>
+<div class="category">proof_of_completion</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/skill_creator.png" alt="software-development_skill-creator" loading="lazy">
+<div class="meta">
+<div class="name">software-development_skill-creator</div>
+<div class="category">skill_creator</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/subagent_driven_development.png" alt="software-development_subagent-driven-development" loading="lazy">
+<div class="meta">
+<div class="name">software-development_subagent-driven-development</div>
+<div class="category">subagent_driven_development</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/systematic_debugging.png" alt="software-development_systematic-debugging" loading="lazy">
+<div class="meta">
+<div class="name">software-development_systematic-debugging</div>
+<div class="category">systematic_debugging</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/tdd_workflow.png" alt="software-development_tdd-workflow" loading="lazy">
+<div class="meta">
+<div class="name">software-development_tdd-workflow</div>
+<div class="category">tdd_workflow</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/verification_loop.png" alt="software-development_verification-loop" loading="lazy">
+<div class="meta">
+<div class="name">software-development_verification-loop</div>
+<div class="category">verification_loop</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/web_dev_ops.png" alt="software-development_web-dev-ops" loading="lazy">
+<div class="meta">
+<div class="name">software-development_web-dev-ops</div>
+<div class="category">web_dev_ops</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/writing_plans.png" alt="software-development_writing-plans" loading="lazy">
+<div class="meta">
+<div class="name">software-development_writing-plans</div>
+<div class="category">writing_plans</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/touchdesigner_generative_art.png" alt="touchdesigner-generative-art" loading="lazy">
+<div class="meta">
+<div class="name">touchdesigner-generative-art</div>
+<div class="category">touchdesigner_generative_art</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/triage.png" alt="triage" loading="lazy">
+<div class="meta">
+<div class="name">triage</div>
+<div class="category">triage</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/vault_knowledge_ops.png" alt="vault-knowledge-ops" loading="lazy">
+<div class="meta">
+<div class="name">vault-knowledge-ops</div>
+<div class="category">vault_knowledge_ops</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/verify_before_claiming.png" alt="verify-before-claiming" loading="lazy">
+<div class="meta">
+<div class="name">verify-before-claiming</div>
+<div class="category">verify_before_claiming</div>
+</div>
+</div>
+<div class="card">
+<img src="renders/youtube_summarizer.png" alt="youtube-summarizer" loading="lazy">
+<div class="meta">
+<div class="name">youtube-summarizer</div>
+<div class="category">youtube_summarizer</div>
+</div>
+</div>
+</div>
+<div class="stats">
+Total: 166 renders | Directory: /Users/djm/claude-projects/edgelesslab-design-system/blender-glb-pipeline/renders
+</div>
+</body>
+</html>

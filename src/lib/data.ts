@@ -15,26 +15,28 @@ export interface Product {
    * Products without a slug link directly to Gumroad from the products grid.
    */
   slug?: string;
+  /**
+   * Product category for section grouping in the grid.
+   */
+  category: string;
+  /**
+   * Visual tag annotations for the card (braille-style scoring dimensions).
+   * Each tag is a { label, score } pair displayed as dot annotations.
+   */
+  scoreTags?: Array<{ label: string; score: 1 | 2 | 3 }>;
 }
+
+/** Braille-dot annotation presets */
+export const TAG_ESSENTIAL = { label: "Essential", score: 3 as const };
+export const TAG_RECOMMENDED = { label: "Recommended", score: 2 as const };
+export const TAG_SPECIALIZED = { label: "Specialized", score: 1 as const };
+export const TAG_BEGINNER = { label: "Beginner", score: 2 as const };
+export const TAG_INTERMEDIATE = { label: "Intermediate", score: 2 as const };
+export const TAG_ADVANCED = { label: "Advanced", score: 3 as const };
 
 const UTM = "utm_source=edgelesslab&utm_medium=website&utm_campaign=products";
 
 export const products: Product[] = [
-  {
-    name: "Claude Code Cheat Sheet",
-    price: "Free",
-    description:
-      "Quick-start reference for Claude Code. Commands, shortcuts, hook patterns, and MCP setup in one printable sheet.",
-    features: [
-      "All slash commands and keyboard shortcuts",
-      "Hook configuration patterns with examples",
-      "MCP server setup cheatsheet",
-      "CLAUDE.md template and memory system quick-start",
-    ],
-    href: `https://edgelessai.gumroad.com/l/claude-code-cheat-sheet?${UTM}`,
-    badge: "Free",
-    slug: "claude-code-cheat-sheet",
-  },
   {
     name: "CLAUDE.md Template Pack",
     price: "Free",
@@ -48,6 +50,8 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/kszapk?${UTM}`,
     badge: "Free",
+    category: "Agent Config",
+    scoreTags: [TAG_ESSENTIAL, TAG_BEGINNER],
   },
   {
     name: "Quick Reference Cards",
@@ -62,6 +66,25 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/dihxts?${UTM}`,
     badge: "Free",
+  category: "Reference Docs",
+  scoreTags: [TAG_BEGINNER],
+  },
+  {
+    name: "Claude Code Cheat Sheet",
+    price: "Free",
+    description:
+      "Quick-start reference for Claude Code. Commands, shortcuts, hook patterns, and MCP setup in one printable sheet.",
+    features: [
+      "All slash commands and keyboard shortcuts",
+      "Hook configuration patterns with examples",
+      "MCP server setup cheatsheet",
+      "CLAUDE.md template and memory system quick-start",
+    ],
+    href: `https://edgelessai.gumroad.com/l/claude-code-cheat-sheet?${UTM}`,
+    badge: "Free",
+    slug: "claude-code-cheat-sheet",
+  category: "Agent Config",
+  scoreTags: [TAG_BEGINNER],
   },
   {
     name: "Claude Memory Kit",
@@ -77,6 +100,8 @@ export const products: Product[] = [
     href: "https://github.com/edgeless-ai/claude-memory-kit?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
     badge: "Free",
     repoUrl: "https://github.com/edgeless-ai/claude-memory-kit",
+  category: "Agent Config",
+  scoreTags: [TAG_ESSENTIAL, TAG_BEGINNER],
   },
   {
     name: "Edgeless Stack",
@@ -92,10 +117,12 @@ export const products: Product[] = [
     href: "https://github.com/edgeless-ai/edgeless-stack?utm_source=edgelesslab&utm_medium=website&utm_campaign=products",
     badge: "Free",
     repoUrl: "https://github.com/edgeless-ai/edgeless-stack",
+  category: "Agent Infrastructure",
+  scoreTags: [TAG_ESSENTIAL, TAG_ADVANCED],
   },
   {
     name: "Multi-Agent Orchestration Blueprint",
-    price: "Free",
+    price: "$39",
     description:
       "The dispatch/worker architecture for coordinating multiple AI agents. Agent Bus messaging, async inboxes, state machines, and 3 reference implementations from a system that runs 5 agents 24/7.",
     features: [
@@ -108,10 +135,12 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "multi-agent-blueprint",
+  category: "Agent Infrastructure",
+  scoreTags: [TAG_RECOMMENDED, TAG_ADVANCED],
   },
   {
     name: "The Agent Cookbook",
-    price: "Free",
+    price: "$39",
     description:
       "Build AI agents that actually work. 15 production-ready agent patterns with complete implementations for Claude, GPT, and open-source models.",
     features: [
@@ -122,10 +151,12 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/plbzo?${UTM}`,
     badge: null,
+  category: "Agent Infrastructure",
+  scoreTags: [TAG_RECOMMENDED, TAG_INTERMEDIATE],
   },
   {
     name: "Claude Memory Kit Pro",
-    price: "Free",
+    price: "$29",
     description:
       "The complete memory system for Claude Code power users. 12 templates, 5 stack libraries, advanced patterns guide, and CLAUDE.md templates.",
     features: [
@@ -136,10 +167,12 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/claude-memory-kit?${UTM}`,
     badge: "Popular",
+  category: "Agent Config",
+  scoreTags: [TAG_RECOMMENDED, TAG_INTERMEDIATE],
   },
   {
     name: "The Prompt Engineering OS",
-    price: "Free",
+    price: "$29",
     description:
       "The complete system for writing AI prompts that work in production. 30 chapters, 8 template schemas, 100+ templates.",
     features: [
@@ -150,10 +183,12 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/prompt-engineering-os?${UTM}`,
     badge: null,
+  category: "Reference Docs",
+  scoreTags: [TAG_ESSENTIAL, TAG_INTERMEDIATE],
   },
   {
     name: "Generative Art Starter Kit",
-    price: "Free",
+    price: "$29",
     description:
       "10 Python generators for pen plotters: flow fields, L-systems, Voronoi, spirals, reaction-diffusion. Each with parameter guides, example SVGs, and AI scoring rubrics from 105+ experiments.",
     features: [
@@ -166,10 +201,12 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "gen-art-starter",
+  category: "Creative Kits",
+  scoreTags: [TAG_SPECIALIZED, TAG_INTERMEDIATE],
   },
   {
     name: "Always-On Agent Deployment Kit",
-    price: "Free",
+    price: "$29",
     description:
       "Deploy an AI agent that runs 24/7 on a $5 VPS. Cron scheduling, grounding packets, memory contracts, Telegram alerting, and the recovery patterns from 3 months of unattended operation.",
     features: [
@@ -182,10 +219,12 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: true,
     slug: "always-on-agent",
+  category: "Agent Infrastructure",
+  scoreTags: [TAG_RECOMMENDED, TAG_ADVANCED],
   },
   {
     name: "Production MCP Server Kit",
-    price: "Free",
+    price: "$29",
     description:
       "Take MCP servers past the tutorial stage. Auth middleware, rate limiting, Docker deployment, health checks, and error handling patterns from running 4+ MCP servers in production.",
     features: [
@@ -198,10 +237,12 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "production-mcp-kit",
+  category: "Developer Kits",
+  scoreTags: [TAG_RECOMMENDED, TAG_ADVANCED],
   },
   {
     name: "AI Code Review Playbook",
-    price: "Free",
+    price: "$24",
     description:
       "Systematic AI-powered code review that catches security vulnerabilities, performance issues, and logic errors before they ship.",
     features: [
@@ -212,10 +253,12 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/uacjr?${UTM}`,
     badge: null,
+  category: "Safety & Quality",
+  scoreTags: [TAG_RECOMMENDED, TAG_INTERMEDIATE],
   },
   {
     name: "Digital Product Launch Toolkit",
-    price: "Free",
+    price: "$24",
     description:
       "The exact process used to ship 18 digital products as a solo developer. Gumroad page templates, pricing strategy, launch checklists, and the daily shipping workflow.",
     features: [
@@ -228,10 +271,12 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "launch-toolkit",
+  category: "Creative Kits",
+  scoreTags: [TAG_SPECIALIZED, TAG_BEGINNER],
   },
   {
     name: "n8n AI Workflow Templates",
-    price: "Free",
+    price: "$24",
     description:
       "5 importable n8n workflows that connect AI to real business processes. YouTube monitoring, RSS intelligence, AI code review, content embedding, and scheduled health checks.",
     features: [
@@ -244,10 +289,12 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "n8n-ai-workflows",
+  category: "Developer Kits",
+  scoreTags: [TAG_SPECIALIZED, TAG_INTERMEDIATE],
   },
   {
     name: "MCP Server Starter Kit",
-    price: "Free",
+    price: "$24",
     description:
       "TypeScript and Python templates for building MCP servers. Go from zero to a running server in under an hour.",
     features: [
@@ -258,10 +305,12 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/lixicg?${UTM}`,
     badge: null,
+  category: "Developer Kits",
+  scoreTags: [TAG_BEGINNER],
   },
   {
     name: "Obsidian + Claude Code Setup Kit",
-    price: "Free",
+    price: "$19",
     description:
       "Turn Obsidian into an AI-powered development environment with pre-configured vault, Claude Code integration, and workflow automations.",
     features: [
@@ -272,10 +321,12 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/fyuwpn?${UTM}`,
     badge: null,
+  category: "Agent Config",
+  scoreTags: [TAG_SPECIALIZED, TAG_BEGINNER],
   },
   {
     name: "Prompt Testing Framework",
-    price: "Free",
+    price: "$19",
     description:
       "Regression testing, A/B comparison templates, and quality scoring rubrics for AI prompts. Built for teams shipping AI features.",
     features: [
@@ -286,10 +337,12 @@ export const products: Product[] = [
     ],
     href: `https://edgelessai.gumroad.com/l/yrail?${UTM}`,
     badge: null,
+  category: "Safety & Quality",
+  scoreTags: [TAG_SPECIALIZED, TAG_ADVANCED],
   },
   {
     name: "Autonomous Agent Safety Patterns",
-    price: "Free",
+    price: "$19",
     description:
       "Hard-won guardrails from an agent that lost $252 of real money. Financial verification protocols, destructive operation prevention, scope containment, and the incident response playbook.",
     features: [
@@ -302,10 +355,12 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "agent-safety-patterns",
+  category: "Safety & Quality",
+  scoreTags: [TAG_ESSENTIAL, TAG_ADVANCED],
   },
   {
     name: "Claude Code Hooks Deep Dive",
-    price: "Free",
+    price: "$19",
     description:
       "15 production hooks beyond the basics. The damage-control hook that blocks destructive commands. The verify-completion hook that won't let you lie about finishing. Session init, memory flush, pre-commit guards.",
     features: [
@@ -318,20 +373,8 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "hooks-deep-dive",
-  },
-  {
-    name: "Hooks Library",
-    price: "Free",
-    description:
-      "24 production-ready hooks across 6 categories. Drop in, configure, ship.",
-    features: [
-      "Quality hooks: linting, testing, secrets detection",
-      "Safety hooks: damage control, backup, force-push guard",
-      "Integration hooks: Slack, Telegram, Linear, Obsidian",
-      "AI hooks: context preload, completion verify, cost tracking",
-    ],
-    href: `https://edgelessai.gumroad.com/l/ztaflt?${UTM}`,
-    badge: null,
+  category: "Safety & Quality",
+  scoreTags: [TAG_RECOMMENDED, TAG_ADVANCED],
   },
   {
     name: "Edgeless Agent Starter Kit",
@@ -351,6 +394,24 @@ export const products: Product[] = [
     badge: "New",
     comingSoon: false,
     slug: "agent-starter-kit",
+  category: "Agent Infrastructure",
+  scoreTags: [TAG_ESSENTIAL, TAG_INTERMEDIATE],
+  },
+  {
+    name: "Hooks Library",
+    price: "$14",
+    description:
+      "24 production-ready hooks across 6 categories. Drop in, configure, ship.",
+    features: [
+      "Quality hooks: linting, testing, secrets detection",
+      "Safety hooks: damage control, backup, force-push guard",
+      "Integration hooks: Slack, Telegram, Linear, Obsidian",
+      "AI hooks: context preload, completion verify, cost tracking",
+    ],
+    href: `https://edgelessai.gumroad.com/l/ztaflt?${UTM}`,
+    badge: null,
+  category: "Developer Kits",
+  scoreTags: [TAG_RECOMMENDED, TAG_INTERMEDIATE],
   },
 ];
 
@@ -517,7 +578,7 @@ export const experiments = [
     stack: ["JavaScript", "p5.js", "Canvas", "SVG"],
     category: "Generative",
     status: "Live",
-    href: "/total-serialism/field-notes/",
+    href: "/total-serialism/app/",
   },
   {
     slug: "tartanism",
@@ -622,7 +683,7 @@ export const experiments = [
     stack: ["Python", "librosa", "numba", "Canvas", "Web Audio", "FFmpeg"],
     category: "Audio Visual",
     status: "Live",
-    href: "/chladni-visualizer/",
+    liveHref: "/chladni-visualizer/",
     relatedFieldNote: {
       title: "Turning Audio Into a Resonant Plate",
       href: "/blog/chladni-waveform-visualizer",

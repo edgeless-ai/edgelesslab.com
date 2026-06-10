@@ -6,22 +6,23 @@
     "dev": "next dev",
     "prebuild": "./scripts/preserve-standalone.sh save",
     "build": "next build",
-    "postbuild": "./scripts/preserve-standalone.sh restore && cp -r pen-plotter/assets out/pen-plotter/ && rm -rf out/pen-plotter/assets/medium out/pen-plotter/assets/mediums-all; [ -d pen-plotter/fxhash ] && cp -r pen-plotter/fxhash out/pen-plotter/; [ -d pen-plotter/kandinsky-to-canvas ] && cp -r pen-plotter/kandinsky-to-canvas out/pen-plotter/; true",
+    "postbuild": "./scripts/preserve-standalone.sh restore && mkdir -p out/pen-plotter/assets && rsync -a --exclude=medium --exclude=mediums-all pen-plotter/assets/ out/pen-plotter/assets/; [ -d pen-plotter/fxhash ] && cp -r pen-plotter/fxhash out/pen-plotter/; [ -d pen-plotter/kandinsky-to-canvas ] && cp -r pen-plotter/kandinsky-to-canvas out/pen-plotter/; npx pagefind --site out; true",
     "start": "next start",
     "lint": "eslint && node scripts/lint-experiments.mjs && npm run lint:voice",
+    "lint:blog-links": "node scripts/lint-blog-links.mjs",
     "lint:experiments": "node scripts/lint-experiments.mjs",
-    "lint:voice": "../scripts/lint-voice.sh src/lib/data.ts && ../scripts/lint-voice.sh src/lib/product-content.ts && ../scripts/lint-voice.sh src/lib/blog.ts"
+    "lint:voice": "../scripts/lint-voice.sh src/lib/data.ts && ../scripts/lint-voice.sh src/lib/product-content.ts && ../scripts/lint-voice.sh src/lib/blog.ts",
+    "worker:ingest:dev": "npx wrangler dev --config workers/ingest/wrangler.toml",
+    "worker:ingest:deploy": "npx wrangler deploy --config workers/ingest/wrangler.toml"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.3",
-    "clsx": "^2.1.1",
+    "react-dom": "19.2.4",
     "lucide-react": "^0.577.0",
     "next": "16.2.0",
     "playwright": "^1.59.1",
     "posthog-js": "^1.363.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "tailwind-merge": "^3.5.0"
+    "react": "19.2.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.0",
@@ -30,6 +31,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.0",
+    "pagefind": "^1.5.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

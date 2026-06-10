@@ -3,7 +3,7 @@
 import { StaggerReveal } from "@/components/ui/pretext-stagger-reveal";
 
 const SUBTITLE =
-  "18 tools, all free. Claude Code skills, MCP kits, agent blueprints, and n8n workflows I use daily.";
+  "5 free lead magnets + 17 premium toolkits. Claude Code skills, MCP kits, agent blueprints, and n8n workflows I use daily.";
 
 export function ProductsSubtitle() {
   return (

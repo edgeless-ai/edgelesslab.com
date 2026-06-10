@@ -1,0 +1,8 @@
+name = "edgeless-ingest"
+main = "worker.js"
+compatibility_date = "2026-06-03"
+workers_dev = true
+
+[vars]
+POSTHOG_HOST = "https://us.i.posthog.com"
+ALLOWED_ORIGINS = "https://edgelesslab.com,http://localhost:3000,http://localhost:3007"

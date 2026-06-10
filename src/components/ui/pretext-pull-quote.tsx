@@ -8,7 +8,6 @@ import {
   type CSSProperties,
 } from "react";
 import { usePreText } from "@/hooks/use-pretext";
-import type { Obstacle } from "@/components/ui/pretext-block";
 
 interface PullQuote {
   text: string;
@@ -146,7 +145,8 @@ export function EditorialBlock({
   ]);
 
   useEffect(() => {
-    doLayout();
+    const frame = requestAnimationFrame(() => doLayout());
+    return () => cancelAnimationFrame(frame);
   }, [doLayout]);
 
   useEffect(() => {

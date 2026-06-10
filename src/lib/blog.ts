@@ -1,23 +1,8 @@
 import { newPosts } from "./blog-new-posts";
+import type { BlogPost } from "./blog-types";
 
-export interface BlogPost {
-  slug: string;
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
-  readTime: string;
-  content: string;
-  productSlug?: string;
-  /** True only for posts that announce a product launch (not editorial posts that happen to link a product). */
-  isLaunch?: boolean;
-  /** Two-column layout with sticky TOC sidebar. For longer, narrative posts. */
-  editorial?: boolean;
-  /** One-line hook for the companion product CTA. Pain-point framing, not generic. */
-  ctaHook?: string;
-  /** Blog post cover image / og:image path */
-  image?: string;
-}
+// Re-exported so existing `@/lib/blog` consumers keep importing the type from here.
+export type { BlogPost };
 
 export const posts: BlogPost[] = [
   {
@@ -1545,7 +1530,7 @@ The path optimizer is the most important shared component. It reorders paths to 
 
 ## The Catalog
 
-The full catalog is browseable at [/total-serialism/field-notes/](/total-serialism/field-notes/). Every algorithm has real-time parameter controls, preset management, and one-click SVG export. The editorial companion describes the taxonomy, the toolkit, and the surprises that emerged from building all ninety-eight.
+The full catalog is browseable at [/total-serialism/app/](/total-serialism/app/). Every algorithm has real-time parameter controls, preset management, and one-click SVG export. The editorial companion describes the taxonomy, the toolkit, and the surprises that emerged from building all ninety-eight.
 
 The most useful entry point is the browse page, which shows every algorithm as a thumbnail grid organized by category. From there, click into any algorithm to adjust parameters and export.
 
@@ -2890,5 +2875,5 @@ The source repo has the full set of skills we use to build these demos automatic
 **The point:** Research shouldn't be read-only. Every paper that matters to your work should have a live, interactive demo attached. marimo makes that practical at scale.
     `.trim(),
   },
-  ...newPosts,
+  ...newPosts.sort((a: BlogPost, b: BlogPost) => new Date(b.date).getTime() - new Date(a.date).getTime()),
 ];

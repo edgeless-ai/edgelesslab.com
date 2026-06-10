@@ -458,7 +458,7 @@ body {
     <div class="gate__marker">addendum to §03</div>
     <h1 class="gate__hed">
       The full catalog.<br>
-      <em>All <span data-stat="kept-words">twenty thousand eight hundred and forty&#8209;five</span><br>pieces.</em>
+      <em>All <span data-stat="kept-words">thirty&#8209;nine thousand four hundred and fourteen</span><br>pieces.</em>
     </h1>
     <p class="gate__deck">
       Every kept specimen the autoresearch loop has produced, on a single page.
@@ -473,7 +473,7 @@ body {
       </div>
       <div class="row">
         <span>plates</span>
-        <span><strong id="gate-count" data-stat="kept">20,845</strong></span>
+        <span><strong id="gate-count" data-stat="kept">39,414</strong></span>
       </div>
       <div class="row">
         <span>thumbnail size</span>
@@ -490,7 +490,7 @@ body {
     </div>
 
     <div class="gate__actions">
-      <button class="gate__btn" id="gate-continue">I understand · load all <span data-stat="kept">20,845</span> plates</button>
+      <button class="gate__btn" id="gate-continue">I understand · load all <span data-stat="kept">39,414</span> plates</button>
       <a class="gate__btn gate__btn--ghost" href="index.html">Take me back</a>
     </div>
   </div>
@@ -561,16 +561,15 @@ body {
   let renderedCount = 0;
   let startTime = 0;
 
-  // ── preflight: count entries ───────────────────────────────
-  fetch('assets/manifest-full.json', { method: 'HEAD' })
+  // ── preflight: verify metadata and deployed image archive ────
+  fetch('assets/thumbs-full/moire-0005.webp', { method: 'HEAD' })
     .then(r => {
-      // we don't really get count from HEAD; just verify it exists
-      if (!r.ok) throw new Error('manifest missing');
+      if (!r.ok) throw new Error('full image archive missing');
     })
     .catch(() => {
-      gateCount.textContent = '— (manifest not yet generated)';
       gateContinue.disabled = true;
-      gateContinue.textContent = 'Manifest not generated yet';
+      gateContinue.textContent = 'Full image archive is not deployed';
+      document.getElementById('gate-bytes').textContent = 'image archive omitted from this deploy';
     });
 
   // ── continue button ─────────────────────────────────────────
@@ -675,8 +674,8 @@ body {
     if (idx < 0 || !manifest.length || idx >= manifest.length) return;
     activeIndex = idx;
     const p = manifest[idx];
-    // load 400px medium webp (deployable, no symlink)
-    lbImg.src = `assets/mediums-all/${p.id}.webp`;
+    // Load deployable full-manifest WebP; manifest-full has empty medium fields.
+    lbImg.src = p.medium || p.thumb || `assets/thumbs-full/${p.id}.webp`;
     lbImg.alt = p.id;
     lbPlateId.textContent = p.id;
     lbPlateRank.textContent = `#${idx + 1} of ${manifest.length.toLocaleString()}`;
@@ -692,7 +691,7 @@ body {
       const n = manifest[idx + d];
       if (n) {
         const i = new Image();
-        i.src = `assets/mediums-all/${n.id}.webp`;
+        i.src = n.medium || n.thumb || `assets/thumbs-full/${n.id}.webp`;
       }
     });
   }

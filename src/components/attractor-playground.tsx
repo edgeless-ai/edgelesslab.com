@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Play, Pause, RefreshCw, Download } from "lucide-react";
+import { RefreshCw, Download } from "lucide-react";
 
 interface Point {
   x: number;
@@ -27,8 +27,6 @@ const ATTRACTOR_PRESETS = {
 
 export function AttractorPlayground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>(0);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [preset, setPreset] = useState<keyof typeof ATTRACTOR_PRESETS>("lorenz");
   const [params, setParams] = useState<AttractorParams>(ATTRACTOR_PRESETS.lorenz);
@@ -134,12 +132,11 @@ export function AttractorPlayground() {
     resize();
     window.addEventListener("resize", resize);
 
-    // Initial draw
-    drawAttractor();
+    const initialDraw = requestAnimationFrame(() => drawAttractor());
 
     return () => {
       window.removeEventListener("resize", resize);
-      cancelAnimationFrame(animationRef.current);
+      cancelAnimationFrame(initialDraw);
     };
   }, [drawAttractor]);
 

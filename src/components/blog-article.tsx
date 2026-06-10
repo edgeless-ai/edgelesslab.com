@@ -112,14 +112,17 @@ export function BlogArticle({ html, editorial, sidebar }: BlogArticleProps) {
   useEffect(() => {
     const el = contentRef.current;
     if (!el) return;
-    const headings = el.querySelectorAll("h2");
-    const items: TocItem[] = [];
-    headings.forEach((h, i) => {
-      const id = h.id || `section-${i}`;
-      if (!h.id) h.id = id;
-      items.push({ id, text: h.textContent || "" });
+    const frame = requestAnimationFrame(() => {
+      const headings = el.querySelectorAll("h2");
+      const items: TocItem[] = [];
+      headings.forEach((h, i) => {
+        const id = h.id || `section-${i}`;
+        if (!h.id) h.id = id;
+        items.push({ id, text: h.textContent || "" });
+      });
+      setToc(items);
     });
-    setToc(items);
+    return () => cancelAnimationFrame(frame);
   }, [html]);
 
   // Track active heading via IntersectionObserver

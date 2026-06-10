@@ -240,7 +240,7 @@ export function BlogSearch({
   );
 }
 
-export function BlogPostCard({ post }: { post: BlogPost }) {
+function BlogPostCard({ post }: { post: BlogPost }) {
   return (
     <div
       style={{

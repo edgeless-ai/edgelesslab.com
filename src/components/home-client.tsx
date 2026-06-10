@@ -7,12 +7,11 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import { GlowingCard } from "@/components/ui/glowing-card";
 import { KineticPreText } from "@/components/ui/kinetic-pretext";
-import { StaggerReveal } from "@/components/ui/pretext-stagger-reveal";
 import { PreTextRichFlow, type RichFlowSegment } from "@/components/ui/pretext-rich-flow";
 import { PreTextOrbs } from "@/components/ui/pretext-orbs";
 import { useShrinkWrap } from "@/hooks/use-shrink-wrap";
-import { products } from "@/lib/data";
-import { posts } from "@/lib/blog";
+import { useDeferredMount } from "@/hooks/use-deferred-mount";
+import type { BlogPost } from "@/lib/blog";
 
 /* ── Dynamic imports for heavy client-side visual components ── */
 const GenerativeHeroBackground = dynamic(
@@ -26,11 +25,12 @@ const GenerativeAscii = dynamic(
 );
 
 const HERO_SUBTITLE =
-  "One developer shipping autonomous agents, MCP servers, and generative art. 18 products, all free. Everything open source.";
+  "One developer shipping autonomous agents, MCP servers, and generative art. 5 free lead magnets, 17 premium toolkits. Everything open source.";
 
 /* ── Hero ────────────────────────────────────────────────── */
 
 export function HeroSection() {
+  const deferred = useDeferredMount(1500);
   return (
     <section className="relative flex min-h-[92svh] items-center px-6 pb-16 pt-28 md:min-h-screen md:items-end md:pb-24 md:pt-32">
       <GenerativeHeroBackground />
@@ -68,7 +68,7 @@ export function HeroSection() {
             className="text-[clamp(3rem,8vw,7.5rem)] font-bold leading-[0.88] tracking-[-0.04em]"
             style={{ color: "var(--text-primary)" }}
           >
-            <span className="inline-block animate-char-reveal" style={{ animationDelay: "0.1s" }}>Built solo</span>
+            <span className="inline-block">Built solo</span>
             <br />
             <span style={{ color: "var(--accent)" }}>
               <span className="inline-block animate-char-reveal" style={{ animationDelay: "0.3s" }}>Shipped</span>
@@ -126,7 +126,7 @@ export function HeroSection() {
                 style={{ background: "var(--accent)" }}
                 onClick={() => trackCTA("hero_view_products", "/products")}
               >
-                18 free products <ArrowRight size={15} />
+                Free products <ArrowRight size={15} />
               </Link>
               <Link
                 href="/projects"
@@ -150,10 +150,10 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Right column: generative ASCII art piece — unique each visit */}
-        <div className="animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
+        {/* Right column: generative ASCII art piece — unique each visit, deferred */}
+        <div className="animate-fade-in-up lg:min-h-[600px]" style={{ animationDelay: "0.5s" }}>
           <div className="hidden lg:block">
-            <GenerativeAscii />
+            {deferred && <GenerativeAscii />}
           </div>
         </div>
       </div>
@@ -174,7 +174,7 @@ function formatRelative(dateStr: string): string {
   return `${Math.floor(days / 365)}y ago`;
 }
 
-export function RecentActivity() {
+export function RecentActivity({ posts }: { posts: BlogPost[] }) {
   // Take the 8 most recent blog posts. Each post that has a productSlug
   // doubles as a product launch announcement.
   const recent = [...posts]

@@ -112,6 +112,24 @@ const agents = [
   },
   {
     model: "Kimi K2.5",
+    role: "Trading",
+    personality:
+      "Quantitative risk management. Monitors prediction markets, executes systematic trading strategies, and manages portfolio allocation with academic rigor.",
+    responseTime: "~20s",
+    status: "active",
+    accent: "rgba(59, 130, 246, 0.15)",
+    accentBorder: "rgba(59, 130, 246, 0.3)",
+    accentDot: "#3B82F6",
+    tools: [
+      "Market analysis",
+      "Portfolio tracking",
+      "Risk management",
+      "Prediction markets",
+      "Systematic trading",
+    ],
+  },
+  {
+    model: "Kimi K2.5",
     role: "Swarm Monitor",
     personality:
       "Quiet observer. Watches inter-agent communication to detect protocol violations and anti-loop behavior.",

@@ -1,0 +1,51 @@
+{
+  "ci": {
+    "collect": {
+      "url": [
+        "https://edgelesslab.com/",
+        "https://edgelesslab.com/blog",
+        "https://edgelesslab.com/products",
+        "https://edgelesslab.com/about",
+        "https://edgelesslab.com/lab",
+        "https://edgelesslab.com/pen-plotter",
+        "https://edgelesslab.com/tartanism"
+      ],
+      "settings": {
+        "preset": "desktop"
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", { "minScore": 0.85 }]
+      }
+    }
+  },
+  "perPageTargets": {
+    "homepage": {
+      "mobile": 90,
+      "desktop": 85
+    },
+    "blog": {
+      "mobile": 95,
+      "desktop": 95
+    },
+    "products": {
+      "mobile": 95,
+      "desktop": 95
+    },
+    "lab": {
+      "mobile": 90,
+      "desktop": 95
+    },
+    "pen-plotter": {
+      "mobile": 80,
+      "desktop": 85
+    },
+    "tartanism": {
+      "mobile": 85,
+      "desktop": 90
+    }
+  },
+  "regressionThreshold": 10,
+  "globalFloor": 80
+}

@@ -85,10 +85,10 @@ All code is Python 3.10+ with zero external dependencies.`,
   "hooks-deep-dive": {
     longTitle: "Claude Code Hooks Deep Dive: 15 Production Hooks with Full Source",
     shortDescription:
-      "15 battle-tested Claude Code hooks from a system that runs 5 autonomous agents 24/7. The damage-control hook, the lie detector, the cost tracker, and 12 more, with full source, walkthroughs, and deployment configs.",
+      "15 battle-tested Claude Code hooks from a system that coordinates autonomous AI agents. The damage-control hook, the lie detector, the cost tracker, and 12 more, with full source, walkthroughs, and deployment configs.",
     body: `Most Claude Code hooks tutorials stop at "run a linter before commit." That's fine for a side project. It falls apart when you have agents making real decisions.
 
-These hooks come from a production system that coordinates 5 autonomous AI agents across a Mac and a Hetzner VPS. One of those agents lost $252 of real money before the right hooks existed. Now it can't.
+These hooks come from a production system that coordinates autonomous AI agents across a Mac and remote infrastructure. One of those agents lost $252 of real money before the right hooks existed. Now it can't.
 
 **What you get:**
 

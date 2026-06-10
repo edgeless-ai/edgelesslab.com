@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Play, Pause, RefreshCw, Download } from "lucide-react";
 
 interface Particle {
@@ -27,13 +27,13 @@ export function LabPlayground() {
   });
 
   // Flow field function
-  const getFlowAngle = (x: number, y: number, time: number) => {
+  const getFlowAngle = useCallback((x: number, y: number, time: number) => {
     const scale = params.flowScale;
     return (
       Math.sin(x * scale + time * 0.0005) * Math.cos(y * scale) * Math.PI * 2 +
       Math.sin((x + y) * scale * 0.5 + time * 0.0003) * Math.PI
     );
-  };
+  }, [params.flowScale]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -137,7 +137,7 @@ export function LabPlayground() {
       window.removeEventListener("resize", resize);
       cancelAnimationFrame(animationRef.current);
     };
-  }, [isPlaying, params]);
+  }, [isPlaying, params, getFlowAngle]);
 
   const handleDownload = () => {
     const canvas = canvasRef.current;

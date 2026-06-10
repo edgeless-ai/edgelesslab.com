@@ -28,7 +28,7 @@ interface PreTextBlockProps {
   fallback?: ReactNode;
 }
 
-export function PreTextBlock({
+function PreTextBlock({
   text,
   font = '16px "Geist"',
   lineHeight = 28,

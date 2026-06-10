@@ -1,4 +1,4 @@
-import { BlogPost } from "./blog";
+import type { BlogPost } from "./blog-types";
 
 export const newPosts: BlogPost[] = [
   {
@@ -708,7 +708,7 @@ The pattern is: **orchestration + verification + resumption**. Claude productize
     editorial: true,
     title: "Building the Autonomous Perp Trading Stack: From Instagram Reels to Production Code",
     description: "How the Edgeless swarm turned quant theory into executable trading infrastructure in one afternoon: six new production modules, a Neural CDE upgrade, Kalman filters, and OU mean-reversion scanners.",
-    date: "2026-06-03",
+    date: "2026-06-02",
     tags: ["Quantitative Trading", "AI Agents", "Crypto", "Machine Learning", "Python", "Hyperliquid"],
     readTime: "18 min",
     content: `

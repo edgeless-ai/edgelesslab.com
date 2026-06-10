@@ -26,11 +26,12 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 STASH_DIR="$PROJECT_DIR/.standalone-stash"
 
 # Standalone directories to preserve (add new ones here)
+# NOTE: flow-viz is served from public/flow-viz/ (copied into out/ by the Next
+# build), so the redundant root copy was removed and is no longer preserved here.
 STANDALONE_DIRS=(
   "pen-plotter"
   "tartanism"
   "total-serialism"
-  "flow-viz"
 )
 
 case "${1:-}" in

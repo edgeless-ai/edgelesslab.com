@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const dynamic = 'force-static';
+export const dynamic = 'force-static';
 
 /**
  * robots.txt: open to everything by default, with explicit allows for the AI

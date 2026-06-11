@@ -11,7 +11,7 @@ export const creativeDemos: CreativeDemo[] = [
   {
     slug: "tartan-weave-synth",
     title: "Tartan Weave Synth",
-    description: "Interactive generative tartan based on Tartanism field notes. 6 weave structures, 48 historical dye colors, mouse-warped threads, and beat-driven color shifts.",
+    description: "Interactive generative tartan based on Tartanism field notes. Brighter, natural textile palette. 6 weave structures, mouse-warped threads, and frame-by-frame export for animated GIFs.",
     tags: ["p5.js", "Tartanism", "Interactive", "Weave"],
     date: "2026-06-10",
     hasControls: true,

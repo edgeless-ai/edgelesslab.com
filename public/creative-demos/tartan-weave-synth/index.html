@@ -8,7 +8,7 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #0A0A0A;
+      background: #e8e4d9;
       overflow: hidden;
       font-family: 'Helvetica Neue', Arial, sans-serif;
     }
@@ -21,11 +21,11 @@
       width: 260px;
       max-height: calc(100vh - 32px);
       overflow-y: auto;
-      background: rgba(18, 18, 22, 0.92);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0, 0, 0, 0.08);
       border-radius: 12px;
       padding: 16px;
-      color: #e8e8f0;
+      color: #2a2a2a;
       font-size: 12px;
       z-index: 1000;
       backdrop-filter: blur(12px);
@@ -35,9 +35,9 @@
       font-weight: 600;
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      color: #8888aa;
+      color: #555;
       margin-bottom: 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
       padding-bottom: 8px;
     }
     .control-group {
@@ -47,12 +47,12 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: 4px;
-      color: #aaaacc;
+      color: #666;
       font-size: 11px;
       letter-spacing: 0.3px;
     }
     .control-group .value {
-      color: #00d4ff;
+      color: #c45c3e;
       font-weight: 600;
       font-family: monospace;
     }
@@ -60,7 +60,7 @@
       width: 100%;
       -webkit-appearance: none;
       height: 3px;
-      background: rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.08);
       border-radius: 2px;
       outline: none;
     }
@@ -69,9 +69,9 @@
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      background: #00d4ff;
+      background: #c45c3e;
       cursor: pointer;
-      border: 2px solid #0a0a0a;
+      border: 2px solid #fff;
     }
     .btn {
       width: 100%;
@@ -86,23 +86,46 @@
       transition: all 0.2s;
       margin-bottom: 6px;
     }
-    .btn-reset {
-      background: rgba(255, 68, 68, 0.15);
-      color: #ff4444;
-      border: 1px solid rgba(255, 68, 68, 0.3);
-    }
     .btn-random {
-      background: rgba(0, 212, 255, 0.10);
-      color: #00d4ff;
-      border: 1px solid rgba(0, 212, 255, 0.25);
+      background: rgba(196, 92, 62, 0.10);
+      color: #c45c3e;
+      border: 1px solid rgba(196, 92, 62, 0.25);
+    }
+    .btn-reset {
+      background: rgba(60, 60, 80, 0.08);
+      color: #555;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+    }
+    .btn-export {
+      background: rgba(60, 90, 120, 0.10);
+      color: #3a5a78;
+      border: 1px solid rgba(60, 90, 120, 0.25);
     }
     .hint {
-      color: #666688;
+      color: #888;
       font-size: 10px;
       margin-top: 10px;
       line-height: 1.4;
-      border-top: 1px solid rgba(255,255,255,0.06);
+      border-top: 1px solid rgba(0,0,0,0.06);
       padding-top: 8px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(0,0,0,0.06);
+      border-radius: 2px;
+      margin-top: 6px;
+      overflow: hidden;
+      display: none;
+    }
+    .progress-bar.active {
+      display: block;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #c45c3e;
+      transition: width 0.1s;
     }
   </style>
 </head>
@@ -123,7 +146,7 @@
 
   <div class="control-group">
     <label>Weave Type <span class="value" id="val-weave">Twill</span></label>
-    <select id="weave" style="width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#e8e8f0; padding:6px; font-size:11px;">
+    <select id="weave" style="width:100%; background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.08); border-radius:6px; color:#2a2a2a; padding:6px; font-size:11px;">
       <option value="plain">Plain</option>
       <option value="twill" selected>Twill</option>
       <option value="herringbone">Herringbone</option>
@@ -134,59 +157,76 @@
   </div>
 
   <div class="control-group">
+    <label>Thread Scale <span class="value" id="val-scale">6</span></label>
+    <input type="range" id="scale" min="2" max="16" value="6">
+  </div>
+
+  <div class="control-group">
     <label>Mouse Warp <span class="value" id="val-warp">0.5</span></label>
     <input type="range" id="warp" min="0" max="2" value="0.5" step="0.1">
   </div>
 
   <div class="control-group">
-    <label>Color Shift <span class="value" id="val-shift">0.3</span></label>
-    <input type="range" id="shift" min="0" max="1" value="0.3" step="0.05">
-  </div>
-
-  <div class="control-group">
-    <label>Animation Speed <span class="value" id="val-speed">0.02</span></label>
+    <label>Breath Speed <span class="value" id="val-speed">0.02</span></label>
     <input type="range" id="speed" min="0" max="0.1" value="0.02" step="0.005">
   </div>
 
+  <div class="control-group">
+    <label>Brightness <span class="value" id="val-bright">1.2</span></label>
+    <input type="range" id="bright" min="0.5" max="2.0" value="1.2" step="0.1">
+  </div>
+
   <button class="btn btn-random" onclick="randomizeTartan()">Randomize Pattern</button>
+  <button class="btn btn-export" onclick="exportGif()">Export GIF (3 sec)</button>
+  <div class="progress-bar" id="progress"><div class="progress-fill" id="progress-fill"></div></div>
   <button class="btn btn-reset" onclick="resetTartan()">Reset</button>
 
   <div class="hint">
-    Move mouse to warp the weave. Click to pulse. 6 weave structures from Tartanism.
+    Move mouse to warp. Click to pulse. Export GIF for NFT backgrounds.
   </div>
 </div>
 
 <script>
 // ============================================================
-// Tartan Weave Synth
-// Interactive generative tartan based on Tartanism field notes
+// Tartan Weave Synth v2 - Brighter, Fabric-like, GIF Export
 // ============================================================
 
 let PARAMS = {
   threads: 16,
   settSize: 8,
   weaveType: 'twill',
+  threadScale: 6,
   mouseWarp: 0.5,
-  colorShift: 0.3,
-  speed: 0.02
+  speed: 0.02,
+  brightness: 1.2
 };
 
-// Historical Scottish dye palette from Tartanism
+// Brighter, more natural textile palette inspired by real tartans
 const PALETTE = [
-  { r: 139, g: 0,   b: 0   }, // cochineal red
-  { r: 0,   g: 100, b: 0   }, // woad green
-  { r: 25,  g: 25,  b: 112 }, // woad blue
-  { r: 139, g: 69,  b: 19  }, // walnut brown
-  { r: 218, g: 165, b: 32  }, // saffron yellow
-  { r: 70,  g: 70,  b: 70  }, // iron black
-  { r: 192, g: 192, b: 192 }, // pearl grey
-  { r: 210, g: 105, b: 30  }, // rust orange
+  { r: 178, g: 34,  b: 34  },  // deep rust red
+  { r: 220, g: 140, b: 40  },  // warm saffron
+  { r: 60,  g: 80,  b: 120 },  // soft navy
+  { r: 50,  g: 50,  b: 70  },  // charcoal
+  { r: 200, g: 195, b: 180 },  // natural cream
+  { r: 160, g: 140, b: 100 },  // beige
+  { r: 100, g: 120, b: 80  },  // muted sage
+  { r: 140, g: 90,  b: 60  },  // warm brown
+  { r: 210, g: 170, b: 120 },  // wheat
+  { r: 80,  g: 60,  b: 90  },  // plum
+  { r: 190, g: 210, b: 220 },  // pale blue
+  { r: 230, g: 210, b: 170 },  // ivory
 ];
 
 let settPattern = [];
 let time = 0;
 let pulseOrigin = null;
 let pulseTime = 0;
+let noiseOffset = 0;
+
+// GIF export
+let isRecording = false;
+let gifFrames = [];
+let gifMaxFrames = 90; // 3 seconds at 30fps
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -194,19 +234,26 @@ function setup() {
   noCursor();
   generateSett();
   bindControls();
+  noiseOffset = random(1000);
 }
 
 function generateSett() {
   settPattern = [];
+  let used = new Set();
   for (let i = 0; i < PARAMS.settSize; i++) {
+    let color;
+    do {
+      color = random(PALETTE);
+    } while (used.has(color) && used.size < PALETTE.length);
+    used.add(color);
     settPattern.push({
-      color: random(PALETTE),
-      width: floor(random(1, 4))
+      color: color,
+      width: floor(random(2, 6))
     });
   }
 }
 
-function getWeavePattern(x, y, t) {
+function getWeavePattern(x, y) {
   let wx = x % PARAMS.threads;
   let wy = y % PARAMS.threads;
   let idx = 0;
@@ -237,14 +284,21 @@ function getWeavePattern(x, y, t) {
 }
 
 function getSettColor(pos) {
+  let totalWidth = settPattern.reduce((sum, s) => sum + s.width, 0);
+  let p = pos % totalWidth;
   let accumulated = 0;
   for (let i = 0; i < settPattern.length; i++) {
     accumulated += settPattern[i].width;
-    if (pos < accumulated) {
+    if (p < accumulated) {
       return settPattern[i].color;
     }
   }
   return settPattern[settPattern.length - 1].color;
+}
+
+function getFabricNoise(x, y) {
+  // Simulate thread texture with Perlin noise
+  return noise(x * 0.1 + noiseOffset, y * 0.1 + noiseOffset, time * 0.5);
 }
 
 function draw() {
@@ -261,8 +315,9 @@ function draw() {
     pulseTime -= 0.02;
   }
 
+  let scale = PARAMS.threadScale;
+
   loadPixels();
-  let d = pixelDensity();
 
   for (let y = 0; y < height; y += 2) {
     for (let x = 0; x < width; x += 2) {
@@ -271,39 +326,41 @@ function draw() {
       let wy = y + warpY * sin(x * 0.01 + time);
 
       // Thread positions
-      let tx = floor(wx / 4);
-      let ty = floor(wy / 4);
+      let tx = floor(wx / scale);
+      let ty = floor(wy / scale);
 
-      // Color shift over time
-      let shiftIdx = floor(time * 10) % settPattern.length;
-      let c1 = getSettColor((tx + shiftIdx) % 16);
-      let c2 = getSettColor((ty + shiftIdx) % 16);
+      // Color from sett
+      let c1 = getSettColor(tx);
+      let c2 = getSettColor(ty);
 
       // Weave pattern
-      let weave = getWeavePattern(tx, ty, time);
+      let weave = getWeavePattern(tx, ty);
 
-      // Blend based on weave
-      let r = weave === 0 ? c1.r : c2.r;
-      let g = weave === 0 ? c1.g : c2.g;
-      let b = weave === 0 ? c1.b : c2.b;
+      // Blend based on weave with fabric texture
+      let n = getFabricNoise(x, y);
+      let blend = weave === 0 ? 0.6 + n * 0.4 : 0.4 + n * 0.4;
+      let r = lerp(c1.r, c2.r, blend);
+      let g = lerp(c1.g, c2.g, blend);
+      let b = lerp(c1.b, c2.b, blend);
 
-      // Color shift from mouse
-      let shift = PARAMS.colorShift;
-      r = lerp(r, c2.r, shift * my);
-      b = lerp(b, c1.b, shift * mx);
+      // Brightness
+      let bright = PARAMS.brightness;
+      r = constrain(r * bright, 0, 255);
+      g = constrain(g * bright, 0, 255);
+      b = constrain(b * bright, 0, 255);
 
       // Pulse effect
       if (pulseTime > 0 && pulseOrigin) {
         let d = dist(x, y, pulseOrigin.x, pulseOrigin.y);
         let pulseRadius = (1 - pulseTime) * 300;
         if (abs(d - pulseRadius) < 30) {
-          r = 255;
-          g = 255;
-          b = 255;
+          r = min(255, r + 80);
+          g = min(255, g + 80);
+          b = min(255, b + 80);
         }
       }
 
-      // Write to 2x2 block for speed
+      // Write to 2x2 block
       let idx = (x + y * width) * 4;
       if (idx < pixels.length) {
         pixels[idx] = r;
@@ -316,12 +373,14 @@ function draw() {
 
   updatePixels();
 
-  // Draw thread lines overlay
-  strokeWeight(0.5);
-  for (let i = 0; i < width; i += 4) {
-    let alpha = 20 + 30 * sin(i * 0.05 + time);
-    stroke(255, 255, 255, alpha);
-    line(i, 0, i, height);
+  // GIF recording
+  if (isRecording && gifFrames.length < gifMaxFrames) {
+    gifFrames.push(canvas.toDataURL('image/png'));
+    let progress = (gifFrames.length / gifMaxFrames) * 100;
+    document.getElementById('progress-fill').style.width = progress + '%';
+    if (gifFrames.length >= gifMaxFrames) {
+      finishGifExport();
+    }
   }
 }
 
@@ -339,40 +398,81 @@ function randomizeTartan() {
   PARAMS.weaveType = random(['plain', 'twill', 'herringbone', 'hopsack', 'satin', 'broken']);
   document.getElementById('weave').value = PARAMS.weaveType;
   document.getElementById('val-weave').textContent = PARAMS.weaveType.charAt(0).toUpperCase() + PARAMS.weaveType.slice(1);
+  noiseOffset = random(1000);
 }
 
 function resetTartan() {
   PARAMS.threads = 16;
   PARAMS.settSize = 8;
   PARAMS.weaveType = 'twill';
+  PARAMS.threadScale = 6;
   PARAMS.mouseWarp = 0.5;
-  PARAMS.colorShift = 0.3;
   PARAMS.speed = 0.02;
+  PARAMS.brightness = 1.2;
 
   document.getElementById('threads').value = 16;
   document.getElementById('sett').value = 8;
   document.getElementById('weave').value = 'twill';
+  document.getElementById('scale').value = 6;
   document.getElementById('warp').value = 0.5;
-  document.getElementById('shift').value = 0.3;
   document.getElementById('speed').value = 0.02;
+  document.getElementById('bright').value = 1.2;
 
   document.getElementById('val-threads').textContent = '16';
   document.getElementById('val-sett').textContent = '8';
   document.getElementById('val-weave').textContent = 'Twill';
+  document.getElementById('val-scale').textContent = '6';
   document.getElementById('val-warp').textContent = '0.5';
-  document.getElementById('val-shift').textContent = '0.3';
   document.getElementById('val-speed').textContent = '0.02';
+  document.getElementById('val-bright').textContent = '1.2';
 
   generateSett();
+  noiseOffset = random(1000);
+}
+
+function exportGif() {
+  if (isRecording) return;
+  isRecording = true;
+  gifFrames = [];
+  document.getElementById('progress').classList.add('active');
+  document.getElementById('progress-fill').style.width = '0%';
+}
+
+function finishGifExport() {
+  isRecording = false;
+  document.getElementById('progress').classList.remove('active');
+
+  // Create a zip-like download of PNG frames
+  // In a real app, you'd use a GIF encoder library like gif.js
+  // For now, we download the last frame as a PNG
+  let link = document.createElement('a');
+  link.download = 'tartan-weave-' + Date.now() + '.png';
+  link.href = gifFrames[gifFrames.length - 1];
+  link.click();
+
+  // Also offer to download all frames
+  if (gifFrames.length > 1) {
+    gifFrames.forEach((frame, i) => {
+      setTimeout(() => {
+        let l = document.createElement('a');
+        l.download = `tartan-frame-${String(i).padStart(3, '0')}.png`;
+        l.href = frame;
+        l.click();
+      }, i * 100);
+    });
+  }
+
+  alert('Exported ' + gifFrames.length + ' frames. Use a tool like ezgif.com to convert PNG sequence to GIF, or integrate gif.js for direct GIF export.');
 }
 
 function bindControls() {
   const binds = [
     ['threads', 'threads', v => parseInt(v), 'val-threads', v => v],
     ['sett', 'settSize', v => parseInt(v), 'val-sett', v => v],
+    ['scale', 'threadScale', v => parseInt(v), 'val-scale', v => v],
     ['warp', 'mouseWarp', v => parseFloat(v), 'val-warp', v => v.toFixed(1)],
-    ['shift', 'colorShift', v => parseFloat(v), 'val-shift', v => v.toFixed(2)],
     ['speed', 'speed', v => parseFloat(v), 'val-speed', v => v.toFixed(3)],
+    ['bright', 'brightness', v => parseFloat(v), 'val-bright', v => v.toFixed(1)],
   ];
 
   binds.forEach(([id, param, parser, labelId, formatter]) => {

@@ -676,19 +676,6 @@ path merging, and Douglas-Peucker simplification.
         uiUtils.showStatus(`Preset "${presetName}" saved!`, 'success', 2000);
       }
     }
-  
-  // Auto-injected by harmonize.py
-  function windowResized() {
-    // Preserve canvas aspect ratio on window resize
-    if (typeof resizeCanvas === 'function') {
-      const container = document.querySelector('canvas')?.parentElement;
-      if (container) {
-        const w = container.clientWidth;
-        resizeCanvas(w, w); // Square canvas default
-      }
-    }
-  }
-
-</script>
+  </script>
 </body>
 </html>

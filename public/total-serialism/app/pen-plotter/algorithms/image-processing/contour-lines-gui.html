@@ -355,8 +355,6 @@
     </div>
   </div>
 
-  <script src="../../shared/panel-controller.js"></script>
-  <script src="../../shared/stats-display.js"></script>
   <script>
     // Parameters object
     let params = {
@@ -1339,19 +1337,8 @@ ${svgPaths}</svg>`;
       });
     }
   </script>
-  <script src="../../shared/algorithm-page-chrome.js">
-  // Auto-injected by harmonize.py
-  function windowResized() {
-    // Preserve canvas aspect ratio on window resize
-    if (typeof resizeCanvas === 'function') {
-      const container = document.querySelector('canvas')?.parentElement;
-      if (container) {
-        const w = container.clientWidth;
-        resizeCanvas(w, w); // Square canvas default
-      }
-    }
-  }
-
-</script>
+  <script src="../../shared/panel-controller.js"></script>
+  <script src="../../shared/stats-display.js"></script>
+  <script src="../../shared/algorithm-page-chrome.js"></script>
 </body>
 </html>

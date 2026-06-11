@@ -210,7 +210,6 @@
     <div class="control-group">
       <h3>Export</h3>
       <button onclick="exportSVG()">Export Current as SVG</button>
-      <button class="ts-btn ts-btn--secondary" onclick="saveCanvas('total-serialism', 'png')">Export PNG</button>
       <button onclick="exportGIF()">Export GIF Animation</button>
       <button onclick="exportAnimation()">Export Animation (100 frames)</button>
       <div class="control">
@@ -874,19 +873,6 @@
       });
     }
   </script>
-  <script src="../../shared/algorithm-page-chrome.js">
-  // Auto-injected by harmonize.py
-  function windowResized() {
-    // Preserve canvas aspect ratio on window resize
-    if (typeof resizeCanvas === 'function') {
-      const container = document.querySelector('canvas')?.parentElement;
-      if (container) {
-        const w = container.clientWidth;
-        resizeCanvas(w, w); // Square canvas default
-      }
-    }
-  }
-
-</script>
+  <script src="../../shared/algorithm-page-chrome.js"></script>
 </body>
 </html>

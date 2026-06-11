@@ -144,7 +144,6 @@
       <h3>Actions</h3>
       <button onclick="regenerate()">Regenerate</button>
       <button onclick="exportSVG()">Export SVG</button>
-      <button class="ts-btn ts-btn--secondary" onclick="saveCanvas('total-serialism', 'png')">Export PNG</button>
       <button onclick="exportGIF()">Export GIF</button>
       <div class="control">
         <label>Seed:</label>
@@ -613,20 +612,5 @@
     }
   </script>
   <script src="../../shared/algorithm-page-chrome.js"></script>
-  <script src="../../shared/page-config.js"></script>
-  <script src="../../shared/init.js">
-  // Auto-injected by harmonize.py
-  function windowResized() {
-    // Preserve canvas aspect ratio on window resize
-    if (typeof resizeCanvas === 'function') {
-      const container = document.querySelector('canvas')?.parentElement;
-      if (container) {
-        const w = container.clientWidth;
-        resizeCanvas(w, w); // Square canvas default
-      }
-    }
-  }
-
-</script>
 </body>
 </html>

@@ -179,21 +179,11 @@ body::before {
 
 .ts-algo-title {
   font-family: var(--ts-font-display);
-  font-size: 1.1rem;
-  font-weight: 600;
-  font-style: normal;
-  color: var(--ts-accent-primary);
-  margin: 0 0 16px 0;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--ts-text-primary);
+  margin: 0;
   letter-spacing: 0.02em;
-}
-
-/* Override inline styles when ts-algo-title is applied via init.js */
-#controls h2.ts-algo-title {
-  font-family: var(--ts-font-display) !important;
-  font-style: normal !important;
-  color: var(--ts-accent-primary) !important;
-  font-weight: 600 !important;
-  font-size: 1.1rem !important;
 }
 
 /* ============================================
@@ -1635,12 +1625,92 @@ body .back-link::before {
   color: var(--ts-text-secondary);
 }
 
+.ts-guidance-chip-row,
 .ts-discovery-badges,
 .ts-discovery-trails,
 .ts-discovery-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--ts-space-sm);
+}
+
+.ts-discovery-badge.is-subtle {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ts-text-primary);
+}
+
+.ts-guidance-grid {
+  display: grid;
+  gap: var(--ts-space-sm);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ts-guidance-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ts-space-sm);
+  padding: var(--ts-space-md);
+  border-radius: var(--ts-radius-md);
+  border: 1px solid var(--ts-border-default);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.ts-guidance-title {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ts-text-muted);
+}
+
+.ts-guidance-copy {
+  font-size: 0.74rem;
+  line-height: 1.6;
+  color: var(--ts-text-secondary);
+}
+
+.ts-guidance-links {
+  display: grid;
+  gap: var(--ts-space-sm);
+}
+
+.ts-guidance-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.65rem 0.75rem;
+  text-decoration: none;
+  border-radius: var(--ts-radius-md);
+  color: var(--ts-text-primary);
+  border: 1px solid var(--ts-border-default);
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color var(--ts-transition-fast), transform var(--ts-transition-fast), color var(--ts-transition-fast);
+}
+
+.ts-guidance-link:hover {
+  color: var(--ts-accent-primary);
+  border-color: var(--ts-accent-primary);
+  transform: translateY(-1px);
+}
+
+.ts-guidance-link-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.ts-guidance-link-copy {
+  font-size: 0.66rem;
+  line-height: 1.5;
+  color: var(--ts-text-secondary);
+}
+
+.ts-guidance-prompts {
+  margin: 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.5rem;
+  color: var(--ts-text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.55;
 }
 
 .ts-discovery-trail {
@@ -1746,6 +1816,10 @@ body .back-link::before {
 }
 
 @media (max-width: 720px) {
+  .ts-guidance-grid {
+    grid-template-columns: 1fr;
+  }
+
   .ts-discovery-card {
     grid-template-columns: 1fr;
   }
@@ -2030,68 +2104,4 @@ body.ts-datgui-mode:has(.ts-stats-bar:not(.hidden)) #canvas-container {
   border-radius: 3px;
   font-size: 10px;
   margin: 0 2px;
-}
-
-/* ============================================================================
-   MOBILE RESPONSIVE (harmonize.py Phase 2)
-   Prevents layout breakage on small screens. Not a full mobile redesign,
-   but ensures algorithms are usable on tablets and phones.
-   ============================================================================ */
-
-@media (max-width: 900px) {
-  /* Stack canvas and controls vertically */
-  .ts-app-layout,
-  .ts-layout,
-  [style*="display: flex"] {
-    flex-direction: column !important;
-  }
-
-  /* Control panels take full width */
-  .ts-panel,
-  .ts-sidebar,
-  .ts-controls,
-  [class*="control-panel"],
-  [class*="sidebar"] {
-    width: 100% !important;
-    max-width: 100% !important;
-    position: static !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  /* Canvas fills available width */
-  canvas {
-    max-width: 100% !important;
-    height: auto !important;
-  }
-
-  /* Hide keyboard shortcut hints on mobile */
-  .ts-shortcuts-hint {
-    display: none;
-  }
-
-  /* Prevent fixed panels from covering content */
-  [style*="position: fixed"],
-  [style*="position: absolute"] {
-    position: static !important;
-  }
-}
-
-@media (max-width: 600px) {
-  /* Smaller text on phones */
-  .ts-panel,
-  .ts-controls {
-    font-size: 12px;
-  }
-
-  /* Stack export buttons */
-  .ts-export-group,
-  .ts-btn-group {
-    flex-wrap: wrap;
-  }
-
-  .ts-btn {
-    font-size: 11px;
-    padding: 6px 10px;
-  }
 }

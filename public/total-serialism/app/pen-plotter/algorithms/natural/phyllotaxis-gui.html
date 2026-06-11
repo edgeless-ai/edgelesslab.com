@@ -393,8 +393,6 @@
         </div>
     </div>
 
-    <script src="../../shared/panel-controller.js"></script>
-    <script src="../../shared/stats-display.js"></script>
     <script>
         // Golden angle constant
         const GOLDEN_ANGLE = 137.5077640500378546463487;
@@ -1210,21 +1208,8 @@
             document.getElementById('seed-display').textContent = params.seed;
         });
     </script>
+    <script src="../../shared/panel-controller.js"></script>
+    <script src="../../shared/stats-display.js"></script>
   <script src="../../shared/algorithm-page-chrome.js"></script>
-  <script src="../../shared/page-config.js"></script>
-  <script src="../../shared/init.js">
-  // Auto-injected by harmonize.py
-  function windowResized() {
-    // Preserve canvas aspect ratio on window resize
-    if (typeof resizeCanvas === 'function') {
-      const container = document.querySelector('canvas')?.parentElement;
-      if (container) {
-        const w = container.clientWidth;
-        resizeCanvas(w, w); // Square canvas default
-      }
-    }
-  }
-
-</script>
 </body>
 </html>

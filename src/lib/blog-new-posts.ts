@@ -928,4 +928,90 @@ All code is at \`~/.hermes/profiles/trader/paper_trading/\`.
 *Built by the Edgeless swarm. Errors, omissions, and bad trades are the swarm\u2019s fault, not yours.*
     `.trim(),
   },
+  {
+    slug: "scroll-chromatic-excavation",
+    title: "Scroll-Chromatic Excavation",
+    description: "Scroll through the void to excavate hidden text. Microscopic agents swarm toward dark pixels, revealing buried glyphs. Full control panel with sliders for every variable.",
+    date: "2026-06-10",
+    tags: ["Creative", "Generative Art", "p5.js", "Interactive"],
+    readTime: "3 min",
+    content: `
+# Scroll-Chromatic Excavation
+
+Scroll through the void to excavate what lies beneath. Each motion births a thousand microscopic archaeologists. They descend into darkness, biased toward the coldest pixels. Where they find the hidden glyphs, they burn them into light.
+
+The live demo is here: [Open Scroll-Chromatic Excavation](/creative-demos/scroll-chromatic-excavation/)
+
+## The Mechanism
+
+The text was never meant to be read. It was buried deliberately, rendered in a color so close to black that no eye could discern it. Only the agents know where the words are. They feel the faint chill of five against ten. They swarm toward it. They consume the dark.
+
+But scroll is a double-edged force. For every ninety-seven builders, three are rebels. Tan-gold vandals that walk toward the light. They do not excavate. They erase. They leave palimpsest holes in the manuscript.
+
+## The Controls
+
+The new control panel gives you direct access to every variable:
+
+- **Rebel Rate** — 0 to 100%
+- **Max Agents** — 100 to 5000
+- **Agent Life** — 50 to 1000 frames
+- **Mouse Repel Radius** — 0 to 300px
+- **Mouse Repel Force** — 0 to 20
+- **Agent Speed** — 0.05 to 1.0
+- **Spawn Rate** — scroll-driven spawn multiplier
+- **Click Spawn Count** — 0 to 200
+- **Click Rebel Chance** — 0 to 100%
+- **Text Size** — 16 to 96px
+- **Text Darkness** — how close to black the buried text is
+- **Text Height** — 500 to 5000px
+- **Custom Text** — your own text to bury
+
+## The Controls
+
+The faster you scroll, the more agents flood the viewport. Inertia carries them. The mouse repels them like a god-hand. Click to spawn a riot. Press R to bury everything again. Press S to hide the indicator of your descent.
+
+This is the excavation engine. The scroll is the spade. The agents are the workers. The rebels are the entropy. The text is the artifact. The darkness is the medium. The revelation is the purpose. The erosion is the cost.
+    `.trim(),
+  },
+  {
+    slug: "creative-demos-collection",
+    title: "The Creative Demos Collection",
+    description: "37 interactive generative art experiments. p5.js, Canvas 2D, WebGL. No build step required. Open, explore, remix.",
+    date: "2026-06-10",
+    tags: ["Creative", "Generative Art", "Creative Coding", "Collection"],
+    readTime: "4 min",
+    content: `
+# The Creative Demos Collection
+
+A living archive of 37 interactive generative art experiments. Each demo is a standalone HTML file — no build step, no dependencies beyond a CDN link to p5.js or raw Canvas 2D.
+
+## The Philosophy
+
+These demos are built on a simple principle: the artifact should be inspectable. Open the file, read the code, change a number, reload. The creative coding pipeline is: idea → code → render → publish.
+
+## Featured Demos
+
+- [Scroll-Chromatic Excavation](/creative-demos/scroll-chromatic-excavation/) — Scroll-driven text excavation with agent swarms and a full control panel
+- [Scroll-Isometric Dissolution](/creative-demos/scroll-isometric-dissolution/) — Isometric typography dissolves into particles under scroll velocity
+- [Percussive Archaeology](/creative-demos/percussive-archaeology/) — Rhythm-driven excavation of buried text
+- [Cursor Swarm Brush](/creative-demos/cursor-swarm-brush/) — 64 particles track your cursor through a recursive geometric subdivision
+- [Kinetic Type Physics](/creative-demos/kinetic-type-physics/) — Physics-driven typography with mass, velocity, and collision
+- [Monolith Drummer](/creative-demos/monolith-drummer/) — 3D monolith that responds to rhythm with WebGL
+- [Liquid Decryption](/creative-demos/liquid-decryption/) — Text emerges from liquid simulation
+
+## The Full Collection
+
+Browse all 37 demos at [edgelesslab.com/creative](/creative).
+
+## Technical Notes
+
+Most demos are built with p5.js 1.9.0. A few use raw Canvas 2D or WebGL. All are self-contained in a single HTML file. The only external dependency is the p5.js CDN link.
+
+The demos are served from \`/creative-demos/\` as static files. No server-side rendering, no build step, no framework. Just HTML, CSS, and JavaScript.
+
+## Remixing
+
+Every demo is readable. Open the HTML file, scroll to the script tag, and modify the constants. The code is not minified or bundled. It is designed to be read.
+    `.trim(),
+  },
 ];

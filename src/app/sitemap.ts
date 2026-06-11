@@ -50,6 +50,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: 'https://edgelesslab.com/now/',
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.7,
+    },
+    {
       url: 'https://edgelesslab.com/agents/',
       lastModified: new Date(),
       changeFrequency: 'weekly',

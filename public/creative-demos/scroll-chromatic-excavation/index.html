@@ -6,31 +6,294 @@
   <title>Scroll-Chromatic Excavation</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
       background: #0A0A0A;
+      overflow: hidden;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
     }
-    canvas {
-      display: block;
+    canvas { display: block; }
+
+    /* ===== Control Panel ===== */
+    #panel {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      width: 260px;
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+      background: rgba(18, 18, 22, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px;
+      color: #e8e8f0;
+      font-size: 12px;
+      z-index: 1000;
+      backdrop-filter: blur(12px);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    #panel.collapsed {
+      transform: translateX(-120%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    #panel h2 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #8888aa;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding-bottom: 8px;
+    }
+    .control-group {
+      margin-bottom: 14px;
+    }
+    .control-group label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      color: #aaaacc;
+      font-size: 11px;
+      letter-spacing: 0.3px;
+    }
+    .control-group .value {
+      color: #00d4ff;
+      font-weight: 600;
+      font-family: monospace;
+    }
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #00d4ff;
+      cursor: pointer;
+      border: 2px solid #0a0a0a;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #00d4ff;
+      cursor: pointer;
+      border: 2px solid #0a0a0a;
+    }
+    .btn {
+      width: 100%;
+      padding: 8px 0;
+      border: none;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 6px;
+    }
+    .btn-reset {
+      background: rgba(255, 68, 68, 0.15);
+      color: #ff4444;
+      border: 1px solid rgba(255, 68, 68, 0.3);
+    }
+    .btn-reset:hover {
+      background: rgba(255, 68, 68, 0.25);
+    }
+    .btn-toggle {
+      background: rgba(0, 212, 255, 0.10);
+      color: #00d4ff;
+      border: 1px solid rgba(0, 212, 255, 0.25);
+    }
+    .btn-toggle:hover {
+      background: rgba(0, 212, 255, 0.20);
+    }
+    .btn-toggle.off {
+      background: rgba(255, 255, 255, 0.05);
+      color: #8888aa;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .checkbox-row input {
+      accent-color: #00d4ff;
+    }
+    .hint {
+      color: #666688;
+      font-size: 10px;
+      margin-top: 10px;
+      line-height: 1.4;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 8px;
+    }
+
+    /* Toggle handle */
+    #panel-toggle {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 1001;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(18, 18, 22, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #00d4ff;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: opacity 0.3s;
+    }
+    #panel-toggle.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Text input for custom message */
+    #custom-text {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      color: #e8e8f0;
+      padding: 8px;
+      font-size: 11px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 60px;
+      outline: none;
+    }
+    #custom-text::placeholder {
+      color: #666688;
     }
   </style>
 </head>
 <body>
+
+<!-- Toggle Button -->
+<div id="panel-toggle" onclick="togglePanel()">
+  <span id="toggle-icon">[controls]</span>
+</div>
+
+<!-- Control Panel -->
+<div id="panel">
+  <h2>Excavation Controls</h2>
+
+  <div class="control-group">
+    <label>Rebel Rate <span class="value" id="val-rebel">3%</span></label>
+    <input type="range" id="rebel-rate" min="0" max="100" value="3">
+  </div>
+
+  <div class="control-group">
+    <label>Max Agents <span class="value" id="val-agents">1000</span></label>
+    <input type="range" id="max-agents" min="100" max="5000" value="1000" step="100">
+  </div>
+
+  <div class="control-group">
+    <label>Agent Life <span class="value" id="val-life">300</span></label>
+    <input type="range" id="agent-life" min="50" max="1000" value="300" step="50">
+  </div>
+
+  <div class="control-group">
+    <label>Mouse Repel Radius <span class="value" id="val-repel-r">100</span></label>
+    <input type="range" id="repel-radius" min="0" max="300" value="100" step="10">
+  </div>
+
+  <div class="control-group">
+    <label>Mouse Repel Force <span class="value" id="val-repel-f">5</span></label>
+    <input type="range" id="repel-force" min="0" max="20" value="5" step="1">
+  </div>
+
+  <div class="control-group">
+    <label>Agent Speed <span class="value" id="val-speed">0.30</span></label>
+    <input type="range" id="agent-speed" min="0.05" max="1.0" value="0.30" step="0.05">
+  </div>
+
+  <div class="control-group">
+    <label>Spawn Rate (scroll) <span class="value" id="val-spawn">1.0</span></label>
+    <input type="range" id="spawn-rate" min="0.1" max="5.0" value="1.0" step="0.1">
+  </div>
+
+  <div class="control-group">
+    <label>Click Spawn Count <span class="value" id="val-click">50</span></label>
+    <input type="range" id="click-spawn" min="0" max="200" value="50" step="10">
+  </div>
+
+  <div class="control-group">
+    <label>Text Size <span class="value" id="val-textsize">48</span></label>
+    <input type="range" id="text-size" min="16" max="96" value="48" step="4">
+  </div>
+
+  <div class="control-group">
+    <label>Text Darkness <span class="value" id="val-darkness">5</span></label>
+    <input type="range" id="text-darkness" min="0" max="20" value="5" step="1">
+  </div>
+
+  <div class="control-group">
+    <label>Text Height <span class="value" id="val-height">2000</span></label>
+    <input type="range" id="text-height" min="500" max="5000" value="2000" step="500">
+  </div>
+
+  <div class="control-group">
+    <label>Custom Text</label>
+    <textarea id="custom-text" placeholder="Leave empty to use default poem..."></textarea>
+  </div>
+
+  <div class="control-group">
+    <label>Click Rebel Chance <span class="value" id="val-click-rebel">50%</span></label>
+    <input type="range" id="click-rebel" min="0" max="100" value="50">
+  </div>
+
+  <button class="btn btn-toggle" id="btn-scroll" onclick="toggleScroll()">Scroll Indicator: ON</button>
+  <button class="btn btn-reset" onclick="doReset()">Bury Everything (R)</button>
+
+  <div class="hint">
+    Scroll to spawn agents. Click to riot. Mouse repels. Rebels erase; builders reveal.
+  </div>
+</div>
+
 <script>
 // ============================================================
-// Scroll-Chromatic Excavation
+// Scroll-Chromatic Excavation — With Controls
 // ============================================================
 
+let PARAMS = {
+  rebelRate: 0.03,
+  maxAgents: 1000,
+  agentLife: 300,
+  repelRadius: 100,
+  repelForce: 5,
+  agentSpeed: 0.30,
+  spawnRate: 1.0,
+  clickSpawn: 50,
+  textSize: 48,
+  textDarkness: 5,
+  textHeight: 2000,
+  clickRebel: 0.5,
+  showScrollIndicator: true,
+  customText: ""
+};
+
 const BG_COLOR = [10, 10, 10];
-const TEXT_DARK = [5, 5, 5];
 const REVEAL_COLOR = [245, 245, 240];
 const REBEL_COLOR = [210, 180, 140];
-const SCROLL_IND_COLOR = [51, 51, 51];
-const TEXT_HEIGHT = 2000;
-const MAX_AGENTS = 1000;
-const REBEL_RATE = 0.03;
 
 let textMask;
 let scrollY = 0;
@@ -38,60 +301,66 @@ let targetScrollY = 0;
 let scrollVelocity = 0;
 let agents = [];
 let rebelTrails = [];
-let showScrollIndicator = true;
 let hiddenText;
+
+// Default poem
+const DEFAULT_PARAGRAPHS = [
+  "Scroll through the void to excavate what lies beneath. " +
+  "Each motion births a thousand microscopic archaeologists. " +
+  "They descend into darkness, biased toward the coldest pixels. " +
+  "Where they find the hidden glyphs, they burn them into light. ",
+
+  "The text was never meant to be read. It was buried deliberately, " +
+  "rendered in a color so close to black that no eye could discern it. " +
+  "Only the agents know where the words are. They feel the faint chill " +
+  "of five against ten. They swarm toward it. They consume the dark. ",
+
+  "But scroll is a double-edged force. For every ninety-seven builders, " +
+  "three are rebels. Tan-gold vandals that walk toward the light. " +
+  "They do not excavate. They erase. They leave palimpsest holes " +
+  "in the manuscript. The text is written and unwritten in the same breath. ",
+
+  "The faster you scroll, the more agents flood the viewport. " +
+  "Inertia carries them. The mouse repels them like a god-hand. " +
+  "Click to spawn a riot. Press R to bury everything again. " +
+  "Press S to hide the indicator of your descent. ",
+
+  "This is the excavation engine. The scroll is the spade. " +
+  "The agents are the workers. The rebels are the entropy. " +
+  "The text is the artifact. The darkness is the medium. " +
+  "The revelation is the purpose. The erosion is the cost. "
+];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   pixelDensity(1);
   noCursor();
 
-  // Build hidden text buffer
-  textMask = createGraphics(width, TEXT_HEIGHT);
+  buildTextMask();
+  bindControls();
+}
+
+function buildTextMask() {
+  if (textMask) textMask.remove();
+  textMask = createGraphics(width, PARAMS.textHeight);
   textMask.background(10);
-  textMask.textSize(48);
+  textMask.textSize(PARAMS.textSize);
   textMask.textFont('Helvetica Neue, Arial, sans-serif');
   textMask.textAlign(LEFT, TOP);
   textMask.textWrap(WORD);
-  textMask.fill(5);
+  textMask.fill(PARAMS.textDarkness);
   textMask.noStroke();
 
-  // Generate long text to fill 2000px
-  const line = "The quick brown fox jumps over the lazy dog. ";
-  const paragraphs = [
-    "Scroll through the void to excavate what lies beneath. " +
-    "Each motion births a thousand microscopic archaeologists. " +
-    "They descend into darkness, biased toward the coldest pixels. " +
-    "Where they find the hidden glyphs, they burn them into light. ",
-
-    "The text was never meant to be read. It was buried deliberately, " +
-    "rendered in a color so close to black that no eye could discern it. " +
-    "Only the agents know where the words are. They feel the faint chill " +
-    "of five against ten. They swarm toward it. They consume the dark. ",
-
-    "But scroll is a double-edged force. For every ninety-seven builders, " +
-    "three are rebels. Tan-gold vandals that walk toward the light. " +
-    "They do not excavate. They erase. They leave palimpsest holes " +
-    "in the manuscript. The text is written and unwritten in the same breath. ",
-
-    "The faster you scroll, the more agents flood the viewport. " +
-    "Inertia carries them. The mouse repels them like a god-hand. " +
-    "Click to spawn a riot. Press R to bury everything again. " +
-    "Press S to hide the indicator of your descent. ",
-
-    "This is the excavation engine. The scroll is the spade. " +
-    "The agents are the workers. The rebels are the entropy. " +
-    "The text is the artifact. The darkness is the medium. " +
-    "The revelation is the purpose. The erosion is the cost. "
-  ];
-
-  let fullText = paragraphs.join("\n\n");
-  // Pad with more text if needed
-  while (fullText.length < 4000) {
-    fullText += " " + line;
+  let fullText = PARAMS.customText.trim();
+  if (!fullText) {
+    const line = "The quick brown fox jumps over the lazy dog. ";
+    fullText = DEFAULT_PARAGRAPHS.join("\n\n");
+    while (fullText.length < 4000) {
+      fullText += " " + line;
+    }
   }
 
-  textMask.text(fullText, 40, 80, width - 80, TEXT_HEIGHT - 80);
+  textMask.text(fullText, 40, 80, width - 80, PARAMS.textHeight - 80);
 }
 
 function draw() {
@@ -99,32 +368,27 @@ function draw() {
   scrollVelocity = (targetScrollY - scrollY) * 0.08;
   scrollY += scrollVelocity;
 
-  let maxScroll = TEXT_HEIGHT - height;
+  let maxScroll = PARAMS.textHeight - height;
   if (maxScroll < 0) maxScroll = 0;
 
-  // Elastic snap at bounds
-  if (scrollY < 0) {
-    scrollY += (0 - scrollY) * 0.2;
-  }
-  if (scrollY > maxScroll) {
-    scrollY += (maxScroll - scrollY) * 0.2;
-  }
+  if (scrollY < 0) scrollY += (0 - scrollY) * 0.2;
+  if (scrollY > maxScroll) scrollY += (maxScroll - scrollY) * 0.2;
 
   // 2. Spawn agents based on scroll velocity
   let sv = abs(scrollVelocity);
   if (sv > 2) {
-    let spawnCount = floor(sv / 2);
+    let spawnCount = floor(sv / 2 * PARAMS.spawnRate);
     for (let i = 0; i < spawnCount; i++) {
-      spawnAgent(random(width), random(height), REBEL_RATE);
+      spawnAgent(random(width), random(height), PARAMS.rebelRate);
     }
   }
 
   // Cap agent count
-  while (agents.length > MAX_AGENTS) {
+  while (agents.length > PARAMS.maxAgents) {
     agents.shift();
   }
 
-  // 3. Load pixels for direct manipulation
+  // 3. Load pixels
   textMask.loadPixels();
 
   // 4. Update agents
@@ -138,12 +402,11 @@ function draw() {
 
     // Mouse repel
     let d = dist(a.x, a.y, mouseX, mouseY);
-    if (d < 100 && d > 0.1) {
-      a.x += (a.x - mouseX) / d * 5;
-      a.y += (a.y - mouseY) / d * 5;
+    if (d < PARAMS.repelRadius && d > 0.1) {
+      a.x += (a.x - mouseX) / d * PARAMS.repelForce;
+      a.y += (a.y - mouseY) / d * PARAMS.repelForce;
     }
 
-    // Clamp to screen
     a.x = constrain(a.x, 0, width);
     a.y = constrain(a.y, 0, height);
 
@@ -155,24 +418,21 @@ function draw() {
     if (target) {
       let tx = target.x;
       let tyScreen = target.y - scrollY;
-      a.x += (tx - a.x) * 0.3 + random(-1, 1);
-      a.y += (tyScreen - a.y) * 0.3 + random(-1, 1);
+      a.x += (tx - a.x) * PARAMS.agentSpeed + random(-1, 1);
+      a.y += (tyScreen - a.y) * PARAMS.agentSpeed + random(-1, 1);
     }
 
     // Paint into mask
     let px = floor(a.x);
     let py = floor(a.y + scrollY);
-    if (px >= 0 && px < width && py >= 0 && py < TEXT_HEIGHT) {
+    if (px >= 0 && px < width && py >= 0 && py < PARAMS.textHeight) {
       let idx = (px + py * width) * 4;
       if (a.isRebel) {
-        // Erase: set to background
         textMask.pixels[idx] = 10;
         textMask.pixels[idx + 1] = 10;
         textMask.pixels[idx + 2] = 10;
-        // Rebel trail
         rebelTrails.push({ x: a.x, y: a.y, alpha: 25, life: 60 });
       } else {
-        // Reveal: set to off-white
         textMask.pixels[idx] = 245;
         textMask.pixels[idx + 1] = 245;
         textMask.pixels[idx + 2] = 240;
@@ -182,7 +442,7 @@ function draw() {
 
   textMask.updatePixels();
 
-  // 5. Draw background + text mask
+  // 5. Draw
   background(10);
   image(textMask, 0, -scrollY);
 
@@ -211,7 +471,7 @@ function draw() {
   }
 
   // 8. Scroll indicator
-  if (showScrollIndicator && maxScroll > 0) {
+  if (PARAMS.showScrollIndicator && maxScroll > 0) {
     let h = map(scrollY, 0, maxScroll, 0, height);
     h = constrain(h, 0, height);
     fill(51);
@@ -225,7 +485,7 @@ function spawnAgent(x, y, rebelRate) {
     x: x,
     y: y,
     isRebel: isRebel,
-    life: 300
+    life: PARAMS.agentLife
   });
 }
 
@@ -238,7 +498,7 @@ function getTargetPixel(mx, my, isRebel) {
     for (let dx = -1; dx <= 1; dx++) {
       let nx = mx + dx;
       let ny = my + dy;
-      if (nx < 0 || nx >= width || ny < 0 || ny >= TEXT_HEIGHT) continue;
+      if (nx < 0 || nx >= width || ny < 0 || ny >= PARAMS.textHeight) continue;
 
       let idx = (nx + ny * width) * 4;
       let brightness = (textMask.pixels[idx] + textMask.pixels[idx + 1] + textMask.pixels[idx + 2]) / 3;
@@ -259,7 +519,6 @@ function getTargetPixel(mx, my, isRebel) {
     }
   }
 
-  // Only return a target if it's different from current position
   if (bestX === mx && bestY === my) return null;
   return { x: bestX, y: bestY };
 }
@@ -270,69 +529,89 @@ function mouseWheel(event) {
 }
 
 function mousePressed() {
-  // Click spawns 50 agents with 50% rebel chance
-  for (let i = 0; i < 50; i++) {
-    spawnAgent(mouseX + random(-20, 20), mouseY + random(-20, 20), 0.5);
+  for (let i = 0; i < PARAMS.clickSpawn; i++) {
+    spawnAgent(mouseX + random(-20, 20), mouseY + random(-20, 20), PARAMS.clickRebel);
   }
 }
 
 function keyPressed() {
   if (key === 'r' || key === 'R') {
-    // Reset: clear all revealed text
-    textMask.background(10);
-    textMask.textSize(48);
-    textMask.textFont('Helvetica Neue, Arial, sans-serif');
-    textMask.textAlign(LEFT, TOP);
-    textMask.textWrap(WORD);
-    textMask.fill(5);
-    textMask.noStroke();
-
-    const line = "The quick brown fox jumps over the lazy dog. ";
-    const paragraphs = [
-      "Scroll through the void to excavate what lies beneath. " +
-      "Each motion births a thousand microscopic archaeologists. " +
-      "They descend into darkness, biased toward the coldest pixels. " +
-      "Where they find the hidden glyphs, they burn them into light. ",
-
-      "The text was never meant to be read. It was buried deliberately, " +
-      "rendered in a color so close to black that no eye could discern it. " +
-      "Only the agents know where the words are. They feel the faint chill " +
-      "of five against ten. They swarm toward it. They consume the dark. ",
-
-      "But scroll is a double-edged force. For every ninety-seven builders, " +
-      "three are rebels. Tan-gold vandals that walk toward the light. " +
-      "They do not excavate. They erase. They leave palimpsest holes " +
-      "in the manuscript. The text is written and unwritten in the same breath. ",
-
-      "The faster you scroll, the more agents flood the viewport. " +
-      "Inertia carries them. The mouse repels them like a god-hand. " +
-      "Click to spawn a riot. Press R to bury everything again. " +
-      "Press S to hide the indicator of your descent. ",
-
-      "This is the excavation engine. The scroll is the spade. " +
-      "The agents are the workers. The rebels are the entropy. " +
-      "The text is the artifact. The darkness is the medium. " +
-      "The revelation is the purpose. The erosion is the cost. "
-    ];
-
-    let fullText = paragraphs.join("\n\n");
-    while (fullText.length < 4000) {
-      fullText += " " + line;
-    }
-    textMask.text(fullText, 40, 80, width - 80, TEXT_HEIGHT - 80);
-
-    // Clear agents and trails
-    agents = [];
-    rebelTrails = [];
+    doReset();
   }
-
   if (key === 's' || key === 'S') {
-    showScrollIndicator = !showScrollIndicator;
+    toggleScroll();
+  }
+  if (key === 'c' || key === 'C') {
+    togglePanel();
   }
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  buildTextMask();
+}
+
+// ===== CONTROL PANEL =====
+
+function bindControls() {
+  const binds = [
+    ['rebel-rate', 'rebelRate', v => v / 100, 'val-rebel', v => v + '%'],
+    ['max-agents', 'maxAgents', v => parseInt(v), 'val-agents', v => v],
+    ['agent-life', 'agentLife', v => parseInt(v), 'val-life', v => v],
+    ['repel-radius', 'repelRadius', v => parseInt(v), 'val-repel-r', v => v],
+    ['repel-force', 'repelForce', v => parseInt(v), 'val-repel-f', v => v],
+    ['agent-speed', 'agentSpeed', v => parseFloat(v), 'val-speed', v => v.toFixed(2)],
+    ['spawn-rate', 'spawnRate', v => parseFloat(v), 'val-spawn', v => v.toFixed(1)],
+    ['click-spawn', 'clickSpawn', v => parseInt(v), 'val-click', v => v],
+    ['text-size', 'textSize', v => parseInt(v), 'val-textsize', v => v],
+    ['text-darkness', 'textDarkness', v => parseInt(v), 'val-darkness', v => v],
+    ['text-height', 'textHeight', v => parseInt(v), 'val-height', v => v],
+    ['click-rebel', 'clickRebel', v => v / 100, 'val-click-rebel', v => v + '%'],
+  ];
+
+  binds.forEach(([id, param, parser, labelId, formatter]) => {
+    const el = document.getElementById(id);
+    const label = document.getElementById(labelId);
+    el.addEventListener('input', () => {
+      PARAMS[param] = parser(el.value);
+      label.textContent = formatter(PARAMS[param]);
+    });
+  });
+
+  // Custom text debounce
+  const textEl = document.getElementById('custom-text');
+  let timeout;
+  textEl.addEventListener('input', () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      PARAMS.customText = textEl.value;
+      buildTextMask();
+    }, 500);
+  });
+}
+
+function doReset() {
+  agents = [];
+  rebelTrails = [];
+  scrollY = 0;
+  targetScrollY = 0;
+  buildTextMask();
+}
+
+function toggleScroll() {
+  PARAMS.showScrollIndicator = !PARAMS.showScrollIndicator;
+  const btn = document.getElementById('btn-scroll');
+  btn.textContent = PARAMS.showScrollIndicator ? 'Scroll Indicator: ON' : 'Scroll Indicator: OFF';
+  btn.classList.toggle('off', !PARAMS.showScrollIndicator);
+}
+
+function togglePanel() {
+  const panel = document.getElementById('panel');
+  const toggle = document.getElementById('panel-toggle');
+  const icon = document.getElementById('toggle-icon');
+  panel.classList.toggle('collapsed');
+  toggle.classList.toggle('hidden', !panel.classList.contains('collapsed'));
+  icon.textContent = panel.classList.contains('collapsed') ? '[controls]' : '[hide]';
 }
 </script>
 </body>

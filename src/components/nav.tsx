@@ -12,9 +12,9 @@ const navLinks = [
   { label: "Products", href: "/products" },
   { label: "Services", href: "/services/private-ai-systems" },
   { label: "Lab", href: "/lab" },
+  { label: "Creative", href: "/creative" },
   { label: "Agents", href: "/agents" },
   { label: "Blog", href: "/blog" },
-  { label: "Knowledge", href: "/knowledge" },
   { label: "About", href: "/about" },
   { label: "Now", href: "/now" },
 ];

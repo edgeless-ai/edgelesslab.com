@@ -998,6 +998,8 @@ These demos are built on a simple principle: the artifact should be inspectable.
 - [Kinetic Type Physics](/creative-demos/kinetic-type-physics/) — Physics-driven typography with mass, velocity, and collision
 - [Monolith Drummer](/creative-demos/monolith-drummer/) — 3D monolith that responds to rhythm with WebGL
 - [Liquid Decryption](/creative-demos/liquid-decryption/) — Text emerges from liquid simulation
+- [Tartan Weave Synth](/creative-demos/tartan-weave-synth/) — Interactive generative tartan with 6 weave structures and historical dye colors
+- [Serial Permutation Canvas](/creative-demos/serial-permutation-canvas/) — Visualizing total serialism as particle geometry
 
 ## The Full Collection
 
@@ -1012,6 +1014,320 @@ The demos are served from \`/creative-demos/\` as static files. No server-side r
 ## Remixing
 
 Every demo is readable. Open the HTML file, scroll to the script tag, and modify the constants. The code is not minified or bundled. It is designed to be read.
+    `.trim(),
+  },
+  {
+    slug: "scroll-isometric-dissolution",
+    title: "Scroll-Isometric Dissolution",
+    description: "Isometric typography that dissolves into particles as you scroll. A 3D word space that collapses under velocity.",
+    date: "2026-06-10",
+    tags: ["Creative", "Generative Art", "Typography", "Scroll"],
+    readTime: "3 min",
+    content: `
+# Scroll-Isometric Dissolution
+
+Isometric typography exists in a curious space between 2D and 3D. It reads as depth without actually having it. The illusion is cheap — a 30-degree angle, a shadow, a second face — but the brain buys it immediately.
+
+This demo asks: what happens when that illusion dissolves?
+
+The live artifact: [Open Scroll-Isometric Dissolution](/creative-demos/scroll-isometric-dissolution/)
+
+## The Mechanism
+
+A word is rendered in isometric projection. Each letter has three faces: front, top, side. The faces are not polygons. They are CSS transforms on divs. The isometric effect is achieved with \`rotateX(60deg) rotateZ(-45deg)\`, a standard axonometric trick.
+
+As you scroll, the word begins to break apart. Not all at once — from the edges inward, or from the center outward, depending on scroll direction. Each letter face becomes a particle. The particle inherits the face's color and position, then drifts away with velocity proportional to scroll speed.
+
+## The Physics
+
+The particles are simple: position, velocity, drag, and a fade. No collision, no gravity. The dissolution looks chaotic but is actually deterministic. The same scroll velocity produces the same particle cloud every time.
+
+The drag coefficient is tuned to feel like ink dispersing in water. Fast scroll = explosive dissolution. Slow scroll = gentle peeling. The particles reassemble when you scroll back up, but not perfectly. Each cycle leaves residue.
+
+## The Design Decision
+
+The isometric projection was chosen because it is the most readable fake-3D. A perspective projection would look more realistic but less typographic. The goal was a word that is clearly a word until it isn't.
+
+The color palette is monochrome: black faces on white, with a single accent color for the particle trails. The accent changes based on scroll velocity: cool at low speeds, warm at high speeds.
+
+## What It Teaches
+
+Scroll is not just navigation. It is a force. The demo treats scroll velocity as a physical input, not a positional one. The word is not at a scroll position. It is in a scroll field.
+
+This is a useful pattern for any scroll-driven animation: measure velocity, not position. Velocity carries energy. Position is just a coordinate.
+    `.trim(),
+  },
+  {
+    slug: "percussive-archaeology",
+    title: "Percussive Archaeology",
+    description: "Rhythm-driven excavation of buried text. Each beat spawns agents that dig toward the hidden manuscript.",
+    date: "2026-06-10",
+    tags: ["Creative", "Generative Art", "Audio", "Agents"],
+    readTime: "3 min",
+    content: `
+# Percussive Archaeology
+
+This is the sibling to Scroll-Chromatic Excavation. Where that demo uses scroll velocity as the excavation force, this one uses rhythm.
+
+The live artifact: [Open Percussive Archaeology](/creative-demos/percussive-archaeology/)
+
+## The Mechanism
+
+A hidden manuscript is buried in near-black text on a black background. The text is a poem about excavation, naturally. Onset detection from the Web Audio API identifies beats in the microphone input or an uploaded audio file. Each beat spawns a cluster of agents at a random position.
+
+The agents are the same species as in Scroll-Chromatic Excavation: builders (reveal dark text) and rebels (erase revealed text). But the spawn dynamics are different. Beats produce clustered spawns, not the continuous stream of scroll. A kick drum spawns 50 agents at once. A hi-hat spawns 5.
+
+## The Audio Pipeline
+
+The Web Audio API creates an AnalyserNode with 2048 frequency bins. A simple onset detector looks for sudden energy increases across the full spectrum. This is not a sophisticated beat tracker — it misses some beats, catches some false positives. But the misses and false positives are part of the aesthetic.
+
+The agent count is capped at 2000. When a beat spawns agents beyond the cap, the oldest agents die. This creates a visual rhythm: the manuscript fills with revealed text, then the rebels catch up and erase it, then the next beat reveals more.
+
+## The Visual Result
+
+The manuscript is never fully revealed. The beat-driven agents are too bursty, too clustered. The text emerges in patches, like reading by flashlight. The rebels erase randomly, leaving holes that the next beat fills differently.
+
+The result is a manuscript that is perpetually half-excavated. The poem is never fully readable. The rhythm is the excavation engine, and the rhythm is always changing.
+
+## What It Teaches
+
+Audio-driven generative art has a specific challenge: the input is one-dimensional (amplitude over time) but the output is two-dimensional (pixels on a screen). The mapping from audio to visual is arbitrary, but the audience feels it immediately when it is wrong.
+
+The correct mapping is not "loud = bright." It is "event = action." A beat is not a value. It is a trigger. The visual should respond to the event, not the amplitude. This demo maps beats to agent spawns, not to color changes. The visual rhythm matches the audio rhythm because both are event-driven.
+    `.trim(),
+  },
+  {
+    slug: "cursor-swarm-brush",
+    title: "Noise-Shared Cursor Swarm Brush",
+    description: "64 particles track your cursor through a recursive geometric subdivision. Noise-driven turbulence stains tiles as you move.",
+    date: "2026-06-10",
+    tags: ["Creative", "Generative Art", "Noise", "Particles"],
+    readTime: "3 min",
+    content: `
+# Noise-Shared Cursor Swarm Brush
+
+Three creative coding aesthetics fused into one: Zajno's cursor-velocity displacement, Manoloide's recursive geometric subdivision, and Raven Kwok's global noise field.
+
+The live artifact: [Open Cursor Swarm Brush](/creative-demos/cursor-swarm-brush/)
+
+## The Three Techniques
+
+### Recursive Geometric Subdivision
+
+The background is built via a recursive quad-tree-like subdivision. A tile splits when its size exceeds a minimum threshold and a 2D simplex noise sample at its center crosses a threshold. Split direction (horizontal vs vertical) is also noise-driven, producing an organic, off-center tessellation rather than a rigid grid.
+
+### Shared Noise Field
+
+A single lightweight inline simplex noise function drives both the tile vertex displacement and the swarm turbulence. Each corner of every tile is displaced by the noise field, creating a breathing, warped mosaic. The cursor-following particles receive velocity impulses from the same field, so the swarm and the tiles warp in the same organic direction.
+
+### Cursor Swarm
+
+The cursor is replaced by 64 particles that lerp-track the mouse position at a factor of ~0.12. Each particle has independent noise-driven turbulence. When the cursor moves fast (velocity > 12 px/frame), particles are randomly shed. These shed particles fall toward the nearest tile and "stain" it.
+
+## The Stain Mechanism
+
+When a shed particle lands on a tile, it does not change the tile's color permanently. It adds a temporary color overlay that fades over 60 frames. The overlay color is sampled from the particle's velocity: fast particles are warm, slow particles are cool. The tile retains a memory of recent activity.
+
+The result is a canvas that records your cursor's path not as a line, but as a field of stains. The stains overlap, fade, and accumulate. The canvas has memory.
+
+## What It Teaches
+
+The key insight is sharing the noise field between two unrelated systems. The tiles and the swarm are independent subsystems, but they respond to the same underlying field. This creates visual coherence without explicit coupling. The tiles breathe, the swarm drifts, and both move in the same direction because they read the same noise.
+
+This is a general pattern: use a shared noise field to coordinate independent visual systems. The coupling is implicit, not explicit. The systems do not know about each other. They only know about the field.
+    `.trim(),
+  },
+  {
+    slug: "kinetic-type-physics",
+    title: "Kinetic Type Physics",
+    description: "Physics-driven typography where letters have mass, velocity, and collision. Mouse repulsion and gravity well.",
+    date: "2026-06-10",
+    tags: ["Creative", "Generative Art", "Physics", "Typography"],
+    readTime: "3 min",
+    content: `
+# Kinetic Type Physics
+
+Typography is usually static. Letters are placed, aligned, and left alone. This demo treats each letter as a physical body with mass, velocity, and collision.
+
+The live artifact: [Open Kinetic Type Physics](/creative-demos/kinetic-type-physics/)
+
+## The Physics Engine
+
+Each letter is a rectangle with mass proportional to its area. The physics is Verlet integration: position, previous position, and implicit velocity. Forces include:
+
+- **Gravity**: a constant downward force
+- **Mouse repulsion**: the cursor pushes letters away with inverse-square falloff
+- **Spring force**: each letter is connected to its original position by a spring, pulling it back toward the word
+- **Collision**: circle-circle collision with restitution 0.7
+
+## The Typography
+
+The word is "PHYSICS" in a bold sans-serif. Each letter starts at its correct position, then gravity pulls it down. The spring force pulls it back up. The mouse repulsion disturbs the equilibrium. The collision keeps letters from overlapping.
+
+The result is a word that is always trying to be a word but is constantly disturbed. Letters bounce off each other, slide past each other, and occasionally get stuck. The word is legible but restless.
+
+## The Design Decision
+
+The spring force is critical. Without it, the letters would fall and scatter. With it, they return to the word but with memory of their disturbance. The spring constant is tuned so that the return is slow, not immediate. The word reassembles over seconds, not frames.
+
+The color is monochrome: black letters on white, with a subtle gray trail showing each letter's recent path. The trail is not a motion blur. It is a deliberate record of the letter's recent positions.
+
+## What It Teaches
+
+Physics-driven typography is not about realism. It is about giving text a material presence. The audience knows that letters are not physical. But when they behave physically, the text feels more present, more tangible. The physics is not accurate. It is expressive.
+
+The lesson: use physics as a metaphor, not a simulation. The goal is not to simulate real bodies. It is to give abstract text a sense of weight and resistance.
+    `.trim(),
+  },
+  {
+    slug: "monolith-drummer",
+    title: "Monolith Drummer",
+    description: "A 3D monolith that responds to rhythm. Web Audio API drives the geometry, each beat deforms the surface.",
+    date: "2026-06-10",
+    tags: ["Creative", "Generative Art", "WebGL", "Audio"],
+    readTime: "3 min",
+    content: `
+# Monolith Drummer
+
+A 3D monolith that listens to rhythm and deforms its surface in response. WebGL renders the geometry, Web Audio API drives the deformation.
+
+The live artifact: [Open Monolith Drummer](/creative-demos/monolith-drummer/)
+
+## The Geometry
+
+The monolith is a subdivided cube, 32 segments per face. The vertices are displaced by a combination of:
+
+- **Base noise**: low-frequency Perlin noise that gives the monolith a rough, stone-like surface
+- **Beat deformation**: on each detected beat, a radial displacement is applied to vertices near the beat's origin point
+- **Decay**: the deformation decays exponentially over 30 frames
+
+The monolith is rendered with a single directional light and flat shading. The aesthetic is brutalist: dark gray, no texture, no specular. The geometry is the entire visual.
+
+## The Audio Pipeline
+
+The Web Audio API provides a real-time frequency analysis. Beats are detected by thresholding the low-frequency energy. On each beat, a random point on the monolith's surface is chosen as the deformation origin. The displacement is radial: vertices near the origin move outward, vertices far away are unaffected.
+
+The deformation is not symmetric. The beat's frequency content determines the deformation shape: low beats produce broad, shallow deformations. High beats produce sharp, localized deformations.
+
+## The Visual Result
+
+The monolith appears to be breathing. Beats produce visible pulses that travel across the surface and fade. The pulses overlap. A fast rhythm creates a continuously vibrating surface. A slow rhythm creates isolated, distinct deformations.
+
+The monolith is never still. Even without audio input, the base noise produces a subtle, constant motion. The monolith is alive.
+
+## What It Teaches
+
+The key technique is mapping audio events to geometric deformations. The mapping is not direct (amplitude -> displacement). It is event-driven (beat -> deformation). The deformation has memory (decay), so the visual is not just a frame-by-frame reaction. It is a cumulative record of recent beats.
+
+This pattern applies to any audio-driven geometry: detect events, apply localized deformations, let them decay. The result is a visual that responds to rhythm without being a slave to it.
+    `.trim(),
+  },
+  {
+    slug: "tartan-weave-synth",
+    title: "Tartan Weave Synth",
+    description: "Interactive generative tartan based on Tartanism field notes. Six weave structures, 48 historical dye colors, mouse-warped threads, and click-to-pulse.",
+    date: "2026-06-10",
+    tags: ["Creative", "Generative Art", "Tartanism", "Interactive"],
+    readTime: "3 min",
+    content: `
+# Tartan Weave Synth
+
+Tartanism is a systematic exploration of generative plaid. The field notes document six weave structures, 48 period-correct dye colors, and a formal grammar for Scottish tartan. This demo takes that system and makes it playable.
+
+The live artifact: [Open Tartan Weave Synth](/creative-demos/tartan-weave-synth/)
+
+## The Weave Structures
+
+The demo implements all six weave structures from the Tartanism field notes:
+
+- **Plain**: the simplest weave, alternating warp and weft
+- **Twill**: diagonal lines created by offsetting the weave pattern
+- **Herringbone**: a broken twill that creates a chevron pattern
+- **Hopsack**: paired warp threads create a basket-like texture
+- **Satin**: long floats create a smooth, lustrous surface
+- **Broken**: an irregular weave that produces chaotic patterns
+
+Each structure is implemented as a pixel-level function that determines which color (warp or weft) is visible at each thread intersection.
+
+## The Color System
+
+The palette uses 8 historical Scottish dye colors from the Tartanism research: cochineal red, woad green, woad blue, walnut brown, saffron yellow, iron black, pearl grey, and rust orange. The sett (the repeating pattern of colored stripes) is generated randomly, with each stripe having a width of 1-3 threads.
+
+## The Interaction
+
+Mouse movement warps the weave. The cursor displaces threads horizontally and vertically, creating a distorted, breathing tartan. The displacement is sinusoidal, so the warp feels organic, not mechanical.
+
+Clicking produces a pulse: a white ring expands from the click point, temporarily brightening the threads it passes through. The pulse decays over 30 frames, leaving a subtle afterimage.
+
+## The Animation
+
+Color shifts over time. The sett pattern is rotated slowly, so the tartan appears to drift. The color shift rate is controlled by a slider. At maximum speed, the tartan becomes a living, changing pattern. At minimum speed, it is static.
+
+## The Design Decision
+
+The pixel-level rendering is deliberate. Most tartan generators use image-based approaches: draw stripes, blend them. This demo renders each thread intersection individually, which allows for the warp and pulse effects. The tradeoff is performance: the demo runs at 30fps on most devices, not 60fps. The visual complexity is worth the frame rate.
+
+## What It Teaches
+
+The lesson is about making a system playable. The Tartanism field notes are a rigorous, scholarly document. This demo is a toy. But the toy is built from the same system. The weave structures, the dye colors, the sett grammar — all from the field notes. The difference is interactivity. The system is no longer read-only. It is played.
+
+This is the bridge between research and creative coding: take a formal system, implement it faithfully, then add interaction. The interaction reveals properties of the system that are not visible in the static form.
+    `.trim(),
+  },
+  {
+    slug: "serial-permutation-canvas",
+    title: "Serial Permutation Canvas",
+    description: "Visualizing total serialism as particle geometry. 12-tone series, prime/retrograde/inversion/rotation permutations, and color-mapped particles.",
+    date: "2026-06-10",
+    tags: ["Creative", "Generative Art", "Total Serialism", "Algorithmic"],
+    readTime: "3 min",
+    content: `
+# Serial Permutation Canvas
+
+Total serialism is the systematic application of serial technique to all musical parameters: pitch, duration, dynamics, timbre. The technique is most commonly associated with Pierre Boulez and the post-Webern serialists. The core idea is that a series (a permutation of the 12 chromatic pitches) is not just a melody. It is a structure that can be transformed in four ways: prime, retrograde, inversion, and retrograde inversion.
+
+This demo visualizes those transformations as particle geometry.
+
+The live artifact: [Open Serial Permutation Canvas](/creative-demos/serial-permutation-canvas/)
+
+## The Series
+
+The demo generates a random 12-tone series: a permutation of the numbers 0-11. Each number is mapped to a pitch class, but the pitch is not audible. It is visible. Each number is mapped to a color (hue), a position (angle on a circle), and a particle size.
+
+## The Permutations
+
+The demo implements all six permutation types:
+
+- **Prime**: the original series
+- **Retrograde**: the series reversed
+- **Inversion**: each interval is inverted (if the original goes up a major third, the inversion goes down a major third)
+- **Retrograde Inversion**: reversed and inverted
+- **Rotation**: the series is rotated, so each element becomes the first element in turn
+- **Random**: a new random permutation
+
+## The Visual Mapping
+
+Each element of the series is a particle. The particle's position is determined by its value in the current permutation. The value maps to an angle on a circle. The particle moves toward that angle, with a spring force that pulls it back if disturbed.
+
+The mouse attracts particles. Moving the cursor pulls nearby particles toward it, distorting the circular arrangement. The particles return to their positions when the mouse moves away.
+
+The trail: each particle leaves a trail of its recent positions. The trail color is the particle's hue. The trail length is adjustable. Long trails create a web of lines. Short trails create a constellation of dots.
+
+## The Ring
+
+The 12 values are displayed as a ring of circles at the center of the canvas. Each circle shows its current value. Lines connect adjacent values in the series. The ring updates in real-time when the permutation changes.
+
+## The Design Decision
+
+The visual mapping is arbitrary but consistent. The value maps to angle, hue, and size. The angle is the most important mapping: it makes the series visible as a circular arrangement. The hue is secondary: it makes each value distinguishable. The size is tertiary: it adds a subtle variation.
+
+The consistency is what matters. If the value 0 is always at angle 0, hue 0, and size 3, then the audience learns the mapping. The permutation becomes visible as a rearrangement of known elements.
+
+## What It Teaches
+
+The lesson is about making abstract structure visible. A 12-tone series is an abstract mathematical object. The permutation transformations are abstract operations. The demo makes them concrete by mapping them to space and color. The audience can see the inversion. They can see the retrograde. The abstract becomes sensory.
+
+This is the bridge between algorithmic art and music theory: take a formal structure, map it to visual parameters, and let the audience explore. The structure is no longer theoretical. It is visible.
     `.trim(),
   },
 ];

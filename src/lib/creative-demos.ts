@@ -9,6 +9,22 @@ export interface CreativeDemo {
 
 export const creativeDemos: CreativeDemo[] = [
   {
+    slug: "tartan-weave-synth",
+    title: "Tartan Weave Synth",
+    description: "Interactive generative tartan based on Tartanism field notes. 6 weave structures, 48 historical dye colors, mouse-warped threads, and beat-driven color shifts.",
+    tags: ["p5.js", "Tartanism", "Interactive", "Weave"],
+    date: "2026-06-10",
+    hasControls: true,
+  },
+  {
+    slug: "serial-permutation-canvas",
+    title: "Serial Permutation Canvas",
+    description: "Visualizing total serialism as particle geometry. 12-tone series, prime/retrograde/inversion/rotation permutations, and color-mapped particles.",
+    tags: ["p5.js", "Total Serialism", "Algorithmic", "Particles"],
+    date: "2026-06-10",
+    hasControls: true,
+  },
+  {
     slug: "scroll-chromatic-excavation",
     title: "Scroll-Chromatic Excavation",
     description: "Scroll through the void to excavate hidden text. Microscopic agents swarm toward dark pixels, revealing buried glyphs. Rebels erase. Builders reveal. Full control panel with sliders.",

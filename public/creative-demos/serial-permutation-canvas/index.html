@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Serial Permutation Canvas</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0A0A0A;
+      overflow: hidden;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+    }
+    canvas { display: block; }
+
+    #panel {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      width: 260px;
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+      background: rgba(18, 18, 22, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px;
+      color: #e8e8f0;
+      font-size: 12px;
+      z-index: 1000;
+      backdrop-filter: blur(12px);
+    }
+    #panel h2 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #8888aa;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding-bottom: 8px;
+    }
+    .control-group {
+      margin-bottom: 14px;
+    }
+    .control-group label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      color: #aaaacc;
+      font-size: 11px;
+      letter-spacing: 0.3px;
+    }
+    .control-group .value {
+      color: #00d4ff;
+      font-weight: 600;
+      font-family: monospace;
+    }
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #00d4ff;
+      cursor: pointer;
+      border: 2px solid #0a0a0a;
+    }
+    .btn {
+      width: 100%;
+      padding: 8px 0;
+      border: none;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 6px;
+    }
+    .btn-random {
+      background: rgba(0, 212, 255, 0.10);
+      color: #00d4ff;
+      border: 1px solid rgba(0, 212, 255, 0.25);
+    }
+    .btn-reset {
+      background: rgba(255, 68, 68, 0.15);
+      color: #ff4444;
+      border: 1px solid rgba(255, 68, 68, 0.3);
+    }
+    .hint {
+      color: #666688;
+      font-size: 10px;
+      margin-top: 10px;
+      line-height: 1.4;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="panel">
+  <h2>Serial Permutation Canvas</h2>
+
+  <div class="control-group">
+    <label>Series Length <span class="value" id="val-length">12</span></label>
+    <input type="range" id="length" min="3" max="24" value="12">
+  </div>
+
+  <div class="control-group">
+    <label>Permutation Type <span class="value" id="val-perm">Prime</span></label>
+    <select id="perm" style="width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#e8e8f0; padding:6px; font-size:11px;">
+      <option value="prime" selected>Prime</option>
+      <option value="retrograde">Retrograde</option>
+      <option value="inversion">Inversion</option>
+      <option value="retrogradeInversion">Retrograde Inversion</option>
+      <option value="rotation">Rotation</option>
+      <option value="random">Random</option>
+    </select>
+  </div>
+
+  <div class="control-group">
+    <label>Particle Count <span class="value" id="val-particles">200</span></label>
+    <input type="range" id="particles" min="50" max="1000" value="200" step="50">
+  </div>
+
+  <div class="control-group">
+    <label>Trail Length <span class="value" id="val-trail">30</span></label>
+    <input type="range" id="trail" min="5" max="100" value="30">
+  </div>
+
+  <div class="control-group">
+    <label>Speed <span class="value" id="val-speed">1.0</span></label>
+    <input type="range" id="speed" min="0.1" max="3" value="1.0" step="0.1">
+  </div>
+
+  <div class="control-group">
+    <label>Color Cycling <span class="value" id="val-cycle">0.5</span></label>
+    <input type="range" id="cycle" min="0" max="1" value="0.5" step="0.05">
+  </div>
+
+  <button class="btn btn-random" onclick="randomizeSeries()">New Series</button>
+  <button class="btn btn-reset" onclick="resetSeries()">Reset</button>
+
+  <div class="hint">
+    Click to spawn particles. Move mouse to attract. Total serialism: all parameters serialized.
+  </div>
+</div>
+
+<script>
+// ============================================================
+// Serial Permutation Canvas
+// Visualizing total serialism as particle geometry
+// ============================================================
+
+let PARAMS = {
+  seriesLength: 12,
+  permType: 'prime',
+  particleCount: 200,
+  trailLength: 30,
+  speed: 1.0,
+  colorCycle: 0.5
+};
+
+let primeSeries = [];
+let currentPermutation = [];
+let particles = [];
+let time = 0;
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  pixelDensity(1);
+  generateSeries();
+  initParticles();
+  bindControls();
+}
+
+function generateSeries() {
+  primeSeries = [];
+  for (let i = 0; i < PARAMS.seriesLength; i++) {
+    primeSeries.push(i);
+  }
+  // Shuffle
+  for (let i = primeSeries.length - 1; i > 0; i--) {
+    let j = floor(random(i + 1));
+    [primeSeries[i], primeSeries[j]] = [primeSeries[j], primeSeries[i]];
+  }
+  updatePermutation();
+}
+
+function updatePermutation() {
+  switch (PARAMS.permType) {
+    case 'prime':
+      currentPermutation = [...primeSeries];
+      break;
+    case 'retrograde':
+      currentPermutation = [...primeSeries].reverse();
+      break;
+    case 'inversion':
+      currentPermutation = primeSeries.map(v => PARAMS.seriesLength - 1 - v);
+      break;
+    case 'retrogradeInversion':
+      currentPermutation = primeSeries.map(v => PARAMS.seriesLength - 1 - v).reverse();
+      break;
+    case 'rotation':
+      let rot = floor(time / 60) % PARAMS.seriesLength;
+      currentPermutation = [...primeSeries.slice(rot), ...primeSeries.slice(0, rot)];
+      break;
+    case 'random':
+      currentPermutation = [];
+      let pool = [...primeSeries];
+      while (pool.length > 0) {
+        let idx = floor(random(pool.length));
+        currentPermutation.push(pool[idx]);
+        pool.splice(idx, 1);
+      }
+      break;
+  }
+}
+
+function initParticles() {
+  particles = [];
+  for (let i = 0; i < PARAMS.particleCount; i++) {
+    let seriesIdx = i % PARAMS.seriesLength;
+    let permVal = currentPermutation[seriesIdx];
+    particles.push({
+      x: width / 2 + cos(permVal * TWO_PI / PARAMS.seriesLength) * 200,
+      y: height / 2 + sin(permVal * TWO_PI / PARAMS.seriesLength) * 200,
+      vx: 0,
+      vy: 0,
+      seriesIdx: seriesIdx,
+      permVal: permVal,
+      trail: [],
+      hue: permVal / PARAMS.seriesLength * 360,
+      size: 3 + permVal / PARAMS.seriesLength * 5
+    });
+  }
+}
+
+function draw() {
+  time += PARAMS.speed;
+
+  // Dark fade
+  background(10, 10, 10, 50);
+
+  // Update permutation if rotation
+  if (PARAMS.permType === 'rotation') {
+    updatePermutation();
+  }
+
+  // Mouse attraction
+  let mx = mouseX;
+  let my = mouseY;
+  let mouseActive = mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height;
+
+  for (let p of particles) {
+    // Update permVal based on current permutation
+    p.permVal = currentPermutation[p.seriesIdx];
+
+    // Target position based on permutation
+    let angle = p.permVal * TWO_PI / PARAMS.seriesLength + time * 0.01;
+    let radius = 150 + sin(p.seriesIdx * 0.5 + time * 0.02) * 100;
+    let tx = width / 2 + cos(angle) * radius;
+    let ty = height / 2 + sin(angle) * radius;
+
+    // Mouse attraction
+    if (mouseActive) {
+      let d = dist(p.x, p.y, mx, my);
+      if (d < 300) {
+        let force = (300 - d) / 300 * 0.5;
+        p.vx += (mx - p.x) * force * 0.01;
+        p.vy += (my - p.y) * force * 0.01;
+      }
+    }
+
+    // Move toward target
+    p.vx += (tx - p.x) * 0.02;
+    p.vy += (ty - p.y) * 0.02;
+
+    // Damping
+    p.vx *= 0.95;
+    p.vy *= 0.95;
+
+    p.x += p.vx * PARAMS.speed;
+    p.y += p.vy * PARAMS.speed;
+
+    // Trail
+    p.trail.push({ x: p.x, y: p.y });
+    if (p.trail.length > PARAMS.trailLength) {
+      p.trail.shift();
+    }
+
+    // Color cycling
+    let hue = (p.hue + time * PARAMS.colorCycle * 2) % 360;
+
+    // Draw trail
+    noFill();
+    strokeWeight(1);
+    for (let i = 1; i < p.trail.length; i++) {
+      let alpha = map(i, 0, p.trail.length, 0, 200);
+      let sat = 80 + sin(p.permVal + time * 0.05) * 20;
+      stroke(hue, sat, 90, alpha);
+      line(p.trail[i-1].x, p.trail[i-1].y, p.trail[i].x, p.trail[i].y);
+    }
+
+    // Draw particle
+    noStroke();
+    fill(hue, 80, 90, 200);
+    ellipse(p.x, p.y, p.size);
+  }
+
+  // Draw series as ring
+  noFill();
+  strokeWeight(2);
+  for (let i = 0; i < PARAMS.seriesLength; i++) {
+    let angle = i * TWO_PI / PARAMS.seriesLength - HALF_PI;
+    let r = 80;
+    let x = width / 2 + cos(angle) * r;
+    let y = height / 2 + sin(angle) * r;
+
+    let val = currentPermutation[i];
+    let hue = val / PARAMS.seriesLength * 360;
+    stroke(hue, 80, 90, 150);
+    ellipse(x, y, 20, 20);
+
+    // Connection lines
+    for (let j = i + 1; j < PARAMS.seriesLength; j++) {
+      let jAngle = j * TWO_PI / PARAMS.seriesLength - HALF_PI;
+      let jx = width / 2 + cos(jAngle) * r;
+      let jy = height / 2 + sin(jAngle) * r;
+
+      let distVal = abs(val - currentPermutation[j]);
+      if (distVal === 1) {
+        stroke(hue, 40, 90, 30);
+        line(x, y, jx, jy);
+      }
+    }
+  }
+}
+
+function mousePressed() {
+  // Spawn new particles at mouse
+  for (let i = 0; i < 20; i++) {
+    let seriesIdx = floor(random(PARAMS.seriesLength));
+    let permVal = currentPermutation[seriesIdx];
+    particles.push({
+      x: mouseX + random(-20, 20),
+      y: mouseY + random(-20, 20),
+      vx: random(-2, 2),
+      vy: random(-2, 2),
+      seriesIdx: seriesIdx,
+      permVal: permVal,
+      trail: [],
+      hue: permVal / PARAMS.seriesLength * 360,
+      size: 3 + permVal / PARAMS.seriesLength * 5
+    });
+  }
+
+  // Cap particle count
+  while (particles.length > PARAMS.particleCount * 2) {
+    particles.shift();
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+function randomizeSeries() {
+  generateSeries();
+  initParticles();
+}
+
+function resetSeries() {
+  PARAMS.seriesLength = 12;
+  PARAMS.permType = 'prime';
+  PARAMS.particleCount = 200;
+  PARAMS.trailLength = 30;
+  PARAMS.speed = 1.0;
+  PARAMS.colorCycle = 0.5;
+
+  document.getElementById('length').value = 12;
+  document.getElementById('perm').value = 'prime';
+  document.getElementById('particles').value = 200;
+  document.getElementById('trail').value = 30;
+  document.getElementById('speed').value = 1.0;
+  document.getElementById('cycle').value = 0.5;
+
+  document.getElementById('val-length').textContent = '12';
+  document.getElementById('val-perm').textContent = 'Prime';
+  document.getElementById('val-particles').textContent = '200';
+  document.getElementById('val-trail').textContent = '30';
+  document.getElementById('val-speed').textContent = '1.0';
+  document.getElementById('val-cycle').textContent = '0.5';
+
+  generateSeries();
+  initParticles();
+}
+
+function bindControls() {
+  const binds = [
+    ['length', 'seriesLength', v => parseInt(v), 'val-length', v => v],
+    ['particles', 'particleCount', v => parseInt(v), 'val-particles', v => v],
+    ['trail', 'trailLength', v => parseInt(v), 'val-trail', v => v],
+    ['speed', 'speed', v => parseFloat(v), 'val-speed', v => v.toFixed(1)],
+    ['cycle', 'colorCycle', v => parseFloat(v), 'val-cycle', v => v.toFixed(2)],
+  ];
+
+  binds.forEach(([id, param, parser, labelId, formatter]) => {
+    const el = document.getElementById(id);
+    const label = document.getElementById(labelId);
+    el.addEventListener('input', () => {
+      PARAMS[param] = parser(el.value);
+      label.textContent = formatter(PARAMS[param]);
+      if (param === 'seriesLength') {
+        generateSeries();
+        initParticles();
+      }
+    });
+  });
+
+  document.getElementById('perm').addEventListener('change', (e) => {
+    PARAMS.permType = e.target.value;
+    document.getElementById('val-perm').textContent = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1).replace(/([A-Z])/g, ' $1');
+    updatePermutation();
+  });
+}
+</script>
+</body>
+</html>

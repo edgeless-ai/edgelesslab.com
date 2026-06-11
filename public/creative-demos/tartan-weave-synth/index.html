@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tartan Weave Synth</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0A0A0A;
+      overflow: hidden;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+    }
+    canvas { display: block; }
+
+    #panel {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      width: 260px;
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+      background: rgba(18, 18, 22, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px;
+      color: #e8e8f0;
+      font-size: 12px;
+      z-index: 1000;
+      backdrop-filter: blur(12px);
+    }
+    #panel h2 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #8888aa;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding-bottom: 8px;
+    }
+    .control-group {
+      margin-bottom: 14px;
+    }
+    .control-group label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      color: #aaaacc;
+      font-size: 11px;
+      letter-spacing: 0.3px;
+    }
+    .control-group .value {
+      color: #00d4ff;
+      font-weight: 600;
+      font-family: monospace;
+    }
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #00d4ff;
+      cursor: pointer;
+      border: 2px solid #0a0a0a;
+    }
+    .btn {
+      width: 100%;
+      padding: 8px 0;
+      border: none;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 6px;
+    }
+    .btn-reset {
+      background: rgba(255, 68, 68, 0.15);
+      color: #ff4444;
+      border: 1px solid rgba(255, 68, 68, 0.3);
+    }
+    .btn-random {
+      background: rgba(0, 212, 255, 0.10);
+      color: #00d4ff;
+      border: 1px solid rgba(0, 212, 255, 0.25);
+    }
+    .hint {
+      color: #666688;
+      font-size: 10px;
+      margin-top: 10px;
+      line-height: 1.4;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="panel">
+  <h2>Tartan Weave Synth</h2>
+
+  <div class="control-group">
+    <label>Threads <span class="value" id="val-threads">16</span></label>
+    <input type="range" id="threads" min="4" max="64" value="16">
+  </div>
+
+  <div class="control-group">
+    <label>Sett Size <span class="value" id="val-sett">8</span></label>
+    <input type="range" id="sett" min="2" max="32" value="8">
+  </div>
+
+  <div class="control-group">
+    <label>Weave Type <span class="value" id="val-weave">Twill</span></label>
+    <select id="weave" style="width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#e8e8f0; padding:6px; font-size:11px;">
+      <option value="plain">Plain</option>
+      <option value="twill" selected>Twill</option>
+      <option value="herringbone">Herringbone</option>
+      <option value="hopsack">Hopsack</option>
+      <option value="satin">Satin</option>
+      <option value="broken">Broken</option>
+    </select>
+  </div>
+
+  <div class="control-group">
+    <label>Mouse Warp <span class="value" id="val-warp">0.5</span></label>
+    <input type="range" id="warp" min="0" max="2" value="0.5" step="0.1">
+  </div>
+
+  <div class="control-group">
+    <label>Color Shift <span class="value" id="val-shift">0.3</span></label>
+    <input type="range" id="shift" min="0" max="1" value="0.3" step="0.05">
+  </div>
+
+  <div class="control-group">
+    <label>Animation Speed <span class="value" id="val-speed">0.02</span></label>
+    <input type="range" id="speed" min="0" max="0.1" value="0.02" step="0.005">
+  </div>
+
+  <button class="btn btn-random" onclick="randomizeTartan()">Randomize Pattern</button>
+  <button class="btn btn-reset" onclick="resetTartan()">Reset</button>
+
+  <div class="hint">
+    Move mouse to warp the weave. Click to pulse. 6 weave structures from Tartanism.
+  </div>
+</div>
+
+<script>
+// ============================================================
+// Tartan Weave Synth
+// Interactive generative tartan based on Tartanism field notes
+// ============================================================
+
+let PARAMS = {
+  threads: 16,
+  settSize: 8,
+  weaveType: 'twill',
+  mouseWarp: 0.5,
+  colorShift: 0.3,
+  speed: 0.02
+};
+
+// Historical Scottish dye palette from Tartanism
+const PALETTE = [
+  { r: 139, g: 0,   b: 0   }, // cochineal red
+  { r: 0,   g: 100, b: 0   }, // woad green
+  { r: 25,  g: 25,  b: 112 }, // woad blue
+  { r: 139, g: 69,  b: 19  }, // walnut brown
+  { r: 218, g: 165, b: 32  }, // saffron yellow
+  { r: 70,  g: 70,  b: 70  }, // iron black
+  { r: 192, g: 192, b: 192 }, // pearl grey
+  { r: 210, g: 105, b: 30  }, // rust orange
+];
+
+let settPattern = [];
+let time = 0;
+let pulseOrigin = null;
+let pulseTime = 0;
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  pixelDensity(1);
+  noCursor();
+  generateSett();
+  bindControls();
+}
+
+function generateSett() {
+  settPattern = [];
+  for (let i = 0; i < PARAMS.settSize; i++) {
+    settPattern.push({
+      color: random(PALETTE),
+      width: floor(random(1, 4))
+    });
+  }
+}
+
+function getWeavePattern(x, y, t) {
+  let wx = x % PARAMS.threads;
+  let wy = y % PARAMS.threads;
+  let idx = 0;
+
+  switch (PARAMS.weaveType) {
+    case 'plain':
+      idx = (wx + wy) % 2;
+      break;
+    case 'twill':
+      idx = (wx + wy) % PARAMS.threads < PARAMS.threads / 2 ? 0 : 1;
+      break;
+    case 'herringbone':
+      let diag = (wx + wy) % (PARAMS.threads * 2);
+      idx = diag < PARAMS.threads ? 0 : 1;
+      break;
+    case 'hopsack':
+      idx = (floor(wx / 2) + floor(wy / 2)) % 2;
+      break;
+    case 'satin':
+      idx = ((wx * 2 + wy * 3) % PARAMS.threads) < 2 ? 0 : 1;
+      break;
+    case 'broken':
+      let bx = (wx + floor(y / 4)) % PARAMS.threads;
+      idx = (bx + wy) % 2;
+      break;
+  }
+  return idx;
+}
+
+function getSettColor(pos) {
+  let accumulated = 0;
+  for (let i = 0; i < settPattern.length; i++) {
+    accumulated += settPattern[i].width;
+    if (pos < accumulated) {
+      return settPattern[i].color;
+    }
+  }
+  return settPattern[settPattern.length - 1].color;
+}
+
+function draw() {
+  time += PARAMS.speed;
+
+  // Mouse warp
+  let mx = mouseX / width;
+  let my = mouseY / height;
+  let warpX = (mouseX - width / 2) / width * PARAMS.mouseWarp * 50;
+  let warpY = (mouseY - height / 2) / height * PARAMS.mouseWarp * 50;
+
+  // Pulse decay
+  if (pulseOrigin && pulseTime > 0) {
+    pulseTime -= 0.02;
+  }
+
+  loadPixels();
+  let d = pixelDensity();
+
+  for (let y = 0; y < height; y += 2) {
+    for (let x = 0; x < width; x += 2) {
+      // Warped coordinates
+      let wx = x + warpX * sin(y * 0.01 + time);
+      let wy = y + warpY * sin(x * 0.01 + time);
+
+      // Thread positions
+      let tx = floor(wx / 4);
+      let ty = floor(wy / 4);
+
+      // Color shift over time
+      let shiftIdx = floor(time * 10) % settPattern.length;
+      let c1 = getSettColor((tx + shiftIdx) % 16);
+      let c2 = getSettColor((ty + shiftIdx) % 16);
+
+      // Weave pattern
+      let weave = getWeavePattern(tx, ty, time);
+
+      // Blend based on weave
+      let r = weave === 0 ? c1.r : c2.r;
+      let g = weave === 0 ? c1.g : c2.g;
+      let b = weave === 0 ? c1.b : c2.b;
+
+      // Color shift from mouse
+      let shift = PARAMS.colorShift;
+      r = lerp(r, c2.r, shift * my);
+      b = lerp(b, c1.b, shift * mx);
+
+      // Pulse effect
+      if (pulseTime > 0 && pulseOrigin) {
+        let d = dist(x, y, pulseOrigin.x, pulseOrigin.y);
+        let pulseRadius = (1 - pulseTime) * 300;
+        if (abs(d - pulseRadius) < 30) {
+          r = 255;
+          g = 255;
+          b = 255;
+        }
+      }
+
+      // Write to 2x2 block for speed
+      let idx = (x + y * width) * 4;
+      if (idx < pixels.length) {
+        pixels[idx] = r;
+        pixels[idx + 1] = g;
+        pixels[idx + 2] = b;
+        pixels[idx + 3] = 255;
+      }
+    }
+  }
+
+  updatePixels();
+
+  // Draw thread lines overlay
+  strokeWeight(0.5);
+  for (let i = 0; i < width; i += 4) {
+    let alpha = 20 + 30 * sin(i * 0.05 + time);
+    stroke(255, 255, 255, alpha);
+    line(i, 0, i, height);
+  }
+}
+
+function mousePressed() {
+  pulseOrigin = { x: mouseX, y: mouseY };
+  pulseTime = 1;
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+function randomizeTartan() {
+  generateSett();
+  PARAMS.weaveType = random(['plain', 'twill', 'herringbone', 'hopsack', 'satin', 'broken']);
+  document.getElementById('weave').value = PARAMS.weaveType;
+  document.getElementById('val-weave').textContent = PARAMS.weaveType.charAt(0).toUpperCase() + PARAMS.weaveType.slice(1);
+}
+
+function resetTartan() {
+  PARAMS.threads = 16;
+  PARAMS.settSize = 8;
+  PARAMS.weaveType = 'twill';
+  PARAMS.mouseWarp = 0.5;
+  PARAMS.colorShift = 0.3;
+  PARAMS.speed = 0.02;
+
+  document.getElementById('threads').value = 16;
+  document.getElementById('sett').value = 8;
+  document.getElementById('weave').value = 'twill';
+  document.getElementById('warp').value = 0.5;
+  document.getElementById('shift').value = 0.3;
+  document.getElementById('speed').value = 0.02;
+
+  document.getElementById('val-threads').textContent = '16';
+  document.getElementById('val-sett').textContent = '8';
+  document.getElementById('val-weave').textContent = 'Twill';
+  document.getElementById('val-warp').textContent = '0.5';
+  document.getElementById('val-shift').textContent = '0.3';
+  document.getElementById('val-speed').textContent = '0.02';
+
+  generateSett();
+}
+
+function bindControls() {
+  const binds = [
+    ['threads', 'threads', v => parseInt(v), 'val-threads', v => v],
+    ['sett', 'settSize', v => parseInt(v), 'val-sett', v => v],
+    ['warp', 'mouseWarp', v => parseFloat(v), 'val-warp', v => v.toFixed(1)],
+    ['shift', 'colorShift', v => parseFloat(v), 'val-shift', v => v.toFixed(2)],
+    ['speed', 'speed', v => parseFloat(v), 'val-speed', v => v.toFixed(3)],
+  ];
+
+  binds.forEach(([id, param, parser, labelId, formatter]) => {
+    const el = document.getElementById(id);
+    const label = document.getElementById(labelId);
+    el.addEventListener('input', () => {
+      PARAMS[param] = parser(el.value);
+      label.textContent = formatter(PARAMS[param]);
+    });
+  });
+
+  document.getElementById('weave').addEventListener('change', (e) => {
+    PARAMS.weaveType = e.target.value;
+    document.getElementById('val-weave').textContent = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1);
+  });
+}
+</script>
+</body>
+</html>

@@ -8,25 +8,22 @@ Export to WASM with:
 
 import marimo
 
-__generated_with = "0.13.0"
+__generated_with = "0.23.8"
 app = marimo.App(width="medium")
 
 
 @app.cell
-
-def __():
-    import marimo as mo
+def _():
     import numpy as np
     from scipy import stats
     import matplotlib.pyplot as plt
     import math
-    return math, mo, np, plt, stats
+
+    return math, np, plt, stats
 
 
 @app.cell
-
-def __(mo):
-    # Path selector and speed
+def _(mo):
     path_type = mo.ui.dropdown(
         options={"circle": "Circle", "sine": "Sine Wave", "lissajous": "Lissajous", "spiral": "Spiral", "figure8": "Figure-8"},
         value="circle",
@@ -39,9 +36,7 @@ def __(mo):
 
 
 @app.cell
-
-def __(mo, speed, loop, path_type):
-    # Play / Pause / Reset controls
+def _(loop, mo, speed):
     play = mo.ui.run_button(label="Play")
     pause = mo.ui.stop_button(label="Pause")
     reset = mo.ui.button(label="Reset")
@@ -53,30 +48,28 @@ def __(mo, speed, loop, path_type):
     frame_counter = mo.state(0)
 
     controls = mo.hstack([play, pause, reset, timer, mo.md(f"**Frame:** {frame_counter.value}")], justify="start")
-    return controls, frame_counter, pause, play, reset, timer
+    return frame_counter, pause, play, timer
 
 
 @app.cell
-
-def __(mo, frame_counter, path_type, speed, timer, play, pause):
-    import math
+def _(frame_counter, math, mo, path_type, pause, play, speed, timer):
     # Compute path parameters for the current frame
     t = frame_counter.value / max(1, speed.value)
-    path = path_type.value
+    _selected_path = path_type.value
 
-    if path == "circle":
+    if _selected_path == "circle":
         mu = 3.0 * math.cos(t)
         sigma = 1.0 + 0.5 * math.sin(t)
-    elif path == "sine":
+    elif _selected_path == "sine":
         mu = 4.0 * math.sin(t)
         sigma = 0.8 + 0.6 * abs(math.cos(t))
-    elif path == "lissajous":
+    elif _selected_path == "lissajous":
         mu = 3.0 * math.sin(3 * t)
         sigma = 1.0 + 0.8 * math.cos(2 * t)
-    elif path == "spiral":
+    elif _selected_path == "spiral":
         mu = 0.1 * t * math.cos(t)
         sigma = 0.5 + 0.05 * t
-    elif path == "figure8":
+    elif _selected_path == "figure8":
         mu = 3.0 * math.sin(t)
         sigma = 1.0 + 0.6 * math.sin(2 * t)
     else:
@@ -90,13 +83,11 @@ def __(mo, frame_counter, path_type, speed, timer, play, pause):
     mo.hstack([
         mo.md(f"**mu = {mu:.2f}** | **sigma = {sigma:.2f}** | **t = {t:.2f}**"),
     ])
-    return mu, path, sigma, t
+    return mu, sigma
 
 
 @app.cell
-
-def __(mo, np, plt, stats, mu, sigma, show_cdf):
-    # Dark theme setup for Edgeless brand
+def _(mu, np, plt, show_cdf, sigma, stats):
     plt.rcParams.update({
         "figure.facecolor": "#0a0a0f",
         "axes.facecolor": "#0a0a0f",
@@ -109,13 +100,13 @@ def __(mo, np, plt, stats, mu, sigma, show_cdf):
         "grid.alpha": 0.4,
     })
 
-    x = np.linspace(-10, 10, 600)
-    pdf = stats.norm.pdf(x, loc=mu, scale=max(sigma, 0.05))
-    cdf = stats.norm.cdf(x, loc=mu, scale=max(sigma, 0.05))
+    x_vals = np.linspace(-10, 10, 600)
+    pdf_vals = stats.norm.pdf(x_vals, loc=mu, scale=max(sigma, 0.05))
+    cdf_vals = stats.norm.cdf(x_vals, loc=mu, scale=max(sigma, 0.05))
 
     fig, ax1 = plt.subplots(figsize=(10, 4.5))
-    ax1.fill_between(x, pdf, alpha=0.25, color="#00d4aa")
-    ax1.plot(x, pdf, color="#00d4aa", linewidth=2.5, label="PDF")
+    ax1.fill_between(x_vals, pdf_vals, alpha=0.25, color="#00d4aa")
+    ax1.plot(x_vals, pdf_vals, color="#00d4aa", linewidth=2.5, label="PDF")
     ax1.axvline(mu, color="#ff6b6b", linestyle="--", linewidth=1.5, label=f"Mean = {mu:.2f}")
     ax1.set_xlabel("x", fontsize=12)
     ax1.set_ylabel("Probability Density", fontsize=12, color="#a0c0c0")
@@ -125,24 +116,21 @@ def __(mo, np, plt, stats, mu, sigma, show_cdf):
     ax1.legend(loc="upper right", facecolor="#0a0a0f", edgecolor="#1e3a3a", labelcolor="#e0e0e0")
     ax1.grid(True, alpha=0.3)
 
-    ax2 = None
     if show_cdf.value:
-        ax2 = ax1.twinx()
-        ax2.plot(x, cdf, color="#5b8def", linewidth=2, alpha=0.7, label="CDF")
-        ax2.set_ylabel("CDF", fontsize=12, color="#5b8def")
-        ax2.set_ylim(0, 1)
-        ax2.tick_params(axis="y", labelcolor="#5b8def")
-        ax2.legend(loc="lower right", facecolor="#0a0a0f", edgecolor="#1e3a3a", labelcolor="#e0e0e0")
+        _cdf_ax = ax1.twinx()
+        _cdf_ax.plot(x_vals, cdf_vals, color="#5b8def", linewidth=2, alpha=0.7, label="CDF")
+        _cdf_ax.set_ylabel("CDF", fontsize=12, color="#5b8def")
+        _cdf_ax.set_ylim(0, 1)
+        _cdf_ax.tick_params(axis="y", labelcolor="#5b8def")
+        _cdf_ax.legend(loc="lower right", facecolor="#0a0a0f", edgecolor="#1e3a3a", labelcolor="#e0e0e0")
 
     plt.tight_layout()
     fig
-    return ax1, ax2, cdf, fig, pdf, x
+    return
 
 
 @app.cell
-
-def __(mo, mu, sigma, stats):
-    # Numerical stats panel
+def _(mo, mu, sigma, stats):
     variance = sigma ** 2
     entropy = stats.norm.entropy(scale=sigma)
     mo.md(f"""
@@ -155,54 +143,49 @@ def __(mo, mu, sigma, stats):
     | 68.3% interval | [{mu - sigma:.3f}, {mu + sigma:.3f}] |
     | 95.4% interval | [{mu - 2*sigma:.3f}, {mu + 2*sigma:.3f}] |
     """)
-    return entropy, variance
+    return
 
 
 @app.cell
-
-def __(mo, mu, sigma, stats, np, plt):
-    import math
+def _(math, mu, np, plt, sigma):
     # Path trace visualization (parameter space trajectory)
     t_trace = np.linspace(0, 4 * np.pi, 200)
-    path = []
+    _trace_points = []
     for tt in t_trace:
         mu_t = 3.0 * math.cos(tt)
         sigma_t = 1.0 + 0.5 * math.sin(tt)
-        path.append((mu_t, sigma_t))
-    mus, sigmas = zip(*path)
+        _trace_points.append((mu_t, sigma_t))
+    mus, sigmas = zip(*_trace_points)
 
-    fig2, ax2 = plt.subplots(figsize=(6, 3))
-    ax2.plot(mus, sigmas, color="#00d4aa", alpha=0.4, linewidth=1)
-    ax2.scatter([mu], [sigma], color="#ff6b6b", s=80, zorder=5)
-    ax2.set_xlabel("mu", fontsize=11)
-    ax2.set_ylabel("sigma", fontsize=11)
-    ax2.set_title("Parameter Space Trajectory", fontsize=12, color="#e0e0e0")
-    ax2.set_xlim(-4, 4)
-    ax2.set_ylim(0, 3)
-    ax2.grid(True, alpha=0.3)
-    ax2.set_facecolor("#0a0a0f")
-    fig2.patch.set_facecolor("#0a0a0f")
+    fig_trace, ax_trace = plt.subplots(figsize=(6, 3))
+    ax_trace.plot(mus, sigmas, color="#00d4aa", alpha=0.4, linewidth=1)
+    ax_trace.scatter([mu], [sigma], color="#ff6b6b", s=80, zorder=5)
+    ax_trace.set_xlabel("mu", fontsize=11)
+    ax_trace.set_ylabel("sigma", fontsize=11)
+    ax_trace.set_title("Parameter Space Trajectory", fontsize=12, color="#e0e0e0")
+    ax_trace.set_xlim(-4, 4)
+    ax_trace.set_ylim(0, 3)
+    ax_trace.grid(True, alpha=0.3)
+    ax_trace.set_facecolor("#0a0a0f")
+    fig_trace.patch.set_facecolor("#0a0a0f")
     plt.tight_layout()
-    fig2
-    return ax2, fig2, mus, sigmas, t_trace
+    fig_trace
+    return
 
 
 @app.cell
-
-def __(mo, mu, sigma, np, stats):
-    # Export helpers (CSV data)
-    x = np.linspace(-10, 10, 600)
-    pdf = stats.norm.pdf(x, loc=mu, scale=max(sigma, 0.05))
-    csv_data = "x,pdf\n" + "\n".join([f"{xi:.4f},{pi:.6f}" for xi, pi in zip(x, pdf)])
+def _(mo, mu, np, sigma, stats):
+    x_csv = np.linspace(-10, 10, 600)
+    pdf_csv = stats.norm.pdf(x_csv, loc=mu, scale=max(sigma, 0.05))
+    csv_data = "x,pdf\n" + "\n".join([f"{xi:.4f},{pi:.6f}" for xi, pi in zip(x_csv, pdf_csv)])
     mo.md(f"""
     [Download CSV](data:text/csv;charset=utf-8,{mo.url(csv_data.encode('utf-8'))})
     """)
-    return csv_data, pdf, x
+    return
 
 
 @app.cell
-
-def __(mo):
+def _(mo):
     mo.md("""
     ## Edgeless Gaussian Explorer
 

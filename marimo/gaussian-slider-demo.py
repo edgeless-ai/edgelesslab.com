@@ -9,7 +9,7 @@ Export to WASM:
 
 import marimo
 
-__generated_with = "0.23.1"
+__generated_with = "0.23.8"
 app = marimo.App(width="full", app_title="Gaussian Probability Density")
 
 
@@ -20,6 +20,7 @@ def _():
     from scipy import stats
     import matplotlib.pyplot as plt
     import math
+
     return mo, np, plt, stats
 
 
@@ -28,9 +29,9 @@ def _(mo):
     # Auto-animated phase slider
     # The refresh timer fires every interval, and the next cell auto-increments the slider
     refresh = mo.ui.refresh(
-        options=[0.2, 0.5, 1, 2, 5],
-        value=0.5,
-        label="Animation interval (sec)",
+        options=["0.2s", "0.5s", "1s", "2s", "5s"],
+        default_interval="0.5s",
+        label="Animation interval",
     )
     return (refresh,)
 
@@ -47,7 +48,7 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(mo, refresh, phase):
+def _(mo, phase, refresh):
     # Auto-increment phase on each refresh tick
     # Using mo.state to avoid triggering infinite loops via direct .value assignment
     _tick = refresh.value
@@ -69,7 +70,7 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(mo, phase, sigma, show_cdf, np, plt, stats):
+def _(np, phase, plt, show_cdf, sigma, stats):
     # Edgeless dark theme
     plt.rcParams.update({
         "figure.facecolor": "#0a0a0f",
@@ -104,16 +105,16 @@ def _(mo, phase, sigma, show_cdf, np, plt, stats):
     ax1.grid(True, alpha=0.3)
 
     if show_cdf.value:
-        ax2 = ax1.twinx()
-        ax2.plot(x, cdf, color="#5b8def", linewidth=2, alpha=0.7, label="CDF")
-        ax2.set_ylabel("CDF", fontsize=12, color="#5b8def")
-        ax2.set_ylim(0, 1)
-        ax2.tick_params(axis="y", labelcolor="#5b8def")
-        ax2.legend(loc="lower right", facecolor="#0a0a0f", edgecolor="#1e3a3a", labelcolor="#e0e0e0")
+        _ax2 = ax1.twinx()
+        _ax2.plot(x, cdf, color="#5b8def", linewidth=2, alpha=0.7, label="CDF")
+        _ax2.set_ylabel("CDF", fontsize=12, color="#5b8def")
+        _ax2.set_ylim(0, 1)
+        _ax2.tick_params(axis="y", labelcolor="#5b8def")
+        _ax2.legend(loc="lower right", facecolor="#0a0a0f", edgecolor="#1e3a3a", labelcolor="#e0e0e0")
 
     plt.tight_layout()
     fig
-    return cdf, fig, mu, pdf, s, x
+    return mu, s
 
 
 @app.cell(hide_code=True)
@@ -131,34 +132,34 @@ def _(mo, mu, s, stats):
     | 68.3% interval | [{mu - s:.3f}, {mu + s:.3f}] |
     | 95.4% interval | [{mu - 2*s:.3f}, {mu + 2*s:.3f}] |
     """)
-    return entropy, variance
+    return
 
 
 @app.cell(hide_code=True)
-def _(mo, np, plt, mu, s):
+def _(mu, np, plt, s):
     # Parameter space trace: mu vs sigma over the full circle
     phases = np.linspace(0, 360, 200)
     mus = 3.0 * np.cos(np.radians(phases))
     sigmas = np.full_like(mus, s)
 
-    fig2, ax2 = plt.subplots(figsize=(6, 3))
-    ax2.plot(mus, sigmas, color="#00d4aa", alpha=0.4, linewidth=1)
-    ax2.scatter([mu], [s], color="#ff6b6b", s=80, zorder=5)
-    ax2.set_xlabel("mu", fontsize=11)
-    ax2.set_ylabel("sigma", fontsize=11)
-    ax2.set_title("Parameter Space Trace", fontsize=12, color="#e0e0e0")
-    ax2.set_xlim(-4, 4)
-    ax2.set_ylim(0, 4)
-    ax2.grid(True, alpha=0.3)
-    ax2.set_facecolor("#0a0a0f")
-    fig2.patch.set_facecolor("#0a0a0f")
+    fig_trace, ax_trace = plt.subplots(figsize=(6, 3))
+    ax_trace.plot(mus, sigmas, color="#00d4aa", alpha=0.4, linewidth=1)
+    ax_trace.scatter([mu], [s], color="#ff6b6b", s=80, zorder=5)
+    ax_trace.set_xlabel("mu", fontsize=11)
+    ax_trace.set_ylabel("sigma", fontsize=11)
+    ax_trace.set_title("Parameter Space Trace", fontsize=12, color="#e0e0e0")
+    ax_trace.set_xlim(-4, 4)
+    ax_trace.set_ylim(0, 4)
+    ax_trace.grid(True, alpha=0.3)
+    ax_trace.set_facecolor("#0a0a0f")
+    fig_trace.patch.set_facecolor("#0a0a0f")
     plt.tight_layout()
-    fig2
-    return ax2, fig2, mus, phases, sigmas
+    fig_trace
+    return
 
 
 @app.cell(hide_code=True)
-def _(mo, phase, mu, s, refresh, sigma, show_cdf):
+def _(mo, mu, phase, refresh, s, show_cdf, sigma):
     # Header and controls layout
     header = mo.vstack([
         mo.md("# Gaussian Probability Density"),
@@ -184,7 +185,7 @@ def _(mo, phase, mu, s, refresh, sigma, show_cdf):
         controls,
     ])
     layout
-    return controls, header, layout
+    return
 
 
 @app.cell(hide_code=True)

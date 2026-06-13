@@ -91,7 +91,7 @@ def __(get_frame, manual_frame, mo):
 
 
 @app.cell(hide_code=True)
-def __(amplitude, color_scheme, frame, frequency, mo, np, plt, wave_count):
+def __(amplitude, color_scheme, frame, frequency, mo, np, plt, refresh, manual_frame, wave_count):
     # Generate the visualization
     phase_rad = np.radians(frame)
     t = np.linspace(0, 4 * np.pi, 1000)

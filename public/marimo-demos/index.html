@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edgeless Lab — Marimo Demos</title>
+    <title>Marimo Demos — Edgeless Lab</title>
+    <meta name="description" content="Interactive reactive computing experiments built with marimo and wigglystuff. TSP solvers, Gaussian explorers, binary search visualizers, bandit simulations, and curve editors — all running in your browser.">
+    <meta property="og:title" content="Marimo Demos — Edgeless Lab">
+    <meta property="og:description" content="Interactive reactive computing experiments built with marimo and wigglystuff. TSP solvers, Gaussian explorers, and more.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://edgelesslab.com/marimo-demos/">
     <link rel="icon" href="./favicon.ico">
     <style>
         * {
@@ -19,11 +25,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             padding: 2rem;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
         }
         h1 {
@@ -35,13 +40,26 @@
         .subtitle {
             text-align: center;
             color: #888;
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
             font-size: 1.1rem;
         }
         .demo-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        .section-title {
+            color: #00d4ff;
+            font-size: 1.2rem;
+            margin: 2rem 0 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #1a1a2e;
+        }
+        .section-title:first-of-type {
+            border-top: none;
+            margin-top: 0;
+            padding-top: 0;
         }
         .demo-card {
             background: #111118;
@@ -49,10 +67,11 @@
             border-radius: 12px;
             padding: 1.5rem;
             transition: all 0.3s ease;
-            cursor: pointer;
             text-decoration: none;
             color: inherit;
-            display: block;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
         .demo-card:hover {
             border-color: #00d4ff;
@@ -61,26 +80,45 @@
         }
         .demo-card h2 {
             color: #00d4ff;
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.15rem;
         }
         .demo-card p {
             color: #888;
-            line-height: 1.5;
-            font-size: 0.95rem;
+            line-height: 1.45;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+        .demo-card .tags {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
         }
         .demo-card .tag {
             display: inline-block;
             background: #1a1a2e;
             color: #00d4ff;
-            padding: 0.25rem 0.75rem;
+            padding: 0.2rem 0.6rem;
             border-radius: 20px;
-            font-size: 0.8rem;
-            margin-top: 1rem;
+            font-size: 0.72rem;
+        }
+        .demo-card .tag.orange {
+            color: #ff6b35;
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid rgba(255, 107, 53, 0.2);
+        }
+        .note {
+            background: rgba(255, 107, 53, 0.08);
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            margin: 1rem 0;
+            color: #ff6b35;
+            font-size: 0.85rem;
+            text-align: center;
         }
         .logo {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
         .logo img {
             width: 64px;
@@ -88,7 +126,7 @@
         }
         .footer {
             text-align: center;
-            margin-top: 3rem;
+            margin-top: 2rem;
             color: #444;
             font-size: 0.85rem;
         }
@@ -106,22 +144,58 @@
         <h1>Marimo Demos</h1>
         <p class="subtitle">Interactive reactive computing experiments by Edgeless Lab</p>
 
+        <h3 class="section-title">🧮 WASM Demos (runs in browser)</h3>
         <div class="demo-grid">
             <a href="./3d-generative-art.html" class="demo-card">
                 <h2>3D Generative Art</h2>
                 <p>Interactive 3D parametric form with reactive controls. Morphs in real-time as you drag sliders.</p>
-                <span class="tag">3D · Parametric · Reactive</span>
+                <div class="tags">
+                    <span class="tag">3D</span><span class="tag">Parametric</span><span class="tag">Reactive</span>
+                </div>
             </a>
 
             <a href="./traveling-salesman-slider.html" class="demo-card">
                 <h2>Traveling Salesman Slider</h2>
                 <p>The slider that closes the loop. Navigate through a nearest-neighbor TSP path with reactive visualization.</p>
-                <span class="tag">TSP · Algorithm · Visualization</span>
+                <div class="tags">
+                    <span class="tag">TSP</span><span class="tag">Algorithm</span><span class="tag">Visualization</span>
+                </div>
+            </a>
+
+            <a href="/marimo-gaussian-demo/" class="demo-card">
+                <h2>Gaussian Explorer</h2>
+                <p>Animated Gaussian probability density with auto-play. Select a parametric path and watch mu/sigma evolve.</p>
+                <div class="tags">
+                    <span class="tag">Statistics</span><span class="tag">PDF</span><span class="tag">Animated</span>
+                </div>
+            </a>
+
+            <a href="/marimo-reactive-slider/" class="demo-card">
+                <h2>Reactive Wave Demo</h2>
+                <p>Superposition of sine waves with auto-animated phase. Scrub or auto-play — everything recomputes reactively.</p>
+                <div class="tags">
+                    <span class="tag">Waves</span><span class="tag">Phase</span><span class="tag">Reactive</span>
+                </div>
+            </a>
+        </div>
+
+        <h3 class="section-title">✏️ Excalidraw Demos (requires live kernel — molab)</h3>
+        <div class="note">
+            These use <strong>wigglystuff</strong> (anywidget) and need a live Python kernel.<br>
+            Click to run on <strong>molab.marimo.io</strong>, or download the .py source for local use.
+        </div>
+        <div class="demo-grid">
+            <a href="/marimo-excalidraw-demos/" class="demo-card">
+                <h2>Marimo × Excalidraw Gallery →</h2>
+                <p>5 demos: TSP + Sketch, Gaussian Sketch Lab, Algorithm Whiteboard, Bandit Canvas, Curve Editor Lab.</p>
+                <div class="tags">
+                    <span class="tag orange">New</span><span class="tag">Excalidraw</span><span class="tag">wigglystuff</span>
+                </div>
             </a>
         </div>
 
         <div class="footer">
-            <p>Built with <a href="https://marimo.io" target="_blank">Marimo</a> · <a href="https://edgelesslab.com">edgelesslab.com</a></p>
+            <p>Built with <a href="https://marimo.io" target="_blank">Marimo</a> · <a href="https://github.com/koaning/wigglystuff" target="_blank">wigglystuff</a> · <a href="https://edgelesslab.com">edgelesslab.com</a></p>
         </div>
     </div>
 </body>

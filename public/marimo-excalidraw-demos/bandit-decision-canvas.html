@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>Bandit Decision Canvas</title>
+    <script type="module" crossorigin src="./assets/index-CA2sQKnW.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-DdZsAcJe.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-BqBOg78p.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-DvoEXWke.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DPBdGRrH.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-NX56vp6K.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-Lfi0pexn.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-xq8miGHn.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-DQRuLEof.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-Dz_KRrWq.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DCUzRj2J.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-DOX1Xxa9.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-BbCh-29a.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-eipL3i3Y.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-DcP01QzW.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BdyjRhEt.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-D5guW7EU.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-BH35Ndha.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-6liIBr.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-DZcFyKFQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-DTV9tlSr.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-ERM44-k9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-BUdrueMv.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-Wvjk_Y4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-DWBqOhWa.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-D_zLHhNi.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-CzVJLtsG.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-DMpttj8Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-DGdfs0bJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-C2lTvbuU.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-DIwGYs0l.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-DieWOfXE.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-DfoVjkkH.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Kwyx4PvL.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DYDL-3-i.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings-wdPMRf6Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-DRroIaBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-A_KhFcGV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-CI9qeK_X.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-SFhaqGlE.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BrR4M-k3.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-HlsDto3K.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CHcznzB-.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BU26XwgJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-COs9gIu5.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BZr6MMV-.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DCqxOggh.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DkA__6UI.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-C9ZB41s2.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-lcoTi-7o.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-B5A0DFEz.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-DvRMX74T.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-BRGiG41H.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-DhnxH9Rh.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-kIkTfzTX.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-B0OX4z33.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-Dnu4nDoy.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DyYDV0HI.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-BJB2rf7K.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-hKfTes-m.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-BqFLkbUc.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-DqOQT_n4.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-_BZcy6gx.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-mY4EY0yG.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BIDQNg9Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-C1Tm_47t.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-CW4V-fpE.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-jH2RfcUG.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-CVE-gIjt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-DEC1mXgV.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-PQYiMZw1.js">
+    <link rel="modulepreload" crossorigin href="./assets/multi-map-CUuNtzHt.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-DrHguQlr.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-CG5QYXYk.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-CR7cnzLX.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-B8WzCnbo.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-C0BPo9m1.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Ch48HVPK.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-BwrPA9zQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-BdZPgXgo.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-B5r25cP5.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-I-LOgxeP.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-D9EoHCkz.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-B8oXOUM-.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-CC9Bko6a.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-XWqnhvJ6.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-UuZAUjoP.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-D6SgvARi.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-BaOnnMs-.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-C5i0IRVM.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-GdhQ07zA.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-BUQpMdx2.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-BSzccEgu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-BQ-BQLiJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-2NPJCYDa.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-DNlzfMKW.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bz_0Vkyf.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-iwK4b4VF.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-B1QFVDP-.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-DQE9hQzM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-DPVTppnD.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-CLO6LFll.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-BRq458WH.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-C7vnqfgk.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-DdlR4-BY.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-DI1TvEEK.js">
+    <link rel="modulepreload" crossorigin href="./assets/maps-n3GaPJwv.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-Dqvpuc10.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-Dangy3Bv.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-d3yglQmW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm--O4lBTlZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-Bk1r00gJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-6NxtGaCm.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-KAhMaCIV.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BTNxSavU.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-1YLdnr8A.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-BJLYnZpG.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Ce2ksurd.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-05-R3eil.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-nqk474t8.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-blYaQso8.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-D1ptWKg6.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-vertical-CkwWkOQL.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-a_9k9BK7.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-DY8FUp3V.js">
+    <link rel="modulepreload" crossorigin href="./assets/components-zB5yT_R8.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-BLIWbdOX.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-8tfAri2V.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-rsi1ibXY.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DbOtUfo-.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-DoKw85w0.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-Cb2bnV6o.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BT-KOYV5.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-CxkHs8QM.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-BKYj8PNf.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-B3fuktN0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-HTLbeC2b.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-BIibSXT6.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-B6DaZdP0.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-BtkQp293.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-CBm-hwqS.js">
+    <link rel="modulepreload" crossorigin href="./assets/globals-CpVAcN9Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-oorMPghT.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-3_FN0u9S.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CxV9N1bc.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-BXNNuw9g.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-xHqFtfdz.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-BBTcSr-i.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-DLc784Sj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BjUJP6PJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-DK-VjfaX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-B8LMGUHl.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CWcgQCbT.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-BYwxXaSY.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-X3ApuO41.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-BeYUTUzO.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-vgBYIo5B.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-DVDiRdwc.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-au8YY-8E.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-DiS_ryrS.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Dl4V1ub3.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-DqWUNly1.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-CZN6vNxu.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-D2ldnAB9.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-rACnnz-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-CJ0ZIqcz.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-BXIlAZ6T.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-jmgGt1lS.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-B7vuddcd.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-DH00kbhV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "import marimo\n\n__generated_with = \"0.23.8\"\napp = marimo.App(width=\"full\", app_title=\"Bandit Decision Canvas\")\n\n\n@app.cell(hide_code=True)\ndef _():\n    import marimo as mo\n    import numpy as np\n    import matplotlib.pyplot as plt\n    from wigglystuff import Excalidraw\n\n    return Excalidraw, mo, np, plt\n\n\n@app.cell(hide_code=True)\ndef _(np):\n    np.random.seed(123)\n    return\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    n_arms = mo.ui.slider(start=2, stop=6, step=1, value=3, label=\"Number of Arms\")\n    n_steps = mo.ui.slider(start=20, stop=200, step=10, value=80, label=\"Time Steps\")\n    eps = mo.ui.slider(start=0.0, stop=0.5, step=0.05, value=0.1, label=\"Epsilon (\u03b5-greedy)\")\n    return eps, n_arms, n_steps\n\n\n@app.cell(hide_code=True)\ndef _(eps, n_arms, n_steps, np):\n    true_means = np.linspace(0.3, 0.9, n_arms.value)\n    np.random.shuffle(true_means)\n\n    def run_bandit(eps_val, steps, means):\n        n = len(means)\n        counts = np.zeros(n)\n        values = np.zeros(n)\n        regrets = []\n        rewards = []\n        optimal = np.max(means)\n        total_regret = 0.0\n\n        for t in range(steps):\n            if np.random.random() \u003C eps_val:\n                action = np.random.randint(n)\n            else:\n                action = np.argmax(values / (counts + 1e-9))\n\n            reward = np.random.binomial(1, means[action])\n            counts[action] += 1\n            values[action] += reward\n            rewards.append(reward)\n            total_regret += optimal - means[action]\n            regrets.append(total_regret)\n\n        return np.array(regrets), np.array(rewards), counts, values\n\n    eps_val = eps.value\n    regrets, rewards, counts, values = run_bandit(eps_val, n_steps.value, true_means)\n    return counts, regrets, rewards, true_means, values\n\n\n@app.cell(hide_code=True)\ndef _(n_steps, np, plt, regrets, rewards):\n    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))\n    fig.patch.set_facecolor('#0a0a0f')\n    ax1.set_facecolor('#0a0a0f')\n    ax2.set_facecolor('#0a0a0f')\n\n    # Cumulative regret\n    ax1.plot(regrets, color='#ff6b35', linewidth=2)\n    ax1.fill_between(range(len(regrets)), regrets, alpha=0.1, color='#ff6b35')\n    ax1.set_title('Cumulative Regret', color='white', fontsize=12)\n    ax1.set_xlabel('Step', color='white')\n    ax1.set_ylabel('Regret', color='white')\n    ax1.tick_params(colors='white')\n    for spine in ax1.spines.values():\n        spine.set_color('white')\n\n    # Rolling average reward\n    window = max(5, n_steps.value // 10)\n    rolling = np.convolve(rewards, np.ones(window)/window, mode='valid')\n    ax2.plot(rolling, color='#00d4ff', linewidth=2)\n    ax2.set_title(f'Rolling Avg Reward (window={window})', color='white', fontsize=12)\n    ax2.set_xlabel('Step', color='white')\n    ax2.set_ylabel('Avg Reward', color='white')\n    ax2.tick_params(colors='white')\n    for spine in ax2.spines.values():\n        spine.set_color('white')\n\n    plt.tight_layout()\n    plt\n    return\n\n\n@app.cell(hide_code=True)\ndef _(Excalidraw, mo):\n    canvas = mo.ui.anywidget(Excalidraw(height=550, theme=\"dark\"))\n    return (canvas,)\n\n\n@app.cell(hide_code=True)\ndef _(counts, eps, mo, n_arms, true_means, values):\n    est_values = values / (counts + 1e-9)\n    rows = []\n    for i in range(n_arms.value):\n        rows.append(\n            f\"| Arm {i} | {true_means[i]:.2f} | {est_values[i]:.2f} | {int(counts[i])} | \"\n            f\"{'\u2705 OPTIMAL' if true_means[i] == max(true_means) else ''} |\"\n        )\n\n    mo.md(f\"\"\"\n    ## Multi-Armed Bandit \u2014 \u03b5-Greedy Strategy\n\n    **\u03b5 = {eps.value}** | Arms = {n_arms.value} | Steps = {len(true_means)} \u2192 only one is optimal\n\n    | Arm | True \u03bc | Estimated \u03bc | Times Pulled | Notes |\n    |-----|--------|-------------|-------------|-------|\n    {chr(10).join(rows)}\n\n    **The exploration-exploitation tradeoff:**\n    - With probability **\u03b5**, explore randomly\n    - With probability **1-\u03b5**, exploit the best-known arm\n    - Higher \u03b5 \u2192 more exploration, slower convergence but less risk of missing the best arm\n    - Lower \u03b5 \u2192 faster convergence but might get stuck on a suboptimal arm\n    \"\"\")\n    return\n\n\n@app.cell(hide_code=True)\ndef _(eps, mo, n_arms, n_steps):\n    mo.hstack([mo.vstack([n_arms, n_steps, eps])])\n    return\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    mo.md(\"\"\"\n    ## \u270f\ufe0f Decision Canvas\n\n    Use the Excalidraw whiteboard to:\n    - Draw a decision tree for the \u03b5-greedy strategy\n    - Annotate the regret curve with insights\n    - Sketch expected value estimates for each arm\n    - Diagram alternative strategies (UCB, Thompson Sampling, etc.)\n    \"\"\")\n    return\n\n\n@app.cell(hide_code=True)\ndef _(canvas):\n    canvas\n    return\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    mo.md(\"\"\"\n    ---\n    ### Architecture\n\n    This demo runs a **multi-armed bandit** simulation with a **freeform annotation layer**:\n\n    1. **Simulation**: \u03b5-greedy strategy plays against arms with hidden true means\n    2. **Visualization**: Cumulative regret (left) + rolling average reward (right) update reactively\n    3. **Excalidraw whiteboard**: Sketch decision trees, annotate strategies, compare approaches\n\n    Adjust \u03b5, arms, and steps \u2014 the simulation re-runs instantly. The whiteboard persists for freeform exploration.\n\n    *Built with [wigglystuff](https://github.com/koaning/wigglystuff) + [marimo](https://marimo.io)*\n\n    #python #reinforcementlearning #bandits #excalidraw #opensource\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">import%20marimo%0A%0A__generated_with%20%3D%20%220.23.8%22%0Aapp%20%3D%20marimo.App(width%3D%22full%22%2C%20app_title%3D%22Bandit%20Decision%20Canvas%22)%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20import%20numpy%20as%20np%0A%20%20%20%20import%20matplotlib.pyplot%20as%20plt%0A%20%20%20%20from%20wigglystuff%20import%20Excalidraw%0A%0A%20%20%20%20return%20Excalidraw%2C%20mo%2C%20np%2C%20plt%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(np)%3A%0A%20%20%20%20np.random.seed(123)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20n_arms%20%3D%20mo.ui.slider(start%3D2%2C%20stop%3D6%2C%20step%3D1%2C%20value%3D3%2C%20label%3D%22Number%20of%20Arms%22)%0A%20%20%20%20n_steps%20%3D%20mo.ui.slider(start%3D20%2C%20stop%3D200%2C%20step%3D10%2C%20value%3D80%2C%20label%3D%22Time%20Steps%22)%0A%20%20%20%20eps%20%3D%20mo.ui.slider(start%3D0.0%2C%20stop%3D0.5%2C%20step%3D0.05%2C%20value%3D0.1%2C%20label%3D%22Epsilon%20(%CE%B5-greedy)%22)%0A%20%20%20%20return%20eps%2C%20n_arms%2C%20n_steps%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(eps%2C%20n_arms%2C%20n_steps%2C%20np)%3A%0A%20%20%20%20true_means%20%3D%20np.linspace(0.3%2C%200.9%2C%20n_arms.value)%0A%20%20%20%20np.random.shuffle(true_means)%0A%0A%20%20%20%20def%20run_bandit(eps_val%2C%20steps%2C%20means)%3A%0A%20%20%20%20%20%20%20%20n%20%3D%20len(means)%0A%20%20%20%20%20%20%20%20counts%20%3D%20np.zeros(n)%0A%20%20%20%20%20%20%20%20values%20%3D%20np.zeros(n)%0A%20%20%20%20%20%20%20%20regrets%20%3D%20%5B%5D%0A%20%20%20%20%20%20%20%20rewards%20%3D%20%5B%5D%0A%20%20%20%20%20%20%20%20optimal%20%3D%20np.max(means)%0A%20%20%20%20%20%20%20%20total_regret%20%3D%200.0%0A%0A%20%20%20%20%20%20%20%20for%20t%20in%20range(steps)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20np.random.random()%20%3C%20eps_val%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20action%20%3D%20np.random.randint(n)%0A%20%20%20%20%20%20%20%20%20%20%20%20else%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20action%20%3D%20np.argmax(values%20%2F%20(counts%20%2B%201e-9))%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20reward%20%3D%20np.random.binomial(1%2C%20means%5Baction%5D)%0A%20%20%20%20%20%20%20%20%20%20%20%20counts%5Baction%5D%20%2B%3D%201%0A%20%20%20%20%20%20%20%20%20%20%20%20values%5Baction%5D%20%2B%3D%20reward%0A%20%20%20%20%20%20%20%20%20%20%20%20rewards.append(reward)%0A%20%20%20%20%20%20%20%20%20%20%20%20total_regret%20%2B%3D%20optimal%20-%20means%5Baction%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20regrets.append(total_regret)%0A%0A%20%20%20%20%20%20%20%20return%20np.array(regrets)%2C%20np.array(rewards)%2C%20counts%2C%20values%0A%0A%20%20%20%20eps_val%20%3D%20eps.value%0A%20%20%20%20regrets%2C%20rewards%2C%20counts%2C%20values%20%3D%20run_bandit(eps_val%2C%20n_steps.value%2C%20true_means)%0A%20%20%20%20return%20counts%2C%20regrets%2C%20rewards%2C%20true_means%2C%20values%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(n_steps%2C%20np%2C%20plt%2C%20regrets%2C%20rewards)%3A%0A%20%20%20%20fig%2C%20(ax1%2C%20ax2)%20%3D%20plt.subplots(1%2C%202%2C%20figsize%3D(12%2C%204))%0A%20%20%20%20fig.patch.set_facecolor('%230a0a0f')%0A%20%20%20%20ax1.set_facecolor('%230a0a0f')%0A%20%20%20%20ax2.set_facecolor('%230a0a0f')%0A%0A%20%20%20%20%23%20Cumulative%20regret%0A%20%20%20%20ax1.plot(regrets%2C%20color%3D'%23ff6b35'%2C%20linewidth%3D2)%0A%20%20%20%20ax1.fill_between(range(len(regrets))%2C%20regrets%2C%20alpha%3D0.1%2C%20color%3D'%23ff6b35')%0A%20%20%20%20ax1.set_title('Cumulative%20Regret'%2C%20color%3D'white'%2C%20fontsize%3D12)%0A%20%20%20%20ax1.set_xlabel('Step'%2C%20color%3D'white')%0A%20%20%20%20ax1.set_ylabel('Regret'%2C%20color%3D'white')%0A%20%20%20%20ax1.tick_params(colors%3D'white')%0A%20%20%20%20for%20spine%20in%20ax1.spines.values()%3A%0A%20%20%20%20%20%20%20%20spine.set_color('white')%0A%0A%20%20%20%20%23%20Rolling%20average%20reward%0A%20%20%20%20window%20%3D%20max(5%2C%20n_steps.value%20%2F%2F%2010)%0A%20%20%20%20rolling%20%3D%20np.convolve(rewards%2C%20np.ones(window)%2Fwindow%2C%20mode%3D'valid')%0A%20%20%20%20ax2.plot(rolling%2C%20color%3D'%2300d4ff'%2C%20linewidth%3D2)%0A%20%20%20%20ax2.set_title(f'Rolling%20Avg%20Reward%20(window%3D%7Bwindow%7D)'%2C%20color%3D'white'%2C%20fontsize%3D12)%0A%20%20%20%20ax2.set_xlabel('Step'%2C%20color%3D'white')%0A%20%20%20%20ax2.set_ylabel('Avg%20Reward'%2C%20color%3D'white')%0A%20%20%20%20ax2.tick_params(colors%3D'white')%0A%20%20%20%20for%20spine%20in%20ax2.spines.values()%3A%0A%20%20%20%20%20%20%20%20spine.set_color('white')%0A%0A%20%20%20%20plt.tight_layout()%0A%20%20%20%20plt%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(Excalidraw%2C%20mo)%3A%0A%20%20%20%20canvas%20%3D%20mo.ui.anywidget(Excalidraw(height%3D550%2C%20theme%3D%22dark%22))%0A%20%20%20%20return%20(canvas%2C)%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(counts%2C%20eps%2C%20mo%2C%20n_arms%2C%20true_means%2C%20values)%3A%0A%20%20%20%20est_values%20%3D%20values%20%2F%20(counts%20%2B%201e-9)%0A%20%20%20%20rows%20%3D%20%5B%5D%0A%20%20%20%20for%20i%20in%20range(n_arms.value)%3A%0A%20%20%20%20%20%20%20%20rows.append(%0A%20%20%20%20%20%20%20%20%20%20%20%20f%22%7C%20Arm%20%7Bi%7D%20%7C%20%7Btrue_means%5Bi%5D%3A.2f%7D%20%7C%20%7Best_values%5Bi%5D%3A.2f%7D%20%7C%20%7Bint(counts%5Bi%5D)%7D%20%7C%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20f%22%7B'%E2%9C%85%20OPTIMAL'%20if%20true_means%5Bi%5D%20%3D%3D%20max(true_means)%20else%20''%7D%20%7C%22%0A%20%20%20%20%20%20%20%20)%0A%0A%20%20%20%20mo.md(f%22%22%22%0A%20%20%20%20%23%23%20Multi-Armed%20Bandit%20%E2%80%94%20%CE%B5-Greedy%20Strategy%0A%0A%20%20%20%20**%CE%B5%20%3D%20%7Beps.value%7D**%20%7C%20Arms%20%3D%20%7Bn_arms.value%7D%20%7C%20Steps%20%3D%20%7Blen(true_means)%7D%20%E2%86%92%20only%20one%20is%20optimal%0A%0A%20%20%20%20%7C%20Arm%20%7C%20True%20%CE%BC%20%7C%20Estimated%20%CE%BC%20%7C%20Times%20Pulled%20%7C%20Notes%20%7C%0A%20%20%20%20%7C-----%7C--------%7C-------------%7C-------------%7C-------%7C%0A%20%20%20%20%7Bchr(10).join(rows)%7D%0A%0A%20%20%20%20**The%20exploration-exploitation%20tradeoff%3A**%0A%20%20%20%20-%20With%20probability%20**%CE%B5**%2C%20explore%20randomly%0A%20%20%20%20-%20With%20probability%20**1-%CE%B5**%2C%20exploit%20the%20best-known%20arm%0A%20%20%20%20-%20Higher%20%CE%B5%20%E2%86%92%20more%20exploration%2C%20slower%20convergence%20but%20less%20risk%20of%20missing%20the%20best%20arm%0A%20%20%20%20-%20Lower%20%CE%B5%20%E2%86%92%20faster%20convergence%20but%20might%20get%20stuck%20on%20a%20suboptimal%20arm%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(eps%2C%20mo%2C%20n_arms%2C%20n_steps)%3A%0A%20%20%20%20mo.hstack(%5Bmo.vstack(%5Bn_arms%2C%20n_steps%2C%20eps%5D)%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(%22%22%22%0A%20%20%20%20%23%23%20%E2%9C%8F%EF%B8%8F%20Decision%20Canvas%0A%0A%20%20%20%20Use%20the%20Excalidraw%20whiteboard%20to%3A%0A%20%20%20%20-%20Draw%20a%20decision%20tree%20for%20the%20%CE%B5-greedy%20strategy%0A%20%20%20%20-%20Annotate%20the%20regret%20curve%20with%20insights%0A%20%20%20%20-%20Sketch%20expected%20value%20estimates%20for%20each%20arm%0A%20%20%20%20-%20Diagram%20alternative%20strategies%20(UCB%2C%20Thompson%20Sampling%2C%20etc.)%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(canvas)%3A%0A%20%20%20%20canvas%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(%22%22%22%0A%20%20%20%20---%0A%20%20%20%20%23%23%23%20Architecture%0A%0A%20%20%20%20This%20demo%20runs%20a%20**multi-armed%20bandit**%20simulation%20with%20a%20**freeform%20annotation%20layer**%3A%0A%0A%20%20%20%201.%20**Simulation**%3A%20%CE%B5-greedy%20strategy%20plays%20against%20arms%20with%20hidden%20true%20means%0A%20%20%20%202.%20**Visualization**%3A%20Cumulative%20regret%20(left)%20%2B%20rolling%20average%20reward%20(right)%20update%20reactively%0A%20%20%20%203.%20**Excalidraw%20whiteboard**%3A%20Sketch%20decision%20trees%2C%20annotate%20strategies%2C%20compare%20approaches%0A%0A%20%20%20%20Adjust%20%CE%B5%2C%20arms%2C%20and%20steps%20%E2%80%94%20the%20simulation%20re-runs%20instantly.%20The%20whiteboard%20persists%20for%20freeform%20exploration.%0A%0A%20%20%20%20*Built%20with%20%5Bwigglystuff%5D(https%3A%2F%2Fgithub.com%2Fkoaning%2Fwigglystuff)%20%2B%20%5Bmarimo%5D(https%3A%2F%2Fmarimo.io)*%0A%0A%20%20%20%20%23python%20%23reinforcementlearning%20%23bandits%20%23excalidraw%20%23opensource%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <!-- This is a portal for the data editor to render in -->
+    <div id="portal" data-testid="glide-portal" style="position: fixed; left: 0; top: 0; z-index: 9999"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.8",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"app_title": "Bandit Decision Canvas", "sql_output": "auto", "width": "full"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

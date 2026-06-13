@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>Curve Editor Lab</title>
+    <script type="module" crossorigin src="./assets/index-CA2sQKnW.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-DdZsAcJe.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-BqBOg78p.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-DvoEXWke.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DPBdGRrH.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-NX56vp6K.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-Lfi0pexn.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-xq8miGHn.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-DQRuLEof.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-Dz_KRrWq.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DCUzRj2J.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-DOX1Xxa9.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-BbCh-29a.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-eipL3i3Y.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-DcP01QzW.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BdyjRhEt.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-D5guW7EU.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-BH35Ndha.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-6liIBr.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-DZcFyKFQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-DTV9tlSr.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-ERM44-k9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-BUdrueMv.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-Wvjk_Y4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-DWBqOhWa.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-D_zLHhNi.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-CzVJLtsG.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-DMpttj8Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-DGdfs0bJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-C2lTvbuU.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-DIwGYs0l.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-DieWOfXE.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-DfoVjkkH.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Kwyx4PvL.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DYDL-3-i.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings-wdPMRf6Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-DRroIaBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-A_KhFcGV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-CI9qeK_X.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-SFhaqGlE.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BrR4M-k3.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-HlsDto3K.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CHcznzB-.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BU26XwgJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-COs9gIu5.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BZr6MMV-.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DCqxOggh.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DkA__6UI.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-C9ZB41s2.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-lcoTi-7o.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-B5A0DFEz.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-DvRMX74T.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-BRGiG41H.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-DhnxH9Rh.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-kIkTfzTX.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-B0OX4z33.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-Dnu4nDoy.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DyYDV0HI.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-BJB2rf7K.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-hKfTes-m.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-BqFLkbUc.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-DqOQT_n4.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-_BZcy6gx.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-mY4EY0yG.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BIDQNg9Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-C1Tm_47t.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-CW4V-fpE.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-jH2RfcUG.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-CVE-gIjt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-DEC1mXgV.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-PQYiMZw1.js">
+    <link rel="modulepreload" crossorigin href="./assets/multi-map-CUuNtzHt.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-DrHguQlr.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-CG5QYXYk.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-CR7cnzLX.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-B8WzCnbo.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-C0BPo9m1.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Ch48HVPK.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-BwrPA9zQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-BdZPgXgo.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-B5r25cP5.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-I-LOgxeP.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-D9EoHCkz.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-B8oXOUM-.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-CC9Bko6a.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-XWqnhvJ6.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-UuZAUjoP.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-D6SgvARi.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-BaOnnMs-.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-C5i0IRVM.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-GdhQ07zA.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-BUQpMdx2.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-BSzccEgu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-BQ-BQLiJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-2NPJCYDa.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-DNlzfMKW.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bz_0Vkyf.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-iwK4b4VF.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-B1QFVDP-.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-DQE9hQzM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-DPVTppnD.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-CLO6LFll.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-BRq458WH.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-C7vnqfgk.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-DdlR4-BY.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-DI1TvEEK.js">
+    <link rel="modulepreload" crossorigin href="./assets/maps-n3GaPJwv.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-Dqvpuc10.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-Dangy3Bv.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-d3yglQmW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm--O4lBTlZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-Bk1r00gJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-6NxtGaCm.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-KAhMaCIV.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BTNxSavU.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-1YLdnr8A.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-BJLYnZpG.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Ce2ksurd.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-05-R3eil.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-nqk474t8.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-blYaQso8.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-D1ptWKg6.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-vertical-CkwWkOQL.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-a_9k9BK7.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-DY8FUp3V.js">
+    <link rel="modulepreload" crossorigin href="./assets/components-zB5yT_R8.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-BLIWbdOX.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-8tfAri2V.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-rsi1ibXY.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DbOtUfo-.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-DoKw85w0.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-Cb2bnV6o.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BT-KOYV5.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-CxkHs8QM.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-BKYj8PNf.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-B3fuktN0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-HTLbeC2b.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-BIibSXT6.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-B6DaZdP0.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-BtkQp293.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-CBm-hwqS.js">
+    <link rel="modulepreload" crossorigin href="./assets/globals-CpVAcN9Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-oorMPghT.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-3_FN0u9S.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CxV9N1bc.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-BXNNuw9g.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-xHqFtfdz.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-BBTcSr-i.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-DLc784Sj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BjUJP6PJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-DK-VjfaX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-B8LMGUHl.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CWcgQCbT.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-BYwxXaSY.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-X3ApuO41.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-BeYUTUzO.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-vgBYIo5B.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-DVDiRdwc.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-au8YY-8E.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-DiS_ryrS.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Dl4V1ub3.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-DqWUNly1.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-CZN6vNxu.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-D2ldnAB9.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-rACnnz-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-CJ0ZIqcz.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-BXIlAZ6T.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-jmgGt1lS.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-B7vuddcd.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-DH00kbhV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "import marimo\n\n__generated_with = \"0.23.8\"\napp = marimo.App(width=\"full\", app_title=\"Curve Editor Lab\")\n\n\n@app.cell(hide_code=True)\ndef _():\n    import marimo as mo\n    import numpy as np\n    import matplotlib.pyplot as plt\n    from wigglystuff import Excalidraw, CurveEditor, BezierCurve\n\n    return CurveEditor, Excalidraw, mo, np, plt\n\n\n@app.cell(hide_code=True)\ndef _(CurveEditor, mo):\n    editor = mo.ui.anywidget(CurveEditor(\n        x_bounds=(0.0, 10.0),\n        y_bounds=(-5.0, 5.0),\n        width=700, height=400,\n        show_axes=True,\n        n_samples=200,\n    ))\n    return (editor,)\n\n\n@app.cell(hide_code=True)\ndef _(Excalidraw, mo):\n    whiteboard = mo.ui.anywidget(Excalidraw(height=500, theme=\"dark\"))\n    return (whiteboard,)\n\n\n@app.cell(hide_code=True)\ndef _(np):\n    def sample_curve(widget, n_pts=200):\n        \"\"\"Extract sampled curve points from the CurveEditor widget.\"\"\"\n        try:\n            pts = widget.points\n            if pts is None or len(pts) \u003C 2:\n                return None, None\n            # points is [(x, y), ...] from the editor\n            xs = np.array([p[0] for p in pts])\n            ys = np.array([p[1] for p in pts])\n            return xs, ys\n        except Exception:\n            return None, None\n\n    return (sample_curve,)\n\n\n@app.cell(hide_code=True)\ndef _(editor, mo, plt, sample_curve):\n    xs, ys = sample_curve(editor)\n\n    mo.stop(xs is None or len(xs) == 0,\n            mo.md(\"\u003E \ud83d\udc46 **Drag the control points** on the CurveEditor above to shape a curve.\"))\n\n    fig, ax = plt.subplots(figsize=(8, 4))\n    fig.patch.set_facecolor('#0a0a0f')\n    ax.set_facecolor('#0a0a0f')\n\n    ax.plot(xs, ys, color='#00d4ff', linewidth=2.5, label='Your Curve')\n    ax.fill_between(xs, ys, alpha=0.1, color='#00d4ff')\n    ax.axhline(0, color='white', alpha=0.2, linewidth=0.5)\n    ax.set_xlabel('x', color='white', fontsize=12)\n    ax.set_ylabel('y', color='white', fontsize=12)\n    ax.set_title('Sampled Curve Output', color='white', fontsize=14)\n    ax.tick_params(colors='white')\n    for spine in ax.spines.values():\n        spine.set_color('white')\n    ax.legend(facecolor='#1a1a2e', edgecolor='#333', labelcolor='white')\n    plt.tight_layout()\n    plt\n    return\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    mo.md(\"\"\"\n    ## \ud83c\udf9b\ufe0f Curve Editor + Excalidraw Lab\n\n    A dual-surface exploration environment:\n\n    **Top**: The **CurveEditor** widget \u2014 drag control points to shape smooth curves.\n      - Natural cubic spline interpolation\n      - Configurable bounds, sampling resolution, and axes\n      - Real-time reactive updates\n\n    **Bottom**: Full **Excalidraw whiteboard** for sketching, annotating, and freeform math.\n\n    ### Try This\n    1. Drag the control points on the CurveEditor to shape a curve\n    2. Watch the sampled output update reactively below\n    3. Use the Excalidraw whiteboard to annotate features, sketch derivatives, or design companion curves\n    4. Export your work \u2014 CurveEditor state is available programmatically, Excalidraw exports to PNG\n    \"\"\")\n    return\n\n\n@app.cell(hide_code=True)\ndef _(editor):\n    editor\n    return\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    mo.md(\"\"\"\n    ## \u270f\ufe0f Excalidraw Whiteboard\n    \"\"\")\n    return\n\n\n@app.cell(hide_code=True)\ndef _(whiteboard):\n    whiteboard\n    return\n\n\n@app.cell(hide_code=True)\ndef _(mo):\n    mo.md(\"\"\"\n    ---\n    ### How It Works\n\n    This demo pairs two interactive surfaces:\n\n    1. **CurveEditor** (`wigglystuff.CurveEditor`): A spline-based curve editor with draggable control points.\n       Points are synced to Python via the `points` traitlet \u2014 you can access them programmatically\n       for further analysis, fitting, or export.\n\n    2. **Excalidraw** (`wigglystuff.Excalidraw`): A full whiteboard for freeform annotation.\n       The `scene` traitlet gives you every element as structured JSON, and `get_pil()` returns\n       the current drawing as a PIL Image.\n\n    3. **Reactivity**: Both widgets sync bi-directionally with Python \u2014 the curve editor updates\n       the sampled output cell, and the Excalidraw canvas is always available for programmatic access.\n\n    *Built with [wigglystuff](https://github.com/koaning/wigglystuff) + [marimo](https://marimo.io)*\n\n    #python #curves #splines #excalidraw #opensource\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">import%20marimo%0A%0A__generated_with%20%3D%20%220.23.8%22%0Aapp%20%3D%20marimo.App(width%3D%22full%22%2C%20app_title%3D%22Curve%20Editor%20Lab%22)%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20import%20numpy%20as%20np%0A%20%20%20%20import%20matplotlib.pyplot%20as%20plt%0A%20%20%20%20from%20wigglystuff%20import%20Excalidraw%2C%20CurveEditor%2C%20BezierCurve%0A%0A%20%20%20%20return%20CurveEditor%2C%20Excalidraw%2C%20mo%2C%20np%2C%20plt%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(CurveEditor%2C%20mo)%3A%0A%20%20%20%20editor%20%3D%20mo.ui.anywidget(CurveEditor(%0A%20%20%20%20%20%20%20%20x_bounds%3D(0.0%2C%2010.0)%2C%0A%20%20%20%20%20%20%20%20y_bounds%3D(-5.0%2C%205.0)%2C%0A%20%20%20%20%20%20%20%20width%3D700%2C%20height%3D400%2C%0A%20%20%20%20%20%20%20%20show_axes%3DTrue%2C%0A%20%20%20%20%20%20%20%20n_samples%3D200%2C%0A%20%20%20%20))%0A%20%20%20%20return%20(editor%2C)%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(Excalidraw%2C%20mo)%3A%0A%20%20%20%20whiteboard%20%3D%20mo.ui.anywidget(Excalidraw(height%3D500%2C%20theme%3D%22dark%22))%0A%20%20%20%20return%20(whiteboard%2C)%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(np)%3A%0A%20%20%20%20def%20sample_curve(widget%2C%20n_pts%3D200)%3A%0A%20%20%20%20%20%20%20%20%22%22%22Extract%20sampled%20curve%20points%20from%20the%20CurveEditor%20widget.%22%22%22%0A%20%20%20%20%20%20%20%20try%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20pts%20%3D%20widget.points%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20pts%20is%20None%20or%20len(pts)%20%3C%202%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%20None%2C%20None%0A%20%20%20%20%20%20%20%20%20%20%20%20%23%20points%20is%20%5B(x%2C%20y)%2C%20...%5D%20from%20the%20editor%0A%20%20%20%20%20%20%20%20%20%20%20%20xs%20%3D%20np.array(%5Bp%5B0%5D%20for%20p%20in%20pts%5D)%0A%20%20%20%20%20%20%20%20%20%20%20%20ys%20%3D%20np.array(%5Bp%5B1%5D%20for%20p%20in%20pts%5D)%0A%20%20%20%20%20%20%20%20%20%20%20%20return%20xs%2C%20ys%0A%20%20%20%20%20%20%20%20except%20Exception%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20return%20None%2C%20None%0A%0A%20%20%20%20return%20(sample_curve%2C)%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(editor%2C%20mo%2C%20plt%2C%20sample_curve)%3A%0A%20%20%20%20xs%2C%20ys%20%3D%20sample_curve(editor)%0A%0A%20%20%20%20mo.stop(xs%20is%20None%20or%20len(xs)%20%3D%3D%200%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20mo.md(%22%3E%20%F0%9F%91%86%20**Drag%20the%20control%20points**%20on%20the%20CurveEditor%20above%20to%20shape%20a%20curve.%22))%0A%0A%20%20%20%20fig%2C%20ax%20%3D%20plt.subplots(figsize%3D(8%2C%204))%0A%20%20%20%20fig.patch.set_facecolor('%230a0a0f')%0A%20%20%20%20ax.set_facecolor('%230a0a0f')%0A%0A%20%20%20%20ax.plot(xs%2C%20ys%2C%20color%3D'%2300d4ff'%2C%20linewidth%3D2.5%2C%20label%3D'Your%20Curve')%0A%20%20%20%20ax.fill_between(xs%2C%20ys%2C%20alpha%3D0.1%2C%20color%3D'%2300d4ff')%0A%20%20%20%20ax.axhline(0%2C%20color%3D'white'%2C%20alpha%3D0.2%2C%20linewidth%3D0.5)%0A%20%20%20%20ax.set_xlabel('x'%2C%20color%3D'white'%2C%20fontsize%3D12)%0A%20%20%20%20ax.set_ylabel('y'%2C%20color%3D'white'%2C%20fontsize%3D12)%0A%20%20%20%20ax.set_title('Sampled%20Curve%20Output'%2C%20color%3D'white'%2C%20fontsize%3D14)%0A%20%20%20%20ax.tick_params(colors%3D'white')%0A%20%20%20%20for%20spine%20in%20ax.spines.values()%3A%0A%20%20%20%20%20%20%20%20spine.set_color('white')%0A%20%20%20%20ax.legend(facecolor%3D'%231a1a2e'%2C%20edgecolor%3D'%23333'%2C%20labelcolor%3D'white')%0A%20%20%20%20plt.tight_layout()%0A%20%20%20%20plt%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(%22%22%22%0A%20%20%20%20%23%23%20%F0%9F%8E%9B%EF%B8%8F%20Curve%20Editor%20%2B%20Excalidraw%20Lab%0A%0A%20%20%20%20A%20dual-surface%20exploration%20environment%3A%0A%0A%20%20%20%20**Top**%3A%20The%20**CurveEditor**%20widget%20%E2%80%94%20drag%20control%20points%20to%20shape%20smooth%20curves.%0A%20%20%20%20%20%20-%20Natural%20cubic%20spline%20interpolation%0A%20%20%20%20%20%20-%20Configurable%20bounds%2C%20sampling%20resolution%2C%20and%20axes%0A%20%20%20%20%20%20-%20Real-time%20reactive%20updates%0A%0A%20%20%20%20**Bottom**%3A%20Full%20**Excalidraw%20whiteboard**%20for%20sketching%2C%20annotating%2C%20and%20freeform%20math.%0A%0A%20%20%20%20%23%23%23%20Try%20This%0A%20%20%20%201.%20Drag%20the%20control%20points%20on%20the%20CurveEditor%20to%20shape%20a%20curve%0A%20%20%20%202.%20Watch%20the%20sampled%20output%20update%20reactively%20below%0A%20%20%20%203.%20Use%20the%20Excalidraw%20whiteboard%20to%20annotate%20features%2C%20sketch%20derivatives%2C%20or%20design%20companion%20curves%0A%20%20%20%204.%20Export%20your%20work%20%E2%80%94%20CurveEditor%20state%20is%20available%20programmatically%2C%20Excalidraw%20exports%20to%20PNG%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(editor)%3A%0A%20%20%20%20editor%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(%22%22%22%0A%20%20%20%20%23%23%20%E2%9C%8F%EF%B8%8F%20Excalidraw%20Whiteboard%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(whiteboard)%3A%0A%20%20%20%20whiteboard%0A%20%20%20%20return%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(%22%22%22%0A%20%20%20%20---%0A%20%20%20%20%23%23%23%20How%20It%20Works%0A%0A%20%20%20%20This%20demo%20pairs%20two%20interactive%20surfaces%3A%0A%0A%20%20%20%201.%20**CurveEditor**%20(%60wigglystuff.CurveEditor%60)%3A%20A%20spline-based%20curve%20editor%20with%20draggable%20control%20points.%0A%20%20%20%20%20%20%20Points%20are%20synced%20to%20Python%20via%20the%20%60points%60%20traitlet%20%E2%80%94%20you%20can%20access%20them%20programmatically%0A%20%20%20%20%20%20%20for%20further%20analysis%2C%20fitting%2C%20or%20export.%0A%0A%20%20%20%202.%20**Excalidraw**%20(%60wigglystuff.Excalidraw%60)%3A%20A%20full%20whiteboard%20for%20freeform%20annotation.%0A%20%20%20%20%20%20%20The%20%60scene%60%20traitlet%20gives%20you%20every%20element%20as%20structured%20JSON%2C%20and%20%60get_pil()%60%20returns%0A%20%20%20%20%20%20%20the%20current%20drawing%20as%20a%20PIL%20Image.%0A%0A%20%20%20%203.%20**Reactivity**%3A%20Both%20widgets%20sync%20bi-directionally%20with%20Python%20%E2%80%94%20the%20curve%20editor%20updates%0A%20%20%20%20%20%20%20the%20sampled%20output%20cell%2C%20and%20the%20Excalidraw%20canvas%20is%20always%20available%20for%20programmatic%20access.%0A%0A%20%20%20%20*Built%20with%20%5Bwigglystuff%5D(https%3A%2F%2Fgithub.com%2Fkoaning%2Fwigglystuff)%20%2B%20%5Bmarimo%5D(https%3A%2F%2Fmarimo.io)*%0A%0A%20%20%20%20%23python%20%23curves%20%23splines%20%23excalidraw%20%23opensource%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <!-- This is a portal for the data editor to render in -->
+    <div id="portal" data-testid="glide-portal" style="position: fixed; left: 0; top: 0; z-index: 9999"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.8",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"app_title": "Curve Editor Lab", "sql_output": "auto", "width": "full"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

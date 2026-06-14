@@ -13,11 +13,9 @@
 export function PerformancePreload() {
   return (
     <>
-      {/* Preconnect to critical origins — fonts are self-hosted via next/font/local, no Google Fonts preconnect needed */}
+      {/* Preconnect to critical origins — Gumroad preconnect moved to /products to avoid global overhead */}
       <link rel="preconnect" href="https://edgelesslab.com" crossOrigin="anonymous" />
-      <link rel="preconnect" href="https://us.i.posthog.com" crossOrigin="anonymous" />
-      <link rel="preconnect" href="https://edgelessai.gumroad.com" crossOrigin="anonymous" />
-      
+      <link rel="preconnect" href="https://us.i.posthog.com" crossOrigin="anonymous" />      
       {/* DNS prefetch for additional origins */}
       <link rel="dns-prefetch" href="https://github.com" />
       <link rel="dns-prefetch" href="https://us.i.posthog.com" />

@@ -6,6 +6,7 @@ import {
   SubscribeSection,
 } from "@/components/home-client";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { Suspense } from "react";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { experiments, projects } from "@/lib/data";
@@ -93,6 +94,20 @@ const stackNodes = [
   { label: "VPS / Hermes", sublabel: "always-on runtime", color: "var(--green)" },
 ];
 
+function SectionSkeleton() {
+  return (
+    <div className="space-y-3">
+      <div className="h-3 w-24 rounded border" style={{ borderColor: "var(--border-subtle)", background: "var(--bg-surface)" }} />
+      <div className="h-3 w-full rounded border" style={{ borderColor: "var(--border-subtle)", background: "var(--bg-surface)" }} />
+      <div className="h-3 w-5/6 rounded border" style={{ borderColor: "var(--border-subtle)", background: "var(--bg-surface)" }} />
+    </div>
+  );
+}
+
+function SectionBlock({ children }: { children: React.ReactNode }) {
+  return <div className="min-h-[520px]">{children}</div>;
+}
+
 export default function Home() {
   return (
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
@@ -103,93 +118,109 @@ export default function Home() {
         <HeroSection />
 
         {/* Recent Activity (chronological stream) */}
-        <section className="px-6 py-16 border-t" style={{ borderColor: "var(--border-subtle)" }}>
-          <div className="max-w-[920px] mx-auto">
-            <div className="flex items-baseline justify-between mb-6">
-              <h2
-                className="text-sm font-mono uppercase tracking-[0.15em]"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                Recent activity
-              </h2>
-              <Link
-                href="/blog"
-                className="text-sm flex items-center gap-1 transition-colors hover:text-white"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                Full feed <ArrowRight size={13} />
-              </Link>
-            </div>
+        <SectionBlock>
+          <section className="px-6 py-16 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+            <div className="max-w-[920px] mx-auto">
+              <div className="flex items-baseline justify-between mb-6">
+                <h2
+                  className="text-sm font-mono uppercase tracking-[0.15em]"
+                  style={{ color: "var(--text-tertiary)" }}
+                >
+                  Recent activity
+                </h2>
+                <Link
+                  href="/blog"
+                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Full feed <ArrowRight size={13} />
+                </Link>
+              </div>
 
-            <RecentActivity posts={posts} />
-          </div>
-        </section>
+              <Suspense fallback={<SectionSkeleton />}>
+                <RecentActivity posts={posts} />
+              </Suspense>
+            </div>
+          </section>
+        </SectionBlock>
 
         {/* Featured Projects */}
-        <section className="px-6 py-20">
-          <ScrollReveal>
-            <div className="max-w-[1280px] mx-auto">
-              <div className="flex items-baseline justify-between mb-10">
-                <h2
-                  className="text-sm font-mono uppercase tracking-[0.15em]"
-                  style={{ color: "var(--text-tertiary)" }}
-                >
-                  Featured
-                </h2>
-                <Link
-                  href="/projects"
-                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  All projects <ArrowRight size={13} />
-                </Link>
-              </div>
+        <SectionBlock>
+          <section className="px-6 py-20">
+            <ScrollReveal>
+              <div className="max-w-[1280px] mx-auto">
+                <div className="flex items-baseline justify-between mb-10">
+                  <h2
+                    className="text-sm font-mono uppercase tracking-[0.15em]"
+                    style={{ color: "var(--text-tertiary)" }}
+                  >
+                    Featured
+                  </h2>
+                  <Link
+                    href="/projects"
+                    className="text-sm flex items-center gap-1 transition-colors hover:text-white"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    All projects <ArrowRight size={13} />
+                  </Link>
+                </div>
 
-              <ProjectShowcaseSection projects={featured} capabilities={capabilities} />
-            </div>
-          </ScrollReveal>
-        </section>
+                <Suspense fallback={<SectionSkeleton />}>
+                  <ProjectShowcaseSection projects={featured} capabilities={capabilities} />
+                </Suspense>
+              </div>
+            </ScrollReveal>
+          </section>
+        </SectionBlock>
 
         {/* Stack */}
-        <section className="px-6 py-20" style={{ background: "var(--bg-base)" }}>
-          <ScrollReveal>
-            <div className="max-w-[1280px] mx-auto">
-              <h2
-                className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                Stack
-              </h2>
-
-              <TechShowcaseSection nodes={stackNodes} experiments={homepageExperiments} />
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* Products */}
-        <section className="px-6 py-20" style={{ background: "var(--bg-surface)" }}>
-          <ScrollReveal>
-            <div className="max-w-[1280px] mx-auto">
-              <div className="flex items-baseline justify-between mb-10">
+        <SectionBlock>
+          <section className="px-6 py-20" style={{ background: "var(--bg-base)" }}>
+            <ScrollReveal>
+              <div className="max-w-[1280px] mx-auto">
                 <h2
-                  className="text-sm font-mono uppercase tracking-[0.15em]"
+                  className="text-sm font-mono uppercase tracking-[0.15em] mb-10"
                   style={{ color: "var(--text-tertiary)" }}
                 >
-                  Products
+                  Stack
                 </h2>
-                <Link
-                  href="/products"
-                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  All products <ArrowRight size={13} />
-                </Link>
-              </div>
 
-              <CTASection />
-            </div>
-          </ScrollReveal>
-        </section>
+                <Suspense fallback={<SectionSkeleton />}>
+                  <TechShowcaseSection nodes={stackNodes} experiments={homepageExperiments} />
+                </Suspense>
+              </div>
+            </ScrollReveal>
+          </section>
+        </SectionBlock>
+
+        {/* Products */}
+        <SectionBlock>
+          <section className="px-6 py-20" style={{ background: "var(--bg-surface)" }}>
+            <ScrollReveal>
+              <div className="max-w-[1280px] mx-auto">
+                <div className="flex items-baseline justify-between mb-10">
+                  <h2
+                    className="text-sm font-mono uppercase tracking-[0.15em]"
+                    style={{ color: "var(--text-tertiary)" }}
+                  >
+                    Products
+                  </h2>
+                  <Link
+                    href="/products"
+                    className="text-sm flex items-center gap-1 transition-colors hover:text-white"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    All products <ArrowRight size={13} />
+                  </Link>
+                </div>
+
+                <Suspense fallback={<SectionSkeleton />}>
+                  <CTASection />
+                </Suspense>
+              </div>
+            </ScrollReveal>
+          </section>
+        </SectionBlock>
 
         {/* Subscribe */}
         <SubscribeSection />

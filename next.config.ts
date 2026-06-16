@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  experimental: {
+    optimizePackageImports: ["lucide-react", "@chenglou/pretext"],
+  },
 };
 
 export default nextConfig;

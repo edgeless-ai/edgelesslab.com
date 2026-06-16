@@ -8,17 +8,23 @@ import { CommandPalette } from "@/components/command-palette";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = localFont({
-  src: "../fonts/Geist[wght].woff2",
+  src: "../fonts/Geist[wght].subset.compressed.woff2",
   variable: "--font-geist-sans",
   weight: "100 900",
   display: "swap",
+  fallback: ["system-ui", "sans-serif"],
+  preload: true,
+  crossOrigin: "anonymous",
 });
 
 const geistMono = localFont({
-  src: "../fonts/GeistMono[wght].woff2",
+  src: "../fonts/GeistMono[wght].subset.woff2",
   variable: "--font-geist-mono",
   weight: "100 900",
   display: "swap",
+  fallback: ["ui-monospace", "monospace"],
+  preload: true,
+  crossorigin: "anonymous",
 });
 
 export const metadata: Metadata = {
@@ -35,12 +41,14 @@ export const metadata: Metadata = {
     siteName: 'Edgeless Lab',
     title: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
     description: 'One person shipping autonomous agents, generative art, and developer tools. Built in production, released in the open.',
-    images: [{
-      url: '/og-image.webp',
-      width: 1200,
-      height: 630,
-      alt: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
-    }],
+    images: [
+      {
+        url: '/og-image.webp',
+        width: 1200,
+        height: 630,
+        alt: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',

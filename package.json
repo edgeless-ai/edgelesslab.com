@@ -6,7 +6,7 @@
     "dev": "next dev",
     "prebuild": "./scripts/preserve-standalone.sh save",
     "build": "next build",
-    "postbuild": "./scripts/preserve-standalone.sh restore && mkdir -p out/pen-plotter/assets && rsync -a --exclude=medium --exclude=mediums-all pen-plotter/assets/ out/pen-plotter/assets/; [ -d pen-plotter/fxhash ] && cp -r pen-plotter/fxhash out/pen-plotter/; [ -d pen-plotter/kandinsky-to-canvas ] && cp -r pen-plotter/kandinsky-to-canvas out/pen-plotter/; npx pagefind --site out; true",
+    "postbuild": "find out -name '*.js.map' -delete && find out -name '*.css.map' -delete && ./scripts/preserve-standalone.sh restore && mkdir -p out/pen-plotter/assets && rsync -a --exclude=medium --exclude=mediums-all pen-plotter/assets/ out/pen-plotter/assets/; [ -d pen-plotter/fxhash ] && cp -r pen-plotter/fxhash out/pen-plotter/; [ -d pen-plotter/kandinsky-to-canvas ] && cp -r pen-plotter/kandinsky-to-canvas out/pen-plotter/; npx pagefind --site out; true",
     "start": "next start",
     "lint": "eslint && node scripts/lint-experiments.mjs && npm run lint:voice",
     "lint:blog-links": "node scripts/lint-blog-links.mjs",
@@ -17,12 +17,11 @@
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.3",
-    "react-dom": "19.2.4",
     "lucide-react": "^0.577.0",
     "next": "16.2.0",
-    "playwright": "^1.59.1",
     "posthog-js": "^1.363.6",
-    "react": "19.2.4"
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.0",

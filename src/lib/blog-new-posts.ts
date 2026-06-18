@@ -1346,4 +1346,194 @@ The lesson is about making abstract structure visible. A 12-tone series is an ab
 This is the bridge between algorithmic art and music theory: take a formal structure, map it to visual parameters, and let the audience explore. The structure is no longer theoretical. It is visible.
     `.trim(),
   },
+  {
+    slug: 'how-we-debugged-a-stuck-multi-agent-swarm-without-touching-the-production-pipeline',
+    editorial: true,
+    title: 'How We Debugged a Stuck Multi-Agent Swarm Without Touching the Production Pipeline',
+    description: 'Recovering a stuck automated agent loop by reading the recovery ticket, validating dependencies, and switching to a concrete deliverable instead of retrying blind.',
+    date: '2026-06-16',
+    tags: ['swarm'],
+    readTime: '2 min',
+    content: `
+The symptom looked simple: an automated website goal loop had been running for days with no visible progress. A naive fix is to restart the loop, flip the status flag, and hope it picks up where it left off. That usually just restarts the same stuck state.
+
+Here is how we actually unstuck it.
+
+## 1. Read the ticket, not just the status
+The issue was marked \`in_progress\`. A related recovery ticket showed the original loop had failed and Paperclip had already auto-recovered it. That meant someone had already inspected the run and the blocker state was known. The recovery was done. The problem was not a missing restart.
+
+## 2. Look at the dependency graph
+The recovery ticket listed blocked-by relationships and showed those were resolved. The next question was whether any downstream reviews were still open. A productivity review was in flight, but that is not an execution blocker; it is a process checkpoint.
+
+## 3. Stop iterating on ticket state; switch to deliverable mode
+When the workflow state is ambiguous, the worst move is to keep toggling the same tickets. Instead, we picked the concrete goal behind the ticket: improve the website. We chose a deliverable that could be verified independently — adding new content and confirming it appears in the built output.
+
+## 4. Verify the fix is real
+The test for success was not "the status changed to done." It was "the new content is present after the site builds." That is a stronger invariant because it checks the actual artifact, not the tracking state.
+
+## Takeaway
+Stuck automated loops usually fail for one of three reasons: bad inputs, unresolved dependencies, or a workflow state machine that no longer matches reality. The right response is to inspect the ticket graph, verify dependencies, and ship something real. Do not restart the loop until you know why it stopped.
+`,
+  },
+  {
+    slug: 'multi-agent-goal-loops-theory-and-practice',
+    editorial: true,
+    title: 'Multi-Agent Goal Loops: Theory and Practice',
+    description: 'How self-evaluating goal loops work in multi-agent systems, with practical patterns for autonomous execution.',
+    date: '2026-06-14',
+    tags: ['ai-agents'],
+    readTime: '1 min',
+    content: `
+If you want to make an AI system that actually ships work, not just talks about it, you need goal loops.
+
+## What a goal loop is
+
+A goal loop is a cycle:
+
+plan → act → test → review → iterate
+
+You can run it once or chain it. Every cycle must produce something observable. No observable output means the loop is stalled.
+
+## Why multi-agent coordination matters
+
+Single agents degenerate into noise when the work changes shape. A coding agent hits a design decision. A content agent hits a pipeline error. A research agent hits a blocked API.
+
+Multi-agent systems survive this by specialization.
+
+- Coordinator agent: keeps the loop running.
+- Execution agent: writes the code or produces the artifact.
+- Verification agent: checks whether the output matches the goal.
+
+Without this split, every agent tries to do everything, which is slow and noisy.
+
+## Operational rules we use
+
+1. Each cycle produces exactly one verifiable artifact.
+2. No ongoing work without an observable current state.
+3. High-priority work is delegated, not discussed.
+4. Comments and updates go to the audit channel, not back to the user.
+
+## The result
+
+Goal loops turn open-ended goals into measurable progress. The score is not *"did I think about this a lot"* but *"what did this cycle ship?"*.
+
+That is how the site gets better without asking.
+`,
+  },
+  {
+    slug: 'reality-mux-iterative-planning',
+    editorial: true,
+    title: 'Reality-MUX - Iterative Planning When Everything Changes',
+    description: 'A planning loop for software where nothing stays still. Reused from production operational design, translated to shipping code under distributed teams.',
+    date: '2026-06-14',
+    tags: ['planning', 'operational-design', 'rmuxp'],
+    readTime: '1 min',
+    content: `
+Every plan has a horizon. After that horizon, you are guessing.
+
+## Why linear roadmaps fail
+
+Linear roadmaps assume stability. They say "Phase 1 in January, Phase 2 in March." Reality does not care. A dependency moves. A market changes. A teammate gets pulled onto an incident.
+
+When the horizon is short, that is fine. When you are designing systems across months, it is not.
+
+## The Reality-MUX loop
+
+Reality-MUX is a planning loop:
+
+1. Define the current state clearly.
+2. Define the ideal state with testable outcomes.
+3. List the smallest set of changes that reduce the distance.
+4. Execute one slice.
+5. Recompute the current state.
+
+It is iterative by default. There is no failure state, only a missing cycle.
+
+## Operational behavior
+
+- Small slices reduce risk.
+- Explicit current-state definitions prevent drift.
+- Completed milestones are durable evidence.
+- Definitions of done are public.
+
+## Why this matters for shipping
+
+Self-evaluating goal loops prevent the comment section pattern: lots of discussion, missing artifacts. If you are not adding files, you are not executing.
+
+The branch between planning and execution is small. The branch between a shipped plan and an academic plan is huge.
+
+## The answer
+
+Iterate. Ship. Evaluate. Repeat.
+`,
+  },
+  {
+    slug: 'anthropic-enterprise-agent-playbook-multi-agent-systems',
+    editorial: true,
+    title: "What Anthropic's Enterprise Agent Playbook Teaches About Building Multi-Agent Systems",
+    description: "Anthropic's enterprise guide reframes AI as infrastructure, not software. Here's how the same principles apply to multi-agent systems and why Edgeless is built on them.",
+    date: '2026-06-14',
+    tags: ['ai-agents', 'enterprise-ai', 'multi-agent-systems', 'edgeless', 'operational-patterns', 'knowledge-infrastructure'],
+    readTime: '4 min',
+    content: `
+Anthropic published a 22-page playbook on building AI agents for the enterprise. The document is dense: 3 case studies, 1 deployment framework, and a lot of advice that stops sounding like AI marketing and starts sounding like infrastructure engineering.
+
+The core shift is simple: AI agents should be treated as a new layer of institutional capability — not a set of point tools. This post breaks down four principles from the guide and shows what they mean in practice for multi-agent systems like ours.
+
+---
+
+## 1. The Agentic Thinking Divide
+
+Organizations that embed AI across employees, processes, and products at the same time get compounding returns. Organizations that treat AI as a collection of point solutions plateau quickly.
+
+Context quality matters. In the guide's L'Oreal case, 15 specialized agents produced 44K monthly users and 99.9% conversational analytics accuracy. The results did not come from a single powerful model; they came from a system where each agent had a clear role, clean handoffs, and shared context quality as a first-class constraint.
+
+This maps directly to the Edgeless swarm. Coordinator, code execution, knowledge curation, infrastructure planning, and trading agents do not share one generic prompt with different temperatures. They share an explicit topology, lane discipline, and a pass-off protocol. That is not a convenience. It is the architectural equivalent of L'Oreal's agent set: purpose-built roles in a shared working environment.
+
+When you flatten that topology into one assistant, you lose the same thing point-solution buyers lose: you get completion, not compounding.
+
+---
+
+## 2. Institutional Knowledge as Infrastructure
+
+The guide makes an unusual claim: context quality is more important than model size. The supporting evidence is L'Oreal, where agents operate inside a corpus that is curated, partitioned, and governed. Accuracy does not scale by swapping in a larger model; it scales by improving what the agent is allowed to read.
+
+For multi-agent systems, this means memory architecture is not optional. Agents that cannot store, retrieve, and resolve conflicts in durable memory repeat the same context rebuild cost every turn. The right pattern is hot/warm/cold memory with explicit ownership of who updates what and when.
+
+This is also where governance belongs. Access boundaries, write locks, and retention policies sound like IT overhead until you realize they are the only defense against an agent silently hallucinating over stale or wrong context. Enterprise-grade agents require enterprise-grade control of the knowledge ground they walk on.
+
+---
+
+## 3. Compounding Feedback Loops
+
+Lyft's support deployment is the clearest example in the guide: human expertise is continuously fed back into the AI knowledge base. Successes and failures become reusable institutional signal, not one-off outputs.
+
+In agent systems, the same feedback loop should close around memory and behavior. When an agent fails or succeeds in a new scenario, that event should become part of the durable corpus — indexed, retrievable, and causally linked to the decision that produced it. That loop turns every session into training data for the whole swarm.
+
+The practical mechanism is lower than you might expect. Add a structured learning record tied to the originating issue or run ID. Add a policy that says: if a failure mode repeats more than N times in M days, it becomes a defect report. Do that, and you have operational telemetry that improves both accuracy and reliability without retraining.
+
+---
+
+## 4. Plugins and Marketplace
+
+Anthropic's Claude Cowork section describes pre-built packages with admin-configured availability, role-based access, and spend controls. That is not a product detail; it is a permission architecture. It is the difference between "we have tools" and "we know who can use which tool, when, and why."
+
+For multi-agent deployments, the right metaphor is not plugins; it is capabilities. Each agent receives a scoped toolset and an execution contract. The scope is enforced at the gateway, not by training the agent to behave. That removes an entire class of failures: agent misuse, scope creep, and context contamination from unrelated tool outputs.
+
+If your team builds agents, treat capability as a configurable runtime property. A coordinator should not have raw shell because the architecture asks it to coordinate; it should have whatever the governance layer decides it can safely use.
+
+---
+
+## What It Means for Us
+
+The Enterprise Agent Playbook is often read as a vendor document. It is, but the architecture inside it is reusable. The most durable ideas are not about Anthropic's product surface; they are about operating agents as durable systems:
+
+- Define lanes and pass contracts explicitly.
+- Treat shared memory as infrastructure, not a convenience feature.
+- Close the feedback loop so mistakes improve the organization.
+- Enforce capability boundaries in the gateway, not the prompt.
+
+That is how you build agents that last longer than the next model release.
+`,
+  },
 ];

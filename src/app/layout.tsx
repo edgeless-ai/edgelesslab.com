@@ -8,7 +8,7 @@ import { CommandPalette } from "@/components/command-palette";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = localFont({
-  src: "../fonts/Geist[wght].subset.compressed.woff2",
+  src: "../fonts/Geist[wght].woff2",
   variable: "--font-geist-sans",
   weight: "100 900",
   display: "swap",
@@ -18,7 +18,7 @@ const geistSans = localFont({
 });
 
 const geistMono = localFont({
-  src: "../fonts/GeistMono[wght].subset.woff2",
+  src: "../fonts/GeistMono[wght].woff2",
   variable: "--font-geist-mono",
   weight: "100 900",
   display: "swap",

@@ -1,0 +1,119 @@
+```
+                                    WORKFLOW DIAGRAMS
+                                    ==================
+                          Reel Analysis: @enterprisevibecode
+
+
+[DIAGRAM A]  "Plug a scraper into your AI agent"
+─────────────────────────────────────────────────────────────────
+        ┌─────────────────┐
+        │   YOUR AI AGENT │   (AI chat-bubble icon)
+        └────────┬────────┘
+                 │   one connection
+              ┌──┴──┐
+              │ MCP │   ← Model Context Protocol
+              └──┬──┘
+                 │
+     ┌───────────┴────────────┐
+     │  Apify  ( + ANY SCRAPER)│
+     └────────────────────────┘
+
+   Reading: AI agent → one MCP tunnel → any web scraper
+
+
+[DIAGRAM B]  "THE LEARNING SKILL" (orchestrator + 4 sub-agents)
+─────────────────────────────────────────────────────────────────
+                                   ┌──────────────┐
+                                   │ ORCHESTRATOR │   ONE agent
+                                   └──────┬───────┘   spawns
+                  ┌───────────────┬───────┼───────┬──────────────┐
+                  ▼               ▼       ▼       ▼              ▼
+            ┌─────────┐      ┌────────┐ ┌────┐ ┌──────────┐    (more
+            │  TITLE  │      │ FIRST  │ │STR │ │  IMAGE   │    sub-
+            │PATTERNS │      │SENTENCE│ │ UCT│ │  STYLE   │    agents)
+            └────┬────┘      └───┬────┘ └─┬──┘ └────┬─────┘
+                 └───────┬─────── ┴──┬────┴──┬──────┘
+                         ▼           ▼       ▼
+                   ┌──────────────────────────┐
+                   │       SCRAPER LAYER      │   each sub-agent
+                   │   (Apify + Firecrawl)    │   feeds raw data
+                   └──────────────┬───────────┘
+                                  │
+                                  ▼   reports "return-line" back to
+                             ORCHESTRATOR  → merges → PATTERN REPORT
+
+
+[DIAGRAM C]  "STEP TWO: Dump the whole field into NotebookLM"
+─────────────────────────────────────────────────────────────────
+       ┌──────────────────────────────┐
+       │   EVERYTHING YOU SCRAPED     │   stack of data tables
+       │   (top 50 + bottom 50 posts) │
+       └──────────────┬───────────────┘
+                      │
+                      ▼
+              ┌───────────────┐
+              │   NotebookLM  │   (Google spiral logo)
+              └───────────────┘
+
+
+[DIAGRAM D]  "One source. Every way to learn"   (NotebookLM × 9 outputs)
+─────────────────────────────────────────────────────────────────
+                            ┌───────────────┐
+                            │   NotebookLM  │
+                            └───────┬───────┘
+       ┌────────────┬──────────────┼──────────────┬────────────┐
+       ▼            ▼              ▼               ▼            ▼
+   ┌─────────┐  ┌──────────┐  ┌──────────┐    ┌────────┐  ┌────────┐
+   │ AUDIO   │  │  SLIDE   │  │  VIDEO   │    │ MIND   │  │REPORTS │
+   │OVERVIEW │  │  DECK    │  │OVERVIEW  │    │  MAP   │  │        │
+   └─────────┘  └──────────┘  └──────────┘    └────────┘  └────────┘
+       ▼            ▼              ▼
+   ┌─────────┐  ┌──────────┐  ┌──────────┐
+   │FLASH-   │  │   QUIZ   │  │ INFOG-   │
+   │ CARDS   │  │          │  │ RAPHIC   │
+   └─────────┘  └──────────┘  └──────────┘
+                                  +
+                            ┌──────────┐
+                            │   DATA   │
+                            │  TABLE   │
+                            └──────────┘
+
+
+END-TO-END FLOW (concatenated)
+─────────────────────────────────────────────────────────────────
+  Pick niche + platform
+       │
+       ▼
+  Scrape top 50 + bottom 50  ─── via Apify / Bright Data / Firecrawl /
+       │                          Decodo / Oxylabs / PhantomBuster
+       ▼
+  Connect scraper → AI agent  ─── via MCP (one tunnel)
+       │
+       ▼
+  Run prompt template:  "Point [scraper] at top/bottom of [niche].
+                          Pull top 50, bottom 50. What does the top 10%
+                          do that the bottom never do? Specific,
+                          repeatable pattern, not vibes."
+       │
+       ▼
+  (Advanced) Build "Learning Skill" orchestrator
+       │         orchestrator + 4+ sub-agents
+       │         (Title / First-Sentence / Structure / Image-Style)
+       │                       │
+       ▼                       ▼
+  Pattern Report  ◄──── sub-agents report return-line
+       │
+       ▼
+  Dump everything → NotebookLM
+       │
+       ▼
+  Generate study material:  Audio · Slide · Video · Mind-Map · Reports ·
+                            Flashcards · Quiz · Infographic · Data-Table
+```
+
+Reel Analysis — Workflow Diagrams (ASCII)
+============================================
+
+Source: Instagram Reel DZsdJ6oxAQl from @enterprisevibecode
+Captured: 2026-06-17 by Claude (frame-by-frame at 2 fps, 125 frames)
+Full report: /Users/djm/claude-projects/security-research/findings/reel-workflow-analysis.md

@@ -9,7 +9,7 @@ interface ScrollRevealProps {
 }
 
 export function ScrollReveal({ children, className = "", delay = 0 }: ScrollRevealProps) {
-  const [ref, inView] = useInView(0.12);
+  const [ref, inView] = useInView(0);
 
   return (
     <div

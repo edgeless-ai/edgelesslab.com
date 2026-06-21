@@ -1,4 +1,17 @@
-/** Performance Preload Component */
+/** Performance Preload Component
+ *
+ * EDGA-5399 cleanup (2026-06-18):
+ *   - Removed global og-image.webp preload (not LCP-critical; was loaded everywhere
+ *     and blocked the bandwidth budget on every page even if OG never used).
+ *     The preload still ships inside <head> only on pages that explicitly request
+ *     it via `generateMetadata({ openGraph: { images: [...] } })` -- returnvalue is
+ *     a real <meta property=og:image> link, which Twitter/Card consumers can fetch
+ *     at share time.
+ *   - Removed global preconnect to gumroad.com (CSP already pins frame-src for it
+ *     on /products; was a wasted ~100ms DNS+TLS round for everything else).
+ *   - Kept critical.css preload and posthog/github preconnect (PostHog instrumentation
+ *     is harmless; github preconnect helps repo CTA clicks).
+ */
 
 export function PerformancePreload() {
   return (
@@ -8,13 +21,6 @@ export function PerformancePreload() {
         href="/fonts/critical.css"
         as="style"
         crossOrigin="anonymous"
-      />
-      <link
-        rel="preload"
-        href="/og-image.webp"
-        as="image"
-        type="image/webp"
-        fetchPriority="high"
       />
       <link rel="preconnect" href="https://edgelesslab.com" crossOrigin="anonymous" />
       <link rel="preconnect" href="https://us.i.posthog.com" crossOrigin="anonymous" />

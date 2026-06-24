@@ -9,19 +9,16 @@
  *     at share time.
  *   - Removed global preconnect to gumroad.com (CSP already pins frame-src for it
  *     on /products; was a wasted ~100ms DNS+TLS round for everything else).
- *   - Kept critical.css preload and posthog/github preconnect (PostHog instrumentation
- *     is harmless; github preconnect helps repo CTA clicks).
+ *   - Removed /fonts/critical.css preload — the file does not exist in public/,
+ *     so every page was issuing a 404 render-blocking preload hunt. EDGA-XXXX
+ *     (mobile LCP 4.4s → target <2.5s). Inline critical CSS in layout.tsx instead.
+ *   - Kept posthog/github preconnect (PostHog instrumentation is harmless;
+ *     github preconnect helps repo CTA clicks).
  */
 
 export function PerformancePreload() {
   return (
     <>
-      <link
-        rel="preload"
-        href="/fonts/critical.css"
-        as="style"
-        crossOrigin="anonymous"
-      />
       <link rel="preconnect" href="https://edgelesslab.com" crossOrigin="anonymous" />
       <link rel="preconnect" href="https://us.i.posthog.com" crossOrigin="anonymous" />
       <link rel="dns-prefetch" href="https://github.com" />

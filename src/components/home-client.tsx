@@ -107,13 +107,13 @@ export function HeroSection() {
               <span>
                 Shipping{" "}
                 <Link
-                  href="/products/launch-toolkit"
+                  href="/blog/edgeless-memory-v1-passive-recall"
                   className="underline-offset-2 hover:underline transition-colors hover:text-white"
                   style={{ color: "var(--text-secondary)" }}
                 >
-                  Digital Product Launch Toolkit
+                  edgeless-memory v1.0
                 </Link>
-                {" "}&middot; 7 products in 7 days
+                {" "}&middot; passive recall across 5 agent profiles
               </span>
             </div>
           </div>

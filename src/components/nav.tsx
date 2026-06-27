@@ -8,6 +8,7 @@ import { openCommandPalette } from "@/lib/command-palette-events";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const navLinks = [
+  { label: "Shop", href: "https://shop.edgelesslab.com" },
   { label: "Projects", href: "/projects" },
   { label: "Products", href: "/products" },
   { label: "Services", href: "/services/private-ai-systems" },

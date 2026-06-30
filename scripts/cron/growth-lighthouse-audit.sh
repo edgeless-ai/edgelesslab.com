@@ -43,6 +43,9 @@ for candidate in \
         break
     fi
 done
+# Export so growth-lighthouse-pages.py (which shells out to lighthouse) resolves the
+# absolute binary under cron's minimal PATH, which excludes ~/.npm-global/bin.
+export LIGHTHOUSE_BIN
 
 NOW_ISO=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
 NOW_DATE=$(date -u '+%Y-%m-%d')

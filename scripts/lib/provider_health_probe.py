@@ -56,6 +56,7 @@ PROVIDERS: List[Dict] = [
         "endpoint": "/models",
         "auth_header": "Authorization: Bearer {key}",
         "deep_model": "accounts/fireworks/routers/kimi-k2p6-turbo",
+        "chat_probe": True,
     },
     {
         "name": "openrouter",
@@ -65,6 +66,9 @@ PROVIDERS: List[Dict] = [
         "endpoint": "/models",
         "auth_header": "Authorization: Bearer {key}",
         "deep_model": "openai/gpt-3.5-turbo",
+        # Key is valid; account is credit-gated (chat returns 402, not an auth/down
+        # condition). Treat as optional so it never counts toward pool exhaustion.
+        "expected_optional": True,
     },
     {
         "name": "openai",
@@ -84,6 +88,9 @@ PROVIDERS: List[Dict] = [
         "auth_header": "x-api-key: {key}",
         "extra_headers": ["anthropic-version: 2023-06-01"],
         "deep_model": "claude-3-5-haiku-20241022",
+        # Key is intentionally absent from .env ("no bots on Anthropic billing").
+        # Its 401 is expected and must NOT count toward pool exhaustion.
+        "expected_absent": True,
     },
     {
         "name": "nous",
@@ -110,6 +117,8 @@ class ProviderResult:
     status_code: Optional[int] = None
     error: Optional[str] = None
     deep_probe: bool = False
+    expected_absent: bool = False
+    expected_optional: bool = False
 
     def to_dict(self):
         return asdict(self)
@@ -240,6 +249,14 @@ def _probe_one_provider(spec: Dict, deep: bool = False) -> ProviderResult:
                 status_code=code, error="unexpectedly alive — review runbook",
             )
 
+    # Chat-probe providers: skip GET /models and go straight to minimal chat completion
+    if spec.get("chat_probe") and spec.get("deep_model"):
+        chat_ok, chat_err, chat_latency = _deep_chat_probe(base_url, spec["deep_model"], headers)
+        return ProviderResult(
+            name=name, label=label, healthy=chat_ok, latency_ms=round(chat_latency, 1),
+            status_code=200 if chat_ok else 401, error=chat_err, deep_probe=True,
+        )
+
     if not ok:
         return ProviderResult(
             name=name, label=label, healthy=False, latency_ms=round(latency_ms, 1),
@@ -324,12 +341,21 @@ def validate_fallback() -> FallbackValidation:
 
     fallbacks = cfg.get("fallback_providers", [])
     if not fallbacks:
-        # Try legacy fallback_model field
+        # Try legacy fallback_model field (may be a dict or a list of dicts)
         fb_cfg = cfg.get("fallback_model", {})
         if fb_cfg:
-            fallback = fb_cfg.get("model", "unknown")
-            fallback_provider = fb_cfg.get("provider", "") or _provider_from_model(fallback)
-            fallback_base = fb_cfg.get("base_url", "")
+            if isinstance(fb_cfg, list):
+                fb_cfg = fb_cfg[0] if fb_cfg else {}
+            if fb_cfg:
+                fallback = fb_cfg.get("model", "unknown")
+                fallback_provider = fb_cfg.get("provider", "") or _provider_from_model(fallback)
+                fallback_base = fb_cfg.get("base_url", "")
+            else:
+                return FallbackValidation(
+                    primary_model=primary, fallback_model="none",
+                    primary_provider=primary_provider, fallback_provider="none",
+                    valid=False, reason="No fallback_providers or fallback_model configured",
+                )
         else:
             return FallbackValidation(
                 primary_model=primary, fallback_model="none",
@@ -342,19 +368,31 @@ def validate_fallback() -> FallbackValidation:
         fallback_provider = fb.get("provider", "") or _provider_from_model(fallback)
         fallback_base = fb.get("base_url", "")
 
-    # If both are 'custom', compare base_url to detect same cloud endpoint
-    same_provider = (fallback_provider == primary_provider)
-    same_endpoint = (fallback_provider == "custom" and primary_provider == "custom" and fallback_base == primary_base)
-    valid = not same_provider and not same_endpoint and primary_provider != "unknown" and fallback_provider != "unknown"
+    # When both providers carry the generic 'custom' label (the normal label for
+    # any OpenAI-compatible gateway), the label alone cannot tell them apart.
+    # Compare base_url HOSTS instead: differing hosts = genuine cross-provider
+    # failover (e.g. nousresearch.com vs nvidia.com), same host = real same-endpoint.
+    from urllib.parse import urlparse
+
+    if primary_provider == fallback_provider == "custom":
+        primary_host = urlparse(primary_base).netloc if primary_base else ""
+        fallback_host = urlparse(fallback_base).netloc if fallback_base else ""
+        same_endpoint = bool(primary_host) and primary_host == fallback_host
+        same_provider = same_endpoint  # for reason reporting below
+        valid = bool(primary_host) and bool(fallback_host) and not same_endpoint
+    else:
+        same_provider = (fallback_provider == primary_provider)
+        same_endpoint = False
+        valid = not same_provider and primary_provider != "unknown" and fallback_provider != "unknown"
 
     reason = None
     if not valid:
         if same_endpoint:
-            reason = f"primary ({primary_provider}) and fallback ({fallback_provider}) use SAME base_url ({primary_base})"
+            reason = f"primary ({primary_provider}) and fallback ({fallback_provider}) use SAME host ({urlparse(primary_base).netloc})"
         elif same_provider:
             reason = f"primary ({primary_provider}) and fallback ({fallback_provider}) resolve to SAME provider identifier"
         else:
-            reason = "fallback validation failed"
+            reason = "fallback validation failed (missing base_url or unknown provider)"
 
     return FallbackValidation(
         primary_model=primary,
@@ -378,14 +416,18 @@ def run_probe(deep: bool = False) -> tuple[List[ProviderResult], float]:
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
         futures = {pool.submit(_probe_one_provider, spec, deep): spec for spec in PROVIDERS}
         for future in concurrent.futures.as_completed(futures):
+            spec = futures[future]
             try:
-                results.append(future.result(timeout=PROBE_TIMEOUT_SEC + 1))
+                r = future.result(timeout=PROBE_TIMEOUT_SEC + 1)
             except Exception as e:
-                spec = futures[future]
-                results.append(ProviderResult(
+                r = ProviderResult(
                     name=spec["name"], label=spec["label"],
                     healthy=False, latency_ms=0.0, error=f"probe crashed: {e}",
-                ))
+                )
+            # Stamp registry intent flags so severity logic and JSON reflect them.
+            r.expected_absent = spec.get("expected_absent", False)
+            r.expected_optional = spec.get("expected_optional", False)
+            results.append(r)
 
     elapsed = time.monotonic() - start
     return results, elapsed
@@ -395,9 +437,17 @@ def determine_exit_code(results: List[ProviderResult], fallback_valid: bool) -> 
     """0=all ok, 1=some degraded, 2=critical (pool exhaustion or fallback same-provider)."""
     if not fallback_valid:
         return 2
-    down = [r for r in results if not r.healthy and not r.error or "confirmed dead" not in (r.error or "")]
-    # Exclude expected-dead (nous) from down count for severity
-    unexpected_down = [r for r in results if not r.healthy and "confirmed dead" not in (r.error or "")]
+    # Exclude from the down-count, for severity purposes:
+    #   - expected-dead (nous): decommissioned endpoint, confirmed dead by design
+    #   - expected_absent (anthropic): key intentionally not in .env (no-billing)
+    #   - expected_optional (openrouter): valid key, credit-gated (402), not "down"
+    unexpected_down = [
+        r for r in results
+        if not r.healthy
+        and "confirmed dead" not in (r.error or "")
+        and not r.expected_absent
+        and not r.expected_optional
+    ]
     if len(unexpected_down) >= 3:
         return 2  # pool exhaustion
     if unexpected_down:

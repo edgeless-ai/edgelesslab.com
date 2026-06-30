@@ -128,6 +128,17 @@ MONITORED_JOBS = {
 DISK_WARNING_GB = 50
 DISK_CRITICAL_GB = 20
 
+# Staleness watchdog (F4 — EDGA-16906): catches jobs that NEVER fire.
+# The legacy alerter only fires on run-and-fail (wrapper exit != 0) and on
+# stale logs for the ~10 hardcoded MONITORED_JOBS. It is BLIND to the ~57
+# other jobs that write logs/state/*.json but silently stop being scheduled.
+# This watchdog scans ALL state files and flags jobs that are overdue.
+# Conservative by design: report-only unless --page is passed.
+STALENESS_GRACE_HOURS = 48               # grace past next_expected_run before flagging
+STALENESS_FALLBACK_MAX_AGE_HOURS = 192   # 8d: for jobs WITHOUT next_expected_run, age of last
+                                         # activity before flagging (tolerates weekly cadence)
+STALENESS_REPORT_FILE = LOGS_DIR / 'cron-staleness-report.txt'
+
 # Self-diagnosis patterns: (regex_pattern, likely_cause, suggested_fix)
 DIAGNOSIS_PATTERNS = [
     # Variable expansion issues (like the Jan 29-Feb 1 incident)
@@ -826,6 +837,165 @@ class CronFailureAlerter:
 
         return stale_jobs
 
+    def check_state_staleness(
+        self,
+        grace_hours: int = STALENESS_GRACE_HOURS,
+        fallback_max_age_hours: int = STALENESS_FALLBACK_MAX_AGE_HOURS,
+    ) -> List[Dict]:
+        """
+        F4 staleness watchdog — catches jobs that NEVER fire.
+
+        Unlike check_stale_logs (which only covers the ~10 hardcoded MONITORED_JOBS
+        via log-file mtime), this scans EVERY logs/state/*.json written by
+        cron-wrapper.sh and flags jobs that are overdue. This closes the blind spot
+        where a job silently drops out of the schedule: the failure alerter only
+        fires on run-and-fail, so a job that never runs again is invisible.
+
+        A job is flagged overdue when EITHER:
+          - it has next_expected_run and now > next_expected_run + grace_hours, OR
+          - it has NO next_expected_run and its last activity (last_heartbeat_at,
+            else started_at) is older than fallback_max_age_hours.
+
+        Timestamps are UTC ('...Z'), compared against datetime.utcnow() — the same
+        convention used elsewhere in this module. Returns a list of dicts sorted by
+        overdue magnitude (worst first). Side-effect free (no email, no state write).
+        """
+        state_dir = LOGS_DIR / 'state'
+        overdue: List[Dict] = []
+        if not state_dir.exists():
+            return overdue
+
+        now = datetime.utcnow()
+
+        def _parse(ts):
+            if not ts:
+                return None
+            try:
+                return datetime.fromisoformat(str(ts).rstrip('Z'))
+            except (ValueError, TypeError):
+                return None
+
+        for sf in sorted(state_dir.glob('*.json')):
+            try:
+                with open(sf) as f:
+                    data = json.load(f)
+            except (json.JSONDecodeError, OSError):
+                continue
+
+            job = data.get('job', sf.stem)
+            status = data.get('status', 'unknown')
+
+            # A job actively running is not stale by definition.
+            if status == 'running':
+                continue
+
+            ner_dt = _parse(data.get('next_expected_run'))
+            last_act_raw = data.get('last_heartbeat_at') or data.get('started_at')
+            last_act = _parse(last_act_raw)
+
+            reason = None
+            overdue_hours = None
+
+            if ner_dt is not None:
+                deadline = ner_dt + timedelta(hours=grace_hours)
+                if now > deadline:
+                    overdue_hours = (now - ner_dt).total_seconds() / 3600
+                    reason = (
+                        f"past next_expected_run ({ner_dt.isoformat()}Z) "
+                        f"+ {grace_hours}h grace — overdue {overdue_hours:.0f}h"
+                    )
+            elif last_act is not None:
+                age_hours = (now - last_act).total_seconds() / 3600
+                if age_hours > fallback_max_age_hours:
+                    overdue_hours = age_hours
+                    reason = (
+                        f"no next_expected_run; last activity {last_act.isoformat()}Z "
+                        f"is {age_hours:.0f}h ago (> {fallback_max_age_hours}h fallback)"
+                    )
+            # else: no parseable timestamps at all — skip to avoid noise.
+
+            if reason:
+                overdue.append({
+                    'job': job,
+                    'status': status,
+                    'last_activity': last_act_raw,
+                    'overdue_hours': round(overdue_hours, 1),
+                    'reason': reason,
+                })
+
+        overdue.sort(key=lambda d: d['overdue_hours'], reverse=True)
+        return overdue
+
+    def run_staleness_watchdog(
+        self,
+        page: bool = False,
+        dry_run: bool = False,
+        report_path: Optional[Path] = None,
+        grace_hours: int = STALENESS_GRACE_HOURS,
+        fallback_max_age_hours: int = STALENESS_FALLBACK_MAX_AGE_HOURS,
+    ) -> List[Dict]:
+        """
+        Run the staleness watchdog. ALWAYS writes a report file. Only pages when
+        page=True (gated for safety so it never blasts alerts on first integration).
+        """
+        report_path = report_path or STALENESS_REPORT_FILE
+        overdue = self.check_state_staleness(grace_hours, fallback_max_age_hours)
+        now = datetime.utcnow()
+
+        lines = [
+            "Cron Staleness Watchdog Report (F4 / EDGA-16906)",
+            f"Generated: {now.isoformat()}Z (UTC)",
+            f"Thresholds: {grace_hours}h grace past next_expected_run | "
+            f"{fallback_max_age_hours}h since last activity for jobs with no next_expected_run",
+            f"Overdue jobs: {len(overdue)}",
+            "=" * 64,
+        ]
+        if not overdue:
+            lines.append("No overdue jobs detected.")
+        for o in overdue:
+            lines.append(
+                f"[{o['overdue_hours']:>8.1f}h overdue] {o['job']}  (status={o['status']})"
+            )
+            lines.append(f"               {o['reason']}")
+            lines.append(f"               last_activity={o['last_activity']}")
+        report = "\n".join(lines) + "\n"
+
+        try:
+            report_path.parent.mkdir(parents=True, exist_ok=True)
+            report_path.write_text(report)
+        except OSError as e:
+            print(f"[watchdog] Failed to write report to {report_path}: {e}")
+
+        print(report)
+
+        if not page:
+            print(f"[watchdog] REPORT-ONLY mode (default). Report written to: {report_path}")
+            print("[watchdog] No alerts sent. Pass --page to enable live email alerts.")
+            return overdue
+
+        if not overdue:
+            print("[watchdog] Nothing overdue — no alert needed.")
+            return overdue
+
+        if dry_run:
+            print(f"[watchdog] [DRY RUN] Would page for {len(overdue)} overdue job(s).")
+            return overdue
+
+        # Paging is gated AND rate-limited (1/day) to avoid spam.
+        if not self._should_alert('_staleness_watchdog', cooldown_hours=24):
+            print("[watchdog] Paging rate-limited (1 per 24h).")
+            return overdue
+
+        subject = f"🕳️ Cron Staleness: {len(overdue)} job(s) overdue / never firing"
+        self._record_alert('_staleness_watchdog')
+        try:
+            send_email_to_david(subject, report)
+            print(f"[watchdog] Alert email sent for {len(overdue)} overdue job(s).")
+        except Exception as e:
+            print(f"[watchdog] Email failed: {e}")
+            self._send_ntfy_backup('staleness_watchdog', f"{len(overdue)} jobs overdue")
+        return overdue
+
     def check_disk_space(self) -> Optional[Tuple[str, int]]:
         """
         Check available disk space.
@@ -1208,6 +1378,17 @@ Examples:
         help='State-based alerting. With JOB EXIT args: inline per-job alert. Without: scan all state files.',
     )
     parser.add_argument(
+        '--staleness-watchdog',
+        action='store_true',
+        help='F4: scan ALL logs/state/*.json for jobs that never fire. Writes a report; '
+             'report-only unless --page is also passed.',
+    )
+    parser.add_argument(
+        '--page',
+        action='store_true',
+        help='With --staleness-watchdog: actually send an email alert (default is report-only).',
+    )
+    parser.add_argument(
         '--dry-run',
         action='store_true',
         help='Show what would be done without sending emails',
@@ -1258,6 +1439,10 @@ Examples:
         else:
             success = alerter.state_notify_scan(dry_run=args.dry_run)
         sys.exit(0 if success else 1)
+
+    elif args.staleness_watchdog:
+        overdue = alerter.run_staleness_watchdog(page=args.page, dry_run=args.dry_run)
+        sys.exit(0)
 
     elif args.check_logs:
         alerter.send_stale_job_alerts()

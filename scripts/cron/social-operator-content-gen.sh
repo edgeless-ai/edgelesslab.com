@@ -32,12 +32,12 @@ BLOG_DRAFTS_DIR="$CLAUDE_PROJECTS_ROOT/edgeless-website/drafts"
 
 RECENT_KB=""
 if [ -d "$KB_DIR" ]; then
-    RECENT_KB=$(find "$KB_DIR" -name "*.md" -mtime -14 2>/dev/null | head -10)
+    RECENT_KB=$(find "$KB_DIR" -name "*.md" -mtime -14 2>/dev/null | head -10 || true)
 fi
 
 BLOG_DRAFTS=""
 if [ -d "$BLOG_DRAFTS_DIR" ]; then
-    BLOG_DRAFTS=$(find "$BLOG_DRAFTS_DIR" -name "*.md" 2>/dev/null | head -5)
+    BLOG_DRAFTS=$(find "$BLOG_DRAFTS_DIR" -name "*.md" 2>/dev/null | head -5 || true)
 fi
 
 KB_COUNT=$(echo "$RECENT_KB" | grep -c '.' 2>/dev/null || echo 0)

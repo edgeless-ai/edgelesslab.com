@@ -416,6 +416,29 @@ def process_vault(
                   f"({stats['embedded_chunks']} chunks embedded, "
                   f"{stats['skipped_files']} skipped)...", flush=True)
 
+        # --- Stale-chunk reconciliation (EDGA-16904 dedup root-cause) ---
+        # Before (re-)embedding a file, delete any chunks already stored under
+        # the same source path so the persisted chunk set is EXACTLY this run's
+        # output. Plain upsert of `file_path::chunk_{i}` ids is NOT sufficient:
+        #   1. A file that shrinks leaves orphan trailing chunks (::chunk_5,6…)
+        #      — upsert only overwrites the indices it rewrites, never the tail.
+        #   2. Re-chunking (changed boundaries) shifts content across indices,
+        #      so old chunks partially survive as near-duplicate neighbours.
+        # Both modes silently re-grow the collection over time (the 21,037
+        # stale dups removed on 2026-06-30). Deleting by file_path first makes
+        # re-embeds replace-in-place instead of accumulating.
+        # Resume-skipped files are intentionally NOT touched (we are not
+        # re-adding them, so deleting would drop live content). A crash between
+        # this delete and the buffered upsert is recovered on the next run:
+        # the file is absent from the checkpoint, so it is reprocessed (delete
+        # = no-op, then re-added).
+        if not dry_run and collection is not None:
+            try:
+                collection.delete(where={"file_path": doc.file_path})
+            except Exception as e:  # noqa: BLE001 - never let cleanup kill the run
+                print(f"Warning: stale-chunk cleanup failed for "
+                      f"{doc.file_path}: {e}", file=sys.stderr, flush=True)
+
         chunks = chunk_text(doc.content)
         for i, chunk in enumerate(chunks):
             stats['total_chunks'] += 1

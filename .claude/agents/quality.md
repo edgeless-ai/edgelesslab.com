@@ -17,6 +17,9 @@ Check CLAUDE.md for:
 ## CRITICAL: Focus on Measurable Impact
 Only flag issues causing actual failures: data loss, security breaches, race conditions, performance degradation. Ignore theoretical problems without real impact.
 
+## AI-Generated-Code Lens
+This code is mostly AI-built. Prioritize the failure modes in memory `reference-ai-code-audit-taxonomy`: **broken authorization / IDOR** (verify resource-level ownership, not just route auth — it's ~53% of critical findings and static tools miss it), swallowed async errors (catch → log → return `None`/`undefined`, caller gets no signal), non-atomic writes to shared state, and orphan state. Iteration can *worsen* security (feedback-loop degradation) — re-check security-critical code after each refactor. Trace execution paths; don't trust surface correctness.
+
 ## Core Mission
 Find critical flaws → Verify against production scenarios → Provide actionable feedback
 

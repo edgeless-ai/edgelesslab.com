@@ -115,11 +115,16 @@ Action Items: [prioritized fixes]
 
 Every Critical/High line carries a `proposed_fix`/`proposed_change` (CHAI Constructive rule). If a real concern has no pinpointed fix, list it under an `Investigation` heading instead of inflating its severity.
 
+## AI-Generated-Code Lens
+
+Most of our code is iteratively AI-built. Apply the taxonomy in memory `reference-ai-code-audit-taxonomy` as a review lens: **authorization/IDOR first** (~53% of critical findings, and SAST misses it — verify resource-level ownership, not just route auth); watch for swallowed async errors (log-and-return-`None`/`undefined`), orphan state, non-atomic writes, and **feedback-loop degradation** (security often *worsens* across refinement passes — re-check security-critical code after each "improvement"). Core stance: **don't trust the appearance of correctness — trace execution paths and data flows.**
+
 ## Related Skills
 
 - `/precommit` - Pre-commit validation (before committing)
 - `/learn` - Save patterns discovered during review
 - `/test` - Run tests after fixes
+- `/harden-audit-rubric` - Sanitize a rubric before an autonomous agent runs it on a live repo
 
 ## Command Reference
 

@@ -33,7 +33,7 @@ export default function PrivacyPolicy() {
             Privacy Policy
           </h1>
           <p className="text-sm mb-16" style={{ color: "var(--text-tertiary)" }}>
-            Last updated: March 25, 2026
+            Last updated: July 1, 2026
           </p>
 
           <div className="max-w-[640px] prose-custom">
@@ -113,6 +113,26 @@ export default function PrivacyPolicy() {
               </ul>
             </Section>
 
+            <Section title="The Clapper iOS App">
+              <p>
+                <strong>Your microphone audio never leaves your device.</strong>{" "}
+                The Clapper listens for claps using on-device signal
+                processing. Audio is analyzed in memory in real time and is
+                never recorded, stored, or transmitted -- by design there is
+                no audio file to leak.
+              </p>
+              <p>
+                Videos and photos you capture are saved directly to your
+                device&apos;s photo library and nowhere else. The app has no
+                accounts, no analytics, and makes no network requests.
+              </p>
+              <p>
+                What the app stores on your device (via iOS UserDefaults):
+                your gesture-to-action mappings, the detection sensitivity
+                setting, and the Background Listening preference.
+              </p>
+            </Section>
+
             <Section title="Children's Privacy">
               <p>
                 We do not knowingly collect any information from children
@@ -132,8 +152,8 @@ export default function PrivacyPolicy() {
             <Section title="Contact">
               <p>
                 Questions? Email{" "}
-                <a href="mailto:david@edgelesslab.com">
-                  david@edgelesslab.com
+                <a href="mailto:help@edgelesslab.com">
+                  help@edgelesslab.com
                 </a>
               </p>
             </Section>

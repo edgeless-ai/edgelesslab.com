@@ -13,6 +13,8 @@ export const posts: BlogPost[] = [
     date: "2026-06-12",
     tags: ["knowledge-base", "ai-agents", "embeddings", "audit", "agent-ops"],
     readTime: "8 min",
+    productSlug: "claude-memory-kit",
+    ctaHook: "The memory templates and stack libraries that keep agent knowledge searchable instead of invisible, from the system this audit fixed.",
     content: `
 # We Audited Our AI Knowledge Base — 85% of Our Content Was Invisible to Our Agents
 

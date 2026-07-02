@@ -5,6 +5,18 @@ export type { BlogPostMeta };
 
 export const postsMeta: BlogPostMeta[] = [
   {
+    slug: "kb-audit-circulation",
+    editorial: true,
+    title: "We Audited Our AI Knowledge Base — 85% of Our Content Was Invisible to Our Agents",
+    description: "After building a 26,000-document knowledge system for my AI agents, I discovered only 14% was vector-searchable. Here's the audit methodology, the 7-domain findings, and the systematic fix.",
+    date: "2026-06-12",
+    tags: ["knowledge-base", "ai-agents", "embeddings", "audit", "agent-ops"],
+    readTime: "8 min",
+    productSlug: "claude-memory-kit",
+    ctaHook: "The memory templates and stack libraries that keep agent knowledge searchable instead of invisible, from the system this audit fixed.",
+    content: "",
+  },
+  {
     slug: "agents-that-improve-themselves",
     editorial: true,
     title: "The Most Useful Thing Your AI Agents Can Do Is Audit Themselves",

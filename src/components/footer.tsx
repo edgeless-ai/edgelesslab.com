@@ -166,7 +166,6 @@ export function Footer() {
             </h2>
             <ul className="space-y-2.5">
               {[
-                { label: "Manifesto", href: "/manifesto" },
                 { label: "Privacy", href: "/privacy" },
                 { label: "Terms", href: "/terms" },
               ].map((item) => (

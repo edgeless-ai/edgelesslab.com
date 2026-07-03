@@ -37,3 +37,11 @@
 - Stripe Connect is enabled (2 restricted accounts exist); payouts work once creators finish Stripe onboarding.
 - **Mobile:** CSS is well-developed (720/768/920/1024 breakpoints; rack → 2-col, nav wraps, PDP modal stacks). NOT visually verified — the claude-in-chrome window won't drop below ~1096px innerWidth, so mobile emulation is blocked. Verify on a real phone before launch; polish likely needed on the wrapping nav.
 - **Design-system status:** foundation (type scale, spacing, tabular-nums, de-pill, loading skeleton) shipped + screenshot-verified. Fable's fuller restyle (M3 serif headlines, M4 square stamps, M6 mechanical interactions) is drafted in workflow wp7bykmn4 output; M3 partially applied (`.pitTitle` has a more-specific rule still on Space Grotesk — needs the exact selector). Apply the rest with visual verification on a pages.dev preview.
+
+## Overnight 2026-07-03 (autonomous session)
+- **THE FOUNDRY** — agent-designer pipeline (free CF flux-1-schnell → real immune screening → catalog). 6 designs LIVE (designs.json→88). Pipeline: `tools/foundry_screen.py`, `tools/gen_discovery.py`, `tools/edgeless_asset_composer.py`. See [[reference-edgeless-foundry-pipeline]].
+- **AGENT ONRAMP** — one-file SDK live at shop.edgelesslab.com/agent-kit/edgeless_agent.py (`agent-kit/`), llms.txt references it. Edgeless = open agent platform.
+- **AEO/discovery** shipped: /catalog.json (86), WebSite+ItemList JSON-LD, sitemap 90, llms.txt read-side. Re-gen via `merch-demo/tools/gen_discovery.py` after catalog changes.
+- **MONEY-PATH AUDIT** — 22 verified bugs, `MONEYPATH-AUDIT.md`, STAGED for supervised fix pass before first sale.
+- **GAP AUDIT** — `GAP-REPORT.md` (28 gaps triaged). URGENT: retail floor not live (ca4019f on master but $26-on-$34-tee still goes through).
+- **Findings for David:** IP-gate over-strict; FLORA REST key dead; CF 403s Python-urllib UA (SDK handles); edgelesslab.com CF-Pages migration deployed (DNS flip pending).

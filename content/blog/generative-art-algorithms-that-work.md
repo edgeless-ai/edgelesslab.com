@@ -21,17 +21,19 @@ ctaHook: Working generators for every algorithm in this post, plus SVG optimizat
 
 Generative art has a dirty secret: most of it looks bad. Not "challenging" bad. Not "you don't understand it" bad. Just noise that happens to be mathematically derived.
 
-I've built 75+ generative algorithms over the past year, run them through 105+ experiments on physical pen plotters, and developed an AI scoring system to evaluate the output. The hit rate for "would I frame this on a wall" is about 13%. That's 10 algorithms out of 75+.
+I've built 75+ generative algorithms over the past year, run them through 105+ experiments on physical pen plotters (the workflow behind that is in [the pen plotter technical primer](/blog/generative-art-pen-plotters/)), and developed an AI scoring system to evaluate the output. The hit rate for "would I frame this on a wall" is about 13%. That's 10 algorithms out of 75+.
 
-What separates the ones that work from the ones that don't.
+This is what separates the ones that work from the ones that don't.
 
 ## The Scoring System
 
 Before talking about specific algorithms, the scoring matters. I built a rubric with five dimensions: composition (does it use the full canvas intentionally?), complexity (is there enough detail to reward close inspection?), coherence (do the elements relate to each other?), novelty (does it look different from obvious generative art?), and craft (would the physical plot look clean?).
 
-Each dimension is 1-10. An AI vision model scores the output. Anything above 35/50 is worth plotting. Anything above 42 is worth framing. The model agrees with my subjective judgment about 80% of the time, which is good enough for filtering hundreds of outputs.
+Each dimension is 1-10. An AI vision model scores the output. Anything above 35/50 is worth plotting. Anything above 42 is worth framing. The model agrees with my subjective judgment about 80% of the time, which is good enough for filtering hundreds of outputs. You can watch this loop run in public in the [Pen Plotter Autoresearch field journal](/pen-plotter/).
 
 ## The Algorithms That Work
+
+These are the survivors. [The full 98-algorithm taxonomy](/blog/ninety-six-algorithms-one-constraint/) covers the whole field they were culled from.
 
 **Flow fields** consistently score highest. A vector field defines direction at every point. Particles follow the field, leaving trails. The key: the field function determines everything. Perlin noise fields produce organic, cloud-like forms. Curl noise fields create turbulent, dynamic compositions. Attractor-based fields generate tight spirals and vortices.
 
@@ -59,6 +61,6 @@ The fix for all three: constrain the algorithm. Limit the parameter space. Test 
 
 If you want to try generative art for pen plotters, start with flow fields. They're forgiving, visually rewarding, and teach you the fundamentals: particle simulation, SVG output, and the relationship between parameter space and visual output.
 
-The [Generative Art Starter Kit](/products) includes 10 production-ready generators, parameter guides, example outputs, and the scoring rubric. The [generative ASCII experiment](/lab/generative-ascii) on this site shows a related technique: mapping mathematical structures to character space.
+The [Generative Art Starter Kit](/products) includes 10 production-ready generators, parameter guides, example outputs, and the scoring rubric. The [generative ASCII experiment](/lab/generative-ascii) on this site shows a related technique: mapping mathematical structures to character space. If you'd rather poke at things in the browser first, there are [37 interactive demos to explore](/blog/creative-demos-collection/).
 
 The best generative art doesn't look generative. It looks like someone made a deliberate choice at every point. The algorithm just happens to be the one making those choices.

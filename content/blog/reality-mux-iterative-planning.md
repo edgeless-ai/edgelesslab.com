@@ -43,9 +43,9 @@ It is iterative by default. There is no failure state, only a missing cycle.
 
 ## Why this matters for shipping
 
-Self-evaluating goal loops prevent the comment section pattern: lots of discussion, missing artifacts. If you are not adding files, you are not executing.
+[Self-evaluating goal loops](/blog/multi-agent-goal-loops-theory-and-practice/) prevent the comment section pattern: lots of discussion, missing artifacts. If you are not adding files, you are not executing.
 
-The branch between planning and execution is small. The branch between a shipped plan and an academic plan is huge.
+The gap between planning and execution is small. The gap between a shipped plan and an academic plan is huge.
 
 ## The answer
 

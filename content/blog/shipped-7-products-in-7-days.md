@@ -49,7 +49,7 @@ Evening: update the website, deploy, push to Gumroad. The website is a Next.js s
 
 ## What Worked
 
-**Building from existing infrastructure.** Every product leverages something that already runs in production. The agent safety guide exists because an agent actually lost $252. The MCP server kit exists because we actually run 4+ MCP servers. The generative art kit exists because we've actually run 105+ experiments. Production experience is the moat. Nobody can replicate it from docs alone.
+**Building from existing infrastructure.** Every product builds on something that already runs in production. The agent safety guide exists because [an agent actually lost $252](/blog/agent-lost-252-dollars/). The MCP server kit exists because [we actually run 4+ MCP servers](/blog/mcp-servers-unix-pipes-of-ai/). The generative art kit exists because [we've actually run 105+ experiments](/blog/generative-art-pen-plotters/). Production experience is the moat. Nobody can replicate it from docs alone.
 
 **One product per day, no exceptions.** Scope expands to fill time. A week per product would produce a marginally better product. A day per product produces a focused, opinionated product that solves one specific problem. The constraint is the feature.
 

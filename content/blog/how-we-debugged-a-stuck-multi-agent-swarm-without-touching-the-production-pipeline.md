@@ -16,12 +16,12 @@ ctaHook: The dispatch architecture, recovery protocol, and monitoring scripts th
 
 # How We Debugged a Stuck Multi-Agent Swarm Without Touching the Production Pipeline
 
-The symptom looked simple: an automated website goal loop had been running for days with no visible progress. A naive fix is to restart the loop, flip the status flag, and hope it picks up where it left off. That usually just restarts the same stuck state.
+The symptom looked simple: an [automated website goal loop](/blog/multi-agent-goal-loops-theory-and-practice/) had been running for days with no visible progress. A naive fix is to restart the loop, flip the status flag, and hope it picks up where it left off. That usually just restarts the same stuck state.
 
-Here is how we actually unstuck it.
+We unstuck it in four moves, none of which touched the production pipeline.
 
 ## 1. Read the ticket, not just the status
-The issue was marked `in_progress`. A related recovery ticket showed the original loop had failed and Paperclip had already auto-recovered it. That meant someone had already inspected the run and the blocker state was known. The recovery was done. The problem was not a missing restart.
+The issue was marked `in_progress`. A related recovery ticket showed the original loop had failed and Paperclip had already [auto-recovered it](/blog/self-healing-ai-infrastructure/). That meant someone had already inspected the run and the blocker state was known. The recovery was done. The problem was not a missing restart.
 
 ## 2. Look at the dependency graph
 The recovery ticket listed blocked-by relationships and showed those were resolved. The next question was whether any downstream reviews were still open. A productivity review was in flight, but that is not an execution blocker; it is a process checkpoint.

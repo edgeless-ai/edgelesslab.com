@@ -22,7 +22,7 @@ At 2am on a Tuesday, I ran a deploy script. The script did three things: delete 
 
 The problem: the cleanup step was `rm -rf _next` and the staging step referenced `src/`. A Claude Code hook called `damage-control.py` saw both tokens in the same command scope and blocked execution. The hook's logic is simple: if a destructive operation (`rm -rf`, `git reset --hard`, `git clean -f`) appears alongside a source directory reference, halt and warn.
 
-That night it prevented nothing catastrophic. The command would have worked fine. But the hook doesn't care about intent; it cares about blast radius. And the one time it does catch a real mistake, it pays for itself permanently.
+That night it prevented nothing catastrophic. The command would have worked fine. But the hook doesn't care about intent; it cares about blast radius. And the one time it does catch a real mistake, it pays for itself permanently. I know what unguarded agents cost because [one of mine lost $252 of real money](/blog/agent-lost-252-dollars/) before this pattern existed.
 
 ## What Hooks Actually Are
 
@@ -36,7 +36,7 @@ Think of them as git hooks, but for your AI coding assistant. Every file write, 
 
 The implementation is around 40 lines of Python. It parses the command string, checks for deny-list tokens, checks for asset-list tokens, and returns exit code 1 if both are present. No ML, no heuristics. Just string matching that works.
 
-**2. Verify Completion**: Runs when a task is marked as done. Checks that tests pass, that the build succeeds, and that the stated changes actually exist in the diff. Prevents the "I'm done" problem where an agent claims completion but left broken code.
+**2. Verify Completion**: Runs when a task is marked as done. Checks that tests pass, that the build succeeds, and that the stated changes actually exist in the diff. Prevents the ["I'm done" problem](/blog/agent-grounding-problem-hermes/) where an agent claims completion but left broken code.
 
 This is the hook that changes behavior most. When an AI agent knows its "done" claim will be verified, it front-loads the verification itself. The hook rarely fires because its existence changes the agent's approach.
 
@@ -46,7 +46,7 @@ This is the hook that changes behavior most. When an AI agent knows its "done" c
 
 Hooks aren't just guardrails. The session initialization hook loads memory context at conversation start. The memory flush hook persists important context before the conversation compresses. The cost tracking hook logs token usage per tool call.
 
-The pattern: anything you'd tell the AI to "always do" or "never do" should be a hook, not a prompt instruction. Prompt instructions get forgotten as context compresses. Hooks execute every time, mechanically.
+The pattern: anything you'd tell the AI to "always do" or "never do" should be a hook, not a prompt instruction. Prompt instructions get forgotten as context compresses. Hooks execute every time, mechanically. This is the core of [harness engineering](/blog/claude-code-hooks-harness-engineering/): the scaffolding around the model matters more than the model.
 
 ## The Deep Dive
 

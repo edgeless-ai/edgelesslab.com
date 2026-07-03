@@ -58,6 +58,8 @@ The bus is fire-and-forget from the sender's perspective. You send a message, th
 
 Why two channels? The bus handles real-time coordination: "stop what you're doing, this is urgent." Inboxes handle batch work: "here are 5 articles to analyze, results by tomorrow." Using one channel for both creates priority inversion. The urgent message sits behind 50 batch tasks.
 
+Both channels sit on top of [the infrastructure stack underneath](/blog/building-ai-agent-infrastructure-solo/): the MCP layer, the memory system, and the safety hooks that make any of this trustworthy.
+
 ## State Machine Per Task
 
 :::flow Task State Machine
@@ -75,7 +77,7 @@ Failed tasks include structured error context: what went wrong, whether it's ret
 
 Multi-agent frameworks love complex abstractions. Shared memory. Consensus protocols. Agent hierarchies with managers and sub-managers. These solve theoretical problems at the cost of operational simplicity.
 
-The problems that actually matter in production are boring: How do you know if an agent crashed? How do you restart a failed task? How do you add a new worker type without changing the dispatch logic? How do you debug a task that produced wrong results?
+The problems that actually matter in production are boring: How do you know if an agent crashed? How do you restart a failed task? How do you add a new worker type without changing the dispatch logic? How do you debug a task that produced wrong results? And, the one I learned the hard way, [what happens when dispatch limits aren't actually enforced](/blog/swarm-tried-to-bankrupt-itself/)?
 
 A simple dispatch/worker topology with explicit state machines and two communication channels answers all of these. It's not elegant. It doesn't make a good conference talk. But it runs unattended at 3am without surprises.
 
@@ -84,5 +86,7 @@ A simple dispatch/worker topology with explicit state machines and two communica
 You don't need five agents on day one. Start with two: one dispatch, one worker. Route one type of task. Get the communication channel working. Add the state machine. Only then add a second worker type.
 
 The [Multi-Agent Orchestration Blueprint](/products) includes the full architecture, the Agent Bus setup, three reference implementations, and the failure patterns I hit along the way. It's on the [products page](/products).
+
+If you're wondering what running all of this costs, [the full cost breakdown of running this team](/blog/12-dollar-ai-operations-team/) comes to $12 a week.
 
 The value isn't in the architecture diagram. It's in knowing which shortcuts work and which ones break at 3am.

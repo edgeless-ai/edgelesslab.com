@@ -23,6 +23,8 @@ Total Serialism started as a homework assignment: implement every algorithmic ar
 
 Ninety-eight algorithms later, the project became a taxonomy. Patterns emerged across categories that no single algorithm would have revealed. Some entire families of generative art are excellent on screen and useless for plotters. Others that look mundane in a browser produce physical output that rewards close inspection for minutes.
 
+Everything described below runs live in the browser at [Total Serialism](/total-serialism/app/), with real-time parameter controls and SVG export.
+
 ## The Taxonomy
 
 The algorithms cluster into sixteen categories. Some are standard (flow fields, fractals, cellular automata). Others emerged from the constraint itself (pen-plotter-specific optimizations that became their own generative category).
@@ -59,7 +61,7 @@ The algorithms cluster into sixteen categories. Some are standard (flow fields, 
 
 ## What Works and What Does Not
 
-Three categories consistently produce the best physical output: flow fields, natural systems, and geometric patterns. The common thread is that these families naturally produce continuous, well-distributed strokes.
+Three categories consistently produce the best physical output: flow fields, natural systems, and geometric patterns. The common thread is that these families naturally produce continuous, well-distributed strokes. I pulled [the 10 algorithms that actually look good](/blog/generative-art-algorithms-that-work) into their own ranked writeup.
 
 Three categories consistently disappoint on paper: fractals (escape-time), cellular automata (grid-based), and raw physics simulations. These produce output that is visually interesting on screen but loses resolution or legibility when plotted. The issue is always the same: the algorithm's visual character depends on pixel-level precision that a pen cannot reproduce.
 
@@ -67,11 +69,11 @@ Three categories consistently disappoint on paper: fractals (escape-time), cellu
 
 All 98 algorithms share a common infrastructure: a parameter control panel, preset management (save, load, share via URL), and a unified export pipeline (SVG, PNG, GIF). The SVG export includes a path optimizer that cleans and sorts strokes for efficient plotting.
 
-The path optimizer is the most important shared component. It reorders paths to minimize pen-up travel distance, removes duplicate strokes, and merges nearly-collinear segments. A 10,000-path SVG that takes 45 minutes to plot unoptimized can drop to 20 minutes after optimization. That matters when you are burning through archival ink and Bristol board.
+The path optimizer is the most important shared component. It reorders paths to minimize pen-up travel distance, removes duplicate strokes, and merges nearly-collinear segments. A 10,000-path SVG that takes 45 minutes to plot unoptimized can drop to 20 minutes after optimization. That matters when you are burning through archival ink and Bristol board. The [pen plotter primer](/blog/generative-art-pen-plotters) covers the hardware side of that equation.
 
 ## The Catalog
 
-The full catalog is browseable at [/total-serialism/app/](/total-serialism/app/). Every algorithm has real-time parameter controls, preset management, and one-click SVG export. The editorial companion describes the taxonomy, the toolkit, and the surprises that emerged from building all ninety-eight.
+The full catalog is browseable at [/total-serialism/app/](/total-serialism/app/). Every algorithm has real-time parameter controls, preset management, and one-click SVG export. The [editorial companion](/lab/total-serialism) describes the taxonomy, the toolkit, and the surprises that emerged from building all ninety-eight.
 
 The most useful entry point is the browse page, which shows every algorithm as a thumbnail grid organized by category. From there, click into any algorithm to adjust parameters and export.
 

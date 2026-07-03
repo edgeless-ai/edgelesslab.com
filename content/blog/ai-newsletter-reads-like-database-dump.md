@@ -16,7 +16,7 @@ editorial: true
 
 # Your AI Newsletter Reads Like a Database Dump (This is the Fix)
 
-At 3:17 a.m. last Thursday I pulled the latest digest from our agent pipeline. It contained fourteen RSS items, three YouTube transcript summaries, and two market-signal alerts. Every bullet began with "The model shows" or "OpenAI released." The facts were correct. The output was still a database dump.
+At 3:17 a.m. last Thursday I pulled the latest digest from [the agent pipeline that assembles it](/blog/n8n-workflows-ai-business/). It contained fourteen RSS items, three YouTube transcript summaries, and two market-signal alerts. Every bullet began with "The model shows" or "OpenAI released." The facts were correct. The output was still a database dump.
 
 Our open rate sat at 18 percent. Replies were zero. I had built an automated system that produced accurate summaries but gave readers nothing to act on.
 
@@ -34,13 +34,15 @@ I studied the three newsletters that actually get opened: Morning Brew opens wit
 
 **5. Limit the total issue to 5-7 items maximum.** Prioritize ruthlessly and group weaker items into a "Quick Hits" section of 20-30 words each.
 
-Those five rules alone cut average read time from nine minutes to under four.
+Those five rules alone cut average read time from nine minutes to under four. The structural rules pair with voice rules: we went as far as [banning stock phrases by name](/blog/meta-ai-style-guide/).
 
 ## The Second-Pass Prompt That Changed Everything
 
 The largest single improvement came from a second-pass prompt that runs after the raw agent output. The raw summaries are accurate but robotic. This prompt humanizes them:
 
 > "Rewrite the following summary. Start with one sentence stating the implication for builders. Use contractions. Never start with the company name. Sound like a knowledgeable colleague, not a press release."
+
+One paragraph, no pipeline changes. Writing [prompts that survive production](/blog/writing-prompts-that-survive-production/) is its own discipline, and this one paid for the whole exercise.
 
 ## Before and After
 

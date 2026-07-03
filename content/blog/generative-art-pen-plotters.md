@@ -35,6 +35,8 @@ The AxiDraw driver (the most common plotter for fine art) accepts SVG directly. 
 
 The critical SVG parameter: stroke width in the SVG should correspond to the actual pen tip width. For a 0.3mm Micron, set stroke-width to 0.3mm in the SVG. This matters when you're evaluating density; you want the visual preview to approximate the physical result.
 
+The format carries surprisingly far. [The tartan generator's SVG export](/blog/when-plaid-becomes-tartan/) renders individual threads as separate strokes so the plot preserves the weave's over-under layering.
+
 ## Why Single-Stroke Paths Matter
 
 A screen renderer draws each path in isolation. Overlapping paths layer visually, and the result is color mixing. Fine.
@@ -45,7 +47,7 @@ The solution: design generators that produce non-overlapping paths, or at minimu
 
 There's a subtler version of this problem with continuous paths. A generator might output 500 separate line segments when it could output 10 continuous strokes. More pen lifts means more travel time and more opportunities for the pen to blot when it returns to paper. Continuous strokes produce cleaner, faster plots.
 
-The optimization problem: given a set of line segments, find the traversal order that minimizes total pen-up travel distance. This is a variant of the Traveling Salesman Problem, NP-hard in general, but good approximations exist. The `vpype` tool does this automatically on any SVG input, which is worth knowing about.
+The optimization problem: given a set of line segments, find the traversal order that minimizes total pen-up travel distance. This is a variant of the Traveling Salesman Problem, NP-hard in general, but good approximations exist. The `vpype` tool does this automatically on any SVG input.
 
 ## Algorithm Families That Work Well
 
@@ -60,6 +62,8 @@ Not all generative art algorithms translate equally to plotters. A few that reli
 **Recursive subdivision** (quadtrees, triangle subdivision) produces patterns with self-similar structure at multiple scales. The subdivision boundary lines are natural paths. Start with a rectangle, subdivide based on local image intensity, and you get an abstract representation of any input image.
 
 **Truchet tiles** fill a grid with simple tile shapes that connect across edges. The key insight: design tiles so connected lines span multiple tiles, creating long continuous paths rather than isolated shapes. This minimizes pen lifts and produces more interesting visual flow.
+
+For the ranked results, see [the 10 algorithms that scored highest](/blog/generative-art-algorithms-that-work/). If you want the complete map, there's [a taxonomy of 98 plotter-safe algorithms](/blog/ninety-six-algorithms-one-constraint/).
 
 ## The AI Scoring Pipeline
 
@@ -95,4 +99,4 @@ If you're writing your own generators, start with a flow field. It's the most fo
 
 The [Edgeless lab experiments](/lab) page logs all the generator experiments including source code for the ones that scored well. The Lorenz attractor generator, the Voronoi dither, and the recursive quad subdivision are all open.
 
-If you want to go deeper into the scoring and iteration pipeline, the [pen plotter autoresearch pattern](/lab) documents how the AI-in-the-loop workflow runs.
+If you want to go deeper into the scoring and iteration pipeline, the [pen plotter autoresearch pattern](/lab/pen-plotter-autoresearch) documents how the AI-in-the-loop workflow runs, and the [live field journal](/pen-plotter/) shows the plots and scores as they land.

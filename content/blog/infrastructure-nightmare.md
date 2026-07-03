@@ -55,7 +55,7 @@ OpenAI's data platform team turned its manual release pipeline over to an agent 
 
 - Runs promotions autonomously (staging → canaries → prod)
 - Pings status in Slack
-- Self-triages failures
+- [Self-triages failures](/blog/self-healing-ai-infrastructure/)
 - Traverses 4–5 internal systems to find and patch bugs at midnight
 
 **"Probably better than humans can."**
@@ -68,7 +68,7 @@ But trust is the chicken-and-egg problem: agents are trusted to pull status and 
 
 1. **Separate code-reviewer agents**: distinct from creators, with their own knowledge bases and incentives
 2. **Private eval suites**: a "janky" Notion doc of inputs + expected outputs, run against every new model release
-3. **Harden internal APIs**: agents will discover and misuse endpoints you thought were hidden
+3. **Harden internal APIs**: agents will discover and misuse endpoints you thought were hidden — [the same failure modes that break MCP servers in production](/blog/mcp-servers-break-in-production/)
 4. **Support bots**: absorb low-urgency, high-cardinality requests to buy platform-team time
 5. **Encode ops knowledge in skills**: agent-launched jobs must fail safe and self-debug
 6. **Multi-layer kill switches**: runtime cancel, identity revoke, gateway block, payment freeze, framework interrupt
@@ -79,7 +79,7 @@ But trust is the chicken-and-egg problem: agents are trusted to pull status and 
 
 ## The Real Lesson
 
-The scaling laws of the upper layers (AI) and lower layers (human) are diverging. The fix isn't a single better model. It's a multi-agent architecture where each layer has its own agent, its own knowledge base, and its own governance.
+The scaling laws of the upper layers (AI) and lower layers (human) are diverging. The fix isn't a single better model. It's a multi-agent architecture where each layer has its own agent, its own knowledge base, and its own governance — another case of [the harness mattering more than the model](/blog/harness-is-the-moat/).
 
 The platform team of the future is not a human team slowing things down. It's a system of agents that maintains the safety invariants while the app teams move at AI speed.
 

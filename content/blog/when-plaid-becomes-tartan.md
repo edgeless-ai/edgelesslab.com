@@ -20,7 +20,7 @@ ctaHook: 10 generators, parameter guides, and the scoring rubric from 105+ exper
 
 A tartan is thirty characters of notation and three centuries of someone wearing it. The notation is the part a machine can learn. The wearing is not.
 
-I built a generator that produces tartans indistinguishable from registered ones. Thread count notation, warp-and-weft interlacement, period-correct dye palettes sourced from historical records. The Scottish Register of Tartans would accept the output, pending a clan petition and a two-year review.
+I built a generator that produces tartans indistinguishable from registered ones. Thread count notation, warp-and-weft interlacement, period-correct dye palettes sourced from historical records. The Scottish Register of Tartans would accept the output, pending a clan petition and a two-year review. The generator is live at [Tartanism](/tartanism/app/) if you want to weave along.
 
 The interesting question was never whether the machine could produce the right pixels. It was whether the result deserves the word.
 
@@ -36,7 +36,7 @@ The notation has a crucial property for generation: it is a formal grammar. You 
 
 A tartan is not a flat grid of colored squares. It is woven fabric, and the weave structure determines which threads pass over or under at each crossing. The simplest weave, 2/2 twill, produces the diagonal ribbing visible in most traditional tartans.
 
-I implemented six weave structures: plain weave, 2/2 twill, herringbone, hopsack, satin, and broken twill. Each changes the visual texture dramatically. The same thread count rendered in herringbone versus satin looks like a different tartan entirely.
+I implemented six weave structures: plain weave, 2/2 twill, herringbone, hopsack, satin, and broken twill. Each changes the visual texture dramatically. The same thread count rendered in herringbone versus satin looks like a different tartan entirely. ([Tartan Weave Synth](/blog/tartan-weave-synth/) makes all six playable in the browser.)
 
 The implementation detail that surprised me: the weave matrix is just a repeating binary pattern applied to the crossing grid. Plain weave is a 2x2 matrix alternating 0 and 1. Twill is a 4x4 matrix with a diagonal. Satin is an 8x8 matrix with distributed crossing points. The entire visual difference between weave types reduces to which matrix you tile across the grid.
 
@@ -60,7 +60,7 @@ Scale interacts with weave structure non-obviously. A herringbone weave needs wi
 
 ## SVG Export and Physical Output
 
-The generator exports SVG with individual threads rendered as separate elements. This matters for pen plotters: each thread becomes a stroke, and the weave determines which strokes are drawn on top. The SVG layering matches the physical over-under pattern of the fabric.
+The generator exports SVG with individual threads rendered as separate elements. This matters for [pen plotters](/blog/generative-art-pen-plotters/): each thread becomes a stroke, and the weave determines which strokes are drawn on top. The SVG layering matches the physical over-under pattern of the fabric.
 
 Plotted tartans have a quality that screen renderings cannot match. The slight variation in ink density where threads cross, the way the pen catches differently on warp versus weft strokes, the physical texture of layered ink. A plotted tartan at close range looks more like woven cloth than a digital rendering does.
 

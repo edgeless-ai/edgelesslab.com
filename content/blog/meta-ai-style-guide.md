@@ -20,7 +20,7 @@ ctaHook: The lint rules, banned phrases, and production prompt templates behind 
 
 Someone leaked Meta AI's production system prompt. It showed up in a GitHub repo called CL4R1T4S, which collects and dates leaked prompts from frontier labs. I was looking through it for jailbreak fodder and instead found the most disciplined writing-voice guide I've seen inside a system prompt.
 
-The model is called Muse Spark. The prompt is 48KB. Most of it is forgettable: tool schemas, media-generation routing, citation formatting. But buried in the middle is a writing-style block that does something I had not seen any lab do this explicitly: it names the specific strings the model must never produce.
+The model is called Muse Spark. The prompt is 48KB. Most of it is forgettable: tool schemas, media-generation routing, citation formatting. But buried in the middle is a writing-style block that does something I had not seen any lab do this explicitly before: it names the specific strings the model must never produce.
 
 Not "be natural." Not "write conversationally." Literal substrings. Quoted. Banned.
 
@@ -40,7 +40,7 @@ I ran a lint across my 14 existing blog posts looking for these exact patterns. 
 
 Rewritten: "Claude Code sits at the top as the primary agent runtime." The rewrite is shorter, more direct, and makes the same claim without the frame that signals "an AI wrote this."
 
-The lesson: vague guidance ("write naturally") underperforms verbatim bans. The model is good at avoiding things it can recognize. A literal substring gives it something to recognize. An abstract instruction does not.
+The lesson: vague guidance ("write naturally") underperforms verbatim bans. The model is good at avoiding things it can recognize. A literal substring gives it something to recognize. An abstract instruction does not. I learned the same thing fixing [the newsletter that read like a database dump](/blog/ai-newsletter-reads-like-database-dump): the drafts only improved when the banned patterns were named.
 
 ## 2. Open with a topic-specific sentence
 
@@ -58,7 +58,7 @@ I didn't realize how much my drafting agent was doing this until I went looking.
 
 The rule I adopted: closings are either a single sharp line that earns the ending, a concrete next step (a link, a command, a related post), or nothing at all. End on the last substantive paragraph.
 
-My best example of this done right, from my own blog: "Your job isn't to trust the agent. It's to make the wrong path impossible." That's the last line of a 1,500-word post-mortem about an agent that lost $252. No recap. No "key takeaway." The line lands because nothing after it dilutes it.
+My best example of this done right, from my own blog: "Your job isn't to trust the agent. It's to make the wrong path impossible." That's the last line of a 1,500-word [post-mortem about an agent that lost $252](/blog/agent-lost-252-dollars). No recap. No "key takeaway." The line lands because nothing after it dilutes it.
 
 ## 4. Tables for structured comparisons, not decoration
 
@@ -82,7 +82,7 @@ And the date-handling anti-pattern, which I have personally watched my research 
 
 I ran a lint over the last 30 days of my agent transcripts looking for this exact violation: search queries containing four-digit years or words like "latest," "recent," "current." The result: 1,096 violations across 168 transcripts. Subagents were 3x worse than main-session transcripts. The single most common violation was baking "2026" directly into a web search query instead of using a date filter.
 
-The fix is a shared decision tree that every search-using agent imports. When to search, when not to, and the three rules for query construction: no years (use `since`), no relative-time words (use `since`), decompose broad queries into specific facets with proper nouns.
+The fix is a shared decision tree that every search-using agent imports. When to search, when not to, and the three rules for query construction: no years (use `since`), no relative-time words (use `since`), decompose broad queries into specific facets with proper nouns. It's the same principle behind [prompts that survive production](/blog/writing-prompts-that-survive-production): decision rules beat vibes.
 
 ## The one rule I rewrote: a values preamble
 

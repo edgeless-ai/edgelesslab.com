@@ -16,7 +16,7 @@ editorial: true
 
 # I Pointed 7 AI Agents at My YouTube History. They Found What I Couldn't See.
 
-I pointed 7 AI agents at my YouTube watch history. They found patterns I couldn't see.
+Seven agents read 1,062 videos' worth of my YouTube watch history and told me things about how I think that I couldn't see myself.
 
 Not "recommendations." Not "you might also like." Actual structural analysis of what I've been consuming, what I've been building, and the gaps between the two. The kind of mirror you can only get when something with no ego reads your data and tells you what it means.
 
@@ -123,17 +123,17 @@ Meanwhile, I've watched 123 WesRoth videos and 87 SabineHossenfelder videos. Hig
 
 Discord and community tooling: **3 YouTube videos** mapped to my discord-infra project. Three. I'm running a 7-agent Discord swarm with 5 specialized bots, and I've watched almost nothing about Discord bot development, community management, or bot-to-bot coordination patterns.
 
-The knowledge gap analysis ranked it as my biggest blind spot. Not because the project is failing; it works; but because I'm building it entirely from first principles with zero external input. That's either impressive or reckless, depending on your perspective.
+The knowledge gap analysis ranked it as my biggest blind spot. Not because the project is failing (it works) but because I'm building it entirely from first principles with zero external input. That's either impressive or reckless, depending on your perspective.
 
 For contrast: my `agentic-os` domain maps to 1,131 YouTube videos. My `knowledge-system` domain maps to 150. Discord infrastructure maps to 3. The ratio of consumption-to-build-effort is wildly inverted for Discord compared to everything else.
 
-The remediation is obvious: search YouTube for Discord bot development, community automation, bot-to-bot coordination. The agents even suggested specific search terms. They're also not only finding gaps; they're writing the prescription.
+The remediation is obvious: search YouTube for Discord bot development, community automation, bot-to-bot coordination. The agents even suggested specific search terms. They aren't only finding gaps; they're writing the prescription.
 
 ---
 
 ## The Meta-Move: Agents Auditing Themselves
 
-This is where it gets interesting. The agentic workflows bridge analysis cross-referenced what the vault *knows* against what the infrastructure *does*. It found 14 automation gaps; things the vault's knowledge suggests I should be automating but aren't.
+This is where it gets interesting. The agentic workflows bridge analysis cross-referenced what the vault *knows* against what the infrastructure *does*. It found 14 automation gaps: things the vault's knowledge suggests I should be automating but aren't. This is the same loop behind [agents that improve themselves](/blog/agents-that-improve-themselves/), pointed at my own stack.
 
 Fourteen things my agents should be doing that they weren't.
 
@@ -141,7 +141,7 @@ The vault had notes about webhook-triggered agent sessions, rubric-based output 
 
 This is the AI equivalent of having a bookshelf full of unread books. Except now the books can read themselves and file bug reports.
 
-The 14 gaps fell into three categories: validation gaps (agents producing unchecked output), learning gaps (agents not accumulating knowledge between sessions), and integration gaps (systems that should talk to each other but don't). The bridge analysis literally drew a diagram showing where vault knowledge pointed to automations that spanned both n8n (event-driven) and the agentic OS (code-driven) but didn't exist in either.
+The 14 gaps fell into three categories: validation gaps (agents producing unchecked output), learning gaps (agents not accumulating knowledge between sessions), and integration gaps (systems that should talk to each other but don't). The bridge analysis literally drew a diagram showing where vault knowledge pointed to automations that spanned both n8n (event-driven) and the agentic OS (code-driven) but didn't exist in either. ([The knowledge-base circulation audit](/blog/kb-audit-circulation/) picks up this thread and quantifies it.)
 
 ---
 
@@ -166,7 +166,7 @@ n8n can now trigger Claude Code sessions via webhook. External events (email arr
 
 Five gaps closed. Nine remaining. The analysis produced its own roadmap.
 
-The remaining nine are bigger lifts; things like multi-model cascade routing for different analysis types, automated A/B testing for agent system prompts, and a feedback loop where ChromaDB query patterns inform which YouTube topics to actively seek out. Each one has a vault note that describes the pattern and a gap in the infrastructure where the implementation should live.
+The remaining nine are bigger lifts: things like multi-model cascade routing for different analysis types, automated A/B testing for agent system prompts, and a feedback loop where ChromaDB query patterns inform which YouTube topics to actively seek out. Each one has a vault note that describes the pattern and a gap in the infrastructure where the implementation should live.
 
 ---
 
@@ -180,25 +180,25 @@ But my *practice* is more sophisticated than my *consumption*.
 
 I'm running a 25-agent swarm with Kantian invariants (ethical constraints that agents cannot override), a 3-layer memory system (ChromaDB + PyTorch + Vault), file-based and API-based inter-agent communication, session poisoning detection, and automated self-improvement loops.
 
-Nobody on YouTube is teaching this. The videos I watch cover *pieces* of what I've built, but the system as a whole; the integration, the failure modes, the operational knowledge; doesn't exist in any channel's content. My consumption feeds my practice, but my practice has outrun my consumption.
+Nobody on YouTube is teaching this. The videos I watch cover *pieces* of what I've built, but the system as a whole (the integration, the failure modes, the operational knowledge) doesn't exist in any channel's content. My consumption feeds my practice, but my practice has outrun my consumption.
 
 The agents found the gap by looking at the data. I couldn't see it because I was too close.
 
-There's a philosophical irony here. I'm building systems that are philosophically more sophisticated than the content I consume about building such systems. The Kantian invariants, the multi-layer memory architecture, the inter-agent communication protocols; these aren't patterns I learned from YouTube. They emerged from operational necessity. The YouTube consumption gave me *vocabulary* and *components*, but the architecture is original.
+There's an irony here. I'm building systems more sophisticated than the content I consume about building such systems. The Kantian invariants, the multi-layer memory architecture, the inter-agent communication protocols: these aren't patterns I learned from YouTube. They emerged from operational necessity. The YouTube consumption gave me *vocabulary* and *components*, but the architecture is original.
 
-That gap; between consumption and practice; might be the most important thing the agents found. It means I'm also not only applying what I learn. I'm synthesizing something new. And the only way I could see that was by having agents analyze the delta.
+That gap between consumption and practice might be the most important thing the agents found. It means I'm not only applying what I learn. I'm synthesizing something new. And the only way I could see that was by having agents analyze the delta.
 
 ---
 
 ## How to Do This Yourself
 
-You don't need 1,062 videos. You need a structured dataset of *something you consume*; articles, podcasts, bookmarks, tweets; and a way to tag and analyze it.
+You don't need 1,062 videos. You need a structured dataset of *something you consume* (articles, podcasts, bookmarks, tweets) and a way to tag and analyze it.
 
 The pipeline I built is open source:
 
-**[YouTube Intelligence Pipeline](https://github.com/thedavidmurray/youtube-intelligence)**; The extraction, tagging, and analysis pipeline. Takes YouTube liked videos, pulls transcripts, generates structured vault notes, runs the 7-analysis battery.
+**[YouTube Intelligence Pipeline](https://github.com/thedavidmurray/youtube-intelligence)**: the extraction, tagging, and analysis pipeline. Takes YouTube liked videos, pulls transcripts, generates structured vault notes, runs the 7-analysis battery.
 
-**[Edgeless Stack](https://github.com/thedavidmurray/edgeless-stack)**; The full agent infrastructure. Hermes, Discord swarm, cron automations, memory system, skills library. Everything the agents run on.
+**[Edgeless Stack](https://github.com/thedavidmurray/edgeless-stack)**: the full agent infrastructure. Hermes, Discord swarm, cron automations, memory system, skills library. Everything the agents run on.
 
 The key insight isn't the code. It's the *approach*: treat your consumption data as a dataset, not a feed. Run structural analysis, not recommendations. Look for gaps between what you know and what you do.
 

@@ -25,15 +25,15 @@ The gap between demo prompts and production prompts is the same gap between a sc
 
 Production prompts fail in predictable ways. Once you know the patterns, you can design against them.
 
-**Drift**: the model's interpretation of your prompt shifts as context accumulates. A prompt that works perfectly in message 1 starts hallucinating by message 15 because earlier responses have polluted the context. Fix: restate critical constraints at decision points, also not only at the top.
+**Drift**: the model's interpretation of your prompt shifts as context accumulates. A prompt that works perfectly in message 1 starts hallucinating by message 15 because earlier responses have polluted the context. Fix: restate critical constraints at decision points, not only at the top.
 
 **Edge collapse**: the model encounters an input it wasn't designed for and produces confidently wrong output instead of signaling uncertainty. The classic: a sentiment classifier that labels gibberish as "positive" because it always picks something. Fix: give the model an explicit "I can't classify this" option and define when to use it.
 
-**Format rot**: the model returns valid content in the wrong structure. You asked for JSON, it returns JSON with markdown wrapping. You asked for a list, it returns a paragraph with embedded list items. Fix: provide a concrete output example, also not only a format description.
+**Format rot**: the model returns valid content in the wrong structure. You asked for JSON, it returns JSON with markdown wrapping. You asked for a list, it returns a paragraph with embedded list items. Fix: provide a concrete output example, not only a format description.
 
 ## Structural Patterns That Work
 
-After writing hundreds of production prompts across classification, extraction, generation, and analysis tasks, a few structural patterns consistently outperform.
+After writing hundreds of production prompts across classification, extraction, generation, and analysis tasks, a few structural patterns consistently outperform. (The [newsletter pipeline rewrite](/blog/ai-newsletter-reads-like-database-dump/) is one of them in the wild.)
 
 **The constraint sandwich**: state the task, list constraints, restate the most critical constraint. Models weight the end of the prompt more heavily. If "never include PII" is your most important constraint, say it last.
 

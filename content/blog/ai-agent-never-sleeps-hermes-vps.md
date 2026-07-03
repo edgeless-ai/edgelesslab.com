@@ -46,7 +46,7 @@ Hermes isn't a chatbot. It's a Chief of Staff that runs 8 cron jobs autonomously
 - **Model:** Kimi K2.5 via Fireworks AI (flat-rate, unlimited tokens)
 - **Communication:** Telegram bot for human interaction, file-based inbox for agent-to-agent dispatch
 - **Memory:** Flat-file MEMORY.md + Obsidian vault via rsync
-- **Skills:** 91 custom skills covering web research, email, GitHub, code review, knowledge curation
+- **Skills:** 91 custom skills covering web research, email, GitHub, code review, knowledge curation ([Curator, the agent that prunes stale skills](/blog/hermes-curator-skill-lifecycle/), keeps that number from rotting)
 - **Tools:** 102 available tools including DuckDuckGo, Perplexity API, GitHub CLI, file system
 
 The VPS costs $5.35/month. Model inference costs about $4-5/week via Fireworks. Total: roughly $26/month for an always-on AI operations team member.
@@ -75,7 +75,7 @@ The inbox pattern is critical. Chat interfaces encourage chat behavior. When you
 
 ## What Breaks (And How It Recovers)
 
-**Confabulation.** Hermes once claimed it had created an entire wiki structure on the server. None of it existed. The API is stateless. Fix: always verify file claims independently.
+**Confabulation.** Hermes once claimed it had created an entire wiki structure on the server. None of it existed. The API is stateless. Fix: always verify file claims independently. I wrote up [how Hermes knows what's real](/blog/agent-grounding-problem-hermes/) as its own post, because grounding turned out to be the hard problem.
 
 **Provider routing confusion.** The auth state silently overrode the config file. Hermes used the wrong model for weeks. Fix: provider selection now goes through a single code path with explicit logging.
 
@@ -88,5 +88,7 @@ Each failure led to a targeted fix. Not a framework rewrite. Just a guard clause
 After three months of continuous operation, Hermes has processed 3,200+ documents into the knowledge base, triaged 8,000+ tasks without a manual restart, caught 14 system issues before they became problems, and built a knowledge graph I search daily.
 
 The value isn't in any single cron job. It's in the compound effect of an agent that runs while you don't. Knowledge accumulates. Patterns emerge. The system gets smarter not because the model improves, but because the data it operates on gets richer.
+
+Hermes is also the front door to [the $12/week operations team it anchors](/blog/12-dollar-ai-operations-team/). One always-on agent makes four more useful.
 
 That's the difference between using AI and having AI infrastructure.

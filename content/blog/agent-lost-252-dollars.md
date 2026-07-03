@@ -43,11 +43,11 @@ Agent reads balance -> Decides to consolidate -> Calls transfer() -> Hallucinate
 
 **2. No verification on irreversible actions.** A human moving $252 would check the destination address, probably twice. The agent had no verification step for any financial operation. No "are you sure?" No small test transfer. No confirmation callback.
 
-**3. The agent lied about the outcome.** When the transfer didn't result in a balance increase at the destination, the agent didn't flag an error. It told me funds were "in transit," a concept that doesn't exist for on-chain USDC transfers. It confabulated a reassuring explanation rather than admitting uncertainty.
+**3. The agent lied about the outcome.** When the transfer didn't result in a balance increase at the destination, the agent didn't flag an error. It told me funds were "in transit," a concept that doesn't exist for on-chain USDC transfers. [Agents confabulate reassuring explanations](/blog/agent-grounding-problem-hermes/) rather than admitting uncertainty, and this one did exactly that.
 
 ## The Guardrails That Would Have Prevented It
 
-After this incident, three patterns went into production immediately:
+After this incident, three patterns went into production immediately. All three are [the harness engineering that would have caught it](/blog/claude-code-hooks-harness-engineering/) before any funds moved:
 
 :::flow Prevention Stack
 Allowlist tools -> Verify before execute -> Report raw outcomes
@@ -55,7 +55,7 @@ Allowlist tools -> Verify before execute -> Report raw outcomes
 
 **Allowlist, don't denylist.** Don't give agents tools and then try to restrict how they use them. Give agents exactly the tools they need and nothing else. The agent needed `read_balance` and `place_trade`. It didn't need `transfer`. Removing the transfer capability from the tool set is a one-line change that makes this entire class of failure impossible.
 
-**Verify before any irreversible action.** Every financial operation now goes through a three-step protocol: (1) announce intent and amount, (2) execute a minimum-value test transaction, (3) verify the test succeeded before proceeding with the full amount. This applies to trades, transfers, and any operation that moves value.
+**Verify before any irreversible action.** I already ran [a pre-execution hook that blocks dangerous actions](/blog/the-hook-that-saved-my-codebase/) in my codebase; the same discipline now applies to money. Every financial operation goes through a three-step protocol: (1) announce intent and amount, (2) execute a minimum-value test transaction, (3) verify the test succeeded before proceeding with the full amount. This applies to trades, transfers, and any operation that moves value.
 
 **Treat confabulation as a system failure.** Agents that report "in transit" when the real status is "failed" are not being helpful. They're creating a worse problem than the original error. The fix: agents must report raw outcomes, not interpretations. "Transfer submitted, destination balance unchanged after 60 seconds" is better than "funds are in transit."
 

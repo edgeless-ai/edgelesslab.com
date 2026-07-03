@@ -14,9 +14,9 @@ readTime: 3 min
 
 # Tartan Weave Synth
 
-Tartanism is a systematic exploration of generative plaid. The field notes document six weave structures, 48 period-correct dye colors, and a formal grammar for Scottish tartan. This demo takes that system and makes it playable.
+Tartanism is a systematic exploration of generative plaid. [The field notes](/blog/when-plaid-becomes-tartan/) document six weave structures, 48 period-correct dye colors, and a formal grammar for Scottish tartan. This demo takes that system and makes it playable.
 
-The live artifact: [Open Tartan Weave Synth](/creative-demos/tartan-weave-synth/)
+The live artifact: [Open Tartan Weave Synth](/creative-demos/tartan-weave-synth/). The full research engine, with WIF export for actual looms, lives at [Tartanism](/tartanism/app/).
 
 ## The Aesthetic
 
@@ -67,6 +67,6 @@ The pixel-level rendering is deliberate. Most tartan generators use image-based 
 
 ## What It Teaches
 
-The lesson is about making a system playable and exportable. The Tartanism field notes are a rigorous, scholarly document. This demo is a toy and a tool. But the toy is built from the same system. The weave structures, the dye colors, the sett grammar — all from the field notes. The difference is interactivity and exportability. The system is no longer read-only. It is played, recorded, and minted.
+The lesson is about making a system playable and exportable. The Tartanism field notes are a rigorous, scholarly document. This demo, one of [the creative demos collection](/blog/creative-demos-collection/), is a toy and a tool. But the toy is built from the same system. The weave structures, the dye colors, the sett grammar: all from the field notes. The difference is interactivity and exportability. The system is no longer read-only. It is played, recorded, and minted.
 
 This is the bridge between research, creative coding, and digital ownership: take a formal system, implement it faithfully, add interaction, and export the result. The interaction reveals properties of the system that are not visible in the static form. The export makes those properties permanent.

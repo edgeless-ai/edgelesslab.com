@@ -46,6 +46,8 @@ Substack newsletters, tech blogs, and research feeds. The workflow fetches all f
 
 The analysis prompt asks for three things: a one-line summary, the key takeaway, and whether this relates to any of my products. That last part is where it pays for itself: "This article about MCP server security gaps is directly relevant to your Production MCP Server Kit."
 
+This is the pipeline that assembles the daily digest, and getting the output to sound human was its own battle: [my AI newsletter read like a database dump](/blog/ai-newsletter-reads-like-database-dump) until I fixed the prompts.
+
 ## 3. AI-Assisted Code Review
 
 **Trigger**: GitHub webhook on PR creation
@@ -69,7 +71,7 @@ The chunking strategy matters: split on paragraph boundaries, preserve headers a
 **Trigger**: Schedule, every 6 hours
 **Flow**: Ping endpoints -> check responses -> alert on failure
 
-A simple but essential workflow. It hits health endpoints on my VPS services (Hermes agent, Mastra orchestrator, PM2 processes), checks response codes and latency, and sends a Telegram alert if anything is down or slow.
+A simple but essential workflow. It hits health endpoints on [my VPS services](/blog/building-ai-agent-infrastructure-solo) (Hermes agent, Mastra orchestrator, PM2 processes), checks response codes and latency, and sends a Telegram alert if anything is down or slow.
 
 The useful addition: a Claude node that receives the last 24 hours of health data and identifies trends. "Hermes response time has increased 3x over the past 12 hours" is more useful than a binary up/down check.
 

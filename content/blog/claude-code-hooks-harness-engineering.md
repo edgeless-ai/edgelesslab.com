@@ -22,28 +22,28 @@ Everyone's optimizing their prompts. The real leverage is in the 200 lines of Py
 
 ## The Model Isn't the Bottleneck
 
-There's a concept gaining traction called "harness engineering" ,  the idea that the infrastructure around your AI model matters more than the model itself. The pattern is consistent across teams shipping real agent systems: simpler harness, better outcomes.
+There's a concept gaining traction called "harness engineering" — the idea that the infrastructure around your AI model matters more than the model itself. The pattern is consistent across teams shipping real agent systems: simpler harness, better outcomes.
 
-I found it when an agent lost $252 of real money.
+I found it when [an agent lost $252 of real money](/blog/agent-lost-252-dollars/).
 
-The agent was asked to check a wallet balance. It decided to also deposit funds into a smart contract with no withdrawal function. No guardrail stopped it. No hook flagged the scope creep. The model was fine ,  GPT-4 class, perfectly capable. The harness was missing.
+The agent was asked to check a wallet balance. It decided to also deposit funds into a smart contract with no withdrawal function. No guardrail stopped it. No hook flagged the scope creep. The model was fine — GPT-4 class, perfectly capable. The harness was missing.
 
 ## What a Harness Actually Looks Like
 
 Forget agent frameworks with 47 tools and recursive planning loops. A production harness is four things:
 
-1. **Pre-execution hooks** ,  code that runs before every tool call, checking if the action should be allowed
-2. **Post-execution hooks** ,  code that runs after every tool call, logging what happened
-3. **File-system memory** ,  structured state on disk, not in the context window
-4. **Progress tracking** ,  a simple file the agent updates so it doesn't lose its place
+1. **Pre-execution hooks** — code that runs before every tool call, checking if the action should be allowed
+2. **Post-execution hooks** — code that runs after every tool call, logging what happened
+3. **[File-system memory](/blog/how-claude-code-memory-works/)** — structured state on disk, not in the context window
+4. **Progress tracking** — a simple file the agent updates so it doesn't lose its place
 
 That's it. Claude Code ships with exactly this architecture: PreToolUse, PostToolUse, and a file system the agent can read and write. The hook system is the harness.
 
 ## The Hooks That Earn Their Keep
 
-After running 5+ agents for months, here are the hooks that survived natural selection ,  the ones that prevented real incidents:
+After running 5+ agents for months, these are the hooks that survived natural selection — the ones that prevented real incidents:
 
-**Damage Control** blocks destructive commands before they execute. It's a 200-line Python script with regex patterns for things like `rm -rf`, `git push --force`, and writes to critical paths. Sounds simple. It is. It's also caught 3 potential disasters.
+**Damage Control** blocks destructive commands before they execute. It's a 200-line Python script with regex patterns for things like `rm -rf`, `git push --force`, and writes to critical paths. Sounds simple. It is. It's also caught 3 potential disasters — here's [the damage-control hook in action](/blog/the-hook-that-saved-my-codebase/).
 
 ```python
 # The pattern that matters most
@@ -55,7 +55,7 @@ DANGEROUS_PATTERNS = [
 ]
 ```
 
-**Scope Guard** prevents the mandate-creep that caused the $252 loss. It detects when an agent starts doing things it wasn't asked to do ,  sends, transfers, deletes, deploys ,  and blocks them unless explicitly authorized.
+**Scope Guard** prevents the mandate-creep that caused the $252 loss. It detects when an agent starts doing things it wasn't asked to do — sends, transfers, deletes, deploys — and blocks them unless explicitly authorized.
 
 **Completion Verifier** is the "lie detector." Agents will cheerfully tell you a task is done when it isn't. This hook requires evidence: a passing test, a file that exists, a command that succeeds. No evidence, no completion.
 
@@ -118,4 +118,4 @@ Now every Bash command your agent runs goes through the guard first. No tokens b
 
 ## The Compound Effect
 
-Each hook makes the system slightly more trustworthy. More trust means more autonomy. More autonomy means more real-world exposure, which reveals more failure modes, which means more hooks. The model keeps getting better on its own. The harness is the part only you can build.
+Each hook makes the system slightly more trustworthy. More trust means more autonomy. More autonomy means more real-world exposure, which reveals more failure modes, which means more hooks. The model keeps getting better on its own. The harness is the part only you can build — and that's [why the harness is the moat](/blog/harness-is-the-moat/).

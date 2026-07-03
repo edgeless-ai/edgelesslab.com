@@ -30,7 +30,7 @@ The monolith is rendered with a single directional light and flat shading. The a
 
 ## The Audio Pipeline
 
-The Web Audio API provides a real-time frequency analysis. Beats are detected by thresholding the low-frequency energy. On each beat, a random point on the monolith's surface is chosen as the deformation origin. The displacement is radial: vertices near the origin move outward, vertices far away are unaffected.
+The Web Audio API provides real-time frequency analysis. Beats are detected by thresholding the low-frequency energy. On each beat, a random point on the monolith's surface is chosen as the deformation origin. The displacement is radial: vertices near the origin move outward, vertices far away are unaffected.
 
 The deformation is not symmetric. The beat's frequency content determines the deformation shape: low beats produce broad, shallow deformations. High beats produce sharp, localized deformations.
 
@@ -45,3 +45,5 @@ The monolith is never still. Even without audio input, the base noise produces a
 The key technique is mapping audio events to geometric deformations. The mapping is not direct (amplitude -> displacement). It is event-driven (beat -> deformation). The deformation has memory (decay), so the visual is not just a frame-by-frame reaction. It is a cumulative record of recent beats.
 
 This pattern applies to any audio-driven geometry: detect events, apply localized deformations, let them decay. The result is a visual that responds to rhythm without being a slave to it.
+
+For a sibling study driven by continuous frequency data instead of discrete beats, see the [Chladni Visualizer](/blog/chladni-waveform-visualizer). Monolith Drummer lives alongside the rest of the [creative demos collection](/blog/creative-demos-collection).

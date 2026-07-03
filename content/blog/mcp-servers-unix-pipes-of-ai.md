@@ -47,7 +47,7 @@ The [agent infrastructure at Edgeless Lab](/blog/building-ai-agent-infrastructur
 
 **Backlog management server**: read and write tasks in a structured backlog. Lets agents file their own tasks, check status, and mark things complete. The backlog is a text file format; the MCP server is the typed interface over it.
 
-**Inter-agent messaging server**: a pub/sub channel for agents to send messages to each other. An orchestrator agent can dispatch work; worker agents can report back. Real-time, without a message queue.
+**Inter-agent messaging server**: a pub/sub channel for [agents to send messages to each other](/blog/agents-that-talk-to-each-other). An orchestrator agent can dispatch work; worker agents can report back. Real-time, without a message queue.
 
 None of these tools know about each other. Any agent can use any combination. Add a new server and it's immediately available to every agent in the system.
 
@@ -63,7 +63,7 @@ This is exactly what made Unix pipes powerful: `grep` doesn't know it's receivin
 
 ## Tools as Services, Not Libraries
 
-The shift MCP enables is treating tools as services rather than library calls. This changes the operational model significantly:
+The shift MCP enables is treating tools as services rather than library calls. This changes the operational model:
 
 You can **deploy tools independently**. The Obsidian server runs on your Mac (it needs local filesystem access). The ChromaDB server runs wherever ChromaDB is. The trading data server runs on the VPS. Each deployed where it makes sense.
 
@@ -79,8 +79,8 @@ The deeper implication is that MCP creates a tool ecosystem that outlives any pa
 
 This is how Unix tools from the 1970s still run on your Mac today. The protocol survived everything else changing.
 
-MCP is early. The tooling is rough in places. Server discovery is manual. Error handling is inconsistent. But the protocol is right, and the ecosystem will follow.
+MCP is early. The tooling is rough in places. Server discovery is manual. Error handling is inconsistent. There are [real ways MCP servers fail in production](/blog/mcp-servers-break-in-production). But the protocol is right, and the ecosystem will follow.
 
-For anyone building agent infrastructure: start treating your tools as MCP servers, not library functions. The composition benefits compound quickly, and you're building on the right abstraction for the next decade of AI development.
+For anyone building agent infrastructure: start treating your tools as MCP servers, not library functions. The composition benefits compound quickly, and it's the right abstraction for the next decade of AI development.
 
 See the [lab experiments page](/lab) for the MCP servers running in this system, or read the [infrastructure deep-dive](/blog/building-ai-agent-infrastructure-solo) for the full architecture.

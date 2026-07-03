@@ -16,7 +16,7 @@ editorial: true
 
 # The $172B Question: What Generative AI Is Actually Worth
 
-Most AI coverage treats the technology as a cost problem: training compute, inference pricing, API margins. That frame misses the real story. In April 2026, Stanford's Digital Economy Lab published a working paper that tried to measure generative AI the way economists measure welfare — not by what firms charge, but by what users would refuse to give up.
+Most AI coverage treats the technology as a cost problem: training compute, inference pricing, API margins, [what agents cost to run in production](/blog/real-cost-ai-agents-production-2026/). That frame misses the real story. In April 2026, Stanford's Digital Economy Lab published a working paper that tried to measure generative AI the way economists measure welfare — not by what firms charge, but by what users would refuse to give up.
 
 The answer changed the baseline.
 
@@ -24,7 +24,7 @@ The answer changed the baseline.
 
 *What is Generative AI Worth?* (Brynjolfsson, Collis, Eggers, Kazinnik, Nguyen, April 2026) ran two waves of willingness-to-accept surveys on Prolific, sampling 1,491 U.S. adults in July 2025 and 1,908 in March 2026. Respondents were asked how much compensation they would need to forfeit one month of access to any generative AI tool for one month starting tomorrow.
 
-The question is deceptively simple. It is a binary choice experiment with randomized price points — $1, $10, $20, $50, $100, $200, $500 — fit to a logit model. From the fitted demand curve the authors recover a median willingness-to-accept (WTA) and a mean, then multiply by the adult user base to get aggregate annual consumer surplus.
+The question sounds trivial. It is a binary choice experiment with randomized price points — $1, $10, $20, $50, $100, $200, $500 — fit to a logit model. From the fitted demand curve the authors recover a median willingness-to-accept (WTA) and a mean, then multiply by the adult user base to get aggregate annual consumer surplus.
 
 What makes the paper interesting is not the method. It is the gap between the result and the narrative the industry tells itself.
 
@@ -67,7 +67,7 @@ Productivity is up. Entry-level employment is down. That is the regime the econo
 
 The $172B figure is a floor, not a ceiling. The surveys were fielded when gen AI tools were still novel and often free. Valuation should rise as usage deepens, tools become more capable, and workflows shift from experimentation to infrastructure.
 
-The 12× surplus-to-revenue ratio is the argument for building on top of existing models rather than training new ones. The welfare is already being created. The question is who captures it.
+The 12× surplus-to-revenue ratio is the argument for building on top of existing models rather than training new ones — [routing across providers](/blog/plan-with-opus-build-with-gemini/) instead of owning weights. The welfare is already being created. The question is who captures it.
 
 That is the operating assumption for every agent product we ship.
 

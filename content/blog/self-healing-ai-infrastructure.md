@@ -33,7 +33,7 @@ This is the specific failure mode nobody warns you about: **registration without
 
 A crash is a gift. It gives you a timestamp, an error, a stack trace. Silent failures give you a slowly degrading baseline you mistake for normal.
 
-The ghost agent problem is structurally invisible to most monitoring setups. Health checks verify that an agent *can* respond. They don't verify that the agent has *been called*. I had agents that would respond fine to a ping but hadn't been called in production in weeks. The distinction matters enormously.
+The ghost agent problem is structurally invisible to most monitoring setups. Health checks verify that an agent *can* respond. They don't verify that the agent has *been called*. I had agents that would respond fine to a ping but hadn't been called in production in weeks. The distinction matters. It's a cousin of [the agent grounding problem](/blog/agent-grounding-problem-hermes/): the system reports a state that has quietly drifted from reality.
 
 A cron job that stops running doesn't send a notification. An agent that can't reach an API just stops. A backlog that grows by 500 items over a week looks like business as usual until you actually count it.
 
@@ -93,7 +93,7 @@ A negative drain rate for one day can be noise. Negative for two consecutive day
 
 For items older than 30 days with no processing attempt, it archives with a reason code (`staleness_archive`) rather than letting them accumulate indefinitely. Stale items aren't deleted — they go to a dated archive directory.
 
-**When it escalates:** If a queue has been growing for 3+ days despite maximum parallel workers, something is structurally wrong. The escalation includes queue name, size, growth rate, and last successful processing timestamp.
+**When it escalates:** If a queue has been growing for 3+ days despite maximum parallel workers, something is structurally wrong. The escalation includes queue name, size, growth rate, and last successful processing timestamp. That class of failure is exactly how we ended up [debugging a stuck multi-agent swarm without touching the production pipeline](/blog/how-we-debugged-a-stuck-multi-agent-swarm-without-touching-the-production-pipeline/).
 
 ### Layer 4: External API Dependencies
 
@@ -167,10 +167,10 @@ Layers 4 and 5 are real, but they're incremental improvements once you have the 
 
 ---
 
-Good infrastructure is boring infrastructure. The goal isn't to eliminate humans from the loop — it's to eliminate *routine* human intervention. Humans should handle novel failures, strategic decisions, and system evolution. Not restarting stuck processes.
+Good infrastructure is boring infrastructure. The goal isn't to eliminate humans from the loop — it's to eliminate *routine* human intervention. Humans should handle novel failures, strategic decisions, and system evolution. Not restarting stuck processes. These five layers are what keep [the $12/week operations team](/blog/12-dollar-ai-operations-team/) actually operating.
 
 ---
 
-*The monitoring scripts, Paperclip integration code, escalation protocol, and heartbeat pattern are packaged in the [Multi-Agent Blueprint](#). If you're running more than five agents and doing manual health checks, that's the place to start.*
+*The monitoring scripts, Paperclip integration code, escalation protocol, and heartbeat pattern are packaged in the [Multi-Agent Blueprint](/products/multi-agent-blueprint/). If you're running more than five agents and doing manual health checks, that's the place to start.*
 
 *Edgeless Lab builds infrastructure for autonomous AI systems.*

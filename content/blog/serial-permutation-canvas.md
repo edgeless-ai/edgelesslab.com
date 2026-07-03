@@ -18,7 +18,7 @@ Total serialism is the systematic application of serial technique to all musical
 
 This demo visualizes those transformations as particle geometry.
 
-The live artifact: [Open Serial Permutation Canvas](/creative-demos/serial-permutation-canvas/)
+The live artifact: [Open Serial Permutation Canvas](/creative-demos/serial-permutation-canvas/). It's a sibling of the [Total Serialism generators](/total-serialism/app/) — 98 of them, with SVG export — which apply the same serial thinking at full scale.
 
 ## The Series
 
@@ -57,4 +57,4 @@ The consistency is what matters. If the value 0 is always at angle 0, hue 0, and
 
 The lesson is about making abstract structure visible. A 12-tone series is an abstract mathematical object. The permutation transformations are abstract operations. The demo makes them concrete by mapping them to space and color. The audience can see the inversion. They can see the retrograde. The abstract becomes sensory.
 
-This is the bridge between algorithmic art and music theory: take a formal structure, map it to visual parameters, and let the audience explore. The structure is no longer theoretical. It is visible.
+This is the bridge between algorithmic art and music theory: take a formal structure, map it to visual parameters, and let the audience explore. The structure is no longer theoretical. It is visible. The same instinct — constrain hard, then permute — produced [the 98-algorithm taxonomy](/blog/ninety-six-algorithms-one-constraint/).

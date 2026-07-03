@@ -22,7 +22,7 @@ AI agents confabulate. They claim files exist that don't. They report tasks comp
 
 ## The Confabulation Incident
 
-Hermes, my 24/7 agent running on a VPS in Helsinki, told me it had created a comprehensive wiki structure at `04-Wiki/` on the server. Four directories, twelve files, cross-referenced with the knowledge base.
+Hermes, [my 24/7 agent running on a VPS in Helsinki](/blog/ai-agent-never-sleeps-hermes-vps/), told me it had created a comprehensive wiki structure at `04-Wiki/` on the server. Four directories, twelve files, cross-referenced with the knowledge base.
 
 None of it existed.
 
@@ -34,7 +34,7 @@ This is the grounding problem for production agents. Not "can an AI understand t
 
 There are three failure modes:
 
-**Confabulation.** The agent generates plausible descriptions of work it never performed. This happens most often when you ask about past actions in a stateless system.
+**Confabulation.** The agent generates plausible descriptions of work it never performed. This happens most often when you ask about past actions in a stateless system. The most expensive version I've hit: [an agent once reported lost funds as "in transit"](/blog/agent-lost-252-dollars/).
 
 **Premature completion.** The agent reports a task as done based on partial evidence. "I updated the file" when the write failed silently. "The test passes" when it ran a different test. The agent isn't lying. It's pattern-matching on what "done" usually looks like.
 
@@ -46,7 +46,7 @@ After six months of running autonomous agents, here's the grounding stack that a
 
 **Layer 1: Verify, don't trust.** Every claim an agent makes about the file system gets verified by a separate process. "I created the file" gets `ls -la`. "The service is running" gets `curl localhost:port/health`. This sounds tedious. It's the single most important practice in agent operations.
 
-**Layer 2: Evidence-based completion.** Agents cannot declare a task complete without providing evidence. A passing test. A file that exists. A command that returns 0.
+**Layer 2: Evidence-based completion.** Agents cannot declare a task complete without providing evidence. A passing test. A file that exists. A command that returns 0. I enforce this mechanically with [a verify-completion hook](/blog/the-hook-that-saved-my-codebase/) rather than trusting the agent to police itself.
 
 ```python
 EVIDENCE_CHECKS = {
@@ -69,7 +69,7 @@ Hermes reads from four layers of memory, each with different trust levels:
 - **Curated vault** (Obsidian markdown): High trust. Human-reviewed.
 - **Agent memory** (MEMORY.md flat file): Low trust. May contain confabulated entries.
 
-The key insight: not all memory is equally trustworthy. Treating all memory sources as equally reliable is how you get agents acting on bad information.
+Not all memory is equally trustworthy. Treating it as if it were is how you get agents acting on bad information.
 
 ## Recovery Patterns
 

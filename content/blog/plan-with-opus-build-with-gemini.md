@@ -17,11 +17,11 @@ editorial: true
 
 # Plan with Opus, Build with Gemini: A Practical Guide to Mixed-Provider Workflows
 
-Anthropic's rate limits are tightening. Subscription output quality is reportedly degrading. And the frontier models — Claude Opus, GPT-4.5 — cost 10x more per token than Kimi K2.6, DeepSeek, or Qwen.
+Anthropic's rate limits are tightening. Subscription output quality is reportedly degrading. And the frontier models (Claude Opus, GPT-4.5) cost 10x more per token than Kimi K2.6, DeepSeek, or Qwen.
 
 The solution isn't abandoning frontier models. It's mixing them: use the expensive model where it matters, and the cheap model everywhere else.
 
-This is the mixed-provider workflow. Here's how to build it.
+This is the mixed-provider workflow. The rest of this post is how to build it.
 
 ---
 
@@ -46,7 +46,7 @@ A mixed-provider workflow has three layers:
 
 The orchestrator is the layer above the coding agent. It builds a DAG of steps, assigns a provider to each node, and manages work-tree isolation.
 
-**Archon** is the reference implementation: per-node provider selection, git work-tree isolation, retry logic, and PR creation. The key insight: **tooling gets replaced, but the orchestration layer doesn't.**
+**Archon** is the reference implementation: per-node provider selection, git work-tree isolation, retry logic, and PR creation. Anthropic is now productizing this same layer as [dynamic workflows](/blog/claude-dynamic-workflows/). The key insight: **tooling gets replaced, but the orchestration layer doesn't.**
 
 ### 2. Provider Routing
 
@@ -71,7 +71,7 @@ The planning node writes a plan.md. The implementation node reads it. The valida
 Kimi K2.6 is the weak link operationally:
 
 - Frequent "tool edit failed" warnings
-- API hangs (~1 in 4–8 runs)
+- API hangs (~1 in 4-8 runs)
 - Weird multi-newline output
 
 Codex is the only agent that reportedly doesn't crash. The Claude Agent SDK also crashes occasionally (subprocess crash → retry → guard).
@@ -86,7 +86,9 @@ Codex is the only agent that reportedly doesn't crash. The Claude Agent SDK also
 - **Anthropic subscription**: subsidized but rate-limited, reportedly degrading in quality
 - **Gemini 3.5 Flash**: ~20% of weekly limit per single-file edit
 
-The strategy: use Gemini for frontend design (fast, visual) + Opus/Kimi for content (accurate, structured). Avoid using Gemini for reasoning — it hallucinates facts.
+The strategy: use Gemini for frontend design (fast, visual) + Opus/Kimi for content (accurate, structured). Avoid using Gemini for reasoning; it hallucinates facts.
+
+Per-token pricing is only one slice of the bill. For the full stack, from token burn to maintenance overhead, see [what AI agents really cost in production](/blog/real-cost-ai-agents-production-2026/).
 
 ---
 

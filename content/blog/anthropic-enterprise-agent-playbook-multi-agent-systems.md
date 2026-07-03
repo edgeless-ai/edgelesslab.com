@@ -24,7 +24,7 @@ ctaHook: The dispatch/worker architecture and Agent Bus messaging patterns for p
 
 Anthropic published a 22-page playbook on building AI agents for the enterprise. The document is dense: 3 case studies, 1 deployment framework, and a lot of advice that stops sounding like AI marketing and starts sounding like infrastructure engineering.
 
-The core shift is simple: AI agents should be treated as a new layer of institutional capability — not a set of point tools. This post breaks down four principles from the guide and shows what they mean in practice for multi-agent systems like ours.
+The core shift is simple: AI agents should be treated as a new layer of institutional capability — not a set of point tools. Four principles from the guide translate directly to multi-agent systems like ours.
 
 ---
 
@@ -42,7 +42,7 @@ When you flatten that topology into one assistant, you lose the same thing point
 
 ## 2. Institutional Knowledge as Infrastructure
 
-The guide makes an unusual claim: context quality is more important than model size. The supporting evidence is L'Oreal, where agents operate inside a corpus that is curated, partitioned, and governed. Accuracy does not scale by swapping in a larger model; it scales by improving what the agent is allowed to read.
+The guide makes an unusual claim: context quality is more important than model size. The supporting evidence is L'Oreal, where agents operate inside a corpus that is curated, partitioned, and governed. Accuracy does not scale by swapping in a larger model; it scales by improving what the agent is allowed to read. We reached the same conclusion [auditing our own knowledge base for context quality](/blog/kb-audit-circulation/).
 
 For multi-agent systems, this means memory architecture is not optional. Agents that cannot store, retrieve, and resolve conflicts in durable memory repeat the same context rebuild cost every turn. The right pattern is hot/warm/cold memory with explicit ownership of who updates what and when.
 
@@ -54,9 +54,9 @@ This is also where governance belongs. Access boundaries, write locks, and reten
 
 Lyft's support deployment is the clearest example in the guide: human expertise is continuously fed back into the AI knowledge base. Successes and failures become reusable institutional signal, not one-off outputs.
 
-In agent systems, the same feedback loop should close around memory and behavior. When an agent fails or succeeds in a new scenario, that event should become part of the durable corpus — indexed, retrievable, and causally linked to the decision that produced it. That loop turns every session into training data for the whole swarm.
+In agent systems, the same feedback loop should close around memory and behavior. When an agent fails or succeeds in a new scenario, that event should become part of the durable corpus — indexed, retrievable, and causally linked to the decision that produced it. That loop turns every session into training data for the whole swarm. We run this exact loop today; see [compounding feedback loops in practice](/blog/agents-that-improve-themselves/).
 
-The practical mechanism is lower than you might expect. Add a structured learning record tied to the originating issue or run ID. Add a policy that says: if a failure mode repeats more than N times in M days, it becomes a defect report. Do that, and you have operational telemetry that improves both accuracy and reliability without retraining.
+The practical mechanism is simpler than you might expect. Add a structured learning record tied to the originating issue or run ID. Add a policy that says: if a failure mode repeats more than N times in M days, it becomes a defect report. Do that, and you have operational telemetry that improves both accuracy and reliability without retraining.
 
 ---
 
@@ -79,4 +79,4 @@ The Enterprise Agent Playbook is often read as a vendor document. It is, but the
 - Close the feedback loop so mistakes improve the organization.
 - Enforce capability boundaries in the gateway, not the prompt.
 
-That is how you build agents that last longer than the next model release.
+The playbook never uses the phrase, but it lands on the same conclusion we did: [the harness is the moat](/blog/harness-is-the-moat/). That is how you build agents that last longer than the next model release.

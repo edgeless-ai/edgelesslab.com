@@ -16,7 +16,7 @@ readTime: 3 min
 
 Typography is usually static. Letters are placed, aligned, and left alone. This demo treats each letter as a physical body with mass, velocity, and collision.
 
-The live artifact: [Open Kinetic Type Physics](/creative-demos/kinetic-type-physics/)
+See it live: [Kinetic Type Physics](/creative-demos/kinetic-type-physics/) — push the letters around with your cursor and watch the word fight to reassemble.
 
 ## The Physics Engine
 
@@ -44,3 +44,5 @@ The color is monochrome: black letters on white, with a subtle gray trail showin
 Physics-driven typography is not about realism. It is about giving text a material presence. The audience knows that letters are not physical. But when they behave physically, the text feels more present, more tangible. The physics is not accurate. It is expressive.
 
 The lesson: use physics as a metaphor, not a simulation. The goal is not to simulate real bodies. It is to give abstract text a sense of weight and resistance.
+
+More studies like this live in [the creative demos collection](/blog/creative-demos-collection/).

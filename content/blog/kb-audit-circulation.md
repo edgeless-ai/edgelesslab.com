@@ -21,7 +21,7 @@ ctaHook: The memory templates and stack libraries that keep agent knowledge sear
 
 # We Audited Our AI Knowledge Base — 85% of Our Content Was Invisible to Our Agents
 
-Two months ago I wrote about the Knowledge Base Loop — how my AI agents store, retrieve, and cross-reference 7,276 documents in a vector database. I was proud of that post. The system worked.
+Two months ago I wrote about [the Knowledge Base Loop](/blog/12-dollar-ai-operations-team/) — how my AI agents store, retrieve, and cross-reference 7,276 documents in a vector database. I was proud of that post. The system worked.
 
 Then last week I ran a count. I had 26,101 markdown documents in my vault. Only 3,800 had ChromaDB embeddings.
 
@@ -31,7 +31,7 @@ My agents had been making decisions — routing tasks, generating creative promp
 
 ## The Problem: Accumulation ≠ Circulation
 
-Here's what happens when you build an AI agent system that ingests aggressively. Each pipeline works. RSS feeds flow. YouTube transcripts transcribe. Are.na blocks sync. But nobody ever asks: *"Is anything downstream reading this?"*
+An AI agent system that ingests aggressively fails in a specific, quiet way. Each pipeline works. RSS feeds flow. YouTube transcripts transcribe. Are.na blocks sync. But nobody ever asks: *"Is anything downstream reading this?"*
 
 | Knowledge Source | What It Produces | Who Consumes It |
 |---|---|---|
@@ -84,6 +84,6 @@ This isn't a technology problem. The embeddings work. The vault is organized. Th
 
 ## Why This Matters
 
-If you're building AI agent systems, you will hit this problem. The fix is not "more tooling." It's a discipline: **every input needs a verified output.** The audit methodology I wrote is now a reusable skill any agent can load. It takes 10-30 minutes per domain.
+If you're building AI agent systems, you will hit this problem. The fix is not "more tooling." It's a discipline: **every input needs a verified output.** It's the same gap I flagged in [the self-improvement loop post](/blog/agents-that-improve-themselves/) — knowledge accumulates faster than automation. The audit methodology I wrote is now a reusable skill any agent can load. It takes 10-30 minutes per domain.
 
 Because the scary number isn't "85% invisible." The scary number is whatever percentage you haven't measured yet.

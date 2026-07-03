@@ -41,7 +41,7 @@ The difference between attention and interpretation is the difference between sh
 Agents don't need emotional marketing copy. They need:
 
 - **Structured data**: JSON schema, clean DOM, extractable datasets
-- **Provable claims**: "This shoe uses a special spring system that reduces impact energy per step" — with the material, the mechanism, and the test data
+- **Provable claims**: "This shoe uses a special spring system that reduces impact energy per step," backed by the material, the mechanism, and the test data
 - **Opinionated positioning**: "If you're not opinionated, you're flattened into the internet average for your category"
 
 A shoe brand that says "we make the best running shoes" gets averaged out. A shoe brand that exposes the spring mechanism, the energy reduction data, and the knee-impact test results gets mapped to customer intent ("reduce impact on my knees") and selected.
@@ -65,7 +65,7 @@ The second path is harder to build but more durable. It requires both human memo
 
 The same logic applies to people. Hiring managers are literally trading prompts to find top candidates. The candidate with a polished LinkedIn profile and no provable skills gets flattened. The candidate with a live demo, a published pipeline, and a measurable result gets surfaced.
 
-This is why we publish our agent infrastructure. The cron jobs, the triage pipelines, the knowledge base architecture — they're not just tools. They're a **truth layer** that proves what we can build.
+This is why we publish our [agent infrastructure](/blog/building-ai-agent-infrastructure-solo/). The cron jobs, the triage pipelines, the [knowledge base architecture](/blog/kb-audit-circulation/): they're more than tools. They're a **truth layer** that proves what we can build.
 
 ---
 
@@ -78,7 +78,7 @@ If you're building anything in 2026:
 3. **Map intent to capability**: How do customers phrase what they want? Does your structured data map those intents onto concrete features?
 4. **Design for both internets**: Human-facing (memory, trust, preference) + agent-facing (clarity, structure, evidence).
 
-The future belongs to people who are willing to be a little bit technical — but not engineers.
+The future belongs to people who are willing to be a little bit technical, but not engineers.
 
 ---
 

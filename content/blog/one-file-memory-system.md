@@ -94,7 +94,7 @@ The pattern I use across projects on this system (documented in detail in the [C
 2. Add your stack, 3-5 conventions, and 2-3 "never do this" rules
 3. Start a new Claude Code session (it will read the file automatically)
 4. For the first few sessions, notice when Claude gets something wrong. Add that correction to the file
-5. After a week, the file has become a trained reflex
+5. After a week, the file is a trained reflex
 
 The free version of the [Claude Memory Kit](https://github.com/edgeless-ai/claude-memory-kit) includes templates for all four memory types and a starter CLAUDE.md structure. If you want stack-specific libraries and multi-project memory patterns, the [Pro version](/products) covers those.
 
@@ -106,4 +106,4 @@ The discipline: when you update your architecture, update your memory file the s
 
 That 10-minute setup has probably saved me 10 hours over the past few months. It's the highest-leverage thing I've done to improve how I work with Claude Code.
 
-Read the longer technical version in [How Claude Code Memory Actually Works](/blog/how-claude-code-memory-works) if you want the full breakdown of the four memory types.
+Read the longer technical version in [How Claude Code Memory Actually Works](/blog/how-claude-code-memory-works) if you want the full breakdown of the four memory types. And if you're curious where this pattern goes once one file stops being enough, [Edgeless Memory v1](/blog/edgeless-memory-v1-passive-recall) is what it grew into.

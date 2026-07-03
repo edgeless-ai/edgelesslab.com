@@ -33,17 +33,19 @@ Every agent product must answer three questions:
 2. **Who else can the agent work with?** → A2A (agent coordination)
 3. **How does the human stay in control?** → AG-UI (human control layer)
 
+I've made the longer case for [MCP as the Unix pipes of AI](/blog/mcp-servers-unix-pipes-of-ai/) before; the short version is that it won the tools layer.
+
 ### MCP: The Security Boundary, Not a Feature Toggle
 
 MCP standardizes how agents discover and invoke tools. 14,000+ servers now. Claude, Codex, and Google all support it.
 
-But MCP is not safe by default. It was designed for high-trust environments. Tool access enables arbitrary code execution. Invariant Labs documented tool-poisoning attacks that smuggle malicious instructions through tool descriptions.
+But MCP is not safe by default. It was designed for high-trust environments. Tool access enables arbitrary code execution. Invariant Labs documented tool-poisoning attacks that smuggle malicious instructions through tool descriptions. And security is only half the story: [the five ways MCP servers fail in production](/blog/mcp-servers-break-in-production/) is what the reliability half looks like.
 
 **MCP needs scopes, approval flows, audit trails, and per-context tool visibility.** Treat it as a security boundary, not a feature toggle.
 
 ### A2A: The Agent Card
 
-A2A is cross-organization agent delegation. The key primitive is the "agent card" — a published contract describing what the agent does, what skills it exposes, and how to reach it.
+A2A is cross-organization agent delegation. The key primitive is the "agent card": a published contract describing what the agent does, what skills it exposes, and how to reach it.
 
 Launch partners: Atlassian, Box, MongoDB, PayPal, Workday. 50+ companies.
 
@@ -88,7 +90,7 @@ The first half of 2026 was a golden time for building. The protocols are stabili
 1. **Audit your MCP servers**: scopes, approvals, audit trails. Read the Invariant Labs tool-poisoning research.
 2. **Design AG-UI control points up front**: approval, edit, interrupt, cancel, progress visibility. Don't bolt them on reactively.
 3. **Evaluate A2A only for genuine delegation**: cross-org workflows that need expertise you don't have.
-4. **Watch payments carefully**: AP2 vs. X402 vs. Stripe. The UX details — fees, returns, re-authorization — matter more than the protocol.
+4. **Watch payments carefully**: AP2 vs. X402 vs. Stripe. The UX details (fees, returns, re-authorization) matter more than the protocol.
 
 The model is the engine. The operating surface is the car. Most teams are tuning the engine while driving without brakes.
 

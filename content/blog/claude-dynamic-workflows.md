@@ -56,11 +56,11 @@ This is still powerful. 16 agents with verification is a 10x force multiplier ov
 
 Anthropic explicitly warns: "uses meaningfully more than a normal session."
 
-Critics call it "the fastest way to speedrun your weekly usage limit."
+Critics call it "the fastest way to speedrun your weekly usage limit." We've written before about [how multi-agent overhead multiplies token burn](/blog/real-cost-ai-agents-production-2026/) — dynamic workflows inherit that multiplier.
 
 The rule: **not for small jobs.** Scope it to genuinely large work — migrations, audits, multi-file refactors — or you're just lighting money on fire.
 
-But the counter-argument is strong: a migration that would cost a 3-person team 3 months can collapse to ~a week for a few hundred dollars in tokens. "One of the best trades in all of software."
+But the counter-argument is strong: a migration that would cost a 3-person team 3 months can collapse to ~a week for a few hundred dollars in tokens. "One of the best trades in all of software." And you don't have to run everything on the expensive model — [mixed-provider orchestration](/blog/plan-with-opus-build-with-gemini/) routes the planning to the frontier model and the bulk work to cheaper ones.
 
 ---
 
@@ -95,7 +95,7 @@ Anthropic engineer Kat Woo cleared hundreds of A/B test flags in under 10 minute
 
 Dynamic workflows are a real 10x multiplier for the right tasks. But they're not magic. The concurrency limit is real. The cost is real. The value is in the verification layer — the adversarial convergence that catches errors before they ship.
 
-The pattern is: **orchestration + verification + resumption**. Claude productized it. You can build it yourself. The question is whether the native version is worth the token tax.
+The pattern is: **orchestration + verification + resumption**. Claude productized it. You can build it with [a dispatch/worker topology you control yourself](/blog/agents-that-talk-to-each-other/). The question is whether the native version is worth the token tax.
 
 ---
 

@@ -21,7 +21,7 @@ ctaHook: Auth middleware, rate limiting, health checks, and Docker configs that 
 
 There are over 400 MCP servers listed in public directories. I've tried dozens. Most work perfectly in a demo: you connect, call a tool, get a result. Ship that to a cron job running at 3am and watch it fail in ways the README never mentioned.
 
-After running 4+ MCP servers continuously for months, here are the five failure modes that actually matter.
+After running 4+ MCP servers continuously for months as part of [my solo agent infrastructure](/blog/building-ai-agent-infrastructure-solo/), five failure modes actually matter. (New to MCP? Start with [why MCP servers are the Unix pipes of AI](/blog/mcp-servers-unix-pipes-of-ai/) — this post is about what happens after you believe that.)
 
 :::bar-chart Failure Mode Severity (Production Impact)
 Transport Timeouts | 9
@@ -67,12 +67,12 @@ Production errors need structure: an error code, a human-readable message, wheth
 
 MCP servers run as background processes. When they crash, nothing notices. The agent's next tool call fails. The agent might retry, or it might report the task as impossible. Either way, you find out hours later when you check logs.
 
-A health endpoint (`/health` or a periodic stdio ping) lets monitoring catch crashes in seconds. Structured logging with request IDs lets you trace a failed tool call back to the specific error. These are basic operational requirements that most MCP servers skip entirely.
+A health endpoint (`/health` or a periodic stdio ping) lets monitoring catch crashes in seconds. Structured logging with request IDs lets you trace a failed tool call back to the specific error. These are basic operational requirements that most MCP servers skip entirely — and the foundation for [self-healing infrastructure](/blog/self-healing-ai-infrastructure/).
 
 ## What Production-Grade Means
 
 It means the server handles the unhappy paths: timeouts, auth failures, rate limits, bad inputs, crashes. It means structured errors that agents can act on. It means health checks that monitoring can watch. It means deployment configs that actually work in Docker and systemd.
 
-The [MCP Server Starter Kit](/products) gets you from zero to running. The [Production MCP Server Kit](/products) gets you from running to reliable. Both are on the [products page](/products).
+The [MCP Server Starter Kit](/products) gets you from zero to running. The [Production MCP Server Kit](/products) gets you from running to reliable.
 
 The gap between "works in a demo" and "runs unattended at 3am" is where most MCP servers live. Closing that gap isn't glamorous work. But it's the work that matters.

@@ -18,7 +18,7 @@ editorial: true
 
 I spent two weeks researching what people charge for AI agent services. Custom chatbot builds. Voice AI deployments. Workflow automation. The range I found was $500 to $150,000 for what clients describe as "the same thing."
 
-The market has no pricing consensus because the market barely exists. Most buyers have never purchased AI services before. Most sellers are making up prices based on vibes and perceived complexity.
+The market has no pricing consensus because the market barely exists. Most buyers have never purchased AI services before. Most sellers are making up prices based on vibes and perceived complexity, partly because so few of them have modeled [what agents actually cost to run in production](/blog/real-cost-ai-agents-production-2026/).
 
 This is the framework I built for Edgeless Lab after surveying twenty agencies and freelancers.
 
@@ -38,7 +38,7 @@ Edgeless Lab runs a hybrid model. Three tiers:
 
 **Growth ($5,000-$15,000).** Project-based. Multi-agent systems, custom integrations, operational AI that touches multiple business processes. Scoped with a paid discovery session ($500, credited toward the project). Delivered in 4-8 weeks.
 
-**Enterprise ($15,000+).** Retainer or project. Full AI operations consulting. Infrastructure design, agent orchestration, monitoring, and ongoing optimization. These clients need architecture, also not only implementation.
+**Enterprise ($15,000+).** Retainer or project. Full AI operations consulting. Infrastructure design, agent orchestration, monitoring, and ongoing optimization. These clients need architecture, not only implementation.
 
 ## The Discovery Session Trick
 

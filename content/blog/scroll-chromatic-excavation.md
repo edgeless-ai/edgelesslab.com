@@ -43,8 +43,10 @@ The new control panel gives you direct access to every variable:
 - **Text Height** — 500 to 5000px
 - **Custom Text** — your own text to bury
 
-## The Controls
+## The Interaction
 
 The faster you scroll, the more agents flood the viewport. Inertia carries them. The mouse repels them like a god-hand. Click to spawn a riot. Press R to bury everything again. Press S to hide the indicator of your descent.
 
 This is the excavation engine. The scroll is the spade. The agents are the workers. The rebels are the entropy. The text is the artifact. The darkness is the medium. The revelation is the purpose. The erosion is the cost.
+
+The same swarm logic drives [Cursor Swarm Brush](/blog/cursor-swarm-brush/) in a different medium — both live in [the creative demos collection](/blog/creative-demos-collection/).

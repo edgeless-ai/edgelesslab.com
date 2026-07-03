@@ -30,7 +30,7 @@ This isn't a minor annoyance. It's a compounding tax on every interaction.
 
 ## File-Based Memory Fixes This
 
-The solution is surprisingly simple: structured markdown files that Claude reads automatically at session start.
+The fix is structured markdown files that Claude reads automatically at session start — the same idea behind [the one-file memory system](/blog/one-file-memory-system/), scaled up.
 
 No databases. No vector stores. No infrastructure. Just files in your repo that Claude already knows how to read.
 
@@ -38,7 +38,7 @@ The memory system layers on top of Claude Code's built-in `CLAUDE.md` hierarchy.
 
 ## The 4 Memory Types
 
-After running this pattern in production across multiple projects, I've found four distinct memory types that cover every use case.
+Running this pattern in production across multiple projects, I've landed on four memory types that cover everything I've needed.
 
 ### 1. User Memory
 
@@ -102,7 +102,7 @@ After a month of accumulated feedback memory, Claude makes roughly 60% fewer mis
 
 Raw memory files work, but they accumulate cruft. Outdated entries. Contradictory instructions. Files that grow past useful size.
 
-The discipline: review monthly, archive aggressively, keep each file under 200 lines. Memory that's too long defeats the purpose; Claude spends context window on stale instructions instead of your actual task.
+The discipline: review monthly, archive aggressively, keep each file under 200 lines. Memory that's too long defeats the purpose; Claude spends context window on stale instructions instead of your actual task. At swarm scale the same neglect compounds into [a knowledge base your agents can't even see](/blog/kb-audit-circulation/).
 
 ## Get Started
 

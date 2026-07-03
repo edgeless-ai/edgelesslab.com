@@ -14,6 +14,7 @@ import { posts } from "@/lib/blog";
 import ProjectShowcaseSection from "@/components/sections/project-showcase-section";
 import TechShowcaseSection from "@/components/sections/tech-showcase-section";
 import CTASection from "@/components/sections/cta-section";
+import { LazyAttractorPlayground } from "@/components/lazy-playground-wrapper";
 
 const featured = [
   { slug: "safety-hooks", span: "md:col-span-2 md:row-span-2" },
@@ -139,6 +140,40 @@ export default function Home() {
 
               <Suspense fallback={<SectionSkeleton />}>
                 <RecentActivity posts={posts} />
+              </Suspense>
+            </div>
+          </section>
+        </SectionBlock>
+
+        {/* Playground — embedded interactive generative art you can actually touch */}
+        <SectionBlock>
+          <section className="px-6 py-20 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+            <div className="max-w-[1280px] mx-auto">
+              <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
+                <div>
+                  <div className="flex items-center gap-2.5 mb-3">
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--accent)" }} />
+                    <span className="text-[11px] font-mono uppercase tracking-[0.15em]" style={{ color: "var(--text-tertiary)" }}>
+                      Play with it
+                    </span>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-bold tracking-tight leading-[0.95]" style={{ color: "var(--text-primary)" }}>
+                    Strange attractors, live
+                  </h2>
+                  <p className="mt-3 max-w-md text-sm" style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}>
+                    Chaos you can steer. Change the system, drag the parameters, watch the structure reorganize in real time.
+                  </p>
+                </div>
+                <Link
+                  href="/creative"
+                  className="text-sm flex items-center gap-1 transition-colors hover:text-white"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  38 more experiments <ArrowRight size={13} />
+                </Link>
+              </div>
+              <Suspense fallback={<SectionSkeleton />}>
+                <LazyAttractorPlayground />
               </Suspense>
             </div>
           </section>

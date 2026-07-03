@@ -202,7 +202,7 @@ export function GenerativeHeroBackground() {
     // Adaptive particle count: fewer on mobile / low-DPR devices
     const dpr = window.devicePixelRatio || 1;
     const isMobile = w < 768;
-    const particleCount = isMobile ? 150 : dpr > 1.5 ? 300 : 400;
+    const particleCount = isMobile ? 220 : dpr > 1.5 ? 620 : 760;
 
     stateRef.current = {
       particles: createParticles(particleCount, w, h, rng),

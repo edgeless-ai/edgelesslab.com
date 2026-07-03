@@ -3,6 +3,7 @@ import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
 import { createPageMetadata } from "@/lib/metadata";
 import { creativeDemos } from "@/lib/creative-demos";
+import { DemoPreview } from "@/components/demo-preview";
 import Link from "next/link";
 
 export const metadata = createPageMetadata({
@@ -126,6 +127,7 @@ function DemoCard({ demo }: { demo: (typeof creativeDemos)[0] }) {
         borderColor: "var(--border-subtle)",
       }}
     >
+      <DemoPreview slug={demo.slug} title={demo.title} />
       <div className="flex items-start justify-between gap-2 mb-3">
         <h3
           className="text-[15px] font-medium leading-tight"

@@ -137,6 +137,26 @@ def pay_royalty(*, charge_id: str, sale_amount_cents: int, creator: str,
     st = account_status(creator)
     if not st.get("payouts_enabled"):
         return {"ok": False, "reason": "onboarding_incomplete", "amount_cents": royalty_cents, "creator": creator}
+    # DURABLE double-pay guard (beyond Stripe's idempotency_key, which expires at 24h while
+    # Stripe re-delivers failed webhooks for up to 72h — a sustained fulfillment outage could
+    # otherwise mint a SECOND transfer past the 24h window). A persistent per-charge marker,
+    # written ONLY after a confirmed transfer, short-circuits any later re-entry. Fail-safe:
+    # a first payment always proceeds (no marker yet); state_store down → we simply fall
+    # through to Stripe's 24h key. It can only PREVENT a double-pay, never withhold a real one.
+    try:
+        import json as _json, state_store as _ss
+        _prior = _ss.get_text(f"royalty_paid/{charge_id}.json")
+        if _prior:
+            _p = _json.loads(_prior)
+            # Echo the creator/account that was ACTUALLY paid (from the marker), not this
+            # call's args — so a future re-entry with a different creator can't misreport a
+            # payment as having gone to them. Correct regardless of who re-invokes.
+            return {"ok": True, "transfer_id": _p.get("transfer_id"),
+                    "account_id": _p.get("account_id", aid),
+                    "amount_cents": _p.get("amount_cents", royalty_cents),
+                    "creator": _p.get("creator", creator), "reason": "already_paid"}
+    except Exception:
+        pass
     try:
         tr = stripe.Transfer.create(
             amount=royalty_cents, currency="usd", destination=aid,
@@ -146,6 +166,13 @@ def pay_royalty(*, charge_id: str, sale_amount_cents: int, creator: str,
             # must NOT create a second transfer (creator would be paid 2×, platform eats it).
             idempotency_key=f"royalty_{charge_id}",
         )
+        try:  # persist the durable marker (best-effort; Stripe's key still guards within 24h)
+            import state_store as _ss2
+            _ss2.put_record("royalty_paid", charge_id,
+                            {"transfer_id": tr.id, "amount_cents": royalty_cents,
+                             "creator": creator, "account_id": aid})
+        except Exception:
+            pass
         return {"ok": True, "transfer_id": tr.id, "account_id": aid,
                 "amount_cents": royalty_cents, "creator": creator}
     except stripe.error.StripeError as e:

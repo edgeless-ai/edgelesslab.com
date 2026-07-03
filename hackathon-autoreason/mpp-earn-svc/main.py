@@ -315,6 +315,15 @@ def trace(event: str, **kwargs):
     with open(traces_file, "a") as f:
         f.write(json.dumps(entry) + "\n")
 
+def _state_store_ok() -> bool:
+    """True if the R2 persistence backend is configured. Never raises — /health must not 500."""
+    try:
+        import state_store
+        return bool(state_store.enabled())
+    except Exception:
+        return False
+
+
 @app.get("/health")
 async def health():
     # Don't disclose live-vs-test publicly — just whether payments are wired.
@@ -325,6 +334,9 @@ async def health():
         # Whether creator identity verification (→ Stripe payout onboarding) can work. True
         # when we have either an explicit PEM or an app id (tokens verify against Privy's JWKS).
         "creator_payouts_configured": _payouts_verifiable(),
+        # R2 state persistence — authoritative for oxygen/royalty/payments/promo/submissions.
+        # False = every money-critical record is silently degrading to ephemeral local disk.
+        "state_store_configured": _state_store_ok(),
     }
 
 
@@ -901,25 +913,37 @@ async def _fulfill_and_royalty(*, intent_id, charge_id, body, amount_cents, resp
                 trace("printful_draft_reused", order=oid, pi=intent_id)
                 await _confirm_printful_if_live(pf, oid, intent_id, resp, confirm)
             else:
-                item = pf.build_catalog_item(
-                    catalog_variant_id=int(body.get("catalog_variant_id") or 4017),
-                    art_url=_safe_art_url(body.get("art_url")),
-                    name=(body.get("design") or "Edgeless Tee")[:120],
-                    retail_price=f"{amount_cents / 100:.2f}",
-                )
-                # Ship to the address the customer entered at Stripe Checkout
-                # (falls back to the demo address for the agent/test path).
-                po = await asyncio.to_thread(pf.create_draft_order, stripe_id=intent_id,
-                                             recipient=_fmt_recipient(recipient, "printful"), items=[item])
-                if po.get("ok"):
-                    oid = (po.get("body") or {}).get("data", {}).get("id")
-                    resp["printful_order_id"] = oid
-                    resp["fulfillment"] = "draft_created"
-                    trace("printful_draft_created", order=oid, pi=intent_id)
-                    await _confirm_printful_if_live(pf, oid, intent_id, resp, confirm)
-                else:
+                _cvar = int(body.get("catalog_variant_id") or 0)
+                _okind = (body.get("kind") or "tee").lower()
+                if _cvar <= 0 and _okind != "tee":
+                    # 4017 is a TEE variant. Never ship it as a stand-in for a hoodie (or any
+                    # non-tee apparel) whose real variant failed to resolve — that ships the
+                    # WRONG PRODUCT. Refuse and let the fulfillment-failed safety net alert +
+                    # retry (returns 500 upstream) instead. A legit tee with no variant still
+                    # gets the 4017 default (right product, maybe default color/size).
                     resp["fulfillment"] = "error"
-                    trace("printful_draft_failed", error=str(po.get("error"))[:200])
+                    resp["fulfillment_error"] = f"no catalog_variant_id for kind={_okind}; refusing tee substitute"
+                    trace("printful_wrong_variant_refused", pi=intent_id, kind=_okind)
+                else:
+                    item = pf.build_catalog_item(
+                        catalog_variant_id=(_cvar if _cvar > 0 else 4017),
+                        art_url=_safe_art_url(body.get("art_url")),
+                        name=(body.get("design") or "Edgeless Tee")[:120],
+                        retail_price=f"{amount_cents / 100:.2f}",
+                    )
+                    # Ship to the address the customer entered at Stripe Checkout
+                    # (falls back to the demo address for the agent/test path).
+                    po = await asyncio.to_thread(pf.create_draft_order, stripe_id=intent_id,
+                                                 recipient=_fmt_recipient(recipient, "printful"), items=[item])
+                    if po.get("ok"):
+                        oid = (po.get("body") or {}).get("data", {}).get("id")
+                        resp["printful_order_id"] = oid
+                        resp["fulfillment"] = "draft_created"
+                        trace("printful_draft_created", order=oid, pi=intent_id)
+                        await _confirm_printful_if_live(pf, oid, intent_id, resp, confirm)
+                    else:
+                        resp["fulfillment"] = "error"
+                        trace("printful_draft_failed", error=str(po.get("error"))[:200])
         else:
             resp["fulfillment"] = "not_configured"
     except _SkipPOD:

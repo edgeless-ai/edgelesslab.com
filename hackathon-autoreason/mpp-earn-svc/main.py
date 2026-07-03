@@ -32,6 +32,11 @@ app.add_middleware(
 # Stripe config
 STRIPE_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
 stripe.api_key = STRIPE_KEY
+# Transparently retry transient Stripe failures (network blips / 5xx / rate-limits) with
+# exponential backoff, so a momentary hiccup during PaymentIntent.retrieve or the royalty
+# Transfer.create doesn't permanently defer a legitimate royalty. Safe for the POST too:
+# pay_royalty's Transfer.create carries an idempotency_key, so a retried create can't double-pay.
+stripe.max_network_retries = 2
 STRIPE_MODE = "test" if "sk_test" in STRIPE_KEY else "live"
 
 # --- Privy verified-creator identity ---------------------------------------
@@ -1127,6 +1132,7 @@ async def pay(request: Request):
             currency="usd",
             payment_method="pm_card_visa",
             confirm=True,
+            idempotency_key=f"buyeragent_{request_id}",  # retry-safe: never double-charge on a lost response
             automatic_payment_methods={"enabled": True, "allow_redirects": "never"},
             metadata={
                 "demo": "edgeless_hackathon",
@@ -3029,7 +3035,12 @@ async def checkout(request: Request):
             # (not the demo address). The webhook reads these into the POD recipient.
             sess_kwargs["shipping_address_collection"] = {"allowed_countries": [
                 "US", "CA", "GB", "AU", "DE", "FR", "ES", "IT", "NL", "SE", "IE", "NZ"]}
-        session = stripe.checkout.Session.create(**{k: v for k, v in sess_kwargs.items() if v is not None})
+        # Idempotency key so the SDK's automatic network-retry (max_network_retries) can't
+        # create a SECOND session if a response is lost after Stripe processed the request.
+        # Fresh per checkout attempt; the retry of THIS call reuses it → Stripe dedupes.
+        session = stripe.checkout.Session.create(
+            idempotency_key=f"checkout_{uuid.uuid4().hex}",
+            **{k: v for k, v in sess_kwargs.items() if v is not None})
         trace("checkout_session_created", session=session.id, amount=amount_cents, kind=meta["kind"])
         return JSONResponse({"session_id": session.id, "url": session.url, "amount": amount_cents})
     except Exception as e:

@@ -81,6 +81,10 @@ def create_onboarding(*, creator: str, return_url: str, refresh_url: str) -> dic
                 business_profile={"url": "https://edgelesslab.com", "mcc": "5699",
                                   "product_description": "AI-generated apparel designs"},
                 metadata={"creator": creator},
+                # Deterministic per-creator key: a lost-response retry (now that the global
+                # max_network_retries applies) or a concurrent onboarding call collapses onto
+                # ONE Express account instead of minting a duplicate/orphaned one.
+                idempotency_key=f"acct_create_{creator.lower()}",
             )
             aid = acct.id
             cache.setdefault(creator, {})["account_id"] = aid

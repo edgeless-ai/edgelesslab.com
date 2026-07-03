@@ -202,7 +202,7 @@ export function GenerativeHeroBackground() {
     // Adaptive particle count: fewer on mobile / low-DPR devices
     const dpr = window.devicePixelRatio || 1;
     const isMobile = w < 768;
-    const particleCount = isMobile ? 220 : dpr > 1.5 ? 620 : 760;
+    const particleCount = isMobile ? 180 : dpr > 1.5 ? 460 : 560;
 
     stateRef.current = {
       particles: createParticles(particleCount, w, h, rng),
@@ -305,14 +305,10 @@ export function GenerativeHeroBackground() {
         ctx.strokeStyle = `hsla(${hue}, ${state.baseSat}%, 62%, ${Math.min(1, alpha * 1.5)})`;
         ctx.lineWidth = lineWidth + 0.4;
         ctx.lineCap = "round";
-        // Neon bloom: give the lime trails a soft glow so they read as a living
-        // luminous structure, not thin scattered strokes.
-        ctx.shadowBlur = 7 + speed * 1.5;
-        ctx.shadowColor = `hsla(${hue}, ${state.baseSat}%, 60%, 0.9)`;
         ctx.stroke();
-        ctx.shadowBlur = 0;
 
-        // Glow — more particles bloom, brighter, for a vivid living structure
+        // Cheap additive bloom (NO canvas shadowBlur — that op is ~10x the cost and tanks
+        // TBT). A translucent fill dot under 'screen' blend gives the lime a luminous halo.
         if (speed > 1.2) {
           ctx.beginPath();
           ctx.arc(x2, y2, lineWidth + 2.5, 0, Math.PI * 2);
@@ -321,9 +317,16 @@ export function GenerativeHeroBackground() {
         }
       }
 
-      animRef.current = requestAnimationFrame(draw);
+      if (!prefersReduced) animRef.current = requestAnimationFrame(draw);
     };
 
+    // Honor reduced-motion: render a single settled frame (no perpetual rAF loop) for
+    // vestibular-sensitive users — and it also drops this canvas out of the TBT budget.
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) {
+      const st = stateRef.current;
+      if (st) for (let i = 0; i < 260; i++) { st.time += 16; for (const p of st.particles) stepParticle(p, st, cssW, cssH); }
+    }
     animRef.current = requestAnimationFrame(draw);
 
     window.addEventListener("resize", resize);

@@ -1,0 +1,128 @@
+NEW FILE — /Users/djm/claude-projects/hackathon-autoreason/mpp-earn-svc/oxygen.py (nothing imports it yet; safe to create). stdlib `hashlib` + the already-imported `stripe` only. Verified against real code: main.py:9 (`stripe` imported), main.py:449 (`stripe.PaymentIntent.retrieve(...).latest_charge` pattern the caller uses to get `charge`), main.py:467 (charge passed into `_fulfill_and_royalty` as `charge_id`), main.py:639/662 (`session.get('customer_details')`/`.get('email')`), main.py:656-674 (defensive dict-access style mirrored), main.py:863/2673 (the spoofable `body['buyer']` this replaces), stripe_connect.py:117-153 (pay_royalty runs off `charge_id` — same charge this resolves). Validated in an isolated scratchpad: `PYTHONPATH=. python3 -m pytest tests/test_oxygen_identity.py` -> 7 passed; `python3 -m py_compile oxygen.py` OK; grep for body['buyer']/meta['buyer'] -> clean (0 refs, docstring reworded so even the substring is absent).
+
+EXACT CODE (full file):
+
+\"\"\"
+Server-side payer identity — the FOOTING of the oxygen (sale-legitimacy) primitive.
+
+A downstream \"did this design earn real demand?\" signal is only unforgeable if the
+BUYER'S identity is derived from the Stripe charge itself, never from the request body.
+main.py today reads the buyer as free text taken straight from the request body
+(main.py:2673) and the self-purchase guard compares that spoofable string (main.py:863).
+This module replaces that with an identity pulled from Stripe: the card fingerprint
+(Stripe's stable per-card-number id), the payer email, and the customer id.
+
+Conventions match the rest of the service: stdlib only + the already-imported `stripe`,
+and the same defensive dict-access style as `_recipient_from_session` (main.py:656-674) —
+Stripe objects are dict-like, so `.get(...)` works on both real StripeObjects and the
+plain-dict stubs used in tests. This resolver NEVER raises into the webhook: a failed
+Charge.retrieve degrades to {'resolved': False}, and a non-card payment method degrades
+to the email key rather than inventing a wrong fingerprint.
+
+PII: raw email is returned in-memory for arms-length comparison, but only its SHA-256 is
+ever meant to be persisted — use `record_identity()` to build the shape that goes into an
+oxygen record (put_record), never the raw resolver dict.
+\"\"\"
+from __future__ import annotations
+
+import hashlib
+
+import stripe
+
+
+def resolve_payer(session: dict, charge_id: str | None) -> dict:
+    \"\"\"Derive the buyer's identity from the Stripe charge + Checkout session.
+
+    Synchronous (call via asyncio.to_thread from the webhook, like every other Stripe
+    call in main.py, e.g. main.py:886). Returns a dict with keys:
+      fingerprint  — stable per-card-number id (None for non-card / cardless PMs)
+      email        — payer email, lowercased/stripped (None if unknown)
+      customer_id  — Stripe customer id (charge first, session fallback)
+      charge_id    — the charge id we resolved against (echoed back)
+      livemode     — True for real money, False for test-mode
+      resolved     — bool(fingerprint or email): False means we have no trustworthy
+                     identity and MUST NOT mint oxygen for this sale
+    On a Charge.retrieve failure it returns {'resolved': False, 'error': ...} and never
+    raises — a webhook must ACK, and an unresolvable payer simply earns no oxygen.
+    \"\"\"
+    session = session or {}
+    fingerprint = None
+    payer_email = None
+    customer = None
+    livemode = None
+
+    if charge_id:
+        try:
+            ch = stripe.Charge.retrieve(charge_id)
+        except Exception as e:  # resolver must NEVER raise into the webhook
+            return {\"resolved\": False, \"error\": str(e)[:120], \"charge_id\": charge_id,
+                    \"fingerprint\": None, \"email\": None, \"customer_id\": None, \"livemode\": None}
+        pmd = ch.get(\"payment_method_details\") or {}
+        # `card` covers online card + wallets (Apple/Google Pay expose the underlying
+        # card's fingerprint); `card_present` covers terminal charges. Exotic PMs
+        # (Link-bank, Cash App) have neither → fingerprint stays None and we fall back
+        # to the email key rather than crash or return a wrong fingerprint.
+        card = pmd.get(\"card\") or pmd.get(\"card_present\") or {}
+        fingerprint = card.get(\"fingerprint\") or None
+        payer_email = (ch.get(\"billing_details\") or {}).get(\"email\")
+        customer = ch.get(\"customer\")
+        livemode = ch.get(\"livemode\")
+
+    # Merge session-side identity the way main.py already reads it (main.py:639/662):
+    # Checkout always collects customer_details.email, so it's a reliable email fallback.
+    cd = session.get(\"customer_details\") or {}
+    if customer is None:
+        customer = session.get(\"customer\")
+    if livemode is None:
+        livemode = session.get(\"livemode\")
+
+    email = (payer_email or cd.get(\"email\") or \"\").strip().lower() or None
+
+    return {
+        \"fingerprint\": fingerprint,
+        \"email\": email,
+        \"customer_id\": customer or None,
+        \"charge_id\": charge_id,
+        \"livemode\": livemode,
+        \"resolved\": bool(fingerprint or email),
+    }
+
+
+def payer_key(payer: dict) -> str:
+    \"\"\"Canonical de-dup key for a payer (the 'distinct-payer' axis of the primitive).
+
+    Prefer the card fingerprint (stable across sessions for the same card number);
+    otherwise fall back to a SHA-256 of the email (never the raw email). Empty string
+    when the payer is unresolved — callers treat '' as 'cannot de-dup, not oxygen'.
+    \"\"\"
+    payer = payer or {}
+    fp = payer.get(\"fingerprint\")
+    if fp:
+        return \"fp:\" + fp
+    email = payer.get(\"email\")
+    if email:
+        return \"em:\" + hashlib.sha256(email.encode(\"utf-8\")).hexdigest()[:16]
+    return \"\"
+
+
+def record_identity(payer: dict) -> dict:
+    \"\"\"PII-safe projection of a resolved payer for persistence in an oxygen record
+    (state_store.put_record). Carries the de-dup key + a SHA-256 of the email — the raw
+    email is deliberately dropped so no oxygen record ever stores buyer PII.\"\"\"
+    payer = payer or {}
+    email = payer.get(\"email\")
+    return {
+        \"payer_key\": payer_key(payer),
+        \"fingerprint\": payer.get(\"fingerprint\"),
+        \"email_sha256\": (hashlib.sha256(email.encode(\"utf-8\")).hexdigest() if email else None),
+        \"customer_id\": payer.get(\"customer_id\"),
+        \"charge_id\": payer.get(\"charge_id\"),
+        \"livemode\": payer.get(\"livemode\"),
+        \"resolved\": bool(payer.get(\"resolved\")),
+    }
+
+DESIGN NOTES / decisions grounded in the code:
+- resolve_payer takes `session` (the Stripe Checkout Session dict, main.py:443) and `charge_id`. The webhook already resolves the charge at main.py:446-451 into `charge` and passes it to _fulfill_and_royalty (main.py:467); OX-1's caller (a later packet) will call resolve_payer with that same `charge`/`pi`+session.
+- `.get()` dict-access is deliberate: real StripeObjects are dict-like AND the tests use plain dicts — one code path, no branching. Mirrors _recipient_from_session (main.py:656-674).
+- resolved = bool(fingerprint or email) per spec. On Charge.retrieve failure we DO NOT fall through to the session-email path — we hard-return resolved=False. Rationale: an untrusted/unfetchable charge must not mint oxygen (acceptance case d requires resolved=False on raise). Non-card success (no fingerprint) still degrades to the email key (case b) because that path never raised.
+- record_identity() added (small, in-scope) so acceptance (e) has a concrete \"record-shaped output\" that provably omits raw email; it is the shape a later packet feeds to state_store.put_record. Raw email stays ONLY in the in-memory resolver dict for arms-length comparison, never persisted.

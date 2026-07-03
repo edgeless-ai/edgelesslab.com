@@ -1,0 +1,9 @@
+DRAFT ONLY — main.py NOT edited (confirmed untouched; sha unchanged). Human applies drafts/ox4-main.patch after review.
+
+Hard dependency: oxygen.py must be created by sibling packets OX-1/2/3 and must export resolve_payer(session, charge), is_arms_length(creator, payer, body) -> (bool|None, reason), bind_creator_payer(creator, payer, source), payer_key(payer), qualify_sale(*, meta, session, payer, royalty, creator, arms_length, prior_records, now) -> {oxygen, weight, reasons}, and list_oxygen_cached() (TTL-cached list_records('oxygen'), same pattern as OX-2). Reviewer checklist item #2 is load-bearing: is_arms_length MUST return exactly (False, 'payer_bound_to_creator') for a proven self-purchase — the guard's fail-open hinges on that exact string; any other False reason (payer_unresolved, arms_length_error) intentionally does NOT block the royalty.
+
+Because every import oxygen is lazy+guarded, applying this patch BEFORE oxygen.py lands is safe: the service boots, royalties still pay, but no oxygen is recorded and the limited-edition cap gate falls back to qual['oxygen']=False → cap never increments. So do NOT apply this patch in isolation expecting the cap to still count sales; apply it together with (or after) OX-1/2/3, or the limited-edition cap goes inert until oxygen.py exists. That is the one behavioral coupling a reviewer must weigh.
+
+Apply order suggestion: land oxygen.py (OX-1/2/3) first, then this patch. Verify with: cd mpp-earn-svc && git apply drafts/ox4-main.patch && python -m compileall main.py && python -m pytest drafts/test_ox4_webhook.py -q.
+
+Out of scope (future OX-5): a vesting job that flips oxygen records status pending->vested after the refund/chargeback window and drops records for refunded/charged-back charges.

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Get verified — Edgeless</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" />
+<style>
+  :root{ --bg:#0B0C0E; --panel:#121417; --line:#262A30; --line2:#353A42; --fg:#ECEEF1; --fg2:#8B919B; --lime:#C9FF4A; --ink:#0B0C0E; --green:#5CE08A; --amber:#F2B84B; }
+  *{ box-sizing:border-box; } html,body{ margin:0; background:var(--bg); color:var(--fg); font-family:'Space Grotesk',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:560px; margin:0 auto; padding:48px 24px 96px; }
+  .wm{ font-family:'Instrument Serif',serif; font-style:italic; font-size:30px; }
+  .wm::before{ content:"▸ "; font-family:'JetBrains Mono',monospace; font-style:normal; font-size:.4em; color:var(--lime); vertical-align:.5em; }
+  a{ color:var(--lime); } a.back{ display:inline-block; margin-top:6px; font-size:13px; font-family:'JetBrains Mono',monospace; }
+  h1{ font-size:30px; letter-spacing:-.02em; margin:28px 0 8px; }
+  .tick{ color:var(--lime); font-weight:700; }
+  p{ color:var(--fg2); line-height:1.65; font-size:15px; }
+  label{ display:block; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--fg2); margin:22px 0 6px; }
+  input,textarea{ width:100%; background:var(--bg); border:1px solid var(--line2); border-radius:9px; padding:12px 13px; color:var(--fg); font-size:15px; font-family:inherit; }
+  textarea{ resize:vertical; min-height:72px; }
+  input:focus,textarea:focus{ outline:none; border-color:var(--lime); }
+  :focus-visible{ outline:2px solid var(--lime,#C9FF4A); outline-offset:2px; }
+  .visually-hidden{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  button{ width:100%; margin-top:18px; background:var(--lime); color:var(--ink); border:0; border-radius:999px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; }
+  button:disabled{ opacity:.6; cursor:default; }
+  .status{ margin-top:20px; border:1px solid var(--line); border-radius:12px; padding:16px; background:var(--panel); font-size:14px; line-height:1.6; }
+  .ok{ color:var(--green); } .pending{ color:var(--amber); } .err{ color:#ff6b6b; }
+  .muted{ color:var(--fg2); font-size:12px; }
+  code{ font-family:'JetBrains Mono',monospace; color:var(--lime); font-size:13px; }
+  hr{ border:0; border-top:1px solid var(--line); margin:28px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="wm">Edgeless</div>
+  <a class="back" href="/">← back to shop</a>
+  <h1>Get the verified <span class="tick">✓</span></h1>
+  <p>The verified ✓ tells shoppers a creator handle is who they say they are. Request it for your
+    handle and the Edgeless team reviews it by hand — drop a proof link (your X, site, or socials)
+    so we can confirm it's really you. Approved handles get the ✓ next to their name on every listing.</p>
+
+  <label for="handle">Your creator handle</label>
+  <input id="handle" placeholder="e.g. your-studio-name" autocomplete="off" maxlength="80" aria-describedby="status" />
+
+  <label for="proof">Proof link (optional)</label>
+  <input id="proof" placeholder="https://x.com/you  or  https://your-site.com" autocomplete="off" />
+
+  <label for="note">Note (optional)</label>
+  <textarea id="note" placeholder="Anything that helps us confirm it's you."></textarea>
+
+  <button id="go">Request verification →</button>
+
+  <div class="status visually-hidden" id="status" role="status" aria-live="polite"></div>
+
+  <hr>
+  <p class="muted">Manual review — there's no instant ✓. We approve handles we can confirm.
+    See <a href="/terms/">Terms</a>.</p>
+</div>
+
+<script>
+  var API = (window.__MPPEARN__) || "https://api.edgelesslab.com";
+  var qs = new URLSearchParams(location.search);
+  var handle = document.getElementById('handle');
+  var proof = document.getElementById('proof');
+  var note = document.getElementById('note');
+  var go = document.getElementById('go');
+  var box = document.getElementById('status');
+  if (qs.get('handle')) handle.value = qs.get('handle');
+
+  function show(html, cls){ box.className='status'; box.innerHTML = html; if(cls) box.classList.add(cls); handle.setAttribute('aria-invalid', cls==='err' ? 'true' : 'false'); }
+
+  go.onclick = async function(){
+    var h = (handle.value||'').trim();
+    if(!h){ show('Enter your creator handle first.', 'err'); return; }
+    if(h.length > 80){ show('Handle is too long (max 80 characters).', 'err'); return; }
+    go.disabled = true; go.textContent = 'Submitting…';
+    try{
+      var r = await fetch(API + '/verify/request', {
+        method:'POST', headers:{'content-type':'application/json'},
+        body: JSON.stringify({ handle: h, proof_url: (proof.value||'').trim(), note: (note.value||'').trim() })
+      });
+      var j = await r.json();
+      if(j.ok){
+        if(j.status === 'verified') show('✓ <span class="ok">Already verified.</span> Your handle <code>'+h+'</code> already has the ✓.', null);
+        else if(j.duplicate) show('<span class="pending">Already in review.</span> We have a pending request for <code>'+h+'</code> — sit tight.', null);
+        else show('<span class="ok">Request submitted</span> — we\'ll review it. Once approved, the ✓ shows up next to <code>'+h+'</code> on your listings.', null);
+      } else {
+        show('Couldn\'t submit: <code>'+(j.reason||'error')+'</code>', 'err');
+      }
+    }catch(e){ show('Network error — try again.', 'err'); }
+    go.disabled = false; go.textContent = 'Request verification →';
+  };
+</script>
+</body>
+</html>

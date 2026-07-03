@@ -1,0 +1,11 @@
+/Users/djm/claude-projects/hackathon-autoreason/mpp-earn-svc/drafts/test_ox4_webhook.py — pytest FastAPI TestClient webhook simulation. Uses the shared-secret replay auth path (main.py:409-430; WEBHOOK_SECRET + x-webhook-secret header, no signing secret), monkeypatches stripe (PaymentIntent.retrieve), state_store (in-memory per-record store), POD clients (printful not_configured), resend_client (no-op), stripe_connect.pay_royalty (records attempts), and _increment_sold (counts calls). Injects a fake `oxygen` module encoding the intended OX-1/2/3 contract so it validates ONLY the main.py wiring this packet owns.
+
+Ran during drafting against a patched scratch copy (OX4_MAIN_PATH) so the real main.py was never touched: 4 passed in 0.67s.
+(a) spoofed empty meta['buyer'] but fingerprint bound to creator → pay_royalty NOT called, resp royalty reason self_purchase_no_royalty, every oxygen record oxygen=False, sold-count 0.
+(b) legit arms-length live sale → pay_royalty called once, exactly one oxygen record status=pending weight 1.0 oxygen=True, sold incremented once.
+(c) same event replayed twice → exactly one oxygen object (same charge key overwritten), sold incremented once total, record sold_counted=True (dedup proven).
+(d) payer_unresolved → pay_royalty still called (fail-open), oxygen record oxygen=False, sold-count 0.
+
+To reproduce in an applied worktree: cd mpp-earn-svc && python -m pytest drafts/test_ox4_webhook.py -q
+
+Also verified independently: git apply --check drafts/ox4-main.patch (OK on HEAD d4aab635); the patch reconstructs the compiled scratch file byte-for-byte via `patch`; py_compile on the patched file passes.

@@ -1,0 +1,74 @@
+DRAFT — new file tests/test_oxygen_binding.py (do not apply; human reviews). Runs standalone pre-OX-1 by installing a reference payer_key if oxygen lacks one; uses OX-1's real payer_key once merged. Monkeypatches state_store with an in-memory dict.
+
+```python
+# tests/test_oxygen_binding.py  — OX-2 acceptance
+import pytest
+import oxygen
+
+
+class FakeStore:
+    """In-memory stand-in for state_store per-record collections."""
+    def __init__(self):
+        self.data = {}
+    def put_record(self, coll, rid, obj):
+        self.data[(coll, rid)] = obj
+        return True
+    def list_records(self, coll):
+        return [v for (c, _rid), v in self.data.items() if c == coll]
+
+
+def _ref_payer_key(payer):
+    # Reference impl for tests only; OX-1 owns the canonical server-derived version.
+    return (payer.get("key") or payer.get("fingerprint")
+            or payer.get("customer") or "").strip().lower()
+
+
+@pytest.fixture(autouse=True)
+def _wire(monkeypatch):
+    monkeypatch.setattr(oxygen, "state_store", FakeStore(), raising=False)
+    if not hasattr(oxygen, "payer_key"):
+        monkeypatch.setattr(oxygen, "payer_key", _ref_payer_key, raising=False)
+    oxygen._invalidate_cache()
+    yield
+    oxygen._invalidate_cache()
+
+
+def _payer(key, email="", resolved=True):
+    return {"resolved": resolved, "key": key, "email": email}
+
+
+def test_a_unbound_distinct_creator_is_arms_length():
+    assert oxygen.is_arms_length("alice", _payer("card_fp_bob"), {"buyer": ""}) == (True, "arms_length")
+
+
+def test_b_bound_fingerprint_not_arms_length_even_when_buyer_empty_or_spoofed():
+    oxygen.bind_creator_payer("alice", _payer("card_fp_alice"), oxygen.BIND_DECLARED_SELF)
+    # buyer omitted entirely -> the old free-text guard would MISS this; the binding catches it
+    assert oxygen.is_arms_length("alice", _payer("card_fp_alice"), {"buyer": ""}) == (False, "payer_bound_to_creator")
+    # buyer spoofed to a different name -> still caught by fingerprint binding
+    assert oxygen.is_arms_length("alice", _payer("card_fp_alice"), {"buyer": "not-alice"}) == (False, "payer_bound_to_creator")
+
+
+def test_c_declared_self_purchase_still_caught():
+    assert oxygen.is_arms_length("alice", _payer("card_fp_bob"), {"buyer": "Alice"}) == (False, "declared_self_purchase")
+
+
+def test_d_unresolved_payer_fails_closed():
+    assert oxygen.is_arms_length("alice", _payer("card_fp_bob", resolved=False), {"buyer": ""}) == (False, "payer_unresolved")
+
+
+def test_e_cache_invalidated_after_bind():
+    # Warm the TTL cache with an empty listing (payer currently arms-length)...
+    assert oxygen.is_arms_length("alice", _payer("card_fp_alice"), {}) == (True, "arms_length")
+    # ...then bind. bind_creator_payer() must invalidate the cache so the very next check sees it.
+    oxygen.bind_creator_payer("alice", _payer("card_fp_alice"), oxygen.BIND_CUSTOMIZE_BUY)
+    assert oxygen.is_arms_length("alice", _payer("card_fp_alice"), {}) == (False, "payer_bound_to_creator")
+
+
+def test_email_equals_creator_handle():
+    ok, reason = oxygen.is_arms_length("alice@x.com", _payer("card_fp_bob", email="Alice@X.com"), {})
+    assert (ok, reason) == (False, "payer_is_creator_email")
+```
+
+Run: `cd /Users/djm/claude-projects/hackathon-autoreason/mpp-earn-svc && python -m pytest tests/test_oxygen_binding.py -q`
+Acceptance mapping: (a)->test_a, (b)->test_b, (c)->test_c, (d)->test_d, (e)->test_e. Extra: email-handle case.

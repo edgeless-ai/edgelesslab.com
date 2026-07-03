@@ -1,0 +1,19 @@
+=== ARTIFACT 3 — drafts/ox5-notes.md (reviewer must action before this is live) ===
+
+1. STRIPE WEBHOOK CONFIG (mandatory, else revocation silently never fires): enable these event types on the endpoint at Stripe Dashboard > Developers > Webhooks (or via API): `charge.refunded`, `charge.dispute.created`, `radar.early_fraud_warning.created`. Without them Stripe never delivers the event and refunded self-pumps stay vested = forgeable oxygen. This is the packet's #1 risk.
+
+2. CHARGE-ID EXTRACTION (the load-bearing correctness point): `charge.refunded`.data.object IS a Charge -> `obj['id']` is the charge id. `charge.dispute.created`.data.object is a Dispute and `radar.early_fraud_warning.created`.data.object is an EarlyFraudWarning -> both carry the charge id in `obj['charge']`. The patch branches on exactly this (`_obj.get('id') if evt_type=='charge.refunded' else _obj.get('charge')`). Getting it backwards makes revocation a no-op. The oxygen record MUST be keyed by the same charge id that OX-1/2/3 stored it under (state_store key `oxygen/<charge_id>.json`).
+
+3. NON-SHADOWING: the interception is a distinct `if evt_type in (...)` that `return`s; `checkout.session.completed` is not in the tuple, so the checkout branch (:442) is untouched. The `return` also short-circuits BEFORE the legacy pod-replay block (:556-621), so refund/dispute events can no longer attempt POD work (acceptance (a)'s pod sentinel).
+
+4. FAIL-OPEN-TO-ACK BY DESIGN: if `import oxygen` or revoke() raises, we still return 200 (ACK) and never fall through to POD. A refund is informational — no money action is owed — so ACKing a transient revoke failure is safe; the record simply stays as-is until the next event or a manual reconcile. Trace `oxygen_revoked` carries found/revoked for observability.
+
+5. VESTING IS LAZY (no scheduler — matches this codebase): tally() flips pending->vested at read time for records older than OXYGEN_VEST_DAYS (env-tunable, default 14) and best-effort put_record's the flip so R2 converges. Because state_store writes are per-key last-writer-wins on identical content, two instances racing the same flip is safe (packet risk item, confirmed). Vesting is NOT gated on a background job, so `/oxygen` is always correct even if a flip write was dropped.
+
+6. READ ENDPOINT SURFACE: `/oxygen` (global, slug=None) and `/oxygen/{slug}` return ONLY aggregates + vest_days; payer_key is reduced to `distinct_payers` (a count) and never serialized. Both are guarded by `_ip_rate_ok('oxygen', _client_ip(request), 60, 60)` exactly like /mockup, so an unauthenticated crawler can't hammer R2 list_records. Slug matches listing_slug OR art_slug.
+
+7. DEPENDENCY ON OX-4: `_records()` currently calls `state_store.list_records('oxygen')` directly. If OX-4 lands a TTL-cached lister in oxygen.py, swap `_records()`'s body to call it (avoids an R2 LIST per /oxygen hit). Also confirm OX-1/2/3 write the record fields this packet reads: charge_id, status, ts, payer_key, weight, listing_slug/art_slug.
+
+8. WHAT THIS PACKET DELIBERATELY DOES NOT TOUCH: the qualifying/recording of oxygen (put_record) and the gating of `_increment_sold` (main.py:1724) are OX-1/2/3, not OX-5. This packet is only vesting + revocation + the read endpoint.
+
+DELIVERABLE PATHS for the reviewer to create: save ARTIFACT 1 to drafts/ox5-main.patch, ARTIFACT 2 into oxygen.py, ARTIFACT 3 to drafts/ox5-notes.md. `git apply --check drafts/ox5-main.patch` was confirmed PASS against the current working tree.

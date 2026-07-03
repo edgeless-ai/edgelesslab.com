@@ -1,0 +1,202 @@
+NEW FILE — /Users/djm/claude-projects/hackathon-autoreason/mpp-earn-svc/oxygen.py (does not exist yet; draft only, not written to the repo). Full contents (196 lines):
+
+```python
+"""
+The oxygen primitive — the ONE signal the future "disintegrator" economy reads.
+
+A sale is OXYGEN only if it proves real, arms-length, distinct human demand for a
+design. Everything downstream (limited-edition caps, creator rankings, whatever
+gets built on top of this signal) reads `qualify_sale()`'s verdict — never the raw
+Stripe event — so the rule must be exhaustive, deterministic, and side-effect free.
+
+This module is PURE: no stripe, no state_store, no network, no filesystem. The
+caller (main.py's webhook handler) resolves everything I/O-shaped — the arms-length
+buyer identity from the Stripe charge, the royalty outcome from stripe_connect,
+the prior oxygen records from state_store — and hands it to `qualify_sale()` as
+plain data. That's what makes this testable without mocking Stripe and safe to
+reason about as "the constitution" of the economy.
+
+Reused / mirrored machinery (do not re-derive these elsewhere — reuse this module):
+  - live_paid check: same boolean expression as main.py:455.
+  - at-cost detection: same meta flag as main.py:2680 (set from promo.apply's
+    at_cost flag, promo.py:90) plus the royalty-layer signal (stripe_connect.py
+    returns reason="at_cost_no_royalty" when main.py:855 already flagged it).
+  - self-purchase detection: same royalty-layer signal (stripe_connect corridor
+    never actually classifies self-purchase itself — main.py:864 does, and
+    stripe_connect just receives creator/cap; the reason string
+    "self_purchase_no_royalty" is set at main.py:865) UNIONED with the caller's
+    server-side arms-length verdict (card fingerprint / customer id — NEVER
+    body['buyer'], which is spoofable free text).
+  - design-key derivation: same scheme as main.py's `_submit_slug` (main.py:1696-98).
+  - velocity cap shape: mirrors demand_gate.py's WINDOW_SECONDS / MAX_IP_VELOCITY
+    (demand_gate.py:44-46), reused here per-payer instead of per-IP.
+"""
+from __future__ import annotations
+
+import hashlib
+
+# Mirrors demand_gate.py's velocity window (demand_gate.py:44 WINDOW_SECONDS=600,
+# demand_gate.py:46 MAX_IP_VELOCITY=8) — same shape, applied to a payer fingerprint
+# instead of an IP so one payer can't pump a design (or the whole marketplace) by
+# rapid-firing many small "distinct" sales.
+OXY_WINDOW_SECONDS = 600
+OXY_MAX_PAYER_VELOCITY = 8
+
+# Distinct-payer diminishing curve: 1st sale from a payer on a given design counts
+# full, 2nd half, 3rd quarter, 4th+ contributes nothing (still "a sale" — refunds/
+# fulfillment are untouched — it just proves zero NEW demand).
+_DIMINISH_WEIGHTS = (1.0, 0.5, 0.25)
+
+# Royalty-layer reasons (stripe_connect.py) that are explicitly OXYGEN-ELIGIBLE:
+# the sale was arms-length and margin-positive, the royalty is merely parked
+# (creator hasn't onboarded yet) or too small to transfer. None of these say
+# anything bad about the DEMAND — only about payout plumbing — so they must
+# never be treated as disqualifiers.
+#   - "creator_not_onboarded"   (stripe_connect.py:136)
+#   - "onboarding_incomplete"   (stripe_connect.py:139)
+#   - "royalty_below_margin"    (stripe_connect.py:133, cap_cents given)
+#   - "royalty_too_small"       (stripe_connect.py:133, no cap given)
+# (Not referenced directly below — listed here so the eligibility list is legible
+# next to the disqualifier list it is NOT part of.)
+
+
+def _design_key(meta: dict) -> str:
+    """Stable identity for 'which design was this a sale of'.
+
+    Same scheme main.py already uses: an explicit listing_slug (limited-edition
+    listings, main.py:508) wins; otherwise fall back to the same content-hash
+    slug main.py's `_submit_slug` computes from art_url (main.py:1696-1698), so
+    two sales of the same not-yet-listed design still diminish against each
+    other. Returns "" if neither is present (caller/record has no design identity
+    — such a record can still be disqualified above, but never diminishes/is
+    diminished against, since "" wouldn't usefully match).
+    """
+    slug = (meta.get("listing_slug") or "").strip()
+    if slug:
+        return slug
+    art_url = (meta.get("art_url") or "").strip()
+    if art_url:
+        return "sub-" + hashlib.sha256(art_url.encode()).hexdigest()[:12]
+    return ""
+
+
+def qualify_sale(*, meta: dict, session: dict, payer: dict, royalty: dict | None,
+                  creator: str, arms_length: tuple[bool, str], prior_records: list[dict],
+                  now: float) -> dict:
+    """Decide whether ONE completed checkout.session sale is OXYGEN, and with what
+    weight. Pure function — no stripe / state_store / network / filesystem calls.
+
+    Args:
+      meta: the webhook's session metadata dict (main.py checkout.session.completed
+        handler reads this as `session.get('metadata')`, main.py:444). Only
+        'at_cost', 'listing_slug', 'art_url' are read here.
+      session: the raw Stripe Checkout Session object (main.py:443). Only
+        'livemode' and 'payment_status' are read here.
+      payer: caller-resolved payer identity for THIS sale —
+        {"payer_key": str, "charge_id": str}. payer_key MUST be derived
+        server-side from the Stripe charge (card fingerprint or customer id) —
+        never from request-body free text. charge_id is this sale's own charge,
+        used only to exclude this sale's own prior write(s) from the
+        diminishing/velocity counts below (webhook retries must not self-diminish
+        or self-throttle).
+      royalty: the dict stripe_connect.pay_royalty() returned for this sale (or
+        None if it was never called, e.g. at-cost path returns before it in
+        main.py). Only 'reason' is read here.
+      creator: the design's creator id (main.py's `body.get('creator')`,
+        main.py:862), already stripped by the caller or as-is (this function
+        strips it again defensively).
+      arms_length: (is_arms_length, reason_if_not) — the caller's SERVER-SIDE
+        verdict on whether the payer's resolved identity differs from the
+        creator's. reason_if_not is used verbatim as the disqualifier reason
+        when is_arms_length is False (e.g. "self_purchase_card_match",
+        "payer_unresolved").
+      prior_records: already-recorded oxygen records this sale should be
+        compared against (injected by the caller — this function does no I/O).
+        Each record is expected to carry at least {"payer_key", "design_key",
+        "charge_id", "ts"} — the same shape this function's caller is expected
+        to persist via state_store.put_record() for every qualifying sale.
+      now: the current time (epoch seconds), injected so this stays a pure
+        function with no wall-clock read inside.
+
+    Returns:
+      {"oxygen": bool, "weight": float, "reasons": [str, ...]}
+      weight is 0.0 whenever oxygen is False. reasons is never empty when
+      oxygen is False; it may contain a "repeat_payer_k{k}" note even when
+      oxygen is True (weight reduced but still > 0).
+    """
+    reasons: list[str] = []
+    royalty_reason = (royalty or {}).get("reason")
+
+    # (1) live_paid — recomputed EXACTLY as main.py:455. A test-mode webhook
+    # replay (or an event Stripe fires before the charge is real money) proves
+    # nothing about demand.
+    live_paid = bool(session.get("livemode")) and session.get("payment_status") == "paid"
+    if not live_paid:
+        return {"oxygen": False, "weight": 0.0, "reasons": ["not_live_paid"]}
+
+    # (2) at-cost — no margin, so this sale proves willingness to acquire at
+    # break-even, not real demand at a real price.
+    at_cost_meta = str(meta.get("at_cost") or "").lower() == "true"
+    if at_cost_meta or royalty_reason == "at_cost_no_royalty":
+        return {"oxygen": False, "weight": 0.0, "reasons": ["at_cost"]}
+
+    # (3) self-purchase — either the royalty layer already caught buyer==creator
+    # (main.py:864, free-text buyer field — kept as a belt-and-suspenders signal)
+    # OR the caller's server-side (charge-derived) arms-length check failed. The
+    # server-side check is authoritative; its reason string is used verbatim.
+    arms_ok, arms_reason = arms_length
+    if not arms_ok:
+        reasons.append(arms_reason or "not_arms_length")
+        return {"oxygen": False, "weight": 0.0, "reasons": reasons}
+    if royalty_reason == "self_purchase_no_royalty":
+        return {"oxygen": False, "weight": 0.0, "reasons": ["self_purchase_no_royalty"]}
+
+    # (4) no creator — a sale of unattributed art proves nothing about a
+    # DESIGN's earning power (there's no design identity to award oxygen to).
+    creator_norm = (creator or "").strip()
+    if not creator_norm:
+        return {"oxygen": False, "weight": 0.0, "reasons": ["no_creator"]}
+
+    # NOTE: royalty reasons "creator_not_onboarded", "onboarding_incomplete",
+    # "royalty_below_margin", "royalty_too_small" reach this point WITHOUT being
+    # disqualified — see the module-level comment. They are arms-length,
+    # margin-positive (or margin-thin) sales; only the payout plumbing differs.
+
+    payer_key = (payer or {}).get("payer_key") or ""
+    charge_id = (payer or {}).get("charge_id") or ""
+    design_key = _design_key(meta)
+    records = prior_records or []
+
+    # Velocity cap — mirrors demand_gate.py:44-46. Same payer fingerprint showing
+    # up >= OXY_MAX_PAYER_VELOCITY times (any design) inside OXY_WINDOW_SECONDS
+    # means "throttle", regardless of the per-design diminishing curve below.
+    if payer_key:
+        velocity_hits = sum(
+            1 for r in records
+            if r.get("payer_key") == payer_key
+            and r.get("charge_id") != charge_id
+            and isinstance(r.get("ts"), (int, float))
+            and (now - r["ts"]) < OXY_WINDOW_SECONDS
+        )
+        if velocity_hits >= OXY_MAX_PAYER_VELOCITY:
+            return {"oxygen": False, "weight": 0.0, "reasons": ["payer_velocity"]}
+
+    # Distinct-payer diminishing — count prior qualifying sales from the SAME
+    # payer on the SAME design, excluding any record sharing this sale's own
+    # charge_id (a Stripe at-least-once webhook retry of THIS sale must not
+    # diminish against itself).
+    k = sum(
+        1 for r in records
+        if payer_key
+        and r.get("payer_key") == payer_key
+        and r.get("design_key") == design_key
+        and r.get("charge_id") != charge_id
+    )
+    weight = _DIMINISH_WEIGHTS[k] if k < len(_DIMINISH_WEIGHTS) else 0.0
+    if k > 0:
+        reasons.append(f"repeat_payer_k{k}")
+
+    return {"oxygen": weight > 0.0, "weight": weight, "reasons": reasons}
+```
+
+This is a wholly new module — no before/after diff against an existing file. It was drafted and verified in an isolated scratch directory (/private/tmp/claude-501/-Users-djm-claude-projects/3e00328e-91aa-4462-a4ad-b63ae47692bf/scratchpad/{oxygen.py,test_oxygen.py}); the real repo at /Users/djm/claude-projects/hackathon-autoreason/mpp-earn-svc/ was NOT touched (read-only).

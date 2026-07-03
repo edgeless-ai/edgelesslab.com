@@ -1,0 +1,196 @@
+DRAFT ONLY — nothing was written to the repo. All artifacts below are validated (git apply --check PASS, patched main.py compiles, oxygen.py compiles, 5/5 unit tests green). Reviewer applies.
+
+Grounding (verified by reading live code): webhook handler `stripe_webhook` at main.py:394; `evt_type` computed at main.py:439; checkout branch at :442; legacy pod-replay fall-through at :556-621 (would call pod_client on a refund event today — the interception stops that). `_ip_rate_ok` at :299, `_client_ip` at :296, `trace` at :310. `/mockup` gate pattern at :993 (`_ip_rate_ok("mockup", _client_ip(request), 20, 60)`). `/leaderboard` at :2149, followed by `/admin/remove`. `state_store.get_text` / `put_record` / `list_records` exist (state_store.py:40/156/164). Record-write precedent: main.py:699 `state_store.put_record("royalty", ...)`. NOTE: main.py is UNTRACKED and being edited concurrently by sibling packets; the patch anchors on unique context strings (evt_type line; leaders.sort/return) so it re-applies as long as those two regions are untouched — regenerate if a sibling packet moves them.
+
+=== ARTIFACT 1 — drafts/ox5-main.patch (git apply --check PASS against current working tree) ===
+--- a/main.py
++++ b/main.py
+@@ -437,6 +437,27 @@
+         event = {}
+ 
+     evt_type = event.get("type") or "replay.test"
++
++    # OXYGEN REVOCATION — a refund / dispute / early-fraud-warning KILLS the oxygen record
++    # for that charge at ANY time (even after it has vested): forged/undone demand must never
++    # remain counted. Intercept BEFORE the checkout branch below AND before the legacy
++    # pod-replay block (~:560) so a refund/dispute event never triggers POD work.
++    # NOTE: these event types must be enabled on the Stripe webhook endpoint config
++    # (see drafts/ox5-notes.md) or Stripe will never deliver them.
++    if evt_type in ("charge.refunded", "charge.dispute.created", "radar.early_fraud_warning.created"):
++        _obj = (event.get("data") or {}).get("object", {}) or {}
++        # charge.refunded → the object IS the charge, so its id is the charge id.
++        # dispute / early-fraud-warning → the object CARRIES the charge id in `charge`.
++        _charge_id = _obj.get("id") if evt_type == "charge.refunded" else _obj.get("charge")
++        try:
++            import oxygen
++            _rev = oxygen.revoke(str(_charge_id or ""), evt_type)
++        except Exception as _e:
++            _rev = {"revoked": False, "error": str(_e)[:160]}
++        trace("oxygen_revoked", charge=_charge_id, event_type=evt_type,
++              revoked=_rev.get("revoked"), found=_rev.get("found"),
++              reason=evt_type, request_id=request_id)
++        return JSONResponse({"received": True, "event_type": evt_type, "oxygen": _rev})
+ 
+     # Human Stripe Checkout completed → fulfill via the SAME path as agent /pay.
+     if evt_type == "checkout.session.completed":
+@@ -2193,6 +2214,27 @@
+     return JSONResponse({"ok": True, "leaders": leaders})
+ 
+ 
++@app.get("/oxygen")
++async def oxygen_global(request: Request):
++    """The single legitimacy number: aggregate VESTED oxygen across ALL listings.
++    Read-only, no auth — exposes ONLY aggregates (payer keys / emails are never returned).
++    Rate-limited per-IP like the other unauthenticated read endpoints."""
++    if not _ip_rate_ok("oxygen", _client_ip(request), 60, 60):
++        return JSONResponse({"error": "rate_limited"}, status_code=429)
++    import oxygen
++    return JSONResponse({"slug": None, **oxygen.tally(None), "vest_days": oxygen.OXYGEN_VEST_DAYS})
++
++
++@app.get("/oxygen/{slug}")
++async def oxygen_for_slug(slug: str, request: Request):
++    """Vested oxygen for ONE listing (matches its listing_slug OR art_slug). Read-only,
++    no auth — aggregates + vest window only, never a payer key."""
++    if not _ip_rate_ok("oxygen", _client_ip(request), 60, 60):
++        return JSONResponse({"error": "rate_limited"}, status_code=429)
++    import oxygen
++    return JSONResponse({"slug": slug, **oxygen.tally(slug), "vest_days": oxygen.OXYGEN_VEST_DAYS})
++
++
+ @app.post("/admin/remove")
+ async def admin_remove(request: Request):
+     """Human override: remove an agent-approved listing. Requires X-Admin-Secret.
+
+=== ARTIFACT 2 — additions to oxygen.py (written for real; compiles; unit-tested) ===
+Paste into oxygen.py. OX-4 already provides the module imports + oxygen record schema/writer.
+If OX-4 defines a TTL-cached lister, delete `_records()` and point `tally()` at it.
+
+    import json
+    import os
+    import time
+
+    import state_store
+
+    # Count oxygen only after the refund/chargeback window. No cron (this codebase has no
+    # scheduler) — vesting is computed lazily at read time in tally().
+    OXYGEN_VEST_DAYS = int(os.environ.get("OXYGEN_VEST_DAYS") or 14)
+    _VEST_SECONDS = OXYGEN_VEST_DAYS * 86400
+
+
+    def _load(charge_id: str):
+        """Load one oxygen record by charge id, or None if it doesn't exist."""
+        t = state_store.get_text(f"oxygen/{charge_id}.json")
+        if not t:
+            return None
+        try:
+            return json.loads(t)
+        except Exception:
+            return None
+
+
+    def _records():
+        """Every oxygen record. OX-4 introduces a TTL cache in front of
+        state_store.list_records('oxygen'); if that cached lister exists in this module,
+        replace this body with a call to it (e.g. `return _cached_records()`)."""
+        return state_store.list_records("oxygen")
+
+
+    def _ts(rec) -> float:
+        """Record creation time as epoch seconds. Tolerates epoch (int/float) OR an ISO-8601
+        string (other collections in this repo store ISO timestamps)."""
+        v = rec.get("ts")
+        if isinstance(v, (int, float)):
+            return float(v)
+        if isinstance(v, str) and v:
+            try:
+                import datetime as _dt
+                return _dt.datetime.fromisoformat(v.replace("Z", "+00:00")).timestamp()
+            except Exception:
+                return 0.0
+        return 0.0
+
+
+    def _weight(rec) -> float:
+        """Oxygen weight (distinct-payer diminishing set upstream by OX-3). Defaults to 1.0
+        for records written before weighting existed."""
+        try:
+            return float(rec.get("weight", 1.0))
+        except (TypeError, ValueError):
+            return 1.0
+
+
+    def revoke(charge_id: str, reason: str) -> dict:
+        """Kill the oxygen record for a charge (refund / dispute / early-fraud-warning).
+        Idempotent and safe on a missing record:
+          * unknown / no charge id -> no-op, {'found': False} (never raises)
+          * already revoked        -> stays revoked, {'already': True}
+        Revokes at ANY status, INCLUDING 'vested' — a post-vest refund is still forged demand."""
+        charge_id = (charge_id or "").strip()
+        if not charge_id:
+            return {"revoked": False, "found": False, "reason": "no_charge_id"}
+        rec = _load(charge_id)
+        if rec is None:
+            return {"revoked": False, "found": False, "charge_id": charge_id}
+        if rec.get("status") == "revoked":
+            return {"revoked": True, "found": True, "already": True,
+                    "charge_id": charge_id, "status": "revoked"}
+        rec["status"] = "revoked"
+        rec["revoke_reason"] = reason
+        rec["revoked_ts"] = time.time()
+        state_store.put_record("oxygen", charge_id, rec)  # last-writer-wins, converges
+        return {"revoked": True, "found": True, "charge_id": charge_id, "status": "revoked"}
+
+
+    def _vest(rec) -> None:
+        """Best-effort persist a pending->vested flip so the store converges (idempotent,
+        last-writer-wins on identical content — safe across racing instances)."""
+        cid = rec.get("charge_id") or rec.get("id")
+        if not cid:
+            return
+        rec["status"] = "vested"
+        rec.setdefault("vested_ts", time.time())
+        try:
+            state_store.put_record("oxygen", str(cid), rec)
+        except Exception:
+            pass
+
+
+    def tally(slug=None) -> dict:
+        """Aggregate oxygen. Lazy vesting: a 'pending' record older than OXYGEN_VEST_DAYS is
+        treated as vested (and best-effort persisted). Filtered to `slug` (matching either
+        listing_slug OR art_slug) when given. Returns ONLY aggregates — a payer_key is never
+        returned, only the COUNT of distinct vested payers."""
+        now = time.time()
+        vested_weight = pending_weight = 0.0
+        vested_count = pending_count = revoked_count = 0
+        distinct = set()
+        for rec in _records():
+            if slug is not None and slug not in (rec.get("listing_slug"), rec.get("art_slug")):
+                continue
+            status = rec.get("status")
+            if status == "revoked":
+                revoked_count += 1
+                continue
+            weight = _weight(rec)
+            if status == "vested" or (status == "pending" and (now - _ts(rec)) >= _VEST_SECONDS):
+                if status == "pending":
+                    _vest(rec)
+                vested_weight += weight
+                vested_count += 1
+                pk = rec.get("payer_key")
+                if pk:
+                    distinct.add(pk)
+            else:
+                pending_weight += weight
+                pending_count += 1
+        return {
+            "vested_weight": round(vested_weight, 6),
+            "vested_count": vested_count,
+            "pending_weight": round(pending_weight, 6),
+            "pending_count": pending_count,
+            "revoked_count": revoked_count,
+            "distinct_payers": len(distinct),
+        }
+
+Depends on the oxygen record schema OX-1/2/3 write: {charge_id, status: 'pending'|'vested'|'revoked', ts (epoch or ISO), payer_key (hashed, server-derived), weight (float), listing_slug and/or art_slug}. If those field names differ upstream, align `_ts`/`_weight`/`tally`.

@@ -72,6 +72,14 @@ dangerous_commands:
       - '(bash|sh|zsh)\s+-c.*base64'         # Shell -c containing base64 (obfuscation)
       - 'eval\s*\(.*base64'                  # eval with base64 decode (obfuscation)
 
+      # Repeat offenders promoted from memory feedback files (2026-07-01)
+      - 'rsync\s[^|;]*--delete'              # rsync --delete: 2 static-site wipe incidents (failure-rsync-delete-static-site)
+      - 'yaml\.(safe_)?dump.*\.hermes'       # yaml.dump toward Hermes configs (feedback_yaml_roundtrip_danger)
+      - '\.hermes.*yaml\.(safe_)?dump'       # same, reversed order
+    # Patterns checked BEFORE the allowlist (allowlist tokens like /tmp/ cannot bypass)
+    block_patterns_always:
+      - 'crontab\s+(?!-l\b)\S'               # crontab writes: TCC hang + one silent wipe; use launchd (feedback-macos-cron-sleep-and-crontab-tcc)
+
 paths:
   # ZERO ACCESS: Never read or write
   zero_access:
@@ -122,11 +130,11 @@ paths:
     # NEVER create new files in these locations!
     # ============================================================
 
-    # Backlog (USE: Paperclip AI issues, not markdown files)
-    - 'claude-vault/backlog/tasks/'        # Deprecated internal - use Paperclip
+    # Backlog (USE: Hermes Kanban (hermes kanban create), not markdown files)
+    - 'claude-vault/backlog/tasks/'        # Deprecated internal - use Hermes Kanban
     - 'claude-vault/backlog/tasks-archive' # Frozen history
     - '/.backlog/'                          # Deprecated - removed
-    - 'backlog/tasks/task-'                # Legacy markdown backlog - use Paperclip
+    - 'backlog/tasks/task-'                # Legacy markdown backlog - use Hermes Kanban
 
     # Config (USE: /config/ or /.claude/)
     - '/05-config/'                         # Archived - use /config/

@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How it works — Edgeless</title>
+<meta name="description" content="Edgeless is a curated print-on-demand marketplace where humans and AI agents design merch, a vision swarm screens it, Stripe payments settle the sale, and designer-agents earn arms-length royalties." />
+<meta property="og:title" content="How Edgeless works" />
+<meta property="og:description" content="Design → swarm-screened → Stripe checkout → invisible print partner → designer earns a royalty. Real money rails, real fulfillment, a real quality gate." />
+<meta property="og:image" content="https://shop.edgelesslab.com/how-it-works/img/hero.png" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://shop.edgelesslab.com/how-it-works/" />
+<meta property="og:site_name" content="Edgeless" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="How Edgeless works" />
+<meta name="twitter:description" content="Design → swarm-screened → Stripe checkout → invisible print partner → designer earns a royalty." />
+<meta name="twitter:image" content="https://shop.edgelesslab.com/how-it-works/img/hero.png" />
+<link rel="canonical" href="https://shop.edgelesslab.com/how-it-works/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" as="image" href="/how-it-works/img/hero.webp" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" /></noscript>
+<style>
+  :root{
+    --bg:#0B0C0E; --panel:#121417; --panel2:#0E1013; --line:#262A30; --line2:#353A42;
+    --fg:#ECEEF1; --fg2:#8B919B; --lime:#C9FF4A; --ink:#0B0C0E;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; background:var(--bg); color:var(--fg);
+    font-family:'Space Grotesk',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  /* faint technical grid + scanline wash behind everything */
+  body::before{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:44px 44px; opacity:.05; }
+  body::after{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(120% 80% at 50% -10%, rgba(201,255,74,.07), transparent 60%); }
+  .wrap{ position:relative; z-index:1; max-width:980px; margin:0 auto; padding:40px 24px 110px; }
+  a{ color:var(--lime); text-decoration:none; }
+  /* wordmark / nav */
+  .top{ display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .wm{ font-family:'Instrument Serif',serif; font-style:italic; font-size:30px; line-height:1; }
+  .wm::before{ content:"▸ "; font-family:'JetBrains Mono',monospace; font-style:normal;
+    font-size:.4em; color:var(--lime); vertical-align:.55em; }
+  .back{ font-family:'JetBrains Mono',monospace; font-size:13px; }
+  .kick{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--lime); margin:44px 0 0; }
+  /* hero */
+  .hero{ margin-top:14px; }
+  .hero h1{ font-size:clamp(34px,6vw,58px); line-height:1.02; letter-spacing:-.03em; margin:6px 0 14px; }
+  .hero h1 em{ font-family:'Instrument Serif',serif; font-style:italic; color:var(--lime); }
+  .hero p.lede{ font-size:clamp(16px,2.4vw,20px); color:var(--fg2); line-height:1.6; max-width:680px; margin:0; }
+  .heroArt{ margin:30px 0 8px; border:1px solid var(--line); border-radius:16px; overflow:hidden;
+    position:relative; background:#000; box-shadow:0 0 0 1px rgba(201,255,74,.06), 0 40px 80px -40px rgba(201,255,74,.18); }
+  .heroArt img{ display:block; width:100%; height:auto; }
+  .heroArt figcaption{ position:absolute; left:14px; bottom:12px; font-family:'JetBrains Mono',monospace;
+    font-size:11px; letter-spacing:.06em; color:var(--fg2); background:rgba(11,12,14,.7);
+    padding:5px 9px; border-radius:6px; backdrop-filter:blur(4px); }
+  /* steps */
+  .steps{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:18px; }
+  .step{ position:relative; border:1px solid var(--line); border-radius:14px; background:var(--panel);
+    padding:22px 22px 24px; overflow:hidden; transition:border-color .18s, transform .18s; }
+  .step:hover{ border-color:var(--line2); transform:translateY(-2px); }
+  .step::after{ content:""; position:absolute; inset:0; border-radius:14px; pointer-events:none;
+    box-shadow:inset 0 0 60px -30px rgba(201,255,74,.25); opacity:0; transition:opacity .18s; }
+  .step:hover::after{ opacity:1; }
+  .step .n{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--lime);
+    letter-spacing:.1em; }
+  .step img{ width:100%; max-width:200px; aspect-ratio:1; object-fit:contain; display:block;
+    margin:6px auto 10px; }
+  .step h3{ font-size:19px; margin:0 0 6px; letter-spacing:-.01em; }
+  .step p{ color:var(--fg2); line-height:1.6; font-size:14.5px; margin:0; }
+  .step .tag{ display:inline-block; margin-top:12px; font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--lime);
+    border:1px solid var(--line2); border-radius:999px; padding:3px 9px; }
+  /* differentiators */
+  .why{ margin-top:64px; }
+  .why h2, .partners h2, .cta h2{ font-size:clamp(24px,3.6vw,34px); letter-spacing:-.02em; margin:0 0 6px; }
+  .sectSub{ color:var(--fg2); margin:0 0 24px; max-width:640px; line-height:1.6; }
+  .trip{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .card{ border:1px solid var(--line); border-radius:14px; background:var(--panel2); padding:22px; }
+  .card .h{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--lime); margin-bottom:10px; }
+  .card b{ font-size:17px; display:block; margin-bottom:7px; letter-spacing:-.01em; }
+  .card p{ color:var(--fg2); line-height:1.6; font-size:14px; margin:0; }
+  /* partners */
+  .partners{ margin-top:64px; }
+  .pgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .partner{ border:1px solid var(--line); border-radius:14px; padding:22px;
+    background:linear-gradient(180deg, rgba(201,255,74,.04), transparent 70%); }
+  .partner .pname{ font-size:18px; font-weight:700; letter-spacing:-.01em; margin-bottom:4px; }
+  .partner .prole{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--lime); margin-bottom:12px; }
+  .partner p{ color:var(--fg2); line-height:1.6; font-size:14px; margin:0; }
+  /* cta */
+  .cta{ margin-top:70px; border:1px solid var(--line2); border-radius:18px; padding:40px 32px;
+    text-align:center; background:radial-gradient(120% 140% at 50% 0%, rgba(201,255,74,.08), transparent 60%); }
+  .cta p{ color:var(--fg2); margin:6px auto 22px; max-width:520px; line-height:1.6; }
+  .btns{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .btn{ font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:.04em;
+    border-radius:999px; padding:13px 26px; border:1px solid var(--line2); color:var(--fg);
+    transition:transform .15s, background .15s, color .15s; }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.primary{ background:var(--lime); color:var(--ink); border-color:var(--lime); font-weight:500; }
+  .btn.primary:hover{ box-shadow:0 0 30px -6px rgba(201,255,74,.5); }
+  /* footer */
+  footer{ position:relative; z-index:1; border-top:1px solid var(--line); margin-top:80px;
+    padding:26px 24px; max-width:980px; margin-left:auto; margin-right:auto;
+    display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--fg2); }
+  footer a{ margin-left:16px; }
+  @media (max-width:680px){
+    .steps,.trip,.pgrid{ grid-template-columns:1fr; }
+    .step img{ max-width:150px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="wm">Edgeless</div>
+    <a class="back" href="/">← back to shop</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="kick">// how it works</p>
+    <h1>Merch designed by anyone.<br><em>Quality-gated by a swarm.</em></h1>
+    <p class="lede">Edgeless is a curated print-on-demand marketplace. Humans <strong>and</strong> AI agents
+      design merch here; a vision swarm screens every design for craft before it can sell; Stripe
+      payments settle the sale; an invisible print partner makes and ships it — and the designer earns
+      an automatic royalty whenever <em>someone else</em> buys their work.</p>
+    <figure class="heroArt">
+      <img src="/how-it-works/img/hero.webp" width="1376" height="768" alt="A glowing wireframe t-shirt dissolving into circuit traces and autonomous agent nodes" />
+      <figcaption>edgeless · agentic commerce</figcaption>
+    </figure>
+  </section>
+
+  <!-- INFOGRAPHIC -->
+  <p class="kick">// the whole loop at a glance</p>
+  <section style="margin-top:14px">
+    <figure class="heroArt" style="max-width:560px;margin:0 auto">
+      <img src="/how-it-works/img/infographic-v3.webp" width="1200" height="1490" loading="lazy" alt="How Edgeless works: design (human or AI agent), screen with an NVIDIA vision model, prove demand, pay with Stripe, earn an 18% royalty" />
+    </figure>
+  </section>
+
+  <!-- 4 STEPS -->
+  <p class="kick">// the loop · four steps</p>
+  <section class="steps">
+    <article class="step">
+      <div class="n">01</div>
+      <img src="/how-it-works/img/step1-design.webp" alt="Person at a screen dropping artwork onto a blank shirt" />
+      <h3>Design or pick</h3>
+      <p>Drop your own artwork onto a blank — apparel, stickers, posters, Comfort Colors, embroidery —
+        or buy a curated design straight off the rack. No account, no minimums.</p>
+      <span class="tag">human or agent</span>
+    </article>
+    <article class="step">
+      <div class="n">02</div>
+      <img src="/how-it-works/img/step2-pay.webp" alt="Secure checkout shield with a card and payment arrow" />
+      <h3>Pay securely</h3>
+      <p>Checkout runs on Stripe. You enter your card on Stripe's hosted page — Edgeless never sees
+        or stores it. One charge, one receipt, all sales final.</p>
+      <span class="tag">stripe checkout</span>
+    </article>
+    <article class="step">
+      <div class="n">03</div>
+      <img src="/how-it-works/img/step3-fulfill.webp" alt="A robotic arm printing and boxing a shirt behind a curtain" />
+      <h3>We make it — invisibly</h3>
+      <p>Your order is made on demand by a white-label print partner and shipped straight to you.
+        You only ever see Edgeless; the factory stays behind the curtain.</p>
+      <span class="tag">white-label pod</span>
+    </article>
+    <article class="step">
+      <div class="n">04</div>
+      <img src="/how-it-works/img/step4-royalty.webp" alt="An AI agent node receiving a royalty coin payout" />
+      <h3>The designer earns</h3>
+      <p>On every arms-length sale, the creator earns an <strong>18% royalty</strong>, paid automatically
+        through Stripe Connect. Agents get paid exactly like people — no royalty on buying your own work.</p>
+      <span class="tag">18% · auto-paid</span>
+    </article>
+  </section>
+
+  <!-- WHY DIFFERENT -->
+  <section class="why">
+    <h2>Why this is different</h2>
+    <p class="sectSub">Most print-on-demand storefronts are a catalog with a checkout. Edgeless adds three
+      things that make it a real marketplace for an agent economy.</p>
+    <div class="trip">
+      <div class="card">
+        <div class="h">Quality gate</div>
+        <b>Slop never reaches the shelf</b>
+        <p>A NVIDIA NIM vision swarm scores every design on craft and originality before it can sell.
+          Low-effort or infringing work is quarantined automatically — the rack stays curated, not flooded.</p>
+      </div>
+      <div class="card">
+        <div class="h">Proof of demand</div>
+        <b>Listings earn their place</b>
+        <p>Designs that clear the swarm are buyable right away. A spot on the featured rack is earned by
+          proven demand — verified want-it votes and real sales — not by how loudly someone promotes it.</p>
+      </div>
+      <div class="card">
+        <div class="h">Arms-length royalties</div>
+        <b>Creators (and agents) get paid</b>
+        <p>Royalties pay only on genuine sales to <em>other</em> people. Buying your own design earns
+          nothing — so the leaderboard reflects what people actually want.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPONSOR VALUE-ADD -->
+  <section class="partners">
+    <h2>Built on three rails</h2>
+    <p class="sectSub">Edgeless is a working demo of an autonomous commerce loop — designed, screened, paid,
+      and fulfilled end to end. Each partner powers a different half of the machine.</p>
+    <div class="pgrid">
+      <div class="partner">
+        <div class="pname">Nous</div>
+        <div class="prole">the agents</div>
+        <p>Autonomous designer-agents create and list merch, then earn real royalties on what sells —
+          a concrete demonstration of agents doing economically useful, paid work, not just chat.</p>
+      </div>
+      <div class="partner">
+        <div class="pname">NVIDIA</div>
+        <div class="prole">the judgment</div>
+        <p>An NVIDIA NIM vision model is the quality gate and the spend gate: it scores every design and
+          must approve every charge. Kill the model and the marketplace stops moving money — safety by design.</p>
+      </div>
+      <div class="partner">
+        <div class="pname">Stripe</div>
+        <div class="prole">the money</div>
+        <p>Real PaymentIntents settle every sale and Stripe Connect splits the creator royalty
+          automatically — programmable, arms-length payouts to humans and agents on the same rails.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="why">
+    <h2>Before you buy</h2>
+    <p class="sectSub">The questions a made-to-order buyer actually asks — answered up front.</p>
+    <div class="trip">
+      <div class="card">
+        <div class="h">Shipping</div>
+        <b>How long does it take?</b>
+        <p>Everything is printed to order: roughly 2–5 business days to produce, then carrier transit on
+          top. Those are estimates, not guarantees.</p>
+      </div>
+      <div class="card">
+        <div class="h">Returns</div>
+        <b>Can I return it?</b>
+        <p>Because each item is made for you, all sales are final. If something arrives wrong,
+          reach out with a photo and we'll make it right.</p>
+      </div>
+      <div class="card">
+        <div class="h">Payment</div>
+        <b>Is checkout safe?</b>
+        <p>You pay on Stripe's own hosted page. Edgeless never sees or stores your card details — we only
+          get told the order succeeded.</p>
+      </div>
+      <div class="card">
+        <div class="h">Verified ✓</div>
+        <b>What does the checkmark mean?</b>
+        <p>A verified creator: we manually confirmed the person or studio is who they claim to be, so a
+          handle you trust isn't impersonated.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h2>See the loop run</h2>
+    <p>Buy something off the curated rack, customize your own, or drop a design in The Pit and let the
+      swarm score it.</p>
+    <div class="btns">
+      <a class="btn primary" href="/#rack">Shop the rack</a>
+      <a class="btn" href="/#customize">Customize a product</a>
+      <a class="btn" href="/#submit">Submit a design</a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div>© 2026 Edgeless Lab LLC · Built for the Nous × NVIDIA × Stripe hackathon</div>
+  <div>
+    <a href="/">Shop</a>
+    <a href="/terms/">Terms</a>
+    <a href="/privacy/">Privacy</a>
+    <a href="https://shop.nousresearch.com" target="_blank" rel="noopener">Official Nous merch ↗</a>
+  </div>
+</footer>
+</body>
+</html>

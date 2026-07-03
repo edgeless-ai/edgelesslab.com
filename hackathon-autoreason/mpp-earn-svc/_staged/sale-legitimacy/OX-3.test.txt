@@ -1,0 +1,228 @@
+NEW FILE — /Users/djm/claude-projects/hackathon-autoreason/mpp-earn-svc/test_oxygen.py (draft; ran successfully against the drafted oxygen.py in the scratch dir: `python3 -m pytest test_oxygen.py -v` → 26 passed). Full contents:
+
+```python
+"""Table-driven tests for oxygen.qualify_sale — the economy's constitution.
+
+Run with: pytest test_oxygen.py -v
+(pytest is not currently in requirements.txt; add it as a dev-only dependency,
+e.g. `pip install pytest` / a requirements-dev.txt, before running.)
+"""
+import time
+
+import pytest
+
+from oxygen import qualify_sale, OXY_MAX_PAYER_VELOCITY, OXY_WINDOW_SECONDS
+
+NOW = 1_000_000.0
+
+LIVE_PAID = {"livemode": True, "payment_status": "paid"}
+TEST_MODE = {"livemode": False, "payment_status": "paid"}
+UNPAID = {"livemode": True, "payment_status": "unpaid"}
+
+BASE_META = {"listing_slug": "tee-abc123", "art_url": ""}
+
+
+def _payer(key="fp_alice", charge="ch_1"):
+    return {"payer_key": key, "charge_id": charge}
+
+
+def _rec(payer_key="fp_alice", design_key="tee-abc123", charge_id="ch_prior", ts=None):
+    return {"payer_key": payer_key, "design_key": design_key, "charge_id": charge_id,
+            "ts": NOW - 10 if ts is None else ts}
+
+
+def _call(meta=None, session=None, payer=None, royalty=None, creator="artist1",
+           arms_length=(True, None), prior_records=None, now=NOW):
+    return qualify_sale(
+        meta=meta if meta is not None else BASE_META,
+        session=session if session is not None else LIVE_PAID,
+        payer=payer if payer is not None else _payer(),
+        royalty=royalty,
+        creator=creator,
+        arms_length=arms_length,
+        prior_records=prior_records if prior_records is not None else [],
+        now=now,
+    )
+
+
+def test_first_sale_is_full_oxygen():
+    out = _call()
+    assert out == {"oxygen": True, "weight": 1.0, "reasons": []}
+
+
+def test_second_sale_same_payer_same_design_diminishes_half():
+    priors = [_rec(charge_id="ch_prior_1")]
+    out = _call(prior_records=priors)
+    assert out["oxygen"] is True
+    assert out["weight"] == 0.5
+    assert out["reasons"] == ["repeat_payer_k1"]
+
+
+def test_third_sale_same_payer_same_design_diminishes_quarter():
+    priors = [_rec(charge_id="ch_prior_1"), _rec(charge_id="ch_prior_2")]
+    out = _call(prior_records=priors)
+    assert out["oxygen"] is True
+    assert out["weight"] == 0.25
+    assert out["reasons"] == ["repeat_payer_k2"]
+
+
+def test_fourth_sale_same_payer_same_design_is_zero():
+    priors = [_rec(charge_id=f"ch_prior_{i}") for i in range(3)]
+    out = _call(prior_records=priors)
+    assert out["oxygen"] is False
+    assert out["weight"] == 0.0
+    assert out["reasons"] == ["repeat_payer_k3"]
+
+
+def test_same_charge_id_replayed_is_idempotent_not_self_diminished():
+    priors = [_rec(charge_id="ch_1"), _rec(charge_id="ch_1"), _rec(charge_id="ch_1")]
+    out = _call(payer=_payer(charge="ch_1"), prior_records=priors)
+    assert out == {"oxygen": True, "weight": 1.0, "reasons": []}
+
+
+def test_different_design_does_not_diminish():
+    priors = [_rec(design_key="other-design", charge_id="ch_prior_1")]
+    out = _call(prior_records=priors)
+    assert out == {"oxygen": True, "weight": 1.0, "reasons": []}
+
+
+def test_different_payer_does_not_diminish():
+    priors = [_rec(payer_key="fp_bob", charge_id="ch_prior_1")]
+    out = _call(prior_records=priors)
+    assert out == {"oxygen": True, "weight": 1.0, "reasons": []}
+
+
+def test_at_cost_meta_disqualifies():
+    meta = dict(BASE_META, at_cost="true")
+    out = _call(meta=meta)
+    assert out == {"oxygen": False, "weight": 0.0, "reasons": ["at_cost"]}
+
+
+def test_at_cost_royalty_reason_disqualifies():
+    out = _call(royalty={"ok": False, "reason": "at_cost_no_royalty"})
+    assert out == {"oxygen": False, "weight": 0.0, "reasons": ["at_cost"]}
+
+
+def test_self_purchase_royalty_reason_disqualifies():
+    out = _call(royalty={"ok": False, "reason": "self_purchase_no_royalty"})
+    assert out == {"oxygen": False, "weight": 0.0, "reasons": ["self_purchase_no_royalty"]}
+
+
+def test_arms_length_false_disqualifies_with_its_own_reason():
+    out = _call(arms_length=(False, "self_purchase_card_match"))
+    assert out == {"oxygen": False, "weight": 0.0, "reasons": ["self_purchase_card_match"]}
+
+
+def test_unresolved_payer_disqualifies():
+    out = _call(arms_length=(False, "payer_unresolved"))
+    assert out == {"oxygen": False, "weight": 0.0, "reasons": ["payer_unresolved"]}
+
+
+def test_creator_not_onboarded_is_still_oxygen():
+    out = _call(royalty={"ok": False, "reason": "creator_not_onboarded", "amount_cents": 500})
+    assert out == {"oxygen": True, "weight": 1.0, "reasons": []}
+
+
+def test_onboarding_incomplete_is_still_oxygen():
+    out = _call(royalty={"ok": False, "reason": "onboarding_incomplete", "amount_cents": 500})
+    assert out == {"oxygen": True, "weight": 1.0, "reasons": []}
+
+
+def test_royalty_below_margin_is_still_oxygen():
+    out = _call(royalty={"ok": False, "reason": "royalty_below_margin"})
+    assert out == {"oxygen": True, "weight": 1.0, "reasons": []}
+
+
+def test_royalty_too_small_is_still_oxygen():
+    out = _call(royalty={"ok": False, "reason": "royalty_too_small"})
+    assert out == {"oxygen": True, "weight": 1.0, "reasons": []}
+
+
+def test_livemode_false_disqualifies_regardless_of_everything_else():
+    out = _call(session=TEST_MODE, royalty={"ok": True})
+    assert out == {"oxygen": False, "weight": 0.0, "reasons": ["not_live_paid"]}
+
+
+def test_payment_status_not_paid_disqualifies():
+    out = _call(session=UNPAID)
+    assert out == {"oxygen": False, "weight": 0.0, "reasons": ["not_live_paid"]}
+
+
+def test_no_creator_disqualifies():
+    out = _call(creator="")
+    assert out == {"oxygen": False, "weight": 0.0, "reasons": ["no_creator"]}
+
+
+def test_whitespace_only_creator_disqualifies():
+    out = _call(creator="   ")
+    assert out == {"oxygen": False, "weight": 0.0, "reasons": ["no_creator"]}
+
+
+def test_payer_velocity_cap_trips_at_threshold():
+    priors = [
+        _rec(payer_key="fp_alice", design_key=f"design-{i}",
+             charge_id=f"ch_v{i}", ts=NOW - 1)
+        for i in range(OXY_MAX_PAYER_VELOCITY)
+    ]
+    out = _call(prior_records=priors)
+    assert out == {"oxygen": False, "weight": 0.0, "reasons": ["payer_velocity"]}
+
+
+def test_payer_velocity_cap_not_tripped_one_below_threshold():
+    priors = [
+        _rec(payer_key="fp_alice", design_key=f"design-{i}",
+             charge_id=f"ch_v{i}", ts=NOW - 1)
+        for i in range(OXY_MAX_PAYER_VELOCITY - 1)
+    ]
+    out = _call(prior_records=priors)
+    assert out["oxygen"] is True
+    assert out["weight"] == 1.0
+
+
+def test_payer_velocity_ignores_hits_outside_window():
+    priors = [
+        _rec(payer_key="fp_alice", design_key=f"design-{i}",
+             charge_id=f"ch_v{i}", ts=NOW - OXY_WINDOW_SECONDS - 1)
+        for i in range(OXY_MAX_PAYER_VELOCITY + 5)
+    ]
+    out = _call(prior_records=priors)
+    assert out["oxygen"] is True
+    assert out["weight"] == 1.0
+
+
+def test_velocity_excludes_this_sales_own_charge_id():
+    priors = [_rec(charge_id="ch_1", ts=NOW - 1) for _ in range(OXY_MAX_PAYER_VELOCITY + 2)]
+    out = _call(payer=_payer(charge="ch_1"), prior_records=priors)
+    assert out == {"oxygen": True, "weight": 1.0, "reasons": []}
+
+
+def test_design_key_falls_back_to_art_url_hash():
+    meta = {"listing_slug": "", "art_url": "https://example.com/art.png"}
+    priors = [_rec(design_key="sub-" + __import__("hashlib").sha256(
+        b"https://example.com/art.png").hexdigest()[:12], charge_id="ch_prior_1")]
+    out = _call(meta=meta, prior_records=priors)
+    assert out["oxygen"] is True
+    assert out["weight"] == 0.5
+    assert out["reasons"] == ["repeat_payer_k1"]
+
+
+def test_no_stripe_or_state_store_imports():
+    import ast
+    import pathlib
+    src = pathlib.Path(__file__).with_name("oxygen.py").read_text()
+    tree = ast.parse(src)
+    imported = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported.update(a.name for a in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported.add(node.module)
+    assert "stripe" not in imported
+    assert "state_store" not in imported
+
+
+if __name__ == "__main__":
+    raise SystemExit(pytest.main([__file__, "-v"]))
+```
+
+Verified: `cd <scratch> && python3 -m pytest test_oxygen.py -v` → all 26 tests passed. `grep -n "^import\|^from" oxygen.py` and the AST-based `test_no_stripe_or_state_store_imports` confirm zero stripe/state_store imports (module-level mentions of "stripe"/"state_store" that do appear are only inside comments/docstrings documenting the caller's responsibilities).

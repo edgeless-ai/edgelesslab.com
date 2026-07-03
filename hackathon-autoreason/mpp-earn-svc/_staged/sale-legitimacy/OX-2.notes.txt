@@ -1,0 +1,21 @@
+DEPENDENCY / ORDERING
+- OX-2 extends oxygen.py, which OX-1 creates. It calls OX-1's `payer_key(payer)` and reads `payer['resolved']` / `payer['email']`. Land OX-1 first (or at least its `payer_key` + payer schema). oxygen.py must have `import state_store` at the top — OX-1 adds it; if applying OX-2 standalone, add that import.
+
+WHO CALLS THIS (OX-4, a separate packet — not wired here)
+- In main.py's `checkout.session.completed` handler (~447+) after `charge` is resolved, OX-4 will: (1) derive `payer = oxygen.resolve_payer(charge)` [OX-1]; (2) compute `arms, reason = oxygen.is_arms_length(meta.get('creator',''), payer, meta)`; (3) call `oxygen.bind_creator_payer(...)` on each self-signal so future sales by that fingerprint are caught:
+    * BIND_DECLARED_SELF — when meta buyer==creator (the existing main.py:862-866 condition).
+    * BIND_AT_COST_PROMO — when `str(meta.get('at_cost')).lower()=='true'` AND `meta.get('creator')` non-empty (the STEPPE/NOUSGANG/HERMES/INSPOART/NOUSGANG at-cost partner codes in promo.py:33-38 exist for creators buying their own designs — see the at_cost skip at main.py:855-858).
+    * BIND_CUSTOMIZE_BUY — when `str(meta.get('list_design')).lower()=='true'` (main.py:522-524: the buyer is listing/customizing their OWN art, i.e. is its creator).
+- OX-4 also uses the (arms,reason) result to: (a) `state_store.put_record` an oxygen record only when arms-length + royalty-paying + distinct-payer + vested; (b) gate `_increment_sold` (main.py:1724, called at 511) on the same qualifying check so the limited-edition cap can't be self-pumped.
+
+SEPARATION OF CONCERNS
+- is_arms_length is ONLY the arms-length leg of the oxygen primitive. Royalty-paying (at_cost / self-purchase / onboarding — stripe_connect.pay_royalty reasons: at_cost_no_royalty, self_purchase_no_royalty, creator_not_onboarded, onboarding_incomplete), distinct-payer de-dup (reuse demand_gate/promo Sybil-velocity machinery), and vesting (pending->vested after refund window) are handled by their own packets. `payer_unresolved` returns NOT-arms-length so the SALE isn't counted as oxygen, but per the packet the caller still decides ROYALTY separately (an unresolved payer may still be paid a royalty via the existing main.py path — OX-4 keeps that decision independent).
+
+DEVIATIONS FROM PACKET (intentional hardening, flag for reviewer)
+- The binding-id hash input is `_norm_creator(creator)` (strip+lower+[:120]) rather than the packet's literal `creator.lower()`. Reason: bind and any id-based dedup must agree; whitespace/length normalization prevents `"Alice "` and `"alice"` minting two records. Lookup in is_arms_length matches on the stored `creator` field (also normalized), so this only affects the R2 object key, not correctness.
+- Added reason `payer_is_creator_email` (packet listed the email==creator condition but not its string). Not asserted by the required acceptance cases; rename if a canonical string is preferred.
+
+RISK / SAFETY (matches packet)
+- False-positive lockout: bindings are written ONLY on the three explicit self-signals, NEVER on ordinary purchases, so a real fan sharing a card is not bound. If a shared-card false positive ever occurs it costs the fan an oxygen credit, not a charge.
+- Money-path latency: a cold cache adds ONE state_store.list_records round-trip; the 300s TTL amortizes it and _creator_payers()/bind_creator_payer() are fully wrapped so an R2 blip degrades to 'unbound' + last-good cache, never a 500. list_records paginates (state_store.py:135-153) but creator_payers is low-cardinality.
+- DRAFT ONLY: nothing here is applied to the live money path; a human reviews and applies.

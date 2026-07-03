@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/djm/claude-projects/.claude/hooks/damage-control.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

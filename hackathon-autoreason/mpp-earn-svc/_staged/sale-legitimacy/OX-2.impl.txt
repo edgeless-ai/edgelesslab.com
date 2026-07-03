@@ -1,0 +1,124 @@
+DRAFT ONLY — append the block below to oxygen.py (the file OX-1 creates). It reuses OX-1's `payer_key(payer)` and the payer dict's `resolved`/`email` keys; it does NOT redefine them. It also assumes `import state_store` is present at the top of oxygen.py (OX-1 adds it; if OX-1 hasn't landed, add `import state_store` too). No existing code is modified — this is purely additive.
+
+```python
+# ============================================================================
+# OX-2 — Creator<->payer binding store + unforgeable arms-length check.
+#
+# The free-text guard at main.py:862-866 (buyer.lower()==creator.lower(), read
+# from body['buyer']) is defeated by any buyer who simply omits 'buyer'. This
+# replaces trust in that string with a SERVER-DERIVED test: a sale is self-dealing
+# if the payer's fingerprint (OX-1's payer_key) has ever been bound to the design's
+# creator via one of three explicit self-signals. Bindings live per-record in R2
+# (concurrency-safe, same pattern as _log_royalty_pending / state_store.put_record).
+#
+# Depends on OX-1: payer_key(payer) -> str, and payer dict keys {'resolved','email'}.
+# ============================================================================
+
+# Binding sources (wired by OX-4; defined here so the whole primitive lives in oxygen.py).
+BIND_DECLARED_SELF = "declared_self_purchase"   # meta buyer==creator (the main.py:864 case)
+BIND_AT_COST_PROMO = "at_cost_promo"            # meta at_cost=='true' AND creator non-empty
+BIND_CUSTOMIZE_BUY = "customize_buy"            # meta list_design=='true' (main.py:522-524)
+
+_CREATOR_PAYERS_COLLECTION = "creator_payers"
+
+# Cache state_store.list_records('creator_payers') so each webhook doesn't re-list R2.
+_CP_CACHE_TTL_SEC = 300
+_cp_cache = {"ts": 0.0, "records": None}
+
+
+def _now_iso() -> str:
+    import datetime
+    return datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+
+def _norm_creator(creator: str) -> str:
+    # Normalize once, use for BOTH the binding-id hash and the stored 'creator' field so
+    # bind and lookup agree (case/whitespace-insensitive, bounded length).
+    return (creator or "").strip().lower()[:120]
+
+
+def _binding_id(creator: str, payer: dict) -> str:
+    import hashlib
+    raw = _norm_creator(creator) + "|" + (payer_key(payer) or "")
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:20]
+
+
+def _invalidate_cache() -> None:
+    """Drop the cached creator_payers list so the next check re-lists R2. Called on every bind."""
+    _cp_cache["ts"] = 0.0
+    _cp_cache["records"] = None
+
+
+def _creator_payers() -> list:
+    """Cached list_records('creator_payers') with a 300s TTL. Never raises: an R2 blip
+    degrades to the last-good list (or empty = 'unbound'), never a webhook 500."""
+    import time
+    now = time.time()
+    if _cp_cache["records"] is not None and (now - _cp_cache["ts"]) < _CP_CACHE_TTL_SEC:
+        return _cp_cache["records"]
+    try:
+        recs = state_store.list_records(_CREATOR_PAYERS_COLLECTION) or []
+    except Exception:
+        recs = _cp_cache["records"] or []   # cold-start R2 blip -> degrade to unbound + move on
+    _cp_cache["ts"] = now
+    _cp_cache["records"] = recs
+    return recs
+
+
+def bind_creator_payer(creator: str, payer: dict, source: str) -> None:
+    """Record that this payer fingerprint IS this creator (a self-signal). Swallow-all,
+    mirroring _log_royalty_pending (main.py:692-704): a binding failure must NEVER break
+    the money path. Bind ONLY on the three explicit self-signals (see BIND_* constants) —
+    never on an ordinary purchase — so a real fan is never locked out of oxygen."""
+    try:
+        pk = payer_key(payer)
+        c = _norm_creator(creator)
+        if not pk or not c:
+            return
+        state_store.put_record(_CREATOR_PAYERS_COLLECTION, _binding_id(creator, payer), {
+            "creator": c,
+            "payer_key": pk,
+            "source": source,
+            "ts": _now_iso(),
+        })
+        _invalidate_cache()   # so an immediate is_arms_length() in the same webhook sees it
+    except Exception:
+        pass
+
+
+def is_arms_length(creator: str, payer: dict, meta: dict) -> tuple[bool, str]:
+    """Unforgeable arms-length test. Returns (is_arms_length, reason).
+
+    NOT arms-length (False) when ANY of:
+      - payer is unresolved (fail CLOSED for oxygen; caller decides royalty separately, OX-4)
+      - meta-declared buyer == creator (belt-and-suspenders vs the main.py:864 case)
+      - payer email equals the creator handle (creator handles are sometimes emails)
+      - payer_key has ever been bound to this creator (the OX-2 store)
+    """
+    c = _norm_creator(creator)
+    meta = meta or {}
+    payer = payer or {}
+
+    # (0) Can't derive who paid -> can't prove arms-length -> not oxygen. Fail closed.
+    if not payer.get("resolved"):
+        return (False, "payer_unresolved")
+
+    # (1) Keep the exact main.py:864 free-text case as a cheap first line of defense.
+    buyer = (meta.get("buyer") or "").strip()
+    if c and buyer and buyer.lower() == c:
+        return (False, "declared_self_purchase")
+
+    # (2) Creator handles are sometimes emails.
+    email = (payer.get("email") or "").strip().lower()
+    if c and email and email == c:
+        return (False, "payer_is_creator_email")
+
+    # (3) The unforgeable check: has this fingerprint ever self-signalled for this creator?
+    pk = payer_key(payer)
+    if c and pk:
+        for r in _creator_payers():
+            if r.get("creator") == c and r.get("payer_key") == pk:
+                return (False, "payer_bound_to_creator")
+
+    return (True, "arms_length")
+```

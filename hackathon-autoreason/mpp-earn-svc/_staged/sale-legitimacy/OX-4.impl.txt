@@ -1,0 +1,19 @@
+DRAFT unified diff produced at /Users/djm/claude-projects/hackathon-autoreason/mpp-earn-svc/drafts/ox4-main.patch (main.py NOT edited). Grounded in the real code (verified by reading, not assuming). git apply --check passes on current HEAD d4aab635; the post-patch file passes python -m py_compile.
+
+Real line numbers confirmed and used: webhook branch checkout.session.completed at main.py:442; charge resolved 447-451; _fulfill_and_royalty call 467-469; fulfillment-failed handling 476-505; listing block 506-518; list_design branch 519-531; ACK JSONResponse at 554. _fulfill_and_royalty signature at 755; at-cost early return 854-858; self-purchase royalty guard 860-867 (elif creator at 868). /pay calls _fulfill at 973-974 (no payer). _increment_sold 1724-1732 (no idempotency). state_store.put_record 156-157 (plain PUT, idempotent by key); get_text at 40. trace at 310. Auth path 409-430. All of time/asyncio/json/state_store already imported at top (line 9-10).
+
+Six hunks:
+(1) main.py:464-467 — resolve server-side payer = await asyncio.to_thread(oxygen.resolve_payer, session, charge) inside try/except (trace payer_resolve_failed, default {'resolved': False}); thread payer=payer into the _fulfill call. /pay path unchanged (payer=None default).
+(2) main.py:755 — signature gains payer=None.
+(3) main.py:855-858 — at-cost binding event bind_creator_payer(creator, payer, 'at_cost_purchase') when creator set (best-effort).
+(4) main.py:860-867 — HARDENED guard: keep creator/buyer extraction verbatim; compute al = oxygen.is_arms_length(creator, payer or {'resolved': False}, body) in try/except (al defaults (None,'payer_unresolved')); store resp['arms_length_reason']; skip royalty (reason self_purchase_no_royalty + arms_length_reason) when legacy_self (old string check) OR server_self == (False,'payer_bound_to_creator'). CRITICAL fail-OPEN: payer_unresolved / arms_length_error NEVER skip the royalty (only block oxygen) — a legit creator is never stiffed by an identity blip or a missing oxygen.py. Fire self_purchase_declared binding.
+(5) main.py:503-518 — after _fulfill returns, compute qual = oxygen.qualify_sale(meta, session, payer, royalty=out.get('royalty'), creator, arms_length=recomputed al, prior_records=oxygen.list_oxygen_cached(), now=time.time()); if live_paid, read prior oxygen object for the charge key and carry sold_counted forward, then state_store.put_record('oxygen', str(charge or pi), {status:'pending', weight, oxygen, reasons, payer_key, creator, listing_slug, design, art_slug(from art_url basename), amount_cents, charge_id, pi, sold_counted, ts:iso-utc}). Whole block best-effort try/except — cannot raise past the ACK.
+(6) main.py:519-522 — list_design binding event bind_creator_payer(creator, payer, 'list_design_on_purchase') when meta creator set.
+
+Cap gate: if listing_slug: → if listing_slug and qual['oxygen'] and not _sold_counted_prev:; after _increment_sold, re-put the same oxygen key with sold_counted=True (dedupes replays since _increment_sold has no idempotency of its own); else-path traces listing_sold_skipped_not_oxygen with qual['reasons']. This also fixes the pre-existing bug where test-mode (non-live_paid) sales burned live limited-edition slots.
+
+Fail-open safety: every one of the 6 `import oxygen` sites is lazy and try/except-wrapped (verified none at module top level), so the service boots and every money path degrades safely if oxygen.py (owned by OX-1/2/3) is absent. No new exception path exists before the ACK — no retry storms / duplicate fulfillment.
+
+Dependency note: oxygen.py does NOT exist on HEAD (sibling packets OX-1/2/3). This patch also expects list_oxygen_cached() to be added to oxygen.py by OX-2 (TTL-cached list_records('oxygen')).
+
+Companion reviewer walkthrough at /Users/djm/claude-projects/hackathon-autoreason/mpp-earn-svc/drafts/ox4-notes.md (hunk-by-hunk with pre-patch line numbers, fail-open rationale, reviewer checklist).

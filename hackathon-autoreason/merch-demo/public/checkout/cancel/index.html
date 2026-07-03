@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>Checkout canceled — Edgeless</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" />
+<style>
+  :root{ --bg:#0B0C0E; --panel:#121417; --line:#262A30; --line2:#353A42; --fg:#ECEEF1; --fg2:#8B919B; --lime:#C9FF4A; --ink:#0B0C0E; }
+  *{ box-sizing:border-box; } html,body{ margin:0; background:var(--bg); color:var(--fg); font-family:'Space Grotesk',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrap{ min-height:100vh; display:grid; place-items:center; padding:24px;
+    background-image:linear-gradient(to right,var(--line) 1px,transparent 1px),linear-gradient(to bottom,var(--line) 1px,transparent 1px); background-size:48px 48px; }
+  .card{ width:min(480px,100%); background:var(--panel); border:1px solid var(--line2); border-radius:4px; padding:40px; text-align:center; }
+  @media (max-width:560px){ .card{ padding:28px 20px; } }
+  .wm{ font-family:'Instrument Serif',serif; font-style:italic; font-size:34px; line-height:1; margin-bottom:24px; }
+  .wm::before{ content:"▸ "; font-family:'JetBrains Mono',monospace; font-style:normal; font-size:.4em; color:var(--lime); vertical-align:.5em; }
+  h1{ font-size:23px; margin:0 0 8px; letter-spacing:-.02em; }
+  .sub{ color:var(--fg2); font-size:15px; line-height:1.55; margin:0 auto 26px; max-width:34ch; }
+  .cta{ display:inline-block; background:var(--lime); color:var(--ink); font-weight:700; text-decoration:none; padding:14px 28px; border-radius:999px; font-size:14px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="wm">Edgeless</div>
+      <h1>Checkout canceled</h1>
+      <p class="sub">No charge was made. Your design is still on the rack whenever you're ready.</p>
+      <a class="cta" href="/">Back to the shop</a>
+    </div>
+  </div>
+</body>
+</html>

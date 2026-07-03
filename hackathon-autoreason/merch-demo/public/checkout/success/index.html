@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>Order confirmed — Edgeless</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" />
+<script src="/config.js"></script>
+<!-- Analytics loader (same conditional pattern as the shop): loads only if a key is set. -->
+<script>
+  (function () {
+    var w = window;
+    if (w.__GA_ID__) {
+      var g = document.createElement('script'); g.async = true;
+      g.src = 'https://www.googletagmanager.com/gtag/js?id=' + w.__GA_ID__;
+      document.head.appendChild(g);
+      w.dataLayer = w.dataLayer || []; w.gtag = function () { w.dataLayer.push(arguments); };
+      w.gtag('js', new Date()); w.gtag('config', w.__GA_ID__, { anonymize_ip: true });
+    }
+    if (w.__POSTHOG_KEY__) {
+      !function (t, e) { var o, n, p, r; e.__SV || (window.posthog = e, e._i = [], e.init = function (i, s, a) { function g(t, e) { var o = e.split('.'); 2 == o.length && (t = t[o[0]], e = o[1]), t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))); }; } (p = t.createElement('script')).type = 'text/javascript', p.async = !0, p.src = s.api_host.replace('.i.posthog.com', '-assets.i.posthog.com') + '/static/array.js', (r = t.getElementsByTagName('script')[0]).parentNode.insertBefore(p, r); var u = e; for (void 0 !== a ? u = e[a] = [] : a = 'posthog', u.people = u.people || [], u.toString = function (t) { var e = 'posthog'; return 'posthog' !== a && (e += '.' + a), t || (e += ' (stub)'), e; }, u.people.toString = function () { return u.toString(1) + '.people (stub)'; }, o = 'init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug'.split(' '), n = 0; n < o.length; n++) g(u, o[n]); e._i.push([i, s, a]); }, e.__SV = 1); }(document, window.posthog || []);
+      window.posthog.init(w.__POSTHOG_KEY__, { api_host: w.__POSTHOG_HOST__ || 'https://us.i.posthog.com', person_profiles: 'identified_only' });
+    }
+  })();
+</script>
+<style>
+  :root{ --bg:#0B0C0E; --panel:#121417; --line:#262A30; --line2:#353A42; --fg:#ECEEF1; --fg2:#8B919B; --lime:#C9FF4A; --ink:#0B0C0E; }
+  *{ box-sizing:border-box; } html,body{ margin:0; background:var(--bg); color:var(--fg);
+    font-family:'Space Grotesk',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrap{ min-height:100vh; display:grid; place-items:center; padding:24px;
+    background-image:linear-gradient(to right,var(--line) 1px,transparent 1px),linear-gradient(to bottom,var(--line) 1px,transparent 1px);
+    background-size:48px 48px; }
+  .card{ width:min(520px,100%); background:var(--panel); border:1px solid var(--line2); border-radius:4px; padding:40px; text-align:center; }
+  @media (max-width:560px){ .card{ padding:28px 20px; } }
+  .wm{ font-family:'Instrument Serif',serif; font-style:italic; font-size:34px; line-height:1; margin-bottom:28px; }
+  .wm::before{ content:"▸ "; font-family:'JetBrains Mono',monospace; font-style:normal; font-size:.4em; color:var(--lime); vertical-align:.5em; }
+  .check{ width:56px; height:56px; border-radius:50%; background:var(--lime); color:var(--ink); display:grid; place-items:center; margin:0 auto 20px; font-size:30px; font-weight:700; }
+  h1{ font-size:24px; margin:0 0 8px; letter-spacing:-.02em; }
+  .sub{ color:var(--fg2); font-size:15px; line-height:1.55; margin:0 auto 24px; max-width:38ch; }
+  .order{ border:1px solid var(--line); border-radius:4px; padding:16px; text-align:left; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--fg2); margin-bottom:24px; }
+  .order .row{ display:flex; justify-content:space-between; gap:12px; padding:4px 0; }
+  .order .row b{ color:var(--fg); font-weight:500; }
+  .order .row .v{ color:var(--lime); }
+  .note{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--fg2); margin-bottom:24px; }
+  .cta{ display:inline-block; background:var(--lime); color:var(--ink); font-weight:700; text-decoration:none;
+    padding:14px 28px; border-radius:999px; font-size:14px; }
+  .fine{ margin-top:18px; font-size:12px; color:var(--fg2); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="wm">Edgeless</div>
+      <div class="check">✓</div>
+      <h1>Order confirmed</h1>
+      <p class="sub">Thank you. Your order is going into production now — a shipping confirmation will be emailed to you when it ships.</p>
+      <div class="order" id="order" style="display:none">
+        <div class="row"><b>Item</b><span class="v" id="o-item">—</span></div>
+        <div class="row"><b>Total</b><span class="v" id="o-amount">—</span></div>
+        <div class="row"><b>Ship to</b><span id="o-ship">—</span></div>
+        <div class="row"><b>Order ref</b><span id="o-ref">—</span></div>
+      </div>
+      <div class="note">Screened by the swarm · made on demand</div>
+      <a class="cta" href="/">Continue shopping</a>
+      <div class="fine">All sales final. Questions? souls@edgelesslab.com</div>
+    </div>
+  </div>
+<script>
+  (function(){
+    var qs = new URLSearchParams(location.search);
+    var sid = qs.get('session_id') || '';
+    document.getElementById('o-ref').textContent = sid ? sid.slice(-12) : '—';
+    // Real-money conversion: the buyer is on the success page, so the purchase completed.
+    // Fire purchase_completed ONCE — enriched with the amount/item when /order-summary
+    // resolves, else a 4s fallback fires it with just the session_id so we never miss the
+    // conversion if the summary API is slow/down. Same domain as the shop ⇒ same PostHog
+    // person ⇒ checkout_started→purchase_completed links into a real funnel.
+    var fired = false;
+    function firePurchase(extra){
+      if (fired) return; fired = true;
+      try {
+        if (window.posthog) window.posthog.capture('purchase_completed',
+          Object.assign({ session_id: sid, source: 'stripe', mode: 'live', real_money: true }, extra || {}));
+      } catch(e){}
+    }
+    var base = (window.__MPPEARN__ || '');
+    if(!sid){ return; }
+    if(!base){ firePurchase({}); return; }
+    setTimeout(function(){ firePurchase({}); }, 20000); // fallback ONLY if the summary fetch never resolves — Render cold start is 10-30s, and a 4s timer raced (and beat) the fetch, logging every cold-start purchase as $0
+    fetch(base + '/order-summary?session_id=' + encodeURIComponent(sid))
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(!d || !d.ok){ firePurchase({}); return; }
+        document.getElementById('order').style.display = 'block';
+        document.getElementById('o-item').textContent = d.item || 'Your order';
+        document.getElementById('o-amount').textContent = d.amount != null ? ('$' + Number(d.amount).toFixed(2)) : '—';
+        document.getElementById('o-ship').textContent = d.ship_to || '—';
+        firePurchase({ amount_cents: d.amount != null ? Math.round(Number(d.amount) * 100) : undefined, item: d.item });
+      })
+      .catch(function(){ firePurchase({}); });
+  })();
+</script>
+</body>
+</html>

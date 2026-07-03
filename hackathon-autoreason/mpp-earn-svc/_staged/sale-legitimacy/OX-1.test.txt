@@ -1,0 +1,112 @@
+NEW FILE — tests/test_oxygen_identity.py (create tests/ dir; the service has no tests dir yet). Run from the service root: `python -m pytest tests/test_oxygen_identity.py` (python -m puts cwd on sys.path so `import oxygen` resolves). Result in validation: 7 passed. Cases: (a) card charge -> fingerprint + resolved=True + fp: key; (a2) card_present fingerprint fallback; (b) cardless PM + no billing email, session customer_details.email present -> resolved=True with em: key; (c) no charge_id + no email -> resolved=False, payer_key==''; (d) Charge.retrieve raises -> resolved=False, 'error' set, no exception escapes; (e) payer_key stable across calls + record_identity emits email_sha256 (64 hex) and raw email absent from json.dumps(record); (e2) fingerprint beats email in payer_key.
+
+EXACT CODE (full file):
+
+\"\"\"Unit tests for the server-side payer identity resolver (oxygen.py).
+
+No network: `stripe.Charge.retrieve` is monkeypatched to return plain-dict stubs, and
+if the real stripe SDK isn't installed a minimal stub module is injected so the resolver
+imports. Run: python -m pytest tests/test_oxygen_identity.py
+\"\"\"
+import json
+import sys
+import types
+
+import pytest
+
+# Ensure `import stripe` inside oxygen succeeds even without the real SDK (no network).
+try:  # pragma: no cover - env dependent
+    import stripe  # noqa: F401
+except Exception:  # pragma: no cover
+    _fake = types.ModuleType(\"stripe\")
+
+    class _Charge:  # replaced per-test via monkeypatch
+        @staticmethod
+        def retrieve(_id, **_kw):
+            raise RuntimeError(\"not patched\")
+
+    _fake.Charge = _Charge
+    _fake.error = types.SimpleNamespace(StripeError=Exception)
+    sys.modules[\"stripe\"] = _fake
+
+import stripe  # noqa: E402
+import oxygen  # noqa: E402
+
+
+def _patch_charge(monkeypatch, fn):
+    monkeypatch.setattr(stripe.Charge, \"retrieve\", staticmethod(fn), raising=False)
+
+
+def test_a_card_charge_yields_fingerprint_and_resolved(monkeypatch):
+    _patch_charge(monkeypatch, lambda cid, **k: {
+        \"payment_method_details\": {\"card\": {\"fingerprint\": \"fp_ABC123\"}},
+        \"billing_details\": {\"email\": \"Fan@Example.com\"},
+        \"customer\": \"cus_1\", \"livemode\": True,
+    })
+    p = oxygen.resolve_payer({\"customer_details\": {\"email\": \"ignored@x.com\"}}, \"ch_1\")
+    assert p[\"fingerprint\"] == \"fp_ABC123\"
+    assert p[\"resolved\"] is True
+    assert p[\"email\"] == \"fan@example.com\"      # lowercased/stripped, from the charge
+    assert p[\"livemode\"] is True
+    assert oxygen.payer_key(p) == \"fp:fp_ABC123\"
+
+
+def test_a2_card_present_fallback_fingerprint(monkeypatch):
+    _patch_charge(monkeypatch, lambda cid, **k: {
+        \"payment_method_details\": {\"card_present\": {\"fingerprint\": \"fp_TERMINAL\"}},
+    })
+    p = oxygen.resolve_payer({}, \"ch_cp\")
+    assert p[\"fingerprint\"] == \"fp_TERMINAL\"
+    assert p[\"resolved\"] is True
+
+
+def test_b_wallet_no_card_degrades_to_email_key(monkeypatch):
+    # Cardless PM (e.g. Link bank / Cash App): no fingerprint on the charge, no billing
+    # email either — the session's customer_details.email carries identity.
+    _patch_charge(monkeypatch, lambda cid, **k: {
+        \"payment_method_details\": {\"link\": {}},
+        \"billing_details\": {\"email\": None},
+        \"customer\": None, \"livemode\": True,
+    })
+    p = oxygen.resolve_payer({\"customer_details\": {\"email\": \"wallet@example.com\"}}, \"ch_2\")
+    assert p[\"fingerprint\"] is None
+    assert p[\"email\"] == \"wallet@example.com\"
+    assert p[\"resolved\"] is True
+    assert oxygen.payer_key(p).startswith(\"em:\")
+
+
+def test_c_no_charge_no_email_unresolved():
+    p = oxygen.resolve_payer({}, None)
+    assert p[\"resolved\"] is False
+    assert p[\"fingerprint\"] is None
+    assert p[\"email\"] is None
+    assert oxygen.payer_key(p) == \"\"
+
+
+def test_d_retrieve_raising_is_swallowed(monkeypatch):
+    def boom(cid, **k):
+        raise RuntimeError(\"stripe down\")
+    _patch_charge(monkeypatch, boom)
+    p = oxygen.resolve_payer({\"customer_details\": {\"email\": \"x@y.com\"}}, \"ch_bad\")
+    assert p[\"resolved\"] is False          # untrusted charge → no oxygen
+    assert \"error\" in p and p[\"error\"]     # error captured, no exception raised
+
+
+def test_e_payer_key_stable_and_email_hashed():
+    payer = {\"fingerprint\": None, \"email\": \"secret@person.com\", \"customer_id\": \"cus_9\",
+             \"charge_id\": \"ch_9\", \"livemode\": True, \"resolved\": True}
+    k1 = oxygen.payer_key(payer)
+    k2 = oxygen.payer_key(dict(payer))
+    assert k1 == k2 and k1.startswith(\"em:\")            # stable across calls
+    rec = oxygen.record_identity(payer)
+    blob = json.dumps(rec)
+    assert \"secret@person.com\" not in blob             # raw PII never persisted
+    assert rec[\"email_sha256\"] and len(rec[\"email_sha256\"]) == 64
+    assert rec[\"payer_key\"] == k1
+
+
+def test_e2_fingerprint_beats_email_in_key():
+    payer = {\"fingerprint\": \"fp_Z\", \"email\": \"a@b.com\"}
+    assert oxygen.payer_key(payer) == \"fp:fp_Z\"
+
+Note: the `try/except import stripe` shim makes the test runnable even where the stripe SDK isn't installed (this scratchpad env lacks it; Render/requirements.txt pins stripe==15.0.1). In prod the real SDK is used and Charge.retrieve is still monkeypatched, so no network either way.

@@ -1,0 +1,18 @@
+DRAFT ONLY — do not edit/deploy; a human reviews + applies. Nothing imports oxygen.py yet, so creating this file is inert (zero behavior change until a later packet wires it in). Wiring contract for the downstream OX packets:
+
+1) CALL SITE: in main.py's `checkout.session.completed` handler, the charge is already resolved at main.py:446-451 (`charge` = the PaymentIntent's latest_charge id). After that, add (in the follow-on packet, NOT here):
+     from oxygen import resolve_payer  # module-level import; stdlib+stripe only, no cycles
+     payer = await asyncio.to_thread(resolve_payer, session, charge)
+   Run it via asyncio.to_thread like the pay_royalty call at main.py:886 (Charge.retrieve is a blocking network call).
+
+2) ARMS-LENGTH (replaces the spoofable guard at main.py:862-867): the current check reads `body.get('buyer')` (sourced from client body at main.py:2673 → meta). The follow-on packet computes arms-length from `payer` (card fingerprint / customer id / email) vs the creator's own on-file identity — NEVER meta['buyer']. resolve_payer gives the server-derived side; the creator-side identity binding is a separate packet (stripe_connect.py:16-18 flags creator ids are still free-text — that's the companion piece).
+
+3) DISTINCT-PAYER: use `payer_key(payer)` as the de-dup key across oxygen records (primitive axis 3). '' means unresolved → treat as NOT distinct / not oxygen.
+
+4) RECORD SHAPE: persist via `state_store.put_record('oxygen', <rec_id>, {...record_identity(payer)..., design/slug, status: 'pending'→'vested', ts})`. record_identity() guarantees no raw email/PII lands in R2 (state_store writes to the private edgeless-state bucket, state_store.py:156-157). Keep raw `payer['email']` in memory only, for the arms-length comparison.
+
+5) CAP GATE: the same qualifying check must gate `_increment_sold` (main.py:1724, called near main.py:508-509) so the limited-edition cap can't be self-pumped — that gating is a downstream packet; OX-1 only supplies the trustworthy identity it will key off.
+
+CAVEATS / risk (from packet): wallet payments (Apple/Google Pay) still expose the underlying card fingerprint, so they resolve via `fp:`; truly cardless PMs (Link-bank, Cash App) degrade to the `em:` email key — resolved stays True as long as an email exists (charge billing_details OR session customer_details, which Checkout always collects). If BOTH are absent (rare), resolved=False and the sale simply earns no oxygen (fail-closed, correct for a legitimacy primitive). resolve_payer never raises into the webhook, so it cannot break fulfillment/ACK.
+
+No requirements.txt change (stdlib hashlib + existing stripe==15.0.1). tests/ dir is new — no conftest needed; `python -m pytest` from the service root makes `import oxygen` resolve.

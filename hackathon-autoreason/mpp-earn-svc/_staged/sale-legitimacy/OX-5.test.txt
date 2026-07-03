@@ -1,0 +1,45 @@
+VALIDATED LOCALLY (scratchpad, with an in-memory state_store stub): oxygen.py compiles; 5/5 unit tests pass covering packet requirement (4) plus acceptance (d)+(e) at the tally layer:
+- test_revoke_idempotent_and_missing: first refund -> status revoked; DOUBLE refund event -> single revoked state, marked {'already': True}, no exception; unknown charge id -> {'found': False}, no crash; empty charge id -> no crash.
+- test_revoke_after_vested_still_kills: a 'vested' record hit by charge.dispute.created -> 'revoked' (post-vest refund still kills it).
+- test_tally_boundary_13d_15d_and_revoked_at_20d: vest_days=14; records aged 13d(pending)/15d(pending)/20d(revoked) -> vested_weight==1.0 (ONLY the 15d unrevoked one), pending_count==1, revoked_count==1, distinct_payers==1; the 15d record's status is converged to 'vested' in the store.
+- test_tally_exact_edge_is_vested_and_iso_ts: a record aged EXACTLY 14d (== window) counts as vested (>= comparison); an ISO-8601 `ts` string is parsed correctly.
+- test_tally_slug_filter_and_no_payer_leak: slug filter isolates listings; a payer_key value ('SECRET') NEVER appears in the tally() output (repr check) and 'payer_key' is not a returned key.
+
+REVIEWER pytest for acceptance (a)-(c) (webhook level — requires OX-1..4 landed + the app importable; not run here because it needs the full FastAPI app + real oxygen module). Auth note: FastAPI TestClient's client host is 'testclient', NOT 127.0.0.1, so the local-replay path won't authorize — set WEBHOOK_SECRET and send the x-webhook-secret header (the shared-secret branch, main.py:412), and leave STRIPE_WEBHOOK_SIGNING_SECRET unset:
+
+    import os, json
+    os.environ['WEBHOOK_SECRET'] = 'test-secret'
+    from fastapi.testclient import TestClient
+    import main, oxygen, state_store
+    client = TestClient(main.app)
+    H = {'x-webhook-secret': 'test-secret', 'content-type': 'application/json'}
+
+    def _post(evt):
+        return client.post('/webhooks/stripe', data=json.dumps(evt), headers=H)
+
+    def test_a_refund_revokes_and_no_pod(monkeypatch):
+        state_store.put_record('oxygen', 'ch_A', {'charge_id':'ch_A','status':'pending',
+            'ts': __import__('time').time(), 'payer_key':'pk','weight':1.0,'listing_slug':'s'})
+        # sentinel: if the legacy pod-replay block runs, this explodes
+        import pod_client
+        monkeypatch.setattr(pod_client, 'health', lambda: (_ for _ in ()).throw(AssertionError('pod ran')))
+        r = _post({'type':'charge.refunded','data':{'object':{'id':'ch_A','object':'charge'}}})
+        assert r.status_code == 200 and r.json()['oxygen']['status'] == 'revoked'
+        assert oxygen._load('ch_A')['status'] == 'revoked'
+
+    def test_b_dispute_uses_object_charge():
+        state_store.put_record('oxygen','ch_B',{'charge_id':'ch_B','status':'vested',
+            'ts':0,'payer_key':'pk','weight':1.0,'listing_slug':'s'})
+        r = _post({'type':'charge.dispute.created','data':{'object':{'id':'dp_1','charge':'ch_B'}}})
+        assert r.status_code == 200 and oxygen._load('ch_B')['status'] == 'revoked'
+
+    def test_c_unknown_charge_is_200_no_crash():
+        r = _post({'type':'radar.early_fraud_warning.created','data':{'object':{'id':'efw_1','charge':'ch_missing'}}})
+        assert r.status_code == 200 and r.json()['oxygen']['found'] is False
+
+    def test_e_read_endpoint_no_payer_leak():
+        r = client.get('/oxygen/s')
+        assert r.status_code == 200 and 'payer_key' not in r.text and 'email' not in r.text
+        assert 'vested_weight' in r.json() and r.json()['vest_days'] == oxygen.OXYGEN_VEST_DAYS
+
+Run: pytest test_ox5_webhook.py -q  (after OX-1..4 merged).

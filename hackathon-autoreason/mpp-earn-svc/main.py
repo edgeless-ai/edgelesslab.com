@@ -1856,15 +1856,63 @@ _KIND_PRICE_FLOOR = {"tee": 34, "hoodie": 48, "cc-tee": 40, "sticker": 10, "post
                      "embroidery": 30, "cap": 30, "bucket": 34, "tote": 24, "mug": 18, "enamel": 26}
 
 
-def _retail_price_cents_for_slug(slug: str):
+_PF_HOODIE_VIDS = None  # cached set of hoodie (Printful product 294) catalog_variant_ids
+
+
+async def _pf_hoodie_variant_ids() -> set:
+    """Cached set of hoodie-product (Printful 294) catalog_variant_ids, used at /checkout to
+    detect a tee-labeled request that actually carries a hoodie variant (tee & hoodie share
+    the Printful path; the variant, not the kind string, decides the physical product). Fetched
+    once from Printful. FAIL-SAFE: any error → empty set → caller keeps trusting the request
+    kind (no worse than before, never blocks checkout). Only a non-empty fetch is cached, so a
+    transient failure retries on the next checkout."""
+    global _PF_HOODIE_VIDS
+    if _PF_HOODIE_VIDS is not None:
+        return _PF_HOODIE_VIDS
+    try:
+        import printful_client as _pf
+        # limit=250 > the hoodie catalog size (≈50) so the cached set is never a partial page
+        # (a partial non-empty page would cache and silently miss later-added variant ids).
+        r = await asyncio.to_thread(_pf.get_variants, 294, 250)
+        body = r.get("body") or {}
+        rows = body.get("data") or ((body.get("result") or {}).get("catalog_variants")) or []
+        vids = set()
+        for v in rows:
+            try:
+                vids.add(int(v.get("id")))
+            except (TypeError, ValueError):
+                pass
+        if vids:
+            _PF_HOODIE_VIDS = vids
+        return vids
+    except Exception:
+        return set()
+
+
+def _retail_price_cents_for_slug(slug: str, kind: str | None = None):
     """Authoritative retail price (cents) for a listing, derived server-side.
-    Returns None for unknown slugs (caller keeps its existing behavior).
     Uses the listing's stored price if set, else the per-kind floor — never the
     client-supplied amount. This is the retail floor for /checkout so a tampered
-    request can't buy a listed item below its shelf price (only above)."""
+    request can't buy a listed item below its shelf price (only above).
+
+    For a slug NOT in SUBMISSIONS (a baked designs.json listing — the bulk of the
+    catalog), fall back to the per-kind floor from the REQUEST's kind. This is
+    authoritative because `kind` also drives fulfillment (you get the product you pay
+    for), so a buyer can't cheapen a tee by claiming a sticker — the cheaper kind makes
+    a cheaper product. Verified: 0/88 baked designs carry a custom price, so the kind
+    floor IS their shelf price. Any future custom-priced listing comes via /submit (a
+    SUBMISSIONS record with .price), which takes precedence below. Returns None only when
+    the kind is unknown too (caller then keeps the cost floor).
+
+    NOTE on tee vs hoodie: those two share the Printful path where the PHYSICAL product is
+    the catalog_variant_id, not the kind string — so the /checkout caller resolves the true
+    kind from the variant (via _pf_hoodie_variant_ids) BEFORE calling this, so `kind` here is
+    already authoritative for that pair. The 9 Printify kinds are self-consistent (kind drives
+    both price and product)."""
     s = _find_submission(slug)
     if not s:
-        return None
+        k = str(kind or "").lower()
+        return int(_KIND_PRICE_FLOOR[k] * 100) if k in _KIND_PRICE_FLOOR else None
     price = s.get("price")
     if price is not None:
         try:
@@ -2832,7 +2880,27 @@ async def checkout(request: Request):
         #    (the shelf price was never enforced server-side, only the cost floor below was).
         # 2) COST floor — for anything without a slug (legacy/ad-hoc), still never sell
         #    below real POD cost (a live order below cost is a guaranteed loss).
-        retail_floor = _retail_price_cents_for_slug(listing_slug) if listing_slug else None
+        # Pre-charge fulfillment guard: a hoodie with no resolvable Printful variant would be
+        # REFUSED at fulfillment (we never ship a tee substitute), so reject it BEFORE charging
+        # the card rather than charge-then-fail. Tee has a safe default variant; Printify kinds
+        # validate their own variant downstream; the promo path already requires a variant.
+        try:
+            _cv = int(body.get("catalog_variant_id") or 0)
+        except (TypeError, ValueError):
+            _cv = 0
+        _reqkind = str(body.get("kind") or "").lower()
+        if _reqkind == "hoodie" and _cv <= 0:
+            trace("checkout_hoodie_no_variant_rejected", slug=listing_slug)
+            return JSONResponse({"error": "variant_required",
+                                 "detail": "Please select a size for this item."}, status_code=400)
+        # tee & hoodie share the Printful path; the PHYSICAL product is the variant, not the
+        # kind string. A "tee"-labeled request carrying a hoodie (product 294) variant would
+        # otherwise price at the $34 tee floor while a $48 hoodie ships — resolve the true kind
+        # from the variant so the retail floor matches what fulfillment actually makes.
+        if _reqkind == "tee" and _cv > 0 and _cv in await _pf_hoodie_variant_ids():
+            trace("checkout_kind_corrected_tee_to_hoodie", variant=_cv, slug=listing_slug)
+            _reqkind = "hoodie"
+        retail_floor = _retail_price_cents_for_slug(listing_slug, _reqkind) if listing_slug else None
         if retail_floor and amount_cents < retail_floor:
             trace("checkout_below_retail_corrected", requested=amount_cents,
                   retail=retail_floor, slug=listing_slug)

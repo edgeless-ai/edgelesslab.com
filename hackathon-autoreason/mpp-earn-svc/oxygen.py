@@ -535,33 +535,52 @@ def _weight(rec) -> float:
         return 1.0
 
 
-def revoke(charge_id: str, reason: str) -> dict:
+def revoke(charge_id: str, reason: str, payment_intent: str = "") -> dict:
     """Kill the oxygen record for a charge (refund / dispute / early-fraud-warning).
-    Idempotent and safe on a missing record:
-      * unknown / no charge id -> no-op, {'found': False} (never raises)
-      * already revoked        -> stays revoked, {'already': True}
+
+    Records are keyed by payment_intent (pi) first (main.py _oxy_key), but refund/dispute/EFW
+    webhooks give us a charge id (and, on the same object, the pi). So look up resiliently:
+    by pi, then by charge_id, then a field-scan — and ALWAYS write back under the key the
+    record actually lives at, never the caller-supplied id (else the revoke lands on a phantom
+    key and the real record keeps its oxygen). Idempotent, never raises:
+      * no id at all      -> no-op, {'found': False}
+      * already revoked   -> stays revoked, {'already': True}
     Revokes at ANY status, INCLUDING 'vested' — a post-vest refund is still forged demand."""
     charge_id = (charge_id or "").strip()
-    if not charge_id:
-        return {"revoked": False, "found": False, "reason": "no_charge_id"}
-    rec = _load(charge_id)
-    if rec is None:
-        return {"revoked": False, "found": False, "charge_id": charge_id}
+    pi = (payment_intent or "").strip()
+    if not charge_id and not pi:
+        return {"revoked": False, "found": False, "reason": "no_charge_or_pi"}
+    key, rec = None, None
+    for cand in (pi, charge_id):                 # point-load by the actual storage key first
+        if cand:
+            r = _load(cand)
+            if r is not None:
+                key, rec = cand, r
+                break
+    if rec is None:                              # field-scan fallback (record keyed elsewhere)
+        for r in (list_oxygen_cached() or []):
+            if (pi and r.get("pi") == pi) or (charge_id and r.get("charge_id") == charge_id):
+                key, rec = str(r.get("pi") or r.get("charge_id") or ""), r
+                break
+    if rec is None or not key:
+        return {"revoked": False, "found": False, "charge_id": charge_id, "pi": pi}
     if rec.get("status") == "revoked":
-        return {"revoked": True, "found": True, "already": True,
-                "charge_id": charge_id, "status": "revoked"}
+        return {"revoked": True, "found": True, "already": True, "status": "revoked", "key": key}
     rec["status"] = "revoked"
     rec["revoke_reason"] = reason
     rec["revoked_ts"] = time.time()
-    state_store.put_record(_OXYGEN_COLLECTION, charge_id, rec)  # last-writer-wins, converges
+    state_store.put_record(_OXYGEN_COLLECTION, key, rec)  # write under the record's real key
     _invalidate_oxygen_cache()
-    return {"revoked": True, "found": True, "charge_id": charge_id, "status": "revoked"}
+    return {"revoked": True, "found": True, "status": "revoked", "key": key}
 
 
 def _vest(rec) -> None:
     """Best-effort persist a pending->vested flip so the store converges (idempotent,
     last-writer-wins on identical content — safe across racing instances)."""
-    cid = rec.get("charge_id") or rec.get("id")
+    # Write back under the record's ACTUAL storage key (pi-first, matching main.py's _oxy_key),
+    # not charge_id — else once records are keyed by pi, _vest would create a duplicate record
+    # at oxygen/{charge_id}.json and double-count the sale in tally()/distinct_payers.
+    cid = rec.get("pi") or rec.get("charge_id")
     if not cid:
         return
     rec["status"] = "vested"

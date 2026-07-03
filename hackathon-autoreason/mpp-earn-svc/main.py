@@ -460,9 +460,12 @@ async def stripe_webhook(request: Request):
         _obj = (event.get("data") or {}).get("object", {}) or {}
         # charge.refunded → object IS the charge (id). dispute/EFW → object CARRIES `charge`.
         _charge_id = _obj.get("id") if evt_type == "charge.refunded" else _obj.get("charge")
+        # pi is present on all three object types (charge/dispute/EFW) and is the PRIMARY
+        # oxygen record key — pass it so revoke() finds pi-keyed records (the common case).
+        _pi_id = _obj.get("payment_intent")
         try:
             import oxygen
-            _rev = oxygen.revoke(str(_charge_id or ""), evt_type)
+            _rev = oxygen.revoke(str(_charge_id or ""), evt_type, payment_intent=str(_pi_id or ""))
         except Exception as _e:
             _rev = {"revoked": False, "error": str(_e)[:160]}
         trace("oxygen_revoked", charge=_charge_id, event_type=evt_type,
@@ -546,7 +549,11 @@ async def stripe_webhook(request: Request):
         listing_slug = meta.get("listing_slug")
         qual = {"oxygen": False, "weight": 0.0, "reasons": ["oxygen_unavailable"]}
         _sold_counted_prev = False
-        _oxy_key = str(charge or pi or session.get("id") or "unknown")
+        # Key on the ALWAYS-present, ALWAYS-stable payment_intent (pi) FIRST. `charge` comes
+        # from a fallible PaymentIntent.retrieve that can transiently fail on a webhook retry,
+        # which would key the SAME sale under two different ids → double sold-count + an
+        # un-revocable record. pi is derived without an API call and identical across retries.
+        _oxy_key = str(pi or charge or session.get("id") or "unknown")
         try:
             import oxygen
             _al = oxygen.is_arms_length(meta.get("creator") or "", payer or {"resolved": False}, meta)
@@ -568,7 +575,9 @@ async def stripe_webhook(request: Request):
                     "listing_slug": meta.get("listing_slug") or "",
                     "design_key": oxygen._design_key(meta),
                     "amount_cents": int(session.get("amount_total") or 0),
-                    "charge_id": str(charge or ""), "pi": str(pi or ""),
+                    # Never let a failed PI-retrieve (charge="") stomp a good charge_id a prior
+                    # webhook delivery already recorded — keep the previously-stored one.
+                    "charge_id": str(charge or "") or _prev.get("charge_id", ""), "pi": str(pi or ""),
                     "sold_counted": _sold_counted_prev,
                     "ts": _prev.get("ts") or time.time()})
                 oxygen._invalidate_oxygen_cache()
@@ -1871,9 +1880,10 @@ async def _pf_hoodie_variant_ids() -> set:
         return _PF_HOODIE_VIDS
     try:
         import printful_client as _pf
-        # limit=250 > the hoodie catalog size (≈50) so the cached set is never a partial page
-        # (a partial non-empty page would cache and silently miss later-added variant ids).
-        r = await asyncio.to_thread(_pf.get_variants, 294, 250)
+        # Printful caps page size at 100 (limit>100 → HTTP 400); the hoodie catalog is ~50
+        # variants, so the default page returns them ALL (verified live: 50 ids incl 9228). If
+        # it ever exceeds 100 this would need pagination — see the len>=100 log below.
+        r = await asyncio.to_thread(_pf.get_variants, 294)
         body = r.get("body") or {}
         rows = body.get("data") or ((body.get("result") or {}).get("catalog_variants")) or []
         vids = set()
@@ -1882,6 +1892,8 @@ async def _pf_hoodie_variant_ids() -> set:
                 vids.add(int(v.get("id")))
             except (TypeError, ValueError):
                 pass
+        if len(vids) >= 100:   # tripwire: at the page cap → catalog may be truncated, needs pagination
+            trace("pf_hoodie_variants_page_full", count=len(vids))
         if vids:
             _PF_HOODIE_VIDS = vids
         return vids

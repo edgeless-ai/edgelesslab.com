@@ -37,14 +37,15 @@ function mulberry32(a: number) {
 
 const ATTRACTOR_TYPES: AttractorType[] = ["lorenz", "rossler", "spiral", "flow"];
 
-// Color palettes — each is [hue, saturation] pairs that blend well
+// Color palettes — [hue, saturation]. Locked to the lime/Exchange family so every
+// visit reads on-brand: electric lime → chartreuse → emerald, with one teal for range.
 const PALETTES: [number, number][] = [
-  [235, 85],  // indigo
-  [160, 70],  // green/teal
-  [270, 75],  // purple
-  [210, 80],  // blue
-  [330, 65],  // rose
-  [180, 60],  // cyan
+  [78, 95],   // electric lime
+  [90, 88],   // green
+  [66, 96],   // chartreuse
+  [110, 78],  // emerald
+  [84, 92],   // lime-green
+  [150, 68],  // teal-green (range)
 ];
 
 interface SimState {
@@ -218,7 +219,7 @@ export function GenerativeHeroBackground() {
       baseHue: palette[0] + (rng() - 0.5) * 30,
       baseSat: palette[1],
       hueRange: 20 + rng() * 40,
-      trailFade: 0.03 + rng() * 0.03,
+      trailFade: 0.015 + rng() * 0.012,
       time: 0,
     };
   }, []);
@@ -301,16 +302,21 @@ export function GenerativeHeroBackground() {
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
-        ctx.strokeStyle = `hsla(${hue}, ${state.baseSat}%, 65%, ${alpha})`;
-        ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = `hsla(${hue}, ${state.baseSat}%, 62%, ${Math.min(1, alpha * 1.5)})`;
+        ctx.lineWidth = lineWidth + 0.4;
         ctx.lineCap = "round";
+        // Neon bloom: give the lime trails a soft glow so they read as a living
+        // luminous structure, not thin scattered strokes.
+        ctx.shadowBlur = 7 + speed * 1.5;
+        ctx.shadowColor = `hsla(${hue}, ${state.baseSat}%, 60%, 0.9)`;
         ctx.stroke();
+        ctx.shadowBlur = 0;
 
-        // Glow for fast particles
-        if (speed > 2.5) {
+        // Glow — more particles bloom, brighter, for a vivid living structure
+        if (speed > 1.2) {
           ctx.beginPath();
-          ctx.arc(x2, y2, lineWidth + 2, 0, Math.PI * 2);
-          ctx.fillStyle = `hsla(${hue}, ${state.baseSat}%, 70%, ${alpha * 0.3})`;
+          ctx.arc(x2, y2, lineWidth + 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${hue}, ${state.baseSat}%, 72%, ${alpha * 0.5})`;
           ctx.fill();
         }
       }
@@ -343,15 +349,24 @@ export function GenerativeHeroBackground() {
         <canvas
           ref={canvasRef}
           className="absolute inset-0 w-full h-full"
-          style={{ opacity: 0.55 }}
+          style={{ opacity: 0.9, mixBlendMode: "screen" }}
         />
       )}
-      {/* Vignette for text readability */}
+      {/* Vignette — lighter, and biased left so the headline column stays readable
+          while the generative structure blooms on the right. */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, rgba(0,0,0,0.65) 100%)",
+            "radial-gradient(ellipse 85% 65% at 62% 42%, transparent 0%, rgba(9,9,11,0.42) 100%)",
+        }}
+      />
+      {/* Left scrim: protects the headline/CTA column at AA contrast. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(90deg, rgba(9,9,11,0.80) 0%, rgba(9,9,11,0.45) 32%, rgba(9,9,11,0) 60%)",
         }}
       />
     </div>

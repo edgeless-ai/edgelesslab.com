@@ -6,8 +6,8 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import { useDeferredMount } from "@/hooks/use-deferred-mount";
 
-const GenerativeHeroBackground = dynamic(
-  () => import("@/components/ui/generative-hero-bg").then(m => m.GenerativeHeroBackground),
+const HeroShader = dynamic(
+  () => import("@/components/hero-shader-bg").then(m => m.HeroShaderBg),
   { ssr: false, loading: () => null }
 );
 
@@ -29,7 +29,7 @@ export function HeroSection() {
   const deferredKinetic = useDeferredMount(2000);
   return (
     <section className="relative flex min-h-[92svh] items-center px-6 pb-16 pt-28 md:min-h-screen md:items-end md:pb-24 md:pt-32">
-      <GenerativeHeroBackground />
+      <HeroShader />
       <div className="relative max-w-[1280px] w-full mx-auto grid grid-cols-1 gap-12 lg:grid-cols-[1.25fr_1fr] lg:items-end">
         {/* Left column: headline + supporting copy */}
         <div className="min-w-0">

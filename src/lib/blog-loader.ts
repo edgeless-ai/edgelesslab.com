@@ -1,11 +1,11 @@
-import fs from "node:fs";
-import path from "node:path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import type { BlogPost } from "./blog-types";
 
-// js-yaml is present in node_modules but not typed; add `@types/js-yaml` before
-// wiring this loader into production, or replace with `gray-matter`.
-// @ts-ignore
-import yaml from "js-yaml";
+// js-yaml is present in node_modules but not typed in this repo. Add
+// `@types/js-yaml` (or switch to `gray-matter`) before wiring the loader into
+// production.
+import * as yaml from "js-yaml";
 
 const BLOG_DIR = path.join(process.cwd(), "content/blog");
 

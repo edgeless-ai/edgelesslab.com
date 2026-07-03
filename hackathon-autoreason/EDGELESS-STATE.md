@@ -45,3 +45,10 @@
 - **MONEY-PATH AUDIT** — 22 verified bugs, `MONEYPATH-AUDIT.md`, STAGED for supervised fix pass before first sale.
 - **GAP AUDIT** — `GAP-REPORT.md` (28 gaps triaged). URGENT: retail floor not live (ca4019f on master but $26-on-$34-tee still goes through).
 - **Findings for David:** IP-gate over-strict; FLORA REST key dead; CF 403s Python-urllib UA (SDK handles); edgelesslab.com CF-Pages migration deployed (DNS flip pending).
+
+## Money-path durable fixes — DEPLOYED 2026-07-03 (David greenlit)
+- **Royalty double-pay guard** — durable `royalty_paid/{charge_id}` R2 marker (beyond Stripe's 24h idempotency vs 72h retries); fail-open, echoes persisted creator/account. (stripe_connect.py)
+- **Fulfillment kind-guard** — no more hoodie-ships-tee (refuses variant 4017 substitute → fulfillment-failed safety net). (main.py Printful branch)
+- **/health state_store_configured** — surfaces silent R2-persistence degradation (live: true).
+- Adversarially reviewed (quality agent: safe-to-deploy), deployed 37b7ee6, checkout verified cs_live_ green.
+- STILL STAGED (David's call): retail-floor-for-baked-designs (GAP-REPORT.md); pre-charge variant requirement; money-path root-cause groups 1/3/5/6 (MONEYPATH-AUDIT.md).

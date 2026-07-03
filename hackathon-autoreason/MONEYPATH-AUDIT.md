@@ -4,6 +4,17 @@
 
 **11 HIGH · 9 MEDIUM · 2 LOW.**
 
+---
+## ✅ FIXED + DEPLOYED 2026-07-03 (adversarially reviewed, checkout verified green — commit 37b7ee6)
+David greenlit "the most durable money-path bug fixes." Done, live, and verified on api.edgelesslab.com:
+1. **Royalty double-pay (root-cause group 2, #2/#8)** — durable `royalty_paid/{charge_id}` marker in R2 state_store (beyond Stripe's 24h idempotency key vs 72h retries). Written only after a confirmed transfer; fail-open on read; `already_paid` echoes the *persisted* creator/account (not the caller's). Can only prevent a double-pay, never withhold a first.
+2. **Hoodie-ships-tee (group 4, #6)** — Printful fulfillment now REFUSES tee variant 4017 as a substitute for a non-tee kind whose variant didn't resolve → routes to the fulfillment-failed safety net (alert + Stripe 500-retry) instead of shipping the wrong product.
+3. **Silent R2-persistence failure** — `/health` now reports `state_store_configured` (live: `true`).
+
+**STAGED (your design call, NOT auto-fixed):** the retail-floor-for-baked-designs gap (see GAP-REPORT.md — needs an authoritative price source for designs.json listings), plus a reviewer-suggested pre-charge `catalog_variant_id` requirement at /checkout (closes the charge-then-refuse window but risks blocking legit flows — test first). Remaining root-cause groups 1/3/5/6 below still warrant a coherent supervised pass.
+
+---
+
 ## Root-cause groups (fix these together)
 
 1. **Webhook keying + idempotency** (#1,#3,#7,#17,#18,#21): oxygen/sold-count keyed `charge or pi` but charge comes from a fallible retrieve → key differs across retries → double sold-count, un-revocable records, false pending. Also Printify order create has no idempotency key (scan-race → duplicate real POD bill). FIX: key everything on the always-present `pi` (payment_intent||session.id); add durable per-charge markers; give Printify create an idempotency key; add Stripe event-id dedup.

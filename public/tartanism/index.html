@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tartanism — Generative Plaid by Edgeless Lab</title>
+<meta name="description" content="A generative tartan system: six weave structures, 48 period-correct dye colors, and a mutation engine that walks the line between generated plaid and authentic Scottish tartan. Explore it interactively or read the field notes.">
+<link rel="canonical" href="https://edgelesslab.com/tartanism/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Tartanism — Generative Plaid by Edgeless Lab">
+<meta property="og:description" content="Six weave structures, 48 historical dye colors, and a formal grammar for Scottish tartan. Explore it, or read the field notes.">
+<meta property="og:url" content="https://edgelesslab.com/tartanism/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f3eddd; --paper-deep:#ebe3cf; --ink:#0c0a08; --ink-soft:#2a2520;
+    --ink-faint:#56524a; --rule:#d4cab4; --woad:#2d4a7a; --woad-deep:#1e3459;
+    --serif:'Fraunces',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(var(--paper-deep) 1px,transparent 1px),linear-gradient(90deg,var(--paper-deep) 1px,transparent 1px);
+    background-size:26px 26px;background-position:center;}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px}
+  header{padding:64px 0 0}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--woad);margin-bottom:20px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(44px,9vw,80px);line-height:1.02;letter-spacing:-.02em}
+  .lede{font-size:clamp(18px,3.4vw,21px);color:var(--ink-soft);max-width:56ch;margin-top:22px}
+  .rule{height:1px;background:var(--rule);border:0;margin:52px 0}
+  .cards{display:grid;gap:20px;grid-template-columns:1fr}
+  @media(min-width:620px){.cards{grid-template-columns:1fr 1fr}}
+  a.card{display:block;text-decoration:none;color:inherit;background:#fbf7ec;border:1px solid var(--rule);
+    border-radius:4px;padding:30px 28px;transition:border-color .18s,transform .18s;position:relative}
+  a.card:hover{border-color:var(--woad);transform:translateY(-2px)}
+  a.card .n{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--ink-faint);text-transform:uppercase}
+  a.card h2{font-family:var(--serif);font-weight:600;font-size:26px;margin:12px 0 8px;letter-spacing:-.01em}
+  a.card p{font-size:15.5px;color:var(--ink-soft)}
+  a.card .go{font-family:var(--mono);font-size:13px;color:var(--woad);margin-top:16px;display:inline-block}
+  .meta{font-family:var(--mono);font-size:12.5px;color:var(--ink-faint);display:flex;gap:26px;flex-wrap:wrap;margin-top:40px}
+  .meta b{color:var(--ink)}
+  footer{border-top:1px solid var(--rule);margin-top:64px;padding:28px 0 60px;font-family:var(--mono);font-size:12.5px;color:var(--ink-faint)}
+  footer a{color:var(--woad);text-decoration:none}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="kicker">Edgeless Lab · Generative Textile Math</div>
+  <h1>Tartanism</h1>
+  <p class="lede">A formal grammar for Scottish tartan, run by machine. Six weave structures, forty-eight period-correct dye colors, and a mutation engine that breeds new plaid from old — walking the line between the generated and the authentic.</p>
+</div></header>
+
+<div class="wrap">
+  <hr class="rule">
+  <div class="cards">
+    <a class="card" href="/tartanism/app/">
+      <div class="n">01 — Interactive</div>
+      <h2>The Explorer</h2>
+      <p>Browse, mutate, and breed tartans in real time. A mobile-first plaid studio — every sett rendered live in the browser.</p>
+      <span class="go">Open the explorer →</span>
+    </a>
+    <a class="card" href="/tartanism/field-notes/">
+      <div class="n">02 — Reading</div>
+      <h2>Field Notes</h2>
+      <p>The scholarship behind the system: weave structures, thread-count notation, the historical dye palette, and the mutation grammar — as a specimen catalog.</p>
+      <span class="go">Read the field notes →</span>
+    </a>
+  </div>
+
+  <div class="meta">
+    <span><b>6</b> weave structures</span>
+    <span><b>48</b> historical dyes</span>
+    <span><b>~120</b> tartans</span>
+    <span><b>generative</b> mutation + breeding</span>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  A study in generative textile-math by <a href="https://edgelesslab.com">Edgeless Lab</a> — companion to the <a href="https://notes.edgelesslab.com">Field Notes</a> gallery and <a href="https://edgelesslab.com/">the lab</a>.
+</div></footer>
+</body>
+</html>

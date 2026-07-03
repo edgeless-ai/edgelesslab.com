@@ -571,7 +571,13 @@ def revoke(charge_id: str, reason: str, payment_intent: str = "") -> dict:
     rec["revoked_ts"] = time.time()
     state_store.put_record(_OXYGEN_COLLECTION, key, rec)  # write under the record's real key
     _invalidate_oxygen_cache()
-    return {"revoked": True, "found": True, "status": "revoked", "key": key}
+    # Surface listing_slug + sold_counted so the caller can RELEASE the limited-edition cap
+    # slot a refunded/disputed unit was holding (so it can resell). Only on this FIRST
+    # transition — the idempotent 'already' branch above omits them, so a webhook retry can't
+    # double-release.
+    return {"revoked": True, "found": True, "status": "revoked", "key": key,
+            "listing_slug": rec.get("listing_slug") or "",
+            "sold_counted": bool(rec.get("sold_counted"))}
 
 
 def _vest(rec) -> None:

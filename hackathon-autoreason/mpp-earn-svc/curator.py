@@ -218,15 +218,17 @@ def curate(art_url: str, title: str = "") -> dict:
     n = len(votes)
     score = int(round(statistics.median(v["score"] for v in votes)))
     slop = sum(1 for v in votes if v["slop"]) > n / 2          # majority calls it slop
-    # IP is asymmetric — one copyrighted listing is a real liability, a wrongly-held good piece
-    # is not. So policy is STRICT: if ANY panelist flags an IP problem, quarantine. Plus a
-    # keyword backstop — a model that NAMES a copyright/trademark/known character in its reason
-    # (but left policy_ok true) still fails (the live 'Eevee' listing slipped through this gap).
-    policy_ok = all(v["policy_ok"] for v in votes)
+    # IP is asymmetric — a copyrighted listing is a real liability, a wrongly-held good piece is
+    # not. Calibration (was unanimous all(), which over-rejected originals — one lone cautious
+    # model quarantined genuine work like a caduceus/hexagon-mark scoring 85): a MAJORITY of the
+    # panel must clear policy, mirroring the slop idiom above. BUT the keyword backstop still
+    # HARD-quarantines any named copyright/trademark/known-character in a reason REGARDLESS of the
+    # vote — that backstop is what actually caught the live 'Eevee' listing, and it's unchanged.
+    policy_ok = sum(1 for v in votes if v["policy_ok"]) > n / 2   # majority clears policy
     _ip_re = re.compile(r"copyright|trademark|infring|pok[eé]mon|eevee|pikachu|disney|nintendo|"
                         r"marvel|mario|mickey|hello kitty|sanrio|studio ghibli|logo of", re.I)
     if any(_ip_re.search(v.get("reason") or "") for v in votes):
-        policy_ok = False
+        policy_ok = False   # known-IP keyword overrides the vote — always quarantine
     # Surface the lead model's reason if it voted, else the first responder's — concrete text.
     reason = next((v["reason"] for v in votes if v["model"] == CURATOR_MODEL), votes[0]["reason"])
     out = {

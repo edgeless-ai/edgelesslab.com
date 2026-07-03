@@ -475,6 +475,21 @@ async def stripe_webhook(request: Request):
             _rev = {"revoked": False, "error": str(_e)[:160]}
         trace("oxygen_revoked", charge=_charge_id, event_type=evt_type,
               revoked=_rev.get("revoked"), found=_rev.get("found"), request_id=request_id)
+        # Release the limited-edition cap slot the unit was holding, so it can resell — but ONLY
+        # on a FINAL refund, NOT on dispute.created / early_fraud_warning (same finality logic as
+        # the royalty reversal below): a WON dispute would leave the charge valid while we'd have
+        # already released + possibly resold the slot → oversell a quantity=1 cap. Refund is
+        # final. Only the FIRST revoke transition returns sold_counted (idempotent repeat omits
+        # it), so a webhook retry can't double-release. (A rare cross-instance concurrent double
+        # delivery could still double-release by one unit — same bounded read-then-write race as
+        # _increment_sold, accepted for this storage layer; tracked for a CAS follow-up.)
+        if evt_type == "charge.refunded" and _rev.get("sold_counted") and _rev.get("listing_slug"):
+            try:
+                _dec = _decrement_sold(_rev["listing_slug"])
+                trace("listing_slot_released", slug=_rev["listing_slug"],
+                      sold=(_dec or {}).get("sold"), request_id=request_id)
+            except Exception:
+                pass
         # Reverse the creator's 18% royalty ONLY on a definitive refund — NOT on
         # dispute.created / early_fraud_warning (those aren't final; a won dispute would leave
         # us having wrongly clawed back a legit creator). Fail-safe: reverse_royalty logs a
@@ -1991,8 +2006,36 @@ def _increment_sold(slug: str):
     s = _find_submission(slug)
     if not s or s.get("quantity") is None:
         return None
+    # Re-fetch the AUTHORITATIVE sold count from R2 before incrementing. SUBMISSIONS is a
+    # boot-time snapshot that never re-syncs, so incrementing it blind would write
+    # (stale + 1) and silently clobber sales counted since boot / by another instance —
+    # a cap bypass. Re-seed from R2 first → a converging read-then-write (self-healing).
+    fresh = state_store.get_text(f"sub/{slug}.json")
+    if fresh:
+        try:
+            s["sold"] = int((json.loads(fresh) or {}).get("sold") or 0)
+        except Exception:
+            pass
     s["sold"] = int(s.get("sold") or 0) + 1
     _persist_sub(s)   # save only this listing's record (no whole-blob clobber)
+    return _scarcity_fields(s)
+
+
+def _decrement_sold(slug: str):
+    """Release one unit back to a limited listing's cap (a refunded/disputed sale) so it can
+    resell. Re-fetches fresh from R2 first (same converging pattern as _increment_sold) and
+    floors at 0. No-op for unknown/unlimited listings."""
+    s = _find_submission(slug)
+    if not s or s.get("quantity") is None:
+        return None
+    fresh = state_store.get_text(f"sub/{slug}.json")
+    if fresh:
+        try:
+            s["sold"] = int((json.loads(fresh) or {}).get("sold") or 0)
+        except Exception:
+            pass
+    s["sold"] = max(0, int(s.get("sold") or 0) - 1)
+    _persist_sub(s)
     return _scarcity_fields(s)
 
 

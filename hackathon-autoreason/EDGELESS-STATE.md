@@ -52,3 +52,10 @@
 - **/health state_store_configured** — surfaces silent R2-persistence degradation (live: true).
 - Adversarially reviewed (quality agent: safe-to-deploy), deployed 37b7ee6, checkout verified cs_live_ green.
 - STILL STAGED (David's call): retail-floor-for-baked-designs (GAP-REPORT.md); pre-charge variant requirement; money-path root-cause groups 1/3/5/6 (MONEYPATH-AUDIT.md).
+
+## Retail floor + pre-charge variant — DEPLOYED+VERIFIED 2026-07-03 (David greenlit)
+- **Retail floor for baked designs** — _retail_price_cents_for_slug(slug, kind) falls back to _KIND_PRICE_FLOOR[kind] (authoritative: 0/88 baked designs carry custom price; kind drives fulfillment). Closes the live margin-erosion gap (most of catalog was under-quotable).
+- **tee/hoodie variant cross-check** — _pf_hoodie_variant_ids() (cached, fail-open): a tee-labeled hoodie variant now prices at the $48 hoodie floor, not $34 (they share the Printful path, product=variant not kind). Reviewer-caught bypass, closed.
+- **Pre-charge hoodie-variant reject** — kind=hoodie + no variant → 400 before charge (was charge-then-refuse).
+- Live-probed 5 cases all green. Reviewed 2x (quality agent). Deployed 4c1e58c + limit-fix.
+- REMAINING money-path (in progress, David greenlit): root-cause groups 1(keying)/3(royalty-fulfillment)/5(royalty-skips)/6(concurrency) + IP-gate calibration. Recon done (wdfscis80, 14 findings).

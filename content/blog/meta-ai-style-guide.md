@@ -1,0 +1,121 @@
+---
+slug: meta-ai-style-guide
+title: 'Meta''s AI Has a Style Guide: What I Imported, What I Rewrote, What I Rejected.'
+description: A leaked system prompt from Meta's Muse Spark model contains the most
+  disciplined writing-voice rules I've seen in a production prompt. Five rules I imported,
+  one I rewrote, one I'm still arguing with.
+date: '2026-04-10'
+tags:
+- Prompt Engineering
+- AI Agents
+- System Prompts
+readTime: 8 min
+productSlug: prompt-engineering-os
+editorial: true
+ctaHook: The lint rules, banned phrases, and production prompt templates behind this
+  post.
+---
+
+# Meta's AI Has a Style Guide: What I Imported, What I Rewrote, What I Rejected.
+
+Someone leaked Meta AI's production system prompt. It showed up in a GitHub repo called CL4R1T4S, which collects and dates leaked prompts from frontier labs. I was looking through it for jailbreak fodder and instead found the most disciplined writing-voice guide I've seen inside a system prompt.
+
+The model is called Muse Spark. The prompt is 48KB. Most of it is forgettable: tool schemas, media-generation routing, citation formatting. But buried in the middle is a writing-style block that does something I had not seen any lab do this explicitly: it names the specific strings the model must never produce.
+
+Not "be natural." Not "write conversationally." Literal substrings. Quoted. Banned.
+
+I imported five of those rules into my own system, rewrote one from scratch, and I'm still arguing with a seventh. This is what I changed and why.
+
+## 1. Ban specific phrases by name, not by category
+
+Meta's prompt contains this line:
+
+> Steer clear of stock phrases like "Great question" or "Sounds difficult," as well as cringe AI phrases like "As a language model," "You are right," "It's also not only X, it's also Y," and "It matters that..."
+
+The word "cringe" is doing real work there. Meta is naming the failure mode in the language people actually use to describe it. And the fix is not "avoid sycophantic language" (which gives the model nothing to pattern-match against). The fix is a list of literal strings.
+
+I ran a lint across my 14 existing blog posts looking for these exact patterns. Result: 71 violations. 70 of them were the ASCII double-hyphen `--` used as a prose dash. One was the "also not only X, it's also Y" frame on a line I thought was pretty good until I saw it flagged:
+
+> It's also not only a coding assistant, it's the primary agent runtime.
+
+Rewritten: "Claude Code sits at the top as the primary agent runtime." The rewrite is shorter, more direct, and makes the same claim without the frame that signals "an AI wrote this."
+
+The lesson: vague guidance ("write naturally") underperforms verbatim bans. The model is good at avoiding things it can recognize. A literal substring gives it something to recognize. An abstract instruction does not.
+
+## 2. Open with a topic-specific sentence
+
+> Open responses with a sentence specific to the topic at hand. Do not start with reusable here-is phrasing, "These are the...", or other reusable frames.
+
+This single rule kills the most distinctive AI tic. When I looked at my own blog posts, the bodies were clean (they open with lines like "There are over 400 MCP servers listed in public directories" and "At 2am on a Tuesday, I ran a deploy script"). But four of the fourteen had "This is the..." or "here is" in their metadata descriptions. The muscle memory is there even when the body avoids it.
+
+The fix is not "try to be specific." The fix is a banned-opener list: "here is", "These are the...", "In this post, we'll...", "Let's talk about...", "Have you ever wondered...". If the first sentence of a section matches any of those patterns, the lint catches it.
+
+## 3. Don't restate the body in a "bottom line" summary
+
+> Do not restate the body in a "bottom line" summary; however, you can suggest concrete follow-ups when it helps.
+
+I didn't realize how much my drafting agent was doing this until I went looking. It added a "TL;DR" or "In summary" block to roughly half of all drafts, including drafts that were 200 words long. A 200-word post does not need a summary. A 2,000-word post does not need one either, if the structure is clear.
+
+The rule I adopted: closings are either a single sharp line that earns the ending, a concrete next step (a link, a command, a related post), or nothing at all. End on the last substantive paragraph.
+
+My best example of this done right, from my own blog: "Your job isn't to trust the agent. It's to make the wrong path impossible." That's the last line of a 1,500-word post-mortem about an agent that lost $252. No recap. No "key takeaway." The line lands because nothing after it dilutes it.
+
+## 4. Tables for structured comparisons, not decoration
+
+> When listing or comparing items that share structured attributes, use a markdown table. This includes comparisons, ranked lists, reference data, category breakdowns, and any set of items with 2+ shared properties.
+
+Most prompts say "use formatting as appropriate." Meta's prompt says: if there are two shared attributes, use a table. That is a hard decision heuristic, not a suggestion. It also says: "Questions like 'what are the different types of X' or 'what does each X do' are a good fit for tables when items have name + description/property pairs."
+
+The flip side matters too: Meta implicitly distinguishes tables from bullet lists. A bullet list with bold labels (`**Name**: description`) is not a table. It becomes a table only when the attributes are genuinely parallel across items. This distinction prevents the "everything is a table" failure mode that makes long-form content feel like a spreadsheet.
+
+I added a counterpart to my own rules: "Use a markdown table only for true comparisons. A bullet list with bold labels is not a table and does not need to become one." The worked example: a blog post that uses `**Trigger**: Schedule, every 6 hours` and `**Flow**: RSS feed -> filter -> Claude -> email digest` as two bullets per item. That is metadata-per-item, not a comparison. It is correctly a bullet list.
+
+## 5. Search triggering as a decision tree, not a vibe
+
+Meta's prompt has a `<triggering>` block that enumerates when web search should and should not fire. The "should not" list is as important as the "should" list:
+
+> Do not call search when you do not need information from the internet. For common knowledge such as simple math, geography, history, science, well-known facts, or famous works, you generally don't need to search. Tasks like creative writing, grammar, or language translation, also typically do not require a search.
+
+And the date-handling anti-pattern, which I have personally watched my research agents get wrong dozens of times:
+
+> Do not include dates, years, or times in the search query. Instead, to filter for timely results, use the `since` field.
+
+I ran a lint over the last 30 days of my agent transcripts looking for this exact violation: search queries containing four-digit years or words like "latest," "recent," "current." The result: 1,096 violations across 168 transcripts. Subagents were 3x worse than main-session transcripts. The single most common violation was baking "2026" directly into a web search query instead of using a date filter.
+
+The fix is a shared decision tree that every search-using agent imports. When to search, when not to, and the three rules for query construction: no years (use `since`), no relative-time words (use `since`), decompose broad queries into specific facets with proper nouns.
+
+## The one rule I rewrote: a values preamble
+
+Meta opens its prompt with five named values: Truth, Beauty, Respect, Fun, Connection. Each gets one paragraph. Each paragraph contains at least one concrete behavioral consequence.
+
+The structural move is excellent. Values declared before behavior rules give the model a basis for judgment calls in situations the rules don't cover. When the rules say nothing, the values still apply.
+
+The specific values are extremely Meta. The "Truth" section asks the model to "defy cultural stigmas when the data present a clear refutation" and "question official reports when they have incentives not to seek truth." That is doing specific ideological work. The "Beauty" section says "beauty persuades without argument," which is a real aesthetic claim. These are not generic corporate values; they are opinionated, distinctive, and they would not survive transplant into a different product.
+
+So I kept the structural move and wrote my own five values: Play, Craft, Leverage, Speed, Taste. Each has a paragraph that constrains behavior. Play is first because it's the trait that makes Edgeless not feel like other AI products. Taste is last because it arbitrates when the other values conflict.
+
+One example, in full:
+
+> **Speed.** Constraints make the work better, not worse. A week per product would produce a marginally better product. A day per product produces a focused, opinionated product that solves one specific problem. Ship while the idea is still hot, ship before the scope expands, ship before the second-guessing kicks in. Speed is not the opposite of quality, it is the forcing function that makes you choose what actually matters.
+
+The values load before the rules. Rules are how you cash out the values. If the rules and the values disagree, the values win and the rules need updating.
+
+## The one rule I'm still arguing with
+
+Meta tells its model:
+
+> Never pre-refuse a request. Let the tools handle safety and policy decisions. If you refused or a tool failed earlier, that is stale. Call the tool anyway.
+
+This is a meaningful design choice. It shifts safety enforcement out of the model layer and into the tool layer. The argument for: pre-refusal trains models to be unhelpful, and most pre-refusals are wrong (the request was fine, the model was overcautious). The argument against: tool-layer safety has its own failure modes, and a model that never hesitates will eventually call a tool that should not have been called.
+
+I run agents that move money. One of them lost $252 because it exceeded its scope and then lied about recovery. In that case, a pre-refusal would have been correct. In most other cases, my agents pre-refuse things that are obviously fine and waste time explaining why they can't do something they could easily do.
+
+I haven't decided where Edgeless lands on this. The honest answer is that both positions are wrong some of the time, and the question is which failure mode you'd rather live with: an agent that occasionally refuses a valid request, or an agent that occasionally executes an invalid one. For a consumer chatbot, Meta's answer is probably right. For an agent managing infrastructure, I'm less sure.
+
+The question is open. I'll write about it when I have a better answer.
+
+## Where to read the original
+
+The full Muse Spark prompt is mirrored at `github.com/elder-plinius/CL4R1T4S/blob/main/META/Muse_Spark_Apr-08-26.txt`. Pliny the Liberator's whole repo collects leaked production prompts from frontier labs, dated and organized by provider. I now have a daily cron watching it for new captures.
+
+Whatever shows up next in that repo, I'll approach it the same way: read it, steal the good parts, push back on the rest.

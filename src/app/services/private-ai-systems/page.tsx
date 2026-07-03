@@ -201,7 +201,7 @@ export default function PrivateAiSystemsPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-8 rounded-lg border p-4" style={{ borderColor: "rgba(129,140,248,0.24)", background: "rgba(129,140,248,0.07)" }}>
+              <div className="mt-8 rounded-lg border p-4" style={{ borderColor: "rgba(198, 242, 78,0.24)", background: "rgba(198, 242, 78,0.07)" }}>
                 <p className="font-mono text-[11px] uppercase tracking-[0.14em]" style={{ color: "var(--accent)" }}>
                   Typical AI usage
                 </p>

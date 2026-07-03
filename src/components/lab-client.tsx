@@ -16,7 +16,7 @@ export function LabHeader() {
       <div
         className="inline-flex items-center gap-2.5 mb-6 px-3 py-1.5 rounded-full border"
         style={{
-          borderColor: "rgba(129, 140, 248, 0.25)",
+          borderColor: "rgba(198, 242, 78, 0.25)",
           background: "var(--accent-muted)",
           animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both",
         }}

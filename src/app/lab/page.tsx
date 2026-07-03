@@ -55,7 +55,7 @@ export default function LabPage() {
                 className="absolute inset-x-0 bottom-0 h-24 opacity-70"
                 style={{
                   background:
-                    "repeating-linear-gradient(0deg, rgba(129,140,248,0.12) 0 1px, transparent 1px 8px), radial-gradient(circle at 20% 40%, rgba(129,140,248,0.45), transparent 26%), radial-gradient(circle at 74% 55%, rgba(52,211,153,0.32), transparent 24%)",
+                    "repeating-linear-gradient(0deg, rgba(198, 242, 78,0.12) 0 1px, transparent 1px 8px), radial-gradient(circle at 20% 40%, rgba(198, 242, 78,0.45), transparent 26%), radial-gradient(circle at 74% 55%, rgba(52,211,153,0.32), transparent 24%)",
                 }}
               />
               <div>

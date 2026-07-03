@@ -282,7 +282,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                       style={{
                         background: "var(--accent-muted)",
                         color: "var(--accent)",
-                        border: "1px solid rgba(129,140,248,0.2)",
+                        border: "1px solid rgba(198, 242, 78,0.2)",
                       }}
                     >
                       Try it live <ArrowUpRight size={14} />

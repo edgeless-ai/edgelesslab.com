@@ -46,7 +46,7 @@ const RARITY_COLORS: Record<string, string> = {
 const RARITY_GLOW: Record<string, string> = {
   common: "none",
   uncommon: "0 0 20px rgba(34,197,94,0.15)",
-  rare: "0 0 30px rgba(129,140,248,0.2)",
+  rare: "0 0 30px rgba(198, 242, 78,0.2)",
   mythic: "0 0 40px rgba(245,158,11,0.3), 0 0 80px rgba(245,158,11,0.1)",
 };
 
@@ -285,7 +285,7 @@ export function GenerativeAscii() {
           borderColor: piece.rarity === "mythic"
             ? "rgba(245,158,11,0.4)"
             : piece.rarity === "rare"
-            ? "rgba(129,140,248,0.3)"
+            ? "rgba(198, 242, 78,0.3)"
             : "var(--border-subtle)",
           boxShadow: rarityGlow,
           transition: "box-shadow 0.5s ease, border-color 0.5s ease",
@@ -397,7 +397,7 @@ export function GenerativeAscii() {
             style={{
               background: "var(--accent-muted)",
               color: "var(--accent)",
-              border: "1px solid rgba(129,140,248,0.2)",
+              border: "1px solid rgba(198, 242, 78,0.2)",
             }}
           >
             New pull

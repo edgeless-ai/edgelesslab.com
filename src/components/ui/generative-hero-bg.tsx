@@ -317,13 +317,14 @@ export function GenerativeHeroBackground() {
         }
       }
 
-      if (!prefersReduced) animRef.current = requestAnimationFrame(draw);
+      // Reduced-motion: draw runs exactly once (below) and never re-schedules → a static frame.
+      if (!prefersReducedMotion) animRef.current = requestAnimationFrame(draw);
     };
 
-    // Honor reduced-motion: render a single settled frame (no perpetual rAF loop) for
-    // vestibular-sensitive users — and it also drops this canvas out of the TBT budget.
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) {
+    // Honor reduced-motion: pre-run the sim to a settled structure, then let draw() paint a
+    // single static frame with NO perpetual rAF loop — correct for vestibular-sensitive users
+    // (uses the prefersReducedMotion flag declared above), and keeps this canvas out of TBT.
+    if (prefersReducedMotion) {
       const st = stateRef.current;
       if (st) for (let i = 0; i < 260; i++) { st.time += 16; for (const p of st.particles) stepParticle(p, st, cssW, cssH); }
     }

@@ -32,6 +32,7 @@ html[data-theme="light"] {
   /* Readable text color to use ON an accent-colored background (lime is bright, so
      dark text — the on-brand "lime pill, black label" look). */
   --accent-contrast: #0A140A;
+  --accent-ghost: rgba(198, 242, 78, 0.08);
 
   --green: #34D399;
   --green-muted: rgba(52, 211, 153, 0.12);
@@ -73,6 +74,7 @@ html[data-theme="light"] {
   --accent-hover: #3F6212;
   --accent-muted: rgba(77, 124, 15, 0.10);
   --accent-contrast: #FAFFF2;
+  --accent-ghost: rgba(77, 124, 15, 0.08);
 
   --green: #10B981;
   --green-muted: rgba(16, 185, 129, 0.10);
@@ -142,12 +144,12 @@ h1, h2, h3 {
 
 /* Gradient mesh for hero */
 .hero-gradient {
-  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(129, 140, 248, 0.15), transparent),
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(198, 242, 78, 0.15), transparent),
               radial-gradient(ellipse 60% 40% at 80% 50%, rgba(52, 211, 153, 0.08), transparent);
 }
 
 [data-theme="light"] .hero-gradient {
-  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(129, 140, 248, 0.12), transparent),
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(198, 242, 78, 0.12), transparent),
               radial-gradient(ellipse 60% 40% at 80% 50%, rgba(52, 211, 153, 0.06), transparent);
 }
 
@@ -357,13 +359,13 @@ h1, h2, h3 {
 
 .blog-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), rgba(129, 140, 248, 0.5));
+  background: linear-gradient(90deg, var(--accent), rgba(198, 242, 78, 0.5));
   border-radius: 4px;
   transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 [data-theme="light"] .blog-bar-fill {
-  background: linear-gradient(90deg, var(--accent), rgba(99, 102, 241, 0.5));
+  background: linear-gradient(90deg, var(--accent), rgba(77, 124, 15, 0.5));
 }
 
 .blog-bar-value {

@@ -60,9 +60,9 @@ export function PreTextOrbs({
     const h = containerSize.height || 300;
 
     const colors = [
-      "rgba(129,140,248,0.12)", // accent
+      "rgba(198, 242, 78,0.12)", // accent
       "rgba(34,197,94,0.10)",   // green
-      "rgba(129,140,248,0.08)", // lighter accent
+      "rgba(198, 242, 78,0.08)", // lighter accent
     ];
 
     orbsRef.current = Array.from({ length: orbCount }, (_, i) => ({

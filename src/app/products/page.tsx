@@ -41,7 +41,7 @@ export default function ProductsPage() {
           <div
             className="inline-flex items-center gap-2.5 mb-6 px-3 py-1.5 rounded-full border"
             style={{
-              borderColor: "rgba(129, 140, 248, 0.25)",
+              borderColor: "rgba(198, 242, 78, 0.25)",
               background: "var(--accent-muted)",
             }}
           >

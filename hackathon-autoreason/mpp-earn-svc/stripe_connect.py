@@ -178,3 +178,59 @@ def pay_royalty(*, charge_id: str, sale_amount_cents: int, creator: str,
     except stripe.error.StripeError as e:
         return {"ok": False, "reason": "connect_not_enabled" if _is_connect_error(e) else str(e)[:160],
                 "amount_cents": royalty_cents, "creator": creator}
+
+
+def reverse_royalty(charge_id: str, reason: str) -> dict:
+    """Reverse a creator royalty Transfer when its sale is REFUNDED — so the platform doesn't
+    eat 100% of a reversed sale while the creator keeps the 18%.
+
+    Idempotent (a durable royalty_reversed/{charge_id} marker). Fail-safe: if the creator has
+    already withdrawn the funds, the connected account may lack the balance and Stripe rejects
+    the reversal — we then persist a royalty_reversal_PENDING marker for manual reconciliation
+    (clawback policy is a business decision) and return pending=True rather than crash. No
+    royalty_paid marker / no transfer_id → nothing was ever paid → no-op. Never raises."""
+    charge_id = (charge_id or "").strip()
+    if not charge_id:
+        return {"reversed": False, "reason": "no_charge_id"}
+    try:
+        import json as _json, state_store as _ss
+        if _ss.get_text(f"royalty_reversed/{charge_id}.json"):
+            return {"reversed": True, "already": True, "charge_id": charge_id}
+        paid = _ss.get_text(f"royalty_paid/{charge_id}.json")
+        if not paid:
+            return {"reversed": False, "reason": "no_royalty_paid", "charge_id": charge_id}
+        p = _json.loads(paid)
+        tid = p.get("transfer_id")
+        if not tid:
+            return {"reversed": False, "reason": "no_transfer_id", "charge_id": charge_id}
+    except Exception as e:
+        return {"reversed": False, "reason": f"marker_read_error:{str(e)[:80]}"}
+    try:
+        rev = stripe.Transfer.create_reversal(
+            tid, metadata={"kind": "royalty_reversal", "charge_id": charge_id, "reason": reason},
+            idempotency_key=f"royalty_reversal_{charge_id}")
+        try:
+            _ss.put_record("royalty_reversed", charge_id,
+                           {"reversal_id": rev.id, "transfer_id": tid,
+                            "amount_cents": p.get("amount_cents"), "creator": p.get("creator"),
+                            "reason": reason})
+        except Exception:
+            pass
+        return {"reversed": True, "reversal_id": rev.id, "transfer_id": tid, "charge_id": charge_id}
+    except stripe.error.IdempotencyError:
+        # Concurrent retry with the same idempotency_key → the OTHER in-flight call already did
+        # (or is doing) the reversal. Money-safe: never a second reversal. Report already-done,
+        # not a false "pending".
+        return {"reversed": True, "already": True, "charge_id": charge_id, "reason": "idempotent_replay"}
+    except stripe.error.StripeError as e:
+        # Most common: creator already withdrew → connected account has insufficient balance.
+        # Log a PENDING marker for manual reconciliation (clawback = David's policy call);
+        # never crash the refund webhook.
+        try:
+            _ss.put_record("royalty_reversal_pending", charge_id,
+                           {"transfer_id": tid, "amount_cents": p.get("amount_cents"),
+                            "creator": p.get("creator"), "reason": reason, "error": str(e)[:160]})
+        except Exception:
+            pass
+        return {"reversed": False, "reason": "reversal_failed", "error": str(e)[:160],
+                "charge_id": charge_id, "pending": True}

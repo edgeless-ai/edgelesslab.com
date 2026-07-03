@@ -470,7 +470,39 @@ async def stripe_webhook(request: Request):
             _rev = {"revoked": False, "error": str(_e)[:160]}
         trace("oxygen_revoked", charge=_charge_id, event_type=evt_type,
               revoked=_rev.get("revoked"), found=_rev.get("found"), request_id=request_id)
-        return JSONResponse({"received": True, "event_type": evt_type, "oxygen": _rev})
+        # Reverse the creator's 18% royalty ONLY on a definitive refund — NOT on
+        # dispute.created / early_fraud_warning (those aren't final; a won dispute would leave
+        # us having wrongly clawed back a legit creator). Fail-safe: reverse_royalty logs a
+        # pending marker (no crash) if the creator already withdrew.
+        _roy_rev = None
+        if evt_type == "charge.refunded":
+            # Only auto-reverse the FULL royalty on a FULL refund. charge.refunded also fires on
+            # PARTIAL refunds, where clawing back 100% of the creator's royalty over a small
+            # refund is unfair — prorated/threshold clawback is a business-policy decision, so a
+            # partial refund is deferred to a pending marker for manual reconciliation (David's
+            # call), never an implicit full clawback.
+            _amt = int(_obj.get("amount") or 0)
+            _refunded = int(_obj.get("amount_refunded") or 0)
+            _fully_refunded = bool(_obj.get("refunded")) or (_amt > 0 and _refunded >= _amt)
+            if _fully_refunded:
+                try:
+                    import stripe_connect as _sc
+                    _roy_rev = _sc.reverse_royalty(str(_charge_id or ""), evt_type)
+                except Exception as _e:
+                    _roy_rev = {"reversed": False, "error": str(_e)[:160]}
+            else:
+                try:
+                    state_store.put_record("royalty_partial_refund_pending", str(_charge_id or ""),
+                        {"charge_id": str(_charge_id or ""), "amount": _amt, "amount_refunded": _refunded,
+                         "note": "partial refund — royalty clawback policy TBD (David)"})
+                except Exception:
+                    pass
+                _roy_rev = {"reversed": False, "reason": "partial_refund_deferred", "pending": True}
+            trace("royalty_reversal", charge=_charge_id, reversed=(_roy_rev or {}).get("reversed"),
+                  pending=(_roy_rev or {}).get("pending"), reason=(_roy_rev or {}).get("reason"),
+                  request_id=request_id)
+        return JSONResponse({"received": True, "event_type": evt_type,
+                             "oxygen": _rev, "royalty_reversal": _roy_rev})
 
     # Human Stripe Checkout completed → fulfill via the SAME path as agent /pay.
     if evt_type == "checkout.session.completed":
@@ -516,7 +548,7 @@ async def stripe_webhook(request: Request):
         # for TRANSIENT failures return non-2xx so Stripe re-delivers (fulfillment is idempotent).
         _ff = out.get("fulfillment")
         _FULFILL_OK = {"confirmed", "printify_order", "printify_order_exists", "draft_exists", "printify_simulated_test"}
-        fulfill_failed = live_paid and (_ff not in _FULFILL_OK or (_ff == "draft_created" and not out.get("confirmed")))
+        fulfill_failed = live_paid and (_ff not in _FULFILL_OK or (_ff in ("draft_created", "draft_exists") and not out.get("confirmed")))
         retryable = _ff in ("error", "exception") or (_ff == "draft_created" and not out.get("confirmed"))
         if fulfill_failed:
             try:
@@ -1002,6 +1034,18 @@ async def _fulfill_and_royalty(*, intent_id, charge_id, body, amount_cents, resp
             oxygen.bind_creator_payer(creator, payer or {}, oxygen.BIND_DECLARED_SELF)
         except Exception:
             pass
+    elif creator and confirm and resp.get("fulfillment") not in ("confirmed", "printify_order", "printify_order_exists"):
+        # Gate royalty on CONFIRMED fulfillment — never pay an 18% royalty for a live sale whose
+        # POD order failed / didn't confirm to production (else the creator is paid for a product
+        # that never ships and the platform eats both the refund AND the royalty). Fails toward
+        # NOT paying; the owed royalty still accrues pending + is logged for reconciliation. The
+        # test/agent path (confirm=False) has no production confirm to check, so it keeps the
+        # existing behavior via the next branch.
+        _ff = resp.get("fulfillment")
+        resp["royalty"] = {"ok": False, "reason": "fulfillment_not_confirmed",
+                           "fulfillment": _ff, "creator": creator}
+        _log_royalty_pending(intent_id, creator, amount_cents, f"fulfillment_not_confirmed:{_ff}")
+        trace("royalty_deferred_fulfillment", creator=creator, fulfillment=_ff)
     elif creator:
         # Margin guard: cap the royalty at this sale's REALIZED margin (net after the Stripe
         # fee − real POD cost to the ACTUAL shipping address, not the floor's domestic proxy).

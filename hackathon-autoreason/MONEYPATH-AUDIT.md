@@ -141,3 +141,29 @@ David greenlit "the most durable money-path bug fixes." Done, live, and verified
 **state_store.py:108** · errors-races-state  
 *Failure:* append_line(name, line) does get_text(name) → concat → put_text(name, body) on the whole object. Two concurrent writers (or old+new instance during redeploy) both read the same existing payments.jsonl body, each append their own line, and the second put_text overwrites the first → one payment record is lost. payments.jsonl is written on every verified /inference payment (main.py:355) and read by /balance for local accounting (main.py:2950). Lost lines mean the platform's local revenue/accounting count silently undercounts real payments — a reconciliation gap rather than a mischarge, but it cor  
 *Fix:* Write payments as per-record objects (state_store.put_record('payments', <pi>, {...})) like royalty/oxygen already do, so concurrent writers touch distinct keys; aggregate by listing the prefix in /balance. Avoid whole-blob append for any money-relevant ledger.
+
+---
+## ✅ MONEY-PATH PASS COMPLETE — 2026-07-03 (David greenlit; every change adversarially reviewed + live-verified)
+All root-cause groups fixed + deployed, checkout green throughout. Reviews caught (and I fixed) real issues before they shipped — most notably an 18% royalty LEAK in a first-draft finding-10 fix, and a dispute-non-finality cap oversell.
+
+**Deployed + verified (8 batches):**
+1. Durable royalty double-pay guard (R2 marker beyond Stripe's 24h key)
+2. Fulfillment kind-guard (no hoodie-ships-tee → safety net)
+3. /health state_store_configured signal
+4. Retail floor for baked designs (kind-authoritative) + tee/hoodie variant cross-check + pre-charge hoodie-variant reject — 5 live probes green
+5. Group-1 keying: pi-stable oxygen key + resilient revoke (no double sold-count / un-revocable oxygen on webhook retry)
+6. Group-3: royalty gated on confirmed fulfillment; reverse royalty on FULL refund (partial→pending marker); draft_exists alert
+7. Group-5: stripe.max_network_retries=2 + idempotency keys on Session/PaymentIntent/Account create
+8. Group-6: sold-count re-fetch (cap-bypass fix) + release cap slot on refund-only; IP-gate calibration (majority + keyword backstop, Eevee hole stays closed)
+
+**STAGED for David (not auto-fixed — need your call or lower priority):**
+- **Proper finding-10** — fingerprint-authoritative `is_arms_length` (reorder so a proven-arms-length fingerprint overrides a spoofed declared buyer==creator; closes the griefing-veto WITHOUT the royalty leak the naive fix caused)
+- **Partial-refund royalty policy** — prorate / threshold / full-clawback (partial refunds parked in `royalty_partial_refund_pending`)
+- **Finding 11** — promo.py per-record cap state (low exposure, single-instance safe; bigger refactor)
+- **revoke concurrent-race CAS** — R2 conditional write on the status transition (bounded one-unit race)
+- **RESEND_API_KEY** — set on Render so fulfillment-failed alerts actually send
+- **DATA_DIR** — Render persistent disk (infra/cost decision)
+- **reverse_royalty fallback** — Stripe Transfer.list(source_transaction) if the royalty_paid marker write ever failed
+- **AccountLink idempotency** — cosmetic
+
+**Next step (yours):** the controlled first-sale go-live (DEPLOY.md) — one real purchase, watch the full loop fire live.

@@ -59,3 +59,8 @@
 - **Pre-charge hoodie-variant reject** — kind=hoodie + no variant → 400 before charge (was charge-then-refuse).
 - Live-probed 5 cases all green. Reviewed 2x (quality agent). Deployed 4c1e58c + limit-fix.
 - REMAINING money-path (in progress, David greenlit): root-cause groups 1(keying)/3(royalty-fulfillment)/5(royalty-skips)/6(concurrency) + IP-gate calibration. Recon done (wdfscis80, 14 findings).
+
+## MONEY-PATH HARDENING PASS — COMPLETE 2026-07-03 (David greenlit; all adversarially reviewed + live-verified)
+8 batches deployed, checkout green throughout. All 4 root-cause groups (keying / royalty↔fulfillment / royalty-skips / concurrency) + IP-gate calibration DONE. Reviews caught real issues pre-ship: an 18% royalty LEAK in a naive finding-10 fix (reverted), a dispute-non-finality cap oversell (fixed to refund-only), a Printful limit=250 that silently disabled the tee/hoodie classifier (reverted). Full detail + staged list in MONEYPATH-AUDIT.md.
+STAGED for David: proper finding-10 (fingerprint-authoritative is_arms_length), partial-refund royalty policy, finding-11 promo per-record, revoke concurrent-race CAS, RESEND env, DATA_DIR disk, reverse_royalty fallback, AccountLink idempotency.
+NEXT (David): controlled first-sale go-live (DEPLOY.md) → then launch → economy surfaces switch on with real oxygen.

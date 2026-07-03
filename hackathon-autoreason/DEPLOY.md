@@ -34,7 +34,7 @@ Render builds the Docker image itself; you don't need local Docker.
    - `PRINTFUL_API_KEY`, `PRINTFUL_STORE_ID`
    - `PRINTIFY_API_KEY`
    - `NVIDIA_NIM_API_KEY` (the `nvapi-…` key)
-   - `CLOUDFLARE_API_TOKEN` (R2 art hosting)
+   - `CLOUDFLARE_API_TOKEN` (R2 art hosting **+ state persistence** — oxygen / royalty-paid markers / payments / promo caps / submissions all live in R2 via state_store; without it every money-critical record silently degrades to ephemeral container disk. Do NOT scope this down to art-only. Verify live via `/health → state_store_configured: true`.)
    - `WEBHOOK_SECRET` = any random string (extra guard)
 5. Deploy. Note the service URL, e.g. `https://edgeless-earn.onrender.com`.
 6. Smoke test: `curl https://<your-backend>/health` → `{"status":"ok","stripe_mode":"live", …}`.

@@ -104,11 +104,97 @@ class TestScenarioMatrix:
         assert r["derived"]["equity_pct"] is None
 
 
+class TestUnknownBalance:
+    """H3 regressions (adversarial review 2026-07-04): a MISSING loan balance
+    is UNKNOWN, not zero debt. The picker used to derive balance=0 whenever
+    the caller omitted it, mint equity_pct=1.0 (overriding the caller's
+    stated 10%), and recommend seller finance with the reason 'Free and
+    clear: ... no underlying lien' on a property the caller said is 90%
+    levered."""
+
+    REVIEW_REPRO = {"value": 400_000, "equity_pct": 0.10,
+                    "signals": ["probate", "arrears"]}
+
+    def test_unknown_balance_is_not_free_and_clear(self):
+        r = sp.pick(self.REVIEW_REPRO)
+        d = r["derived"]
+        assert d["balance_known"] is False
+        assert d["equity_pct"] == 0.10          # caller's number is authoritative
+        sf = entry(r, "seller_finance")
+        assert not any(hit["rule"] == "F2" for hit in sf["reasons"])
+        assert not sf["applicable"]             # F-DQ1: stated equity < 30%
+        assert r["recommendation"] != "seller_finance"
+        # sub-to must not be DQ'd for "No existing debt" either — unknown != 0
+        s = entry(r, "subto")
+        assert not any(dq["rule"] == "S-DQ1" for dq in s["disqualifiers"])
+
+    def test_caller_equity_authoritative_when_balance_missing(self):
+        """value present + balance missing is exactly the case where value
+        and balance CAN'T derive equity — the stated fraction wins."""
+        d = sp.derive_facts({"value": 500_000, "equity_pct": 0.40})
+        assert d["balance_known"] is False
+        assert d["equity_pct"] == 0.40
+        # but a KNOWN balance still derives (more accurate than a stated pct)
+        d2 = sp.derive_facts({"value": 500_000, "loan_balance": 250_000,
+                              "equity_pct": 0.40})
+        assert d2["balance_known"] is True
+        assert d2["equity_pct"] == 0.50
+
+    def test_free_and_clear_requires_affirmative_knowledge(self):
+        # explicit zero balance -> free and clear (F2 fires)
+        explicit = sp.pick({"value": 400_000, "loan_balance": 0,
+                            "condition": 4, "signals": ["tired_landlord"]})
+        assert explicit["derived"]["balance_known"] is True
+        assert any(hit["rule"] == "F2"
+                   for hit in entry(explicit, "seller_finance")["reasons"])
+        # the free_and_clear fact is equivalent to an explicit 0
+        fact = sp.pick({"value": 400_000, "free_and_clear": True,
+                        "condition": 4, "signals": ["tired_landlord"]})
+        assert fact["derived"]["balance_known"] is True
+        assert fact["derived"]["loan_balance"] == 0.0
+        assert fact["recommendation"] == explicit["recommendation"] == "seller_finance"
+
+
 class TestNormalization:
     def test_rate_percent_and_decimal_equivalent(self):
         a = sp.derive_facts({"loan_rate": 3.25})
         b = sp.derive_facts({"loan_rate": 0.0325})
         assert a["loan_rate"] == b["loan_rate"] == 3.25
+
+    def test_rate_convention_shared_with_calculators(self):
+        """M5 regression (adversarial review 2026-07-04): the picker read
+        loan_rate=1.0 as 1%/yr while subto read the same field as 100%/yr
+        (wrap P&I $24k/mo on a $290k note). One shared convention now lives
+        in finance.normalize_rate: >= 0.25 is percent form, < 0.25 decimal."""
+        from underwriting import assumption, finance, subto
+
+        # picker and both calculators agree at the old 1.0 boundary
+        assert sp.derive_facts({"loan_rate": 1.0})["loan_rate"] == 1.0   # 1%/yr
+        assert subto._norm_rate(1.0) == 0.01
+        assert assumption._norm_rate(1.0) == 0.01
+        # 0.9 is a teaser/ARM floor (0.9%/yr), not a 90% note
+        assert subto._norm_rate(0.9) == finance.normalize_rate(0.9)
+        assert abs(subto._norm_rate(0.9) - 0.009) < 1e-12
+        assert sp.derive_facts({"loan_rate": 0.9})["loan_rate"] == 0.9
+        # boundary semantics: 0.25 is percent form, just below is decimal
+        assert finance.normalize_rate(0.25) == 0.0025
+        assert finance.normalize_rate(0.2499) == 0.2499
+        # unambiguous forms unchanged
+        assert finance.normalize_rate(2.75) == 0.0275
+        assert finance.normalize_rate(0.0275) == 0.0275
+        assert finance.normalize_rate(8.5) == 0.085
+        assert finance.normalize_rate(None) is None
+        assert finance.normalize_rate(0) == 0.0
+        assert finance.normalize_rate(float("nan")) is None
+
+    def test_wrap_exit_sane_at_rate_one(self):
+        """The concrete M5 blowup: wrap_rate=1.0 produced a $24,166/mo wrap
+        P&I (100%/yr). It now reads as 1%/yr."""
+        from underwriting import subto
+
+        wrap = subto.wrap_exit({"wrap_price": 310_000, "wrap_down": 20_000,
+                                "wrap_rate": 1.0, "piti": 1_500}, 10_000)
+        assert wrap["wrap_p_and_i"] < 1_500  # ~$933/mo at 1% — not $24k
 
     def test_condition_words(self):
         assert sp.derive_facts({"condition": "teardown"})["condition"] == 1

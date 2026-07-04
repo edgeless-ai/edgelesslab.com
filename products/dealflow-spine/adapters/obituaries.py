@@ -118,14 +118,17 @@ def _to_signal(item: dict, metro: str) -> dict:
 
 
 def fetch(metro: str = "klamath_falls", limit: int = 25,
-          offline: bool = False) -> list[dict]:
+          offline: bool | None = None) -> list[dict]:
     """Fetch obituary signals from a metro newspaper RSS feed.
 
     Args:
         metro: key into METROS registry.
         limit: max feed items requested.
-        offline: skip the network and use the bundled fixture.
+        offline: skip the network and use the bundled fixture. Default None
+            = offline unless the run is live (`cli.py run --live` /
+            DEALFLOW_LIVE=1).
     """
+    offline = _common.resolve_offline(offline)
     if metro not in METROS:
         raise ValueError(f"unknown metro: {metro!r} ({sorted(METROS)})")
     items: list[dict] = []

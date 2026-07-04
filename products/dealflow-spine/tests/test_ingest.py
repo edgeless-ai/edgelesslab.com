@@ -154,6 +154,76 @@ def test_missing_source_stamped_from_module(tmp_path):
     assert sig.dedupe_key == "canonical_name:x1"
 
 
+# --- regressions from the 2026-07-04 adversarial review ----------------------
+
+def test_poisoned_evidence_does_not_kill_run(tmp_path):
+    """H1: a signal whose evidence has non-string-able dict KEYS (tuple) or
+    NaN floats used to raise out of json.dumps and abort the whole run —
+    adapters later in the loop never ran. Now: defensively serialized, every
+    adapter runs, and every ledger row is strict RFC-8259 JSON."""
+    adapters = tmp_path / "adapters"
+    adapters.mkdir()
+
+    def mk(name, extra=""):
+        (adapters / name).write_text(
+            "def fetch():\n"
+            "    return [{'id': 'x', 'signal_type': 'obituary',\n"
+            "             'observed_at': '2026-07-01T00:00:00+00:00',\n"
+            "             'property': {'address': '1 A St', 'state': 'OR', 'zip': '1'}"
+            f"{extra}}}]\n"
+        )
+
+    mk("good_one.py")
+    mk("poison.py",
+       ", 'evidence': {(1, 2): 'tuple key', b'bytes': 1, 'nan': float('nan'),"
+       " 'inf': float('inf')}")
+    mk("zz_after.py")   # alphabetically after poison — used to never run
+
+    ledger = tmp_path / "signals.jsonl"
+    result = run_ingest(adapters, ledger)
+    assert [a.name for a in result.adapters] == ["good_one", "poison", "zz_after"]
+    assert result.total_written == 3
+    assert result.failed_adapters == []
+
+    def _reject_constant(c):   # NaN/Infinity are NOT valid RFC-8259 JSON
+        raise AssertionError(f"non-standard JSON constant {c!r} in ledger")
+
+    for line in ledger.read_text().strip().splitlines():
+        json.loads(line, parse_constant=_reject_constant)
+    # and the poisoned signal round-trips back out
+    assert len(load_ledger_signals(ledger)) == 3
+
+
+def test_duplicate_ledger_rows_deduped_at_load(tmp_path):
+    """M2: two overlapping ingest processes can both snapshot dedupe keys
+    before either writes, appending the same signal twice. The duplicate row
+    used to HALVE the property's score (component-key collision + same-type
+    dampening). load_ledger_signals now dedupes by (source, id)."""
+    from spine.ingest import append_signal
+    from spine.merge import merge_signals
+    from spine.schema import Signal
+    from spine.scoring import score_record
+    from spine_test_utils import FIXED_NOW
+
+    ledger = tmp_path / "l.jsonl"
+    d = {"id": "obit-1", "source": "obits", "signal_type": "obituary",
+         "observed_at": "2026-07-01T00:00:00+00:00",
+         "property": {"address": "4 Pine St", "state": "OR", "zip": "97601"},
+         "confidence": 1.0}
+    # two processes snapshot the (empty) key set independently
+    ka, kb = existing_dedupe_keys(ledger), existing_dedupe_keys(ledger)
+    assert append_signal(ledger, Signal.from_dict(d), ka)
+    assert append_signal(ledger, Signal.from_dict(d), kb)  # dupe slips in
+    assert len(ledger.read_text().strip().splitlines()) == 2
+
+    sigs = load_ledger_signals(ledger)
+    assert len(sigs) == 1   # deduped on the way out
+    dup_score, _ = score_record(merge_signals(sigs)[0], now=FIXED_NOW)
+    solo_score, _ = score_record(
+        merge_signals([Signal.from_dict(d)])[0], now=FIXED_NOW)
+    assert dup_score == solo_score  # no score halving
+
+
 def test_malformed_ledger_lines_skipped(tmp_path):
     ledger = tmp_path / "signals.jsonl"
     ledger.write_text(

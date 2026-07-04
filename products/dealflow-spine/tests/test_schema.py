@@ -45,6 +45,16 @@ def test_confidence_clamped_and_coerced():
     assert make_signal(confidence="0.75").confidence == 0.75
 
 
+def test_nonfinite_confidence_distrusted_not_maxed():
+    """M3 regression (adversarial review 2026-07-04): NaN slipped through
+    max(0, min(1, x)) as 1.0 — MAXIMUM trust for garbage input. Non-finite
+    confidence is now 0.0 (distrust), not the 0.5 unparseable default."""
+    assert make_signal(confidence=float("nan")).confidence == 0.0
+    assert make_signal(confidence=float("inf")).confidence == 0.0
+    assert make_signal(confidence=float("-inf")).confidence == 0.0
+    assert make_signal(confidence="nan").confidence == 0.0  # float('nan') parses
+
+
 def test_missing_id_generated_deterministically():
     a = make_signal(id=None)
     b = make_signal(id=None)

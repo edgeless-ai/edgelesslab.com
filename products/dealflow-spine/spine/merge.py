@@ -82,21 +82,41 @@ def normalize_apn(apn: str | None) -> str | None:
     return n or None
 
 
-def property_key(prop: PropertyRef) -> str:
+def _norm_county(county) -> str | None:
+    """Uppercase/strip a county name from facts/evidence; None if unknown."""
+    if county is None:
+        return None
+    c = str(county).strip().upper()
+    return c or None
+
+
+def property_key(prop: PropertyRef, county: str | None = None) -> str:
     """Canonical grouping key for a property.
 
-    APN wins when present (county parcel identity beats string address);
-    otherwise state+zip+normalized address.
+    APN wins when present (county parcel identity beats string address) —
+    but APNs are COUNTY-scoped identifiers, so the county is part of the key
+    when known ('apn:FL:LEE:...'): the same digit string legitimately exists
+    in two Florida counties. County comes from facts/evidence (it is not on
+    PropertyRef); with no county the key degrades to the old state-scoped
+    form. Address fallback: state + zip + normalized address, with the CITY
+    standing in when the adapter didn't know the zip ('100 Main St' exists in
+    nearly every municipality — without zip or city it would false-merge
+    across the whole state).
     """
     apn = normalize_apn(prop.apn)
     if apn:
+        c = _norm_county(county)
+        if c:
+            return f"apn:{prop.state.upper()}:{c}:{apn}"
         return f"apn:{prop.state.upper()}:{apn}"
-    return f"addr:{prop.state.upper()}:{prop.zip}:{normalize_address(prop.address)}"
+    return _address_key(prop)
 
 
 def _address_key(prop: PropertyRef) -> str:
-    """Address-only key (ignores APN) — used for the first grouping pass."""
-    return f"addr:{prop.state.upper()}:{prop.zip}:{normalize_address(prop.address)}"
+    """Address-only key (ignores APN) — used for the first grouping pass.
+    Locality anchor is the zip, or the city when zip is missing (M1)."""
+    locality = prop.zip.strip() or prop.city.strip().upper()
+    return f"addr:{prop.state.upper()}:{locality}:{normalize_address(prop.address)}"
 
 
 # ---------------------------------------------------------------------------
@@ -165,15 +185,25 @@ def merge_signals(signals: list[Signal]) -> list[PropertyRecord]:
     for sig in signals:
         groups.setdefault(_address_key(sig.property), []).append(sig)
 
-    # pass 2: bridge groups that share a normalized APN
-    apn_to_keys: dict[str, list[str]] = {}
+    # pass 2: bridge groups that share a normalized APN. APNs are
+    # COUNTY-scoped, so bucket per (state, apn) and partition each bucket by
+    # the county each signal reported (evidence["county"], None = unknown):
+    #   - 0 or 1 distinct KNOWN counties -> unambiguous, union everything
+    #     (unknown-county signals join the known county)
+    #   - 2+ distinct known counties -> the same digit string in different
+    #     counties (H4); union only within each county and leave
+    #     unknown-county groups alone (a false split beats a false merge)
+    apn_buckets: dict[tuple[str, str], dict[str | None, list[str]]] = {}
     for key, sigs in groups.items():
         for sig in sigs:
             apn = normalize_apn(sig.property.apn)
             if apn:
-                bucket = apn_to_keys.setdefault(f"{sig.property.state.upper()}:{apn}", [])
-                if key not in bucket:
-                    bucket.append(key)
+                county = _norm_county(sig.evidence.get("county"))
+                bucket = apn_buckets.setdefault(
+                    (sig.property.state.upper(), apn), {})
+                keys = bucket.setdefault(county, [])
+                if key not in keys:
+                    keys.append(key)
 
     # union groups sharing an APN (small-N union-find via canonical map)
     canon: dict[str, str] = {k: k for k in groups}
@@ -184,10 +214,19 @@ def merge_signals(signals: list[Signal]) -> list[PropertyRecord]:
             k = canon[k]
         return k
 
-    for keys in apn_to_keys.values():
+    def union(keys: list[str]) -> None:
         root = find(keys[0])
         for k in keys[1:]:
             canon[find(k)] = root
+
+    for bucket in apn_buckets.values():
+        known_counties = [c for c in bucket if c is not None]
+        if len(known_counties) <= 1:
+            union([k for keys in bucket.values() for k in keys])
+        else:
+            for county, keys in bucket.items():
+                if county is not None:
+                    union(keys)
 
     merged_groups: dict[str, list[Signal]] = {}
     for key, sigs in groups.items():
@@ -198,13 +237,14 @@ def merge_signals(signals: list[Signal]) -> list[PropertyRecord]:
     for sigs in merged_groups.values():
         sigs_sorted = sorted(sigs, key=lambda s: (s.observed_dt, s.dedupe_key))
         prop = _merge_property(sigs_sorted)
+        facts = _lift_facts(sigs_sorted)
         records.append(
             PropertyRecord(
-                key=property_key(prop),
+                key=property_key(prop, county=facts.get("county")),
                 property=prop,
                 signals=sigs_sorted,
                 owner=_merge_owner(sigs_sorted),
-                facts=_lift_facts(sigs_sorted),
+                facts=facts,
             )
         )
     records.sort(key=lambda r: r.key)

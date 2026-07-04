@@ -28,9 +28,11 @@ def test_pipeline_end_to_end_and_idempotent(tmp_adapters_dir, tmp_path):
     assert result.ingest.total_invalid == 0
     assert result.ingest.failed_adapters == []
 
-    # merge + route: 8 properties with the designed route split
-    assert len(result.candidates) == 8
-    assert result.route_counts == {"hot": 3, "warm": 1, "watch": 3, "discard": 1}
+    # merge + route: 8 properties with the designed route split.
+    # NOTE (adversarial review 2026-07-04, H2): Riverside (other+obituary)
+    # was hot under the old distinct-count rule; the "other" bucket no longer
+    # counts toward the hot stack, so it is now WARM — hot 3->2, warm 1->2.
+    assert result.route_counts == {"hot": 2, "warm": 2, "watch": 3, "discard": 1}
 
     # outputs on disk
     assert paths.ledger.exists()
@@ -38,15 +40,20 @@ def test_pipeline_end_to_end_and_idempotent(tmp_adapters_dir, tmp_path):
     assert result.digest_path.exists()
     assert (paths.data_dir / "digest-latest.md").exists()
 
-    # the hot tier is the stacked, in-the-box tier
+    # the hot tier is the stacked, in-the-box tier — 2+ live CLASSIFIED types
     hot = [c for c in result.candidates if c.route == "hot"]
     for c in hot:
-        assert len(c.distinct_signal_types) >= 2
+        assert len(c.distinct_signal_types - {"other"}) >= 2
+        assert c.distress_score >= 2.0
         assert not [m for m in c.criteria_matches["misses"] if not m.startswith("signals:")]
     hot_addrs = " | ".join(c.property.address.upper() for c in hot)
     assert "12TH TER" in hot_addrs or "TERRACE" in hot_addrs
     assert "PALM AVE" in hot_addrs or "PALM AVENUE" in hot_addrs
-    assert "RIVERSIDE" in hot_addrs
+    # Riverside (other+obituary) demoted to warm by the H2 gate: "other" is
+    # not a classified type, so its stack is 1 — still warm (in box, score>=1)
+    warm_addrs = " | ".join(c.property.address.upper()
+                            for c in result.candidates if c.route == "warm")
+    assert "RIVERSIDE" in warm_addrs
 
     # the Ohio control property discards on geo
     discard = [c for c in result.candidates if c.route == "discard"]

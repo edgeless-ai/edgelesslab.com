@@ -2,10 +2,12 @@
 """
 dealflow-spine CLI.
 
-  python cli.py run      # full pipeline: ingest all adapters -> merge -> score -> route -> digest
-  python cli.py ingest   # ingest only (adapters -> data/signals.jsonl)
-  python cli.py score    # merge + score the ledger, print the ranked table (no writes)
-  python cli.py digest   # re-render the digest from data/candidates.jsonl
+  python cli.py run        # full pipeline: ingest -> merge -> score -> route -> underwrite -> digest
+  python cli.py run --live # same, with network adapters enabled (default is offline/fixtures)
+  python cli.py ingest     # ingest only (adapters -> data/signals.jsonl)
+  python cli.py score      # merge + score the ledger, print the ranked table (no writes)
+  python cli.py underwrite # re-run the strategy picker on data/candidates.jsonl + refresh digest
+  python cli.py digest     # re-render the digest from data/candidates.jsonl
 
 Common flags: --config config/buybox.json --data-dir data --adapters-dir adapters
 """
@@ -13,6 +15,7 @@ Common flags: --config config/buybox.json --data-dir data --adapters-dir adapter
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -23,8 +26,22 @@ from spine.criteria import BuyBox
 from spine.ingest import load_ledger_signals, run_ingest
 from spine.merge import merge_signals
 from spine.pipeline import Paths, run_pipeline
-from spine.route import build_candidates, load_candidates, write_digest
+from spine.route import load_candidates, write_candidates, write_digest
 from spine.scoring import score_record
+from spine.underwrite import top_reason, underwrite_candidates
+
+LIVE_ENV_VAR = "DEALFLOW_LIVE"  # read by adapters/_common.resolve_offline()
+
+
+def _apply_live(args) -> None:
+    """`--live` opts network adapters in for THIS process; the default run
+    stays offline (bundled fixtures). Adapters read the env var via
+    adapters/_common.live_enabled(), keeping the politeness layer
+    (UA, rate-limit, bounded retries) as the only network path."""
+    if getattr(args, "live", False):
+        os.environ[LIVE_ENV_VAR] = "1"
+        print("[live] network adapters ENABLED (polite: shared UA, >=1s "
+              "between requests, bounded retries)", file=sys.stderr)
 
 
 def _paths(args) -> Paths:
@@ -64,6 +81,7 @@ def _print_ingest_summary(result) -> None:
 
 def cmd_run(args) -> int:
     paths = _paths(args)
+    _apply_live(args)
     result = run_pipeline(
         paths=paths,
         buybox=_buybox(args),
@@ -74,6 +92,7 @@ def cmd_run(args) -> int:
     counts = result.route_counts
     print(f"  candidates: {len(result.candidates)}  "
           + "  ".join(f"{k}: {v}" for k, v in sorted(counts.items())))
+    print(f"  underwritten: {result.underwritten} (hot/warm got a strategy verdict)")
     print(f"  candidates -> {result.candidates_path}")
     print(f"  digest     -> {result.digest_path}")
     if result.ingest.failed_adapters:
@@ -84,9 +103,34 @@ def cmd_run(args) -> int:
 
 def cmd_ingest(args) -> int:
     paths = _paths(args)
+    _apply_live(args)
     result = run_ingest(paths.adapters_dir, paths.ledger, only=args.only or None)
     _print_ingest_summary(result)
     return 1 if result.failed_adapters and not result.adapters else 0
+
+
+def cmd_underwrite(args) -> int:
+    paths = _paths(args)
+    candidates = load_candidates(paths.candidates)
+    if not candidates:
+        print(f"no candidates at {paths.candidates} — run `python cli.py run` first")
+        return 1
+    n = underwrite_candidates(candidates)
+    write_candidates(candidates, paths.candidates)
+    buybox = _buybox(args)
+    write_digest(candidates, digest_dir=paths.data_dir, buybox_name=buybox.name)
+    print(f"underwrote {n} hot/warm candidate(s) of {len(candidates)}")
+    for c in candidates:
+        if not c.underwriting:
+            continue
+        p = c.property
+        addr = f"{p.address}, {p.city} {p.state}".strip().strip(",")
+        print(f"  [{c.route:<4}] {addr}")
+        print(f"         -> {c.underwriting['recommendation']}: "
+              f"{top_reason(c.underwriting)}")
+    print(f"  candidates -> {paths.candidates}")
+    print(f"  digest     -> {paths.data_dir / 'digest-latest.md'}")
+    return 0
 
 
 def cmd_score(args) -> int:
@@ -146,11 +190,19 @@ def main(argv: list[str] | None = None) -> int:
 
     p_run = sub.add_parser("run", help="full pipeline on all adapters")
     p_run.add_argument("--only", nargs="*", help="restrict to these adapter module names")
+    p_run.add_argument("--live", action="store_true",
+                       help="enable network adapters (default: offline, bundled fixtures)")
     p_run.set_defaults(func=cmd_run)
 
     p_ing = sub.add_parser("ingest", help="ingest only (adapters -> signals ledger)")
     p_ing.add_argument("--only", nargs="*")
+    p_ing.add_argument("--live", action="store_true",
+                       help="enable network adapters (default: offline, bundled fixtures)")
     p_ing.set_defaults(func=cmd_ingest)
+
+    p_uw = sub.add_parser("underwrite",
+                          help="strategy-pick hot/warm candidates, rewrite snapshot + digest")
+    p_uw.set_defaults(func=cmd_underwrite)
 
     p_score = sub.add_parser("score", help="merge + score the ledger, print ranking")
     p_score.add_argument("--top", type=int, default=25)

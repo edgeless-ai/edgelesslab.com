@@ -89,6 +89,66 @@ def test_candidates_sorted_hot_first_then_score():
     assert [c.route for c in cands] == ["hot", "warm", "discard"]
 
 
+# --- H2 regressions (adversarial review 2026-07-04): hot gate hardening -----
+
+def test_dead_signal_cannot_mint_hot():
+    """A fresh 0.2-confidence obituary + a fully-decayed (score-0) 2.5-year
+    old violation used to route HOT at total score 0.4981. Dead signals
+    don't count toward the hot stack, and the score floor holds."""
+    cands = _candidates([
+        make_signal(id="ob", signal_type="obituary", confidence=0.2,
+                    observed_at="2026-07-03T00:00:00+00:00", evidence=GOOD_FACTS),
+        make_signal(id="cv", signal_type="code_violation", confidence=0.9,
+                    observed_at="2024-01-01T00:00:00+00:00"),  # > max_age_days
+    ])
+    assert cands[0].distress_score < 1.0
+    assert cands[0].route == Route.WATCH.value
+
+
+def test_coerced_other_type_does_not_count_toward_hot():
+    """One source emitting a made-up second signal_type (coerced to 'other')
+    used to fake a 2-type stack and mint HOT. 'other' still SCORES but never
+    counts toward the distinct-types requirement."""
+    cands = _candidates([
+        make_signal(id="a", signal_type="obituary", observed_at=RECENT,
+                    evidence=GOOD_FACTS),
+        make_signal(id="b", signal_type="made_up_label", observed_at=RECENT),
+    ])
+    c = cands[0]
+    assert c.distinct_signal_types == {"obituary", "other"}
+    assert c.route == Route.WARM.value  # in the box, scored — but not hot
+    # the 'other' signal still contributed to the score
+    assert any(k.startswith("signal:other:") and v > 0
+               for k, v in c.score_breakdown.components.items())
+
+
+def test_hot_requires_min_total_score():
+    """Hot needs score >= hot_min_score (default 2.0) on top of the stack
+    requirement. (Under the DEFAULT ScoringConfig the +2.0 stack bonus means
+    any 2-live-type record clears 2.0, so the floor is exercised with a
+    custom scoring config — the gate exists precisely so weakened/custom
+    scoring can't quietly re-open the hot tier to near-zero pairs.)"""
+    from spine.route import RoutingConfig, route_record
+    from spine.scoring import ScoringConfig, score_record
+    from spine_test_utils import FIXED_NOW as NOW
+
+    signals = [
+        make_signal(id="a", signal_type="obituary", confidence=0.2,
+                    observed_at=RECENT, evidence=GOOD_FACTS),
+        make_signal(id="b", signal_type="code_violation", confidence=0.2,
+                    observed_at=RECENT),
+    ]
+    rec = merge_signals(signals)[0]
+    cfg = ScoringConfig.from_dict({"stack_bonus": 0.1})
+    score, breakdown = score_record(rec, cfg, now=NOW)
+    criteria = BOX.evaluate(rec)
+    assert score < 2.0  # two LIVE distinct types, but a near-zero pair
+    assert route_record(rec, criteria, score, breakdown=breakdown) != Route.HOT
+    # lowering the configurable floor re-admits it (both types are live)
+    lax = RoutingConfig.from_dict({"hot_min_score": 0.5})
+    assert route_record(rec, criteria, score, lax, breakdown=breakdown) == Route.HOT
+
+
 def test_recommended_strategy_priority_and_stack_prefix():
     single = merge_signals([make_signal(id="a", signal_type="assumable_loan")])[0]
     assert "assumption" in recommend_strategy(single)

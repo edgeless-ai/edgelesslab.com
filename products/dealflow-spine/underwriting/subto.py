@@ -5,9 +5,11 @@ stays in the seller's name. Entry cost is arrears reinstatement + cash to
 seller + closing costs (no new loan). The economics are the spread between
 the existing PITI and market rent, plus equity captured at entry.
 
-Hard structural risk: virtually every post-1982 mortgage has a due-on-sale
-clause (Garn–St Germain), so the lender MAY call the loan on transfer.
-This module always flags it. R&D / educational-analytical use only — not
+Hard structural risk: virtually all post-1982 conventional loans carry a
+due-on-sale clause, and Garn–St Germain (1982) made those clauses federally
+enforceable (it preempted state limits on enforcement — it did not insert
+clauses into notes), so the lender MAY call the loan on transfer. This
+module always flags it. R&D / educational-analytical use only — not
 financial or legal advice; verify with an attorney.
 """
 
@@ -75,9 +77,10 @@ def analyze(deal: dict) -> dict:
 
 
 def _norm_rate(rate) -> float:
-    """Accept 0.0325 or 3.25 for 3.25%."""
-    r = float(rate or 0)
-    return r / 100.0 if r > 1.0 else r
+    """Accept 0.0325 or 3.25 for 3.25% — finance.normalize_rate is the one
+    shared convention (0.25 boundary; 1.0 means 1%/yr, never 100%/yr)."""
+    r = finance.normalize_rate(rate)
+    return 0.0 if r is None else r
 
 
 # ------------------------------------------------------------- risk --------

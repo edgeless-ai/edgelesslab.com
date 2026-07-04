@@ -89,15 +89,18 @@ def _to_signal(rec: dict) -> dict:
 
 
 def fetch(state: str | None = None, days: int = 120, limit: int = 500,
-          offline: bool = False) -> list[dict]:
+          offline: bool | None = None) -> list[dict]:
     """Fetch recent disaster declarations as county-level signals.
 
     Args:
         state: optional 2-letter state filter (e.g. "OR").
         days: lookback window on declarationDate.
         limit: max records requested from the API.
-        offline: skip the network and use the bundled fixture.
+        offline: skip the network and use the bundled fixture. Default None
+            = offline unless the run is live (`cli.py run --live` /
+            DEALFLOW_LIVE=1).
     """
+    offline = _common.resolve_offline(offline)
     records: list[dict] = []
     from_fixture = False
     if not offline:

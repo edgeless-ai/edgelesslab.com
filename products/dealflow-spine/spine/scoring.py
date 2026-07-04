@@ -93,6 +93,16 @@ def score_record(
 
         contribution = round(weight * sig.confidence * decay * dampen, 4)
         key = f"signal:{sig.signal_type}:{sig.id}"
+        # Duplicate (type, id) pairs on one record (adapter bug reusing an id,
+        # or ledger rows that slipped past load-time dedupe) must not
+        # OVERWRITE the first component with the dampened repeat — that
+        # silently halves the property's score (M2). Uniquify instead so
+        # total == sum(components) stays true.
+        if key in components:
+            n = 2
+            while f"{key}#{n}" in components:
+                n += 1
+            key = f"{key}#{n}"
         components[key] = contribution
         age_days = (now - sig.observed_dt).total_seconds() / 86400.0
         parts = [

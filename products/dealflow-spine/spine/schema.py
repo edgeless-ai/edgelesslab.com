@@ -19,6 +19,7 @@ scripts/lib/triage_core.py (task-298), rebuilt standalone here.
 from __future__ import annotations
 
 import hashlib
+import math
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -82,6 +83,11 @@ def _clamp01(value: Any, default: float = 0.5) -> float:
         f = float(value)
     except (TypeError, ValueError):
         return default
+    # NaN/inf are garbage, not "maximum trust": NaN slips through
+    # max(0, min(1, x)) as 1.0 because NaN comparisons are all False.
+    # Distrust it entirely (0.0), don't default it (0.5).
+    if not math.isfinite(f):
+        return 0.0
     return max(0.0, min(1.0, f))
 
 
@@ -380,6 +386,10 @@ class DealCandidate:
     owner: Owner | None = None
     facts: dict = field(default_factory=dict)
     scored_at: str = field(default_factory=_utcnow_iso)
+    # Strategy-picker verdict, attached by spine/underwrite.py for hot/warm
+    # candidates: {"recommendation": str, "ranked_top3": [...], "hitl_note": str}.
+    # None = not underwritten (watch/discard, or an older snapshot).
+    underwriting: dict | None = None
 
     @property
     def distinct_signal_types(self) -> set[str]:
@@ -398,6 +408,7 @@ class DealCandidate:
             "score_breakdown": self.score_breakdown.as_dict(),
             "route": self.route,
             "scored_at": self.scored_at,
+            "underwriting": self.underwriting,
         }
 
     @classmethod
@@ -414,4 +425,6 @@ class DealCandidate:
             score_breakdown=ScoreBreakdown.from_dict(d.get("score_breakdown")),
             route=_opt_str(d.get("route")),
             scored_at=_opt_str(d.get("scored_at")) or _utcnow_iso(),
+            underwriting=(d.get("underwriting")
+                          if isinstance(d.get("underwriting"), dict) else None),
         )

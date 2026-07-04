@@ -130,7 +130,7 @@ def _portland_to_signal(rec: dict) -> dict:
 
 
 def fetch(city: str = "seattle", days: int = 30, limit: int = 200,
-          offline: bool = False) -> list[dict]:
+          offline: bool | None = None) -> list[dict]:
     """Fetch code-violation signals.
 
     Args:
@@ -138,8 +138,11 @@ def fetch(city: str = "seattle", days: int = 30, limit: int = 200,
               (synthetic fixture until an API-key integration lands).
         days: lookback window on case-open date (seattle live mode only).
         limit: max records (seattle live mode only).
-        offline: skip the network and use bundled fixtures.
+        offline: skip the network and use bundled fixtures. Default None =
+            offline unless the run is live (`cli.py run --live` /
+            DEALFLOW_LIVE=1).
     """
+    offline = _common.resolve_offline(offline)
     city = city.lower()
     if city == "seattle":
         records: list[dict] = []

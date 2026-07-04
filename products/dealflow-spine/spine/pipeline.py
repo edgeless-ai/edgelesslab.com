@@ -4,6 +4,7 @@ pipeline.py — the full CMCO spine run, as one function.
   ingest (adapters -> signals.jsonl ledger)          Marketing: signals
     -> merge (signals -> PropertyRecords)
     -> criteria + scoring + routing                  Criteria / Conversion
+    -> underwrite (strategy picker on hot/warm)      Conversion: deal shape
     -> candidates.jsonl snapshot + digest markdown   Ops: ledger + review queue
 
 cli.py `run` is a thin wrapper over run_pipeline(); tests call it directly.
@@ -26,6 +27,7 @@ from .route import (
 )
 from .schema import DealCandidate
 from .scoring import ScoringConfig
+from .underwrite import underwrite_candidates
 
 PACKAGE_ROOT = Path(__file__).resolve().parent.parent
 
@@ -52,6 +54,7 @@ class PipelineResult:
     candidates: list[DealCandidate] = field(default_factory=list)
     candidates_path: Path | None = None
     digest_path: Path | None = None
+    underwritten: int = 0           # hot/warm candidates given a picker verdict
 
     @property
     def route_counts(self) -> dict[str, int]:
@@ -86,6 +89,7 @@ def run_pipeline(
         routing_config=routing_config,
         now=now,
     )
+    underwritten = underwrite_candidates(candidates)
     candidates_path = write_candidates(candidates, paths.candidates)
     digest_path = write_digest(
         candidates, digest_dir=paths.data_dir, buybox_name=buybox.name, now=now
@@ -95,4 +99,5 @@ def run_pipeline(
         candidates=candidates,
         candidates_path=candidates_path,
         digest_path=digest_path,
+        underwritten=underwritten,
     )

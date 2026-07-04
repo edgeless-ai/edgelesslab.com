@@ -63,6 +63,69 @@ def test_apn_bridges_different_address_strings():
     assert rec.property.zip == "33905"  # backfilled from the signal that knew it
 
 
+# --- H4/M1 regressions (adversarial review 2026-07-04) ----------------------
+
+def test_same_apn_different_counties_do_not_merge():
+    """H4: APNs are COUNTY-scoped — Florida's section-township-range format
+    yields numerically identical APNs in different counties. A Lee County
+    tax delinquency and a Collier County violation with the same digit
+    string used to fuse into one (nonexistent) HOT property."""
+    signals = [
+        make_signal(id="l", source="fdor_lee",
+                    property={"address": "11 Beach Rd", "city": "Fort Myers",
+                              "zip": "33901", "apn": "01-44-24-P2-00600.0010"},
+                    evidence={"county": "LEE"}),
+        make_signal(id="c", source="collier_ce", signal_type="code_violation",
+                    property={"address": "99 Swamp Ln", "city": "Naples",
+                              "zip": "34102", "apn": "0144 24P2 006000010"},
+                    evidence={"county": "COLLIER"}),
+    ]
+    records = merge_signals(signals)
+    assert len(records) == 2
+    assert {r.key for r in records} == {
+        "apn:FL:LEE:014424P2006000010",
+        "apn:FL:COLLIER:014424P2006000010",
+    }
+
+
+def test_unknown_county_still_bridges_to_single_known_county():
+    """One adapter knows the county, the other doesn't: same APN, no county
+    conflict -> still one record (the realistic obituary/tax-roll pairing
+    must keep merging)."""
+    signals = [
+        make_signal(id="a", property={"address": "315 Riverside Drive",
+                                      "zip": "33905", "apn": "10-43-25-P1-00300.0010"},
+                    evidence={"county": "LEE"}),
+        make_signal(id="b", signal_type="obituary",
+                    property={"address": "315 Riverside Dr", "zip": "",
+                              "apn": "10432 5P1 00300.0010"}),
+    ]
+    records = merge_signals(signals)
+    assert len(records) == 1
+    assert records[0].key == "apn:FL:LEE:104325P1003000010"
+
+
+def test_missing_zip_uses_city_not_statewide_wildcard():
+    """M1: with zip missing, '100 Main St, Springfield IL' and '100 Main St,
+    Chicago IL' used to share the key 'addr:IL::100 MAIN ST' — a systematic
+    false-merge generator ('Main St' exists in every municipality). The city
+    now anchors the key when the zip is absent."""
+    springfield = make_signal(
+        id="s", property={"address": "100 Main St", "city": "Springfield",
+                          "state": "IL", "zip": ""})
+    chicago = make_signal(
+        id="c", signal_type="code_violation",
+        property={"address": "100 Main St", "city": "Chicago",
+                  "state": "IL", "zip": ""})
+    assert len(merge_signals([springfield, chicago])) == 2
+    # same city + no zip still merges (the key stays deterministic)
+    chicago2 = make_signal(
+        id="c2", signal_type="code_violation",
+        property={"address": "100 MAIN STREET", "city": "CHICAGO",
+                  "state": "IL", "zip": ""})
+    assert len(merge_signals([chicago, chicago2])) == 1
+
+
 def test_no_apn_no_matching_address_stays_separate():
     signals = [
         make_signal(id="a", property={"address": "1 First St"}),
@@ -103,8 +166,9 @@ def test_fixture_merge_shape(fixture_signals):
     assert len(records) == 8
     by_count = sorted((r.signal_count for r in records), reverse=True)
     assert by_count == [4, 2, 2, 1, 1, 1, 1, 1]
-    # keyed by APN (parcel identity beats address string)
-    cape = next(r for r in records if r.key == "apn:FL:134424C3005420010")
+    # keyed by APN (parcel identity beats address string); APNs are
+    # county-scoped, so the county from evidence is part of the key (H4)
+    cape = next(r for r in records if r.key == "apn:FL:LEE:134424C3005420010")
     assert cape.signal_count == 4  # 3 sources, address spelled 4 ways
     assert cape.distinct_signal_types == {"fema_disaster", "tax_delinquent", "code_violation"}
     assert cape.owner.name == "HAROLD J WHEELER"

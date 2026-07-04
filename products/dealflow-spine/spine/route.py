@@ -4,8 +4,15 @@ route.py — DealCandidates + routing (the "Conversion" C in CMCO).
 Routes (Route enum, triage_core lineage — hot/warm/watch/discard instead of
 ticket/enrich/skip):
 
-  HOT      2+ distinct signal types AND the buy-box holds (no non-signal
-           misses). The "2+ list stacking" tier — goes to underwriting first.
+  HOT      2+ distinct LIVE, CLASSIFIED signal types AND score >=
+           hot_min_score AND the buy-box holds (no non-signal misses). The
+           "2+ list stacking" tier — goes to underwriting first.
+           "Live" mirrors scoring's stack-bonus rule: a signal past
+           max_age_days contributes 0 and cannot mint HOT; "classified"
+           excludes "other" (a novel/coerced label still SCORES, but one
+           source inventing a second label must not fake a 2-list stack);
+           the score floor (RoutingConfig.hot_min_score, default 2.0) keeps
+           near-zero-confidence pairs out of the product surface.
   WARM     buy-box holds but only one signal type (or stacked-but-marginal);
            score >= warm_min_score.
   WATCH    something's there (score >= watch_min_score) but box misses or
@@ -37,6 +44,7 @@ from pathlib import Path
 from .criteria import BuyBox, CriteriaResult
 from .schema import DealCandidate, PropertyRecord, ScoreBreakdown
 from .scoring import ScoringConfig, score_record
+from .underwrite import top_reason
 
 DEFAULT_CANDIDATES = Path(__file__).resolve().parent.parent / "data" / "candidates.jsonl"
 DEFAULT_DIGEST_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -54,7 +62,8 @@ ROUTE_ORDER = {Route.HOT: 0, Route.WARM: 1, Route.WATCH: 2, Route.DISCARD: 3}
 
 @dataclass
 class RoutingConfig:
-    hot_min_signals: int = 2       # distinct signal TYPES for the hot tier
+    hot_min_signals: int = 2       # distinct LIVE, non-"other" signal TYPES for hot
+    hot_min_score: float = 2.0     # hot also needs at least this total score
     warm_min_score: float = 1.0
     watch_min_score: float = 0.25
 
@@ -64,7 +73,7 @@ class RoutingConfig:
         cfg = cls()
         if "hot_min_signals" in d:
             cfg.hot_min_signals = int(d["hot_min_signals"])
-        for k in ("warm_min_score", "watch_min_score"):
+        for k in ("hot_min_score", "warm_min_score", "watch_min_score"):
             if k in d:
                 setattr(cfg, k, float(d[k]))
         return cfg
@@ -108,18 +117,42 @@ def _box_fit(criteria: CriteriaResult) -> bool:
     return not [m for m in criteria.misses if not m.startswith("signals:")]
 
 
+def _live_types(breakdown: ScoreBreakdown) -> set[str]:
+    """Signal types with a positive score contribution. Component keys are
+    'signal:{type}:{id}' (scoring.py owns the format)."""
+    types: set[str] = set()
+    for key, value in breakdown.components.items():
+        if value > 0 and key.startswith("signal:"):
+            types.add(key.split(":", 2)[1])
+    return types
+
+
 def route_record(
     record: PropertyRecord,
     criteria: CriteriaResult,
     score: float,
     config: RoutingConfig | None = None,
+    breakdown: ScoreBreakdown | None = None,
 ) -> Route:
+    """Route one scored record.
+
+    HOT requires (a) >= hot_min_signals distinct signal types that are LIVE
+    (positive score contribution — a fully-decayed signal doesn't count, same
+    rule scoring uses for the stack bonus) and CLASSIFIED (the "other" bucket
+    scores but never counts toward the stack), (b) score >= hot_min_score,
+    and (c) box fit. Pass the ScoreBreakdown that produced `score` when you
+    have it (build_candidates does); if omitted, liveness is recomputed with
+    the default ScoringConfig.
+    """
     config = config or RoutingConfig()
     if criteria.geo_missed:
         return Route.DISCARD
     fit = _box_fit(criteria)
-    distinct = len(record.distinct_signal_types)
-    if distinct >= config.hot_min_signals and fit:
+    if breakdown is None:
+        _, breakdown = score_record(record)
+    countable = _live_types(breakdown) - {"other"}
+    if (len(countable) >= config.hot_min_signals and fit
+            and score >= config.hot_min_score):
         return Route.HOT
     if fit and score >= config.warm_min_score:
         return Route.WARM
@@ -142,7 +175,8 @@ def build_candidates(
     for record in records:
         criteria = buybox.evaluate(record)
         score, breakdown = score_record(record, scoring_config, now=now)
-        route = route_record(record, criteria, score, routing_config)
+        route = route_record(record, criteria, score, routing_config,
+                             breakdown=breakdown)
         candidates.append(
             DealCandidate(
                 property_key=record.key,
@@ -223,18 +257,22 @@ def render_digest(
     lines.append("> R&D pipeline — no outreach. Routes feed underwriting review only.")
     lines.append("")
 
-    def _table(items: list[DealCandidate]) -> list[str]:
-        rows = [
-            "| Score | Address | Signals | Strategy |",
-            "|------:|---------|---------|----------|",
-        ]
+    def _table(items: list[DealCandidate], underwrite_col: bool = False) -> list[str]:
+        head = "| Score | Address | Signals | Strategy |"
+        rule = "|------:|---------|---------|----------|"
+        if underwrite_col:
+            head += " Underwrite |"
+            rule += "-----------|"
+        rows = [head, rule]
         for c in items:
             p = c.property
             addr = f"{p.address}, {p.city} {p.state} {p.zip}".strip().strip(",")
             sigs = ", ".join(sorted(c.distinct_signal_types))
-            rows.append(
-                f"| {c.distress_score:.2f} | {addr} | {sigs} | {c.recommended_strategy} |"
-            )
+            row = f"| {c.distress_score:.2f} | {addr} | {sigs} | {c.recommended_strategy} |"
+            if underwrite_col:
+                rec = (c.underwriting or {}).get("recommendation") or "—"
+                row += f" **{rec}** |"
+            rows.append(row)
         return rows
 
     for route, title in ((Route.HOT, "🔥 Hot — stacked + in the box"),
@@ -244,7 +282,7 @@ def render_digest(
         lines.append(f"## {title} ({len(items)})")
         lines.append("")
         if items:
-            lines.extend(_table(items))
+            lines.extend(_table(items, underwrite_col=route is Route.HOT))
             lines.append("")
             # top hot candidates get their receipts printed
             if route is Route.HOT:
@@ -253,6 +291,11 @@ def render_digest(
                     if c.owner and c.owner.name:
                         lines.append(f"- Owner: {c.owner.name}"
                                      + (f" ({c.owner.mailing_address})" if c.owner.mailing_address else ""))
+                    if c.underwriting:
+                        lines.append(
+                            f"- Underwrite: **{c.underwriting['recommendation']}**"
+                            f" — {top_reason(c.underwriting)}"
+                        )
                     for key, why in c.score_breakdown.reasons.items():
                         lines.append(f"- `{key}`: {why}")
                     unknowns = c.criteria_matches.get("unknowns") or []

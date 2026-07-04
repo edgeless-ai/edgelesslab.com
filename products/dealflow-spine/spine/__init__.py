@@ -27,6 +27,7 @@ from .schema import (
     Signal,
 )
 from .scoring import DEFAULT_WEIGHTS, ScoringConfig, score_record
+from .underwrite import picker_facts, underwrite_candidate, underwrite_candidates
 
 __all__ = [
     "BuyBox", "CriteriaResult", "load_buybox",
@@ -40,6 +41,7 @@ __all__ = [
     "DealCandidate", "Owner", "PropertyRecord", "PropertyRef",
     "ScoreBreakdown", "Signal",
     "DEFAULT_WEIGHTS", "ScoringConfig", "score_record",
+    "picker_facts", "underwrite_candidate", "underwrite_candidates",
 ]
 
 __version__ = "0.1.0"

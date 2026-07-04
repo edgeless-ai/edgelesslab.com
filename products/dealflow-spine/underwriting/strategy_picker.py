@@ -29,6 +29,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Callable
 
+try:
+    from . import finance
+except ImportError:  # standalone execution
+    import finance  # type: ignore
+
 DOC = "2026-06-23-ebre-cmco-opportunity-engine.md §1"
 
 # Signals the spine's detectors emit that indicate SELLER MOTIVATION.
@@ -129,7 +134,7 @@ RULES: list[Rule] = [
          "Deep below-market coupon (>=2.5% delta): the existing note is "
          "worth preserving at almost any structure."),
     Rule("S-DQ1", "subto", 0,
-         lambda d: d["loan_balance"] == 0,
+         lambda d: d["balance_known"] and d["loan_balance"] == 0,
          "No existing debt — nothing to take subject-to; route to "
          "seller-finance.", dq=True),
     Rule("S-DQ2", "subto", 0,
@@ -168,7 +173,7 @@ RULES: list[Rule] = [
          "Loan type is not assumable (conventional due-on-sale enforced).",
          dq=True),
     Rule("A-DQ2", "assumption", 0,
-         lambda d: d["loan_balance"] == 0,
+         lambda d: d["balance_known"] and d["loan_balance"] == 0,
          "No loan to assume.", dq=True),
     Rule("A-DQ3", "assumption", 0,
          lambda d: d["equity_gap_pct"] is not None and d["equity_gap_pct"] > 0.25,
@@ -182,7 +187,8 @@ RULES: list[Rule] = [
          "Equity >=70%: seller can carry a meaningful note; converts a "
          "lump-sum sale into income (often their actual goal)."),
     Rule("F2", "seller_finance", 2,
-         lambda d: d["loan_balance"] == 0 and d["value"] > 0,
+         lambda d: d["balance_known"] and d["loan_balance"] == 0
+                   and d["value"] > 0,
          "Free and clear: cleanest possible carryback — no underlying lien, "
          "no due-on-sale, seller becomes the bank."),
     Rule("F3", "seller_finance", 1,
@@ -209,7 +215,9 @@ def derive_facts(facts: dict) -> dict:
 
     Forgiving means:
       * unknown keys ignored, missing keys default to None/0
-      * rates as 3.25, 0.0325, or "2.75%" (strings with %/$/commas ok)
+      * rates as 3.25, 0.0325, or "2.75%" (strings with %/$/commas ok) —
+        normalized via finance.normalize_rate (one shared convention: values
+        >= 0.25 are percent form, so 1.0 means 1%/yr everywhere, never 100%)
       * condition as int 1-5 or a word (teardown/poor/fair/good/turnkey)
       * signals under `signals`, `motivation`, or `motivation_signals`;
         a bare string is treated as a one-element list; synonyms mapped via
@@ -217,28 +225,41 @@ def derive_facts(facts: dict) -> dict:
         UNKNOWN_SIGNAL_WEIGHT (never silently zero)
       * loan facts either flat (`loan_balance`/`loan_rate`/`loan_type`) or
         nested under `loan` ({"balance", "rate", "type"})
-      * a caller-supplied `equity_pct` (0.12 or 12) is used when value and
-        balance can't derive it; it also stands in for equity_gap_pct
-        (gap = price - balance = equity, to first order)
+      * a MISSING loan balance is UNKNOWN, never zero debt: `balance_known`
+        tracks whether the caller affirmatively supplied a balance (explicit
+        0 or `free_and_clear: true` both count as known). Free-and-clear /
+        no-debt rules only fire when balance_known.
+      * a caller-supplied `equity_pct` (0.12 or 12) is AUTHORITATIVE whenever
+        value+balance can't derive equity — including when `value` is present
+        but the balance is unknown (the old behavior derived balance=0 there
+        and minted a fake 100% equity). It also stands in for equity_gap_pct
+        (gap = price - balance = equity, to first order).
     """
     if not isinstance(facts, dict):
         facts = {}
     loan = facts.get("loan") if isinstance(facts.get("loan"), dict) else {}
     value = _f(facts.get("value") or facts.get("arv") or facts.get("price"))
-    balance = _first_f(facts.get("loan_balance"), loan.get("balance")) or 0.0
+    raw_balance = _first_f(facts.get("loan_balance"), loan.get("balance"))
+    if raw_balance is None and facts.get("free_and_clear"):
+        raw_balance = 0.0                 # debt affirmatively known absent
+    balance_known = raw_balance is not None
+    balance = raw_balance if balance_known else 0.0
     rate = _rate_pct(_first(facts.get("loan_rate"), loan.get("rate")))
     loan_type = str(_first(facts.get("loan_type"), loan.get("type")) or "").lower() or None
     market_rate = _rate_pct(facts.get("market_rate")) or DEFAULT_MARKET_RATE
 
-    if value:
+    stated_equity = _fraction(facts.get("equity_pct"))
+    if balance_known and value:
         equity_pct = (value - balance) / value
     else:
-        equity_pct = _fraction(facts.get("equity_pct"))
+        # balance unknown (or no value): the caller's stated equity is the
+        # best available debt picture — do not derive garbage from balance=0
+        equity_pct = stated_equity
     rate_delta = (market_rate - rate) if rate is not None else None
 
-    if value:
+    if balance_known and value:
         gap_pct = max(0.0, value - balance) / value
-    elif equity_pct is not None and balance > 0:
+    elif equity_pct is not None and (balance > 0 or not balance_known):
         gap_pct = max(0.0, equity_pct)  # gap ≈ equity when price ≈ value
     else:
         gap_pct = None
@@ -257,6 +278,7 @@ def derive_facts(facts: dict) -> dict:
     return {
         "value": value or 0.0,
         "loan_balance": balance,
+        "balance_known": balance_known,
         "loan_type": loan_type,
         "loan_rate": rate,
         "market_rate": market_rate,
@@ -302,11 +324,14 @@ def _fraction(x):
 
 
 def _rate_pct(rate):
-    """Normalize to PERCENT (3.25). Accepts 3.25 or 0.0325."""
-    r = _f(rate)
-    if r is None or r == 0:
-        return None if r is None else 0.0
-    return r * 100.0 if r < 1.0 else r
+    """Normalize to PERCENT (3.25). Accepts 3.25 or 0.0325 via the ONE
+    shared convention (finance.normalize_rate, 0.25 boundary) — so a value
+    like 1.0 reads as 1%/yr here AND in subto/assumption, never both 1% and
+    100% depending on the module."""
+    dec = finance.normalize_rate(_f(rate))
+    # round: the decimal->percent round-trip ( /100 then *100 ) otherwise
+    # leaves float noise on inputs that were already percent-form (6.8)
+    return None if dec is None else round(dec * 100.0, 10)
 
 
 def _condition(c):

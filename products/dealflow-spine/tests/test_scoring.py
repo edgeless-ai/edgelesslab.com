@@ -80,6 +80,28 @@ def test_signals_past_max_age_contribute_zero_and_dont_unlock_stack():
     assert "stack_bonus" not in breakdown.components  # only 1 LIVE type
 
 
+def test_duplicate_signal_id_does_not_overwrite_component():
+    """M2 regression (adversarial review 2026-07-04): two signals with the
+    same (type, id) on one record used to collide on the component key —
+    the dampened repeat OVERWROTE the full-credit first contribution,
+    halving the score. Components are now key-uniquified; the invariant
+    total == sum(components) holds."""
+    from spine.schema import PropertyRecord, PropertyRef
+
+    dup = make_signal(id="same", observed_at=RECENT, confidence=1.0)
+    dup2 = make_signal(id="same", observed_at=RECENT, confidence=1.0)
+    record = PropertyRecord(key="k", property=PropertyRef(address="1 X St"),
+                            signals=[dup, dup2])
+    solo = PropertyRecord(key="k", property=PropertyRef(address="1 X St"),
+                          signals=[dup])
+    total_dup, breakdown = score_record(record, now=FIXED_NOW)
+    total_solo, _ = score_record(solo, now=FIXED_NOW)
+    assert len(breakdown.components) == 2       # nothing overwritten
+    assert total_dup > total_solo               # corroboration, not halving
+    assert abs(total_dup - sum(breakdown.components.values())) < 1e-9
+    assert set(breakdown.reasons) == set(breakdown.components)
+
+
 def test_confidence_scales_linearly():
     full, _ = _score([make_signal(observed_at=RECENT, confidence=1.0)])
     half, _ = _score([make_signal(observed_at=RECENT, confidence=0.5)])

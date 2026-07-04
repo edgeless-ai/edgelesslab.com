@@ -172,7 +172,7 @@ def _nyc_to_signal(rec: dict) -> dict:
 
 
 def fetch(county: str = "philadelphia", min_total_due: float = 1000.0,
-          limit: int = 200, offline: bool = False) -> list[dict]:
+          limit: int = 200, offline: bool | None = None) -> list[dict]:
     """Fetch delinquent-property-tax signals.
 
     Args:
@@ -180,8 +180,11 @@ def fetch(county: str = "philadelphia", min_total_due: float = 1000.0,
                 "nyc" (lien-sale notice list).
         min_total_due: philadelphia only — minimum total due filter.
         limit: max records.
-        offline: skip the network and use bundled fixtures.
+        offline: skip the network and use bundled fixtures. Default None =
+            offline unless the run is live (`cli.py run --live` /
+            DEALFLOW_LIVE=1).
     """
+    offline = _common.resolve_offline(offline)
     county = county.lower()
     if county == "philadelphia":
         records: list[dict] = []

@@ -29,11 +29,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-import requests
+try:
+    import requests  # only needed for LIVE fetches
+except ImportError:  # fresh env: offline/fixture mode must still work
+    requests = None  # type: ignore[assignment]
 
 USER_AGENT = (
     "dealflow-spine-rnd/0.1 (internal R&D; polite; contact: ops@edgelesslab.com)"
@@ -44,6 +48,27 @@ FIXTURES_DIR = Path(__file__).resolve().parent.parent / "fixtures" / "adapters"
 
 _MIN_INTERVAL_S = 1.0  # self-imposed rate limit: >= 1s between requests
 _last_request_ts = 0.0
+
+# ---------------------------------------------------------------------------
+# live/offline gate
+#
+# Network adapters default to OFFLINE (bundled fixtures) unless the run is
+# explicitly made live: `python cli.py run --live` sets DEALFLOW_LIVE=1.
+# An adapter's fetch(offline=...) argument still wins when passed explicitly
+# (True or False); only offline=None consults the environment.
+# ---------------------------------------------------------------------------
+
+LIVE_ENV_VAR = "DEALFLOW_LIVE"
+
+
+def live_enabled() -> bool:
+    """True when this process was explicitly switched to live network mode."""
+    return os.environ.get(LIVE_ENV_VAR, "").strip().lower() in {"1", "true", "yes"}
+
+
+def resolve_offline(offline: bool | None) -> bool:
+    """Resolve a fetch(offline=...) argument against the live gate."""
+    return (not live_enabled()) if offline is None else bool(offline)
 
 VALID_SIGNAL_TYPES = {
     "fema_disaster",
@@ -57,8 +82,13 @@ VALID_SIGNAL_TYPES = {
 
 
 def http_get(url: str, params: dict | None = None, *, timeout: int = 30,
-             retries: int = 2, backoff_s: float = 2.0) -> requests.Response:
+             retries: int = 2, backoff_s: float = 2.0) -> "requests.Response":
     """Polite GET: proper UA, self rate-limit, bounded retries."""
+    if requests is None:
+        raise RuntimeError(
+            "the 'requests' package is not installed — live fetches are "
+            "unavailable. Run offline (the default) or `pip install requests` "
+            "and re-run with `cli.py run --live`.")
     global _last_request_ts
     last_exc: Exception | None = None
     for attempt in range(retries + 1):

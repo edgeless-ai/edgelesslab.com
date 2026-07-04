@@ -83,8 +83,10 @@ def analyze(deal: dict) -> dict:
 
 
 def _norm_rate(rate) -> float:
-    r = float(rate or 0)
-    return r / 100.0 if r > 1.0 else r
+    """Delegates to finance.normalize_rate — the one shared percent-vs-decimal
+    convention (0.25 boundary)."""
+    r = finance.normalize_rate(rate)
+    return 0.0 if r is None else r
 
 
 def _mechanics(loan_type: str) -> list[str]:

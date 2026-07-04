@@ -41,8 +41,10 @@ QUARANTINE (data/signals_pending.jsonl):
 
 from __future__ import annotations
 
+import fcntl
 import importlib.util
 import json
+import math
 import sys
 import traceback
 from dataclasses import dataclass, field
@@ -161,6 +163,45 @@ def discover_adapters(adapters_dir: str | Path = DEFAULT_ADAPTERS_DIR) -> dict[s
 # ledger primitives (idempotent JSONL — triage_core lineage)
 # ---------------------------------------------------------------------------
 
+def _jsonable(obj):
+    """Coerce arbitrary adapter payloads into strict, RFC-8259-safe JSON.
+
+    Adapters control Signal.evidence, so a poisoned upstream record can carry
+    non-string dict KEYS (tuple/bytes — json.dumps `default=` never applies to
+    keys, so it raises TypeError) or NaN/Infinity floats (Python json emits
+    them, but the row becomes invalid JSON for every non-Python consumer).
+    Defensive rules: keys stringified, non-finite floats -> None, unknown
+    objects -> str(). One bad signal must never kill an ingest run (H1/M3).
+    """
+    if isinstance(obj, dict):
+        return {str(k): _jsonable(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple, set)):
+        return [_jsonable(v) for v in obj]
+    if isinstance(obj, float):
+        return obj if math.isfinite(obj) else None
+    if obj is None or isinstance(obj, (str, int, bool)):
+        return obj
+    return str(obj)
+
+
+def _dumps_row(row: dict) -> str:
+    """Serialize one ledger/quarantine row defensively (see _jsonable)."""
+    return json.dumps(_jsonable(row), allow_nan=False)
+
+
+def _locked_append(path: Path, line: str) -> None:
+    """Append one line under an exclusive flock so two overlapping ingest
+    processes (cron + manual) can't interleave partial rows (M2). Single-host
+    ledger, so fcntl on the ledger file itself is sufficient."""
+    with path.open("a") as f:
+        fcntl.flock(f, fcntl.LOCK_EX)
+        try:
+            f.write(line + "\n")
+            f.flush()
+        finally:
+            fcntl.flock(f, fcntl.LOCK_UN)
+
+
 def existing_dedupe_keys(ledger_path: str | Path) -> set[str]:
     """Stream the ledger and collect dedupe_keys. Malformed rows are skipped
     silently — an archive with one bad line beats a crashed run."""
@@ -205,16 +246,22 @@ def append_signal(
         "ingested_at": datetime.now(timezone.utc).isoformat(),
         "signal": signal.to_dict(),
     }
-    with ledger_path.open("a") as f:
-        f.write(json.dumps(row, default=str) + "\n")
+    _locked_append(ledger_path, _dumps_row(row))
     known_keys.add(signal.dedupe_key)
     return True
 
 
 def load_ledger_signals(ledger_path: str | Path = DEFAULT_LEDGER) -> list[Signal]:
-    """Read every signal back out of the ledger (malformed rows skipped)."""
+    """Read every signal back out of the ledger (malformed rows skipped).
+
+    Deduped by (source, id) on the way out: overlapping ingest processes can
+    race the dedupe-key snapshot and append the same signal twice (M2), and a
+    duplicate row would otherwise HALVE the merged property's score via the
+    same-type dampening. First occurrence wins.
+    """
     ledger_path = Path(ledger_path)
     signals: list[Signal] = []
+    seen: set[str] = set()
     if not ledger_path.exists():
         return signals
     with ledger_path.open() as f:
@@ -226,7 +273,11 @@ def load_ledger_signals(ledger_path: str | Path = DEFAULT_LEDGER) -> list[Signal
                 row = json.loads(line)
                 payload = row.get("signal")
                 if payload:
-                    signals.append(Signal.from_dict(payload))
+                    sig = Signal.from_dict(payload)
+                    if sig.dedupe_key in seen:
+                        continue
+                    seen.add(sig.dedupe_key)
+                    signals.append(sig)
             except (json.JSONDecodeError, TypeError):
                 continue
     return signals
@@ -308,7 +359,18 @@ def run_ingest(
         report.fetched = len(raw or [])
         report.invalid = invalid
         for sig in signals:
-            if append_signal(ledger_path, sig, known_keys):
+            # Per-signal isolation (mirrors the fetch() contract): one signal
+            # whose payload defeats even the defensive serializer must be
+            # dropped with a warning, never abort the rest of the run (H1).
+            try:
+                written = append_signal(ledger_path, sig, known_keys)
+            except Exception as e:
+                report.invalid += 1
+                print(f"[ingest] adapter {name}: signal {sig.dedupe_key!r} "
+                      f"could not be written ({type(e).__name__}: {e}) — dropped",
+                      file=sys.stderr)
+                continue
+            if written:
                 report.written += 1
             else:
                 report.duplicates += 1
@@ -321,8 +383,14 @@ def run_ingest(
                     "problems": problems,
                     "signal": sig.to_dict(),
                 }
-                with pending_path.open("a") as f:
-                    f.write(json.dumps(row, default=str) + "\n")
+                try:
+                    _locked_append(pending_path, _dumps_row(row))
+                except Exception as e:
+                    report.invalid += 1
+                    print(f"[ingest] adapter {name}: quarantine row "
+                          f"{sig.dedupe_key!r} could not be written "
+                          f"({type(e).__name__}: {e}) — dropped", file=sys.stderr)
+                    continue
                 pending_keys.add(sig.dedupe_key)
             report.quarantined += 1
         result.adapters.append(report)

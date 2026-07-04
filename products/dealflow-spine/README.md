@@ -1,31 +1,80 @@
 # dealflow-spine
 
 The **CMCO spine** for the internal real-estate opportunity engine:
-**C**riteria → **M**arketing (signals) → **C**onversion (routing) → **O**ps (ledger).
-
-The reusable pattern underneath (from the EBRE deal-engine analysis):
-
-```
-spine + signal-detectors  →  stack-score  →  qualify (buy-box)  →  route  →  ops ledger
-     adapters/*.py            scoring.py       criteria.py        route.py    data/*.jsonl
-```
+**C**riteria → **M**arketing (signals) → **C**onversion (routing + underwriting) → **O**ps (ledger).
 
 > ⚠️ **R&D / capability only.** No outreach, no deals, no paid APIs. Routes feed
 > an internal underwriting review queue and nothing else (Accordion conflict gate —
 > see memory `project_ebre_cmco_real_estate`).
 
-Python 3.11, stdlib-only core (adapters may use `requests`). No install step:
+## 60-second quickstart
+
+Python 3.11, stdlib only, no install step, **zero network by default**:
 
 ```bash
-python3.11 cli.py run       # full pipeline: ingest all adapters → merge → score → route → digest
-python3.11 cli.py ingest    # adapters → data/signals.jsonl only
-python3.11 cli.py score --explain   # ranked properties with score receipts (no writes)
-python3.11 cli.py digest    # re-render digest from data/candidates.jsonl
-python3.11 -m pytest tests/ # 62 tests, hermetic (tmp dirs, zero network, fixed clock)
+python3.11 cli.py run            # full offline run on bundled fixtures
+cat data/digest-latest.md        # the human review queue it produced
+python3.11 -m pytest -q          # 130 tests, hermetic (tmp dirs, zero network, fixed clock)
 ```
 
-Runs end-to-end with **zero network** out of the box: `adapters/sample_fixtures.py`
-serves `fixtures/sample_signals.json` (13 signals, 8 properties, all 7 signal types).
+`run` ingests every adapter (bundled fixtures unless `--live`), merges signals
+per property, scores + routes them, runs the **underwriting strategy picker**
+on every hot/warm candidate, and writes `data/candidates.jsonl` plus the digest.
+
+**Reading the digest:** 🔥 **hot** means 2+ *distinct* "why they'd sell now"
+signals stacked on one property AND the buy-box (`config/buybox.json`) holds —
+the highest-conviction tier, first in line for a human underwriter. Every hot
+row carries its distress score, the stacked signals, and the picker's verdict
+(**wholesale / subto / assumption / seller_finance / pass**) with the top
+reason. Warm = in the box, single signal. Watch = something's there. Discard =
+out of geo or below floor.
+
+**Live data is opt-in:** `python3.11 cli.py run --live` enables the network
+adapters (openFEMA, Philly/NYC tax rolls, Seattle code violations, obituary
+RSS) through the shared politeness layer in `adapters/_common.py` — descriptive
+User-Agent, ≥1s self rate-limit, bounded retries. Requires `pip install
+requests`; the default run never touches the network (adapters serve their
+bundled fixtures).
+
+## Architecture (one picture)
+
+```
+        adapters/*.py                  signal detectors — offline fixtures by
+  fema · tax · obituaries ·            default; `run --live` (or DEALFLOW_LIVE=1)
+  code-violations · assumable          enables network via the politeness layer
+             │  fetch()
+             ▼
+  data/signals.jsonl       INGEST      append-only idempotent ledger (spine/ingest.py)
+             │
+             ▼
+  PropertyRecord           MERGE       address normalization + APN bridging (spine/merge.py)
+             │
+             ▼
+  score × buy-box          SCORE +     explainable distress score (spine/scoring.py)
+             │             CRITERIA    declarative buy-box (spine/criteria.py)
+             ▼
+  hot·warm·watch·discard   ROUTE       hot = 2+ distinct signal types AND in the box
+             │                         (spine/route.py)
+             │ hot/warm only
+             ▼
+  strategy verdict         UNDERWRITE  underwriting.strategy_picker.pick() ranks
+             │                         wholesale/subto/assumption/seller-finance/pass
+             │                         (spine/underwrite.py — the bridge)
+             ▼
+  data/candidates.jsonl    OPS         review queue for a HUMAN underwriter:
+  data/digest-latest.md                strategy + why, score receipts, missing facts
+```
+
+All CLI commands:
+
+```bash
+python3.11 cli.py run               # full pipeline (offline fixtures)
+python3.11 cli.py run --live        # same, network adapters enabled (polite)
+python3.11 cli.py ingest [--live]   # adapters → data/signals.jsonl only
+python3.11 cli.py score --explain   # ranked properties with score receipts (no writes)
+python3.11 cli.py underwrite        # re-run the strategy picker on candidates.jsonl + digest
+python3.11 cli.py digest            # re-render digest from data/candidates.jsonl
+```
 
 ---
 
@@ -38,6 +87,7 @@ serves `fixtures/sample_signals.json` (13 signals, 8 properties, all 7 signal ty
 | **Criteria** | `spine/criteria.py` | `PropertyRecord` × buy-box config → `CriteriaResult` (matches/misses/unknowns) |
 | **Scoring** | `spine/scoring.py` | `PropertyRecord` → distress score + explainable `ScoreBreakdown` |
 | **Route** | `spine/route.py` | records → `DealCandidate`s → hot/warm/watch/discard → `data/candidates.jsonl` + digest markdown |
+| **Underwrite** | `spine/underwrite.py` | hot/warm `DealCandidate` → `underwriting.strategy_picker.pick()` → `candidate.underwriting` verdict (strategy + why); shown in the digest's hot section |
 | **Pipeline** | `spine/pipeline.py` | `run_pipeline()` = all of the above, one call |
 
 ### Data files (the "Ops" ledger)
@@ -109,7 +159,12 @@ the APN, else `addr:<STATE>:<zip>:<normalized-address>`.
   "score_breakdown": {"total": 9.81, "components": {"signal:...": 2.19, "stack_bonus": 4.0},
                        "reasons": {"signal:...": "human-readable why", ...}},
   "route": "hot",                    // hot | warm | watch | discard
-  "scored_at": "2026-07-04T..."
+  "scored_at": "2026-07-04T...",
+  "underwriting": {                  // hot/warm only; null otherwise
+    "recommendation": "subto",       // == ranked_top3[0].strategy
+    "ranked_top3": [ ...picker entries: strategy/score/applicable/reasons/... ],
+    "hitl_note": "Decision support only. ... a HUMAN underwrites, offers, ..."
+  }
 }
 ```
 
@@ -147,10 +202,20 @@ omit a block to stop filtering on it. Default box: Lee County FL
 
 | Route | Rule |
 |-------|------|
-| **hot** | 2+ distinct signal types **and** buy-box holds (no non-signal misses) |
+| **hot** | 2+ distinct **live, classified** signal types **and** score ≥ 2.0 **and** buy-box holds (no non-signal misses) |
 | **warm** | buy-box holds, score ≥ 1.0 (typically single-signal) |
 | **watch** | score ≥ 0.25 but box misses (e.g. price) or weak signal |
 | **discard** | out of target geo (hard disqualifier) or score below floor |
+
+Hot's stack count only admits signal types that are *live* (positive score
+contribution — a fully-decayed 2-year-old signal can't mint a hot lead; same
+rule scoring uses for the stack bonus) and *classified* (the `other` bucket
+still **scores**, but never counts toward the 2-list stack — otherwise one
+source emitting a novel/coerced second label fakes a stack). The score floor
+keeps near-zero-confidence pairs off the product surface. All thresholds live
+on `RoutingConfig` (`hot_min_signals`, `hot_min_score` default 2.0,
+`warm_min_score`, `watch_min_score`), overridable via
+`RoutingConfig.from_dict`.
 
 The box's own `min_signal_count` criterion is excluded from routing's box-fit
 check — routing owns the stacking rule (`RoutingConfig.hot_min_signals`), so a
@@ -165,21 +230,33 @@ Full contract: **`adapters/README.md`**. Short version: drop
 dicts). Optional `SOURCE = "canonical_name"`, `ENABLED = False`. Shared helpers
 in `adapters/_common.py` work with either `from . import _common` or
 `import _common`. Adapters are isolated: import errors and fetch() exceptions
-are reported per-adapter and never block the run. Test yours with
+are reported per-adapter and never block the run. Network adapters take
+`offline: bool | None = None` and resolve it via
+`_common.resolve_offline()` — offline (bundled fixture) unless the process is
+live (`cli.py run --live` sets `DEALFLOW_LIVE=1`). Test yours with
 `python3.11 cli.py run --only <module_name>`.
 
-## How underwriting plugs in (for the underwriting agent)
+## How underwriting plugs in
 
-Read `data/candidates.jsonl` (or `spine.route.load_candidates()`), filter
-`route in ("hot", "warm")`, use `criteria_matches.unknowns` as the
-missing-facts checklist and `score_breakdown.reasons` as the display-ready
-"why". Emit whatever you want downstream — this package doesn't care.
+Wired in: `spine/underwrite.py` maps each hot/warm candidate's facts + signal
+evidence into `underwriting.strategy_picker.pick()` input (value from
+estimated/assessed value, implied loan balance from `equity_pct`, loan
+type/rate from assumable-loan evidence, spine signal types → picker motivation
+vocabulary) and attaches the verdict as `candidate.underwriting` — see the
+module docstring for every mapping decision. The underwriting library's API is
+contract-locked (`underwriting/README.md`); the bridge only calls it.
+
+Downstream consumers still read `data/candidates.jsonl` (or
+`spine.route.load_candidates()`), filter `route in ("hot", "warm")`, and get
+the strategy verdict for free in `underwriting`; `criteria_matches.unknowns`
+is the missing-facts checklist and `score_breakdown.reasons` the
+display-ready "why".
 
 ## Layout
 
 ```
 dealflow-spine/
-├── cli.py                 # run | ingest | score | digest
+├── cli.py                 # run [--live] | ingest [--live] | score | underwrite | digest
 ├── config/buybox.json     # default buy-box (Lee County FL reference market)
 ├── spine/                 # the engine (stdlib only)
 │   ├── schema.py          #   ← THE CONTRACT
@@ -188,9 +265,12 @@ dealflow-spine/
 │   ├── criteria.py        #   buy-box engine
 │   ├── scoring.py         #   explainable distress score
 │   ├── route.py           #   hot/warm/watch/discard + digest
+│   ├── underwrite.py      #   bridge: hot/warm candidates → strategy_picker verdicts
 │   └── pipeline.py        #   run_pipeline() orchestrator
+├── underwriting/          # deal-math + strategy picker (contract-locked; own README)
+├── playbooks/             # operational manuals per strategy (worked examples)
 ├── adapters/              # signal detectors (drop-in; see adapters/README.md)
-├── fixtures/              # 13 sample signals — zero-network e2e
-├── tests/                 # pytest; hermetic
+├── fixtures/              # sample + per-adapter fixtures — zero-network e2e
+├── tests/                 # pytest; hermetic (underwriting/tests/ too)
 └── data/                  # ledger + candidates + digests (gitignored)
 ```

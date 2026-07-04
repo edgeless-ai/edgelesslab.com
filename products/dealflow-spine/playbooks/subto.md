@@ -28,10 +28,14 @@ Strategy-picker rules S1–S4 (see `strategy_picker.RULES`):
 2. **Run `subto.analyze(deal)`** with statement numbers + market rent.
    Kill on `negative_cash_flow`; treat `low_dscr`/`thin_cash_flow` as
    price-negotiation facts.
-3. **Attorney designs the close**: deed transfer (often to a land trust),
-   attorney-drafted seller disclosures acknowledging the loan stays in the
-   seller's name and due-on-sale risk, third-party loan servicing so
-   payments are provable.
+3. **Attorney designs the close**: deed transfer (often to a land trust —
+   for privacy and administration only; the Garn–St Germain inter-vivos
+   trust exemption, 12 U.S.C. §1701j-3(d)(8), does **not** cover an
+   investor sub-to transfer, since it requires the borrower to remain a
+   beneficiary and occupant — a land trust is NOT a due-on-sale
+   workaround), attorney-drafted seller disclosures acknowledging the loan
+   stays in the seller's name and due-on-sale risk, third-party loan
+   servicing so payments are provable.
 4. **Cure arrears at closing through escrow** and obtain the reinstatement
    letter from the servicer (the `reinstatement` flag).
 5. **Reserve for the structural risk**: hold enough liquidity to refinance

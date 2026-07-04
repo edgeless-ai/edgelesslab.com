@@ -57,6 +57,11 @@ def fetch() -> list[dict]:     # required, zero-argument
 - **Patient pacing** on free public endpoints (they throttle; see the FDOR
   lesson in `opportunity-engine/re-vertical/`). Cache raw pulls under
   `data/raw/<source>/` if useful.
+- **Offline by default.** Network adapters accept `offline: bool | None = None`
+  and resolve it with `_common.resolve_offline()`: fixtures unless the run is
+  explicitly live (`cli.py run --live` → `DEALFLOW_LIVE=1`). All HTTP goes
+  through `_common.http_get()` (shared UA, ≥1s rate-limit, bounded retries);
+  `requests` is only required for live fetches — fixture mode is stdlib.
 
 ## Testing your adapter
 

@@ -1,0 +1,352 @@
+{
+  "_comment": "Fixture signals for zero-network end-to-end runs. Lee County FL theme (the Slice-1 reference market) + one out-of-geo control. Exercises: 3-signal stacking, same-type repeat (dampening), address-spelling variants, APN-format variants + APN bridging (missing zip), unknown signal_type coercion, missing id generation, low confidence, out-of-state discard.",
+  "signals": [
+    {
+      "id": "nfip-claimgap-334412",
+      "source": "openfema_nfip",
+      "signal_type": "fema_disaster",
+      "observed_at": "2026-05-18T14:00:00+00:00",
+      "property": {
+        "apn": "13-44-24-C3-00542.0010",
+        "address": "1417 SE 12th Terrace",
+        "city": "Cape Coral",
+        "state": "FL",
+        "zip": "33990",
+        "lat": 26.6406,
+        "lon": -81.9401
+      },
+      "owner": null,
+      "evidence": {
+        "disaster": "DR-4673 (Ian) legacy claim, coverage gap flagged",
+        "ratedFloodZone": "AE",
+        "federalPolicyFee": 89,
+        "insurance_lapsed": true,
+        "estimated_value": 285000,
+        "property_type": "single_family",
+        "county": "LEE"
+      },
+      "source_url": "https://www.fema.gov/api/open/v2/FimaNfipPolicies",
+      "confidence": 0.8
+    },
+    {
+      "id": "td-2026-088231",
+      "source": "lee_tax_collector",
+      "signal_type": "tax_delinquent",
+      "observed_at": "2026-06-12T09:30:00+00:00",
+      "property": {
+        "apn": "13-44-24-C3-00542.0010",
+        "address": "1417 SE 12TH TER",
+        "city": "CAPE CORAL",
+        "state": "FL",
+        "zip": "33990",
+        "lat": null,
+        "lon": null
+      },
+      "owner": {
+        "name": "HAROLD J WHEELER",
+        "mailing_address": "88 LAKE SHORE DR, COLUMBUS, OH 43204"
+      },
+      "evidence": {
+        "years_delinquent": 2,
+        "amount_due": 8412.55,
+        "certificate": "2026-088231",
+        "equity_pct": 0.55,
+        "absentee_owner": true,
+        "county": "LEE"
+      },
+      "source_url": "https://www.leetc.com/",
+      "confidence": 0.95
+    },
+    {
+      "id": "td-2025-071115",
+      "source": "lee_tax_collector",
+      "signal_type": "tax_delinquent",
+      "observed_at": "2026-01-05T09:30:00+00:00",
+      "property": {
+        "apn": "13-44-24-C3-00542.0010",
+        "address": "1417 SE 12th Ter.",
+        "city": "Cape Coral",
+        "state": "FL",
+        "zip": "33990",
+        "lat": null,
+        "lon": null
+      },
+      "owner": {
+        "name": "HAROLD J WHEELER",
+        "mailing_address": "88 LAKE SHORE DR, COLUMBUS, OH 43204"
+      },
+      "evidence": {
+        "years_delinquent": 1,
+        "amount_due": 4103.02,
+        "certificate": "2025-071115",
+        "county": "LEE"
+      },
+      "source_url": "https://www.leetc.com/",
+      "confidence": 0.9
+    },
+    {
+      "id": "ce26-04471",
+      "source": "lee_code_enforcement",
+      "signal_type": "code_violation",
+      "observed_at": "2026-06-25T16:45:00+00:00",
+      "property": {
+        "apn": null,
+        "address": "1417 Southeast 12th Terrace",
+        "city": "Cape Coral",
+        "state": "FL",
+        "zip": "33990",
+        "lat": 26.6406,
+        "lon": -81.9401
+      },
+      "owner": null,
+      "evidence": {
+        "violation": "unsafe structure — unrepaired hurricane roof damage",
+        "case": "CE26-04471",
+        "status": "open",
+        "absentee_owner": true
+      },
+      "source_url": "https://www.capecoral.gov/department/code_compliance/",
+      "confidence": 0.9
+    },
+    {
+      "id": "lp-26-CA-003318",
+      "source": "lee_clerk_lis_pendens",
+      "signal_type": "pre_foreclosure",
+      "observed_at": "2026-06-20T11:00:00+00:00",
+      "property": {
+        "apn": "25-44-24-P2-01201.0140",
+        "address": "902 Palm Avenue",
+        "city": "Fort Myers",
+        "state": "FL",
+        "zip": "33901",
+        "lat": 26.6337,
+        "lon": -81.8687
+      },
+      "owner": {
+        "name": "DENISE R CALLOWAY",
+        "mailing_address": "902 PALM AVE, FORT MYERS, FL 33901"
+      },
+      "evidence": {
+        "case_no": "26-CA-003318",
+        "plaintiff": "MIDFIRST BANK",
+        "filed": "2026-06-18",
+        "estimated_value": 240000,
+        "equity_pct": 0.4,
+        "property_type": "single_family",
+        "county": "LEE"
+      },
+      "source_url": "https://www.leeclerk.org/",
+      "confidence": 0.9
+    },
+    {
+      "id": "mls-fha-224061882",
+      "source": "mls_scrape",
+      "signal_type": "assumable_loan",
+      "observed_at": "2026-06-01T08:00:00+00:00",
+      "property": {
+        "apn": "254424P2012010140",
+        "address": "902 PALM AVE.",
+        "city": "FORT MYERS",
+        "state": "FL",
+        "zip": "33901",
+        "lat": null,
+        "lon": null
+      },
+      "owner": null,
+      "evidence": {
+        "loan_type": "FHA",
+        "note_rate": 3.1,
+        "listing_remarks": "assumable FHA at 3.1%, motivated",
+        "property_type": "single_family"
+      },
+      "source_url": "https://example-mls.test/listing/224061882",
+      "confidence": 0.6
+    },
+    {
+      "id": "obit-osorio-margaret-20260615",
+      "source": "legacy_obits",
+      "signal_type": "obituary",
+      "observed_at": "2026-06-15T07:00:00+00:00",
+      "property": {
+        "apn": null,
+        "address": "2210 Oak Street",
+        "city": "Lehigh Acres",
+        "state": "FL",
+        "zip": "33936",
+        "lat": null,
+        "lon": null
+      },
+      "owner": {
+        "name": "ESTATE OF MARGARET T OSORIO",
+        "mailing_address": null
+      },
+      "evidence": {
+        "deceased": "MARGARET T OSORIO",
+        "published": "2026-06-14",
+        "estimated_value": 190000,
+        "equity_pct": 0.85,
+        "property_type": "single_family",
+        "county": "LEE"
+      },
+      "source_url": "https://www.legacy.com/",
+      "confidence": 0.7
+    },
+    {
+      "id": "nfip-claimgap-339571",
+      "source": "openfema_nfip",
+      "signal_type": "fema_disaster",
+      "observed_at": "2026-05-30T14:00:00+00:00",
+      "property": {
+        "apn": "19-46-22-T4-00100.0030",
+        "address": "77 Gulfview Boulevard",
+        "city": "Sanibel",
+        "state": "FL",
+        "zip": "33957",
+        "lat": 26.4485,
+        "lon": -82.1023
+      },
+      "owner": {
+        "name": "GULFVIEW HOLDINGS LLC",
+        "mailing_address": "1 METROTECH CTR, BROOKLYN, NY 11201"
+      },
+      "evidence": {
+        "disaster": "DR-4673 (Ian) rebuild, coverage shortfall",
+        "ratedFloodZone": "VE",
+        "estimated_value": 1250000,
+        "property_type": "single_family",
+        "absentee_owner": true,
+        "county": "LEE"
+      },
+      "source_url": "https://www.fema.gov/api/open/v2/FimaNfipPolicies",
+      "confidence": 0.85
+    },
+    {
+      "id": "ce26-02290",
+      "source": "lee_code_enforcement",
+      "signal_type": "code_violation",
+      "observed_at": "2026-03-10T10:00:00+00:00",
+      "property": {
+        "apn": null,
+        "address": "4501 Del Prado Blvd S",
+        "city": "Cape Coral",
+        "state": "FL",
+        "zip": "33904",
+        "lat": null,
+        "lon": null
+      },
+      "owner": null,
+      "evidence": {
+        "violation": "overgrowth / possible vacancy (drive-by, unverified)",
+        "case": "CE26-02290",
+        "status": "unverified"
+      },
+      "source_url": "https://www.capecoral.gov/department/code_compliance/",
+      "confidence": 0.25
+    },
+    {
+      "id": "clark-oh-td-8800",
+      "source": "clark_county_oh_treasurer",
+      "signal_type": "tax_delinquent",
+      "observed_at": "2026-06-22T12:00:00+00:00",
+      "property": {
+        "apn": "3400700012206016",
+        "address": "8800 Main Street",
+        "city": "Springfield",
+        "state": "OH",
+        "zip": "45503",
+        "lat": null,
+        "lon": null
+      },
+      "owner": {
+        "name": "RUTH ANN PELFREY",
+        "mailing_address": "8800 MAIN ST, SPRINGFIELD, OH 45503"
+      },
+      "evidence": {
+        "amount_due": 6200,
+        "estimated_value": 98000,
+        "property_type": "single_family",
+        "county": "CLARK"
+      },
+      "source_url": "https://www.clarkcountyohio.gov/",
+      "confidence": 0.9
+    },
+    {
+      "id": "fsbo-fb-20260628-riverside",
+      "source": "social_fsbo",
+      "signal_type": "other",
+      "observed_at": "2026-06-28T19:20:00+00:00",
+      "property": {
+        "apn": "10-43-25-P1-00300.0010",
+        "address": "315 Riverside Drive",
+        "city": "Fort Myers",
+        "state": "FL",
+        "zip": "33905",
+        "lat": 26.6689,
+        "lon": -81.8104
+      },
+      "owner": {
+        "name": "T. VANCE (POSTER)",
+        "mailing_address": null
+      },
+      "evidence": {
+        "post": "Inherited house, MUST sell this month, as-is, no agents",
+        "platform": "facebook_marketplace",
+        "estimated_value": 210000,
+        "equity_pct": 0.3,
+        "property_type": "single_family",
+        "county": "LEE"
+      },
+      "source_url": "https://facebook.test/marketplace/item/998877",
+      "confidence": 0.65
+    },
+    {
+      "id": "obit-vance-eleanor-20260610",
+      "source": "legacy_obits",
+      "signal_type": "obituary",
+      "observed_at": "2026-06-10T07:00:00+00:00",
+      "property": {
+        "apn": "10432 5P1 00300.0010",
+        "address": "315 Riverside Dr",
+        "city": "Fort Myers",
+        "state": "FL",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "owner": {
+        "name": "ELEANOR VANCE (DECEASED)",
+        "mailing_address": null
+      },
+      "evidence": {
+        "deceased": "ELEANOR VANCE",
+        "published": "2026-06-09",
+        "county": "LEE"
+      },
+      "source_url": "https://www.legacy.com/",
+      "confidence": 0.75
+    },
+    {
+      "source": "usps_vacancy",
+      "signal_type": "vacancy",
+      "observed_at": "2026-06-18T00:00:00+00:00",
+      "property": {
+        "apn": null,
+        "address": "1220 NE 7th Place",
+        "city": "Cape Coral",
+        "state": "FL",
+        "zip": "33909",
+        "lat": null,
+        "lon": null
+      },
+      "owner": null,
+      "evidence": {
+        "vacant": true,
+        "months_vacant": 4,
+        "estimated_value": 165000,
+        "property_type": "single_family"
+      },
+      "source_url": null,
+      "confidence": 0.5
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+[
+  {
+    "_note": "Synthetic deed-of-trust recording records in the documented fixture format (see assumable_heuristic.py docstring). Real feed would come from a county recorder index or HMDA-targeted pulls.",
+    "instrument_id": "2020-045512",
+    "recorded_date": "2020-08-14",
+    "doc_type": "DEED_OF_TRUST",
+    "loan_program": "FHA",
+    "loan_amount": 372800.0,
+    "note_rate": null,
+    "origination_date": "2020-08-07",
+    "lender": "CALIBER HOME LOANS INC",
+    "borrower": "MARTINEZ, ANDREA L",
+    "property": {
+      "apn": "R318442",
+      "address": "9645 N CLARENDON AVE",
+      "city": "PORTLAND",
+      "state": "OR",
+      "zip": "97203",
+      "lat": 45.6042,
+      "lon": -122.7501
+    },
+    "county": "MULTNOMAH"
+  },
+  {
+    "instrument_id": "2021-011203",
+    "recorded_date": "2021-02-22",
+    "doc_type": "DEED_OF_TRUST",
+    "loan_program": "VA",
+    "loan_amount": 451000.0,
+    "note_rate": 2.25,
+    "origination_date": "2021-02-16",
+    "lender": "VETERANS UNITED HOME LOANS",
+    "borrower": "OKAFOR, JAMES T & OKAFOR, LISA M",
+    "property": {
+      "apn": "R227719",
+      "address": "4412 SE 34TH AVE",
+      "city": "PORTLAND",
+      "state": "OR",
+      "zip": "97202",
+      "lat": 45.4886,
+      "lon": -122.6301
+    },
+    "county": "MULTNOMAH"
+  },
+  {
+    "instrument_id": "2019-098871",
+    "recorded_date": "2019-11-05",
+    "doc_type": "DEED_OF_TRUST",
+    "loan_program": "FHA",
+    "loan_amount": 289500.0,
+    "note_rate": null,
+    "origination_date": "2019-10-30",
+    "lender": "GUILD MORTGAGE COMPANY",
+    "borrower": "NGUYEN, PETER",
+    "property": {
+      "apn": "R445102",
+      "address": "17233 SE STARK ST",
+      "city": "PORTLAND",
+      "state": "OR",
+      "zip": "97233",
+      "lat": 45.5192,
+      "lon": -122.4867
+    },
+    "county": "MULTNOMAH"
+  },
+  {
+    "instrument_id": "2021-077340",
+    "recorded_date": "2021-09-13",
+    "doc_type": "DEED_OF_TRUST",
+    "loan_program": "USDA",
+    "loan_amount": 315000.0,
+    "note_rate": null,
+    "origination_date": "2021-09-03",
+    "lender": "UMPQUA BANK",
+    "borrower": "WHEELER, DANA R",
+    "property": {
+      "apn": "R990233",
+      "address": "38122 SE LUSTED RD",
+      "city": "GRESHAM",
+      "state": "OR",
+      "zip": "97080",
+      "lat": 45.4711,
+      "lon": -122.3402
+    },
+    "county": "MULTNOMAH"
+  },
+  {
+    "instrument_id": "2022-014501",
+    "recorded_date": "2022-03-30",
+    "doc_type": "DEED_OF_TRUST",
+    "loan_program": "FHA",
+    "loan_amount": 405000.0,
+    "note_rate": 4.75,
+    "origination_date": "2022-03-25",
+    "lender": "ROCKET MORTGAGE LLC",
+    "borrower": "SILVA, MARCO",
+    "property": {
+      "apn": "R101877",
+      "address": "6205 N MISSISSIPPI AVE",
+      "city": "PORTLAND",
+      "state": "OR",
+      "zip": "97217",
+      "lat": 45.5701,
+      "lon": -122.6755
+    },
+    "county": "MULTNOMAH"
+  },
+  {
+    "instrument_id": "2020-066118",
+    "recorded_date": "2020-12-01",
+    "doc_type": "DEED_OF_TRUST",
+    "loan_program": "CONV",
+    "loan_amount": 610000.0,
+    "note_rate": 2.875,
+    "origination_date": "2020-11-20",
+    "lender": "WELLS FARGO BANK NA",
+    "borrower": "CHEN, ROBERT & CHEN, AMY",
+    "property": {
+      "apn": "R533210",
+      "address": "2815 NE ALAMEDA ST",
+      "city": "PORTLAND",
+      "state": "OR",
+      "zip": "97212",
+      "lat": 45.5488,
+      "lon": -122.636
+    },
+    "county": "MULTNOMAH"
+  }
+]

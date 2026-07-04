@@ -1,0 +1,24 @@
+{
+  "name": "lee-county-fl-default",
+  "_comment": "Default buy-box: Lee County FL (Slice-1 reference market). Every block is optional — remove a block to stop filtering on it. zips support '*' prefix-glob. unknown_policy: lenient = missing facts don't fail the box (reported as unknowns); strict = missing facts count as misses.",
+  "geo": {
+    "states": ["FL"],
+    "cities": [],
+    "zips": ["339*"],
+    "counties": ["LEE"]
+  },
+  "price_band": {
+    "min": 60000,
+    "max": 600000
+  },
+  "min_equity_pct": 0.2,
+  "property_types": [
+    "single_family",
+    "duplex",
+    "triplex",
+    "quadplex",
+    "mobile_home"
+  ],
+  "min_signal_count": 2,
+  "unknown_policy": "lenient"
+}

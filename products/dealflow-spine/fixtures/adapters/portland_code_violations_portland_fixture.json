@@ -1,0 +1,45 @@
+[
+  {
+    "_synthetic": true,
+    "_note": "Synthetic records mirroring Portland BDS AMANDA property-compliance case shape (PortlandMaps API, key-gated). Replace with live records once an API key integration is approved.",
+    "case_number": "25-123456-HS",
+    "case_type": "Housing Maintenance",
+    "description": "Roof deterioration, broken windows, accumulation of debris in yard",
+    "status": "Under Investigation",
+    "case_opened": "2026-06-12T00:00:00",
+    "address": "4523 SE HAWTHORNE BLVD",
+    "zip": "97215",
+    "state_id": "R123456",
+    "lat": 45.5121,
+    "lon": -122.6106,
+    "url": null
+  },
+  {
+    "_synthetic": true,
+    "case_number": "25-118877-NU",
+    "case_type": "Nuisance",
+    "description": "Vacant structure open to entry; overgrown vegetation over 10 inches",
+    "status": "Violation Confirmed",
+    "case_opened": "2026-05-28T00:00:00",
+    "address": "7811 N LOMBARD ST",
+    "zip": "97203",
+    "state_id": "R654321",
+    "lat": 45.5889,
+    "lon": -122.7284,
+    "url": null
+  },
+  {
+    "_synthetic": true,
+    "case_number": "25-101204-DS",
+    "case_type": "Dangerous Building",
+    "description": "Fire-damaged single family residence, unsecured; posted unsafe",
+    "status": "Enforcement - Lien Pending",
+    "case_opened": "2026-04-03T00:00:00",
+    "address": "215 NE 82ND AVE",
+    "zip": "97220",
+    "state_id": "R777888",
+    "lat": 45.5266,
+    "lon": -122.5789,
+    "url": null
+  }
+]

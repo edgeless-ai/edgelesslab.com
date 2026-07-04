@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Reaction-Diffusion — Edgeless Lab</title>
+<style>
+  :root { --bg:#09090B; --ink:#C6F24E; --muted:#8FA378; --panel:rgba(17,17,19,.72); --line:rgba(255,255,255,.10); }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; background:var(--bg); overflow:hidden; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:#FAFAFA; }
+  #gl { position:fixed; inset:0; width:100%; height:100%; display:block; touch-action:none; }
+  .hud { position:fixed; left:0; right:0; bottom:0; padding:14px 16px calc(14px + env(safe-area-inset-bottom));
+         background:linear-gradient(to top, rgba(9,9,11,.88), rgba(9,9,11,0)); pointer-events:none; }
+  .panel { max-width:520px; margin:0 auto; pointer-events:auto; }
+  .row { display:flex; align-items:center; gap:12px; margin-top:10px; }
+  .row label { font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); width:38px; flex:none; }
+  .row input[type=range]{ -webkit-appearance:none; appearance:none; flex:1; height:2px; background:var(--line); border-radius:2px; outline:none; }
+  .row input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--ink); cursor:pointer; box-shadow:0 0 10px rgba(198,242,78,.5); }
+  .row input[type=range]::-moz-range-thumb{ width:16px; height:16px; border:none; border-radius:50%; background:var(--ink); }
+  .row .val { font-size:11px; color:var(--ink); width:52px; text-align:right; flex:none; }
+  .top { position:fixed; top:0; left:0; right:0; padding:calc(12px + env(safe-area-inset-top)) 16px 12px; display:flex; align-items:center; justify-content:space-between; pointer-events:none; }
+  .brand { font-size:13px; font-weight:600; letter-spacing:-.01em; }
+  .brand .dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--ink); margin-right:7px; vertical-align:middle; box-shadow:0 0 8px rgba(198,242,78,.6); }
+  .brand .sub { color:rgba(255,255,255,.4); }
+  .hint { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:2px; pointer-events:auto; }
+  .chip { pointer-events:auto; font:inherit; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+          background:rgba(198,242,78,.10); border:1px solid var(--line); border-radius:999px; padding:6px 11px; cursor:pointer; transition:.15s; }
+  .chip:hover, .chip.on { color:var(--bg); background:var(--ink); border-color:var(--ink); }
+  .err { position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:24px; text-align:center; color:var(--muted); font-size:13px; line-height:1.6; }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div class="top">
+  <div class="brand"><span class="dot"></span>edgeless<span class="sub">/lab</span></div>
+  <div class="hint">drag to seed</div>
+</div>
+<div class="hud"><div class="panel">
+  <div class="chips">
+    <button class="chip on" data-preset="worms">worms</button>
+    <button class="chip" data-preset="mitosis">mitosis</button>
+    <button class="chip" data-preset="coral">coral</button>
+    <button class="chip" data-preset="maze">maze</button>
+    <button class="chip" data-preset="clear">clear</button>
+  </div>
+  <div class="row"><label>feed</label><input id="f" type="range" min="0.010" max="0.090" step="0.001" value="0.037"><span class="val" id="fv">0.037</span></div>
+  <div class="row"><label>kill</label><input id="k" type="range" min="0.045" max="0.070" step="0.0005" value="0.060"><span class="val" id="kv">0.060</span></div>
+</div></div>
+<div class="err" id="err">WebGL2 with float buffers isn't available on this device.<br>Try a current mobile browser.</div>
+
+<script>
+"use strict";
+const canvas = document.getElementById("gl");
+const gl = canvas.getContext("webgl2", { antialias:false, preserveDrawingBuffer:false });
+function fail(){ document.getElementById("err").style.display="flex"; }
+if (!gl) { fail(); throw new Error("no webgl2"); }
+const extF = gl.getExtension("EXT_color_buffer_float");
+if (!extF) { fail(); throw new Error("no float buffers"); }
+
+// ── shaders ──────────────────────────────────────────────────────────────
+const VERT = `#version 300 es
+in vec2 p; out vec2 uv;
+void main(){ uv = p*0.5+0.5; gl_Position = vec4(p,0.,1.); }`;
+
+// Gray-Scott update — the Karl-Sims parameterization (Du=.16,Dv=.08,dt=1), stable in realtime.
+const SIM = `#version 300 es
+precision highp float;
+in vec2 uv; out vec4 o;
+uniform sampler2D state; uniform vec2 texel; uniform float F, K;
+uniform vec2 seed; uniform float seedR; uniform float seeding;
+void main(){
+  vec2 c = texture(state, uv).xy;
+  vec2 l = texture(state, uv+vec2(-texel.x,0.)).xy + texture(state, uv+vec2(texel.x,0.)).xy
+         + texture(state, uv+vec2(0.,-texel.y)).xy + texture(state, uv+vec2(0.,texel.y)).xy
+         + 0.5*(texture(state, uv+vec2(-texel.x,-texel.y)).xy + texture(state, uv+vec2(texel.x,-texel.y)).xy
+              + texture(state, uv+vec2(-texel.x,texel.y)).xy + texture(state, uv+vec2(texel.x,texel.y)).xy)
+         - 6.0*c;
+  l /= 6.0; // normalized laplacian
+  float u=c.x, v=c.y, uvv=u*v*v;
+  float du = 0.16*l.x - uvv + F*(1.0-u);
+  float dv = 0.08*l.y + uvv - (F+K)*v;
+  vec2 n = c + vec2(du,dv);
+  // inject v where the finger is
+  float d = distance(uv, seed);
+  if (seeding>0.5 && d < seedR){ n.y = 0.5; n.x = 0.2; }
+  o = vec4(clamp(n,0.,1.), 0., 1.);
+}`;
+
+// Display — map v through the Edgeless bioluminescent ramp.
+const DISP = `#version 300 es
+precision highp float;
+in vec2 uv; out vec4 o;
+uniform sampler2D state;
+vec3 ramp(float t){
+  t = clamp(t,0.,1.);
+  vec3 c0=vec3(0.020,0.027,0.039), c1=vec3(0.031,0.125,0.102), c2=vec3(0.047,0.227,0.165),
+       c3=vec3(0.180,0.490,0.275), c4=vec3(0.490,0.827,0.373), c5=vec3(0.776,0.949,0.306), c6=vec3(0.957,1.0,0.902);
+  if(t<0.16) return mix(c0,c1,t/0.16);
+  if(t<0.34) return mix(c1,c2,(t-0.16)/0.18);
+  if(t<0.52) return mix(c2,c3,(t-0.34)/0.18);
+  if(t<0.72) return mix(c3,c4,(t-0.52)/0.20);
+  if(t<0.88) return mix(c4,c5,(t-0.72)/0.16);
+  return mix(c5,c6,(t-0.88)/0.12);
+}
+void main(){
+  float v = texture(state, uv).y;
+  o = vec4(ramp(pow(v*3.4, 0.9)), 1.0);
+}`;
+
+function sh(type, src){ const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s);
+  if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){ console.error(gl.getShaderInfoLog(s)); fail(); throw new Error("shader"); } return s; }
+function prog(vs,fs){ const p=gl.createProgram(); gl.attachShader(p,sh(gl.VERTEX_SHADER,vs)); gl.attachShader(p,sh(gl.FRAGMENT_SHADER,fs));
+  gl.linkProgram(p); if(!gl.getProgramParameter(p,gl.LINK_STATUS)){ console.error(gl.getProgramInfoLog(p)); fail(); throw new Error("link"); } return p; }
+const simP = prog(VERT,SIM), dispP = prog(VERT,DISP);
+
+// fullscreen quad
+const quad = gl.createVertexArray(); gl.bindVertexArray(quad);
+const vbo = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+
+// ── simulation resolution (capped for phone perf) ──
+let SW, SH, texel, fbos=[], texs=[], cur=0;
+function makeTarget(w,h){
+  const t=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,t);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA16F,w,h,0,gl.RGBA,gl.HALF_FLOAT,null);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  const f=gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER,f);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,t,0);
+  return {t,f};
+}
+function seedField(){
+  // CPU-seed: u=1 everywhere, a few v blobs → then let it grow
+  const w=SW,h=SH, data=new Float32Array(w*h*4);
+  for(let i=0;i<w*h;i++){ data[i*4]=1.0; data[i*4+1]=0.0; data[i*4+3]=1.0; }
+  const blobs=14, r=Math.max(3, Math.floor(SW/26));
+  for(let b=0;b<blobs;b++){
+    const cx=r+Math.floor(Math.random()*(w-2*r)), cy=r+Math.floor(Math.random()*(h-2*r));
+    for(let y=-r;y<r;y++)for(let x=-r;x<r;x++){ const idx=((cy+y)*w+(cx+x))*4; data[idx]=0.2; data[idx+1]=0.5; }
+  }
+  return data;
+}
+function initTargets(){
+  const maxDim = Math.min(720, Math.floor(Math.min(window.innerWidth,window.innerHeight)*(window.devicePixelRatio>1?1.4:1.0)));
+  const aspect = window.innerWidth/window.innerHeight;
+  SW = aspect>=1 ? maxDim : Math.floor(maxDim*aspect);
+  SH = aspect>=1 ? Math.floor(maxDim/aspect) : maxDim;
+  SW = Math.max(64, SW); SH = Math.max(64, SH);
+  texel = [1/SW, 1/SH];
+  fbos.forEach(o=>{ gl.deleteTexture(o.t); gl.deleteFramebuffer(o.f); });
+  texs=[makeTarget(SW,SH), makeTarget(SW,SH)]; fbos=texs; cur=0;
+  const seed=seedField();
+  gl.bindTexture(gl.TEXTURE_2D, texs[0].t);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA16F,SW,SH,0,gl.RGBA,gl.FLOAT,seed);
+  gl.bindTexture(gl.TEXTURE_2D, texs[1].t);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA16F,SW,SH,0,gl.RGBA,gl.FLOAT,seed);
+}
+
+function resize(){
+  const dpr=Math.min(window.devicePixelRatio||1, 2);
+  canvas.width=Math.floor(window.innerWidth*dpr); canvas.height=Math.floor(window.innerHeight*dpr);
+  initTargets();
+}
+window.addEventListener("resize", ()=>{ clearTimeout(window._rt); window._rt=setTimeout(resize,180); });
+
+// ── interaction ──
+let seeding=0, seedPos=[0.5,0.5];
+function pos(e){ const r=canvas.getBoundingClientRect(); const t=e.touches?e.touches[0]:e;
+  seedPos=[(t.clientX-r.left)/r.width, 1.0-(t.clientY-r.top)/r.height]; }
+canvas.addEventListener("pointerdown", e=>{ seeding=1; pos(e); });
+canvas.addEventListener("pointermove", e=>{ if(seeding) pos(e); });
+window.addEventListener("pointerup", ()=> seeding=0);
+
+// ── controls ──
+let F=0.037, K=0.060;
+const fEl=document.getElementById("f"), kEl=document.getElementById("k"), fv=document.getElementById("fv"), kv=document.getElementById("kv");
+fEl.oninput=()=>{ F=+fEl.value; fv.textContent=F.toFixed(3); };
+kEl.oninput=()=>{ K=+kEl.value; kv.textContent=K.toFixed(3); };
+const PRESETS={ worms:[0.037,0.060], mitosis:[0.026,0.055], coral:[0.055,0.062], maze:[0.029,0.057] };
+document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{
+  document.querySelectorAll(".chip").forEach(x=>x.classList.remove("on")); c.classList.add("on");
+  const p=c.dataset.preset;
+  if(p==="clear"){ initTargets(); return; }
+  const [f,k]=PRESETS[p]; F=f; K=k; fEl.value=f; kEl.value=k; fv.textContent=f.toFixed(3); kv.textContent=k.toFixed(3);
+});
+
+// ── render loop ──
+const uSim={ state:gl.getUniformLocation(simP,"state"), texel:gl.getUniformLocation(simP,"texel"),
+  F:gl.getUniformLocation(simP,"F"), K:gl.getUniformLocation(simP,"K"),
+  seed:gl.getUniformLocation(simP,"seed"), seedR:gl.getUniformLocation(simP,"seedR"), seeding:gl.getUniformLocation(simP,"seeding") };
+const uDisp={ state:gl.getUniformLocation(dispP,"state") };
+resize();
+let _fc=0;
+window._probe = () => ({ frames:_fc, cur, SW, SH });
+function frame(){
+  try {
+  _fc++;
+  gl.bindVertexArray(quad);
+  gl.useProgram(simP);
+  gl.uniform2fv(uSim.texel, texel); gl.uniform1f(uSim.F,F); gl.uniform1f(uSim.K,K);
+  gl.uniform2fv(uSim.seed, seedPos); gl.uniform1f(uSim.seedR, 0.03); gl.uniform1f(uSim.seeding, seeding);
+  gl.viewport(0,0,SW,SH);
+  const STEPS=10;
+  for(let s=0;s<STEPS;s++){
+    const src=texs[cur], dst=texs[cur^1];
+    gl.bindFramebuffer(gl.FRAMEBUFFER, dst.f);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, src.t); gl.uniform1i(uSim.state,0);
+    gl.uniform1f(uSim.seeding, s===0?seeding:0.0);
+    gl.drawArrays(gl.TRIANGLES,0,3);
+    cur^=1;
+  }
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+  gl.viewport(0,0,canvas.width,canvas.height);
+  gl.useProgram(dispP);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texs[cur].t); gl.uniform1i(uDisp.state,0);
+  gl.drawArrays(gl.TRIANGLES,0,3);
+  } catch(e){ console.error("FRAME_ERR", e && e.message, e); window._ferr = String(e); return; }
+  requestAnimationFrame(frame);
+}
+window._step = frame;  // manual driver for headless/background verification
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

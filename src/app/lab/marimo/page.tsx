@@ -4,7 +4,6 @@ import { JsonLd } from "@/components/json-ld";
 import { createPageMetadata } from "@/lib/metadata";
 import { marimoDemos, marimoCategories, type MarimoDemo } from "@/lib/marimo-demos";
 import { MarimoPreview } from "@/components/marimo-preview";
-import Link from "next/link";
 
 export const metadata = createPageMetadata({
   title: "Marimo",
@@ -138,8 +137,10 @@ export default function MarimoPage() {
 
 function DemoCard({ demo }: { demo: MarimoDemo }) {
   return (
-    <Link
-      href={`/marimo/${demo.slug}/`}
+    <a
+      href={`https://edgeless-marimo.pages.dev/${demo.slug}/`}
+      target="_blank"
+      rel="noopener noreferrer"
       className="group block rounded-lg border p-4 transition-all hover:border-[var(--border-hover)]"
       style={{
         background: "var(--bg-surface)",
@@ -177,6 +178,6 @@ function DemoCard({ demo }: { demo: MarimoDemo }) {
           </span>
         ))}
       </div>
-    </Link>
+    </a>
   );
 }

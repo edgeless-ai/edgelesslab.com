@@ -86,6 +86,33 @@ const fit = [
   "Operators who tried generic AI tools and need someone to make the real workflow work",
 ];
 
+const faqs = [
+  {
+    q: "Do I use my own API keys or yours?",
+    a: "You keep your own accounts with OpenAI, Anthropic, or other providers. I wire the system to your keys, recommend a cost-effective model mix, and show you how to monitor usage. Provider bills are paid directly by you.",
+  },
+  {
+    q: "Can the system run locally and keep my data private?",
+    a: "Yes. I can set up a local LLM on hardware you already own, or help source dedicated hardware, and tune the workflow around it so private work stays off third-party model APIs where practical.",
+  },
+  {
+    q: "How much does a build cost?",
+    a: "Scoped build fees range from a $250-$500 diagnostic session to $7,500+ for custom full-service work, with personal workflow, small business, and private hardware tiers in between. Ranges depend on integrations, data sensitivity, and whether hardware sourcing is included.",
+  },
+  {
+    q: "What ongoing AI costs should I expect?",
+    a: "Provider usage is billed directly to you. Many API-backed systems land around $10-$100 per month, and local workloads can reduce recurring API spend when the hardware makes sense.",
+  },
+  {
+    q: "Do you work remotely or only in Portland?",
+    a: "Builds are based in Portland, Oregon, with remote work available. The system is deployed to your machine, your server, or dedicated hardware and handed off with documentation.",
+  },
+  {
+    q: "What kinds of tasks can you automate?",
+    a: "Inbox assistants that draft replies and sort leads, overnight research and reporting, content pipelines that turn notes into drafts, private knowledge bases that answer questions from your documents, and automations that connect email, calendar, documents, and spreadsheets.",
+  },
+];
+
 export default function PrivateAiSystemsPage() {
   return (
     <div className="flex min-h-full flex-col" style={{ background: "var(--bg-base)" }}>
@@ -109,6 +136,18 @@ export default function PrivateAiSystemsPage() {
             name: tier.name,
             priceSpecification: tier.price,
             description: tier.scope,
+          })),
+        }}
+      />
+
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqs.map((item) => ({
+            "@type": "Question",
+            name: item.q,
+            acceptedAnswer: { "@type": "Answer", text: item.a },
           })),
         }}
       />
@@ -339,6 +378,29 @@ export default function PrivateAiSystemsPage() {
                 Email the workflow
                 <ArrowRight size={14} />
               </ServiceCtaLink>
+            </div>
+          </div>
+        </section>
+
+        <section className="px-6 py-20" style={{ background: "var(--bg-surface)" }}>
+          <div className="mx-auto max-w-[820px]">
+            <p className="mb-3 font-mono text-xs uppercase tracking-[0.18em]" style={{ color: "var(--accent)" }}>
+              FAQ
+            </p>
+            <h2 className="mb-10 text-3xl font-semibold tracking-tight" style={{ color: "var(--text-primary)" }}>
+              Common questions.
+            </h2>
+            <div className="divide-y" style={{ borderColor: "var(--border-subtle)" }}>
+              {faqs.map((item) => (
+                <div key={item.q} className="py-6 first:pt-0" style={{ borderColor: "var(--border-subtle)" }}>
+                  <h3 className="mb-2 text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
+                    {item.q}
+                  </h3>
+                  <p className="text-sm leading-7" style={{ color: "var(--text-secondary)" }}>
+                    {item.a}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </section>

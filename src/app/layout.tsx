@@ -120,10 +120,24 @@ export default function RootLayout({
             "@type": "Person",
             "name": "David Murray"
           },
+          "logo": "https://edgelesslab.com/favicon.svg",
           "sameAs": [
             "https://github.com/edgeless-ai",
             "https://edgelessai.gumroad.com"
           ]
+        }} />
+        <JsonLd data={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Edgeless Lab",
+          "url": "https://edgelesslab.com",
+          "description": "One person shipping autonomous agents, generative art, and developer tools. Built in production, released in the open.",
+          "inLanguage": "en-US",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Edgeless Lab",
+            "url": "https://edgelesslab.com"
+          }
         }} />
         <a
           href="#main-content"

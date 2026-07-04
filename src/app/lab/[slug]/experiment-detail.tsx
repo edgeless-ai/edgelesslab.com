@@ -50,6 +50,17 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
           url: `https://edgelesslab.com/lab/${experiment.slug}`,
         }}
       />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://edgelesslab.com" },
+            { "@type": "ListItem", position: 2, name: "Lab", item: "https://edgelesslab.com/lab" },
+            { "@type": "ListItem", position: 3, name: experiment.title, item: `https://edgelesslab.com/lab/${experiment.slug}` },
+          ],
+        }}
+      />
       <Nav />
 
       <main id="main-content">

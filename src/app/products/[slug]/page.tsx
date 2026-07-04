@@ -87,7 +87,7 @@ export default async function ProductDetailPage({
           "@type": "Product",
           name: product.name,
           description: content.shortDescription,
-          image: `${SITE}/product-covers/${slug}.png`,
+          image: `${SITE}/product-covers/${slug}.webp`,
           brand: { "@type": "Brand", name: "Edgeless Lab" },
           url: `${SITE}/products/${slug}`,
           offers: {

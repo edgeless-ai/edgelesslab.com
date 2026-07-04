@@ -19,6 +19,15 @@ export function ProjectDetail({ project }: { project: Project }) {
         "author": { "@type": "Organization", "name": "Edgeless Lab", "url": "https://edgelesslab.com" },
         "url": `https://edgelesslab.com/projects/${project.slug}`,
       }} />
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://edgelesslab.com" },
+          { "@type": "ListItem", position: 2, name: "Projects", item: "https://edgelesslab.com/projects" },
+          { "@type": "ListItem", position: 3, name: project.title, item: `https://edgelesslab.com/projects/${project.slug}` },
+        ],
+      }} />
       <Nav />
 
       <main id="main-content">

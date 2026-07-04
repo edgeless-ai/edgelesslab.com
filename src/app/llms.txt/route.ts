@@ -19,7 +19,10 @@ export async function GET(): Promise<Response> {
   const recent = sortedPosts.slice(0, 12);
   const editorial = sortedPosts.filter((p) => p.editorial);
 
-  const featuredProducts = products.filter((p) => !p.comingSoon).slice(0, 20);
+  const liveProductsAll = products.filter((p) => !p.comingSoon);
+  const freeCount = liveProductsAll.filter((p) => p.price === "Free").length;
+  const paidCount = liveProductsAll.length - freeCount;
+  const featuredProducts = liveProductsAll.slice(0, 20);
   const liveProjects = projects.filter((p) => p.status !== "Draft");
   const liveExperiments = experiments.filter((e) => e.status !== "Draft");
 
@@ -43,7 +46,7 @@ export async function GET(): Promise<Response> {
 
   const body = `# Edgeless Lab
 
-> One developer shipping autonomous agents, MCP servers, and generative art. 5 free lead magnets, 17 premium toolkits. Everything open source. Built in production, released in the open.
+> One developer shipping autonomous agents, MCP servers, and generative art. ${freeCount} free lead magnets, ${paidCount} premium toolkits. Everything open source. Built in production, released in the open.
 
 ## Docs
 
@@ -52,8 +55,11 @@ export async function GET(): Promise<Response> {
 - [Projects](${SITE_URL}/projects): shipped and live systems
 - [Agents](${SITE_URL}/agents): multi-agent orchestration stack
 - [Lab](${SITE_URL}/lab): interactive playgrounds and experiments
-- [Services / Private AI Systems](${SITE_URL}/services/private-ai-systems): outbound consulting
+- [Creative](${SITE_URL}/creative): generative art, pen-plotter, and visual work
+- [Services / Private AI Systems](${SITE_URL}/services/private-ai-systems): custom private AI agent systems for professionals and small businesses
+- [Agentic OS series](${SITE_URL}/series/agentic-os): long-form series on building autonomous AI infrastructure
 - [Knowledge](${SITE_URL}/knowledge): KB index
+- [Support](${SITE_URL}/support): help and contact
 
 ## Recent posts
 
@@ -74,6 +80,11 @@ ${liveProjects.map(itemLine).join("\n")}
 ## Live experiments
 
 ${liveExperiments.map(itemLine).join("\n")}
+
+## Related properties
+
+- [Field Notes](https://notes.edgelesslab.com): gallery of field notes and visual experiments (separate subdomain)
+- [Shop](https://shop.edgelesslab.com): merch and physical goods (separate subdomain)
 
 ## Optional
 

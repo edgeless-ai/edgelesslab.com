@@ -16,6 +16,7 @@ const labLinks = [
   { label: "Strange Attractors", href: "/lab/strange-attractors", external: false },
   { label: "Total Serialism", href: "/total-serialism/app/", external: false },
   { label: "Excalidraw Diagrams", href: "/lab/excalidraw-diagrams", external: false },
+  { label: "Field Notes", href: "https://notes.edgelesslab.com", external: true },
 ];
 
 const ASCII_BANNER = `    ______    __           __

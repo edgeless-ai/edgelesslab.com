@@ -14,6 +14,7 @@ const navLinks = [
   { label: "Services", href: "/services/private-ai-systems" },
   { label: "Lab", href: "/lab" },
   { label: "Creative", href: "/creative" },
+  { label: "Notes", href: "https://notes.edgelesslab.com" },
   { label: "Agents", href: "/agents" },
   { label: "Blog", href: "/blog" },
   { label: "About", href: "/about" },

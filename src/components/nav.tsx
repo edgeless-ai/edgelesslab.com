@@ -27,6 +27,7 @@ const NAV: NavItem[] = [
     children: [
       { label: "Lab", href: "/lab" },
       { label: "Creative", href: "/creative" },
+      { label: "Marimo", href: "/lab/marimo" },
       { label: "Agents", href: "/agents" },
     ],
   },

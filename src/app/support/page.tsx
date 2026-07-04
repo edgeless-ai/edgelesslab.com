@@ -71,9 +71,9 @@ export default function Support() {
                   Clapper.
                 </li>
                 <li>
-                  <strong>Background listening</strong> -- off by default. The
-                  mic is released whenever you leave the app unless you enable
-                  Background Listening in Settings.
+                  <strong>Microphone use</strong> -- The Clapper only listens
+                  while the app is open. The mic is always released when you
+                  leave the app.
                 </li>
               </ul>
             </Section>

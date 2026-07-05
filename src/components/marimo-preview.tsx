@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from "react";
 // The 12 WASM notebooks (each bundles a 27MB Pyodide runtime → 322MB total) are
 // hosted on Cloudflare Pages, off the main GitHub repo. Swap this base for a custom
 // subdomain (e.g. marimo.edgelesslab.com) once DNS is set.
-const MARIMO_BASE = "https://edgeless-marimo.pages.dev";
+const MARIMO_BASE = "https://marimo.edgelesslab.com";
 
 export function MarimoPreview({ slug, title }: { slug: string; title: string }) {
   const ref = useRef<HTMLDivElement>(null);

@@ -138,7 +138,7 @@ export default function MarimoPage() {
 function DemoCard({ demo }: { demo: MarimoDemo }) {
   return (
     <a
-      href={`https://edgeless-marimo.pages.dev/${demo.slug}/`}
+      href={`https://marimo.edgelesslab.com/${demo.slug}/`}
       target="_blank"
       rel="noopener noreferrer"
       className="group block rounded-lg border p-4 transition-all hover:border-[var(--border-hover)]"

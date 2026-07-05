@@ -2,7 +2,7 @@ export interface MarimoDemo {
   slug: string;
   title: string;
   description: string;
-  category: "Finance/GPU" | "Generative" | "Algorithms" | "Reactive";
+  category: "Finance/GPU" | "Generative" | "Algorithms" | "Reactive" | "Research";
   tags: string[];
 }
 
@@ -93,6 +93,116 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["TSP", "Optimization", "Whiteboard"],
   },
 
+  // Reactive (overnight expansion 2026-07-05)
+  {
+    slug: "reactive-wave-demo",
+    title: "Reactive Wave Demo",
+    description:
+      "Auto-animated superposition of N sine waves with a live phase-vector circle plot — marimo's reactive state model doing the animation loop.",
+    category: "Reactive",
+    tags: ["Signal Processing", "Animation", "Teaching"],
+  },
+  {
+    slug: "gaussian-probability",
+    title: "Gaussian Probability Explorer",
+    description:
+      "An auto-playing Gaussian PDF/CDF viewer where mean and sigma trace parametric paths — circles, spirals, Lissajous — with a live parameter-space trajectory.",
+    category: "Reactive",
+    tags: ["Statistics", "Generative Art", "Teaching"],
+  },
+  {
+    slug: "gaussian-path-explorer",
+    title: "Gaussian Path Explorer",
+    description:
+      "A 2D animated path navigator — seven path shapes with play, reset, and manual override — whose position drives a live Gaussian PDF and parameter trace.",
+    category: "Reactive",
+    tags: ["Statistics", "Animation", "Interactive"],
+  },
+
+  // Algorithms (overnight expansion)
+  {
+    slug: "tsp-nearest-neighbor",
+    title: "TSP: The Slider That Closes the Loop",
+    description:
+      "A nearest-neighbor traveling-salesman tour over twelve random cities, scrubbed step by step with a slider — path-so-far and distance stats update live.",
+    category: "Algorithms",
+    tags: ["TSP", "Optimization", "Teaching"],
+  },
+
+  // Research explainers (overnight expansion)
+  {
+    slug: "routerarena-scoring",
+    title: "RouterArena Score Simulation",
+    description:
+      "How a single composite benchmark score can hide capability gaps — simulate aggregate vs per-difficulty-band scoring on an LLM-routing benchmark.",
+    category: "Research",
+    tags: ["LLM Routing", "Benchmarking"],
+  },
+  {
+    slug: "ppl-diff",
+    title: "PPL-Diff: When Finetuned Models Overgeneralize",
+    description:
+      "Perplexity-difference detection between finetuned and reference models, simulated live — why the metric is simple but noisy.",
+    category: "Research",
+    tags: ["LLM Evaluation", "Finetuning"],
+  },
+  {
+    slug: "contextforge-budget",
+    title: "ContextForge: Context Budget vs Full Replay",
+    description:
+      "Slider-driven comparison of naive full-context replay against a fixed context-recycling budget — accuracy and cumulative token cost over a long conversation.",
+    category: "Research",
+    tags: ["Long Context", "LLM Cost"],
+  },
+  {
+    slug: "ttt-memory-claims",
+    title: "Beyond Perplexity: Behavioral Memory in TTT",
+    description:
+      "Does test-time-training's perplexity gain reflect genuine behavioral memory? Probe the claim with a support-length slider.",
+    category: "Research",
+    tags: ["Test-Time Training", "LLM Evaluation"],
+  },
+  {
+    slug: "kimi-k1-5-context",
+    title: "Kimi K1.5 — Long Context as Search Space",
+    description:
+      "The reasoning-token budget trade-off behind Kimi K1.5's long2short distillation — optimal context budget vs answer quality, simulated.",
+    category: "Research",
+    tags: ["Reasoning", "Distillation"],
+  },
+  {
+    slug: "verifier-guided-decoding",
+    title: "Best-of-N + Verifier-Guided Decoding",
+    description:
+      "Expected total generation cost per successful sample under verifier-guided backtracking versus plain best-of-N sampling.",
+    category: "Research",
+    tags: ["Decoding", "LLM Cost"],
+  },
+  {
+    slug: "wayfinder-router",
+    title: "Deterministic vs Learned Router Economics",
+    description:
+      "A rule-based deterministic router against a learned router across synthetic workloads — local vs hosted cost trade-offs, visualized.",
+    category: "Research",
+    tags: ["LLM Routing", "Economics"],
+  },
+  {
+    slug: "persona-belief-probes",
+    title: "Roleplaying Persona Belief Probes",
+    description:
+      "An intervention spectrum for probing whether roleplaying LLM personas hold genuine internal beliefs or surface mimicry.",
+    category: "Research",
+    tags: ["Interpretability", "Roleplay"],
+  },
+  {
+    slug: "adaptrack-decoding",
+    title: "AdapTrack: Constrained Decoding Without Distortion",
+    description:
+      "How naive grammar constraints distort model intent during constrained decoding — and how adaptive tracking avoids it.",
+    category: "Research",
+    tags: ["Constrained Decoding", "Interpretability"],
+  },
+
   // Reactive
   {
     slug: "curve-editor",
@@ -117,4 +227,5 @@ export const marimoCategories: MarimoDemo["category"][] = [
   "Generative",
   "Algorithms",
   "Reactive",
+  "Research",
 ];

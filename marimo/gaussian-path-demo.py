@@ -119,7 +119,7 @@ def _(mo, np, path_type, phase, smoothing):
         x = np.clip((x - edge0) / (edge1 - edge0), 0.0, 1.0)
         return x * x * (3 - 2 * x)
 
-    if path == "circle":
+    if _path == "circle":
         mu = 3.0 * np.cos(t)
         sigma = 1.0 + 0.5 * np.sin(t)
     elif _path == "sine":

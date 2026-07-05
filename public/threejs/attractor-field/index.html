@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Attractor Field — Edgeless Lab</title>
+<style>
+  :root { --bg:#09090B; --ink:#C6F24E; --muted:#8FA378; --line:rgba(255,255,255,.10); }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; background:var(--bg); overflow:hidden; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:#FAFAFA; }
+  #gl { position:fixed; inset:0; width:100%; height:100%; display:block; touch-action:none; }
+  .top { position:fixed; top:0; left:0; right:0; padding:calc(12px + env(safe-area-inset-top)) 16px 12px; display:flex; align-items:center; justify-content:space-between; pointer-events:none; z-index:2; }
+  .brand { font-size:13px; font-weight:600; letter-spacing:-.01em; }
+  .brand .dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--ink); margin-right:7px; vertical-align:middle; box-shadow:0 0 8px rgba(198,242,78,.6); }
+  .brand .sub { color:rgba(255,255,255,.4); }
+  .hint { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); transition:opacity .5s; }
+  .hud { position:fixed; left:0; right:0; bottom:0; padding:14px 16px calc(14px + env(safe-area-inset-bottom));
+         background:linear-gradient(to top, rgba(9,9,11,.86), rgba(9,9,11,0)); pointer-events:none;
+         transition:opacity .5s, transform .5s; }
+  .hud.hidden { opacity:0; transform:translateY(12px); }
+  .panel { max-width:560px; margin:0 auto; pointer-events:auto; }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+  .chip { pointer-events:auto; font:inherit; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+          background:rgba(198,242,78,.10); border:1px solid var(--line); border-radius:999px; padding:6px 11px; cursor:pointer; transition:.15s; }
+  .chip:hover, .chip.on { color:var(--bg); background:var(--ink); border-color:var(--ink); box-shadow:0 0 14px rgba(198,242,78,.35); }
+  .chip.sys { background:rgba(255,255,255,.06); }
+  .row { display:flex; align-items:center; gap:12px; margin-top:8px; }
+  .row label { font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); width:64px; flex:none; }
+  .row input[type=range]{ -webkit-appearance:none; appearance:none; flex:1; height:2px; background:var(--line); border-radius:2px; outline:none; }
+  .row input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--ink); cursor:pointer; box-shadow:0 0 12px rgba(198,242,78,.6); }
+  .row input[type=range]::-moz-range-thumb{ width:16px; height:16px; border:none; border-radius:50%; background:var(--ink); }
+  .err { position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:24px; text-align:center; color:var(--muted); font-size:13px; line-height:1.6; }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div class="top">
+  <div class="brand"><span class="dot"></span>edgeless<span class="sub">/lab · attractor field</span></div>
+  <div class="hint" id="hint">drag to bend the field</div>
+</div>
+<div class="hud" id="hud"><div class="panel">
+  <div class="chips" id="syschips">
+    <button class="chip sys on" data-sys="dejong">de Jong</button>
+    <button class="chip sys" data-sys="clifford">Clifford</button>
+    <button class="chip" data-mode="wander" id="wanderchip">wander</button>
+  </div>
+  <div class="chips" id="presets"></div>
+  <div class="row"><label>exposure</label><input id="expo" type="range" min="0.2" max="4" step="0.05" value="1.4"></div>
+</div></div>
+<div class="err" id="err">WebGL2 with float buffers isn't available on this device.</div>
+
+<script>
+"use strict";
+// Every preset below was DISCOVERED tonight (2026-07-05) by the Edgeless aesthetic
+// autoresearch rig: thousands of random parameter universes searched, scored on
+// coverage/entropy/edge/composition/contrast, the most beautiful kept. Same engine
+// that curates our pen-plotter prints — here, live under your finger.
+const SYSTEMS = {
+  dejong: {
+    step: (x, y, p) => [Math.sin(p.a*y) - Math.cos(p.b*x), Math.sin(p.c*x) - Math.cos(p.d*y)],
+    scale: 0.46,
+    presets: [
+      {a:2.8804, b:-2.7063, c:-1.5752, d:2.9987, s:"0.69"},
+      {a:2.6090, b:-2.5533, c:-0.9402, d:2.9963, s:"0.68"},
+      {a:2.4014, b:2.5615, c:-1.5286, d:-2.7407, s:"0.68"},
+      {a:2.0380, b:2.6080, c:-1.5838, d:2.3277, s:"0.68"},
+      {a:-2.9132, b:-2.9388, c:-2.4695, d:1.3569, s:"0.68"},
+      {a:2.8831, b:-2.0156, c:2.6494, d:1.6348, s:"0.67"},
+    ],
+  },
+  clifford: {
+    step: (x, y, p) => [Math.sin(p.a*y) + p.c*Math.cos(p.a*x), Math.sin(p.b*x) + p.d*Math.cos(p.b*y)],
+    scale: 0.30,
+    presets: [
+      {a:-1.4837, b:-1.5204, c:2.5478, d:-0.1100, s:"0.69"},
+      {a:1.4503, b:1.5852, c:-0.0765, d:-2.6730, s:"0.68"},
+      {a:-0.1605, b:-2.6719, c:0.0635, d:2.4337, s:"0.65"},
+      {a:0.5717, b:-2.9675, c:0.9990, d:0.7561, s:"0.64"},
+      {a:1.1737, b:0.6958, c:1.8665, d:-1.8104, s:"0.63"},
+      {a:0.6618, b:-1.9045, c:-2.8410, d:-0.1816, s:"0.63"},
+    ],
+  },
+};
+
+const canvas = document.getElementById("gl");
+const gl = canvas.getContext("webgl2", { antialias:false, alpha:false, powerPreference:"high-performance" });
+function fail(){ document.getElementById("err").style.display = "flex"; }
+if (!gl) { fail(); throw new Error("no webgl2"); }
+if (!gl.getExtension("EXT_color_buffer_float")) { fail(); throw new Error("no float buf"); }
+gl.getExtension("EXT_float_blend");
+
+// ── shaders ──
+const PT_VS = `#version 300 es
+in vec2 p; uniform float aspect;
+void main(){
+  vec2 q = vec2(p.x/aspect, p.y);
+  gl_Position = vec4(q, 0., 1.);
+  gl_PointSize = 1.0;
+}`;
+const PT_FS = `#version 300 es
+precision highp float; out vec4 o;
+void main(){ o = vec4(0.35, 0.35, 0.35, 1.0); }`;   // density increments (additive)
+
+const Q_VS = `#version 300 es
+in vec2 p; out vec2 uv; void main(){ uv=p*0.5+0.5; gl_Position=vec4(p,0.,1.); }`;
+const FADE_FS = `#version 300 es
+precision highp float; in vec2 uv; out vec4 o;
+uniform sampler2D src; uniform float decay;
+void main(){ o = texture(src, uv) * decay; }`;
+// bright2 recipe, live: exposure-normalized density -> gamma 0.5 -> bioluminescent ramp
+const DISP_FS = `#version 300 es
+precision highp float; in vec2 uv; out vec4 o;
+uniform sampler2D acc; uniform float exposure;
+vec3 ramp(float t){ t=clamp(t,0.,1.);
+  vec3 c0=vec3(0.020,0.027,0.039),c1=vec3(0.031,0.125,0.102),c2=vec3(0.047,0.227,0.165),
+       c3=vec3(0.180,0.490,0.275),c4=vec3(0.490,0.827,0.373),c5=vec3(0.776,0.949,0.306),c6=vec3(0.957,1.0,0.902);
+  if(t<0.16)return mix(c0,c1,t/0.16); if(t<0.34)return mix(c1,c2,(t-0.16)/0.18);
+  if(t<0.52)return mix(c2,c3,(t-0.34)/0.18); if(t<0.72)return mix(c3,c4,(t-0.52)/0.20);
+  if(t<0.88)return mix(c4,c5,(t-0.72)/0.16); return mix(c5,c6,(t-0.88)/0.12); }
+void main(){
+  float d = texture(acc, uv).r;
+  float t = pow(1.0 - exp(-d * exposure * 0.06), 0.5);   // soft-knee + gamma 0.5
+  o = vec4(ramp(t), 1.0);
+}`;
+
+function sh(t, s){ const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o);
+  if(!gl.getShaderParameter(o, gl.COMPILE_STATUS)){ console.error(gl.getShaderInfoLog(o)); fail(); throw 0; } return o; }
+function prog(v, f){ const p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, v)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, f));
+  gl.linkProgram(p); if(!gl.getProgramParameter(p, gl.LINK_STATUS)){ console.error(gl.getProgramInfoLog(p)); fail(); throw 0; } return p; }
+const ptP = prog(PT_VS, PT_FS), fadeP = prog(Q_VS, FADE_FS), dispP = prog(Q_VS, DISP_FS);
+
+// fullscreen quad
+const quadVAO = gl.createVertexArray(); gl.bindVertexArray(quadVAO);
+const qbo = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, qbo);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+// point batch
+const N = 45000;
+const pts = new Float32Array(N * 2);
+const ptVAO = gl.createVertexArray(); gl.bindVertexArray(ptVAO);
+const pbo = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, pbo);
+gl.bufferData(gl.ARRAY_BUFFER, pts.byteLength, gl.DYNAMIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+// accumulation targets (ping-pong for fade)
+let W, H, acc = [], cur = 0;
+function target(w, h){
+  const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, w, h, 0, gl.RED, gl.HALF_FLOAT, null);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  const f = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, f);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+  return { t, f };
+}
+function resize(){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = canvas.width = Math.floor(window.innerWidth * dpr);
+  H = canvas.height = Math.floor(window.innerHeight * dpr);
+  acc.forEach(o => { gl.deleteTexture(o.t); gl.deleteFramebuffer(o.f); });
+  acc = [target(W, H), target(W, H)]; cur = 0;
+  clearAcc();
+}
+function clearAcc(){
+  for (const a of acc){ gl.bindFramebuffer(gl.FRAMEBUFFER, a.f); gl.clearColor(0,0,0,1); gl.clear(gl.COLOR_BUFFER_BIT); }
+}
+window.addEventListener("resize", () => { clearTimeout(window._rt); window._rt = setTimeout(resize, 200); });
+
+// ── state ──
+let sysName = "dejong";
+let P = { ...SYSTEMS.dejong.presets[0] };
+let target_ = null;          // morph target (preset click)
+let wander = false;
+let settle = 1.0;            // 1 = params stable (accumulate), <1 while morphing (fade)
+let exposure = 1.4;
+let x = 0.1, y = 0.1;
+
+const presetsEl = document.getElementById("presets");
+function renderPresets(){
+  presetsEl.innerHTML = "";
+  SYSTEMS[sysName].presets.forEach((p, i) => {
+    const b = document.createElement("button");
+    b.className = "chip" + (i === 0 ? " on" : "");
+    b.textContent = "β" + p.s;
+    b.onclick = () => {
+      [...presetsEl.children].forEach(c => c.classList.remove("on")); b.classList.add("on");
+      target_ = { ...p }; revealHUD();
+    };
+    presetsEl.appendChild(b);
+  });
+}
+renderPresets();
+
+document.querySelectorAll(".chip.sys").forEach(c => c.onclick = () => {
+  document.querySelectorAll(".chip.sys").forEach(z => z.classList.remove("on")); c.classList.add("on");
+  sysName = c.dataset.sys;
+  P = { ...SYSTEMS[sysName].presets[0] }; target_ = null;
+  x = 0.1; y = 0.1; clearAcc(); renderPresets(); revealHUD();
+});
+const wanderChip = document.getElementById("wanderchip");
+wanderChip.onclick = () => { wander = !wander; wanderChip.classList.toggle("on", wander); revealHUD(); };
+document.getElementById("expo").oninput = e => { exposure = +e.target.value; };
+
+// drag to bend params
+let dragging = false, lx = 0, ly = 0;
+canvas.addEventListener("pointerdown", e => { dragging = true; lx = e.clientX; ly = e.clientY; target_ = null; revealHUD(); });
+canvas.addEventListener("pointermove", e => {
+  if (!dragging) return;
+  const dx = (e.clientX - lx) / window.innerWidth, dy = (e.clientY - ly) / window.innerHeight;
+  lx = e.clientX; ly = e.clientY;
+  P.a += dx * 1.2; P.c += dx * 0.7;
+  P.b += dy * 1.2; P.d += dy * 0.7;
+  settle = 0.0;
+});
+window.addEventListener("pointerup", () => dragging = false);
+canvas.addEventListener("dblclick", () => clearAcc());
+
+// auto-hide HUD
+const hud = document.getElementById("hud"), hint = document.getElementById("hint");
+let hideT; function revealHUD(){ hud.classList.remove("hidden"); hint.style.opacity = "0"; clearTimeout(hideT); hideT = setTimeout(() => hud.classList.add("hidden"), 4500); }
+setTimeout(() => hud.classList.add("hidden"), 5200);
+
+// ── loop ──
+const uPt = { aspect: gl.getUniformLocation(ptP, "aspect") };
+const uFade = { src: gl.getUniformLocation(fadeP, "src"), decay: gl.getUniformLocation(fadeP, "decay") };
+const uDisp = { acc: gl.getUniformLocation(dispP, "acc"), exposure: gl.getUniformLocation(dispP, "exposure") };
+resize();
+
+let _fc = 0; window._probe = () => ({ frames: _fc, W, H, sys: sysName, P: { ...P } });
+let _t0 = 0;
+function frame(tms){
+  try {
+  _fc++;
+  const t = tms * 0.001, dt = Math.min(0.05, t - _t0); _t0 = t;
+
+  // param dynamics
+  if (target_) {
+    let done = true;
+    for (const k of ["a","b","c","d"]) {
+      const d = target_[k] - P[k];
+      if (Math.abs(d) > 0.0008) { P[k] += d * Math.min(1, dt * 3.2); done = false; }
+    }
+    settle = 0.0;
+    if (done) target_ = null;
+  } else if (wander) {
+    P.a += Math.sin(t * 0.13) * 0.0016; P.b += Math.cos(t * 0.11) * 0.0016;
+    P.c += Math.sin(t * 0.07 + 1.7) * 0.0012; P.d += Math.cos(t * 0.05 + 0.6) * 0.0012;
+    settle = Math.min(settle + dt * 0.05, 0.55);
+  } else if (!dragging) {
+    settle = Math.min(settle + dt * 0.8, 1.0);
+  }
+
+  // iterate the map (JS is plenty fast; the GPU does accumulation + tone)
+  const S = SYSTEMS[sysName], sc = S.scale;
+  let xx = x, yy = y, bad = 0;
+  for (let i = 0; i < N; i++) {
+    const r = S.step(xx, yy, P); xx = r[0]; yy = r[1];
+    if (!isFinite(xx) || !isFinite(yy) || Math.abs(xx) > 50 || Math.abs(yy) > 50) { xx = Math.random()*0.2-0.1; yy = Math.random()*0.2-0.1; bad++; }
+    pts[i*2] = xx * sc; pts[i*2+1] = yy * sc;
+  }
+  x = xx; y = yy;
+
+  // fade pass (ping-pong): decay strong while morphing, ~1 when settled
+  const decay = 0.86 + 0.139 * settle;
+  const src = acc[cur], dst = acc[cur ^ 1];
+  gl.bindFramebuffer(gl.FRAMEBUFFER, dst.f);
+  gl.viewport(0, 0, W, H);
+  gl.disable(gl.BLEND);
+  gl.useProgram(fadeP); gl.bindVertexArray(quadVAO);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, src.t);
+  gl.uniform1i(uFade.src, 0); gl.uniform1f(uFade.decay, decay);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  // additive points into dst
+  gl.useProgram(ptP); gl.bindVertexArray(ptVAO);
+  gl.bindBuffer(gl.ARRAY_BUFFER, pbo);
+  gl.bufferSubData(gl.ARRAY_BUFFER, 0, pts);
+  gl.uniform1f(uPt.aspect, W / H);
+  gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
+  gl.drawArrays(gl.POINTS, 0, N);
+  gl.disable(gl.BLEND);
+  cur ^= 1;
+
+  // display
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.viewport(0, 0, W, H);
+  gl.useProgram(dispP); gl.bindVertexArray(quadVAO);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, acc[cur].t);
+  gl.uniform1i(uDisp.acc, 0); gl.uniform1f(uDisp.exposure, exposure);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  } catch(e){ console.error("FRAME_ERR", e); window._ferr = String(e); return; }
+  requestAnimationFrame(frame);
+}
+window._step = () => frame(performance.now());
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

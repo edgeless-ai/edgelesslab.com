@@ -5,6 +5,7 @@ dealflow-spine CLI.
   python cli.py run        # full pipeline: ingest -> merge -> score -> route -> underwrite -> digest
   python cli.py run --live # same, with network adapters enabled (default is offline/fixtures)
   python cli.py ingest     # ingest only (adapters -> data/signals.jsonl)
+  python cli.py enrich     # resolve quarantined signals (signals_pending.jsonl -> resolvers -> ledger)
   python cli.py score      # merge + score the ledger, print the ranked table (no writes)
   python cli.py underwrite # re-run the strategy picker on data/candidates.jsonl + refresh digest
   python cli.py digest     # re-render the digest from data/candidates.jsonl
@@ -23,6 +24,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
 from spine.criteria import BuyBox
+from spine.enrich import run_enrich
 from spine.ingest import load_ledger_signals, run_ingest
 from spine.merge import merge_signals
 from spine.pipeline import Paths, run_pipeline
@@ -48,6 +50,7 @@ def _paths(args) -> Paths:
     return Paths(
         root=ROOT,
         adapters_dir=Path(args.adapters_dir).resolve(),
+        resolvers_dir=Path(args.resolvers_dir).resolve(),
         data_dir=Path(args.data_dir).resolve(),
     )
 
@@ -79,6 +82,23 @@ def _print_ingest_summary(result) -> None:
               "await address/APN enrichment)")
 
 
+def _print_enrich_summary(result) -> None:
+    print("── enrich ──")
+    if not result.resolvers:
+        print("  (no resolvers found)")
+    else:
+        print(f"  resolvers: {', '.join(result.resolvers)}")
+    print(f"  pending {result.pending_total:>3}  examined {result.examined:>3}  "
+          f"resolved {result.resolved:>3}  ambiguous {result.ambiguous:>3}  "
+          f"unmatched {result.unmatched:>3}  unresolvable +{result.newly_unresolvable}  "
+          f"skipped {result.skipped:>3}")
+    if result.duplicates:
+        print(f"  ({result.duplicates} resolved signal(s) already in the ledger — "
+              "idempotent re-run)")
+    for name, err in result.resolver_errors.items():
+        print(f"  [warn] resolver {name}: {err}", file=sys.stderr)
+
+
 def cmd_run(args) -> int:
     paths = _paths(args)
     _apply_live(args)
@@ -88,6 +108,8 @@ def cmd_run(args) -> int:
         only_adapters=args.only or None,
     )
     _print_ingest_summary(result.ingest)
+    if result.enrich is not None:
+        _print_enrich_summary(result.enrich)
     print("── pipeline ──")
     counts = result.route_counts
     print(f"  candidates: {len(result.candidates)}  "
@@ -107,6 +129,22 @@ def cmd_ingest(args) -> int:
     result = run_ingest(paths.adapters_dir, paths.ledger, only=args.only or None)
     _print_ingest_summary(result)
     return 1 if result.failed_adapters and not result.adapters else 0
+
+
+def cmd_enrich(args) -> int:
+    paths = _paths(args)
+    _apply_live(args)
+    result = run_enrich(
+        resolvers_dir=paths.resolvers_dir,
+        pending_path=paths.pending,
+        ledger_path=paths.ledger,
+        only=args.only or None,
+    )
+    _print_enrich_summary(result)
+    if result.resolved:
+        print(f"  {result.resolved} enriched signal(s) -> {paths.ledger}")
+        print("  (run `python cli.py run` to score + route them)")
+    return 0
 
 
 def cmd_underwrite(args) -> int:
@@ -185,6 +223,7 @@ def main(argv: list[str] | None = None) -> int:
                         help="buy-box config (.json, or .yaml if PyYAML installed)")
     parser.add_argument("--data-dir", default=str(ROOT / "data"))
     parser.add_argument("--adapters-dir", default=str(ROOT / "adapters"))
+    parser.add_argument("--resolvers-dir", default=str(ROOT / "resolvers"))
 
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -199,6 +238,16 @@ def main(argv: list[str] | None = None) -> int:
     p_ing.add_argument("--live", action="store_true",
                        help="enable network adapters (default: offline, bundled fixtures)")
     p_ing.set_defaults(func=cmd_ingest)
+
+    p_enr = sub.add_parser("enrich",
+                           help="resolve quarantined signals against parcel "
+                                "resolvers (signals_pending.jsonl -> ledger)")
+    p_enr.add_argument("--only", nargs="*",
+                       help="restrict to these resolver names")
+    p_enr.add_argument("--live", action="store_true",
+                       help="enable live resolvers (default: offline, fixture "
+                            "resolver only)")
+    p_enr.set_defaults(func=cmd_enrich)
 
     p_uw = sub.add_parser("underwrite",
                           help="strategy-pick hot/warm candidates, rewrite snapshot + digest")

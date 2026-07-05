@@ -14,10 +14,11 @@ Python 3.11, stdlib only, no install step, **zero network by default**:
 ```bash
 python3.11 cli.py run            # full offline run on bundled fixtures
 cat data/digest-latest.md        # the human review queue it produced
-python3.11 -m pytest -q          # 130 tests, hermetic (tmp dirs, zero network, fixed clock)
+python3.11 -m pytest -q          # 183 tests, hermetic (tmp dirs, zero network, fixed clock)
 ```
 
-`run` ingests every adapter (bundled fixtures unless `--live`), merges signals
+`run` ingests every adapter (bundled fixtures unless `--live`), **enriches**
+quarantined address-less signals against parcel resolvers, merges signals
 per property, scores + routes them, runs the **underwriting strategy picker**
 on every hot/warm candidate, and writes `data/candidates.jsonl` plus the digest.
 
@@ -44,8 +45,15 @@ bundled fixtures).
   code-violations · assumable          enables network via the politeness layer
              │  fetch()
              ▼
-  data/signals.jsonl       INGEST      append-only idempotent ledger (spine/ingest.py)
-             │
+  data/signals.jsonl       INGEST      append-only idempotent ledger (spine/ingest.py);
+             │                         unanchored signals (no address AND no APN)
+             │                         quarantine to data/signals_pending.jsonl ─┐
+             │                                                                   ▼
+             │                         ENRICH      resolvers/*.py match owner name →
+             │◄─── resolved signals ── (spine/     parcel (Philly OPA live; fixture
+             │     rejoin the ledger    enrich.py) index offline); ambiguous/unmatched
+             │     via the normal                  stay pending (attempts counter,
+             │     ingest append                   unresolvable after 3 passes)
              ▼
   PropertyRecord           MERGE       address normalization + APN bridging (spine/merge.py)
              │
@@ -71,6 +79,7 @@ All CLI commands:
 python3.11 cli.py run               # full pipeline (offline fixtures)
 python3.11 cli.py run --live        # same, network adapters enabled (polite)
 python3.11 cli.py ingest [--live]   # adapters → data/signals.jsonl only
+python3.11 cli.py enrich [--live]   # quarantine → resolvers → ledger (offline: fixture resolver)
 python3.11 cli.py score --explain   # ranked properties with score receipts (no writes)
 python3.11 cli.py underwrite        # re-run the strategy picker on candidates.jsonl + digest
 python3.11 cli.py digest            # re-render digest from data/candidates.jsonl
@@ -83,6 +92,7 @@ python3.11 cli.py digest            # re-render digest from data/candidates.json
 | Stage | Module | In → Out |
 |-------|--------|----------|
 | **Ingest** | `spine/ingest.py` | adapters `fetch()` → `data/signals.jsonl` (append-only ledger, idempotent by `source:id`) |
+| **Enrich** | `spine/enrich.py` | `data/signals_pending.jsonl` × resolvers `resolve()` → anchored signals appended through the normal ingest path (same `source:id` — supersedes the pending twin, never duplicates) |
 | **Merge** | `spine/merge.py` | signals → `PropertyRecord`s (address normalization + APN bridging; facts lifted from evidence) |
 | **Criteria** | `spine/criteria.py` | `PropertyRecord` × buy-box config → `CriteriaResult` (matches/misses/unknowns) |
 | **Scoring** | `spine/scoring.py` | `PropertyRecord` → distress score + explainable `ScoreBreakdown` |
@@ -95,7 +105,7 @@ python3.11 cli.py digest            # re-render digest from data/candidates.json
 | File | Semantics |
 |------|-----------|
 | `data/signals.jsonl` | **Append-only history.** One row per accepted signal: `{"dedupe_key": "<source>:<id>", "ingested_at": ..., "signal": {...}}`. Idempotent — re-running adapters writes 0 new rows for known signals. |
-| `data/signals_pending.jsonl` | **Quarantine** (same idempotent row shape + `"problems": [...]`). Signals that parse but are *unanchored* — no address AND no APN (e.g. an obituary that only knows city + deceased name). They can't join the merge without corrupting address grouping; an enrichment pass can resolve them against a parcel spine and re-emit them anchored. |
+| `data/signals_pending.jsonl` | **Quarantine, consumed by the enrichment stage.** Signals that parse but are *unanchored* — no address AND no APN (e.g. an obituary that only knows city + deceased name) — can't join the merge without corrupting address grouping, so ingest parks them here instead of dropping them. `spine/enrich.py` consumes the file: resolvers match the owner/deceased name against parcel rolls; a **unique** match re-emits the signal anchored — same `source:id`, so it supersedes its pending twin and can never duplicate it — **ambiguous** matches stay pending with every candidate parcel in `evidence.enrichment_candidates` (never guess between parcels), and rows failing 3 passes are parked as `status: unresolvable`. The file is an **append-only event log**: enrich appends updated rows (`status`/`attempts`/`last_attempt`) per `dedupe_key`, readers take the last row per key, nothing is ever deleted. |
 | `data/candidates.jsonl` | **Snapshot, rewritten each run** (scores/routes legitimately change as signals age and land). One `DealCandidate` per line, sorted hot→discard, score desc. **This is what underwriting reads.** |
 | `data/digest-latest.md` + `data/digests/digest-YYYY-MM-DD.md` | Human review queue: route counts, hot/warm tables, score receipts for hot candidates, facts still missing. |
 
@@ -236,6 +246,29 @@ are reported per-adapter and never block the run. Network adapters take
 live (`cli.py run --live` sets `DEALFLOW_LIVE=1`). Test yours with
 `python3.11 cli.py run --only <module_name>`.
 
+## How resolvers plug in (the enrichment stage)
+
+Mirror of the adapter registry: drop `resolvers/<name>.py` exposing
+`resolve(signal: dict) -> dict | None` (full return contract in
+`resolvers/_common.py`). Optional `NAME`, `ENABLED = False`, `ORDER` (lower
+runs first — live resolvers outrank the offline fixture stand-in). Resolvers
+are isolated like adapters: import errors and `resolve()` exceptions are
+reported per-resolver and never block the pass. Shipped resolvers:
+
+- **`philly_opa`** (live, `ORDER=10`) — owner-name search against the
+  Philadelphia OPA parcel roll (`opa_properties_public`, same keyless Carto
+  SQL endpoint the tax_delinquent adapter uses; live-verified sample in
+  `fixtures/resolvers/philly_opa_sample.json`). Jurisdiction-gated (only
+  fires for Philadelphia PA signals), exact-ish name match required, one
+  parcel → resolved at confidence 0.35 (names cap at 0.4), two+ → ambiguous
+  with all candidates in evidence. Live-only: returns `None` offline.
+- **`fixture_owner_index`** (offline, `ORDER=90`) — same matching logic over
+  `fixtures/resolvers/owner_index.json`, a bundled assessor-style owner index
+  (Klamath Falls OR), so the whole enrich path runs with zero network — the
+  CLI default. Live resolution stays behind `--live` / `DEALFLOW_LIVE=1`.
+
+Test yours with `python3.11 cli.py enrich --only <name>`.
+
 ## How underwriting plugs in
 
 Wired in: `spine/underwrite.py` maps each hot/warm candidate's facts + signal
@@ -252,15 +285,25 @@ the strategy verdict for free in `underwriting`; `criteria_matches.unknowns`
 is the missing-facts checklist and `score_breakdown.reasons` the
 display-ready "why".
 
+## Ops (scheduled runs)
+
+A launchd user agent (`com.edgeless.dealflow-weekly`) runs `cli.py run --live`
+every **Monday 09:00 local** and Telegrams the digest top to David — weekly
+because the consumer is a human reading a digest and the upstream sources
+(county tax rolls, code enforcement, FEMA) update on days-to-weeks cadence.
+The `--live` dependency (`requests`) lives in the product venv at `.venv/`.
+Full runbook — pause/resume, logs, schedule changes: **`ops/README.md`**.
+
 ## Layout
 
 ```
 dealflow-spine/
-├── cli.py                 # run [--live] | ingest [--live] | score | underwrite | digest
+├── cli.py                 # run [--live] | ingest [--live] | enrich [--live] | score | underwrite | digest
 ├── config/buybox.json     # default buy-box (Lee County FL reference market)
 ├── spine/                 # the engine (stdlib only)
 │   ├── schema.py          #   ← THE CONTRACT
 │   ├── ingest.py          #   adapter registry + idempotent ledger
+│   ├── enrich.py          #   quarantine consumer: resolver registry + supersede-into-ledger
 │   ├── merge.py           #   address/APN normalization + record merge
 │   ├── criteria.py        #   buy-box engine
 │   ├── scoring.py         #   explainable distress score
@@ -270,7 +313,9 @@ dealflow-spine/
 ├── underwriting/          # deal-math + strategy picker (contract-locked; own README)
 ├── playbooks/             # operational manuals per strategy (worked examples)
 ├── adapters/              # signal detectors (drop-in; see adapters/README.md)
-├── fixtures/              # sample + per-adapter fixtures — zero-network e2e
+├── resolvers/             # enrichment resolvers (drop-in; contract in resolvers/_common.py)
+├── fixtures/              # sample + per-adapter/-resolver fixtures — zero-network e2e
 ├── tests/                 # pytest; hermetic (underwriting/tests/ too)
+├── ops/                   # weekly launchd run + Telegram digest (ops/README.md)
 └── data/                  # ledger + candidates + digests (gitignored)
 ```

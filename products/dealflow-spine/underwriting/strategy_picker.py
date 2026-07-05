@@ -30,11 +30,19 @@ from dataclasses import dataclass, field
 from typing import Callable
 
 try:
-    from . import finance
+    from . import assumption, finance
 except ImportError:  # standalone execution
+    import assumption  # type: ignore
     import finance  # type: ignore
 
 DOC = "2026-06-23-ebre-cmco-opportunity-engine.md §1"
+CITE_M6 = "review/adversarial-review-2026-07-04.md §M6"
+
+# NPV convention for the underwater-assumption exception (M6): mirror
+# assumption.analyze's defaults so the picker's gate and the calculator's
+# number agree — 360mo remaining term (its `or 360` fallback), 60mo hold,
+# 5% discount. Savings isolate the coupon: same balance, same term.
+NPV_TERM_MONTHS = 360
 
 # Signals the spine's detectors emit that indicate SELLER MOTIVATION.
 MOTIVATION_SIGNALS = {
@@ -154,9 +162,11 @@ RULES: list[Rule] = [
          "Assumable (FHA/VA/USDA) note >=1.5% below market: the rate delta "
          "is legally transferable — a below-market annuity."),
     Rule("A2", "assumption", 2,
-         lambda d: d["equity_gap_pct"] is not None and d["equity_gap_pct"] <= 0.15,
+         lambda d: d["equity_gap_pct"] is not None and d["equity_gap_pct"] <= 0.15
+                   and not d["underwater"],
          "Equity gap <=15% of value: bridgeable with a normal down payment — "
-         "no exotic gap financing needed."),
+         "no exotic gap financing needed. (Underwater deals excluded: a "
+         "clamped-to-zero gap is a shortfall, not a bridgeable gap — M6.)"),
     Rule("A3", "assumption", 1,
          lambda d: d["rate_delta"] is not None and d["rate_delta"] >= 3.0,
          "Extreme rate delta (>=3%): savings NPV large enough to pay for "
@@ -180,6 +190,29 @@ RULES: list[Rule] = [
          "Equity gap over 25% of value: typical buyers cannot bridge it; "
          "the rate delta is stranded (consider seller carryback instead).",
          dq=True),
+    # M6 (adversarial review 2026-07-04): an underwater loan is still legally
+    # assumable — the buyer just overpays principal vs value. That's a DQ
+    # UNLESS the below-market coupon's savings NPV exceeds the shortfall
+    # (strictly: at NPV == shortfall the buyer gains nothing for the risk).
+    Rule("A5", "assumption", 0,   # weight 0: underwater is never a bonus,
+         lambda d: d["underwater"]                    # only an explanation
+                   and d["npv_rate_savings"] is not None
+                   and d["negative_equity"] is not None
+                   and d["npv_rate_savings"] > d["negative_equity"],
+         "UNDERWATER but still economically assumable: the buyer overpays "
+         "principal vs value (negative equity), yet the below-market "
+         "coupon's rate-savings NPV exceeds that shortfall. Price the "
+         "overpayment explicitly against npv_rate_savings.", cite=CITE_M6),
+    Rule("A-DQ4", "assumption", 0,
+         lambda d: d["underwater"]
+                   and not (d["npv_rate_savings"] is not None
+                            and d["negative_equity"] is not None
+                            and d["npv_rate_savings"] > d["negative_equity"]),
+         "Negative equity: assuming the note means paying more principal "
+         "than the property is worth, and the rate-savings NPV does not "
+         "(demonstrably) cover the shortfall — dead deal absent a principal "
+         "writedown. (The old A2 called this 'bridgeable'.)",
+         cite=CITE_M6, dq=True),
 
     # -------------------------------------------------- SELLER FINANCE ----
     Rule("F1", "seller_finance", 3,
@@ -234,6 +267,11 @@ def derive_facts(facts: dict) -> dict:
         but the balance is unknown (the old behavior derived balance=0 there
         and minted a fake 100% equity). It also stands in for equity_gap_pct
         (gap = price - balance = equity, to first order).
+      * NEGATIVE equity (balance > value, or a stated negative equity_pct) is
+        surfaced as `underwater` + `negative_equity` (dollars) rather than
+        clamped away, and `npv_rate_savings` (coupon savings NPV, assumption
+        conventions) lets rules A5/A-DQ4 decide whether an underwater
+        assumable is still worth it (M6, adversarial review 2026-07-04).
     """
     if not isinstance(facts, dict):
         facts = {}
@@ -264,6 +302,31 @@ def derive_facts(facts: dict) -> dict:
     else:
         gap_pct = None
 
+    # M6: negative equity is a first-class fact, never clamped away. The
+    # underwater flag also honors a caller-STATED negative equity_pct when
+    # the balance itself is unknown. negative_equity is DOLLARS (None when
+    # underwater but the dollar size can't be derived — treated as
+    # unverifiable by A5/A-DQ4, i.e. DQ).
+    if balance_known and value:
+        underwater = balance > value
+        negative_equity = max(0.0, balance - value)
+    elif equity_pct is not None and equity_pct < 0:
+        underwater = True
+        negative_equity = -equity_pct * value if value else None
+    else:
+        underwater = False
+        negative_equity = 0.0
+
+    # NPV of the coupon savings on the existing note (same balance/term at
+    # market rate vs note rate — assumption.analyze's exact convention).
+    npv_rate_savings = None
+    if balance_known and balance > 0 and rate is not None:
+        savings = (finance.monthly_payment(balance, market_rate / 100.0, NPV_TERM_MONTHS)
+                   - finance.monthly_payment(balance, rate / 100.0, NPV_TERM_MONTHS))
+        npv_rate_savings = finance.annuity_pv(
+            savings, assumption.DEFAULT_DISCOUNT_RATE,
+            assumption.DEFAULT_HOLD_MONTHS)
+
     raw = _first(facts.get("signals"), facts.get("motivation"),
                  facts.get("motivation_signals")) or []
     if isinstance(raw, str):
@@ -285,6 +348,9 @@ def derive_facts(facts: dict) -> dict:
         "rate_delta": rate_delta,
         "equity_pct": equity_pct,
         "equity_gap_pct": gap_pct,
+        "underwater": underwater,
+        "negative_equity": negative_equity,
+        "npv_rate_savings": npv_rate_savings,
         "piti": _f(facts.get("piti")),
         "market_rent": _f(facts.get("market_rent")),
         "condition": _condition(facts.get("condition")),

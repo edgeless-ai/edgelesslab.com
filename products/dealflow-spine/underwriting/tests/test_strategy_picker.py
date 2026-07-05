@@ -155,6 +155,130 @@ class TestUnknownBalance:
         assert fact["recommendation"] == explicit["recommendation"] == "seller_finance"
 
 
+class TestNegativeEquity:
+    """M6 regressions (adversarial review 2026-07-04): underwater loans
+    (equity < 0) used to sail through A2 — max(0, value-balance) clamped the
+    gap to 0, so the picker ranked assumption #1 with the reason 'bridgeable
+    with a normal down payment' on a deal where the buyer would overpay
+    principal vs value. Domain rule now explicit: underwater is a DQ (A-DQ4)
+    UNLESS the coupon's rate-savings NPV strictly exceeds the negative
+    equity (A5) — an underwater FHA/VA with a big enough rate delta is still
+    economically assumable."""
+
+    def _rule(self, rid):
+        return next(r for r in sp.RULES if r.id == rid)
+
+    def test_underwater_low_delta_is_disqualified(self):
+        """Clear DQ: $50k underwater, 1.5% delta -> NPV ~ $18k < $50k."""
+        r = sp.pick({"value": 300_000, "loan_balance": 350_000,
+                     "loan_type": "va", "loan_rate": 5.5,
+                     "signals": ["divorce"]})
+        a = entry(r, "assumption")
+        assert not a["applicable"]
+        assert any(d["rule"] == "A-DQ4" for d in a["disqualifiers"])
+        assert not any(hit["rule"] == "A2" for hit in a["reasons"])
+        assert r["recommendation"] != "assumption"
+        assert r["derived"]["underwater"] is True
+        assert r["derived"]["negative_equity"] == 50_000
+
+    def test_underwater_big_delta_survives_via_npv_exception(self):
+        """$20k underwater VA at 2.5% in a 7% market: NPV of savings ~ $46k
+        covers the shortfall — still assumable, but the WHY must say
+        underwater, never 'bridgeable gap'."""
+        r = sp.pick({"value": 300_000, "loan_balance": 320_000,
+                     "loan_type": "va", "loan_rate": 2.5,
+                     "signals": ["divorce"]})
+        a = entry(r, "assumption")
+        assert a["applicable"]
+        rules_hit = {hit["rule"] for hit in a["reasons"]}
+        assert "A5" in rules_hit and "A2" not in rules_hit
+        assert r["recommendation"] == "assumption"   # A1+A3+A4 still stand
+        d = r["derived"]
+        assert d["negative_equity"] == 20_000
+        assert d["npv_rate_savings"] > d["negative_equity"]
+        # A5 is explanatory, not a bonus: weight 0
+        a5 = next(hit for hit in a["reasons"] if hit["rule"] == "A5")
+        assert a5["weight"] == 0
+
+    def test_review_m6_repro_is_explicitly_handled(self):
+        """The review's exact repro (value 300k, balance 350k, VA 2.5%).
+        Its NPV sits ~0.2% ABOVE the $50k shortfall, so applicability is a
+        genuine judgment call the numbers happen to win — what the finding
+        actually demands is that A2's false 'bridgeable' reason is gone and
+        the underwater state is named either way."""
+        r = sp.pick({"value": 300_000, "loan_balance": 350_000,
+                     "loan_type": "va", "loan_rate": 2.5,
+                     "signals": ["divorce"]})
+        a = entry(r, "assumption")
+        hits = ({h["rule"] for h in a["reasons"]}
+                | {d["rule"] for d in a["disqualifiers"]})
+        assert "A2" not in hits
+        assert hits & {"A5", "A-DQ4"}                # underwater named
+        assert r["derived"]["underwater"] is True
+
+    def test_boundary_balance_equals_value_is_not_underwater(self):
+        """equity == 0 exactly: gap is genuinely zero, A2 legitimately
+        fires, no underwater machinery."""
+        d = sp.derive_facts({"value": 300_000, "loan_balance": 300_000,
+                             "loan_type": "va", "loan_rate": 2.5})
+        assert d["underwater"] is False and d["negative_equity"] == 0.0
+        assert self._rule("A2").test(d)
+        assert not self._rule("A-DQ4").test(d)
+        assert not self._rule("A5").test(d)
+
+    def test_boundary_npv_exactly_equal_is_still_dq(self):
+        """'Exceeds' is strict: at NPV == shortfall the buyer takes
+        assumption friction and DOS-free paperwork for zero gain."""
+        d = sp.derive_facts({"value": 300_000, "loan_balance": 350_000,
+                             "loan_type": "va", "loan_rate": 2.5})
+        d["npv_rate_savings"] = d["negative_equity"]   # forced boundary
+        assert self._rule("A-DQ4").test(d)
+        assert not self._rule("A5").test(d)
+
+    def test_underwater_with_unknowable_npv_is_dq(self):
+        """No rate -> NPV unverifiable -> the exception can't be claimed."""
+        r = sp.pick({"value": 300_000, "loan_balance": 350_000,
+                     "loan_type": "va", "signals": ["divorce"]})
+        a = entry(r, "assumption")
+        assert not a["applicable"]
+        assert any(d["rule"] == "A-DQ4" for d in a["disqualifiers"])
+        assert r["derived"]["npv_rate_savings"] is None
+
+    def test_stated_negative_equity_without_balance_counts(self):
+        """Caller states equity_pct=-0.10 with the balance unknown: underwater
+        anyway (dollars derived from value), and the clamped gap must not
+        resurrect A2."""
+        d = sp.derive_facts({"value": 400_000, "equity_pct": -0.10,
+                             "loan_type": "fha", "loan_rate": 2.75})
+        assert d["underwater"] is True
+        assert d["negative_equity"] == 40_000
+        assert not self._rule("A2").test(d)
+        # balance unknown -> savings NPV can't be computed -> DQ path
+        assert d["npv_rate_savings"] is None
+        assert self._rule("A-DQ4").test(d)
+
+    def test_m6_rules_cite_the_review(self):
+        for rid in ("A5", "A-DQ4"):
+            assert self._rule(rid).cite == sp.CITE_M6
+        # and the citation reaches the output payload
+        r = sp.pick({"value": 300_000, "loan_balance": 320_000,
+                     "loan_type": "va", "loan_rate": 2.5,
+                     "signals": ["divorce"]})
+        a5 = next(hit for hit in entry(r, "assumption")["reasons"]
+                  if hit["rule"] == "A5")
+        assert "adversarial-review-2026-07-04" in a5["cite"]
+
+    def test_npv_convention_matches_assumption_analyze(self):
+        """The picker's gate and assumption.analyze() must not disagree about
+        the savings NPV (same balance/term/hold/discount)."""
+        from underwriting import assumption
+        facts = {"value": 300_000, "loan_balance": 320_000,
+                 "loan_type": "va", "loan_rate": 2.5}
+        d = sp.derive_facts(facts)
+        full = assumption.analyze(facts)
+        assert abs(d["npv_rate_savings"] - full["npv_savings"]) < 1e-6
+
+
 class TestNormalization:
     def test_rate_percent_and_decimal_equivalent(self):
         a = sp.derive_facts({"loan_rate": 3.25})

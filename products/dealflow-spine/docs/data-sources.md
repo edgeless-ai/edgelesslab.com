@@ -93,15 +93,63 @@ data.detroitmi.gov, Cook County IL (Scavenger Sale lists, Socrata).
 - **Negative findings:** Legacy.com hosts most metro obits (Oregonian, Lee papers like gazettetimes.com/democratherald.com now redirect there) — HTML only, ToS prohibits scraping → NOT used. `columbian.com` (Vancouver WA) WP feed exists but returns 0 items. `eastoregonian.com` (WordPress) has no obituaries feed.
 - **Signal design:** name + metro only, confidence 0.2; spine merge layer owns probate/assessor enrichment.
 
-## 5. Assumable loans — fixture-only by design 📦
+## 5. Assumable loans — fixtures by default, live NYC path wired ✅ (2026-07-04)
 
 **Adapter:** `adapters/assumable_heuristic.py` · signal_type `assumable_loan`
 
 - **Logic:** flag FHA/VA/USDA deeds of trust originated 2019-01-01..2021-12-31; rate-delta hint = current 30y rate − (stated note rate, else Freddie Mac PMMS monthly average embedded in the module).
-- **Real feed to wire later:**
-  - **County recorder deed-of-trust indexes** — FHA case numbers / VA riders identify program; most counties (incl. Multnomah via MultcoRecords) are search-portals with per-doc fees, no keyless bulk.
-  - **HMDA LAR bulk files** (https://ffiec.cfpb.gov/data-publication/ — keyless CSV): `loan_type` 2=FHA / 3=VA + census tract + year → target tracts dense in 2019-21 FHA/VA originations even without parcel joins.
-- **Fixture format:** documented in the module docstring.
+- **Live path (`--live`):** NYC ACRIS Master×Legals (keyless Socrata; boroughs 1-4 only — Staten Island is NOT in ACRIS) joined to HMDA LAR loan-level CSV for the program label. The label is PROBABILISTIC (year + $10k amount-bin match) and signal confidence tracks the Bayes posterior `county_gov_share / batch_match_rate` — live-verified ~0.10 in Queens (weak market, honestly priced). Full survey, probes, and verdict table: **`docs/deed-data-sources.md`**. Real sample: `fixtures/adapters/assumable_heuristic_live_sample.json`.
+- **Recorder reality (survey headline):** no keyless source publishes loan program + parcel together; FHA case numbers / VA riders live on document images. FHA/VA-dense metros' recorders are captcha-gated/paid — there, HMDA+HUD can target tracts/ZIPs but parcel resolution needs a negotiated/paid feed.
+- **Fixture format:** documented in the module docstring (fixture path emits `loan_program_source: "stated"`, live path `"inferred"` + `program_inference` provenance).
+
+## 6. Property resolution (ENRICHMENT stage) — owner-name → parcel
+
+### Philadelphia OPA property assessments — LIVE-VERIFIED ✅ (keyless)
+
+**Resolver:** `resolvers/philly_opa.py` (consumed by `spine/enrich.py`) — anchors
+quarantined signals (owner/deceased name + city/state, no address/APN) to parcels.
+
+- **Endpoint:** `https://phl.carto.com/api/v2/sql?q=<SQL>` — table
+  `opa_properties_public` (~580k rows, one per OPA account/parcel) — the same
+  keyless Carto SQL family as the tax-delinquency adapter (§3).
+- **Sample query (live-run 2026-07-04, responses saved to
+  `fixtures/resolvers/philly_opa_sample.json`):**
+  `SELECT parcel_number, location, unit, zip_code, owner_1, owner_2, market_value, category_code_description, year_built, mailing_street, mailing_city_state, ST_Y(the_geom) AS lat, ST_X(the_geom) AS lon FROM opa_properties_public WHERE owner_1 LIKE 'SMITH JOHN%' OR owner_2 LIKE 'SMITH JOHN%' LIMIT 25`
+- **Verification results:** `'SMITH JOHN FRED%'` → exactly 1 parcel
+  (361285400, 2235 LATONA ST — the unique-match path); `'SMITH JOHN%'` → 25
+  parcels (the ambiguity path — resolver refuses to guess and returns every
+  candidate); owner_2 matches work (Cheryl Lynne McGovern → 1434 S NEWKIRK ST
+  via `owner_2`, live-verified through the resolver's own query builder).
+- **Owner-name format:** `LAST FIRST [MIDDLE] [JR/TR/...]` — the resolver
+  queries the `LAST FIRST%` prefix, then applies an exact-ish token match
+  (last+first exact; extra owner tokens must be prefix-compatible middle
+  names). Names are ambiguous by design → resolved matches carry
+  **confidence 0.35** (capped ≤ 0.4).
+- **Rate limits:** Carto SQL API keyless/public (OpenDataPhilly open license);
+  one bounded query (`LIMIT 25`) per pending signal, through the shared
+  politeness layer. Jurisdiction gate means only Philadelphia PA signals ever
+  query it.
+- **Fit note:** the bundled obituary feed is Klamath Falls OR, so this
+  resolver mostly demonstrates the machinery until a Philly-metro obituary or
+  probate feed lands; it DOES fire for degraded Philadelphia assessor rows
+  that arrive address-less.
+
+### Offline stand-in — `resolvers/fixture_owner_index.py` 📦
+
+`fixtures/resolvers/owner_index.json` — synthetic assessor-style owner index
+(Klamath Falls OR) matched to the bundled obituary fixture, so the entire
+enrich path (pending file → resolution → supersede-into-ledger) runs with zero
+network. Live resolution stays behind `cli.py enrich --live` / `DEALFLOW_LIVE=1`.
+
+### Klamath County OR (the obituary metro) — documented, not usable keylessly ❌
+
+Klamath County assessment data is published via a per-parcel search portal
+(assessor.klamathcounty.org) with no bulk/API access; Oregon's ORMAP serves
+parcel *geometry* only (no owner names). Same story as Multnomah (§3): most
+counties gate owner indexes behind search portals or paid extracts. Counties
+with keyless owner-indexed rolls that could become resolvers: Philadelphia
+(above), NYC (PLUTO `ownername`, Socrata `64uk-42ks`), Cook County IL
+(Socrata assessor extracts).
 
 ---
 

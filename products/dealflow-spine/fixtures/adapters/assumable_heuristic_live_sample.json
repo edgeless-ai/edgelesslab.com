@@ -1,0 +1,1694 @@
+{
+  "_meta": {
+    "harvested_at": "2026-07-04",
+    "method": "adapters/assumable_heuristic._live_records(borough='4', limit=120) \u2014 real ACRIS master+legals x HMDA LAR pull; transport shimmed to stdlib urllib because python3.11 lacks `requests` (review M7)",
+    "borough": "4 (QUEENS, FIPS 36081)",
+    "master_rows": 120,
+    "records_with_parcel": 120,
+    "program_label_counts": {
+      "CONV_OR_UNKNOWN": 14,
+      "FHA": 99,
+      "VA": 7
+    },
+    "inferred_program_records": 106,
+    "signals_emitted": 106
+  },
+  "records": [
+    {
+      "instrument_id": "2025052000659001",
+      "recorded_date": "2025-05-21",
+      "doc_type": "MORTGAGE",
+      "loan_program": "CONV_OR_UNKNOWN",
+      "loan_amount": 32417.5,
+      "note_rate": null,
+      "origination_date": "2021-09-24",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2025052000659001",
+      "property": {
+        "apn": "4-12667-0016",
+        "address": "121-05 MILBURN STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      }
+    },
+    {
+      "instrument_id": "2025031200158002",
+      "recorded_date": "2025-03-14",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 871720.0,
+      "note_rate": null,
+      "origination_date": "2020-03-05",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2025031200158002",
+      "property": {
+        "apn": "4-15817-0025",
+        "address": "146 BEACH 26TH STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 875000.0,
+        "bin_counts": {
+          "FHA": 5,
+          "VA": 1
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0850602316303211,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0963
+      }
+    },
+    {
+      "instrument_id": "2024080500375001",
+      "recorded_date": "2024-08-12",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 290000.0,
+      "note_rate": null,
+      "origination_date": "2021-11-19",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2024080500375001",
+      "property": {
+        "apn": "4-09158-0040",
+        "address": "105-41 91ST STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 295000.0,
+        "bin_counts": {
+          "VA": 5,
+          "FHA": 9
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2024020900464001",
+      "recorded_date": "2024-02-12",
+      "doc_type": "MORTGAGE",
+      "loan_program": "CONV_OR_UNKNOWN",
+      "loan_amount": 36637.3,
+      "note_rate": null,
+      "origination_date": "2021-11-17",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2024020900464001",
+      "property": {
+        "apn": "4-15731-0063",
+        "address": "23-92 CORNAGA AVENUE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      }
+    },
+    {
+      "instrument_id": "2023090700260001",
+      "recorded_date": "2023-09-20",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 200000.0,
+      "note_rate": null,
+      "origination_date": "2021-10-21",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2023090700260001",
+      "property": {
+        "apn": "4-09997-0020",
+        "address": "149-15 ARCHER AVENUE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 205000.0,
+        "bin_counts": {
+          "FHA": 1
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2023052600615001",
+      "recorded_date": "2023-05-30",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 86400.0,
+      "note_rate": null,
+      "origination_date": "2021-12-12",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2023052600615001",
+      "property": {
+        "apn": "4-05371-0026",
+        "address": "42-14 196TH STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 85000.0,
+        "bin_counts": {
+          "FHA": 3
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2022101900110001",
+      "recorded_date": "2023-05-18",
+      "doc_type": "MORTGAGE",
+      "loan_program": "CONV_OR_UNKNOWN",
+      "loan_amount": 30347.98,
+      "note_rate": null,
+      "origination_date": "2021-06-14",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022101900110001",
+      "property": {
+        "apn": "4-12450-0004",
+        "address": "118-97 RIVERTON STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      }
+    },
+    {
+      "instrument_id": "2022101900110004",
+      "recorded_date": "2023-05-18",
+      "doc_type": "MORTGAGE",
+      "loan_program": "CONV_OR_UNKNOWN",
+      "loan_amount": 34405.13,
+      "note_rate": null,
+      "origination_date": "2021-06-07",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022101900110004",
+      "property": {
+        "apn": "4-11492-0050",
+        "address": "96-16 133RD AVENUE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      }
+    },
+    {
+      "instrument_id": "2022080400055001",
+      "recorded_date": "2023-05-17",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 54796.0,
+      "note_rate": null,
+      "origination_date": "2021-09-30",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022080400055001",
+      "property": {
+        "apn": "4-10924-0086",
+        "address": "191-09 109TH ROAD",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 55000.0,
+        "bin_counts": {
+          "FHA": 2
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2022080400055002",
+      "recorded_date": "2023-05-17",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 48259.58,
+      "note_rate": null,
+      "origination_date": "2021-06-07",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022080400055002",
+      "property": {
+        "apn": "4-11637-0029",
+        "address": "111-48 134TH STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 45000.0,
+        "bin_counts": {
+          "FHA": 2
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2023042000482001",
+      "recorded_date": "2023-05-10",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 23287.41,
+      "note_rate": null,
+      "origination_date": "2021-07-21",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2023042000482001",
+      "property": {
+        "apn": "4-12981-0038",
+        "address": "24307 132ND ROAD",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 25000.0,
+        "bin_counts": {
+          "FHA": 2
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2023042600849001",
+      "recorded_date": "2023-04-27",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 200000.0,
+      "note_rate": null,
+      "origination_date": "2021-12-09",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2023042600849001",
+      "property": {
+        "apn": "3-01542-0070",
+        "address": "2061 FULTON ST",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 205000.0,
+        "bin_counts": {
+          "FHA": 1
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2021032300041005",
+      "recorded_date": "2023-04-03",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 843858.0,
+      "note_rate": null,
+      "origination_date": "2021-03-15",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2021032300041005",
+      "property": {
+        "apn": "3-08171-0113",
+        "address": "657 EAST 102 STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 845000.0,
+        "bin_counts": {
+          "FHA": 29
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2023013100520001",
+      "recorded_date": "2023-03-30",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 56548.68,
+      "note_rate": null,
+      "origination_date": "2021-04-28",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2023013100520001",
+      "property": {
+        "apn": "4-15702-0063",
+        "address": "1419 POINT BREEZE PLACE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 55000.0,
+        "bin_counts": {
+          "FHA": 2
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2023031600106001",
+      "recorded_date": "2023-03-21",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 160000.0,
+      "note_rate": null,
+      "origination_date": "2021-02-15",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2023031600106001",
+      "property": {
+        "apn": "4-11866-0008",
+        "address": "149-55 123RD STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 165000.0,
+        "bin_counts": {
+          "FHA": 2
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2021111001339002",
+      "recorded_date": "2023-02-09",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 269882.75,
+      "note_rate": null,
+      "origination_date": "2021-08-11",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2021111001339002",
+      "property": {
+        "apn": "3-00947-0033",
+        "address": "56 SAINT JOHNS PLACE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 265000.0,
+        "bin_counts": {
+          "FHA": 17,
+          "VA": 1
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2023011200851001",
+      "recorded_date": "2023-01-17",
+      "doc_type": "MORTGAGE",
+      "loan_program": "CONV_OR_UNKNOWN",
+      "loan_amount": 39300.0,
+      "note_rate": null,
+      "origination_date": "2021-11-22",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2023011200851001",
+      "property": {
+        "apn": "4-10245-0157",
+        "address": "107-18 171 STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      }
+    },
+    {
+      "instrument_id": "2022030901083001",
+      "recorded_date": "2022-12-22",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 58883.58,
+      "note_rate": null,
+      "origination_date": "2021-11-04",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022030901083001",
+      "property": {
+        "apn": "4-10716-0021",
+        "address": "9022 218TH PLACE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 55000.0,
+        "bin_counts": {
+          "FHA": 2
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2021122701284001",
+      "recorded_date": "2022-12-06",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 99300.0,
+      "note_rate": null,
+      "origination_date": "2021-12-27",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2021122701284001",
+      "property": {
+        "apn": "4-05179-0044",
+        "address": "54-13 153RD STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 95000.0,
+        "bin_counts": {
+          "FHA": 1
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2022021100950001",
+      "recorded_date": "2022-11-28",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 80250.0,
+      "note_rate": null,
+      "origination_date": "2021-01-22",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022021100950001",
+      "property": {
+        "apn": "4-05800-0029",
+        "address": "201-15 24TH AVENUE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 85000.0,
+        "bin_counts": {
+          "FHA": 3
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2022111000476001",
+      "recorded_date": "2022-11-15",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 45542.73,
+      "note_rate": null,
+      "origination_date": "2021-10-01",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022111000476001",
+      "property": {
+        "apn": "4-09337-0073",
+        "address": "87-17 129TH STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 45000.0,
+        "bin_counts": {
+          "FHA": 2
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2021042000793002",
+      "recorded_date": "2022-11-10",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 483312.0,
+      "note_rate": null,
+      "origination_date": "2021-03-18",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2021042000793002",
+      "property": {
+        "apn": "4-08737-0029",
+        "address": "81-09 262ND STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 485000.0,
+        "bin_counts": {
+          "FHA": 53,
+          "VA": 5
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2022102000769001",
+      "recorded_date": "2022-10-27",
+      "doc_type": "MORTGAGE",
+      "loan_program": "CONV_OR_UNKNOWN",
+      "loan_amount": 35550.0,
+      "note_rate": null,
+      "origination_date": "2021-11-19",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022102000769001",
+      "property": {
+        "apn": "4-12755-0096",
+        "address": "118-40 219 STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      }
+    },
+    {
+      "instrument_id": "2022092200577001",
+      "recorded_date": "2022-10-14",
+      "doc_type": "MORTGAGE",
+      "loan_program": "CONV_OR_UNKNOWN",
+      "loan_amount": 2800000.0,
+      "note_rate": null,
+      "origination_date": "2021-08-05",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022092200577001",
+      "property": {
+        "apn": "4-05321-0020",
+        "address": "37-06 FRANCIS LEWIS BLVD",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      }
+    },
+    {
+      "instrument_id": "2020021100120004",
+      "recorded_date": "2022-10-12",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 13348.48,
+      "note_rate": null,
+      "origination_date": "2019-10-10",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2020021100120004",
+      "property": {
+        "apn": "4-13553-0033",
+        "address": "241-02 WELLER AVENUE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 15000.0,
+        "bin_counts": {
+          "FHA": 1
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.10463273676360925,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.1185
+      }
+    },
+    {
+      "instrument_id": "2020112301162002",
+      "recorded_date": "2022-10-12",
+      "doc_type": "MORTGAGE",
+      "loan_program": "CONV_OR_UNKNOWN",
+      "loan_amount": 2125000.0,
+      "note_rate": null,
+      "origination_date": "2020-08-25",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2020112301162002",
+      "property": {
+        "apn": "1-00016-3843",
+        "address": "2 RIVER TERRACE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      }
+    },
+    {
+      "instrument_id": "2020112301162003",
+      "recorded_date": "2022-10-12",
+      "doc_type": "MORTGAGE",
+      "loan_program": "CONV_OR_UNKNOWN",
+      "loan_amount": 3375000.0,
+      "note_rate": null,
+      "origination_date": "2020-09-25",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2020112301162003",
+      "property": {
+        "apn": "1-00016-3843",
+        "address": "2 RIVER TERRACE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      }
+    },
+    {
+      "instrument_id": "2022080400792001",
+      "recorded_date": "2022-09-28",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 14980.0,
+      "note_rate": null,
+      "origination_date": "2021-09-30",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022080400792001",
+      "property": {
+        "apn": "4-12163-0046",
+        "address": "110-48 160 STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 15000.0,
+        "bin_counts": {
+          "FHA": 1
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2022091501198001",
+      "recorded_date": "2022-09-21",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 95604.16,
+      "note_rate": null,
+      "origination_date": "2021-12-29",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022091501198001",
+      "property": {
+        "apn": "4-10130-0041",
+        "address": "150-43 SHORE AVENUE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 95000.0,
+        "bin_counts": {
+          "FHA": 1
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2022091501086001",
+      "recorded_date": "2022-09-21",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 72393.89,
+      "note_rate": null,
+      "origination_date": "2021-10-14",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022091501086001",
+      "property": {
+        "apn": "4-12398-0217",
+        "address": "114-68 176TH STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 75000.0,
+        "bin_counts": {
+          "FHA": 2
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2022020201010001",
+      "recorded_date": "2022-08-26",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 343000.0,
+      "note_rate": null,
+      "origination_date": "2021-12-03",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022020201010001",
+      "property": {
+        "apn": "4-03152-0050",
+        "address": "66-50 THORNTON PLACE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 345000.0,
+        "bin_counts": {
+          "FHA": 23,
+          "VA": 3
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2022020200947001",
+      "recorded_date": "2022-08-26",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 430000.0,
+      "note_rate": null,
+      "origination_date": "2021-11-22",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022020200947001",
+      "property": {
+        "apn": "4-04024-0137",
+        "address": "117-13 12TH AVENUE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 435000.0,
+        "bin_counts": {
+          "FHA": 32,
+          "VA": 5
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2021092500019004",
+      "recorded_date": "2022-08-23",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 134363.66,
+      "note_rate": null,
+      "origination_date": "2021-09-04",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2021092500019004",
+      "property": {
+        "apn": "3-08387-0065",
+        "address": "1438 EAST 66TH STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 135000.0,
+        "bin_counts": {
+          "FHA": 1
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2022020301093001",
+      "recorded_date": "2022-08-23",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 350000.0,
+      "note_rate": null,
+      "origination_date": "2021-11-13",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022020301093001",
+      "property": {
+        "apn": "4-02324-1046",
+        "address": "63-14 QUEENS BOULEVARD",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 355000.0,
+        "bin_counts": {
+          "FHA": 26,
+          "VA": 5
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2022072001366002",
+      "recorded_date": "2022-08-19",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 600000.0,
+      "note_rate": null,
+      "origination_date": "2021-07-15",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022072001366002",
+      "property": {
+        "apn": "4-09298-0066",
+        "address": "8721 108 STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 605000.0,
+        "bin_counts": {
+          "VA": 8,
+          "FHA": 38,
+          "USDA": 1
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2020070600817002",
+      "recorded_date": "2022-08-03",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 80000.0,
+      "note_rate": null,
+      "origination_date": "2020-05-15",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2020070600817002",
+      "property": {
+        "apn": "4-16204-0012",
+        "address": "451 BEACH 122 STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 85000.0,
+        "bin_counts": {
+          "FHA": 1
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0850602316303211,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0963
+      }
+    },
+    {
+      "instrument_id": "2022071900399002",
+      "recorded_date": "2022-07-27",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 142837.33,
+      "note_rate": null,
+      "origination_date": "2021-06-30",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022071900399002",
+      "property": {
+        "apn": "3-00230-0011",
+        "address": "104 HICKS STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 145000.0,
+        "bin_counts": {
+          "FHA": 1
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2021041601265001",
+      "recorded_date": "2022-07-27",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 438251.0,
+      "note_rate": null,
+      "origination_date": "2021-02-23",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2021041601265001",
+      "property": {
+        "apn": "2-03712-0073",
+        "address": "1021 WHEELER AVENUE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 435000.0,
+        "bin_counts": {
+          "FHA": 32,
+          "VA": 5
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2022022000030001",
+      "recorded_date": "2022-07-22",
+      "doc_type": "MORTGAGE",
+      "loan_program": "FHA",
+      "loan_amount": 323544.77,
+      "note_rate": null,
+      "origination_date": "2021-10-01",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022022000030001",
+      "property": {
+        "apn": "4-00691-0028",
+        "address": "32-25 43RD STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 325000.0,
+        "bin_counts": {
+          "VA": 4,
+          "FHA": 10
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    },
+    {
+      "instrument_id": "2021122000365001",
+      "recorded_date": "2022-07-21",
+      "doc_type": "MORTGAGE",
+      "loan_program": "VA",
+      "loan_amount": 120200.0,
+      "note_rate": null,
+      "origination_date": "2021-12-19",
+      "lender": "",
+      "borrower": "",
+      "county": "QUEENS",
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2021122000365001",
+      "property": {
+        "apn": "4-06145-0051",
+        "address": "3615 200TH ST",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "program_inference": {
+        "method": "hmda_amount_bin_county_year_match",
+        "matched_bin": 125000.0,
+        "bin_counts": {
+          "VA": 1
+        },
+        "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+        "county_gov_share": 0.0751993481171061,
+        "batch_match_rate": 0.8833,
+        "posterior_gov_probability": 0.0851
+      }
+    }
+  ],
+  "signals": [
+    {
+      "id": "204a4979035fbebd",
+      "source": "county_recorder_assumable_heuristic",
+      "signal_type": "assumable_loan",
+      "observed_at": "2025-03-14T00:00:00",
+      "property": {
+        "apn": "4-15817-0025",
+        "address": "146 BEACH 26TH STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "owner": null,
+      "evidence": {
+        "instrument_id": "2025031200158002",
+        "doc_type": "MORTGAGE",
+        "loan_program": "FHA",
+        "loan_amount": 871720.0,
+        "origination_date": "2020-03-05",
+        "lender": "",
+        "note_rate_stated": null,
+        "estimated_origination_rate": 3.45,
+        "current_market_rate": 6.8,
+        "rate_delta_hint": 3.35,
+        "rate_source": "freddie_mac_pmms_monthly_avg",
+        "loan_program_source": "inferred",
+        "program_inference": {
+          "method": "hmda_amount_bin_county_year_match",
+          "matched_bin": 875000.0,
+          "bin_counts": {
+            "FHA": 5,
+            "VA": 1
+          },
+          "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+          "county_gov_share": 0.0850602316303211,
+          "batch_match_rate": 0.8833,
+          "posterior_gov_probability": 0.0963
+        },
+        "county": "QUEENS"
+      },
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2025031200158002",
+      "confidence": 0.096
+    },
+    {
+      "id": "12c771b57a14b0aa",
+      "source": "county_recorder_assumable_heuristic",
+      "signal_type": "assumable_loan",
+      "observed_at": "2024-08-12T00:00:00",
+      "property": {
+        "apn": "4-09158-0040",
+        "address": "105-41 91ST STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "owner": null,
+      "evidence": {
+        "instrument_id": "2024080500375001",
+        "doc_type": "MORTGAGE",
+        "loan_program": "FHA",
+        "loan_amount": 290000.0,
+        "origination_date": "2021-11-19",
+        "lender": "",
+        "note_rate_stated": null,
+        "estimated_origination_rate": 3.07,
+        "current_market_rate": 6.8,
+        "rate_delta_hint": 3.73,
+        "rate_source": "freddie_mac_pmms_monthly_avg",
+        "loan_program_source": "inferred",
+        "program_inference": {
+          "method": "hmda_amount_bin_county_year_match",
+          "matched_bin": 295000.0,
+          "bin_counts": {
+            "VA": 5,
+            "FHA": 9
+          },
+          "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+          "county_gov_share": 0.0751993481171061,
+          "batch_match_rate": 0.8833,
+          "posterior_gov_probability": 0.0851
+        },
+        "county": "QUEENS"
+      },
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2024080500375001",
+      "confidence": 0.085
+    },
+    {
+      "id": "e557a468599460fe",
+      "source": "county_recorder_assumable_heuristic",
+      "signal_type": "assumable_loan",
+      "observed_at": "2023-09-20T00:00:00",
+      "property": {
+        "apn": "4-09997-0020",
+        "address": "149-15 ARCHER AVENUE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "owner": null,
+      "evidence": {
+        "instrument_id": "2023090700260001",
+        "doc_type": "MORTGAGE",
+        "loan_program": "FHA",
+        "loan_amount": 200000.0,
+        "origination_date": "2021-10-21",
+        "lender": "",
+        "note_rate_stated": null,
+        "estimated_origination_rate": 3.07,
+        "current_market_rate": 6.8,
+        "rate_delta_hint": 3.73,
+        "rate_source": "freddie_mac_pmms_monthly_avg",
+        "loan_program_source": "inferred",
+        "program_inference": {
+          "method": "hmda_amount_bin_county_year_match",
+          "matched_bin": 205000.0,
+          "bin_counts": {
+            "FHA": 1
+          },
+          "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+          "county_gov_share": 0.0751993481171061,
+          "batch_match_rate": 0.8833,
+          "posterior_gov_probability": 0.0851
+        },
+        "county": "QUEENS"
+      },
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2023090700260001",
+      "confidence": 0.085
+    },
+    {
+      "id": "5e58654e0dbe21be",
+      "source": "county_recorder_assumable_heuristic",
+      "signal_type": "assumable_loan",
+      "observed_at": "2023-05-30T00:00:00",
+      "property": {
+        "apn": "4-05371-0026",
+        "address": "42-14 196TH STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "owner": null,
+      "evidence": {
+        "instrument_id": "2023052600615001",
+        "doc_type": "MORTGAGE",
+        "loan_program": "FHA",
+        "loan_amount": 86400.0,
+        "origination_date": "2021-12-12",
+        "lender": "",
+        "note_rate_stated": null,
+        "estimated_origination_rate": 3.1,
+        "current_market_rate": 6.8,
+        "rate_delta_hint": 3.7,
+        "rate_source": "freddie_mac_pmms_monthly_avg",
+        "loan_program_source": "inferred",
+        "program_inference": {
+          "method": "hmda_amount_bin_county_year_match",
+          "matched_bin": 85000.0,
+          "bin_counts": {
+            "FHA": 3
+          },
+          "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+          "county_gov_share": 0.0751993481171061,
+          "batch_match_rate": 0.8833,
+          "posterior_gov_probability": 0.0851
+        },
+        "county": "QUEENS"
+      },
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2023052600615001",
+      "confidence": 0.085
+    },
+    {
+      "id": "576f2b5429ba043c",
+      "source": "county_recorder_assumable_heuristic",
+      "signal_type": "assumable_loan",
+      "observed_at": "2023-05-17T00:00:00",
+      "property": {
+        "apn": "4-10924-0086",
+        "address": "191-09 109TH ROAD",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "owner": null,
+      "evidence": {
+        "instrument_id": "2022080400055001",
+        "doc_type": "MORTGAGE",
+        "loan_program": "FHA",
+        "loan_amount": 54796.0,
+        "origination_date": "2021-09-30",
+        "lender": "",
+        "note_rate_stated": null,
+        "estimated_origination_rate": 2.9,
+        "current_market_rate": 6.8,
+        "rate_delta_hint": 3.9,
+        "rate_source": "freddie_mac_pmms_monthly_avg",
+        "loan_program_source": "inferred",
+        "program_inference": {
+          "method": "hmda_amount_bin_county_year_match",
+          "matched_bin": 55000.0,
+          "bin_counts": {
+            "FHA": 2
+          },
+          "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+          "county_gov_share": 0.0751993481171061,
+          "batch_match_rate": 0.8833,
+          "posterior_gov_probability": 0.0851
+        },
+        "county": "QUEENS"
+      },
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022080400055001",
+      "confidence": 0.085
+    },
+    {
+      "id": "a6afad60cecac9e3",
+      "source": "county_recorder_assumable_heuristic",
+      "signal_type": "assumable_loan",
+      "observed_at": "2023-05-17T00:00:00",
+      "property": {
+        "apn": "4-11637-0029",
+        "address": "111-48 134TH STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "owner": null,
+      "evidence": {
+        "instrument_id": "2022080400055002",
+        "doc_type": "MORTGAGE",
+        "loan_program": "FHA",
+        "loan_amount": 48259.58,
+        "origination_date": "2021-06-07",
+        "lender": "",
+        "note_rate_stated": null,
+        "estimated_origination_rate": 2.98,
+        "current_market_rate": 6.8,
+        "rate_delta_hint": 3.82,
+        "rate_source": "freddie_mac_pmms_monthly_avg",
+        "loan_program_source": "inferred",
+        "program_inference": {
+          "method": "hmda_amount_bin_county_year_match",
+          "matched_bin": 45000.0,
+          "bin_counts": {
+            "FHA": 2
+          },
+          "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+          "county_gov_share": 0.0751993481171061,
+          "batch_match_rate": 0.8833,
+          "posterior_gov_probability": 0.0851
+        },
+        "county": "QUEENS"
+      },
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2022080400055002",
+      "confidence": 0.085
+    },
+    {
+      "id": "81a25282fd53e9e9",
+      "source": "county_recorder_assumable_heuristic",
+      "signal_type": "assumable_loan",
+      "observed_at": "2023-05-10T00:00:00",
+      "property": {
+        "apn": "4-12981-0038",
+        "address": "24307 132ND ROAD",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "owner": null,
+      "evidence": {
+        "instrument_id": "2023042000482001",
+        "doc_type": "MORTGAGE",
+        "loan_program": "FHA",
+        "loan_amount": 23287.41,
+        "origination_date": "2021-07-21",
+        "lender": "",
+        "note_rate_stated": null,
+        "estimated_origination_rate": 2.87,
+        "current_market_rate": 6.8,
+        "rate_delta_hint": 3.93,
+        "rate_source": "freddie_mac_pmms_monthly_avg",
+        "loan_program_source": "inferred",
+        "program_inference": {
+          "method": "hmda_amount_bin_county_year_match",
+          "matched_bin": 25000.0,
+          "bin_counts": {
+            "FHA": 2
+          },
+          "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+          "county_gov_share": 0.0751993481171061,
+          "batch_match_rate": 0.8833,
+          "posterior_gov_probability": 0.0851
+        },
+        "county": "QUEENS"
+      },
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2023042000482001",
+      "confidence": 0.085
+    },
+    {
+      "id": "d770aafaf60459c8",
+      "source": "county_recorder_assumable_heuristic",
+      "signal_type": "assumable_loan",
+      "observed_at": "2023-04-27T00:00:00",
+      "property": {
+        "apn": "3-01542-0070",
+        "address": "2061 FULTON ST",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "owner": null,
+      "evidence": {
+        "instrument_id": "2023042600849001",
+        "doc_type": "MORTGAGE",
+        "loan_program": "FHA",
+        "loan_amount": 200000.0,
+        "origination_date": "2021-12-09",
+        "lender": "",
+        "note_rate_stated": null,
+        "estimated_origination_rate": 3.1,
+        "current_market_rate": 6.8,
+        "rate_delta_hint": 3.7,
+        "rate_source": "freddie_mac_pmms_monthly_avg",
+        "loan_program_source": "inferred",
+        "program_inference": {
+          "method": "hmda_amount_bin_county_year_match",
+          "matched_bin": 205000.0,
+          "bin_counts": {
+            "FHA": 1
+          },
+          "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+          "county_gov_share": 0.0751993481171061,
+          "batch_match_rate": 0.8833,
+          "posterior_gov_probability": 0.0851
+        },
+        "county": "QUEENS"
+      },
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2023042600849001",
+      "confidence": 0.085
+    },
+    {
+      "id": "30fc4518cf4a5d8c",
+      "source": "county_recorder_assumable_heuristic",
+      "signal_type": "assumable_loan",
+      "observed_at": "2023-04-03T00:00:00",
+      "property": {
+        "apn": "3-08171-0113",
+        "address": "657 EAST 102 STREET",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "owner": null,
+      "evidence": {
+        "instrument_id": "2021032300041005",
+        "doc_type": "MORTGAGE",
+        "loan_program": "FHA",
+        "loan_amount": 843858.0,
+        "origination_date": "2021-03-15",
+        "lender": "",
+        "note_rate_stated": null,
+        "estimated_origination_rate": 3.08,
+        "current_market_rate": 6.8,
+        "rate_delta_hint": 3.72,
+        "rate_source": "freddie_mac_pmms_monthly_avg",
+        "loan_program_source": "inferred",
+        "program_inference": {
+          "method": "hmda_amount_bin_county_year_match",
+          "matched_bin": 845000.0,
+          "bin_counts": {
+            "FHA": 29
+          },
+          "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+          "county_gov_share": 0.0751993481171061,
+          "batch_match_rate": 0.8833,
+          "posterior_gov_probability": 0.0851
+        },
+        "county": "QUEENS"
+      },
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2021032300041005",
+      "confidence": 0.085
+    },
+    {
+      "id": "4239d5dee81c019d",
+      "source": "county_recorder_assumable_heuristic",
+      "signal_type": "assumable_loan",
+      "observed_at": "2023-03-30T00:00:00",
+      "property": {
+        "apn": "4-15702-0063",
+        "address": "1419 POINT BREEZE PLACE",
+        "city": "QUEENS",
+        "state": "NY",
+        "zip": "",
+        "lat": null,
+        "lon": null
+      },
+      "owner": null,
+      "evidence": {
+        "instrument_id": "2023013100520001",
+        "doc_type": "MORTGAGE",
+        "loan_program": "FHA",
+        "loan_amount": 56548.68,
+        "origination_date": "2021-04-28",
+        "lender": "",
+        "note_rate_stated": null,
+        "estimated_origination_rate": 3.06,
+        "current_market_rate": 6.8,
+        "rate_delta_hint": 3.74,
+        "rate_source": "freddie_mac_pmms_monthly_avg",
+        "loan_program_source": "inferred",
+        "program_inference": {
+          "method": "hmda_amount_bin_county_year_match",
+          "matched_bin": 55000.0,
+          "bin_counts": {
+            "FHA": 2
+          },
+          "caveat": "probabilistic label \u2014 same-county originations sharing the $10k amount bin and year; verify program on the recorded instrument image (FHA Case No. / VA rider)",
+          "county_gov_share": 0.0751993481171061,
+          "batch_match_rate": 0.8833,
+          "posterior_gov_probability": 0.0851
+        },
+        "county": "QUEENS"
+      },
+      "source_url": "https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentImageView?doc_id=2023013100520001",
+      "confidence": 0.085
+    }
+  ]
+}

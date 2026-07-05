@@ -1,0 +1,1057 @@
+{
+  "results" :
+    [
+      {
+        "resource" :
+          {
+            "name" : "Cook County Recorder of Deeds - Mortgages - 2011 Complete!",
+            "id" : "33fu-uwca",
+            "resource_name" : null,
+            "parent_fxf" : [],
+            "description" : "Mortgages recorded between January 1, 2011 and December 31, 2011",
+            "attribution" : "Cook County Recorder of Deeds",
+            "attribution_link" : "http://cookrecorder.com/",
+            "contact_email" : null,
+            "type" : "dataset",
+            "updatedAt" : "2026-01-27T20:04:19.000Z",
+            "createdAt" : "2012-04-24T21:17:21.000Z",
+            "metadata_updated_at" : "2026-01-27T20:04:19.000Z",
+            "data_updated_at" : "2014-10-09T23:12:00.000Z",
+            "page_views" :
+              {
+                "page_views_last_week" : 145,
+                "page_views_last_month" : 208,
+                "page_views_total" : 3178,
+                "page_views_last_week_log" : 7.189824558880018,
+                "page_views_last_month_log" : 7.7073591320808825,
+                "page_views_total_log" : 11.634357301137976
+              },
+            "columns_name" :
+              [
+                "Pin",
+                "Location 1 (state)",
+                "Doc Type",
+                "Consideration Amount",
+                "Location 1 (zip)",
+                "Location 1 (city)",
+                "Location 1 (address)",
+                "Location 1",
+                "Execution Date",
+                "Recorded Date",
+                "Doc Number"
+              ],
+            "columns_field_name" :
+              [
+                "pin",
+                "location_1_state",
+                "doc_type",
+                "consideration_amount",
+                "location_1_zip",
+                "location_1_city",
+                "location_1_address",
+                "location_1",
+                "execution_date",
+                "recorded_date",
+                "doc_number"
+              ],
+            "columns_datatype" :
+              [
+                "Text",
+                "Text",
+                "Text",
+                "Number",
+                "Text",
+                "Text",
+                "Text",
+                "Point",
+                "Calendar date",
+                "Calendar date",
+                "Text"
+              ],
+            "columns_description" :
+              [ "", "", "", "", "", "", "", "", "", "", "" ],
+            "columns_format" :
+              [
+                {},
+                {},
+                { "align" : "center" },
+                {
+                  "precision" : "2",
+                  "align" : "center",
+                  "currencyStyle" : "USD",
+                  "humane" : "false",
+                  "precisionStyle" : "currency"
+                },
+                {},
+                {},
+                {},
+                { "view" : "address_coords", "align" : "left" },
+                { "view" : "date", "align" : "center" },
+                { "view" : "date", "align" : "center" },
+                { "align" : "center" }
+              ],
+            "download_count" : 36913,
+            "provenance" : "official",
+            "lens_view_type" : "tabular",
+            "lens_display_type" : "table",
+            "locked" : false,
+            "backend" : "nbe",
+            "blob_mime_type" : null,
+            "hide_from_data_json" : false,
+            "publication_date" : "2023-06-01T20:08:45.000Z"
+          },
+        "classification" :
+          {
+            "categories" : [],
+            "tags" : [],
+            "domain_category" : "Property & Taxation",
+            "domain_tags" : [ "inactive" ],
+            "domain_metadata" : []
+          },
+        "metadata" :
+          {
+            "domain" : "datacatalog.cookcountyil.gov",
+            "license" : "Public Domain"
+          },
+        "permalink" : "https://datacatalog.cookcountyil.gov/d/33fu-uwca",
+        "link" : "https://datacatalog.cookcountyil.gov/Property-Taxation/Cook-County-Recorder-of-Deeds-Mortgages-2011-Compl/33fu-uwca",
+        "owner" :
+          {
+            "id" : "zker-e3n4",
+            "user_type" : "interactive",
+            "display_name" : "joe.ruiz"
+          },
+        "creator" :
+          {
+            "id" : "zker-e3n4",
+            "user_type" : "interactive",
+            "display_name" : "joe.ruiz"
+          }
+      },
+      {
+        "resource" :
+          {
+            "name" : "Cook County Recorder - Mortgages - 2013 through March 27, 2015",
+            "id" : "pu79-z8ux",
+            "resource_name" : null,
+            "parent_fxf" : [ "4f2q-h3b7" ],
+            "description" : "Mortgages recorded with the Cook County Recorder of Deeds. Data covers 2013 through March 27, 2015. This dataset will be updated Quarterly. For more information see http://cookrecorder.com/ .",
+            "attribution" : "Cook County Recorder of Deeds",
+            "attribution_link" : "http://cookrecorder.com/",
+            "contact_email" : null,
+            "type" : "filter",
+            "updatedAt" : "2026-01-27T20:26:34.000Z",
+            "createdAt" : "2014-09-17T15:06:47.000Z",
+            "metadata_updated_at" : "2026-01-27T20:26:34.000Z",
+            "data_updated_at" : "2015-04-07T21:59:43.000Z",
+            "page_views" :
+              {
+                "page_views_last_week" : 25,
+                "page_views_last_month" : 62,
+                "page_views_total" : 4873,
+                "page_views_last_week_log" : 4.700439718141093,
+                "page_views_last_month_log" : 5.977279923499917,
+                "page_views_total_log" : 12.250890535723341
+              },
+            "columns_name" :
+              [
+                "Document Type",
+                "Consideration Amount",
+                "State",
+                "City",
+                "Street",
+                "Execution Date",
+                "Recorded Date",
+                "Document Number",
+                "PIN",
+                "Zip code",
+                "Location"
+              ],
+            "columns_field_name" :
+              [
+                "document_type",
+                "consideration_amount",
+                "state",
+                "city",
+                "street",
+                "execution_date",
+                "recorded_date",
+                "document_number",
+                "pin",
+                "zip_code",
+                "location"
+              ],
+            "columns_datatype" :
+              [
+                "Text",
+                "Number",
+                "Text",
+                "Text",
+                "Text",
+                "Calendar date",
+                "Calendar date",
+                "Number",
+                "Text",
+                "Text",
+                "Point"
+              ],
+            "columns_description" :
+              [ "", "", "", "", "", "", "", "", "", "", "" ],
+            "columns_format" :
+              [
+                {},
+                {
+                  "precisionStyle" : "currency",
+                  "currencyStyle" : "USD",
+                  "precision" : "2"
+                },
+                {},
+                {},
+                {},
+                { "view" : "date", "align" : "left" },
+                { "view" : "date", "align" : "left" },
+                {
+                  "precisionStyle" : "standard",
+                  "noCommas" : "true",
+                  "align" : "right"
+                },
+                {},
+                {},
+                {}
+              ],
+            "download_count" : 687,
+            "provenance" : "official",
+            "lens_view_type" : "tabular",
+            "lens_display_type" : "table",
+            "locked" : false,
+            "backend" : "nbe",
+            "blob_mime_type" : null,
+            "hide_from_data_json" : false,
+            "publication_date" : "2015-04-07T22:06:28.000Z"
+          },
+        "classification" :
+          {
+            "categories" : [],
+            "tags" : [],
+            "domain_category" : "Property & Taxation",
+            "domain_tags" :
+              [
+                "quit claim deeds",
+                "foreclosures",
+                "mortgages",
+                "recorder",
+                "property"
+              ],
+            "domain_metadata" :
+              [
+                { "key" : "Metadata_Update-Frequency", "value" : "Quarterly" }
+              ]
+          },
+        "metadata" :
+          {
+            "domain" : "datacatalog.cookcountyil.gov",
+            "license" : "Public Domain"
+          },
+        "permalink" : "https://datacatalog.cookcountyil.gov/d/pu79-z8ux",
+        "link" : "https://datacatalog.cookcountyil.gov/Property-Taxation/Cook-County-Recorder-Mortgages-2013-through-March-/pu79-z8ux",
+        "owner" :
+          {
+            "id" : "d4g2-kc7i",
+            "user_type" : "interactive",
+            "display_name" : "Cook County Webmaster"
+          },
+        "creator" :
+          {
+            "id" : "d4g2-kc7i",
+            "user_type" : "interactive",
+            "display_name" : "Cook County Webmaster"
+          }
+      },
+      {
+        "resource" :
+          {
+            "name" : "2011 Mortgages, Sortable by Consideration Amount",
+            "id" : "nx89-4r6w",
+            "resource_name" : null,
+            "parent_fxf" : [ "33fu-uwca" ],
+            "description" : "",
+            "attribution" : "Cook County Recorder of Deeds",
+            "attribution_link" : "http://cookrecorder.com/",
+            "contact_email" : null,
+            "type" : "filter",
+            "updatedAt" : "2026-01-27T20:08:33.000Z",
+            "createdAt" : "2012-04-27T03:28:44.000Z",
+            "metadata_updated_at" : "2026-01-27T20:08:33.000Z",
+            "data_updated_at" : "2014-10-09T23:12:00.000Z",
+            "page_views" :
+              {
+                "page_views_last_week" : 0,
+                "page_views_last_month" : 1,
+                "page_views_total" : 452,
+                "page_views_last_week_log" : 0.0,
+                "page_views_last_month_log" : 1.0,
+                "page_views_total_log" : 8.823367240046236
+              },
+            "columns_name" :
+              [
+                "Doc Number",
+                "Consideration Amount",
+                "Location 1",
+                "Doc Type",
+                "Pin",
+                "Execution Date",
+                "Recorded Date"
+              ],
+            "columns_field_name" :
+              [
+                "doc_number",
+                "consideration_amount",
+                "location_1",
+                "doc_type",
+                "pin",
+                "execution_date",
+                "recorded_date"
+              ],
+            "columns_datatype" :
+              [
+                "Text",
+                "Number",
+                "Point",
+                "Text",
+                "Text",
+                "Calendar date",
+                "Calendar date"
+              ],
+            "columns_description" : [ "", "", "", "", "", "", "" ],
+            "columns_format" :
+              [
+                { "align" : "center" },
+                {
+                  "precision" : "2",
+                  "align" : "center",
+                  "currencyStyle" : "USD",
+                  "humane" : "false",
+                  "precisionStyle" : "currency"
+                },
+                { "view" : "address_coords", "align" : "left" },
+                { "align" : "center" },
+                {},
+                { "view" : "date", "align" : "center" },
+                { "view" : "date", "align" : "center" }
+              ],
+            "download_count" : 113,
+            "provenance" : "official",
+            "lens_view_type" : "tabular",
+            "lens_display_type" : "table",
+            "locked" : false,
+            "backend" : "nbe",
+            "blob_mime_type" : null,
+            "hide_from_data_json" : false,
+            "publication_date" : "2014-10-09T23:12:45.000Z"
+          },
+        "classification" :
+          {
+            "categories" : [],
+            "tags" : [],
+            "domain_category" : "Property & Taxation",
+            "domain_tags" : [ "mortgage" ],
+            "domain_metadata" : []
+          },
+        "metadata" :
+          {
+            "domain" : "datacatalog.cookcountyil.gov",
+            "license" : "Public Domain"
+          },
+        "permalink" : "https://datacatalog.cookcountyil.gov/d/nx89-4r6w",
+        "link" : "https://datacatalog.cookcountyil.gov/Property-Taxation/2011-Mortgages-Sortable-by-Consideration-Amount/nx89-4r6w",
+        "owner" :
+          {
+            "id" : "u38g-hbsa",
+            "user_type" : "interactive",
+            "display_name" : "Cook County Open Data"
+          },
+        "creator" :
+          {
+            "id" : "u38g-hbsa",
+            "user_type" : "interactive",
+            "display_name" : "Cook County Open Data"
+          }
+      },
+      {
+        "resource" :
+          {
+            "name" : "2011 Mortgages, Sortable by Consideration Amount",
+            "id" : "aepy-3b2m",
+            "resource_name" : null,
+            "parent_fxf" : [ "33fu-uwca" ],
+            "description" : "",
+            "attribution" : "Cook County Recorder of Deeds",
+            "attribution_link" : "http://cookrecorder.com/",
+            "contact_email" : null,
+            "type" : "filter",
+            "updatedAt" : "2026-01-27T20:46:02.000Z",
+            "createdAt" : "2012-04-27T03:26:16.000Z",
+            "metadata_updated_at" : "2026-01-27T20:46:02.000Z",
+            "data_updated_at" : "2014-10-09T23:12:00.000Z",
+            "page_views" :
+              {
+                "page_views_last_week" : 2,
+                "page_views_last_month" : 12,
+                "page_views_total" : 384,
+                "page_views_last_week_log" : 1.5849625007211563,
+                "page_views_last_month_log" : 3.700439718141092,
+                "page_views_total_log" : 8.588714635582265
+              },
+            "columns_name" :
+              [
+                "Execution Date",
+                "Pin",
+                "Doc Number",
+                "Recorded Date",
+                "Consideration Amount",
+                "Location 1",
+                "Doc Type"
+              ],
+            "columns_field_name" :
+              [
+                "execution_date",
+                "pin",
+                "doc_number",
+                "recorded_date",
+                "consideration_amount",
+                "location_1",
+                "doc_type"
+              ],
+            "columns_datatype" :
+              [
+                "Calendar date",
+                "Text",
+                "Text",
+                "Calendar date",
+                "Number",
+                "Point",
+                "Text"
+              ],
+            "columns_description" : [ "", "", "", "", "", "", "" ],
+            "columns_format" :
+              [
+                { "view" : "date", "align" : "center" },
+                {},
+                { "align" : "center" },
+                { "view" : "date", "align" : "center" },
+                {
+                  "precision" : "2",
+                  "align" : "center",
+                  "currencyStyle" : "USD",
+                  "humane" : "false",
+                  "precisionStyle" : "currency"
+                },
+                { "view" : "address_coords", "align" : "left" },
+                { "align" : "center" }
+              ],
+            "download_count" : 107,
+            "provenance" : "official",
+            "lens_view_type" : "tabular",
+            "lens_display_type" : "table",
+            "locked" : false,
+            "backend" : "nbe",
+            "blob_mime_type" : null,
+            "hide_from_data_json" : false,
+            "publication_date" : "2014-10-09T23:12:45.000Z"
+          },
+        "classification" :
+          {
+            "categories" : [],
+            "tags" : [],
+            "domain_category" : "Property & Taxation",
+            "domain_tags" : [ "mortgage" ],
+            "domain_metadata" : []
+          },
+        "metadata" :
+          {
+            "domain" : "datacatalog.cookcountyil.gov",
+            "license" : "Public Domain"
+          },
+        "permalink" : "https://datacatalog.cookcountyil.gov/d/aepy-3b2m",
+        "link" : "https://datacatalog.cookcountyil.gov/Property-Taxation/2011-Mortgages-Sortable-by-Consideration-Amount/aepy-3b2m",
+        "owner" :
+          {
+            "id" : "u38g-hbsa",
+            "user_type" : "interactive",
+            "display_name" : "Cook County Open Data"
+          },
+        "creator" :
+          {
+            "id" : "u38g-hbsa",
+            "user_type" : "interactive",
+            "display_name" : "Cook County Open Data"
+          }
+      },
+      {
+        "resource" :
+          {
+            "name" : "Cook County Recorder of Deeds - Mortgages - 2012 January 1 to November 29",
+            "id" : "myuk-usmm",
+            "resource_name" : null,
+            "parent_fxf" : [],
+            "description" : "",
+            "attribution" : "Cook County Recorder of Deeds",
+            "attribution_link" : "http://cookrecorder.com",
+            "contact_email" : null,
+            "type" : "dataset",
+            "updatedAt" : "2026-01-27T20:52:22.000Z",
+            "createdAt" : "2012-04-25T15:35:32.000Z",
+            "metadata_updated_at" : "2026-01-27T20:52:22.000Z",
+            "data_updated_at" : "2012-12-07T23:14:51.000Z",
+            "page_views" :
+              {
+                "page_views_last_week" : 9,
+                "page_views_last_month" : 39,
+                "page_views_total" : 3931,
+                "page_views_last_week_log" : 3.3219280948873626,
+                "page_views_last_month_log" : 5.321928094887363,
+                "page_views_total_log" : 11.94104760634058
+              },
+            "columns_name" :
+              [
+                "Location 1 (city)",
+                "Location 1 (address)",
+                "Location 1",
+                "Consideration Amount",
+                "Execution Date",
+                "Recorded Date",
+                "Doc Type",
+                "Doc Number",
+                "Pin",
+                "Location 1 (state)",
+                "Location 1 (zip)"
+              ],
+            "columns_field_name" :
+              [
+                "location_1_city",
+                "location_1_address",
+                "location_1",
+                "consideration_amount",
+                "execution_date",
+                "recorded_date",
+                "doc_type",
+                "doc_number",
+                "pin",
+                "location_1_state",
+                "location_1_zip"
+              ],
+            "columns_datatype" :
+              [
+                "Text",
+                "Text",
+                "Point",
+                "Number",
+                "Calendar date",
+                "Calendar date",
+                "Text",
+                "Text",
+                "Text",
+                "Text",
+                "Text"
+              ],
+            "columns_description" :
+              [ "", "", "", "", "", "", "", "", "", "", "" ],
+            "columns_format" :
+              [
+                {},
+                {},
+                {},
+                {
+                  "noCommas" : "false",
+                  "precision" : "2",
+                  "align" : "center",
+                  "currencyStyle" : "USD",
+                  "precisionStyle" : "standard"
+                },
+                { "view" : "date", "align" : "center" },
+                { "view" : "date", "align" : "center" },
+                { "align" : "center" },
+                { "align" : "center" },
+                {},
+                {},
+                {}
+              ],
+            "download_count" : 8184,
+            "provenance" : "official",
+            "lens_view_type" : "tabular",
+            "lens_display_type" : "table",
+            "locked" : false,
+            "backend" : "nbe",
+            "blob_mime_type" : null,
+            "hide_from_data_json" : false,
+            "publication_date" : "2023-05-31T00:07:11.000Z"
+          },
+        "classification" :
+          {
+            "categories" : [],
+            "tags" : [],
+            "domain_category" : "Property & Taxation",
+            "domain_tags" : [ "inactive", "mortgages" ],
+            "domain_metadata" :
+              [
+                {
+                  "key" : "Metadata_Update-Frequency",
+                  "value" : "No updates"
+                }
+              ]
+          },
+        "metadata" : { "domain" : "datacatalog.cookcountyil.gov" },
+        "permalink" : "https://datacatalog.cookcountyil.gov/d/myuk-usmm",
+        "link" : "https://datacatalog.cookcountyil.gov/Property-Taxation/Cook-County-Recorder-of-Deeds-Mortgages-2012-Janua/myuk-usmm",
+        "owner" :
+          {
+            "id" : "zker-e3n4",
+            "user_type" : "interactive",
+            "display_name" : "joe.ruiz"
+          },
+        "creator" :
+          {
+            "id" : "zker-e3n4",
+            "user_type" : "interactive",
+            "display_name" : "joe.ruiz"
+          }
+      },
+      {
+        "resource" :
+          {
+            "name" : "Cook County Recorder - Foreclosures, Mortgages, and Quit Claim Deeds - 2013 through March 27, 2015",
+            "id" : "4f2q-h3b7",
+            "resource_name" : null,
+            "parent_fxf" : [],
+            "description" : "Foreclosures, Mortgages, and Quit Claim Deeds recorded with the Cook County Recorder of Deeds. Data covers 2013 through March 27, 2015. This dataset will be updated Quarterly. For more information see http://cookrecorder.com/ .",
+            "attribution" : "Cook County Recorder of Deeds",
+            "attribution_link" : "http://cookrecorder.com/",
+            "contact_email" : null,
+            "type" : "dataset",
+            "updatedAt" : "2026-01-27T20:34:11.000Z",
+            "createdAt" : "2014-09-16T15:16:26.000Z",
+            "metadata_updated_at" : "2026-01-27T20:34:11.000Z",
+            "data_updated_at" : "2015-04-07T21:59:43.000Z",
+            "page_views" :
+              {
+                "page_views_last_week" : 49,
+                "page_views_last_month" : 157,
+                "page_views_total" : 6269,
+                "page_views_last_week_log" : 5.643856189774724,
+                "page_views_last_month_log" : 7.303780748177103,
+                "page_views_total_log" : 12.614249727689403
+              },
+            "columns_name" :
+              [
+                "Zip code",
+                "Location (city)",
+                "State",
+                "Location (address)",
+                "Location (state)",
+                "Recorded Date",
+                "Location (zip)",
+                "Location",
+                "Document Number",
+                "PIN",
+                "Execution Date",
+                "Consideration Amount",
+                "Street",
+                "City",
+                "Document Type"
+              ],
+            "columns_field_name" :
+              [
+                "zip_code",
+                "location_city",
+                "state",
+                "location_address",
+                "location_state",
+                "recorded_date",
+                "location_zip",
+                "location",
+                "document_number",
+                "pin",
+                "execution_date",
+                "consideration_amount",
+                "street",
+                "city",
+                "document_type"
+              ],
+            "columns_datatype" :
+              [
+                "Text",
+                "Text",
+                "Text",
+                "Text",
+                "Text",
+                "Calendar date",
+                "Text",
+                "Point",
+                "Number",
+                "Text",
+                "Calendar date",
+                "Number",
+                "Text",
+                "Text",
+                "Text"
+              ],
+            "columns_description" :
+              [ "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" ],
+            "columns_format" :
+              [
+                {},
+                {},
+                {},
+                {},
+                {},
+                { "view" : "date", "align" : "left" },
+                {},
+                {},
+                {
+                  "precisionStyle" : "standard",
+                  "noCommas" : "true",
+                  "align" : "right"
+                },
+                {},
+                { "view" : "date", "align" : "left" },
+                {
+                  "precisionStyle" : "currency",
+                  "currencyStyle" : "USD",
+                  "precision" : "2"
+                },
+                {},
+                {},
+                {}
+              ],
+            "download_count" : 17469,
+            "provenance" : "official",
+            "lens_view_type" : "tabular",
+            "lens_display_type" : "table",
+            "locked" : false,
+            "backend" : "nbe",
+            "blob_mime_type" : null,
+            "hide_from_data_json" : false,
+            "publication_date" : "2023-05-30T23:54:59.000Z"
+          },
+        "classification" :
+          {
+            "categories" : [],
+            "tags" : [],
+            "domain_category" : "Property & Taxation",
+            "domain_tags" :
+              [
+                "inactive",
+                "deeds",
+                "forclosures",
+                "mortgages",
+                "property",
+                "recorder"
+              ],
+            "domain_metadata" :
+              [
+                { "key" : "Metadata_Update-Frequency", "value" : "Quarterly" }
+              ]
+          },
+        "metadata" :
+          {
+            "domain" : "datacatalog.cookcountyil.gov",
+            "license" : "Public Domain"
+          },
+        "permalink" : "https://datacatalog.cookcountyil.gov/d/4f2q-h3b7",
+        "link" : "https://datacatalog.cookcountyil.gov/Property-Taxation/Cook-County-Recorder-Foreclosures-Mortgages-and-Qu/4f2q-h3b7",
+        "owner" :
+          {
+            "id" : "u38g-hbsa",
+            "user_type" : "interactive",
+            "display_name" : "Cook County Open Data"
+          },
+        "creator" :
+          {
+            "id" : "u38g-hbsa",
+            "user_type" : "interactive",
+            "display_name" : "Cook County Open Data"
+          }
+      },
+      {
+        "resource" :
+          {
+            "name" : "Cook County Recorder - Foreclosures - 2013 through March 27, 2015",
+            "id" : "nk2q-7kjv",
+            "resource_name" : null,
+            "parent_fxf" : [ "4f2q-h3b7" ],
+            "description" : "Foreclosures recorded with the Cook County Recorder of Deeds. Data covers 2013 through March 27, 2015. This dataset will be updated Quarterly. For more information see http://cookrecorder.com/ .",
+            "attribution" : "Cook County Recorder of Deeds",
+            "attribution_link" : "http://cookrecorder.com/",
+            "contact_email" : null,
+            "type" : "filter",
+            "updatedAt" : "2026-01-27T20:54:58.000Z",
+            "createdAt" : "2014-09-17T15:03:01.000Z",
+            "metadata_updated_at" : "2026-01-27T20:54:58.000Z",
+            "data_updated_at" : "2015-04-07T21:59:43.000Z",
+            "page_views" :
+              {
+                "page_views_last_week" : 39,
+                "page_views_last_month" : 143,
+                "page_views_total" : 8773,
+                "page_views_last_week_log" : 5.321928094887363,
+                "page_views_last_month_log" : 7.169925001442313,
+                "page_views_total_log" : 13.09901899101923
+              },
+            "columns_name" :
+              [
+                "Recorded Date",
+                "Street",
+                "Consideration Amount",
+                "Document Type",
+                "PIN",
+                "Location",
+                "Zip code",
+                "City",
+                "Document Number",
+                "State",
+                "Execution Date"
+              ],
+            "columns_field_name" :
+              [
+                "recorded_date",
+                "street",
+                "consideration_amount",
+                "document_type",
+                "pin",
+                "location",
+                "zip_code",
+                "city",
+                "document_number",
+                "state",
+                "execution_date"
+              ],
+            "columns_datatype" :
+              [
+                "Calendar date",
+                "Text",
+                "Number",
+                "Text",
+                "Text",
+                "Point",
+                "Text",
+                "Text",
+                "Number",
+                "Text",
+                "Calendar date"
+              ],
+            "columns_description" :
+              [ "", "", "", "", "", "", "", "", "", "", "" ],
+            "columns_format" :
+              [
+                { "view" : "date", "align" : "left" },
+                {},
+                {
+                  "precisionStyle" : "currency",
+                  "currencyStyle" : "USD",
+                  "precision" : "2"
+                },
+                {},
+                {},
+                {},
+                {},
+                {},
+                {
+                  "precisionStyle" : "standard",
+                  "noCommas" : "true",
+                  "align" : "right"
+                },
+                {},
+                { "view" : "date", "align" : "left" }
+              ],
+            "download_count" : 3320,
+            "provenance" : "official",
+            "lens_view_type" : "tabular",
+            "lens_display_type" : "table",
+            "locked" : false,
+            "backend" : "nbe",
+            "blob_mime_type" : null,
+            "hide_from_data_json" : false,
+            "publication_date" : "2015-04-07T22:06:28.000Z"
+          },
+        "classification" :
+          {
+            "categories" : [ "public safety" ],
+            "tags" : [],
+            "domain_category" : "Property & Taxation",
+            "domain_tags" :
+              [
+                "foreclosures",
+                "recorder",
+                "quit claim deeds",
+                "property",
+                "mortgages"
+              ],
+            "domain_metadata" :
+              [
+                { "key" : "Metadata_Update-Frequency", "value" : "Quarterly" }
+              ]
+          },
+        "metadata" :
+          {
+            "domain" : "datacatalog.cookcountyil.gov",
+            "license" : "Public Domain"
+          },
+        "permalink" : "https://datacatalog.cookcountyil.gov/d/nk2q-7kjv",
+        "link" : "https://datacatalog.cookcountyil.gov/Property-Taxation/Cook-County-Recorder-Foreclosures-2013-through-Mar/nk2q-7kjv",
+        "owner" :
+          {
+            "id" : "d4g2-kc7i",
+            "user_type" : "interactive",
+            "display_name" : "Cook County Webmaster"
+          },
+        "creator" :
+          {
+            "id" : "d4g2-kc7i",
+            "user_type" : "interactive",
+            "display_name" : "Cook County Webmaster"
+          }
+      },
+      {
+        "resource" :
+          {
+            "name" : "Cook County Recorder - Quit Claim Deeds - 2013 through March 27, 2015",
+            "id" : "7aey-b5t6",
+            "resource_name" : null,
+            "parent_fxf" : [ "4f2q-h3b7" ],
+            "description" : "Quit Claim Deeds recorded with the Cook County Recorder of Deeds. Data covers 2013 through March 27, 2015. This dataset will be updated Quarterly. For more information see http://cookrecorder.com/ .",
+            "attribution" : "Cook County Recorder of Deeds",
+            "attribution_link" : "http://cookrecorder.com/",
+            "contact_email" : null,
+            "type" : "filter",
+            "updatedAt" : "2026-01-27T20:47:42.000Z",
+            "createdAt" : "2014-09-17T15:07:51.000Z",
+            "metadata_updated_at" : "2026-01-27T20:47:42.000Z",
+            "data_updated_at" : "2015-04-07T21:59:43.000Z",
+            "page_views" :
+              {
+                "page_views_last_week" : 39,
+                "page_views_last_month" : 109,
+                "page_views_total" : 7970,
+                "page_views_last_week_log" : 5.321928094887363,
+                "page_views_last_month_log" : 6.78135971352466,
+                "page_views_total_log" : 12.960545013211663
+              },
+            "columns_name" :
+              [
+                "Zip code",
+                "Street",
+                "Consideration Amount",
+                "Execution Date",
+                "Recorded Date",
+                "PIN",
+                "Document Number",
+                "City",
+                "Location",
+                "State",
+                "Document Type"
+              ],
+            "columns_field_name" :
+              [
+                "zip_code",
+                "street",
+                "consideration_amount",
+                "execution_date",
+                "recorded_date",
+                "pin",
+                "document_number",
+                "city",
+                "location",
+                "state",
+                "document_type"
+              ],
+            "columns_datatype" :
+              [
+                "Text",
+                "Text",
+                "Number",
+                "Calendar date",
+                "Calendar date",
+                "Text",
+                "Number",
+                "Text",
+                "Point",
+                "Text",
+                "Text"
+              ],
+            "columns_description" :
+              [ "", "", "", "", "", "", "", "", "", "", "" ],
+            "columns_format" :
+              [
+                {},
+                {},
+                {
+                  "precisionStyle" : "currency",
+                  "currencyStyle" : "USD",
+                  "precision" : "2"
+                },
+                { "view" : "date", "align" : "left" },
+                { "view" : "date", "align" : "left" },
+                {},
+                {
+                  "precisionStyle" : "standard",
+                  "noCommas" : "true",
+                  "align" : "right"
+                },
+                {},
+                {},
+                {},
+                {}
+              ],
+            "download_count" : 718,
+            "provenance" : "official",
+            "lens_view_type" : "tabular",
+            "lens_display_type" : "table",
+            "locked" : false,
+            "backend" : "nbe",
+            "blob_mime_type" : null,
+            "hide_from_data_json" : false,
+            "publication_date" : "2015-04-07T22:06:28.000Z"
+          },
+        "classification" :
+          {
+            "categories" : [],
+            "tags" : [],
+            "domain_category" : "Property & Taxation",
+            "domain_tags" :
+              [
+                "foreclosures",
+                "property",
+                "quit claim deeds",
+                "recorder",
+                "mortgages"
+              ],
+            "domain_metadata" :
+              [
+                { "key" : "Metadata_Update-Frequency", "value" : "Quarterly" }
+              ]
+          },
+        "metadata" :
+          {
+            "domain" : "datacatalog.cookcountyil.gov",
+            "license" : "Public Domain"
+          },
+        "permalink" : "https://datacatalog.cookcountyil.gov/d/7aey-b5t6",
+        "link" : "https://datacatalog.cookcountyil.gov/Property-Taxation/Cook-County-Recorder-Quit-Claim-Deeds-2013-through/7aey-b5t6",
+        "owner" :
+          {
+            "id" : "d4g2-kc7i",
+            "user_type" : "interactive",
+            "display_name" : "Cook County Webmaster"
+          },
+        "creator" :
+          {
+            "id" : "d4g2-kc7i",
+            "user_type" : "interactive",
+            "display_name" : "Cook County Webmaster"
+          }
+      }
+    ],
+  "resultSetSize" : 8,
+  "timings" : { "serviceMillis" : 19, "searchMillis" : [ 2, 6 ] },
+  "warnings" : []
+}

@@ -29,14 +29,21 @@ LEDGER (data/signals.jsonl):
       {"dedupe_key": "<source>:<id>", "ingested_at": iso8601, "signal": {...}}
   Idempotent by dedupe_key — running the same adapters twice writes nothing
   new. Pattern lifted from triage_core.append_archive_jsonl (task-302),
-  rebuilt standalone.
+  rebuilt standalone. A torn final line (crash mid-append) is healed on load:
+  quarantined to signals.jsonl.corrupt if unparseable, newline-terminated in
+  place if it was a complete row (M4, review 2026-07-04).
 
 QUARANTINE (data/signals_pending.jsonl):
   Signals that parse but are UNANCHORED (no address AND no APN — e.g. an
   obituary that only knows city + deceased name) can't join the merge without
   corrupting address grouping. They are quarantined here (same idempotent row
-  shape, plus "problems": [...]) instead of dropped, so an enrichment pass can
-  resolve them against a parcel spine and re-emit them anchored.
+  shape, plus "problems": [...]) instead of dropped. The consumer is
+  spine/enrich.py: it resolves pending signals against parcel resolvers
+  (resolvers/*.py) and re-emits them anchored through append_signal. The
+  pending file is an append-only EVENT LOG — enrich appends updated rows
+  (status/attempts) for the same dedupe_key; readers take the last row per
+  key (enrich.load_pending), and existing_dedupe_keys keeps working as the
+  ingest-side dedupe unchanged.
 """
 
 from __future__ import annotations
@@ -192,23 +199,97 @@ def _dumps_row(row: dict) -> str:
 def _locked_append(path: Path, line: str) -> None:
     """Append one line under an exclusive flock so two overlapping ingest
     processes (cron + manual) can't interleave partial rows (M2). Single-host
-    ledger, so fcntl on the ledger file itself is sufficient."""
-    with path.open("a") as f:
+    ledger, so fcntl on the ledger file itself is sufficient.
+
+    Anti-fuse guard (M4): if some OTHER process crashed mid-append after our
+    load-time heal ran, the file may end without a newline; terminate that
+    tail first so this row can never fuse onto it. (The torn fragment itself
+    is quarantined by _heal_torn_tail on the next load if it doesn't parse.)
+    """
+    with path.open("a+b") as f:
         fcntl.flock(f, fcntl.LOCK_EX)
         try:
-            f.write(line + "\n")
+            if f.seek(0, 2) > 0:
+                f.seek(-1, 2)
+                if f.read(1) != b"\n":
+                    f.write(b"\n")
+            f.write(line.encode("utf-8") + b"\n")
             f.flush()
         finally:
             fcntl.flock(f, fcntl.LOCK_UN)
 
 
+def _heal_torn_tail(ledger_path: Path) -> None:
+    """Heal a torn FINAL line left by a crash/full-disk mid-append (M4,
+    adversarial review 2026-07-04).
+
+    `_locked_append` writes `row + "\\n"` in one call, so a partial flush
+    leaves an unterminated tail; the next append would fuse onto it, turning
+    two rows into one unparseable line and silently losing both. Called on
+    every ledger LOAD, under the same flock as the append path:
+
+      * tail parses as JSON (row complete, only the newline lost) ->
+        terminate it in place — a VALID line is never swallowed;
+      * tail doesn't parse (truly torn) -> move the fragment to
+        <ledger>.corrupt and truncate it off, with a stderr warning.
+
+    Mid-file malformed lines are newline-terminated (can't fuse with future
+    appends) and are left alone — readers already skip them. Any healing
+    failure (read-only fs, etc.) degrades to a warning: load never crashes.
+    """
+    try:
+        with ledger_path.open("r+b") as f:
+            fcntl.flock(f, fcntl.LOCK_EX)
+            try:
+                size = f.seek(0, 2)
+                if size == 0:
+                    return
+                f.seek(-1, 2)
+                if f.read(1) == b"\n":
+                    return  # cleanly terminated — nothing torn
+                # find the start of the unterminated tail (byte after the
+                # last newline), scanning backward in chunks
+                pos, last_nl = size, -1
+                while pos > 0 and last_nl < 0:
+                    step = min(4096, pos)
+                    pos -= step
+                    f.seek(pos)
+                    idx = f.read(step).rfind(b"\n")
+                    if idx >= 0:
+                        last_nl = pos + idx
+                tail_start = last_nl + 1
+                f.seek(tail_start)
+                fragment = f.read()
+                try:
+                    json.loads(fragment.decode("utf-8"))
+                except (UnicodeDecodeError, json.JSONDecodeError):
+                    corrupt = ledger_path.with_name(ledger_path.name + ".corrupt")
+                    with corrupt.open("ab") as cf:
+                        cf.write(fragment + b"\n")
+                    f.truncate(tail_start)
+                    print(f"[ingest] torn final line in {ledger_path.name} "
+                          f"({len(fragment)} bytes, likely a crash mid-append) — "
+                          f"quarantined to {corrupt.name}", file=sys.stderr)
+                else:
+                    # complete row that only lost its newline: keep it
+                    f.seek(0, 2)
+                    f.write(b"\n")
+            finally:
+                fcntl.flock(f, fcntl.LOCK_UN)
+    except OSError as e:
+        print(f"[ingest] could not heal ledger tail of {ledger_path}: {e}",
+              file=sys.stderr)
+
+
 def existing_dedupe_keys(ledger_path: str | Path) -> set[str]:
-    """Stream the ledger and collect dedupe_keys. Malformed rows are skipped
-    silently — an archive with one bad line beats a crashed run."""
+    """Stream the ledger and collect dedupe_keys. The torn-tail check runs
+    first (see _heal_torn_tail); other malformed rows are skipped silently —
+    an archive with one bad line beats a crashed run."""
     ledger_path = Path(ledger_path)
     keys: set[str] = set()
     if not ledger_path.exists():
         return keys
+    _heal_torn_tail(ledger_path)
     with ledger_path.open() as f:
         for line in f:
             line = line.strip()
@@ -264,6 +345,7 @@ def load_ledger_signals(ledger_path: str | Path = DEFAULT_LEDGER) -> list[Signal
     seen: set[str] = set()
     if not ledger_path.exists():
         return signals
+    _heal_torn_tail(ledger_path)
     with ledger_path.open() as f:
         for line in f:
             line = line.strip()

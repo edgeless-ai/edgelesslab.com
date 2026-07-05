@@ -1,0 +1,58 @@
+{
+  "_meta": {
+    "what": "Offline stand-in for a county-assessor owner index (the 'parcel spine'). Consumed by resolvers/fixture_owner_index.py so the whole enrich path runs with ZERO network.",
+    "shape": "jurisdictions[].records[] — owner is the assessor-style 'LAST FIRST [MIDDLE]' string; apn/address anchor the parcel; extra keys are KNOWN_FACT_KEYS evidence.",
+    "note": "Synthetic records matched to the bundled Klamath Falls obituary fixture: LEHMAN and SAWYER resolve uniquely, RAJNUS is deliberately ambiguous (two parcels, same owner name) to exercise the never-guess path."
+  },
+  "jurisdictions": [
+    {
+      "jurisdiction": {"city": "KLAMATH FALLS", "state": "OR", "county": "KLAMATH"},
+      "records": [
+        {
+          "owner": "LEHMAN JANET L",
+          "apn": "R-3809-025BB-01700",
+          "address": "1934 Earle St",
+          "city": "Klamath Falls",
+          "state": "OR",
+          "zip": "97601",
+          "assessed_value": 182500,
+          "property_type": "single_family",
+          "year_built": 1948
+        },
+        {
+          "owner": "SAWYER EDWARD",
+          "apn": "R-3909-011CA-04200",
+          "address": "4522 Bristol Ave",
+          "city": "Klamath Falls",
+          "state": "OR",
+          "zip": "97603",
+          "assessed_value": 234000,
+          "property_type": "single_family",
+          "year_built": 1962
+        },
+        {
+          "owner": "RAJNUS VIRGINIA",
+          "apn": "R-3810-032AD-00900",
+          "address": "2117 Wiard St",
+          "city": "Klamath Falls",
+          "state": "OR",
+          "zip": "97603",
+          "assessed_value": 168900,
+          "property_type": "single_family",
+          "year_built": 1955
+        },
+        {
+          "owner": "RAJNUS VIRGINIA",
+          "apn": "R-4011-006B-01100",
+          "address": "31650 Hwy 39",
+          "city": "Merrill",
+          "state": "OR",
+          "zip": "97633",
+          "assessed_value": 412000,
+          "property_type": "land",
+          "year_built": null
+        }
+      ]
+    }
+  ]
+}

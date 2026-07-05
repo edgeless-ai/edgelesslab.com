@@ -237,3 +237,103 @@ def test_malformed_ledger_lines_skipped(tmp_path):
     )
     assert existing_dedupe_keys(ledger) == {"a:1"}
     assert len(load_ledger_signals(ledger)) == 1
+
+
+# ---------------------------------------------------------------------------
+# M4 (adversarial review 2026-07-04): torn final line healing
+# ---------------------------------------------------------------------------
+
+def _row(n: int) -> str:
+    return json.dumps({"dedupe_key": f"src:g{n}", "signal": {
+        "id": f"g{n}", "source": "src", "signal_type": "other",
+        "observed_at": "2026-07-01T00:00:00+00:00",
+        "property": {"address": f"{n} Elm St", "state": "OR", "zip": "97601"},
+    }})
+
+
+class TestTornTailHealing:
+    """M4: a crash mid-append (or full disk) leaves a torn final line with no
+    trailing newline. The NEXT append used to fuse onto it, producing one
+    unparseable line that silently lost BOTH rows. Ledger load now heals the
+    tail: torn fragments are quarantined to <ledger>.corrupt with a stderr
+    warning; a VALID final line that merely lost its newline is terminated in
+    place, never swallowed."""
+
+    def test_torn_tail_quarantined_on_load(self, tmp_path, capsys):
+        ledger = tmp_path / "signals.jsonl"
+        torn = _row(3)[:37]  # crash mid-write: partial row, no newline
+        ledger.write_text(_row(1) + "\n" + _row(2) + "\n" + torn)
+
+        sigs = load_ledger_signals(ledger)
+        assert [s.id for s in sigs] == ["g1", "g2"]   # valid rows all survive
+        # fragment moved out of the ledger, preserved in the corpse file
+        assert not ledger.read_text().endswith(torn)
+        corrupt = tmp_path / "signals.jsonl.corrupt"
+        assert corrupt.exists() and torn in corrupt.read_text()
+        assert "torn" in capsys.readouterr().err.lower()
+
+    def test_next_append_does_not_fuse_after_heal(self, tmp_path):
+        """The actual M4 failure mode: append after a torn tail fused two rows
+        into one silently-skipped line (append_signal returned True but the
+        signal was unrecoverable)."""
+        from spine.ingest import append_signal
+        from spine.schema import Signal
+
+        ledger = tmp_path / "signals.jsonl"
+        ledger.write_text(_row(1) + "\n" + _row(2)[:40])  # torn g2 fragment
+        keys = existing_dedupe_keys(ledger)               # load path heals
+        assert keys == {"src:g1"}
+        sig = Signal.from_dict(json.loads(_row(3))["signal"])
+        assert append_signal(ledger, sig, keys)
+        loaded = load_ledger_signals(ledger)
+        assert sorted(s.id for s in loaded) == ["g1", "g3"]  # g3 NOT fused/lost
+
+    def test_valid_final_line_missing_newline_is_kept(self, tmp_path):
+        """Never swallow a VALID line: a complete row that only lost its
+        trailing newline is terminated in place, not quarantined."""
+        ledger = tmp_path / "signals.jsonl"
+        ledger.write_text(_row(1) + "\n" + _row(2))       # no trailing \n
+        sigs = load_ledger_signals(ledger)
+        assert [s.id for s in sigs] == ["g1", "g2"]
+        assert ledger.read_text().endswith("\n")          # healed in place
+        assert not (tmp_path / "signals.jsonl.corrupt").exists()
+
+    def test_torn_single_line_file(self, tmp_path):
+        """Boundary: the whole file is one torn fragment (crash on first-ever
+        append)."""
+        ledger = tmp_path / "signals.jsonl"
+        ledger.write_text(_row(1)[:25])
+        assert load_ledger_signals(ledger) == []
+        assert existing_dedupe_keys(ledger) == set()
+        assert ledger.read_text() == ""                   # tail truncated away
+        assert (tmp_path / "signals.jsonl.corrupt").exists()
+
+    def test_append_guard_when_heal_was_bypassed(self, tmp_path):
+        """Concurrent-crash window: another process tears the tail AFTER our
+        load-time heal already ran (we hold a pre-snapshotted key set, so no
+        re-heal happens). The locked append itself must refuse to fuse."""
+        from spine.ingest import append_signal
+        from spine.schema import Signal
+
+        ledger = tmp_path / "signals.jsonl"
+        keys = existing_dedupe_keys(ledger)               # snapshot: empty
+        ledger.write_text(_row(1) + "\n" + _row(2)[:40])  # foreign torn tail
+        sig = Signal.from_dict(json.loads(_row(3))["signal"])
+        assert append_signal(ledger, sig, keys)           # bypasses heal
+        assert "g3" in {s.id for s in load_ledger_signals(ledger)}
+
+    def test_mid_file_garbage_untouched_empty_file_ok(self, tmp_path):
+        """A newline-terminated malformed line mid-file is NOT the torn-tail
+        case: it can't fuse with future appends, so it stays (history is not
+        rewritten). Empty files are a no-op."""
+        ledger = tmp_path / "signals.jsonl"
+        ledger.write_text(_row(1) + "\n{ not json\n" + _row(2) + "\n")
+        before = ledger.read_text()
+        assert len(load_ledger_signals(ledger)) == 2
+        assert ledger.read_text() == before
+        assert not (tmp_path / "signals.jsonl.corrupt").exists()
+
+        empty = tmp_path / "empty.jsonl"
+        empty.write_text("")
+        assert load_ledger_signals(empty) == []
+        assert empty.read_text() == ""

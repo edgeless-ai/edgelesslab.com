@@ -2,6 +2,7 @@
 pipeline.py — the full CMCO spine run, as one function.
 
   ingest (adapters -> signals.jsonl ledger)          Marketing: signals
+    -> enrich (signals_pending.jsonl -> resolvers -> ledger)
     -> merge (signals -> PropertyRecords)
     -> criteria + scoring + routing                  Criteria / Conversion
     -> underwrite (strategy picker on hot/warm)      Conversion: deal shape
@@ -17,6 +18,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .criteria import BuyBox
+from .enrich import EnrichResult, run_enrich
 from .ingest import IngestResult, load_ledger_signals, run_ingest
 from .merge import merge_signals
 from .route import (
@@ -37,11 +39,16 @@ class Paths:
     """All pipeline file locations, derived from one data_dir."""
     root: Path = PACKAGE_ROOT
     adapters_dir: Path = PACKAGE_ROOT / "adapters"
+    resolvers_dir: Path = PACKAGE_ROOT / "resolvers"
     data_dir: Path = PACKAGE_ROOT / "data"
 
     @property
     def ledger(self) -> Path:
         return self.data_dir / "signals.jsonl"
+
+    @property
+    def pending(self) -> Path:
+        return self.data_dir / "signals_pending.jsonl"
 
     @property
     def candidates(self) -> Path:
@@ -51,6 +58,7 @@ class Paths:
 @dataclass
 class PipelineResult:
     ingest: IngestResult
+    enrich: EnrichResult | None = None
     candidates: list[DealCandidate] = field(default_factory=list)
     candidates_path: Path | None = None
     digest_path: Path | None = None
@@ -81,6 +89,15 @@ def run_pipeline(
         ledger_path=paths.ledger,
         only=only_adapters,
     )
+    # ENRICH: consume the quarantine — resolve unanchored signals to parcels
+    # and re-emit them through the normal ingest append (before merge, so
+    # freshly anchored signals join this run's candidates).
+    enrich_result = run_enrich(
+        resolvers_dir=paths.resolvers_dir,
+        pending_path=paths.pending,
+        ledger_path=paths.ledger,
+        now=now,
+    )
     signals = load_ledger_signals(paths.ledger)
     records = merge_signals(signals)
     candidates = build_candidates(
@@ -96,6 +113,7 @@ def run_pipeline(
     )
     return PipelineResult(
         ingest=ingest_result,
+        enrich=enrich_result,
         candidates=candidates,
         candidates_path=candidates_path,
         digest_path=digest_path,

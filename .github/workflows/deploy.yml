@@ -44,3 +44,7 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+      # Known transient flake: "Deployment failed, try again later" — one retry.
+      - id: deployment-retry
+        if: failure()
+        uses: actions/deploy-pages@v5

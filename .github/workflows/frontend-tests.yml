@@ -10,33 +10,19 @@ on:
 jobs:
   frontend-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: edgeless-website
+    timeout-minutes: 10
     env:
       NEXT_TELEMETRY_DISABLED: 1
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: edgeless-website/package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run vitest
         run: npx vitest run
-
-      - name: Upload coverage
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: vitest-coverage
-          path: edgeless-website/coverage/
-          retention-days: 7

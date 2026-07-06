@@ -1,8 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
   HeroSection,
-  RecentActivity,
   SubscribeSection,
 } from "@/components/home-client";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
@@ -11,10 +11,26 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { experiments, projects } from "@/lib/data";
 import { posts } from "@/lib/blog";
-import ProjectShowcaseSection from "@/components/sections/project-showcase-section";
-import TechShowcaseSection from "@/components/sections/tech-showcase-section";
-import CTASection from "@/components/sections/cta-section";
 import { LazyAttractorPlayground } from "@/components/lazy-playground-wrapper";
+
+// Below-fold sections loaded dynamically to keep the initial RSC payload small.
+// Each pulls heavy data modules that don't need to be in the critical path for LCP.
+const RecentActivity = dynamic(
+  () => import("@/components/recent-activity").then((m) => ({ default: m.RecentActivity })),
+  { loading: () => <div className="min-h-[200px]" /> }
+);
+const ProjectShowcaseSection = dynamic(
+  () => import("@/components/sections/project-showcase-section"),
+  { loading: () => <div className="min-h-[300px]" /> }
+);
+const TechShowcaseSection = dynamic(
+  () => import("@/components/sections/tech-showcase-section"),
+  { loading: () => <div className="min-h-[300px]" /> }
+);
+const CTASection = dynamic(
+  () => import("@/components/sections/cta-section"),
+  { loading: () => <div className="min-h-[200px]" /> }
+);
 
 const featured = [
   { slug: "safety-hooks", span: "md:col-span-2 md:row-span-2" },

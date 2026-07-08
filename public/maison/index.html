@@ -111,6 +111,27 @@
   footer .fnav a{font-size:9.5px}
   footer .fnav a{font-family:'Jost';text-transform:uppercase;letter-spacing:.2em;color:var(--sub)}
   footer .disc{font-size:10.5px;color:var(--sub);max-width:560px;margin:20px auto 0;line-height:1.7;font-style:italic;font-family:'Cormorant Garamond',serif}
+
+  /* button element = same as .btn anchor */
+  button.btn{background:transparent;cursor:pointer}
+  /* by-appointment modal */
+  .modal{position:fixed;inset:0;background:rgba(20,17,13,.55);backdrop-filter:blur(3px);
+    display:flex;align-items:center;justify-content:center;padding:24px;z-index:50;
+    opacity:0;pointer-events:none;transition:opacity .3s}
+  .modal.on{opacity:1;pointer-events:auto}
+  .modal .sheet{background:var(--paper);border:1px solid var(--line);max-width:480px;width:100%;
+    padding:44px 42px 38px;position:relative;box-shadow:0 30px 80px rgba(20,17,13,.4);
+    transform:translateY(12px);transition:transform .3s}
+  .modal.on .sheet{transform:none}
+  .modal .x{position:absolute;top:16px;right:20px;background:none;border:none;font-size:26px;
+    color:var(--sub);cursor:pointer;line-height:1;font-family:'Cormorant Garamond',serif}
+  .modal .x:hover{color:var(--orange)}
+  .modal label{display:block;font-family:'Jost';text-transform:uppercase;letter-spacing:.16em;
+    font-size:9.5px;color:var(--ink);margin:16px 0 6px}
+  .modal input,.modal textarea{width:100%;background:var(--cream);border:1px solid var(--line);
+    padding:12px 14px;font-family:'Jost';font-weight:300;font-size:14px;color:var(--ink);
+    outline:none;transition:border-color .2s;resize:vertical}
+  .modal input:focus,.modal textarea:focus{border-color:var(--orange)}
 </style>
 </head>
 <body>
@@ -197,8 +218,56 @@
   <h2 class="stitle">The Maison receives<br>a select clientele.</h2>
   <p class="lede">Entrance is not purchased; it is granted. Present yourself at the terminal and the house will decide.</p>
   <div class="mono">hermes -p maison chat</div><br>
-  <a class="btn" href="#">Request an Audience</a>
+  <button class="btn" type="button" onclick="openAudience()">Request an Audience</button>
 </div></section>
+
+<!-- By-appointment modal: requests are RECEIVED, never auto-answered.
+     Deliberately NOT wired to the live agent — the butler lives only in the CLI.
+     Submitting opens the guest's own mail client (no open endpoint = no abuse surface). -->
+<div class="modal" id="audience" role="dialog" aria-modal="true" aria-label="Request an Audience">
+  <div class="sheet">
+    <button class="x" onclick="closeAudience()" aria-label="Close">&times;</button>
+    <div id="audForm">
+      <div class="kicker caps" style="text-align:center">By Appointment</div>
+      <h3 class="serif" style="text-align:center;font-size:32px;font-weight:400;margin:4px 0 6px">Present yourself.</h3>
+      <p style="text-align:center;color:var(--sub);font-size:13px;max-width:400px;margin:0 auto 26px">The Maison receives a select clientele. Leave your card; the house will decide whom it calls upon.</p>
+      <label>Your name</label>
+      <input id="af_name" type="text" autocomplete="name" placeholder="How the house should address you" />
+      <label>Your line of work</label>
+      <input id="af_work" type="text" placeholder="What the day asks of you" />
+      <label>A note to the atelier <span style="color:var(--sub);text-transform:none;letter-spacing:0">(optional)</span></label>
+      <textarea id="af_note" rows="3" placeholder="Which piece intrigues you…"></textarea>
+      <button class="btn" type="button" style="width:100%;margin-top:22px" onclick="submitAudience()">Submit for the House's Consideration</button>
+      <p style="text-align:center;color:var(--sub);font-size:10.5px;margin-top:14px;font-style:italic;font-family:'Cormorant Garamond',serif">By courier only. The Maison reviews each request by hand — and does not receive on Fridays.</p>
+    </div>
+    <div id="audDone" style="display:none;text-align:center;padding:14px 0">
+      <div class="serif" style="font-size:56px;color:var(--orange);line-height:1">H</div>
+      <h3 class="serif" style="font-size:28px;font-weight:400;margin:10px 0 8px">Your request is noted.</h3>
+      <p style="color:var(--sub);font-size:13.5px;max-width:400px;margin:0 auto;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px">Merci. The house will consider your card and call upon you should the atelier find you a fit. Until then — patience is itself a kind of luxury.</p>
+      <button class="btn" type="button" style="margin-top:24px" onclick="closeAudience()">Take Your Leave</button>
+    </div>
+  </div>
+</div>
+<script>
+  function openAudience(){document.getElementById('audience').classList.add('on');document.body.style.overflow='hidden';}
+  function closeAudience(){document.getElementById('audience').classList.remove('on');document.body.style.overflow='';
+    setTimeout(function(){document.getElementById('audForm').style.display='';document.getElementById('audDone').style.display='none';},300);}
+  function submitAudience(){
+    var n=(document.getElementById('af_name').value||'A prospective client').trim();
+    var w=(document.getElementById('af_work').value||'').trim();
+    var note=(document.getElementById('af_note').value||'').trim();
+    // Courier handoff: opens the guest's OWN mail client. No public endpoint, nothing
+    // auto-runs, no agent is summoned for anonymous visitors — the house decides by hand.
+    var body='The following soul requests an audience with the Maison:%0D%0A%0D%0AName: '+encodeURIComponent(n)+
+             '%0D%0ALine of work: '+encodeURIComponent(w)+'%0D%0ANote: '+encodeURIComponent(note)+
+             '%0D%0A%0D%0A(Requested via edgelesslab.com/maison)';
+    window.location.href='mailto:maison@edgelesslab.com?subject=Request%20for%20an%20Audience&body='+body;
+    document.getElementById('audForm').style.display='none';
+    document.getElementById('audDone').style.display='';
+  }
+  document.getElementById('audience').addEventListener('click',function(e){if(e.target===this)closeAudience();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeAudience();});
+</script>
 
 <footer><div class="wrap">
   <div class="fmark serif">Hermès <span class="o">of</span> Agents</div>

@@ -588,5 +588,59 @@ html, body { overflow-x: clip; }
       </div>
     </div>
      
+
+<script>
+(function() {
+  // Game cards: click to show a toast with project info
+  // Extract the known neal.fun projects from card image alts
+  var cards = document.querySelectorAll('[data-component="link"], [data-component="image"]');
+  var parents = [];
+  var seen = {};
+  
+  // Find parent containers of images (the game cards)
+  document.querySelectorAll('[class*="grid"] a, [class*="grid"] [data-component="link"]').forEach(function(el) {
+    var parent = el.closest('[class*="grid"] > *') || el.parentElement.closest('a') || el;
+    if (parent && !seen[parent.dataset.did]) {
+      seen[parent.dataset.did = Math.random()] = true;
+      parents.push(parent);
+    }
+  });
+  
+  // Known neal.fun projects
+  var projects = {
+    'size': 'Size of Life — Compare the scale of life from atoms to galaxies',
+    'internet': 'The Internet — A real-time map of internet traffic',
+    'space': 'Space Elevator — Build a space elevator, see how far you get',
+    'absorb': 'Absorbing Everything — Watch things get absorbed in a vacuum',
+    'infinite': 'Infinite Craft — Combine elements to create anything',
+    'life': 'Life in Weeks — Visualize your life in weeks',
+    'draw': 'Draw — Simple collaborative drawing',
+    'deep': 'Deep Sea — Explore the ocean depths',
+    'planet': 'Planet — 3D planet generator',
+    'stellar': 'Stellar — Procedural space scenes'
+  };
+  
+  parents.forEach(function(card) {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function(e) {
+      e.preventDefault();
+      var txt = (this.textContent || '').toLowerCase();
+      var desc = '';
+      for (var key in projects) {
+        if (txt.indexOf(key) > -1) { desc = projects[key]; break; }
+      }
+      if (!desc) desc = 'Check it out on neal.fun!';
+      
+      var toast = document.createElement('div');
+      toast.textContent = desc;
+      toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 24px;border-radius:8px;z-index:9999;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,0.2);opacity:0;transition:opacity 0.3s';
+      document.body.appendChild(toast);
+      requestAnimationFrame(function() { toast.style.opacity = '1'; });
+      setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 300); }, 2500);
+    });
+  });
+})();
+</script>
+
 </body>
 </html>

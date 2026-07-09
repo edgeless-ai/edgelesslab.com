@@ -1972,5 +1972,36 @@ html, body { overflow-x: clip; }
     <div class="cn461" data-cid="n461" id="_R_3mllb_">
       <div class="cn462" data-cid="n462" aria-atomic="false" aria-label="Notifications" aria-live="polite" aria-relevant="additions text" role="region"></div>
     </div>
+
+<script>
+(function() {
+  // Add a search bar at top, filter card grid items by alt text / visible text
+  var grid = document.querySelector('[class*="grid"]');
+  if (!grid && document.querySelector('main')) grid = document.querySelector('main');
+  if (!grid) return;
+  
+  var searchDiv = document.createElement('div');
+  searchDiv.style.cssText = 'padding:16px;max-width:400px;margin:0 auto 16px';
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'Search cards\u2026';
+  input.style.cssText = 'width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:15px;outline:none;box-sizing:border-box';
+  searchDiv.appendChild(input);
+  grid.parentNode.insertBefore(searchDiv, grid);
+  
+  var cards = grid.querySelectorAll('a, [class*="card"], [class*="item"], [data-component="link"]');
+  if (cards.length < 3) cards = grid.children;
+  
+  input.addEventListener('input', function() {
+    var q = this.value.toLowerCase();
+    for (var i = 0; i < cards.length; i++) {
+      var c = cards[i];
+      var txt = (c.textContent || c.getAttribute('alt') || c.getAttribute('aria-label') || '').toLowerCase();
+      c.style.display = (!q || txt.indexOf(q) > -1) ? '' : 'none';
+    }
+  });
+})();
+</script>
+
 </body>
 </html>

@@ -975,5 +975,52 @@ html, body { overflow-x: clip; }
         </div>
       </div>
     </div>
+
+<script>
+(function() {
+  // Simple canvas zoom/pan wrapper
+  var body = document.body;
+  var controls = document.createElement('div');
+  controls.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:999;display:flex;gap:6px';
+  
+  function btn(label, fn) {
+    var b = document.createElement('button');
+    b.textContent = label;
+    b.style.cssText = 'width:36px;height:36px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.1)';
+    b.addEventListener('click', fn);
+    return b;
+  }
+  
+  var zoom = 1;
+  controls.appendChild(btn('+', function() {
+    zoom = Math.min(zoom * 1.2, 3);
+    body.style.transform = 'scale(' + zoom + ')';
+    body.style.transformOrigin = 'top left';
+  }));
+  controls.appendChild(btn('\u2212', function() {
+    zoom = Math.max(zoom / 1.2, 0.3);
+    body.style.transform = 'scale(' + zoom + ')';
+    body.style.transformOrigin = 'top left';
+  }));
+  controls.appendChild(btn('\u21BA', function() {
+    zoom = 1;
+    body.style.transform = '';
+    body.style.transformOrigin = '';
+  }));
+  
+  document.body.appendChild(controls);
+  
+  // Mouse wheel zoom
+  body.addEventListener('wheel', function(e) {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      zoom = Math.max(0.3, Math.min(3, zoom + (e.deltaY > 0 ? -0.05 : 0.05)));
+      body.style.transform = 'scale(' + zoom + ')';
+      body.style.transformOrigin = e.clientX + 'px ' + e.clientY + 'px';
+    }
+  }, { passive: false });
+})();
+</script>
+
 </body>
 </html>

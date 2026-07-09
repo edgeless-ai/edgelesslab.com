@@ -12257,5 +12257,59 @@ html, body { overflow-x: clip; }
     <div class="cn2712" data-cid="n2712" id="_rht_toaster"></div>
     <div class="cn2713" data-cid="n2713" id="portal/_R_25km55_"></div>
     <div class="cn2714" data-cid="n2714" id="portal/_R_13e55_"></div>
+
+<script>
+(function() {
+  // Find the card grid and extract categories from nav/links
+  var grid = document.querySelector('[class*="grid"]');
+  if (!grid) return;
+  
+  var cards = grid.querySelectorAll('[data-component="link"], a, [class*="card"], [class*="item"]');
+  if (cards.length < 3) cards = grid.children;
+  
+  // Extract category keywords from text content
+  var cats = {};
+  for (var i = 0; i < cards.length; i++) {
+    var txt = (cards[i].textContent || '').trim().split(/\s+/).slice(0, 3).join(' ');
+    cats[txt] = cards[i].textContent || '';
+  }
+  
+  // Build filter buttons from nav links
+  var navLinks = document.querySelectorAll('nav a, [class*="nav"] a, [class*="tab"]');
+  var categories = ['All'];
+  for (var i = 0; i < navLinks.length; i++) {
+    var t = (navLinks[i].textContent || '').trim();
+    if (t && categories.indexOf(t) === -1 && t.length < 30) categories.push(t);
+  }
+  if (categories.length < 2) categories = ['All', 'Image', 'Text', 'Audio', 'Video'];
+  
+  var filterBar = document.createElement('div');
+  filterBar.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;padding:16px;justify-content:center';
+  
+  categories.forEach(function(cat) {
+    var btn = document.createElement('button');
+    btn.textContent = cat;
+    btn.style.cssText = 'padding:6px 14px;border-radius:20px;border:1px solid #ddd;background:' + (cat === 'All' ? '#333' : '#fff') + ';color:' + (cat === 'All' ? '#fff' : '#333') + ';cursor:pointer;font-size:13px;transition:all 0.2s';
+    
+    btn.addEventListener('click', function() {
+      filterBar.querySelectorAll('button').forEach(function(b) {
+        b.style.background = b === this ? '#333' : '#fff';
+        b.style.color = b === this ? '#fff' : '#333';
+      }.bind(this));
+      
+      var q = cat.toLowerCase();
+      for (var i = 0; i < cards.length; i++) {
+        var txt = (cards[i].textContent || '').toLowerCase();
+        cards[i].style.display = (q === 'all' || txt.indexOf(q) > -1) ? '' : 'none';
+      }
+    });
+    
+    filterBar.appendChild(btn);
+  });
+  
+  grid.parentNode.insertBefore(filterBar, grid);
+})();
+</script>
+
 </body>
 </html>

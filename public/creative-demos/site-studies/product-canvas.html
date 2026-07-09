@@ -7408,5 +7408,92 @@ export const HomeScreen = () =&gt; {
     <div class="cn1971" data-cid="n1971"></div>
     <div class="cn1972" data-cid="n1972" id="_r_67_"></div>
     <div class="cn1973" data-cid="n1973" id="_r_6d_"></div>
+
+<script>
+(function() {
+  // Cmd+K / Ctrl+K command palette
+  function showPalette() {
+    var existing = document.getElementById('__cmd_palette');
+    if (existing) { existing.remove(); return; }
+    
+    var overlay = document.createElement('div');
+    overlay.id = '__cmd_palette';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding-top:10vh';
+    
+    var modal = document.createElement('div');
+    modal.style.cssText = 'background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.15);width:480px;max-width:90vw;overflow:hidden';
+    
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Search or jump to\u2026';
+    input.style.cssText = 'width:100%;padding:14px 16px;border:none;border-bottom:1px solid #eee;font-size:16px;outline:none;box-sizing:border-box';
+    
+    var list = document.createElement('div');
+    list.style.cssText = 'padding:8px 0;max-height:300px;overflow-y:auto';
+    
+    var items = [
+      {label:'About', shortcut:'G H'},
+      {label:'Features', shortcut:'G F'},
+      {label:'Pricing', shortcut:'G P'},
+      {label:'Blog', shortcut:'G B'},
+      {label:'Docs', shortcut:'G D'}
+    ];
+    
+    function renderItems(q) {
+      list.innerHTML = '';
+      var filtered = !q ? items : items.filter(function(it) { return it.label.toLowerCase().indexOf(q) > -1; });
+      if (!filtered.length) {
+        var e = document.createElement('div');
+        e.textContent = 'No results';
+        e.style.cssText = 'padding:12px 16px;color:#999;font-size:14px';
+        list.appendChild(e);
+        return;
+      }
+      for (var i = 0; i < filtered.length; i++) {
+        var row = document.createElement('div');
+        row.style.cssText = 'padding:10px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px';
+        row.onmouseenter = function() { this.style.background = '#f5f5f5'; };
+        row.onmouseleave = function() { this.style.background = ''; };
+        row.innerHTML = '<span>' + filtered[i].label + '</span><span style="color:#999;font-size:12px;font-family:monospace">' + filtered[i].shortcut + '</span>';
+        list.appendChild(row);
+      }
+    }
+    renderItems('');
+    
+    input.addEventListener('input', function() { renderItems(this.value.toLowerCase()); });
+    
+    modal.appendChild(input);
+    modal.appendChild(list);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    
+    setTimeout(function() { input.focus(); }, 50);
+    
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) overlay.remove();
+    });
+    document.addEventListener('keydown', function esc(e) {
+      if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', esc); }
+    });
+  }
+  
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      showPalette();
+    }
+  });
+  
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      var tgt = document.querySelector(this.getAttribute('href'));
+      if (tgt) tgt.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+})();
+</script>
+
 </body>
 </html>

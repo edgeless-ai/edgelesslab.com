@@ -2289,5 +2289,40 @@ html, body { overflow-x: clip; }
        
     </div>
      
+
+<script>
+(function() {
+  // Scroll progress bar + fade-in sections
+  var bar = document.createElement('div');
+  bar.id = '__scroll_progress';
+  bar.style.cssText = 'position:fixed;top:0;left:0;height:3px;background:#333;z-index:9999;width:0%;transition:width 100ms ease';
+  document.body.appendChild(bar);
+  
+  window.addEventListener('scroll', function() {
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+  });
+  
+  // Reveal sections on scroll
+  var sections = document.querySelectorAll('section, [class*="section"], main > div, article');
+  if (sections.length < 2) return;
+  
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  
+  for (var i = 0; i < sections.length; i++) {
+    sections[i].style.cssText += ';opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease';
+    observer.observe(sections[i]);
+  }
+})();
+</script>
+
 </body>
 </html>

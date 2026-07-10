@@ -132,6 +132,31 @@
     padding:12px 14px;font-family:'Jost';font-weight:300;font-size:14px;color:var(--ink);
     outline:none;transition:border-color .2s;resize:vertical}
   .modal input:focus,.modal textarea:focus{border-color:var(--orange)}
+
+  /* the salon — live concierge */
+  .salon{max-width:680px;margin:34px auto 0}
+  .status{display:inline-flex;align-items:center;gap:10px;font-family:'Jost';font-size:10px;
+    letter-spacing:.26em;text-transform:uppercase;color:var(--sub);margin-bottom:6px}
+  .status .dot{width:7px;height:7px;border-radius:50%;background:var(--sub);transition:.3s}
+  .status.open .dot{background:var(--orange);animation:pulse 2.6s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(234,91,12,.5)}70%{box-shadow:0 0 0 9px rgba(234,91,12,0)}100%{box-shadow:0 0 0 0 rgba(234,91,12,0)}}
+  .thread{text-align:left;margin:28px 0 20px;display:flex;flex-direction:column;gap:18px}
+  .msg{max-width:84%}
+  .msg.guest{align-self:flex-end;text-align:right}
+  .msg .who{font-family:'Jost';font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--orange);margin-bottom:5px}
+  .msg.guest .who{color:var(--sub)}
+  .msg .txt{font-family:'Cormorant Garamond',serif;font-size:19px;line-height:1.5;color:var(--ink);white-space:pre-wrap}
+  .msg.guest .txt{font-family:'Jost';font-weight:300;font-size:14px;color:var(--sub)}
+  .msg .txt.composing{font-style:italic;color:var(--sub)}
+  .salonform{display:flex;gap:10px;border-top:1px solid var(--line);padding-top:24px}
+  .salonform input{flex:1;background:var(--paper);border:1px solid var(--line);
+    padding:15px 16px;font-family:'Jost';font-weight:300;font-size:14px;color:var(--ink);outline:none;transition:border-color .2s}
+  .salonform input:focus{border-color:var(--orange)}
+  .salonform button{border:1px solid var(--ink);background:var(--ink);color:var(--cream);
+    font-family:'Jost';text-transform:uppercase;letter-spacing:.2em;font-size:10px;padding:0 24px;cursor:pointer;transition:.2s}
+  .salonform button:disabled{opacity:.35;cursor:default}
+  .closed-note{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;
+    color:var(--sub);max-width:540px;margin:0 auto 20px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -213,12 +238,27 @@
 </div></section>
 
 <!-- APPOINTMENT -->
-<section class="appt" id="appt"><div class="wrap">
-  <div class="kicker caps">By Appointment</div>
-  <h2 class="stitle">The Maison receives<br>a select clientele.</h2>
-  <p class="lede">Entrance is not purchased; it is granted. Present yourself at the terminal and the house will decide.</p>
-  <div class="mono">hermes -p maison chat</div><br>
-  <button class="btn" type="button" onclick="openAudience()">Request an Audience</button>
+<section class="appt" id="appt"><div class="wrap" style="text-align:center">
+  <div class="kicker caps">The Salon</div>
+  <h2 class="stitle">Speak with the concierge.</h2>
+  <p class="lede">The concierge attends each guest by hand. When the house is receiving, you may present yourself below.</p>
+  <div class="salon">
+    <div id="statusPill" class="status"><span class="dot"></span><span id="statusText">Enquiring at the door…</span></div>
+    <!-- OPEN: live chat, relayed to the real maison agent -->
+    <div id="salonOpen" style="display:none">
+      <div id="thread" class="thread"></div>
+      <form class="salonform" onsubmit="return sendMaison(event)">
+        <input id="salonInput" type="text" maxlength="800" placeholder="Bonjour…" autocomplete="off" aria-label="Message to the concierge" />
+        <button id="salonSend" type="submit">Send</button>
+      </form>
+    </div>
+    <!-- CLOSED: the house is not receiving -->
+    <div id="salonClosed" style="display:none">
+      <p class="closed-note">The house is closed for inventory; the concierge is not presently receiving. Leave your card and the Maison will consider your request by hand.</p>
+      <div class="mono">hermes -p maison chat</div><br>
+      <button class="btn" type="button" onclick="openAudience()">Request an Audience</button>
+    </div>
+  </div>
 </div></section>
 
 <!-- By-appointment modal: requests are RECEIVED, never auto-answered.
@@ -249,6 +289,60 @@
   </div>
 </div>
 <script>
+  // --- The Salon: open/closed heartbeat + live chat relayed to the real maison agent ---
+  var MAISON_API='https://souls.edgelesslab.com';
+  var maisonHist=[], maisonSession='s'+Math.random().toString(36).slice(2), maisonBusy=false;
+  async function maisonStatus(){
+    try{
+      var r=await fetch(MAISON_API+'/maison/status'); var d=await r.json();
+      var open=d.status==='open';
+      document.getElementById('statusPill').className='status'+(open?' open':'');
+      document.getElementById('statusText').textContent=open?'The Maison is receiving':'Closed for inventory';
+      document.getElementById('salonOpen').style.display=open?'':'none';
+      document.getElementById('salonClosed').style.display=open?'none':'';
+    }catch(e){
+      document.getElementById('statusText').textContent='Closed for inventory';
+      document.getElementById('salonClosed').style.display='';
+      document.getElementById('salonOpen').style.display='none';
+    }
+  }
+  function maisonAdd(who,txt,guest){
+    var t=document.getElementById('thread');
+    var d=document.createElement('div'); d.className='msg'+(guest?' guest':'');
+    var w=document.createElement('div'); w.className='who'; w.textContent=who;
+    var b=document.createElement('div'); b.className='txt'; b.textContent=txt;
+    d.appendChild(w); d.appendChild(b); t.appendChild(d);
+    d.scrollIntoView({behavior:'smooth',block:'nearest'});
+    return b;
+  }
+  async function sendMaison(e){
+    e.preventDefault(); if(maisonBusy) return false;
+    var inp=document.getElementById('salonInput'), msg=inp.value.trim(); if(!msg) return false;
+    maisonBusy=true; document.getElementById('salonSend').disabled=true; inp.value='';
+    maisonAdd('You',msg,true); maisonHist.push({role:'user',content:msg});
+    var b=maisonAdd('The Concierge','is attending to you…',false); b.classList.add('composing');
+    try{
+      var r=await fetch(MAISON_API+'/maison/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({session:maisonSession,message:msg,history:maisonHist.slice(0,-1)})});
+      var d=await r.json();
+      if(d.error){ b.textContent=d.error; }
+      else {
+        var got=false;
+        for(var i=0;i<70;i++){
+          await new Promise(function(res){setTimeout(res,3000);});
+          var pr=await fetch(MAISON_API+'/maison/chat/'+d.id); if(!pr.ok) continue;
+          var pd=await pr.json();
+          if(pd.status==='done'){ b.classList.remove('composing'); b.textContent=pd.reply;
+            maisonHist.push({role:'assistant',content:pd.reply}); got=true; break; }
+        }
+        if(!got){ b.textContent='The concierge is detained a while longer than usual. Do try once more.'; }
+      }
+    }catch(err){ b.textContent='Forgive me — a moment’s difficulty at the door. Do try again.'; }
+    maisonBusy=false; document.getElementById('salonSend').disabled=false; inp.focus();
+    return false;
+  }
+  maisonStatus(); setInterval(maisonStatus,30000);
+
   function openAudience(){document.getElementById('audience').classList.add('on');document.body.style.overflow='hidden';}
   function closeAudience(){document.getElementById('audience').classList.remove('on');document.body.style.overflow='';
     setTimeout(function(){document.getElementById('audForm').style.display='';document.getElementById('audDone').style.display='none';},300);}

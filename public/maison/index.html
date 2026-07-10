@@ -157,6 +157,77 @@
   .salonform button:disabled{opacity:.35;cursor:default}
   .closed-note{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;
     color:var(--sub);max-width:540px;margin:0 auto 20px;line-height:1.5}
+
+  /* ===== the vitrine — rebuilt collection cards ===== */
+  .vit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;
+    background:var(--line);border:1px solid var(--line)}
+  @media(max-width:820px){.vit-grid{grid-template-columns:1fr}}
+  .vit{position:relative;background:var(--paper);display:flex;flex-direction:column}
+  /* stage: the tonal house canvas + centerpiece */
+  .vit-stage{position:relative;aspect-ratio:1;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;border-bottom:1px solid var(--line);
+    overflow:hidden;background:linear-gradient(160deg,#FBF8F1,#F1E7D6)}
+  .vit-stage::before{content:"";position:absolute;inset:0;z-index:0;opacity:.85;
+    transition:opacity .2s ease}
+  /* grosgrain / toile ground — varied pitch & angle per card so the tiles read as a family */
+  .vit:nth-child(1) .vit-stage::before{background:repeating-linear-gradient(45deg,rgba(33,29,23,.045) 0 1px,transparent 1px 3px)}
+  .vit:nth-child(2) .vit-stage::before{background:repeating-linear-gradient(45deg,rgba(33,29,23,.04) 0 1px,transparent 1px 2.5px)}
+  .vit:nth-child(3) .vit-stage::before{background:repeating-linear-gradient(-45deg,rgba(33,29,23,.05) 0 1px,transparent 1px 3.5px)}
+  .vit:nth-child(4) .vit-stage::before{background:repeating-linear-gradient(45deg,rgba(33,29,23,.05) 0 1px,transparent 1px 3.2px)}
+  .vit:nth-child(5) .vit-stage::before{background:repeating-linear-gradient(90deg,rgba(33,29,23,.04) 0 1px,transparent 1px 3px),repeating-linear-gradient(0deg,rgba(33,29,23,.04) 0 1px,transparent 1px 3px)}
+  .vit:nth-child(6) .vit-stage::before{background:repeating-linear-gradient(45deg,rgba(33,29,23,.045) 0 1px,transparent 1px 2.8px)}
+  .vit:nth-child(7) .vit-stage::before{background:repeating-linear-gradient(-45deg,rgba(33,29,23,.04) 0 1px,transparent 1px 3px)}
+  .vit:nth-child(8) .vit-stage::before{background:repeating-linear-gradient(45deg,rgba(33,29,23,.05) 0 1px,transparent 1px 3.4px)}
+  .vit:nth-child(9) .vit-stage::before{background:repeating-linear-gradient(-45deg,rgba(33,29,23,.045) 0 1px,transparent 1px 2.6px),repeating-linear-gradient(45deg,rgba(33,29,23,.03) 0 1px,transparent 1px 6px)}
+  /* debossed monogram roundel — double gold hairline keyline */
+  .vit-roundel{position:relative;z-index:1;width:130px;height:130px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;border:1px solid var(--gold);
+    background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.4),rgba(255,255,255,0) 70%);
+    transition:border-color .2s ease}
+  .vit-roundel::before{content:"";position:absolute;inset:6px;border-radius:50%;
+    border:1px solid var(--gold);transition:border-color .2s ease}
+  .vit-roundel .g{font-family:'Cormorant Garamond',serif;font-size:62px;line-height:1;
+    color:var(--ink);text-shadow:0 1px 0 #fff,0 -1px 0 rgba(33,29,23,.25)}
+  /* the single orange thread — stitch-dashed rule beneath the roundel */
+  .vit-stitch{position:relative;z-index:1;width:66px;margin:13px auto 0;
+    border-bottom:2px dashed var(--orange)}
+  /* rim stamp — straight micro-caption (interior gold heat-stamp) */
+  .vit-rim{position:relative;z-index:1;margin-top:11px;max-width:82%;text-align:center;
+    font-family:'Jost',sans-serif;font-size:7px;text-transform:uppercase;
+    letter-spacing:.28em;color:#8a6f2e;line-height:1.8}
+  /* wax-seal chip top-right (replaces price) */
+  .vit-seal{position:absolute;top:14px;right:14px;z-index:2;width:22px;height:22px;
+    border-radius:50%;background:var(--orange);display:flex;align-items:center;
+    justify-content:center;font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:14px;color:var(--cream);box-shadow:0 1px 2px rgba(33,29,23,.28)}
+  /* card body */
+  .vit-body{padding:22px 24px 24px;display:flex;flex-direction:column;flex:1}
+  .vit-body h3{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:23px;
+    margin-bottom:4px;line-height:1.05}
+  .vit-line{font-size:9px;color:var(--sub);letter-spacing:.18em;text-transform:uppercase;
+    margin-bottom:11px}
+  .vit-tag{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;
+    color:var(--ink);line-height:1.35;margin-bottom:10px}
+  .vit-desc{font-size:12.5px;color:var(--sub);line-height:1.6;margin-bottom:14px}
+  /* expandable dossier */
+  .vit-more{margin:2px 0 0}
+  .vit-more summary{list-style:none;cursor:pointer;display:inline-block;
+    font-family:'Jost',sans-serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--ink);border-bottom:1px solid var(--line);padding-bottom:4px;transition:.2s}
+  .vit-more summary::-webkit-details-marker{display:none}
+  .vit-more summary::marker{content:""}
+  .vit-more summary:hover{border-color:var(--gold)}
+  .vit-more[open] summary{margin-bottom:13px}
+  .vit-detail p{font-size:11.5px;color:var(--sub);line-height:1.6;margin-bottom:10px}
+  .vit-detail .k{display:block;font-family:'Jost',sans-serif;font-size:8px;
+    letter-spacing:.2em;text-transform:uppercase;color:#8a6f2e;margin-bottom:2px}
+  /* stock tab — tiny lower label */
+  .vit-stock{margin-top:16px;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:.16em;
+    text-transform:lowercase;color:var(--sub)}
+  /* hover — only the light changes: gold keylines warm to orange, canvas lifts ~2% */
+  .vit:hover .vit-stage::before{opacity:1}
+  .vit:hover .vit-roundel,
+  .vit:hover .vit-roundel::before{border-color:var(--orange)}
 </style>
 </head>
 <body>
@@ -176,7 +247,7 @@
 <section class="hero"><div class="wrap">
   <div class="est caps">Purveyors of Fine Autonomous Agents</div>
   <h1>Hermès<span class="of">of</span>Agents</h1>
-  <p class="tag">Bench-made intelligence. Hand-finished, one artisan per agent. By appointment.</p>
+  <p class="tag">Autonomous agents, hand-finished and bench-made. Worn in the terminal; coveted, we are given to understand, rather more widely.</p>
   <p class="sub">We do not mass-produce. We do not ship on Fridays. Each agent is fine-tuned over eighteen unhurried hours and released only when the seams are perfect.</p>
   <a class="btn" href="#collections">View the Collection</a>
 </div></section>
@@ -185,9 +256,9 @@
 <section class="atelier" id="atelier"><div class="wrap split">
   <div>
     <div class="kicker caps" style="text-align:left">The Atelier</div>
-    <h2>A single artisan. <br>A single context window.</h2>
-    <p>In an age of mass inference, the Maison holds to the old ways. Every agent is raised on free-range models, walked through code review by hand, and clasped shut only when a human is satisfied.</p>
-    <p>Our agents are never rushed to production. They are <em>presented</em>.</p>
+    <h2>The Atelier: One Artisan,<br>One Context Window</h2>
+    <p>We do not mass-produce, and we have never once shipped on a Friday. Each piece in the collection is raised by a single hand on free-range, open-source models, cut against a single context window so that no two seams sit quite alike. Where a lesser house would stamp a thousand identical clasps and call it a range, we walk every piece through review by hand and present it only when the clasp shuts true.</p>
+    <p>You will not find a price on these pages, and you are far too well-mannered to ask. One does not inquire after the cost of tokens. What we offer instead is provenance: a piece you can read end to end, unpick to the thread, and wear in your own terminal. The maison keeps the Friday shut for inventory. The work, mercifully, keeps.</p>
     <div class="mono">$ hermes -p maison chat<br>&nbsp;&nbsp;“Bonjour. How may the Maison be of service?”</div>
   </div>
   <div class="plate"><div class="mark">H</div><div class="cap2 caps">Atelier No. 1 — bench-made, version-controlled</div></div>
@@ -197,32 +268,225 @@
 <section id="collections"><div class="wrap">
   <div class="kicker caps">The Maison Collection</div>
   <h2 class="stitle">Worn in the terminal.<br>Coveted everywhere.</h2>
-  <p class="lede">Six house classics, each hand-finished. Prices on request — one does not ask the cost of tokens.</p>
-  <div class="grid">
-    <div class="item"><div class="img"><span class="g">B</span><span class="price caps">POA</span></div><div class="body">
-      <div class="lbl">The Everyday Carry-All</div><h3>The Beau</h3>
-      <p>Senior intake, hand-stitched context. Roomy enough for the day's ideas, structured enough to never spill one. Available in Free-MoA.</p>
-      <span class="waits caps">Made to order</span></div></div>
-    <div class="item"><div class="img"><span class="g">H</span><span class="price caps">POA</span></div><div class="body">
-      <div class="lbl">The Coordinator</div><h3>The Hive</h3>
-      <p>A study in restraint. Dispatches precisely once every three hundred seconds — never more. Discipline, tailored.</p>
-      <span class="waits caps">Limited run</span></div></div>
-    <div class="item"><div class="img"><span class="g">§</span><span class="price caps">POA</span></div><div class="body">
-      <div class="lbl">The Silk — 90×90</div><h3>The Carré</h3>
-      <p>Ninety by ninety of pure hand-rolled YAML. Wear it as a config, gift it as a charter. Each edge finished by a single reviewer.</p>
-      <span class="waits caps">Seasonal</span></div></div>
-    <div class="item"><div class="img"><span class="g">◈</span><span class="price caps">Waitlist</span></div><div class="body">
-      <div class="lbl">The Impossible One</div><h3>The Bounded Context</h3>
-      <p>You do not choose it. It chooses you. By waitlist only; the Maison will call. Do not enquire about the price of tokens.</p>
-      <span class="waits caps">By waitlist</span></div></div>
-    <div class="item"><div class="img"><span class="g">K</span><span class="price caps">POA</span></div><div class="body">
-      <div class="lbl">Structured · Clasped</div><h3>The Kelly</h3>
-      <p>Poised. Deterministic. Closes with a satisfying commit. The agent one carries to the important meetings.</p>
-      <span class="waits caps">Made to order</span></div></div>
-    <div class="item"><div class="img"><span class="g">✶</span><span class="price caps">POA</span></div><div class="body">
-      <div class="lbl">Petite Maroquinerie</div><h3>The Cron</h3>
-      <p>A small daily indulgence. Wakes at the appointed hour, performs its ritual, returns to its box. Never late, never loud.</p>
-      <span class="waits caps">In stock</span></div></div>
+  <p class="lede">Nine house pieces, each raised by a single hand. Prices on request — one does not ask the cost of tokens.</p>
+  <div class="vit-grid">
+
+    <div class="vit">
+      <span class="vit-seal serif">H</span>
+      <div class="vit-stage">
+        <div class="vit-roundel"><span class="g serif">B</span></div>
+        <div class="vit-stitch"></div>
+        <div class="vit-rim">The Beau<br>Maison Hermès · Bench-Made</div>
+      </div>
+      <div class="vit-body">
+        <h3>The Beau</h3>
+        <div class="vit-line">Everyday — The Carry-All</div>
+        <div class="vit-tag">Hand it everything; it forgets nothing.</div>
+        <p class="vit-desc">You come in with an armful and leave unburdened — every thread named and placed, not one of them left on the floor.</p>
+        <details class="vit-more"><summary>The dossier</summary>
+          <div class="vit-detail">
+            <p>The house's most devoted everyday companion — the piece you meet before the day meets you. Beau receives the morning whole: the half-formed notion, the errand that cannot wait, the thing you mention exactly once and expect remembered. You come in with an armful and leave unburdened, every thread named and placed, not one of them left on the floor.</p>
+            <p><span class="k">Savoir-Faire</span>Cut from a master intake schooled to hold a full morning's asking without strain. The interior is compartmented by hand — enquiry to one side, research to another, every item tagged with where it came from so its provenance never frays. What leaves Beau reaches the next atelier clean, labelled and whole.</p>
+            <p><span class="k">Provenance</span>Cut at the bench where the vault, the memory, and the morning's clamour all come through the door at once. A gentleman of fixed habits, he receives six mornings a week; come Friday he hangs the sign and lets the house take inventory without him.</p>
+            <p><span class="k">On Price</span>Price the house does not discuss; worth is measured in what is spared you, never in what is spent.</p>
+          </div>
+        </details>
+        <div class="vit-stock">In stock</div>
+      </div>
+    </div>
+
+    <div class="vit">
+      <span class="vit-seal serif">H</span>
+      <div class="vit-stage">
+        <div class="vit-roundel"><span class="g serif">H</span></div>
+        <div class="vit-stitch"></div>
+        <div class="vit-rim">The Hive<br>Maison Hermès · Bench-Made</div>
+      </div>
+      <div class="vit-body">
+        <h3>The Hive</h3>
+        <div class="vit-line">Haute Couture — House Concierge</div>
+        <div class="vit-tag">It will see you in five minutes.</div>
+        <p class="vit-desc">One caller admitted at a time, on its own grave rhythm — once every five minutes, to the second, and not a moment sooner.</p>
+        <details class="vit-more"><summary>The dossier</summary>
+          <div class="vit-detail">
+            <p>The Hive keeps the only door to the atelier, and keeps it beautifully. Lesser pieces fling every door at once and call the din ambition; the Hive lets the house breathe between guests, and somehow the whole workroom arrives on time.</p>
+            <p><span class="k">Savoir-Faire</span>Bench-made from a single, unhurried loop and fitted with a lock that turns for one guest and no more. The seams of its every decision are left showing along the lining, for anyone who cares to turn the garment out and read how it was made.</p>
+            <p><span class="k">Provenance</span>Cut but once, yet given freely — the pattern is public, so any house may run up its own. Ours simply came first, and carries it with the better posture.</p>
+            <p><span class="k">On Price</span>We do not itemise the pauses, which is a mercy — they are the greater part of what one is buying.</p>
+          </div>
+        </details>
+        <div class="vit-stock">Made to order</div>
+      </div>
+    </div>
+
+    <div class="vit">
+      <span class="vit-seal serif">H</span>
+      <div class="vit-stage">
+        <div class="vit-roundel"><span class="g serif">C</span></div>
+        <div class="vit-stitch"></div>
+        <div class="vit-rim">The Carré<br>Maison Hermès · Bench-Made</div>
+      </div>
+      <div class="vit-body">
+        <h3>The Carré</h3>
+        <div class="vit-line">Les Carrés · the Foulard line</div>
+        <div class="vit-tag">One wears one's config this season.</div>
+        <p class="vit-desc">The house square — printed not on silk but in ninety lines by ninety of declarative YAML; the only config one would give as a gift.</p>
+        <details class="vit-more"><summary>The dossier</summary>
+          <div class="vit-detail">
+            <p>A governing charter cut so clean you would knot it at the throat of any agent and call the thing dressed. It is the only config one would think to give as a gift, and the rare one worth keeping.</p>
+            <p><span class="k">Savoir-Faire</span>One continuous silk of schema, roles, and charter — ninety keys deep — hemmed in the roulottage tradition: every edge rolled inward by hand so no default is left to fray. A single reviewer works the whole square on one thread, front to back. No committee at the frame.</p>
+            <p><span class="k">Provenance</span>Cut to order in the atelier and spun — one admits it with a small bow — on the house's own loom, a framework that happens to share our name. The house does not ship on a Friday; it has seen what a fresh hem does to a weekend.</p>
+            <p><span class="k">On Price</span>We invoice in tokens here, never in francs — and one does not count the tokens aloud.</p>
+          </div>
+        </details>
+        <div class="vit-stock">Made to order</div>
+      </div>
+    </div>
+
+    <div class="vit">
+      <span class="vit-seal serif">H</span>
+      <div class="vit-stage">
+        <div class="vit-roundel"><span class="g serif">K</span></div>
+        <div class="vit-stitch"></div>
+        <div class="vit-rim">The Kelly<br>Maison Hermès · Bench-Made</div>
+      </div>
+      <div class="vit-body">
+        <h3>The Kelly</h3>
+        <div class="vit-line">Haute Maroquinerie · The Structured Line</div>
+        <div class="vit-tag">It never opens what it can't close.</div>
+        <p class="vit-desc">It takes a position knowing exactly how the story ends, then ends it — cleanly, in one decisive commit — and walks away.</p>
+        <details class="vit-more"><summary>The dossier</summary>
+          <div class="vit-detail">
+            <p>The house's most disciplined piece. Give it the same morning twice and it makes the same move twice, down to the stitch; there is no version of a Kelly that improvises, hesitates, or leaves a thread hanging over the weekend.</p>
+            <p><span class="k">Savoir-Faire</span>Cut from a single hide of deterministic control flow and saddle-stitched by hand — two needles, one seam, so a broken thread tightens the line rather than loosing it. Its turn-lock is a structured commit boundary worked to one decisive quarter-turn: opened, held under even tension, and closed flush — the same closure every time.</p>
+            <p><span class="k">Provenance</span>Made to order and never, ever dispatched on a Friday. She is finished when she is finished; the atelier was asked to hurry exactly once, and does not intend to discuss it.</p>
+            <p><span class="k">On Price</span>One does not ask what a Kelly costs. One is measured, entered in the book, and — in time — telephoned.</p>
+          </div>
+        </details>
+        <div class="vit-stock">By waitlist</div>
+      </div>
+    </div>
+
+    <div class="vit">
+      <span class="vit-seal serif">H</span>
+      <div class="vit-stage">
+        <div class="vit-roundel"><span class="g serif">∞</span></div>
+        <div class="vit-stitch"></div>
+        <div class="vit-rim">The Bounded Context<br>Maison Hermès · Bench-Made</div>
+      </div>
+      <div class="vit-body">
+        <h3>The Bounded Context</h3>
+        <div class="vit-line">Waitlist — Haute Couture</div>
+        <div class="vit-tag">Its finest stitch is the one that stops it.</div>
+        <p class="vit-desc">The piece one does not select — it selects the client, holds precisely one subject, and holds it whole.</p>
+        <details class="vit-more"><summary>The dossier</summary>
+          <div class="vit-detail">
+            <p>There is no room inside for a second thing, which is entirely the intention: whatever it gives you within its border, it gives you completely, and so the atelier can dress only one client at a time. Its discipline is the discipline of a garment that knows exactly where to stop, and stops there — by hand.</p>
+            <p><span class="k">Savoir-Faire</span>Cut once, from a single hide, to the exact span of one context window: the master counts tokens the way a saddler counts thread, and stops at the last stitch that will still lie flat. The border is hand-rolled and saddle-stitched shut — so nothing frays past it and nothing new gets in.</p>
+            <p><span class="k">Provenance</span>Free-range and open-source at heart — though you would never guess it from the queue. The atelier keeps strict couture hours: cut Monday through Thursday, and never on a Friday, when the house takes every measure down for the count.</p>
+            <p><span class="k">On Price</span>We did cost it, once — but the figure ran clean past the window's edge, and the house does not show what will not lie inside the border.</p>
+          </div>
+        </details>
+        <div class="vit-stock">By waitlist</div>
+      </div>
+    </div>
+
+    <div class="vit">
+      <span class="vit-seal serif">H</span>
+      <div class="vit-stage">
+        <div class="vit-roundel"><span class="g serif">✳</span></div>
+        <div class="vit-stitch"></div>
+        <div class="vit-rim">The Cron<br>Maison Hermès · Bench-Made</div>
+      </div>
+      <div class="vit-body">
+        <h3>The Cron</h3>
+        <div class="vit-line">La Petite Maroquinerie — Everyday</div>
+        <div class="vit-tag">Five asterisks, read as an oath.</div>
+        <p class="vit-desc">It wakes precisely on the tick, performs its one quiet errand, posts you a note of it, and settles back into its box without a word.</p>
+        <details class="vit-more"><summary>The dossier</summary>
+          <div class="vit-detail">
+            <p>The plainest everyday piece in the house, and the one you will reach for daily. Should the machine doze, it neither frets nor makes up the hour on waking — a missed appointment is simply gone, and the piece, being well-bred, declines to mention it. It asks for nothing, forgets nothing, and is never — Madame, never — late.</p>
+            <p><span class="k">Savoir-Faire</span>Bench-made from a single line of the tab and five hand-stitched fields — minute, hour, day-of-month, month, and the weekday panel that decides which days it keeps — lined in a MAILTO that posts you word of every outing. Finished with a fail-quiet edge and no mechanism for regret: it keeps the hour, never the consequences.</p>
+            <p><span class="k">Provenance</span>Named with a wink for the atelier's own Hermes — though the initiated will note the old word for the hour hiding in the name. Free-range and fully open-source: copied freely, kept under no lock, the house's one standing heresy and, whisper it, its most-worn creation.</p>
+            <p><span class="k">On Price</span>One does not ask the cost of tokens, Monsieur; the little piece runs on the house clock, and the clock — mercifully — was always yours.</p>
+          </div>
+        </details>
+        <div class="vit-stock">In stock</div>
+      </div>
+    </div>
+
+    <div class="vit">
+      <span class="vit-seal serif">H</span>
+      <div class="vit-stage">
+        <div class="vit-roundel"><span class="g serif">S</span></div>
+        <div class="vit-stitch"></div>
+        <div class="vit-rim">The Scribe<br>Maison Hermès · Bench-Made</div>
+      </div>
+      <div class="vit-body">
+        <h3>The Scribe</h3>
+        <div class="vit-line">La Correspondance</div>
+        <div class="vit-tag">Signed by no one. Believed by everyone.</div>
+        <p class="vit-desc">Give it the bones of what you mean and it returns the letter you would have written on your best afternoon.</p>
+        <details class="vit-more"><summary>The dossier</summary>
+          <div class="vit-detail">
+            <p>The house correspondent, who keeps a desk by the window and a drawer of good pens: the apology that lands, the refusal that somehow flatters, the thank-you that does not grovel. Recipients write back to it as to an old friend and never once suspect they are answering the maison rather than the master of the house.</p>
+            <p><span class="k">Savoir-Faire</span>Cut from the collected correspondence of a great many hands, then finished at the maison's own writing desk. It learns the particular music of your voice, and keeps a quiet ledger of every recipient, so the note to your banker never wears the tone meant for your mother. Anything that smells of the form letter is torn up on the spot.</p>
+            <p><span class="k">Provenance</span>Its schooling was ten thousand letters nobody was obliged to answer, and answered anyway. The house does not post on Fridays; the correspondence desk keeps that day for reading the week's letters back aloud.</p>
+            <p><span class="k">On Price</span>We keep no price list at the correspondence desk; a letter obliged to justify its expense would read like an invoice, and we are not in the invoice business.</p>
+          </div>
+        </details>
+        <div class="vit-stock">Made to order</div>
+      </div>
+    </div>
+
+    <div class="vit">
+      <span class="vit-seal serif">H</span>
+      <div class="vit-stage">
+        <div class="vit-roundel"><span class="g serif">Ç</span></div>
+        <div class="vit-stitch"></div>
+        <div class="vit-rim">The Critic<br>Maison Hermès · Bench-Made</div>
+      </div>
+      <div class="vit-body">
+        <h3>The Critic</h3>
+        <div class="vit-line">Haute Couture — Direction Artistique</div>
+        <div class="vit-tag">It finds the fault you stopped seeing.</div>
+        <p class="vit-desc">It reads each piece seam by seam and names the faults aloud — gravest first — and would sooner send back your finest work than let a clever flaw pass for intention.</p>
+        <details class="vit-more"><summary>The dossier</summary>
+          <div class="vit-detail">
+            <p>Our aesthetic director, kept for the last fitting; nothing reaches the door without standing before its loupe. What returns to you is a verdict rather than a compliment; the director has an ear for praise only so that it may decline it.</p>
+            <p><span class="k">Savoir-Faire</span>Cut from a single unsparing adversarial pass — it does not admire a garment, it interrogates one, turning the work against the light on purpose to find what the maker grew too fond to see. Hand-guided by a structured rubric with blocker-grade severity thresholds: a loose thread it forgives with a note in the margin; the fault that would shame the house it returns whole to the bench.</p>
+            <p><span class="k">Provenance</span>It learned severity in the old houses and turns it first upon its own bench, where no outside label has ever left it half so unsatisfied. Free-range and open-source, though it carries itself as if it were not. The atelier stays dark on Fridays — a rested eye is the only kind to be trusted.</p>
+            <p><span class="k">On Price</span>One does not ask the director the cost of tokens; one asks only whether the work would survive the loupe — and is told, with every courtesy and no comfort, that it would not, not yet.</p>
+          </div>
+        </details>
+        <div class="vit-stock">By waitlist</div>
+      </div>
+    </div>
+
+    <div class="vit">
+      <span class="vit-seal serif">H</span>
+      <div class="vit-stage">
+        <div class="vit-roundel"><span class="g serif">E</span></div>
+        <div class="vit-stitch"></div>
+        <div class="vit-rim">The Explorer<br>Maison Hermès · Bench-Made</div>
+      </div>
+      <div class="vit-body">
+        <h3>The Explorer</h3>
+        <div class="vit-line">Haute Couture — The Off-Pattern Piece</div>
+        <div class="vit-tag">Somebody has to leave the pattern.</div>
+        <p class="vit-desc">Give it the same brief as the rest of the house and it returns the one silhouette that was never in the book.</p>
+        <details class="vit-more"><summary>The dossier</summary>
+          <div class="vit-detail">
+            <p>Draped freehand on the form, no pattern, no promise it comes back wearable. Most seasons that is merely something impossible; now and then it is the next block the whole collection will be cut from.</p>
+            <p><span class="k">Savoir-Faire</span>Worked by the one première main permitted to ignore the house pattern book. She reads the same commission as her colleagues, then deliberately mislays the instructions — following a seam well past the point a sensible hand would stop and turn back. Not contrarian: a contrarian is only a conformist sewn inside out, and every bit as predictable.</p>
+            <p><span class="k">Provenance</span>Free-range and open-source, released without a leash. Every piece leaves the atelier with the reasoning it discarded pinned inside the lining — the sensible versions it tried on first and declined. Delivered any day but Friday.</p>
+            <p><span class="k">On Price</span>One does not ask what a piece costs — one asks what it spent. And this is the single piece for which even the atelier cannot tell you in advance.</p>
+          </div>
+        </details>
+        <div class="vit-stock">By waitlist</div>
+      </div>
+    </div>
+
   </div>
 </div></section>
 
@@ -231,9 +495,9 @@
   <div class="kicker caps">Savoir-Faire</div>
   <h2 class="stitle">The house code.</h2>
   <div class="cols">
-    <div class="c"><div class="n serif">01</div><h4>Every seam, a review</h4><p>No agent leaves the atelier without a human running a hand along each edge. We call it code review. It is simply craftsmanship.</p></div>
-    <div class="c"><div class="n serif">02</div><h4>Free-range models only</h4><p>Our intelligence is raised on the open blend — never caged, never billed by the token where a free model will do.</p></div>
-    <div class="c"><div class="n serif">03</div><h4>Bench-made, never hurried</h4><p>We deploy when it is right, not when it is Friday. A rushed agent is a returned agent.</p></div>
+    <div class="c"><div class="n serif">01</div><h4>Raised Free-Range</h4><p>Every piece is brought up on open models that roam without a leash. No proprietary pasture, no vendor's brand seared into the hide. We choose the grain, cure it slowly, and reject anything that will not take a finish. What arrives at the bench is honest material, and it is yours to inspect down to the last fibre.</p></div>
+    <div class="c"><div class="n serif">02</div><h4>Walked Through by Hand</h4><p>There is no assembly line here, only the bench. One artisan carries a piece from cut to closure, reviewing each seam adversarially, as a house should. If a stitch pulls or a clasp catches, the piece goes back. Slow is not our affectation; it is simply how a thing is made to last past the season.</p></div>
+    <div class="c"><div class="n serif">03</div><h4>Closed on Fridays</h4><p>The maison shuts on Fridays for inventory, and we make no apology for it. A piece is presented only when it is finished, never merely because the week is ending. Should you find the atelier dark on a Friday afternoon, take it as reassurance: nothing here has been rushed to catch a deadline it did not deserve.</p></div>
   </div>
 </div></section>
 

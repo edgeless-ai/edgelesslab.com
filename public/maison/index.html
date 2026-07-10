@@ -144,10 +144,10 @@
   .msg{max-width:84%}
   .msg.guest{align-self:flex-end;text-align:right}
   .msg .who{font-family:'Jost';font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--orange);margin-bottom:5px}
-  .msg.guest .who{color:var(--sub)}
-  .msg .txt{font-family:'Cormorant Garamond',serif;font-size:19px;line-height:1.5;color:var(--ink);white-space:pre-wrap}
-  .msg.guest .txt{font-family:'Jost';font-weight:300;font-size:14px;color:var(--sub)}
-  .msg .txt.composing{font-style:italic;color:var(--sub)}
+  .msg.guest .who{color:rgba(247,242,231,.5)}
+  .msg .txt{font-family:'Cormorant Garamond',serif;font-size:19px;line-height:1.5;color:var(--cream);white-space:pre-wrap}
+  .msg.guest .txt{font-family:'Jost';font-weight:300;font-size:14px;color:rgba(247,242,231,.72)}
+  .msg .txt.composing{font-style:italic;color:rgba(247,242,231,.5)}
   .salonform{display:flex;gap:10px;border-top:1px solid var(--line);padding-top:24px}
   .salonform input{flex:1;background:var(--paper);border:1px solid var(--line);
     padding:15px 16px;font-family:'Jost';font-weight:300;font-size:14px;color:var(--ink);outline:none;transition:border-color .2s}
@@ -156,7 +156,7 @@
     font-family:'Jost';text-transform:uppercase;letter-spacing:.2em;font-size:10px;padding:0 24px;cursor:pointer;transition:.2s}
   .salonform button:disabled{opacity:.35;cursor:default}
   .closed-note{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;
-    color:var(--sub);max-width:540px;margin:0 auto 20px;line-height:1.5}
+    color:rgba(247,242,231,.6);max-width:540px;margin:0 auto 20px;line-height:1.5}
 
   /* ===== the vitrine — rebuilt collection cards ===== */
   .vit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;

@@ -1,0 +1,501 @@
+/* ============================================================
+   Swarm Narrative — Pudding.cool-style scrollytelling stylesheet
+   Design tokens derived from The Pudding / Ditto clone
+   ============================================================ */
+
+/* ---------- RESET ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "Atlas Grotesk", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+}
+
+ul, ol, menu { list-style: none; }
+a { color: inherit; text-decoration: none; }
+img, picture, video, canvas, svg { display: block; max-width: 100%; }
+h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd { margin: 0; }
+h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
+b, strong { font-weight: inherit; }
+
+/* ---------- DESIGN TOKENS ---------- */
+:root {
+  /* Colors (from Ditto/Pudding clone) */
+  --background: #ffffff;
+  --foreground: #262626;
+  --primary: #b51670;
+  --accent: #ed12ed;
+  --border: rgba(48, 48, 48, 0.4);
+  --muted-foreground: #6d6d6d;
+  --black: #000000;
+
+  /* Font families */
+  --font-sans: "Atlas Grotesk", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  --font-display: "Gooper SemiCondensed", "Iowan Old Style", "Times New Roman", Times, serif;
+  --font-serif: "Tiempos Text", Georgia, "Times New Roman", Times, serif;
+  --font-mono: "Atlas Typewriter", Menlo, Consolas, Monaco, monospace;
+
+  /* Font sizes */
+  --text-xs: 0.8rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.4rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.8rem;
+  --text-4xl: 3.5rem;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  /* Transitions */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-slow: 0.8s;
+  --duration-base: 0.4s;
+  --duration-fast: 0.2s;
+
+  /* Layout */
+  --graphic-width: 60vw;
+  --text-width: 40vw;
+  --step-max-width: 480px;
+}
+
+/* ---------- DARK MODE ---------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1a1a1a;
+    --foreground: #e0e0e0;
+    --primary: #ff4da6;
+    --accent: #f561f5;
+    --border: rgba(200, 200, 200, 0.2);
+    --muted-foreground: #999999;
+    --black: #ffffff;
+  }
+}
+
+/* ---------- BASE TYPOGRAPHY ---------- */
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ---------- HERO ---------- */
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--background);
+  padding: var(--space-6);
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+  padding: var(--space-8) var(--space-5);
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-4xl);
+  line-height: 1.1;
+  margin-bottom: var(--space-5);
+  letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  margin-bottom: var(--space-5);
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-byline {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--primary);
+}
+
+.hero-canvas-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0.12;
+}
+
+.hero-canvas-wrap canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: var(--space-8);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--muted-foreground);
+  animation: float-down 2s var(--ease-out-expo) infinite;
+}
+
+.scroll-arrow {
+  opacity: 0.6;
+}
+
+@keyframes float-down {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+
+/* ---------- SCROLLYTELLING LAYOUT ---------- */
+#scrolly {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+/* Sticky graphic panel — left 60vw, sticks on scroll */
+.sticky-graphic {
+  position: sticky;
+  top: 0;
+  width: var(--graphic-width);
+  height: 100vh;
+  flex-shrink: 0;
+  overflow: hidden;
+  background-color: var(--background);
+}
+
+.sticky-graphic canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.graphic-overlay {
+  position: absolute;
+  bottom: var(--space-6);
+  left: var(--space-6);
+  z-index: 2;
+}
+
+.step-indicator {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  background: rgba(255, 255, 255, 0.85);
+  padding: var(--space-1) var(--space-3);
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .step-indicator {
+    background: rgba(26, 26, 26, 0.85);
+  }
+}
+
+/* Text steps — right 40vw, scrolls over the sticky panel */
+.step-list {
+  width: var(--text-width);
+  position: relative;
+  z-index: 2;
+  padding: 0;
+}
+
+/* ---------- STEP STYLES ---------- */
+.step {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--space-8) var(--space-6);
+  max-width: var(--step-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0.3;
+  transform: translateY(24px);
+  transition:
+    opacity var(--duration-slow) var(--ease-out-expo),
+    transform var(--duration-slow) var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+
+.step.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.step-number {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--primary);
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-3);
+  display: block;
+}
+
+.step h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-2xl);
+  line-height: 1.2;
+  margin-bottom: var(--space-4);
+  letter-spacing: -0.01em;
+}
+
+.step-subtitle {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  margin-bottom: var(--space-5);
+  font-style: italic;
+}
+
+.step p {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.7;
+  margin-bottom: var(--space-4);
+  color: var(--foreground);
+}
+
+.step-stat {
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border);
+}
+
+.stat-value {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-3xl);
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: var(--space-2);
+}
+
+.stat-label {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+/* ---------- CODA / FOOTER ---------- */
+.coda {
+  width: 100%;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background);
+  padding: var(--space-9) var(--space-6);
+  border-top: 1px solid var(--border);
+}
+
+.coda-inner {
+  max-width: 640px;
+  text-align: center;
+}
+
+.coda h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-3xl);
+  line-height: 1.2;
+  margin-bottom: var(--space-5);
+}
+
+.coda p {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  line-height: 1.7;
+  color: var(--muted-foreground);
+  margin-bottom: var(--space-5);
+}
+
+.coda-divider {
+  width: 60px;
+  height: 2px;
+  background: var(--primary);
+  margin: var(--space-7) auto var(--space-5);
+}
+
+.coda-credit {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted-foreground);
+  opacity: 0.6;
+}
+
+/* ---------- RESPONSIVE: MOBILE ---------- */
+@media (max-width: 768px) {
+  #scrolly {
+    flex-direction: column;
+  }
+
+  .sticky-graphic {
+    position: relative;
+    width: 100%;
+    height: 50vh;
+    top: auto;
+  }
+
+  .step-list {
+    width: 100%;
+  }
+
+  .step {
+    min-height: auto;
+    padding: var(--space-7) var(--space-5);
+    max-width: 100%;
+    opacity: 1;
+    transform: none;
+  }
+
+  .step.active {
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero-title {
+    font-size: var(--text-2xl);
+  }
+
+  .hero-subtitle {
+    font-size: var(--text-base);
+  }
+
+  .coda h2 {
+    font-size: var(--text-2xl);
+  }
+
+  .step h2 {
+    font-size: var(--text-xl);
+  }
+
+  .step-stat {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+  }
+
+  .stat-value {
+    font-size: var(--text-2xl);
+  }
+
+  .graphic-overlay {
+    bottom: var(--space-4);
+    left: var(--space-4);
+  }
+}
+
+/* ---------- RESPONSIVE: TABLET ---------- */
+@media (min-width: 769px) and (max-width: 1024px) {
+  :root {
+    --graphic-width: 50vw;
+    --text-width: 50vw;
+  }
+
+  .step {
+    padding: var(--space-7) var(--space-5);
+    max-width: 400px;
+  }
+
+  .hero-title {
+    font-size: var(--text-3xl);
+  }
+}
+
+/* ---------- SELECTION ---------- */
+::selection {
+  background: var(--primary);
+  color: var(--background);
+}
+
+/* ---------- FOCUS VISIBLE ---------- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- PRINT ---------- */
+@media print {
+  .sticky-graphic {
+    position: relative;
+    width: 100%;
+    height: auto;
+    page-break-inside: avoid;
+  }
+
+  .step-list {
+    width: 100%;
+  }
+
+  .scroll-hint {
+    display: none;
+  }
+
+  .step {
+    opacity: 1;
+    transform: none;
+    min-height: auto;
+    page-break-inside: avoid;
+  }
+}

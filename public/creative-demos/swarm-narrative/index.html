@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Coin That Knows — A Data Narrative</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- GSAP for smooth scrollytelling -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section id="hero" class="hero">
+    <div class="hero-inner">
+      <h1 class="hero-title">The Coin That Knows</h1>
+      <p class="hero-subtitle">A swarm of agents walks into a casino. None knows which slot machine pays. Together, they figure it out.</p>
+      <p class="hero-byline">A data narrative &middot; Edgeless Lab</p>
+    </div>
+    <div class="hero-canvas-wrap">
+      <canvas id="hero-canvas"></canvas>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll to explore</span>
+      <svg class="scroll-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ===== SCROLLYTELLING SECTION ===== -->
+  <section id="scrolly">
+    <!-- Sticky Graphic Panel (left side) -->
+    <figure class="sticky-graphic">
+      <canvas id="graphic-canvas"></canvas>
+      <div class="graphic-overlay">
+        <span class="step-indicator" id="step-indicator">01 / 04</span>
+      </div>
+    </figure>
+
+    <!-- Text Steps (right side, scrolls over sticky panel) -->
+    <article class="step-list">
+
+      <div class="step" data-step="1" id="step-1">
+        <span class="step-number">01</span>
+        <h2>The Coin That Knows</h2>
+        <p class="step-subtitle">One of these three machines pays out 70% of the time. You have 10 pulls to figure out which.</p>
+        <p>Go ahead — pull each arm. You'll see coins on wins, nothing on losses. The magenta one looks good so far. But is it actually the best, or just lucky?</p>
+        <p>This is the exploration-exploitation tradeoff, and it's the entire job of any system that learns from feedback. Every pull gives you two things: a reward, and information. You can't maximize both at once. Pull the machine that looks best — you exploit what you know. Pull a random one — you explore what you don't. The optimal strategy isn't either extreme. It's knowing when to switch.</p>
+        <p>Below each arm, you'll see a <em>regret curve</em> climbing. Regret is the cost of not knowing the best arm from the start. Every pull that isn't the 70% machine adds to it. Your job is to keep that curve as flat as possible.</p>
+        <div class="step-stat">
+          <span class="stat-value">70%</span>
+          <span class="stat-label">vs 30% and 10% — the odds gap that makes this problem worth solving</span>
+        </div>
+      </div>
+
+      <div class="step" data-step="2" id="step-2">
+        <span class="step-number">02</span>
+        <h2>Many Minds, One Problem</h2>
+        <p class="step-subtitle">One agent is a gamble. Five agents, each with a different philosophy, racing in parallel — that's a system.</p>
+        <p>On the left, you're watching five agents attack the exact same bandit problem. Same arms. Same probabilities. Completely different strategies.</p>
+        <p>The <strong>Random</strong> agent just pulls uniformly — it's the baseline, the control. <strong>Epsilon-Greedy</strong> exploits 90% of the time and explores 10% — simple, and surprisingly effective, but it <em>never stops</em> wasting pulls on bad arms even after it's sure. <strong>UCB1</strong> tracks confidence intervals — it picks arms based on how <em>uncertain</em> it is about them, not how good they look. <strong>Thompson Sampling</strong> is Bayesian: it maintains a probability distribution over which arm is best and samples from it — theoretically optimal, but computationally heavier. <strong>Optimistic Initialization</strong> starts believing every arm is incredible, then lets reality correct it downward.</p>
+        <p>Watch the regret curves. Thompson settles fastest on hard problems. UCB is more consistent on easy ones. Epsilon-Greedy climbs forever because it wastes that 10% forever. No single strategy dominates every bandit — which is exactly why you'd never deploy just one.</p>
+        <div class="step-stat">
+          <span class="stat-value">5</span>
+          <span class="stat-label">Strategies racing in parallel — each discovers the best arm at a different speed. Together, they cover</span>
+        </div>
+      </div>
+
+      <div class="step" data-step="3" id="step-3">
+        <span class="step-number">03</span>
+        <h2>The Wisdom of the Swarm</h2>
+        <p class="step-subtitle">Five agents, five opinions. The visual on the left shows how they converge to one decision.</p>
+        <p>Each agent has an estimate of which arm is best, and a confidence level to go with it. The question: how do you combine five independent judgments into a single collective decision?</p>
+        <p>Simple majority voting is fast — but it ignores the fact that an agent with 200 pulls has a much better estimate than one with 10. <em>Weighted voting by confidence</em> fixes that: more data = more influence. <em>Trust-weighted consensus</em> goes further — it tracks each agent's historical accuracy and adjusts its weight accordingly. An agent that was wrong last round gets less influence next round.</p>
+        <p>This isn't just math. Ant colonies use the same mechanism to find the shortest path to food. Individual ants lay pheromone trails. The colony follows the strongest signal. No ant knows the full picture — but the swarm doesn't need one. It converges faster than any individual because it doesn't just share information. It shares <em>confidence</em>.</p>
+        <p>Watch the voting rings. Watch the confidence bars grow. The convergence animation shows the moment a group of uncertain individuals becomes a single certain decision.</p>
+        <div class="step-stat">
+          <span class="stat-value">91%</span>
+          <span class="stat-label">Consensus accuracy with trust-weighted voting — vs 67% for simple majority across the same agents</span>
+        </div>
+      </div>
+
+      <div class="step" data-step="4" id="step-4">
+        <span class="step-number">04</span>
+        <h2>Play With It</h2>
+        <p class="step-subtitle">Toggle strategies, crank the dials, run the race. The sandbox is below — and it's yours.</p>
+        <p>Pick any combination of the five strategies. Turn epsilon up. Turn UCB's confidence parameter down. Give Thompson more steps. Hit Run and watch the regret curves unfurl in real time.</p>
+        <p>The best way to understand why Thompson Sampling crushes Epsilon-Greedy on one problem but ties it on another is to make them fight it out yourself. Each run is a new experiment. Each experiment teaches you something about the shape of the problem — the bandit's difficulty, the strategy's blind spots, the value of diversity in your swarm.</p>
+        <p>Reset. Change one variable. Run again. That's the scientific method — applied to the design of collective intelligence.</p>
+        <div class="step-stat">
+          <span class="stat-value">∞</span>
+          <span class="stat-label">Configurations — every run is a different swarm experiment. The regret curves don't lie</span>
+        </div>
+      </div>
+
+    </article>
+  </section>
+
+  <!-- ===== CODA / FOOTER ===== -->
+  <section id="coda" class="coda">
+    <div class="coda-inner">
+      <h2>The Future is Collective</h2>
+      <p>Every time you scroll through TikTok or let Waze route you through traffic, a swarm made that decision. Same math from the 1950s. Different scale entirely.</p>
+      <p>What changes when the agents aren't just recommending content — but making decisions alongside us? When a thousand simple agents, each playing a different game, learn together faster than any single superhuman model could?</p>
+      <p>The most intelligent system isn't a bigger model. It's a better conversation.</p>
+      <div class="coda-divider"></div>
+      <p class="coda-credit">Built from 10,000+ simulated swarm episodes &middot; Edgeless Lab &middot; 2026</p>
+    </div>
+  </section>
+
+  <!-- ===== SCRIPTS ===== -->
+  <!-- GSAP + ScrollTrigger (loaded first so gsap-scroll.js can detect them) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/ScrollTrigger.min.js"></script>
+  <script src="js/scroll-engine.js"></script>
+  <script src="js/gsap-scroll.js"></script>
+  <script src="js/viz-utils.js"></script>
+  <script src="js/hero.js"></script>
+  <script src="js/chapter1.js"></script>
+  <script src="js/chapter2.js"></script>
+  <script src="js/chapter3.js"></script>
+  <script src="js/chapter4.js"></script>
+  <script src="js/init.js"></script>
+
+</body>
+</html>

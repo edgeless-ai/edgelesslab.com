@@ -16,10 +16,11 @@
     "worker:ingest:deploy": "npx wrangler deploy --config workers/ingest/wrangler.toml"
   },
   "dependencies": {
-    "@chenglou/pretext": "^0.0.3",
+    "@chenglou/pretext": "^0.0.8",
     "@paper-design/shaders-react": "^0.0.76",
     "lucide-react": "^0.577.0",
-    "next": "16.2.0",
+    "motion": "^12.42.2",
+    "next": "16.2.10",
     "posthog-js": "^1.363.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
@@ -33,6 +34,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.0",
     "pagefind": "^1.5.2",
+    "playwright": "^1.44.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.9"

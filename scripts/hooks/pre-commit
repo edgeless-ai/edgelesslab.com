@@ -1,0 +1,75 @@
+#!/bin/bash
+# Pre-commit GATE — deterministic backbone (the factory model's "code guards the middle").
+# Canonical, version-controlled copy. Install into .git/hooks via: bash scripts/hooks/install.sh
+#
+# Runs FAST and ONLY on staged files, with NO optional-dependency imports, so it
+# catches real breakage (syntax, bad shell, malformed skill frontmatter, leaked
+# secrets) without ever false-blocking on environment gaps. This is deliberately
+# NOT the full smoke_test.py (which needs every optional dep installed and exits 1
+# in a bare env — that would block all commits). Separation of concerns.
+set -uo pipefail
+RED='\033[0;31m'; GREEN='\033[0;32m'; NC='\033[0m'
+STAGED=$(git diff --cached --name-only --diff-filter=ACM)
+PY=$(command -v python3.11 || command -v python3 || echo python3)
+FAIL=0
+
+# 1) Secret scan (preserved from the original hook)
+PATTERNS="(API_KEY|SECRET|TOKEN|PASSWORD|api_key|secret|token|password)\s*=\s*[\"']?[a-zA-Z0-9_-]{10,}[\"']?"
+SAFE='\.(env|env\..*|bak.*)$|auth\.json|config\.yaml'
+for file in $STAGED; do
+    echo "$file" | grep -qE "$SAFE" && continue
+    if git diff --cached -- "$file" | grep -iE "$PATTERNS" 2>/dev/null; then
+        echo -e "${RED}⚠️  Secret found in $file${NC}"; FAIL=1
+    fi
+done
+
+# 2) Staged Python — syntax compile (no imports, catches the #1 breakage)
+for f in $STAGED; do
+    case "$f" in
+        *.py) [ -f "$f" ] || continue
+              if ! "$PY" -m py_compile "$f" 2>/tmp/_pc_err; then
+                  echo -e "${RED}✗ py_compile: $f${NC}"; sed 's/^/    /' /tmp/_pc_err; FAIL=1
+              fi ;;
+    esac
+done
+
+# 3) Staged shell — bash -n syntax
+for f in $STAGED; do
+    case "$f" in
+        *.sh) [ -f "$f" ] || continue
+              if ! bash -n "$f" 2>/tmp/_sh_err; then
+                  echo -e "${RED}✗ shell syntax: $f${NC}"; sed 's/^/    /' /tmp/_sh_err; FAIL=1
+              fi ;;
+    esac
+done
+
+# 4) Staged skill frontmatter — must parse and carry a name/title
+for f in $STAGED; do
+    case "$f" in
+        *[Ss][Kk][Ii][Ll][Ll].md) [ -f "$f" ] || continue
+            if ! "$PY" - "$f" <<'PYEOF' 2>/tmp/_fm_err
+import sys, re
+t = open(sys.argv[1]).read()
+m = re.match(r'^---\n(.*?)\n---', t, re.S)
+if not m:
+    raise SystemExit("no --- frontmatter block")
+body = m.group(1)
+try:
+    import yaml
+    d = yaml.safe_load(body)
+except ModuleNotFoundError:
+    d = {k.strip(): 1 for k in re.findall(r'^([A-Za-z_][\w-]*):', body, re.M)}
+if not (isinstance(d, dict) and (d.get('name') or d.get('title'))):
+    raise SystemExit("frontmatter missing name/title")
+PYEOF
+            then echo -e "${RED}✗ skill frontmatter: $f${NC}"; sed 's/^/    /' /tmp/_fm_err; FAIL=1
+            fi ;;
+    esac
+done
+
+if [ "$FAIL" -eq 1 ]; then
+    echo -e "${RED}🚨 Commit blocked by pre-commit gate. Fix the above, or --no-verify if you are certain.${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✅ pre-commit gate passed (secrets + staged compile/shell/skill)${NC}"
+exit 0

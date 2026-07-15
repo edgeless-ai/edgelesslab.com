@@ -116,14 +116,32 @@ export default function RootLayout({
           "name": "Edgeless Lab",
           "url": "https://edgelesslab.com",
           "description": "Creative technology lab building AI agents, MCP servers, generative art pipelines, and developer tools",
-          "founder": {
-            "@type": "Person",
-            "name": "David Murray"
-          },
+          "founder": { "@id": "https://edgelesslab.com/#david-murray" },
           "logo": "https://edgelesslab.com/favicon.svg",
           "sameAs": [
             "https://github.com/edgeless-ai",
-            "https://edgelessai.gumroad.com"
+            "https://edgelessai.gumroad.com",
+            "https://huggingface.co/EdgelessLab",
+            "https://linefields.etsy.com"
+          ]
+        }} />
+        <JsonLd data={{
+          "@context": "https://schema.org",
+          "@type": "Person",
+          "@id": "https://edgelesslab.com/#david-murray",
+          "name": "David Murray",
+          "url": "https://edgelesslab.com/about",
+          "jobTitle": "Founder",
+          "description": "AI builder and creative technologist. Founder of Edgeless Lab — agent systems, generative art, and developer tools.",
+          "worksFor": {
+            "@type": "Organization",
+            "name": "Edgeless Lab",
+            "url": "https://edgelesslab.com"
+          },
+          "sameAs": [
+            "https://github.com/thedavidmurray",
+            "https://huggingface.co/thedavidmurray",
+            "https://linefields.etsy.com"
           ]
         }} />
         <JsonLd data={{

@@ -141,7 +141,8 @@ export default function RootLayout({
           "sameAs": [
             "https://github.com/thedavidmurray",
             "https://huggingface.co/thedavidmurray",
-            "https://linefields.etsy.com"
+            "https://linefields.etsy.com",
+            "https://www.fxhash.xyz/u/thedavidmurray"
           ]
         }} />
         <JsonLd data={{

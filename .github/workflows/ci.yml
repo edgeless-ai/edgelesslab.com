@@ -1,0 +1,54 @@
+name: ci-deterministic-gate
+
+# Server-side mirror of the local pre-commit gate (scripts/hooks/pre-commit).
+# Local hooks are bypassable and one-machine; headless swarm workers commit without
+# them. This runs the same deterministic, dependency-free checks on push/PR so
+# nothing merges with a syntax error, broken shell, or malformed skill frontmatter.
+# Deliberately NOT the full smoke_test.py (needs every optional dep; would false-fail).
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Python syntax (compile, no imports)
+        run: |
+          # Syntax-only: never fails on missing optional deps.
+          python -m compileall -q scripts .claude tools src 2>&1 | tee /tmp/compile.log
+          if grep -q 'Error' /tmp/compile.log; then echo "::error::python syntax error"; exit 1; fi
+
+      - name: Shell syntax
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            bash -n "$f" || { echo "::error file=$f::shell syntax error"; fail=1; }
+          done < <(find scripts -name '*.sh' -type f)
+          exit $fail
+
+      - name: Skill frontmatter valid
+        run: |
+          python - <<'PY'
+          import glob, re, sys
+          bad = []
+          for f in glob.glob('.claude/skills/*/[Ss][Kk][Ii][Ll][Ll].md'):
+              t = open(f, encoding='utf-8', errors='ignore').read()
+              m = re.match(r'^---\n(.*?)\n---', t, re.S)
+              if not m:
+                  bad.append(f'{f}: no frontmatter'); continue
+              keys = {k.strip() for k in re.findall(r'^([A-Za-z_][\w-]*):', m.group(1), re.M)}
+              if not ({'name', 'title'} & keys):
+                  bad.append(f'{f}: missing name/title')
+          if bad:
+              print('\n'.join(f'::error::{b}' for b in bad)); sys.exit(1)
+          print('skill frontmatter OK')
+          PY

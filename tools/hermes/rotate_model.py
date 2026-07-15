@@ -78,6 +78,23 @@ REGISTRY = {
         "note": "MoA fusion (nvnim aggregator + hfrouter/nvnim/nous refs). Managed via set_moa_blend.py.",
         "no_verify": True,  # fusion, verify via a live agent chat instead
     },
+    "freellmapi-fusion": {
+        "provider": "custom", "default": "fusion",
+        "base_url": "http://localhost:3001/v1",
+        "api_key": "freellmapi-3a2e9538d05f84fe440ebd03baa488a01ca860ff25215bea",
+        "note": "freellmapi NATIVE fusion MoA (kimi-k2.6 + mistral-large-3 + gpt-oss-120b + "
+                "qwen3-coder-480b, judge gpt-oss-120b). FREE, high quality, ~19s (slower when "
+                "upstreams burned). Quality/judgment agents. Verify slow -> use no_verify.",
+        "no_verify": True,
+    },
+    "freellmapi-auto": {
+        "provider": "custom", "default": "auto",
+        "base_url": "http://localhost:3001/v1",
+        "api_key": "freellmapi-3a2e9538d05f84fe440ebd03baa488a01ca860ff25215bea",
+        "note": "freellmapi auto self-route (usually gpt-oss-120b, ~1s). FREE, fast. Speed agents. "
+                "Can spike when upstreams exhausted. NOTE: /v1 endpoints are slow — verify w/ 40s.",
+        "verify": "auto",
+    },
     # DEAD — kept as a tombstone so we do not rotate back onto it:
     "cerebras-glm": {"provider": "custom", "default": "zai-glm-4.7",
                      "base_url": "https://api.cerebras.ai/v1", "api_key": "",

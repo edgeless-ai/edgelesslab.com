@@ -1,0 +1,36 @@
+{
+  "goal": "Transform the swarm from ad-hoc agent-routing into an IndyDevDan-style Software Factory — with the emphasis on DETERMINISTIC CODE as the reliable backbone + verification gates, because that is the exact gap this session exposed.",
+  "guiding_source": "IndyDevDan 'Loop Engineering is Dead — Build AI Developer Workflows' (youtu.be/VQy50fuxI34, full transcript pulled 2026-07-14)",
+  "startedAt": "2026-07-14T23:50:00-07:00",
+  "north_star_principles": [
+    "Three actors: engineers / agents / CODE. Code is most reliable (deterministic, zero-token, no hallucination). Do NOT over-leverage agents ('AI psychosis').",
+    "Engineers show up at PLANNING and REVIEW only; deterministic gates (lint→test→format→CI, pass/fail routing) guard the middle.",
+    "Separate code from agents — don't bury deterministic checks inside agent skills.",
+    "Scale compute to scale confidence (planner/scout/build/test/review agents).",
+    "Isolation: git worktrees first, agent sandboxes next.",
+    "Kanban intake → factory router picks the right ADW by price/performance/speed.",
+    "Meta-work is the highest-leverage: build the system that builds the system; template EXPERTISE into workflows.",
+    "KISS; design ADWs by doing the work yourself first."
+  ],
+  "grounded_reality_2026-07-14": {
+    "edgeless_board": "1501 tasks: 7 ready, 0 in_progress, 272 BLOCKED, 573 DONE (many likely declared-done-unverified). NOT empty (a prior agent audit wrongly claimed empty).",
+    "jojo_board": "5 tasks (Maggie's — audit read-only only).",
+    "swap": "~25GB used — OOM-killed heavy Codex/agent runs 3x today; a reboot + standalone launchd supervisor is the robust base for an all-night run.",
+    "session_evidence": "This session's real problems (YouTube '0 likes', Groq '403', '12 gateways down', config drift) were ALL agent/monitor lies debunked by deterministic verification — live proof of the thesis."
+  },
+  "plan": {
+    "A_grounded_audit": "Decomposed parallel auditors, each GROUNDED in real files/commands (no vibes), across: MOA/freellmapi, Flora/image routing, kanban health (272 blocked + 573 'done' hygiene), memory structures (376 files + taxonomy), stubbed/declared-done projects, factory-model + deterministic-backbone gaps. jojo read-only. -> prioritized remediation backlog + ADW catalog v1. Report: reports/swarm-factory-audit-2026-07-14.md.",
+    "B_build_the_backbone": "Highest-leverage, most-aligned builds (Codex leads implementation): (1) DONE-GATE — deterministic verification a task actually passes before it can be marked done (kills declared-done-unverified). (2) CONFIG-LINT — reject single/unregistered/broken provider configs (kills drift-to-broken). (3) ADW CATALOG — codify top workflows (chore/bug/feature/hotfix/audit) as named plan->build->test->review stages with pass/fail routing, templating THIS session's expertise (verify-the-monitor, reuse-existing-stack). (4) FACTORY ROUTER — ticket tag -> ADW. (5) ISOLATION — worktree/sandbox per kanban claim. (6) KANBAN HYGIENE — triage 272 blocked, verify-or-reopen the 573 'done'.",
+    "C_supervised_overnight": "Seed backlog into Hermes Kanban; STANDALONE launchd supervisor + swarm work it with the new gates; honest-kill; FREE-only; morning digest via Atlas (now deepseek-v4-pro + grounded health) with EVIDENCE."
+  },
+  "guardrails": [
+    "FREE models/engines only (cost policy; paid only as one MoA reference).",
+    "jojo-sunshine board: read-only audit; NO changes without David's explicit ok.",
+    "Never touch hive dispatcher config; never mass-restart gateways blindly.",
+    "Deterministic verification before any 'done' (practice what we build).",
+    "Honest-kill on OOM/anomaly; surface real blockers, don't fake progress.",
+    "Engineer (David) at plan + review; risky/irreversible changes gated."
+  ],
+  "cyclesCompleted": 0,
+  "nextPriority": "Align on run-mode (reboot+handoff vs in-session), jojo scope, and gating; then launch Phase A audit."
+}

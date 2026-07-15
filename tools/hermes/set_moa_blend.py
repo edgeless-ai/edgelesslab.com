@@ -162,22 +162,20 @@ def _blend_and_providers(profile=""):
     nous_key = _profile_nous_key(profile)
     preset = {
         "reference_models": [
-            {"provider": "cerebras", "model": "zai-glm-4.7"},                          # GLM, fastest, 2 parallel tools
+            # cerebras zai-glm-4.7 REMOVED 2026-07-15: 403 Forbidden (verified). Dead as ref + aggregator.
             {"provider": "hfrouter", "model": "Qwen/Qwen3-235B-A22B-Instruct-2507"},   # Qwen 235B, 2 parallel tools
             {"provider": "nvnim", "model": "openai/gpt-oss-120b"},                     # GPT-OSS on NVIDIA NIM, fast
             # gflash (gemini-3.5-flash) REMOVED 2026-07-07: both gemini keys 429 "prepayment credits
             # depleted" — dead as reference AND aggregator. Do NOT re-add without a funded key.
-            *(
-                # Free Nous option (kept per David) via the BUILT-IN auto-refreshing OAuth `nous`
-                # provider — stepfun:free verified serving even on the depleted free tier.
-                [{"provider": "nous", "model": "stepfun/step-3.7-flash:free"}]
-                if nous_key else []
-            ),
+            # Free Nous via the BUILT-IN auto-refreshing OAuth `nous` provider (stepfun:free, verified
+            # serving even on the depleted tier). UNCONDITIONAL so the ref-count stays >= 3 after the
+            # cerebras removal, regardless of per-profile nous_key presence.
+            {"provider": "nous", "model": "stepfun/step-3.7-flash:free"},
         ],
-        # Aggregator = cerebras zai-glm-4.7 (2026-07-07): verified working (0.2s), reliable tool-caller
-        # that does PARALLEL tool calls, no daily cap. Replaced gflash/gemini (429 depleted) — and NOT
-        # Hy3 (which only does ONE tool call at a time, per David). One call/req.
-        "aggregator": {"provider": "cerebras", "model": "zai-glm-4.7"},
+        # Aggregator = nvnim gpt-oss-120b (2026-07-15): cerebras zai-glm-4.7 went 403 Forbidden
+        # (verified with a real tool-call request), dead as aggregator AND reference. NVIDIA NIM
+        # gpt-oss-120b is FREE and verified tool-calling (proper tool_calls, finish=tool_calls).
+        "aggregator": {"provider": "nvnim", "model": "openai/gpt-oss-120b"},
         "enabled": True,
         "reference_temperature": 0.6,
         "aggregator_temperature": 0.4,

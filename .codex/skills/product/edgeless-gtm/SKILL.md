@@ -3,6 +3,7 @@ name: edgeless-gtm
 author: Edgeless Lab
 category: product
 title: Edgeless GTM Skill
+description: Edgeless Lab go-to-market playbook — positioning, channels, pricing, and launch sequencing for products and drops.
 status: incomplete
 ---
 

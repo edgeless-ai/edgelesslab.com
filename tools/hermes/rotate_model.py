@@ -29,6 +29,7 @@ import os
 import re
 import sys
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -142,16 +143,29 @@ def verify(entry, tools=True):
     body = {"model": entry.get("verify", entry["default"]),
             "messages": [{"role": "user", "content": "Call get_status for edgeless."}],
             "max_tokens": 120}
-    if tools:
-        body["tools"] = [{"type": "function", "function": {
-            "name": "get_status", "parameters": {"type": "object", "properties": {"board": {"type": "string"}}}}}]
-    req = urllib.request.Request(entry["base_url"].rstrip("/") + "/chat/completions",
-                                 data=json.dumps(body).encode(),
-                                 headers={"Authorization": f"Bearer {entry['api_key']}",
-                                          "Content-Type": "application/json"}, method="POST")
-    try:
+    tool_spec = [{"type": "function", "function": {
+        "name": "get_status", "parameters": {"type": "object", "properties": {"board": {"type": "string"}}}}}]
+
+    def _post(with_tools):
+        b = dict(body, tools=tool_spec) if with_tools else body
+        req = urllib.request.Request(entry["base_url"].rstrip("/") + "/chat/completions",
+                                     data=json.dumps(b).encode(),
+                                     headers={"Authorization": f"Bearer {entry['api_key']}",
+                                              "Content-Type": "application/json"}, method="POST")
         with urllib.request.urlopen(req, timeout=40) as r:
-            d = json.load(r)
+            return json.load(r)
+
+    try:
+        try:
+            d = _post(tools)
+        except urllib.error.HTTPError as he:
+            # Some endpoints (NVIDIA gpt-oss-120b) 400 on the tool schema but are UP for plain
+            # completions. Don't false-negative: retry without tools and report the provider live.
+            if tools and he.code == 400:
+                m = _post(False)["choices"][0]["message"]
+                c = (m.get("content") or "").strip()
+                return (True, "text OK (tools rejected by endpoint): " + c[:40]) if c else (False, "empty response")
+            raise
         m = d["choices"][0]["message"]
         if m.get("tool_calls"):
             return True, "tool_call OK: " + m["tool_calls"][0]["function"]["name"]

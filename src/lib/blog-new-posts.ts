@@ -1757,4 +1757,256 @@ A popular Instagram reel citing this paper claimed a "$150 median consumer surpl
 The core insight survived the misquote. Generative AI is already worth a lot to a lot of people, and the market has not come close to capturing it.
     `.trim(),
   },
+  {
+    slug: "the-router-that-timed-out-on-everything",
+    editorial: true,
+    title: "The $0 Router That Timed Out on Everything",
+    description: "A free local model router answered every health check and hung on every real request. Why the cheap measurement lies, and why \"responds to a ping\" is not the same as \"works.\"",
+    date: "2026-07-05",
+    tags: ["Infrastructure", "AI", "Multi-Agent"],
+    readTime: "5 min",
+    content: `# The $0 Router That Timed Out on Everything
+
+I run a lot of agents on free inference. One of the cheapest tricks in the stack is a
+self-hosted router that fans requests across a dozen free model providers and hands back
+whichever answers first. When it works, it's magic: real generation at no marginal cost.
+
+Last week it stopped working, and it took me embarrassingly long to see it — because it
+never went *down*. It stayed up the entire time. It just stopped doing the one thing it
+existed to do.
+
+## The symptom that wasn't
+
+The bot that depends on it went quiet. No errors in the channel, no alerts, no crash. I
+did what everyone does first: I checked if the router was alive.
+
+\`\`\`
+GET /v1/models  → 200 OK, 62 models
+\`\`\`
+
+Green. Healthy. Serving. I moved on and looked everywhere else for an hour — the bot's
+code, its token, its channel permissions — before I came back and actually asked the
+router to *generate something*.
+
+\`\`\`
+POST /v1/chat/completions  → hang … hang … 429
+\`\`\`
+
+Every model. Not just the one I wanted — deepseek, the fast ones, the big ones, all of
+them. The router was answering the cheap question ("are you there?") perfectly and failing
+the expensive one ("can you do work?") completely.
+
+## Why the ping lies
+
+A health check that only proves the process is listening is worse than no health check,
+because it actively teaches you the wrong thing. \`GET /models\` reads a static list from
+memory. It says nothing about whether the thing behind it — the pool of upstream providers,
+the connection budget, the rate-limit accounting — is exhausted. Under sustained load, all
+of that had quietly tipped over, and the only surface that reflected reality was the one I
+wasn't watching.
+
+The tell, in hindsight: the failure mode was *global*. When one specific model 429s, that's
+a provider rate limit. When *every* model hangs the same way, the problem isn't upstream —
+it's the thing in front of them. A restart of the container cleared it for a few minutes,
+then it choked again. That's not a rate-limit window. That's a component that can't sustain
+the load it's being asked to carry.
+
+## The fix, and the better default
+
+The immediate fix was to stop asking the free router to do the heavy lifting and route real
+generation to a provider whose free tier is *reliable* under load — one that hosts the same
+model I'd already chosen, so quality didn't change, only the road it traveled. Generation
+went from "hangs for five minutes then fails" to "answers in sixty seconds," and the bot
+came back to life.
+
+But the durable fix wasn't the provider swap. It was changing what "healthy" means.
+
+The router's heartbeat now has to survive the expensive question, not the cheap one. If a
+component's whole job is to complete requests, then "it completed a request recently" is the
+only heartbeat that counts. Anything less — a ping, a listening port, an uptime number — is a
+green light wired to the wrong sensor.
+
+## The lesson worth stealing
+
+Free infrastructure rarely fails by falling over. It fails in the gap between *responds to a
+ping* and *sustains real work* — and that gap is exactly where a lazy health check will lie
+to you.
+
+Three things I do now on anything I don't pay for:
+
+1. **Measure the promise, not the process.** If the job is "generate," the probe generates.
+   If the job is "post," the probe checks that something posted. Uptime is not a promise kept.
+2. **Read the shape of the failure.** One thing failing is a specific problem. *Everything*
+   failing the same way is almost always the layer in front of them.
+3. **Absence of an error is never green.** A quiet channel and a passing ping are not
+   success. They're the two most common disguises failure wears.
+
+The router still runs. It's still free. I just don't trust it to tell me it's fine anymore —
+I trust the work, or the lack of it.`.trim(),
+  },
+  {
+    slug: "six-dispatchers-where-one-is-law",
+    editorial: true,
+    title: "Six Dispatchers Where One Is Law",
+    description: "My agent swarm had exactly one rule about who assigns work. The config said so. The runtime disagreed six ways. On why observability isn't the same as reconciliation.",
+    date: "2026-07-09",
+    tags: ["Multi-Agent", "Infrastructure", "Automation"],
+    readTime: "6 min",
+    content: `# Six Dispatchers Where One Is Law
+
+There's a rule in my swarm that I consider load-bearing: exactly one agent is allowed to
+assign work off the shared task board. One dispatcher, on a fixed tick, with a hard cap on
+how many jobs go out at once. That rule exists because the alternative — several agents all
+grabbing from the same queue at once — once melted the machine under a stampede of workers.
+It's not a preference. It's scar tissue.
+
+Last week I went looking for why a bot had been spawning duplicate workers, and found that
+my one-dispatcher rule was being enforced by four dispatchers. Plus a global default that
+made it five. Plus two external jobs poking the same queue on their own schedules. The
+config file still said, in a comment I'd written myself, "this is the only dispatcher." The
+runtime had quietly stopped agreeing months ago.
+
+## How a rule drifts without anyone breaking it
+
+Nobody disabled the lockdown. That's the unsettling part. Each individual change was
+reasonable in isolation — a new agent got the same default as the others, a global setting
+flipped to the permissive value during an unrelated migration, a helper job got added to
+"keep the queue moving." No single step was wrong. The invariant died by a thousand
+defaults.
+
+This is the failure mode that documentation is worst at catching. The doc describes the
+world as it was true when someone wrote it down. It has no idea the world moved. And the
+more confidently the doc asserts the rule ("this is the ONLY dispatcher"), the more it lulls
+you — because you read the assertion and stop checking the fact.
+
+## Why a dashboard wouldn't have saved me
+
+Around the same time, I was designing an observability layer for the swarm — a single view of
+every scheduled job, what it consumes, what it produces. The obvious pitch: *make the drift
+visible.*
+
+But visibility would not have prevented this. A dashboard would have *shown* me six dispatch
+surfaces — as six healthy green rows. Six things running, all reporting fine, none of them
+aware that five of them shouldn't exist. Seeing the drift and knowing it's wrong are
+different problems.
+
+What catches this is not a picture. It's **reconciliation**: a declared state ("one
+dispatcher, named X") and an observed state (discovered by reading what's actually
+scheduled), continuously compared, with the difference treated as an alarm. Not "here is
+everything that runs" but "here is everything that runs *that shouldn't*, and everything
+that should run *and doesn't*."
+
+A dashboard answers "what is happening." A reconciler answers "what is wrong." Those are not
+the same product, and confusing them is how you end up with a beautiful, honest view of a
+system that's quietly out of policy.
+
+## The fix, and the guard
+
+The fix took ten minutes: turn the four extra dispatchers off, one at a time, verifying the
+one true dispatcher stayed up between each change. Reversible, boring, done.
+
+The part that matters took longer and is worth more: I wrote the check that makes this drift
+loud forever. A tiny preflight that reads every profile's config, confirms exactly one is a
+dispatcher and it's the right one, and fails otherwise. It isn't clever. It's twenty lines.
+But it converts "a rule I believe is true" into "a rule the machine re-verifies on demand" —
+and that's the only kind of rule that survives contact with a system that keeps changing
+underneath you.
+
+## The lesson worth stealing
+
+Every invariant you care about will drift toward the permissive default unless something
+actively pushes back. Three habits that came out of this:
+
+1. **A comment is not an enforcement.** If a rule matters, write the check that fails when
+   it's violated. Documentation describes; a guard defends.
+2. **Reconcile, don't just observe.** The valuable question isn't "what's running" — it's
+   "what's running that my declared intent says shouldn't be." Build the second one.
+3. **Every incident should leave a guard behind.** The fix that only fixes today is half a
+   fix. The one that also makes the failure loud next time is the whole thing.
+
+I still have one dispatcher. Now I have a way to know it, instead of a comment that hopes so.`.trim(),
+  },
+  {
+    slug: "the-bot-that-was-online-but-couldnt-talk",
+    editorial: true,
+    title: "The Bot That Was Online But Couldn't Talk",
+    description: "A chat agent showed green, connected, running — and ignored every message. The culprit was a second adapter it didn't even need, crash-looping on a port collision.",
+    date: "2026-07-14",
+    tags: ["Multi-Agent", "Infrastructure", "Agent"],
+    readTime: "5 min",
+    content: `# The Bot That Was Online But Couldn't Talk
+
+I stood up a new chat agent, watched it connect, saw the little green dot, and told the
+person waiting on it that it was live. They messaged it. Nothing. They messaged it again.
+Nothing. Meanwhile a *different*, older bot kept cheerfully answering in the same channel —
+the one that was supposed to have been retired from it.
+
+Two bugs wearing one coat. Let me take them in order, because the debugging order is the
+lesson.
+
+## "Running with 1 platform" — but which one?
+
+The new agent's startup log said, plainly: \`Gateway running with 1 platform(s)\`. Connected.
+Green. So I assumed the messaging platform I cared about was the one running.
+
+It wasn't guaranteed to be. The agent was configured for *two* platforms — the chat network I
+wanted, and a second integration I'd copied over from a template and never thought about. The
+log's "1 platform" was true, but ambiguous: one of the two had connected, one had failed, and
+the summary didn't tell me which was which. I'd read "1 platform running" as "the platform is
+running." Those are not the same sentence.
+
+When I actually read further down, the second adapter was in a crash loop:
+
+\`\`\`
+Fatal adapter error: sidecar exited unexpectedly
+Error: listen EADDRINUSE: address already in use 127.0.0.1:8792
+\`\`\`
+
+The unwanted integration was trying to bind a port that another agent already held. It
+crashed, a supervisor restarted it, it crashed again — every thirty seconds, forever. And
+each of those "Fatal adapter error" cycles churned the whole gateway process enough that the
+platform I *did* care about never got a stable footing to answer a message. The bot was
+online the way a person mid-panic-attack is technically awake.
+
+## The fix: delete the thing you never needed
+
+I didn't debug the port collision. I asked a better question: does this agent need that
+second integration at all? It's a chat bot. It needs the chat network. The other adapter was
+inherited baggage — present because it was in the template, not because anything used it.
+
+So I removed it. One platform in the config, the crash-looping one disabled, restart. The log
+changed to something unambiguous:
+
+\`\`\`
+Connected as <the bot> — discord connected
+Gateway running with 1 platform(s)
+\`\`\`
+
+Same "1 platform" line. Completely different meaning, because now there was only one platform
+it *could* mean. The bot answered the next message immediately.
+
+## The second bug: the retired bot that didn't retire
+
+The reason the *old* bot kept talking in that channel was subtler and worth its own note. I'd
+"relieved" it of the channel by changing which bot posts there — but I'd never told the old
+bot's gateway to *ignore* the channel. It still had permission to respond anywhere. And a
+reply-chain quirk (someone replying to one of its old messages counts as mentioning it) kept
+dragging it back in.
+
+The fix there was a denylist, not an allowlist: an explicit "never respond in these channels,
+even when mentioned." Allowlists are fragile — miss one channel and you silence the bot where
+it belongs. A targeted denylist says exactly what I mean: *this channel is not yours.*
+
+## The lesson worth stealing
+
+1. **"The process is up" is not "the service works."** A gateway can be running while the
+   part you care about is starved by a neighbor. Verify the capability, not the pulse.
+2. **Delete inherited complexity before you debug it.** The fastest fix for the crash loop
+   wasn't fixing the crash — it was removing the component that had no reason to be there.
+3. **A crash loop is not a quiet failure.** It's a loud one that hides *behind* a green
+   status line. When something "up" won't do its job, read past the summary to what its
+   subcomponents are actually doing.
+
+The bot's online now — the real kind, where online means it answers.`.trim(),
+  },
 ];

@@ -195,12 +195,12 @@ const artPicks = [
 // --- Off-the-rack catalog, fed by immune-system verdicts (designs.json) ---
 // Each design is offered as a specific product (variety across the rack), priced to its
 // kind. Sold-out is data-driven (d.exclusive) — no fake positional sold-outs.
-const _RACK_KINDS = ['tee', 'hoodie', 'sticker', 'cap', 'poster', 'tote', 'cc-tee', 'mug', 'tee', 'enamel', 'hoodie', 'bucket', 'sticker', 'embroidery', 'tee', 'poster', 'tote', 'cc-tee'];
+const _RACK_KINDS = ['tee', 'hoodie', 'sticker', 'cap', 'poster', 'print', 'tote', 'cc-tee', 'mug', 'tee', 'enamel', 'hoodie', 'bucket', 'sticker', 'embroidery', 'tee', 'print', 'poster', 'tote', 'cc-tee'];
 // Flat kinds composite the art directly (ProductThumb) — safe for a design with no baked
 // mockup. Base-strategy kinds (cap/mug/bucket/enamel/embroidery) show only a studio blank
 // unless a mockup was baked, so a mockup-less design assigned one renders as an empty product.
-const _RACK_FLAT_KINDS = ['tee', 'hoodie', 'sticker', 'poster', 'tote', 'cc-tee'];
-const _KIND_PRICE = { tee: 34, hoodie: 48, sticker: 10, poster: 28, 'cc-tee': 40, embroidery: 30, cap: 30, bucket: 34, tote: 24, mug: 18, enamel: 26 };
+const _RACK_FLAT_KINDS = ['tee', 'hoodie', 'sticker', 'poster', 'print', 'tote', 'cc-tee'];
+const _KIND_PRICE = { tee: 34, hoodie: 48, sticker: 10, poster: 28, print: 48, 'cc-tee': 40, embroidery: 30, cap: 30, bucket: 34, tote: 24, mug: 18, enamel: 26 };
 const RACK = designs
   .filter(d => d.verdict === 'premium')
   .map((d, i) => {
@@ -248,6 +248,8 @@ const PRODUCT_DETAILS = {
     specs: ['Durable kiss-cut vinyl', '3×3in', 'Matte UV-resistant laminate', 'Water & scratch resistant'] },
   'poster':     { label: 'Poster',         name: 'Matte Poster',                  detail: 'Museum matte · 11×14in',           price: 28,
     specs: ['Museum-grade matte paper', '11×14in', 'Giclée archival inks', 'Unframed'] },
+  'print':      { label: 'Fine Art Print',  name: 'Archival Giclée Print',         detail: 'Cotton rag · 13×19in',             price: 48,
+    specs: ['Heavyweight cotton rag (300gsm)', '13×19in / A3', 'Archival pigment giclée inks', 'Deckled edges', 'Signed & numbered edition'] },
   'cc-tee':     { label: 'Comfort Colors', name: 'Comfort Colors Garment-Dyed Tee', detail: 'Pigment-dyed · relaxed fit',     price: 40,
     specs: ['Heavyweight ringspun cotton', 'Garment-dyed · pigment wash', 'Full-front DTG print', 'Relaxed fit · S–2XL'] },
   'embroidery': { label: 'Embroidery',     name: 'Embroidered Emblem Tee',        detail: 'Stitched emblem · bold art only',  price: 30,
@@ -264,7 +266,7 @@ const PRODUCT_DETAILS = {
     specs: ['Steel-core enamel', '12oz · colored rim & handle', 'Camping / outdoor durable', 'Wrap-around or front-insert print · hand wash'] },
 };
 // Apparel renders client-side; these Printify kinds fetch a /mockup render.
-const PRINTIFY_KINDS = ['sticker', 'poster', 'cc-tee', 'embroidery', 'cap', 'bucket', 'tote', 'mug', 'enamel'];
+const PRINTIFY_KINDS = ['sticker', 'print', 'poster', 'cc-tee', 'embroidery', 'cap', 'bucket', 'tote', 'mug', 'enamel'];
 const isPrintifyKind = (k) => PRINTIFY_KINDS.includes(k);
 // Kinds where wrap-around vs front-insert is a real, meaningful print choice (drinkware).
 // Other kinds have one sensible placement → no selector shown.
@@ -300,6 +302,7 @@ const KIND_PREVIEW = {
   embroidery: { blank: '/blanks/embroidery.png', strategy: 'base' },
   'cc-tee':   { blank: '/blanks/cc-tee.png',     strategy: 'flat', region: { top: 27, left: 31, width: 38, height: 42 } },
   sticker:    { strategy: 'art' },
+  print:      { strategy: 'art' },
   poster:     { strategy: 'art' },
 };
 const kindPreview = (k) => KIND_PREVIEW[k] || null;
@@ -1089,7 +1092,7 @@ function App({ anonymous = false }) {
   const [colors, setColors] = useState([]);          // garment color swatches for this blank
   const [variantId, setVariantId] = useState(null);  // chosen color variant; null = blank default
   // --- Customize product type: apparel (blank picker + editor) OR a Printify kind ---
-  const [custKind, setCustKind] = useState('apparel'); // apparel | sticker | poster | cc-tee | embroidery
+  const [custKind, setCustKind] = useState('apparel'); // apparel | sticker | poster | print | cc-tee | embroidery | cap | bucket | tote | mug | enamel
   const custPrintify = isPrintifyKind(custKind);
   // Print placement for kinds that support it (mug/enamel). Default = wrap-around.
   const [custPlacement, setCustPlacement] = useState('wrap');
@@ -2295,7 +2298,7 @@ function App({ anonymous = false }) {
         <div className="sectionTitle"><Icon name="pkg" size={18}/> 1 · Choose a product</div>
         <div className="familyRow segRow--wrap" style={{ marginTop: 12 }}>
           {/* Comfort Colors is NOT a top type — it's an apparel family (below). */}
-          {[['apparel','Apparel'],['cap','Cap'],['bucket','Bucket Hat'],['tote','Tote'],['mug','Mug'],['enamel','Enamel Mug'],['sticker','Sticker'],['poster','Poster'],['embroidery','Embroidery']].map(([k,l]) => (
+          {[['apparel','Apparel'],['cap','Cap'],['bucket','Bucket Hat'],['tote','Tote'],['mug','Mug'],['enamel','Enamel Mug'],['sticker','Sticker'],['poster','Poster'],['print','Fine Art Print'],['embroidery','Embroidery']].map(([k,l]) => (
             <button key={k} className={(k==='apparel'? inApparel : custKind===k)?'on':''}
                     onClick={() => { if (k==='apparel') { pickApparelFamily(APPAREL_FAMILIES[0]); } else { setCustKind(k); } }}>{l}</button>
           ))}

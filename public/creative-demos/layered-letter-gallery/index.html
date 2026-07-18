@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Layered Letter Gallery</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      overflow: hidden;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+    }
+    #canvas-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+    #subtitle-overlay {
+      position: fixed;
+      bottom: 80px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      pointer-events: none;
+      color: #f5f5f5;
+      font-size: 24px;
+      letter-spacing: 2px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      z-index: 10;
+    }
+    #subtitle-overlay.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #subtitle-overlay .letter-name {
+      font-weight: 700;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 6px;
+    }
+    #subtitle-overlay .layer-list {
+      font-size: 14px;
+      color: #aaaaaa;
+      font-weight: 400;
+      letter-spacing: 1px;
+    }
+    #instruction {
+      position: fixed;
+      top: 40px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      pointer-events: none;
+      color: #f5f5f5;
+      font-size: 14px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      transition: opacity 1s ease;
+      z-index: 10;
+    }
+    #instruction.hidden {
+      opacity: 0;
+    }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div id="instruction">Scroll to walk through the word</div>
+  <div id="subtitle-overlay">
+    <span class="letter-name"></span>
+    <span class="layer-list"></span>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a0a);
+    scene.fog = new THREE.FogExp2(0x0a0a0a, 0.03);
+
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+    document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+    // Post-processing
+    const composer = new EffectComposer(renderer);
+    const renderPass = new RenderPass(scene, camera);
+    composer.addPass(renderPass);
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      0.4, 0.5, 0.2
+    );
+    composer.addPass(bloomPass);
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+    scene.add(ambientLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(10, 20, 10);
+    scene.add(dirLight);
+    const fillLight = new THREE.DirectionalLight(0x404040, 0.4);
+    fillLight.position.set(-10, 10, -10);
+    scene.add(fillLight);
+
+    // Block letter shapes (7x5 grid coordinates)
+    const letterShapes = {
+      T: [[-2,6],[-1,6],[0,6],[1,6],[2,6],[0,5],[0,4],[0,3],[0,2],[0,1],[0,0]],
+      Y: [[-2,6],[2,6],[-1,5],[1,5],[0,4],[0,3],[0,2],[0,1],[0,0]],
+      P: [[-2,6],[-1,6],[0,6],[1,6],[-2,5],[1,5],[-2,4],[1,4],[-2,3],[-1,3],[0,3],[1,3],[-2,2],[-2,1],[-2,0]],
+      E: [[-2,6],[-1,6],[0,6],[1,6],[2,6],[-2,5],[-2,4],[-2,3],[-1,3],[0,3],[-2,2],[-2,1],[-2,0],[-1,0],[0,0],[1,0],[2,0]]
+    };
+
+    const letterNames = ['T', 'Y', 'P', 'E'];
+    const layerConfigs = [
+      { name: 'Base', color: 0xffffff, zOffset: 0, scale: 1.0, opacity: 1.0, emissiveIntensity: 0.0 },
+      { name: 'Inline', color: 0xe30613, zOffset: 0.4, scale: 0.92, opacity: 0.9, emissiveIntensity: 0.3 },
+      { name: 'Shadow', color: 0x0055ff, zOffset: -0.4, scale: 1.0, opacity: 0.85, emissiveIntensity: 0.3 },
+      { name: 'Outline', color: 0xffcc00, zOffset: 0.8, scale: 1.08, opacity: 0.85, emissiveIntensity: 0.3 }
+    ];
+
+    const boxGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+
+    function createLetterBaseGroup(shape) {
+      const group = new THREE.Group();
+      shape.forEach(([x, y]) => {
+        const mesh = new THREE.Mesh(boxGeo, new THREE.MeshStandardMaterial({ color: 0xffffff }));
+        mesh.position.set(x, y, 0);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        group.add(mesh);
+      });
+      return group;
+    }
+
+    const letterData = [];
+    const letterPositions = [-27, -9, 9, 27];
+
+    letterPositions.forEach((xPos, idx) => {
+      const letterGroup = new THREE.Group();
+      letterGroup.position.set(xPos, 0, 0);
+
+      const shape = letterShapes[letterNames[idx]];
+      const baseGroup = createLetterBaseGroup(shape);
+
+      const layers = [];
+      layerConfigs.forEach((config) => {
+        const layerGroup = baseGroup.clone();
+        layerGroup.traverse((child) => {
+          if (child.isMesh) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: config.color,
+              emissive: config.color,
+              emissiveIntensity: config.emissiveIntensity,
+              transparent: true,
+              opacity: config.opacity,
+              roughness: 0.4,
+              metalness: 0.1
+            });
+          }
+        });
+        layerGroup.position.z = config.zOffset;
+        layerGroup.scale.set(config.scale, config.scale, config.scale);
+        letterGroup.add(layerGroup);
+        layers.push(layerGroup);
+      });
+
+      scene.add(letterGroup);
+      letterData.push({
+        name: letterNames[idx],
+        group: letterGroup,
+        layers: layers,
+        position: new THREE.Vector3(xPos, 3, 0)
+      });
+
+      // Add a point light near each letter for drama
+      const pl = new THREE.PointLight(0xffffff, 0.3, 25);
+      pl.position.set(xPos, 3, 8);
+      scene.add(pl);
+    });
+
+    // Particle dust
+    const particleCount = 100;
+    const particleGeo = new THREE.BufferGeometry();
+    const particlePositions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      particlePositions[i * 3] = (Math.random() - 0.5) * 60;
+      particlePositions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 40;
+    }
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+    const particleMat = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.5,
+      transparent: true,
+      opacity: 0.6,
+      sizeAttenuation: true
+    });
+    const particleSystem = new THREE.Points(particleGeo, particleMat);
+    scene.add(particleSystem);
+
+    // Camera path
+    const curvePoints = [
+      new THREE.Vector3(-40, 5, 25),
+      new THREE.Vector3(-27, 0, 15),
+      new THREE.Vector3(-9, 0, 15),
+      new THREE.Vector3(9, 0, 15),
+      new THREE.Vector3(27, 0, 15),
+      new THREE.Vector3(40, 5, 25)
+    ];
+    const curve = new THREE.CatmullRomCurve3(curvePoints);
+
+    // Scroll state
+    let scrollProgress = 0;
+    let scrollDelta = 0;
+    let motion = 0;
+    let hasScrolled = false;
+
+    window.addEventListener('wheel', (e) => {
+      if (!hasScrolled) {
+        hasScrolled = true;
+        document.getElementById('instruction').classList.add('hidden');
+      }
+      const delta = e.deltaY * 0.0005;
+      scrollProgress += delta;
+      scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+      scrollDelta = Math.abs(e.deltaY);
+      motion += scrollDelta * 0.05;
+      motion = Math.min(motion, 100);
+    }, { passive: true });
+
+    // Subtitle overlay
+    const subtitleEl = document.getElementById('subtitle-overlay');
+    const letterNameEl = subtitleEl.querySelector('.letter-name');
+    const layerListEl = subtitleEl.querySelector('.layer-list');
+
+    // Animation loop
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = clock.getDelta();
+
+      // Decay motion
+      motion = Math.max(0, motion - 2);
+
+      // Camera lerp along spline
+      const targetPoint = curve.getPoint(scrollProgress);
+      camera.position.lerp(targetPoint, 0.05);
+
+      // Look at closest letter
+      let closestDist = Infinity;
+      let closestLetter = null;
+      letterData.forEach((data) => {
+        const dist = camera.position.distanceTo(data.position);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestLetter = data;
+        }
+      });
+
+      if (closestLetter) {
+        const lookTarget = closestLetter.position.clone();
+        lookTarget.y = 3;
+        camera.lookAt(lookTarget);
+      }
+
+      // Layer deconstruction based on motion
+      const driftX = Math.sin(motion * 0.1) * 0.05;
+      const driftY = Math.cos(motion * 0.1) * 0.05;
+
+      letterData.forEach((data) => {
+        const layers = data.layers;
+        // Base layer
+        layers[0].position.z = THREE.MathUtils.lerp(layers[0].position.z, layerConfigs[0].zOffset, 0.05);
+        layers[0].position.x = THREE.MathUtils.lerp(layers[0].position.x, 0, 0.05);
+        layers[0].position.y = THREE.MathUtils.lerp(layers[0].position.y, 0, 0.05);
+
+        // Red inline
+        const targetZ1 = layerConfigs[1].zOffset + motion * 0.02;
+        layers[1].position.z = THREE.MathUtils.lerp(layers[1].position.z, targetZ1, 0.05);
+        layers[1].position.x = THREE.MathUtils.lerp(layers[1].position.x, driftX, 0.05);
+        layers[1].position.y = THREE.MathUtils.lerp(layers[1].position.y, driftY, 0.05);
+
+        // Blue shadow
+        const targetZ2 = layerConfigs[2].zOffset - motion * 0.02;
+        layers[2].position.z = THREE.MathUtils.lerp(layers[2].position.z, targetZ2, 0.05);
+        layers[2].position.x = THREE.MathUtils.lerp(layers[2].position.x, -driftX, 0.05);
+        layers[2].position.y = THREE.MathUtils.lerp(layers[2].position.y, -driftY, 0.05);
+
+        // Yellow outline
+        const targetZ3 = layerConfigs[3].zOffset + motion * 0.04;
+        layers[3].position.z = THREE.MathUtils.lerp(layers[3].position.z, targetZ3, 0.05);
+        layers[3].position.x = THREE.MathUtils.lerp(layers[3].position.x, driftX * 1.5, 0.05);
+        layers[3].position.y = THREE.MathUtils.lerp(layers[3].position.y, driftY * 1.5, 0.05);
+      });
+
+      // Particle animation
+      particleSystem.rotation.y += 0.0005;
+      const pPos = particleSystem.geometry.attributes.position.array;
+      for (let i = 0; i < particleCount; i++) {
+        pPos[i * 3 + 1] += 0.01;
+        if (pPos[i * 3 + 1] > 10) pPos[i * 3 + 1] = -10;
+      }
+      particleSystem.geometry.attributes.position.needsUpdate = true;
+
+      // Subtitle overlay
+      if (closestLetter && closestDist < 12) {
+        letterNameEl.textContent = closestLetter.name;
+        layerListEl.textContent = 'Base + Inline + Shadow + Outline';
+        subtitleEl.classList.add('visible');
+      } else {
+        subtitleEl.classList.remove('visible');
+      }
+
+      composer.render();
+    }
+
+    animate();
+
+    // Resize handler
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      composer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glitch-Grid Variable Type Machine</title>
+<script type="module">
+import 'https://esm.sh/css-doodle@0.50.2';
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght,wdth,slnt@14..32,100..900,50..200,-10..0&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a12;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+}
+.doodle-wrapper {
+  position: relative;
+  width: 600px;
+  height: 300px;
+}
+css-doodle {
+  display: block;
+  width: 100%;
+  height: 100%;
+  --seed: 0;
+}
+.overlay-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Inter', sans-serif;
+  font-size: 9vw;
+  font-weight: 700;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  color: #fff;
+  text-shadow: 0 0 40px rgba(100, 150, 255, 0.1);
+  letter-spacing: 0.05em;
+  transition: font-variation-settings 0.3s ease;
+}
+.status-bar {
+  color: rgba(255,255,255,0.08);
+  font-size: 10px;
+  margin-top: 40px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-family: 'Inter', sans-serif;
+}
+.status-detail {
+  color: rgba(255,255,255,0.05);
+  font-size: 9px;
+  margin-top: 8px;
+  font-family: monospace;
+}
+</style>
+</head>
+<body>
+
+<div class="doodle-wrapper">
+  <css-doodle id="doodle" click-to-update>
+    :doodle {
+      @grid: 30 / 100%;
+      background: #0a0a12;
+    }
+    --hue: calc(@row * 8 + @col * 5 + @n * 0.1);
+    --size: @r(6px, 12px);
+    
+    :after {
+      content: '';
+      display: block;
+      width: var(--size);
+      height: var(--size);
+      border-radius: @pick('50%', '30%', '10%');
+      background: hsla(
+        calc(var(--hue) + @r(-10, 10)),
+        @r(60, 80)%,
+        @r(40, 70)%,
+        @r(0.3, 0.9)
+      );
+      transform: rotate(@r(0, 360)deg) scale(@r(0.5, 1.2));
+      box-shadow: @m2(0 0 @r(4px, 12px) hsla(var(--hue), 70%, 50%, 0.3));
+    }
+  </css-doodle>
+  
+  <div class="overlay-text" id="overlayText">TYPE</div>
+</div>
+
+<div class="status-bar" id="statusBar">generative type machine</div>
+<div class="status-detail" id="statusDetail">grid 30×30 · css-doodle · variable font</div>
+
+<script>
+const doodle = document.getElementById('doodle');
+const overlayText = document.getElementById('overlayText');
+const statusBar = document.getElementById('statusBar');
+const words = ['TYPE', 'CODE', 'FLUX', 'VOID', 'DATA', 'GRID', 'GLYPH', 'CORE', 'LOOP', 'WAVE'];
+let currentWordIdx = 0;
+let regenerationInterval;
+let isStuttering = false;
+let lastStutterTime = 0;
+let tickCount = 0;
+
+// Variable font axis animation
+let wght = 500;
+let wdth = 100;
+let time = 0;
+
+// Update overlay text font-variation-settings smoothly
+function updateVariableFont() {
+  time += 0.01;
+  wght = 400 + Math.sin(time * 1.3) * 300 + Math.sin(time * 0.7) * 100;
+  wdth = 80 + Math.sin(time * 0.9) * 50 + Math.sin(time * 0.5) * 20;
+  const slnt = Math.sin(time * 1.1) * 5;
+  
+  overlayText.style.fontVariationSettings = `'wght' ${wght}, 'wdth' ${wdth}, 'slnt' ${slnt}`;
+  
+  // Subtle color shift
+  const hue = (time * 20) % 360;
+  overlayText.style.color = `hsl(${hue}, 60%, 80%)`;
+}
+
+// Cycle words every regeneration
+function cycleWord() {
+  currentWordIdx = (currentWordIdx + 1) % words.length;
+  const word = words[currentWordIdx];
+  overlayText.textContent = word;
+  statusBar.textContent = `${word} · ${words[(currentWordIdx + 1) % words.length]} → ${words[(currentWordIdx + 2) % words.length]}`;
+}
+
+// Trigger grid regeneration
+function regenerateGrid() {
+  if (isStuttering) return; // skip during stutter (weirdness)
+  
+  tickCount++;
+  
+  // Weirdness: stutter effect every 15-25 cycles
+  const now = Date.now();
+  if (!isStuttering && Math.random() < 0.04 && now - lastStutterTime > 10000) {
+    isStuttering = true;
+    lastStutterTime = now;
+    statusBar.textContent = '⏣ stutter · holding frame';
+    
+    // Hold for ~2x normal time
+    setTimeout(() => {
+      isStuttering = false;
+      cycleWord();
+      doodle.update();
+      statusBar.textContent = `${words[currentWordIdx]} · generative type machine`;
+    }, 2000);
+    return;
+  }
+  
+  // Normal regeneration with seed shift
+  const seed = Math.floor(Math.random() * 9999);
+  doodle.style.setProperty('--seed', seed);
+  doodle.update();
+  
+  cycleWord();
+}
+
+// Initial setup
+updateVariableFont();
+regenerateGrid();
+
+// Continuous regeneration at ~2Hz
+regenerationInterval = setInterval(regenerateGrid, 1600);
+
+// Variable font animation loop
+function animateFont() {
+  updateVariableFont();
+  requestAnimationFrame(animateFont);
+}
+requestAnimationFrame(animateFont);
+
+// Clean up on page unload
+window.addEventListener('beforeunload', () => {
+  clearInterval(regenerationInterval);
+});
+
+// Keyboard interaction: space to force regeneration
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    clearInterval(regenerationInterval);
+    regenerateGrid();
+    regenerationInterval = setInterval(regenerateGrid, 1600);
+  }
+});
+</script>
+</body>
+</html>

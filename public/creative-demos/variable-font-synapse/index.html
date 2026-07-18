@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Variable Font Synapse</title>
+  <!-- Inter variable font (100–900) from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+  <!-- p5.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #080A10;
+    }
+  </style>
+</head>
+<body>
+<script>
+/**
+ * Variable Font Synapse
+ * ----------------------
+ * A hybrid of Motion Fonts (variable font weight choreography) and Recursive Signals
+ * (generative synaptic branching). Each node in a recursive tree is a single glyph
+ * rendered in Inter (100–900). Signal pulses travel outward from the root (or click)
+ * and modulate the font-weight axis of each glyph as they pass, creating a
+ * neurological wave through an alphabet.
+ *
+ * Controls:
+ *   - Click anywhere to inject a magenta pulse burst.
+ *   - Auto-pulses fire from the root every 35 frames.
+ */
+
+// ===== Configuration =====
+const MAX_DEPTH = 6;                     // Recursion depth of the synaptic tree
+const BRANCH_ANGLE = 25 * (Math.PI / 180); // Branch split angle in radians
+const BASE_LENGTH = 140;                   // Length of the root branch
+const LENGTH_DECAY = 0.75;               // Length multiplier per depth level
+const TEXT_BASE = 48;                      // Text size at the root
+const TEXT_MIN = 12;                       // Text size at the deepest leaves
+const SWAY_SPEED = 0.01;                  // Time increment per frame for organic sway
+const SWAY_AMP = 0.03;                    // Base angle-offset amplitude for sway
+const PULSE_SPEED = 6;                    // Expansion speed of a pulse wavefront
+const PULSE_DECAY = 0.008;                // Exponential decay factor for pulse intensity LUT
+const AUTO_PULSE_INTERVAL = 35;           // Frames between auto-pulses
+const MAX_PULSE_RADIUS = 2500;            // Maximum pulse radius before culling
+const MAX_DIST = 3000;                    // Upper bound for the precomputed intensity LUT
+const TEXT_STRING = "NEURAL SIGNALS PROPAGATE THROUGH TYPOGRAPHIC SYNAPSES";
+
+// ===== Globals =====
+let root;          // Root node of the synaptic tree
+let nodes = [];    // Flat list of all nodes for iteration
+let pulses = [];   // Active signal pulses
+let intensityLUT = []; // Precomputed exp(-decay * d) lookup table
+let charIndex = 0; // Cursor into TEXT_STRING for assigning glyphs
+let t = 0;         // Global time accumulator for sine-driven sway
+
+// ===== Node Class =====
+class Node {
+  constructor(parent, angle, depth, char) {
+    this.parent = parent;
+    this.baseAngle = angle;          // Absolute angle (no sway)
+    this.depth = depth;
+    this.char = char;                // The glyph rendered at this node
+    this.children = [];
+    this.length = BASE_LENGTH * Math.pow(LENGTH_DECAY, depth);
+    this.textSize = map(depth, 0, MAX_DEPTH, TEXT_BASE, TEXT_MIN);
+    // Sway amplitude decreases toward the leaves
+    this.swayAmp = SWAY_AMP * (MAX_DEPTH - depth + 1);
+    this.swayOffset = depth * 0.7;     // Phase shift per depth layer
+    this.x = 0;
+    this.y = 0;
+    // Path distance from root (sum of branch lengths) used for wavefront timing
+    this.pathDist = parent ? parent.pathDist + this.length : 0;
+  }
+}
+
+// ===== Pulse Class =====
+class Pulse {
+  constructor(x, y, col) {
+    this.x = x;            // Origin of the pulse
+    this.y = y;
+    this.radius = 0;       // Current wavefront radius
+    this.speed = PULSE_SPEED;
+    this.alive = true;
+    this.col = col;        // p5.Color (#00FFFF or #FF00FF)
+  }
+
+  update() {
+    this.radius += this.speed;
+    if (this.radius > MAX_PULSE_RADIUS) {
+      this.alive = false;
+    }
+  }
+
+  draw() {
+    noFill();
+    strokeWeight(3);
+    stroke(this.col);
+    // Draw the wavefront as a neon ring
+    circle(this.x, this.y, this.radius * 2);
+  }
+}
+
+// ===== Helpers =====
+function getNextChar() {
+  const clean = TEXT_STRING.replace(/\s/g, '');
+  const c = clean.charAt(charIndex % clean.length);
+  charIndex++;
+  return c;
+}
+
+function buildNode(parent, angle, depth) {
+  const node = new Node(parent, angle, depth, getNextChar());
+  nodes.push(node);
+  if (depth < MAX_DEPTH) {
+    node.children.push(buildNode(node, angle - BRANCH_ANGLE, depth + 1));
+    node.children.push(buildNode(node, angle + BRANCH_ANGLE, depth + 1));
+  }
+  return node;
+}
+
+// Recursively compute each node's screen position, applying sine-driven sway to angles
+function updateTree(node, px, py, time) {
+  if (node.parent !== null) {
+    const angle = node.baseAngle + Math.sin(time + node.swayOffset) * node.swayAmp;
+    node.x = px + Math.cos(angle) * node.length;
+    node.y = py + Math.sin(angle) * node.length;
+  }
+  for (const child of node.children) {
+    updateTree(child, node.x, node.y, time);
+  }
+}
+
+// Precompute the exponential decay curve so we never call Math.exp() per-node per-frame
+function initLUT() {
+  intensityLUT = new Float32Array(MAX_DIST + 1);
+  for (let i = 0; i <= MAX_DIST; i++) {
+    intensityLUT[i] = Math.exp(-PULSE_DECAY * i);
+  }
+}
+
+// ===== p5.js Lifecycle =====
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  textAlign(CENTER, CENTER);
+
+  initLUT();
+  root = buildNode(null, -Math.PI / 2, 0);
+  root.x = width / 2;
+  root.y = height * 0.9;
+
+  // Wait for the Inter variable font to be ready before starting the render loop.
+  document.fonts.load("1px Inter").then(() => {
+    loop();
+  });
+  noLoop();
+}
+
+function draw() {
+  // 1. Trail persistence — translucent background instead of clear()
+  background(8, 10, 16, 35);
+
+  // 2. Advance organic time
+  t += SWAY_SPEED;
+
+  // 3. Anchor the root near the bottom-center and update the entire tree
+  root.x = width / 2;
+  root.y = height * 0.9;
+  updateTree(root, root.x, root.y, t);
+
+  // 4. Auto-pulse from the root every 35 frames
+  if (frameCount % AUTO_PULSE_INTERVAL === 0) {
+    pulses.push(new Pulse(root.x, root.y, color(0, 255, 255))); // Cyan
+  }
+
+  // 5. Update pulse lifetimes
+  for (let i = pulses.length - 1; i >= 0; i--) {
+    pulses[i].update();
+    if (!pulses[i].alive) {
+      pulses.splice(i, 1);
+    }
+  }
+
+  // 6. Draw pulses with additive blending for neon glow
+  push();
+  blendMode(ADD);
+  for (const p of pulses) {
+    p.draw();
+  }
+  pop();
+
+  // 7. Render glyphs with variable weight driven by pulse proximity
+  const ctx = drawingContext;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  for (const node of nodes) {
+    let maxIntensity = 0;
+    // Find the strongest pulse influence on this node
+    for (const p of pulses) {
+      const dx = node.x - p.x;
+      const dy = node.y - p.y;
+      const d = Math.floor(Math.sqrt(dx * dx + dy * dy));
+      const diff = Math.abs(d - Math.floor(p.radius));
+      if (diff <= MAX_DIST) {
+        const intensity = intensityLUT[diff];
+        if (intensity > maxIntensity) {
+          maxIntensity = intensity;
+        }
+      }
+    }
+    // Map pulse intensity to the Inter wght axis (100 → 900)
+    const weight = 100 + 800 * maxIntensity;
+    ctx.font = `${Math.floor(weight)} ${Math.floor(node.textSize)}px Inter, sans-serif`;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(node.char, node.x, node.y);
+  }
+}
+
+// 8. Interactive pulse injection on click
+function mousePressed() {
+  pulses.push(new Pulse(mouseX, mouseY, color(255, 0, 255))); // Magenta
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  root.x = width / 2;
+  root.y = height * 0.9;
+}
+</script>
+</body>
+</html>

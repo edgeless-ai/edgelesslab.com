@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manifest Cloth — Logistics Text as Physics Ribbon</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<style>
+  body { margin: 0; overflow: hidden; background: #FFFFFF; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<script>
+const rows = 14;
+const cols = 24;
+const spacing = 28;
+const chars = "LOGISTICS MANIFEST CARGO ROUTE HAUL TRUCK ROLL ";
+const damp = 0.88;
+let points = [];
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  fill(0);
+  noStroke();
+  textFont('Helvetica Neue, Helvetica, Arial, sans-serif');
+  initPoints();
+}
+
+function initPoints() {
+  points = [];
+  let startX = width / 2 - (cols * spacing) / 2;
+  let startY = height / 2 - (rows * spacing) / 2;
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      points.push({
+        x: startX + x * spacing,
+        y: startY + y * spacing,
+        vx: 0, vy: 0,
+        fixed: (x === 0 || x === cols - 1)
+      });
+    }
+  }
+}
+
+function draw() {
+  background(255);
+  for (let i = 0; i < 4; i++) updatePhysics();
+  let t = frameCount * 0.03;
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      let p = points[y * cols + x];
+      let ch = chars[(x + y * 3) % chars.length];
+      let angle = 0;
+      if (!p.fixed) {
+        let left = points[y * cols + x - 1];
+        let right = points[y * cols + x + 1];
+        angle = atan2(right.y - left.y, right.x - left.x);
+      } else {
+        angle = sin(t + y * 0.2) * 0.15;
+      }
+      push();
+      translate(p.x, p.y);
+      rotate(angle);
+      text(ch, 0, 0);
+      pop();
+    }
+  }
+}
+
+function updatePhysics() {
+  let t = frameCount * 0.03;
+  let startY = height / 2 - (rows * spacing) / 2;
+  for (let y = 0; y < rows; y++) {
+    let pLeft = points[y * cols];
+    let pRight = points[y * cols + cols - 1];
+    pLeft.y = startY + y * spacing + sin(t + y * 0.25) * 18;
+    pRight.y = startY + y * spacing + sin(t + y * 0.25 + PI) * 18;
+  }
+  for (let y = 0; y < rows; y++) {
+    for (let x = 1; x < cols - 1; x++) {
+      let p = points[y * cols + x];
+      let left = points[y * cols + x - 1];
+      let right = points[y * cols + x + 1];
+      let up = (y > 0) ? points[(y - 1) * cols + x] : p;
+      let down = (y < rows - 1) ? points[(y + 1) * cols + x] : p;
+      let ax = 0, ay = 0;
+      let neighbors = [left, right, up, down];
+      for (let n of neighbors) {
+        ax += (n.x - p.x) * 0.06;
+        ay += (n.y - p.y) * 0.06;
+      }
+      p.vx += ax;
+      p.vy += ay;
+      p.vx *= damp;
+      p.vy *= damp;
+      let maxV = 6;
+      p.vx = constrain(p.vx, -maxV, maxV);
+      p.vy = constrain(p.vy, -maxV, maxV);
+    }
+  }
+  for (let y = 0; y < rows; y++) {
+    for (let x = 1; x < cols - 1; x++) {
+      let p = points[y * cols + x];
+      p.x += p.vx;
+      p.y += p.vy;
+    }
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  initPoints();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,2293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Pudding</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; border: 0 solid currentColor; }
+html { -webkit-text-size-adjust: 100%; line-height: normal; }
+body { margin: 0; }
+ul, ol, menu { list-style: none; }
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea, optgroup { font: inherit; color: inherit; background: transparent; border: 0; padding: 0; margin: 0; text-align: inherit; letter-spacing: inherit; }
+button { cursor: pointer; }
+table { border-collapse: separate; border-spacing: 0; }
+img, picture, video, canvas, svg { display: inline-block; }
+/* Lottie runtime fit: the player re-mounts its svg/canvas into an absolute overlay that fills
+   the host's captured (per-viewport, definite) box. Force that runtime media to fit the box so
+   an aspect-mismatched viewBox (e.g. a portrait animation in a shorter, letterboxed source box)
+   can't inflate past the pinned height. Scoped to the runtime-marked host only. */
+[data-ditto-lottie] > div > svg, [data-ditto-lottie] > div > canvas { width: 100%; height: 100%; display: block; }
+h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd { margin: 0; }
+/* Neutralize UA text defaults to inherit so the generator's default-skipping is
+   correct: a property equal to its inherited value is simply not emitted. */
+h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
+b, strong, th { font-weight: inherit; }
+em, i, cite, var, dfn, address, q { font-style: inherit; }
+small, big, sub, sup { font-size: inherit; }
+sub, sup { vertical-align: inherit; }
+code, kbd, samp, pre, tt, var { font-family: inherit; font-size: inherit; }
+mark { background-color: transparent; color: inherit; }
+abbr[title] { text-decoration: none; }
+fieldset, legend { min-width: 0; }
+
+/* fonts */
+@font-face {
+  font-family: "Atlas Grotesk";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("public/assets/cloned/fonts/5c9deac14a40.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Atlas Grotesk";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("public/assets/cloned/fonts/2ba1d8002a38.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Atlas Typewriter";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("public/assets/cloned/fonts/5bd8aef9ceb6.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Gooper SemiCondensed";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("public/assets/cloned/fonts/0f915afede2d.woff") format("woff2");
+}
+
+@font-face {
+  font-family: "Gooper SemiCondensed";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("public/assets/cloned/fonts/79dc879b874e.woff") format("woff2");
+}
+
+@font-face {
+  font-family: "Tiempos Text";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("public/assets/cloned/fonts/bef4905422cc.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Tiempos Text";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("public/assets/cloned/fonts/be6c1642c7d9.woff2") format("woff2");
+}
+
+/* tokens */
+:root {
+  --background: rgb(255, 255, 255);
+  --foreground: rgb(38, 38, 38);
+  --primary: rgb(181, 22, 112);
+  --accent: rgb(237, 18, 237);
+  --border: rgba(48, 48, 48, 0.4);
+  --muted-foreground: rgb(109, 109, 109);
+  --color-001: rgb(0, 0, 0);
+}
+
+:root {
+  /* fonts */
+  --font-body: "Gooper SemiCondensed", "Iowan Old Style", "Times New Roman", Times, serif;
+  --font-001: "Atlas Grotesk", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  --font-002: "Atlas Typewriter", Menlo, Consolas, Monaco, monospace;
+  /* fontSizes */
+  --font-size-001: 12.8px;
+  --font-size-002: 14px;
+  --font-size-003: 16px;
+  --font-size-004: 22.4px;
+  --font-size-005: 32px;
+  /* fontWeights */
+  --font-weight-001: 400;
+  --font-weight-002: 500;
+  --font-weight-003: 700;
+  --font-weight-004: 900;
+  /* lineHeights */
+  --line-height-001: 22.4px;
+  --line-height-002: 19.6px;
+  --line-height-003: 32px;
+  --line-height-004: 14.72px;
+  --line-height-005: 18.4px;
+  --line-height-006: 26.88px;
+  --line-height-007: 17.92px;
+  --line-height-008: 18.55px;
+  /* spacing */
+  --space-001: 4px;
+  --space-002: 8px;
+  --space-003: 12px;
+  --space-004: 16px;
+  --space-005: 24px;
+  --space-006: 32px;
+  --space-007: 36px;
+  --space-008: 64px;
+  /* radii */
+  --radius-001: 2px;
+  --radius-002: 6px;
+  --radius-003: 28px;
+  /* shadows */
+  --shadow-001: rgba(0, 0, 0, 0.3) 0px 2px 1px 0px;
+  /* breakpoints */
+  --bp-375: 375px;
+  --bp-768: 768px;
+  --bp-1280: 1280px;
+  --bp-1920: 1920px;
+}
+
+
+/* page base */
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+html, body { overflow-x: clip; }
+
+/* nodes */
+.cn0{display:block;color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-003);font-weight:var(--font-weight-001);font-style:normal;line-height:var(--line-height-001);letter-spacing:normal;word-spacing:0px;text-align:start;text-transform:none;white-space:normal;word-break:normal;overflow-wrap:break-word;text-indent:0px;text-shadow:none;font-variant-caps:normal;font-feature-settings:"kern", "liga" 0, "onum" 0, "tnum";list-style-position:outside;writing-mode:horizontal-tb;direction:ltr;background-color:var(--background)}
+.cn1{width:1px;height:1px;display:block;position:absolute;overflow-x:hidden;overflow-y:hidden;color:var(--color-001);text-decoration-line:underline;cursor:pointer}
+.cn2{display:block}
+.cn3{height:120px;display:flex;max-width:1280px;max-height:120px;margin-bottom:var(--space-005);padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-004);padding-left:var(--space-004);justify-content:space-between;align-items:center;font-family:var(--font-001);margin-left:auto;margin-right:auto}
+.cn4{width:100%;height:37.0938px;display:block;max-width:300px}
+.cn5{display:block;font-size:var(--font-size-002);line-height:var(--line-height-008)}
+.cn6{display:inline}
+.cn7{display:inline-block;font-weight:var(--font-weight-003)}
+.cn8{width:220px;display:flex;margin-right:auto;margin-left:auto;justify-content:center;transform:matrix(0.997564, -0.0697565, 0.0697565, 0.997564, 0, 0);transform-origin:110px 47.1875px}
+.cn9{display:block;max-width:256px;text-decoration-line:underline;cursor:pointer}
+.cn10{width:220px;height:94px;display:block;overflow-x:hidden;overflow-y:hidden}
+.cn11{width:350px;display:block}
+.cn12{display:flex;align-items:center;list-style-type:disc;list-style-position:outside}
+.cn13{width:99.9844px;display:block;list-style-type:none;transform:matrix(0.999391, -0.0348995, 0.0348995, 0.999391, 0, 0);transform-origin:49.9922px 26.6562px}
+.cn14{display:block;max-width:150px;color:var(--color-001);text-decoration-line:underline;cursor:pointer}
+.cn15{width:100px;height:53px;display:block;max-width:100%;overflow-x:clip;overflow-y:clip}
+.cn16{width:150.016px;display:block;list-style-type:none}
+.cn17{display:block;max-width:150px;color:var(--color-001);text-decoration-line:underline;cursor:pointer}
+.cn18{width:150px;height:45px;display:block;max-width:100%;overflow-x:clip;overflow-y:clip}
+.cn19{width:99.9844px;display:list-item;list-style-type:none;transform:matrix(0.999391, 0.0348995, -0.0348995, 0.999391, 0, 0);transform-origin:49.9922px 28.6172px}
+.cn20{height:52.8438px;display:inline-block;border-top-left-radius:var(--radius-001);border-top-right-radius:var(--radius-001);border-bottom-right-radius:var(--radius-001);border-bottom-left-radius:var(--radius-001);color:var(--background);font-family:var(--font-002);font-size:var(--font-size-001);line-height:12.8px;text-align:center;text-transform:uppercase;font-feature-settings:normal;cursor:pointer}
+.cn21{width:100px;height:53px;display:block;max-width:100%;overflow-x:clip;overflow-y:clip}
+.cn22{width:100%;max-width:1280px;display:block;padding-right:var(--space-004);padding-left:var(--space-004)}
+.cn23{display:none;max-width:300px;margin-top:10px;margin-bottom:var(--space-008);font-family:var(--font-001);text-align:left;transform:none}
+.cn24{display:block;font-size:var(--font-size-002);line-height:var(--line-height-008)}
+.cn25{display:inline}
+.cn26{display:inline-block;font-weight:var(--font-weight-003)}
+.cn27{display:block;max-width:1280px;margin-left:auto;margin-right:auto}
+.cn28{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px}
+.cn29{height:80px;display:flex;position:sticky;top:0px;left:0px;z-index:1000;max-width:1280px;padding-top:var(--space-004);padding-right:var(--space-004);padding-bottom:var(--space-004);padding-left:var(--space-004);justify-content:space-between;align-items:center;font-family:var(--font-002);font-size:var(--font-size-002);font-weight:var(--font-weight-003);line-height:var(--line-height-002);text-transform:uppercase;background-color:var(--background)}
+.cn30{display:flex;align-items:center}
+.cn31{width:auto;height:48px;display:block;max-width:100%;margin-left:-4px;overflow-x:clip;overflow-y:clip}
+.cn32{width:auto;height:36px;border-width:1px;border-style:solid;border-color:var(--border);display:block;margin-left:-4px;padding-top:var(--space-002);padding-right:var(--space-002);padding-bottom:var(--space-002);padding-left:var(--space-002);border-top-left-radius:var(--radius-002);border-top-right-radius:var(--radius-002);border-bottom-right-radius:var(--radius-002);border-bottom-left-radius:var(--radius-002);overflow-x:clip;overflow-y:clip;font-size:var(--font-size-003);font-weight:var(--font-weight-001);line-height:var(--line-height-005);text-transform:none;font-feature-settings:normal;background-color:var(--background);box-shadow:var(--shadow-001);transform:matrix(0.875, 0, 0, 0.875, 0, 0);transform-origin:96px 18.1953px;cursor:text}
+.cn32::placeholder{color:rgb(135, 135, 135);font-family:var(--font-001)}
+.cn33{display:block}
+.cn34{display:flex;align-items:center}
+.cn35{height:48px;display:flex;margin-right:var(--space-004);margin-left:-8px;border-top-left-radius:var(--radius-001);border-top-right-radius:var(--radius-001);border-bottom-right-radius:var(--radius-001);border-bottom-left-radius:var(--radius-001);align-items:center;color:var(--background);font-size:var(--font-size-001);font-weight:var(--font-weight-001);line-height:var(--line-height-004);text-align:center;font-feature-settings:normal;cursor:pointer}
+.cn36{width:48px;height:48px;display:block;max-width:100%;margin-left:var(--space-001);overflow-x:clip;overflow-y:clip;transform:matrix(0.999391, -0.0348995, 0.0348995, 0.999391, 0, 0);transform-origin:24px 24px}
+.cn37{display:block;color:var(--foreground);text-align:left}
+.cn38{height:48px;display:flex;margin-right:var(--space-004);margin-left:-8px;border-top-left-radius:var(--radius-001);border-top-right-radius:var(--radius-001);border-bottom-right-radius:var(--radius-001);border-bottom-left-radius:var(--radius-001);align-items:center;color:var(--background);font-size:var(--font-size-001);font-weight:var(--font-weight-001);line-height:var(--line-height-004);text-align:center;font-feature-settings:normal;cursor:pointer}
+.cn39{width:48px;height:48px;display:block;max-width:100%;margin-left:var(--space-001);overflow-x:clip;overflow-y:clip;transform:matrix(0.999391, 0.0348995, -0.0348995, 0.999391, 0, 0);transform-origin:24px 24px}
+.cn40{display:block;color:var(--foreground);text-align:left}
+.cn41{height:48px;display:flex;margin-right:var(--space-004);margin-left:-8px;border-top-left-radius:var(--radius-001);border-top-right-radius:var(--radius-001);border-bottom-right-radius:var(--radius-001);border-bottom-left-radius:var(--radius-001);align-items:center;color:var(--background);font-size:var(--font-size-001);font-weight:var(--font-weight-001);line-height:var(--line-height-004);text-align:center;font-feature-settings:normal;cursor:pointer}
+.cn42{width:48px;height:48px;display:block;max-width:100%;margin-left:var(--space-001);overflow-x:clip;overflow-y:clip;transform:matrix(0.999391, -0.0348995, 0.0348995, 0.999391, 0, 0);transform-origin:24px 24px}
+.cn43{display:block;color:var(--foreground);text-align:left}
+.cn44{height:48px;display:flex;margin-right:var(--space-004);margin-left:-8px;border-top-left-radius:var(--radius-001);border-top-right-radius:var(--radius-001);border-bottom-right-radius:var(--radius-001);border-bottom-left-radius:var(--radius-001);align-items:center;color:var(--background);font-size:var(--font-size-001);font-weight:var(--font-weight-001);line-height:var(--line-height-004);text-align:center;font-feature-settings:normal;cursor:pointer}
+.cn45{width:48px;height:48px;display:block;max-width:100%;margin-left:var(--space-001);overflow-x:clip;overflow-y:clip;transform:matrix(0.999391, 0.0348995, -0.0348995, 0.999391, 0, 0);transform-origin:24px 24px}
+.cn46{display:block;color:var(--foreground);text-align:left}
+.cn47{height:48px;display:flex;margin-right:var(--space-004);margin-left:-8px;border-top-left-radius:var(--radius-001);border-top-right-radius:var(--radius-001);border-bottom-right-radius:var(--radius-001);border-bottom-left-radius:var(--radius-001);align-items:center;color:var(--background);font-size:var(--font-size-001);font-weight:var(--font-weight-001);line-height:var(--line-height-004);text-align:center;font-feature-settings:normal;cursor:pointer}
+.cn48{width:48px;height:48px;display:block;max-width:100%;margin-left:var(--space-001);overflow-x:clip;overflow-y:clip;transform:matrix(0.999391, -0.0348995, 0.0348995, 0.999391, 0, 0);transform-origin:24px 24px}
+.cn49{display:block;color:var(--foreground);text-align:left}
+.cn50{height:48px;display:flex;margin-right:var(--space-004);margin-left:-8px;border-top-left-radius:var(--radius-001);border-top-right-radius:var(--radius-001);border-bottom-right-radius:var(--radius-001);border-bottom-left-radius:var(--radius-001);align-items:center;color:var(--background);font-size:var(--font-size-001);font-weight:var(--font-weight-001);line-height:var(--line-height-004);text-align:center;font-feature-settings:normal;cursor:pointer}
+.cn51{width:48px;height:48px;display:block;max-width:100%;margin-left:var(--space-001);overflow-x:clip;overflow-y:clip;transform:matrix(0.999391, 0.0348995, -0.0348995, 0.999391, 0, 0);transform-origin:24px 24px}
+.cn52{display:block;color:var(--foreground);text-align:left}
+.cn53{display:none;margin-top:1px;color:var(--background)}
+.cn54{border-width:1px;border-style:solid;border-color:rgb(214, 214, 214);display:inline-block;padding-top:var(--space-002);padding-right:var(--space-005);padding-bottom:var(--space-002);padding-left:var(--space-002);border-top-left-radius:var(--radius-002);border-top-right-radius:var(--radius-002);border-bottom-right-radius:var(--radius-002);border-bottom-left-radius:var(--radius-002);align-items:center;color:var(--foreground);font-size:var(--font-size-003);font-weight:var(--font-weight-001);line-height:20px;text-transform:none;white-space:pre;text-wrap:nowrap;font-feature-settings:normal;background-color:rgb(247, 247, 247);background-image:url(data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20448%22%20enable-background%3D%22new%200%200%20256%20448%22%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E.arrow%7Bfill%3A%23424242%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22arrow%22%20d%3D%22M255.9%20168c0-4.2-1.6-7.9-4.8-11.2-3.2-3.2-6.9-4.8-11.2-4.8H16c-4.2%200-7.9%201.6-11.2%204.8S0%20163.8%200%20168c0%204.4%201.6%208.2%204.8%2011.4l112%20112c3.1%203.1%206.8%204.6%2011.2%204.6%204.4%200%208.2-1.5%2011.4-4.6l112-112c3-3.2%204.5-7%204.5-11.4z%22%2F%3E%3C%2Fsvg%3E%0A);background-size:auto 50%;background-position:right 8px 50%;background-repeat:no-repeat;box-shadow:rgba(0, 0, 0, 0.1) 0px 2px 1px 0px;transform:none;cursor:pointer}
+.cn55{min-height:24px;display:block;min-width:24px;align-items:center;row-gap:var(--space-002);column-gap:var(--space-002);white-space:nowrap}
+.cn56{min-height:24px;display:block;min-width:24px;align-items:center;row-gap:var(--space-002);column-gap:var(--space-002);white-space:nowrap}
+.cn57{min-height:24px;display:block;min-width:24px;align-items:center;row-gap:var(--space-002);column-gap:var(--space-002);white-space:nowrap}
+.cn58{min-height:24px;display:block;min-width:24px;align-items:center;row-gap:var(--space-002);column-gap:var(--space-002);white-space:nowrap}
+.cn59{min-height:24px;display:block;min-width:24px;align-items:center;row-gap:var(--space-002);column-gap:var(--space-002);white-space:nowrap}
+.cn60{min-height:24px;display:block;min-width:24px;align-items:center;row-gap:var(--space-002);column-gap:var(--space-002);white-space:nowrap}
+.cn61{min-height:24px;display:block;min-width:24px;align-items:center;row-gap:var(--space-002);column-gap:var(--space-002);white-space:nowrap}
+.cn62{display:block}
+.cn63{display:block;margin-top:var(--space-004)}
+.cn64{display:flex;flex-wrap:wrap;list-style-type:disc;list-style-position:outside}
+.cn65{width:426.234px;height:592.609px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn66{display:block}
+.cn67{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn68{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn69{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn70{display:block;color:var(--color-001);cursor:pointer}
+.cn71{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(230, 143, 51)}
+.cn72{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn73{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn74{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn75{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn76{display:block;color:var(--muted-foreground)}
+.cn77{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn78{height:100%;display:block}
+.cn79{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn80{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn81{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn82{display:block;color:var(--color-001);cursor:pointer}
+.cn83{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(99, 195, 75)}
+.cn84{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn85{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn86{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn87{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn88{display:block;color:var(--muted-foreground)}
+.cn89{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn90{height:100%;display:block}
+.cn91{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn92{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn93{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn94{display:block;color:var(--color-001);cursor:pointer}
+.cn95{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(240, 228, 168)}
+.cn96{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn97{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn98{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn99{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn100{display:block;color:var(--muted-foreground)}
+.cn101{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn102{height:100%;display:block}
+.cn103{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn104{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn105{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn106{display:block;color:var(--color-001);cursor:pointer}
+.cn107{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(76, 130, 184)}
+.cn108{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn109{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn110{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn111{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn112{display:block;color:var(--muted-foreground)}
+.cn113{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn114{height:100%;display:block}
+.cn115{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn116{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn117{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn118{display:block;color:var(--color-001);cursor:pointer}
+.cn119{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:var(--primary)}
+.cn120{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn121{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn122{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn123{display:inline;font-weight:var(--font-weight-003)}
+.cn124{display:block;color:var(--muted-foreground)}
+.cn125{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn126{height:100%;display:block}
+.cn127{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn128{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn129{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn130{display:block;color:var(--color-001);cursor:pointer}
+.cn131{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(187, 160, 239)}
+.cn132{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn133{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn134{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn135{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn136{display:block;color:var(--muted-foreground)}
+.cn137{width:426.234px;height:592.609px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn138{display:block}
+.cn139{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn140{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn141{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn142{display:block;color:var(--color-001);cursor:pointer}
+.cn143{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(65, 184, 190)}
+.cn144{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn145{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn146{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn147{display:inline;font-weight:var(--font-weight-003)}
+.cn148{display:block;color:var(--muted-foreground)}
+.cn149{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn150{height:100%;display:flex;padding-top:var(--space-005);padding-right:var(--space-005);padding-bottom:var(--space-005);padding-left:var(--space-005);flex-direction:column;align-items:center;overflow-x:hidden;overflow-y:hidden}
+.cn151{width:100%;display:flex;justify-content:center;align-items:center}
+.cn152{width:150px;height:131px;display:block;max-width:100%;margin-top:var(--space-004);margin-bottom:var(--space-004);overflow-x:clip;overflow-y:clip}
+.cn153{height:44.8125px;display:block;max-width:260px;font-size:var(--font-size-004);font-weight:var(--font-weight-003);text-align:center}
+.cn154{display:inline}
+.cn155{height:117.484px;display:flex;margin-top:var(--space-004);flex-wrap:wrap;justify-content:center;row-gap:10px;column-gap:10px}
+.cn156{width:175px;height:36px;border-width:1px;border-style:solid;border-color:var(--border);display:block;padding-top:var(--space-002);padding-right:var(--space-002);padding-bottom:var(--space-002);padding-left:var(--space-002);border-top-left-radius:var(--radius-002);border-top-right-radius:var(--radius-002);border-bottom-right-radius:var(--radius-002);border-bottom-left-radius:var(--radius-002);overflow-x:clip;overflow-y:clip;font-family:var(--font-001);line-height:var(--line-height-005);font-feature-settings:normal;background-color:var(--background);box-shadow:var(--shadow-001);cursor:text}
+.cn156::placeholder{color:rgb(135, 135, 135)}
+.cn157{width:100%;display:block;font-family:var(--font-001);text-align:center;cursor:default}
+.cn158{width:175px;height:39px;border-width:1px;border-style:solid;border-color:var(--border);display:block;padding-top:var(--space-002);padding-right:var(--space-002);padding-bottom:var(--space-002);padding-left:var(--space-002);border-top-left-radius:var(--radius-002);border-top-right-radius:var(--radius-002);border-bottom-right-radius:var(--radius-002);border-bottom-left-radius:var(--radius-002);overflow-x:clip;overflow-y:clip;font-family:var(--font-001);line-height:var(--line-height-005);font-feature-settings:normal;background-color:var(--background);box-shadow:var(--shadow-001);cursor:text}
+.cn158::placeholder{color:rgb(135, 135, 135)}
+.cn159{width:97px;height:39px;display:block;padding-top:var(--space-003);padding-right:var(--space-002);padding-bottom:var(--space-003);padding-left:var(--space-002);border-top-left-radius:3px;border-top-right-radius:3px;border-bottom-right-radius:3px;border-bottom-left-radius:3px;overflow-x:clip;overflow-y:clip;color:var(--background);font-family:var(--font-002);font-size:var(--font-size-001);line-height:var(--line-height-004);letter-spacing:1px;text-align:center;text-transform:uppercase;white-space:pre;text-wrap:nowrap;font-feature-settings:normal;background-color:var(--foreground);cursor:pointer}
+.cn160{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn161{height:100%;display:block}
+.cn162{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn163{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn164{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn165{display:block;color:var(--color-001);cursor:pointer}
+.cn166{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(240, 208, 211)}
+.cn167{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn168{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn169{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn170{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn171{display:block;color:var(--muted-foreground)}
+.cn172{width:426.234px;height:592.609px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn173{display:block}
+.cn174{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn175{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn176{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn177{display:block;color:var(--color-001);cursor:pointer}
+.cn178{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(51, 185, 222)}
+.cn179{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn180{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn181{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn182{display:inline;font-weight:var(--font-weight-003)}
+.cn183{display:block;color:var(--muted-foreground)}
+.cn184{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn185{height:100%;display:block}
+.cn186{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn187{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn188{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn189{display:block;color:var(--color-001);cursor:pointer}
+.cn190{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(194, 217, 50)}
+.cn191{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn192{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn193{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn194{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn195{display:block;color:var(--muted-foreground)}
+.cn196{width:426.234px;height:592.609px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn197{display:block}
+.cn198{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn199{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn200{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn201{display:block;color:var(--color-001);cursor:pointer}
+.cn202{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(253, 227, 0)}
+.cn203{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn204{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn205{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn206{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn207{display:block;color:var(--muted-foreground)}
+.cn208{width:426.234px;height:592.609px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn209{display:block}
+.cn210{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn211{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn212{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn213{display:block;color:var(--color-001);cursor:pointer}
+.cn214{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:var(--accent)}
+.cn215{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn216{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn217{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn218{display:inline;font-weight:var(--font-weight-003)}
+.cn219{display:block;color:var(--muted-foreground)}
+.cn220{width:426.234px;height:592.609px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn221{display:block}
+.cn222{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn223{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn224{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn225{display:block;color:var(--color-001);cursor:pointer}
+.cn226{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(241, 204, 167)}
+.cn227{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn228{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn229{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn230{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn231{display:block;color:var(--muted-foreground)}
+.cn232{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn233{height:100%;display:block}
+.cn234{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn235{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn236{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn237{display:block;color:var(--color-001);cursor:pointer}
+.cn238{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(250, 197, 20)}
+.cn239{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn240{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn241{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn242{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn243{display:block;color:var(--muted-foreground)}
+.cn244{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn245{height:100%;display:flex;padding-top:var(--space-008);padding-right:var(--space-007);padding-bottom:var(--space-008);padding-left:var(--space-007);flex-direction:column;justify-content:center;align-items:center}
+.cn246{height:107.5px;display:block;margin-bottom:var(--space-006);font-size:var(--font-size-004);line-height:var(--line-height-006);text-align:center}
+.cn247{display:inline;color:var(--color-001);font-weight:var(--font-weight-004);text-decoration-line:underline;cursor:pointer}
+.cn248{display:inline;color:var(--color-001);font-weight:var(--font-weight-004);text-decoration-line:underline;cursor:pointer}
+.cn249{display:inline;color:var(--color-001);font-weight:var(--font-weight-004);text-decoration-line:underline;cursor:pointer}
+.cn250{height:126.531px;display:block}
+.cn251{height:126.531px;display:flex;flex-direction:column;align-items:center;color:var(--color-001);cursor:pointer}
+.cn252{width:80px;height:80px;display:block;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:1 / 1}
+.cn253{display:block;padding-top:var(--space-002);padding-bottom:var(--space-001);color:var(--foreground);font-family:var(--font-002);line-height:19.2px;text-align:center;text-transform:uppercase;text-decoration-line:underline;white-space:nowrap}
+.cn254{width:100%;display:block;color:var(--muted-foreground);font-family:var(--font-001);font-size:var(--font-size-001);line-height:15.36px;text-align:center}
+.cn255{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn256{height:100%;display:block}
+.cn257{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn258{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn259{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn260{display:block;color:var(--color-001);cursor:pointer}
+.cn261{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(23, 176, 232)}
+.cn262{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn263{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn264{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn265{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn266{display:block;color:var(--muted-foreground)}
+.cn267{width:426.234px;height:592.609px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn268{display:block}
+.cn269{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn270{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn271{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn272{display:block;color:var(--color-001);cursor:pointer}
+.cn273{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(208, 236, 253)}
+.cn274{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn275{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn276{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn277{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn278{display:block;color:var(--muted-foreground)}
+.cn279{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn280{height:100%;display:block}
+.cn281{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn282{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn283{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn284{display:block;color:var(--color-001);cursor:pointer}
+.cn285{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(188, 148, 204)}
+.cn286{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn287{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn288{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn289{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn290{display:block;color:var(--muted-foreground)}
+.cn291{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn292{height:100%;display:block}
+.cn293{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn294{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn295{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn296{display:block;color:var(--color-001);cursor:pointer}
+.cn297{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(131, 73, 182)}
+.cn298{width:292px;height:195px;display:block;position:absolute;bottom:197.109px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;transform:matrix(1, 0, 0, 1, -145.914, 97.2734);transform-origin:145.914px 97.2734px}
+.cn299{width:64px;height:64px;display:block;position:absolute;top:clamp(171.5px, 50%, calc(100% - 171.5px));left:clamp(171.5px, 50%, calc(100% - 171.5px));z-index:100;aspect-ratio:1 / 1;transform:matrix(1, 0, 0, 1, -32, -32);transform-origin:32px 32px;pointer-events:none}
+.cn300{width:auto;height:64px;display:block;overflow-x:hidden;overflow-y:hidden;pointer-events:none}
+.cn301{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn302{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn303{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn304{display:block;color:var(--muted-foreground)}
+.cn305{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn306{height:100%;display:block}
+.cn307{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn308{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn309{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn310{display:block;color:var(--color-001);cursor:pointer}
+.cn311{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(208, 121, 113)}
+.cn312{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn313{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn314{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn315{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn316{display:block;color:var(--muted-foreground)}
+.cn317{width:426.234px;height:592.609px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn318{display:block}
+.cn319{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn320{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn321{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn322{display:block;color:var(--color-001);cursor:pointer}
+.cn323{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(184, 75, 71)}
+.cn324{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn325{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn326{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn327{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn328{display:block;color:var(--muted-foreground)}
+.cn329{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn330{height:100%;display:block}
+.cn331{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn332{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn333{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn334{display:block;color:var(--color-001);cursor:pointer}
+.cn335{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(193, 75, 62)}
+.cn336{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn337{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn338{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn339{display:inline;font-weight:var(--font-weight-003)}
+.cn340{display:block;color:var(--muted-foreground)}
+.cn341{width:426.234px;height:592.609px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn342{display:block}
+.cn343{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn344{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn345{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn346{display:block;color:var(--color-001);cursor:pointer}
+.cn347{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(212, 212, 43)}
+.cn348{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn349{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn350{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn351{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn352{display:block;color:var(--muted-foreground)}
+.cn353{width:426.234px;height:592.609px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn354{display:block}
+.cn355{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn356{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn357{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn358{display:block;color:var(--color-001);cursor:pointer}
+.cn359{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(249, 228, 255)}
+.cn360{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn361{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn362{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn363{display:inline;font-weight:var(--font-weight-003)}
+.cn364{display:block;color:var(--muted-foreground)}
+.cn365{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn366{height:100%;display:block}
+.cn367{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn368{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn369{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn370{display:block;color:var(--color-001);cursor:pointer}
+.cn371{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(240, 225, 15)}
+.cn372{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn373{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn374{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn375{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn376{display:block;color:var(--muted-foreground)}
+.cn377{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn378{height:100%;display:flex;padding-top:var(--space-007);padding-right:var(--space-007);padding-bottom:var(--space-007);padding-left:var(--space-007);flex-direction:column;align-items:center}
+.cn379{width:100%;height:44.8125px;display:block;font-size:var(--font-size-004);font-weight:var(--font-weight-003);text-align:center}
+.cn380{display:inline}
+.cn381{width:100%;display:flex;position:relative;top:0px;right:0px;bottom:0px;left:0px;justify-content:center;align-items:center;aspect-ratio:1 / 1}
+.cn382{width:300px;height:300px;display:block;position:absolute;top:161.109px;left:50%;min-width:0px;max-width:300px;overflow-x:clip;overflow-y:clip;transform:matrix(1, 0, 0, 1, -150, -150);transform-origin:150px 150px}
+.cn383{width:129px;height:64px;display:block;position:absolute;bottom:32.2188px;left:16.1094px;min-width:0px;max-width:100%;overflow-x:clip;overflow-y:clip;transform:matrix(0.996195, -0.0871557, 0.0871557, 0.996195, 0, 0);transform-origin:64.4453px 32.1406px}
+.cn384{width:97px;height:104px;display:block;position:absolute;top:32.2188px;right:16.1094px;min-width:0px;max-width:100%;overflow-x:clip;overflow-y:clip;transform:matrix(0.996195, 0.0871557, -0.0871557, 0.996195, 0, 0);transform-origin:48.3281px 51.7891px}
+.cn385{display:block;padding-top:var(--space-003);padding-right:var(--space-003);padding-bottom:var(--space-003);padding-left:var(--space-003);border-top-left-radius:var(--radius-001);border-top-right-radius:var(--radius-001);border-bottom-right-radius:var(--radius-001);border-bottom-left-radius:var(--radius-001);color:var(--background);font-family:var(--font-002);font-size:var(--font-size-001);line-height:var(--line-height-007);text-transform:uppercase;background-color:var(--foreground);cursor:pointer}
+.cn386{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn387{height:100%;display:block}
+.cn388{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn389{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn390{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn391{display:block;color:var(--color-001);cursor:pointer}
+.cn392{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(191, 64, 183)}
+.cn393{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn394{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn395{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn396{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn397{display:block;color:var(--muted-foreground)}
+.cn398{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn399{height:100%;display:block}
+.cn400{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn401{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn402{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn403{display:block;color:var(--color-001);cursor:pointer}
+.cn404{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(173, 68, 187)}
+.cn405{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn406{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn407{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn408{height:100%;display:inline;font-weight:var(--font-weight-003)}
+.cn409{display:block;color:var(--muted-foreground)}
+.cn410{width:426.234px;display:list-item;padding-top:var(--space-006);padding-right:var(--space-004);padding-bottom:var(--space-006);padding-left:var(--space-004);list-style-type:none}
+.cn411{height:100%;display:block}
+.cn412{display:flex;margin-bottom:var(--space-002);justify-content:space-between;align-items:center;font-family:var(--font-002)}
+.cn413{width:56px;border-width:1px;border-style:solid;border-color:var(--foreground);display:block;padding-top:var(--space-001);padding-right:var(--space-001);padding-bottom:var(--space-001);padding-left:var(--space-001);border-top-left-radius:var(--radius-003);border-top-right-radius:var(--radius-003);border-bottom-right-radius:var(--radius-003);border-bottom-left-radius:var(--radius-003);font-size:var(--font-size-002);line-height:var(--line-height-002);text-align:center;text-transform:uppercase}
+.cn414{display:block;font-size:var(--font-size-002);line-height:var(--line-height-002);text-transform:uppercase}
+.cn415{display:block;color:var(--color-001);cursor:pointer}
+.cn416{display:block;position:relative;top:0px;right:0px;bottom:0px;left:0px;overflow-x:hidden;overflow-y:hidden;aspect-ratio:1 / 1;background-color:rgb(247, 92, 8)}
+.cn417{width:292px;height:340px;display:block;position:absolute;bottom:0px;left:50%;max-width:100%;overflow-x:clip;overflow-y:clip;aspect-ratio:6 / 7;transform:matrix(1, 0, 0, 1, -145.914, 0);transform-origin:145.914px 170.227px}
+.cn418{display:block;margin-top:var(--space-003);font-family:var(--font-001)}
+.cn419{display:block;margin-bottom:var(--space-002);color:var(--foreground);font-family:var(--font-body);font-size:var(--font-size-005);font-weight:var(--font-weight-002);line-height:var(--line-height-003);letter-spacing:-0.8px}
+.cn420{display:inline;font-weight:var(--font-weight-003)}
+.cn421{display:block;color:var(--muted-foreground)}
+.cn422{height:400px;display:flex;position:absolute;right:0px;bottom:0px;left:0px;z-index:1000;max-height:600px;flex-direction:column;justify-content:flex-end;align-items:center;background-image:linear-gradient(rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 30%, rgb(255, 255, 255) 50%);pointer-events:none}
+.cn423{height:55px;display:flex;margin-bottom:256px;padding-top:var(--space-004);padding-right:18px;padding-bottom:var(--space-004);padding-left:18px;border-top-left-radius:var(--radius-001);border-top-right-radius:var(--radius-001);border-bottom-right-radius:var(--radius-001);border-bottom-left-radius:var(--radius-001);align-items:center;color:var(--background);font-family:var(--font-002);font-size:var(--font-size-001);line-height:var(--line-height-004);text-align:center;text-transform:uppercase;font-feature-settings:normal;background-color:var(--foreground);cursor:pointer;pointer-events:all}
+.cn424{width:auto;height:23px;display:block;margin-right:7px;overflow-x:hidden;overflow-y:hidden;pointer-events:all}
+.cn425{display:block;font-size:var(--font-size-003);line-height:var(--line-height-005);letter-spacing:1px;pointer-events:all}
+.cn426{display:block;margin-top:60px}
+.cn427{display:block;max-width:1248px;margin-top:var(--space-006);margin-right:auto;margin-bottom:100px;margin-left:auto;padding-top:var(--space-004);padding-right:var(--space-004);padding-bottom:var(--space-004);padding-left:var(--space-004);font-family:var(--font-001)}
+.cn428{display:flex;margin-bottom:var(--space-008);justify-content:center;align-items:center}
+.cn429{height:364.25px;display:flex;justify-content:space-between;align-items:stretch;row-gap:48px;column-gap:48px}
+.cn430{width:64%;display:flex;row-gap:48px;column-gap:48px}
+.cn431{width:47%;display:flex;flex-direction:column;align-items:center}
+.cn432{width:100%;height:180px;display:flex;justify-content:center;align-items:center}
+.cn433{display:block;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn434{width:180px;height:158px;display:block;max-width:180px;overflow-x:clip;overflow-y:clip;transform:matrix(0.999391, 0.0348995, -0.0348995, 0.999391, 0, 0);transform-origin:90px 78.8906px}
+.cn435{width:100%;display:block}
+.cn436{display:block;margin-top:var(--space-004);margin-bottom:var(--space-004)}
+.cn437{display:inline;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn438{height:24px;display:inline-block;position:relative;top:6px;right:4px;bottom:-6px;left:-4px}
+.cn439{width:auto;height:24px;display:block;overflow-x:hidden;overflow-y:hidden}
+.cn440{display:block;margin-top:var(--space-004);margin-bottom:var(--space-004)}
+.cn441{width:47%;display:flex;flex-direction:column;align-items:center}
+.cn442{width:100%;height:180px;display:flex;justify-content:center;align-items:center}
+.cn443{display:block;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn444{width:200px;height:174px;display:block;max-width:200px;overflow-x:clip;overflow-y:clip}
+.cn445{width:100%;display:block}
+.cn446{display:block;margin-top:var(--space-004);margin-bottom:var(--space-004)}
+.cn447{display:inline;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn448{height:24px;display:inline-block;position:relative;top:6px;right:4px;bottom:-6px;left:-4px}
+.cn449{width:auto;height:24px;display:block;overflow-x:hidden;overflow-y:hidden}
+.cn450{display:block;margin-top:var(--space-004);margin-bottom:var(--space-004)}
+.cn451{width:32%;display:block;min-width:300px}
+.cn452{height:180px;display:flex;justify-content:center;align-items:center}
+.cn453{display:block;max-width:320px;margin-left:-19.4531px;transform:matrix(0.999391, -0.0348995, 0.0348995, 0.999391, 0, 0);transform-origin:160px 68.6406px}
+.cn454{width:320px;height:137px;display:block;overflow-x:hidden;overflow-y:hidden}
+.cn455{display:flex;justify-content:center;row-gap:var(--space-004);column-gap:var(--space-004)}
+.cn456{flex-grow:1;flex-basis:0%;display:block}
+.cn457{display:block;margin-top:var(--space-004);margin-bottom:var(--space-004);font-family:var(--font-002);font-size:var(--font-size-001);line-height:var(--line-height-007);text-transform:uppercase}
+.cn458{display:block;list-style-type:disc;list-style-position:outside}
+.cn459{display:list-item;list-style-type:none}
+.cn460{display:inline;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn461{display:list-item;list-style-type:none}
+.cn462{display:inline;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn463{display:list-item;list-style-type:none}
+.cn464{display:inline;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn465{display:list-item;list-style-type:none}
+.cn466{display:inline;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn467{display:list-item;list-style-type:none}
+.cn468{display:inline;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn469{flex-grow:1;flex-basis:0%;display:block}
+.cn470{display:block;margin-top:var(--space-004);margin-bottom:var(--space-004);font-family:var(--font-002);font-size:var(--font-size-001);line-height:var(--line-height-007);text-transform:uppercase}
+.cn471{display:block;list-style-type:disc;list-style-position:outside}
+.cn472{display:list-item;list-style-type:none}
+.cn473{display:inline;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn474{display:list-item;list-style-type:none}
+.cn475{display:inline;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn476{display:list-item;list-style-type:none}
+.cn477{display:inline;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn478{display:list-item;list-style-type:none}
+.cn479{display:inline;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn480{display:list-item;list-style-type:none}
+.cn481{display:inline;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn482{display:list-item;list-style-type:none}
+.cn483{display:inline;font-weight:var(--font-weight-003);text-decoration-line:underline;cursor:pointer}
+.cn484{width:1px;height:1px;display:block;position:absolute;top:0px;overflow-x:hidden;overflow-y:hidden;white-space:nowrap;text-wrap:nowrap;clip-path:inset(50%)}
+
+@media (max-width: 571px) {
+.cn3{margin-bottom:0}
+.cn4{display:none}
+.cn8{width:180px;margin-left:-8px;justify-content:start;transform-origin:90px 38.6094px;margin-right:0}
+.cn10{width:180px;height:77px}
+.cn11{width:100px;max-width:100px}
+.cn13{display:none}
+.cn16{display:none}
+.cn19{width:100px;transform-origin:50px 28.625px}
+.cn20{height:52.8594px;font-size:12px;line-height:12px}
+.cn23{display:block;text-align:center;max-width:none}
+.cn32{height:44px;padding-top:var(--space-003);padding-bottom:var(--space-003);transform:none;margin-left:0;transform-origin:initial}
+.cn34{display:none}
+.cn53{display:inline-block}
+.cn54{width:120px;height:46px;max-width:120px;padding-top:var(--space-003);padding-bottom:var(--space-003)}
+.cn65{width:375px;height:533.375px}
+.cn72{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn74{font-size:24px;line-height:24px}
+.cn77{width:375px}
+.cn84{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn86{font-size:24px;line-height:24px}
+.cn89{width:375px}
+.cn96{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn98{font-size:24px;line-height:24px}
+.cn101{width:375px}
+.cn108{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn110{font-size:24px;line-height:24px}
+.cn113{width:375px}
+.cn120{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn122{font-size:24px;line-height:24px}
+.cn125{width:375px}
+.cn132{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn134{font-size:24px;line-height:24px}
+.cn137{width:375px;height:533.375px}
+.cn144{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn146{font-size:24px;line-height:24px}
+.cn149{width:375px}
+.cn153{height:32px;line-height:16px;font-size:inherit}
+.cn155{height:116.578px}
+.cn158{height:38px}
+.cn159{height:38px;font-size:12px;line-height:13.8px}
+.cn160{width:375px}
+.cn167{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn169{font-size:24px;line-height:24px}
+.cn172{width:375px;height:533.375px}
+.cn179{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn181{font-size:24px;line-height:24px}
+.cn184{width:375px}
+.cn191{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn193{font-size:24px;line-height:24px}
+.cn196{width:375px;height:533.375px}
+.cn203{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn205{font-size:24px;line-height:24px}
+.cn208{width:375px;height:533.375px}
+.cn215{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn217{font-size:24px;line-height:24px}
+.cn220{width:375px;height:533.375px}
+.cn227{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn229{font-size:24px;line-height:24px}
+.cn232{width:375px}
+.cn239{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn241{font-size:24px;line-height:24px}
+.cn244{width:375px}
+.cn246{height:60.5625px;line-height:19.2px;font-size:inherit}
+.cn250{height:124.391px}
+.cn251{height:124.391px}
+.cn253{font-size:15px;line-height:18px}
+.cn254{font-size:12px;line-height:14.4px}
+.cn255{width:375px}
+.cn262{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn264{font-size:24px;line-height:24px}
+.cn267{width:375px;height:533.375px}
+.cn274{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn276{font-size:24px;line-height:24px}
+.cn279{width:375px}
+.cn286{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn288{font-size:24px;line-height:24px}
+.cn291{width:375px}
+.cn298{width:253px;height:169px;bottom:171.5px;transform:matrix(1, 0, 0, 1, -126.5, 84.3281);transform-origin:126.5px 84.3281px}
+.cn302{font-size:24px;line-height:24px}
+.cn305{width:375px}
+.cn312{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn314{font-size:24px;line-height:24px}
+.cn317{width:375px;height:533.375px}
+.cn324{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn326{font-size:24px;line-height:24px}
+.cn329{width:375px}
+.cn336{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn338{font-size:24px;line-height:24px}
+.cn341{width:375px;height:555.766px}
+.cn348{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn350{font-size:24px;line-height:24px}
+.cn353{width:375px;height:533.375px}
+.cn360{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn362{font-size:24px;line-height:24px}
+.cn365{width:375px}
+.cn372{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn374{font-size:24px;line-height:24px}
+.cn377{width:375px}
+.cn379{height:32px;line-height:16px;font-size:inherit}
+.cn382{width:271px;height:271px;top:135.5px;transform:matrix(1, 0, 0, 1, -135.5, -135.5);transform-origin:135.5px 135.5px}
+.cn383{width:108px;height:54px;bottom:27.0938px;left:13.5469px;transform-origin:54.1953px 27.0234px}
+.cn384{width:81px;height:87px;top:27.0938px;right:13.5469px;transform-origin:40.6484px 43.5547px}
+.cn385{font-size:12px;line-height:16.8px}
+.cn386{width:375px}
+.cn393{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn395{font-size:24px;line-height:24px}
+.cn398{width:375px}
+.cn405{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn407{font-size:24px;line-height:24px}
+.cn410{width:375px}
+.cn417{width:253px;height:295px;transform:matrix(1, 0, 0, 1, -126.5, 0);transform-origin:126.5px 147.578px}
+.cn419{font-size:24px;line-height:24px}
+.cn422{height:406px}
+.cn423{margin-bottom:75px;font-size:12px;line-height:13.8px}
+.cn429{height:778.172px;flex-direction:column}
+.cn430{width:100%}
+.cn431{width:43%}
+.cn432{height:160px;max-width:160px}
+.cn434{width:148px;height:129px;transform-origin:73.75px 64.6484px}
+.cn436{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn438{height:18px;top:4px;bottom:-4px}
+.cn439{height:18px}
+.cn440{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn441{width:43%}
+.cn442{height:160px;max-width:160px}
+.cn444{width:148px;height:129px;max-width:180px}
+.cn446{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn448{height:18px;top:4px;bottom:-4px}
+.cn449{height:18px}
+.cn450{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn451{width:100%}
+.cn452{height:137.281px}
+.cn453{margin-left:-17.1406px}
+.cn457{font-size:12px;line-height:16.8px}
+.cn459{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn461{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn463{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn465{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn467{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn470{font-size:12px;line-height:16.8px}
+.cn472{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn474{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn476{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn478{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn480{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+.cn482{font-size:var(--font-size-002);line-height:var(--line-height-002)}
+}
+
+@media (min-width: 572px) and (max-width: 1024px) {
+.cn3{margin-bottom:0}
+.cn4{display:none}
+.cn8{margin-left:-8px;justify-content:start;margin-right:0}
+.cn20{font-size:12px;line-height:12px}
+.cn22{height:37.0938px}
+.cn23{display:block;transform:matrix(1, 0, 0, 1, 0, 5);transform-origin:368px 18.5469px;max-width:none}
+.cn34{display:none}
+.cn53{display:inline-block}
+.cn54{width:134px;height:38px;transform:matrix(0.875, 0, 0, 0.875, 0, 0);transform-origin:67px 19px}
+.cn65{width:384px;height:568.766px}
+.cn72{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn74{font-size:28px;line-height:28px}
+.cn77{width:384px}
+.cn84{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn86{font-size:28px;line-height:28px}
+.cn89{width:384px}
+.cn96{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn98{font-size:28px;line-height:28px}
+.cn101{width:384px}
+.cn108{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn110{font-size:28px;line-height:28px}
+.cn113{width:384px}
+.cn120{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn122{font-size:28px;line-height:28px}
+.cn125{width:384px}
+.cn132{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn134{font-size:28px;line-height:28px}
+.cn137{width:384px;height:546.375px}
+.cn144{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn146{font-size:28px;line-height:28px}
+.cn149{width:384px}
+.cn153{height:32px;line-height:16px;font-size:inherit}
+.cn155{height:116.578px}
+.cn158{height:38px}
+.cn159{height:38px;font-size:12px;line-height:13.8px}
+.cn160{width:384px}
+.cn167{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn169{font-size:28px;line-height:28px}
+.cn172{width:384px;height:546.375px}
+.cn179{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn181{font-size:28px;line-height:28px}
+.cn184{width:384px}
+.cn191{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn193{font-size:28px;line-height:28px}
+.cn196{width:384px;height:546.375px}
+.cn203{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn205{font-size:28px;line-height:28px}
+.cn208{width:384px;height:546.375px}
+.cn215{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn217{font-size:28px;line-height:28px}
+.cn220{width:384px;height:546.375px}
+.cn227{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn229{font-size:28px;line-height:28px}
+.cn232{width:384px}
+.cn239{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn241{font-size:28px;line-height:28px}
+.cn244{width:384px}
+.cn246{height:60.5625px;line-height:19.2px;font-size:inherit}
+.cn250{height:124.391px}
+.cn251{height:124.391px}
+.cn253{font-size:15px;line-height:18px}
+.cn254{font-size:12px;line-height:14.4px}
+.cn255{width:384px}
+.cn262{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn264{font-size:28px;line-height:28px}
+.cn267{width:384px;height:546.375px}
+.cn274{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn276{font-size:28px;line-height:28px}
+.cn279{width:384px}
+.cn286{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn288{font-size:28px;line-height:28px}
+.cn291{width:384px}
+.cn298{width:260px;height:173px;bottom:176px;transform:matrix(1, 0, 0, 1, -129.914, 86.6094);transform-origin:129.914px 86.6094px}
+.cn302{font-size:28px;line-height:28px}
+.cn305{width:384px}
+.cn312{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn314{font-size:28px;line-height:28px}
+.cn317{width:384px;height:546.375px}
+.cn324{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn326{font-size:28px;line-height:28px}
+.cn329{width:384px}
+.cn336{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn338{font-size:28px;line-height:28px}
+.cn341{width:384px;height:568.766px}
+.cn348{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn350{font-size:28px;line-height:28px}
+.cn353{width:384px;height:568.766px}
+.cn360{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn362{font-size:28px;line-height:28px}
+.cn365{width:384px}
+.cn372{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn374{font-size:28px;line-height:28px}
+.cn377{width:384px}
+.cn379{height:32px;line-height:16px;font-size:inherit}
+.cn382{width:280px;height:280px;top:140px;transform:matrix(1, 0, 0, 1, -140, -140);transform-origin:140px 140px}
+.cn383{width:112px;height:56px;bottom:28px;left:14px;transform-origin:56px 27.9297px}
+.cn384{width:84px;height:90px;top:28px;right:14px;transform-origin:42px 45.0078px}
+.cn385{font-size:12px;line-height:16.8px}
+.cn386{width:384px}
+.cn393{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn395{font-size:28px;line-height:28px}
+.cn398{width:384px}
+.cn405{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn407{font-size:28px;line-height:28px}
+.cn410{width:384px}
+.cn417{width:260px;height:303px;transform:matrix(1, 0, 0, 1, -129.914, 0);transform-origin:129.914px 151.562px}
+.cn419{font-size:28px;line-height:28px}
+.cn422{height:512px}
+.cn423{margin-bottom:153.594px;font-size:12px;line-height:13.8px}
+.cn429{height:447.078px}
+.cn430{width:53%;flex-direction:column}
+.cn431{width:100%;row-gap:var(--space-005);column-gap:var(--space-005);flex-direction:initial}
+.cn432{width:31.5%;height:160px;max-width:160px}
+.cn434{width:121px;height:106px;transform-origin:60.6641px 53.1719px}
+.cn435{width:62.5%}
+.cn441{width:100%;row-gap:var(--space-005);column-gap:var(--space-005);flex-direction:initial}
+.cn442{width:31.5%;height:160px;max-width:160px}
+.cn444{width:121px;height:106px;max-width:180px}
+.cn445{width:62.5%}
+.cn451{width:41%}
+.cn452{height:135.141px}
+.cn453{margin-left:-15px;transform-origin:157.5px 67.5703px}
+.cn454{width:315px;height:135px}
+.cn457{font-size:12px;line-height:16.8px}
+.cn470{font-size:12px;line-height:16.8px}
+}
+
+@media (min-width: 1601px) {
+.cn72{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn84{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn96{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn108{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn120{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn132{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn144{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn153{height:48px;font-size:24px;line-height:24px}
+.cn167{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn179{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn191{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn203{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn215{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn227{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn239{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn246{height:115.188px;font-size:24px;line-height:28.8px}
+.cn262{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn274{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn286{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn298{width:282px;height:188px;transform:matrix(1, 0, 0, 1, -141.117, 94.0781);transform-origin:141.117px 94.0781px}
+.cn312{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn324{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn336{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn348{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn360{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn372{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn379{height:48px;font-size:24px;line-height:24px}
+.cn393{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn405{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn417{width:282px;height:329px;transform:matrix(1, 0, 0, 1, -141.117, 0);transform-origin:141.117px 164.633px}
+.cn422{height:540px}
+}
+
+</style>
+</head>
+<body class="cn0" data-cid="n0">
+    <a class="cn1" data-cid="n1" href="#content">
+      Skip to main content
+    </a>
+     
+    <div class="cn2" data-cid="n2">
+      <header class="cn3" data-cid="n3">
+        <div class="cn4" data-cid="n4">
+          <p class="cn5" data-cid="n5">
+            A digital publication that...
+            <br class="cn6" data-cid="n6" />
+             
+            <strong class="cn7" data-cid="n7">
+              is the best internet rabbit hole
+            </strong>
+          </p>
+        </div>
+         
+        <div class="cn8" data-cid="n8">
+          <a class="cn9" data-cid="n9" aria-label="The Pudding" href="https://pudding.cool/" target="_self">
+            <svg class="cn10" data-cid="n10" fill="none" height="260" viewBox="0 0 606 260" width="606" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_dddd_3325_11626)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M223.342 8.32435C227.137 4.49333 234.197 -0.342233 243.763 1.3462L244.222 1.43153L244.281 1.44358L244.341 1.45564C250.904 2.80179 255.325 7.125 257.709 11.3645L257.933 11.7745L257.952 11.8106L257.971 11.8459C258.556 12.9588 259.081 14.2063 259.488 15.5631C262.236 17.8972 263.955 20.8246 264.922 23.6384C267.449 22.65 271.08 21.5646 275.162 21.6175C280.957 21.6928 288.047 24.2298 292.242 31.4541L292.44 31.8009L292.66 32.1979L292.856 32.6069C295.489 38.0845 295.248 43.6983 294.505 47.422C294.719 47.7897 294.916 48.156 295.094 48.5192C295.996 50.3608 296.49 52.1809 296.742 53.8418C301.955 50.5147 308.301 48.9272 315.437 49.8807L315.438 49.8797C315.474 49.8844 315.51 49.8897 315.546 49.8946C315.55 49.8951 315.555 49.8958 315.559 49.8964C325.472 51.2235 335.429 58.1511 338.132 70.0796L338.255 70.6537L338.324 70.9932L338.378 71.3363C338.648 73.0535 338.758 74.7578 338.736 76.4392C340.363 75.9698 342.056 75.568 343.819 75.2446L344.368 75.1444L344.923 75.0841C347.918 74.7598 351.189 74.8616 354.465 75.5349C354.717 74.6703 354.971 73.8213 355.226 73.0131C357.773 64.942 362.994 50.9121 377.338 45.3844L377.567 45.2963L377.799 45.2156C382.767 43.483 387.785 43.6318 391.803 44.4755C395.395 45.2297 399.273 46.7644 402.695 49.3233C404.013 47.0844 405.554 45.0113 407.283 43.1631C411.406 38.7581 417.989 34.2801 426.328 34.2234L427.14 34.2318L427.587 34.2485C436.931 34.6825 443.586 40.5507 446.893 47.1558C449.796 52.955 450.411 59.5187 449.489 65.6557C452.218 65.5449 455.172 65.8589 458.219 66.8781L458.877 67.109L458.936 67.1313L458.995 67.1526C461.621 68.1403 463.905 69.5427 465.846 71.2334C470.422 68.219 475.52 65.5938 481.012 64.0289C490.636 61.1207 501.76 61.9358 510.293 68.7293C511.907 70.014 513.325 71.4306 514.553 72.9529C516.844 71.0977 519.337 69.3701 522.06 67.8185L522.182 67.7499C528.698 64.1161 540.718 59.5514 552.729 63.7498C556.768 60.0308 561.574 57.2088 566.653 55.6494C571.985 54.0126 578.363 53.5536 584.757 55.7681C591.362 58.056 596.633 62.7389 600.145 68.9722C602.736 75.3833 603.878 81.4685 602.234 88.4005C601.082 93.2561 598.979 97.531 597.319 100.546L597.273 100.63L597.225 100.713C592.486 109.07 586.627 116.734 581.903 123.197C576.925 130.007 572.871 135.903 569.981 142.182L569.973 142.199L569.966 142.216C566.345 150.032 563.23 158.601 559.714 168.089C556.295 177.314 552.523 187.326 547.841 196.794C538.4 215.885 524.311 234.68 498.902 243.108C498.878 243.116 498.855 243.123 498.832 243.131C498.801 243.141 498.77 243.153 498.739 243.163L498.738 243.162C484.794 247.894 463.813 250.517 447.089 237.703C447.044 237.669 446.999 237.635 446.954 237.601C446.922 237.576 446.89 237.553 446.859 237.528C432.416 226.565 427.834 205.653 437.324 189.846C435.537 188.684 433.924 187.316 432.506 185.779C425.432 193.631 413.936 198.157 402.058 194.026L402.005 194.008C399.506 193.138 397.395 191.962 395.617 190.588C389.218 195.719 380.178 200.227 369.031 197.671L368.166 197.472L367.331 197.176C364.916 196.316 362.853 195.153 361.095 193.803C357.18 196.95 352.348 199.838 346.684 201.093L345.725 201.306L344.746 201.393C340.06 201.811 334.627 201.354 329.586 198.513C328.548 197.928 327.597 197.281 326.727 196.587C319.943 201.294 307.39 207.485 294.404 200.126L294.257 200.042L294.112 199.956C292.46 198.971 291.014 197.867 289.745 196.686C285.587 200.102 280.713 203.045 274.995 204.861L274.996 204.863C274.946 204.88 274.895 204.894 274.845 204.911C274.824 204.917 274.803 204.924 274.782 204.931L274.781 204.93C267.63 207.215 259.012 206.991 252.145 201.462C245.061 206.604 234.803 210.922 222.751 206.286L222.124 206.045L221.52 205.749C219.168 204.597 217.194 203.176 215.537 201.609C213.719 203.165 211.786 204.637 209.735 205.958C205.778 208.611 200.283 211.006 194.134 211.304C188.859 211.561 182.696 210.184 177.649 205.887C171.028 211.203 161.392 216.13 149.382 213.138L148.521 212.924L147.691 212.61C139.827 209.643 134.819 203.786 132.347 197.145C130.115 191.151 130.08 184.976 130.519 180.16C131.089 173.898 132.778 167.35 134.267 162.279C125.168 164.429 114.744 164.406 105.236 160.266C103.421 165.231 101.428 170.214 99.1811 175.018C93.1845 188.198 84.2951 205.96 68.667 217.573L68.5761 217.64L68.4852 217.706C64.4293 220.627 59.7971 223.135 54.5735 224.751L54.5744 224.753C54.5371 224.764 54.4986 224.775 54.4613 224.787C54.4304 224.796 54.3994 224.807 54.3685 224.817L54.3676 224.815C44.4615 227.919 33.4769 227.056 24.2467 222.747C14.7373 218.309 6.24255 209.724 3.72503 197.2C0.454513 182.053 8.39405 164.069 24.6029 157.992C28.6252 156.369 32.9011 155.328 35.4355 154.646C38.3062 153.873 39.942 153.329 41.1468 152.731C45.001 150.395 49.5025 145.845 54.4019 139.377C45.1304 136.405 36.7521 129.512 32.2711 118.353L32.2247 118.238L32.1811 118.123C26.5943 103.529 27.2368 89.4119 32.6912 76.9845C37.9791 64.9365 47.332 55.4523 57.7157 48.4663C76.7332 35.6717 102.476 29.0821 124.298 31.5663C131.185 26.6684 141.427 21.2483 153.788 22.7406C153.79 22.741 153.794 22.7413 153.797 22.7416C153.805 22.7425 153.82 22.7444 153.82 22.7444C174.601 23.8904 175.359 26.3283 185.48 17.1639C189.929 13.1355 195.293 10.4877 200.392 9.08949V9.08764C200.455 9.06948 200.52 9.05341 200.583 9.0357C200.612 9.02783 200.642 9.01844 200.671 9.01066C207.743 7.05689 214.147 7.95762 218.83 9.06723C219.893 9.31911 220.93 9.59932 221.908 9.87968C222.364 9.35204 222.841 8.82969 223.342 8.32435Z" fill="url(#paint0_radial_3325_11626)"></path>
+</g>
+<path d="M586.912 76.4217C579.382 63.0563 562.116 70.9722 557.538 82.8247C556.911 83.8609 556.574 84.701 555.586 84.3051C554.19 83.3993 551.907 79.7211 549.535 78.8633C543.265 75.6539 535.38 77.7821 529.589 81.0117C506.864 93.9614 503.977 124.846 489.19 140.85C486.173 144.253 476.762 150.874 473.45 144.817C469.108 129.804 501.304 114.322 504.853 95.5473C508.136 82.0748 497.4 74.8238 485.221 78.6222C475.627 81.3417 466.79 89.174 459.898 95.9931C459.271 96.556 458.615 97.3314 457.881 97.5197C457.68 97.5339 457.598 97.4024 457.562 97.2124C457.379 96.31 458.704 92.754 458.816 90.8392C459.39 87.0689 457.249 82.7188 453.652 81.3663C448.672 79.5401 443.029 82.6481 439.225 85.7112C419.493 103.097 423.965 139.014 397.998 151.013C392.52 153.184 388.125 151.001 388.457 144.807C389.853 127.308 409.91 116.264 416.299 100.213C418.641 94.8352 420.351 86.0739 412.797 84.0194L412.685 83.9878C395.472 82.0901 386.777 122.291 378.62 134.33C375.083 140.19 361.218 163.617 354.368 152.66C352.878 145.724 358.497 136.575 361.88 130.789C373.474 112.457 390.533 96.9594 396.773 75.4988C397.962 70.7276 398.116 65.2462 394.1 61.881C391.231 59.4172 386.298 58.3372 382.808 59.5541C368.694 64.993 368.854 88.5767 362.33 100.354C362.064 100.639 361.727 100.657 361.478 100.351C360.792 99.6585 360.082 97.0195 358.852 95.2528C356.155 91.2124 351.363 89.6617 346.566 90.1813C317.559 95.5022 314.282 130.521 299.506 150.412C296.111 155.429 283.672 168.138 280.04 157.107C278.248 133.459 326.84 95.747 323.373 73.6851C322.362 68.7336 318.257 65.5561 313.495 64.9405C295.064 62.4062 294.573 93.0482 287.919 105.977C287.173 107.1 286.262 105.031 285.6 103.676C279.448 90.5539 264.093 94.9535 255.031 103.291C237.174 118.668 231.335 157.245 212.685 166.917C209.385 168.309 205.126 167.885 204.043 163.915C200.731 142.997 233.394 127.44 234.121 106.339C234.157 103.181 232.85 99.8567 229.91 98.7287C225.899 97.162 220.919 99.82 217.743 102.356C206.007 112.131 202.423 129.81 195.774 143.005C191.113 151.928 183.483 163.946 176.491 169.267C174.291 170.909 170.955 172.217 168.287 171.2C163.301 168.333 167.69 158.601 170.245 154.605C178.189 140.823 198.584 124.815 197.839 108.161C197.087 100.788 187.972 100.736 183.039 103.791C167.873 113.051 156.51 143.527 150.773 160.269C147.46 171.192 139.682 193.335 153.062 198.384C167.258 201.921 177.514 182.951 186.269 173.289C186.754 172.717 187.99 171.325 187.623 172.626C185.228 178.832 181.909 187.003 186.056 192.677C189.723 198.007 196.874 196.327 201.376 193.264C208.811 188.531 214.247 181.03 219.783 174.11C220.121 173.696 220.44 173.323 220.724 173.038C221.233 172.521 221.623 172.273 221.865 172.396C222.569 173.354 222.09 174.949 222.102 176.985C222.001 182.479 222.741 189.413 228.212 192.094C241.971 197.386 253.535 178.48 260.674 168.63C261.833 166.935 263.206 164.663 261.804 168.91C260.745 172.53 258.899 177.059 258.651 180.344C257.924 187.756 262.182 193.066 270.268 190.414C281.56 186.896 288.297 176.501 294.626 167.17C295.046 166.538 295.957 165.288 296.46 165.191C297.052 164.899 296.975 167.4 296.762 168.645C296.022 174.98 295.608 183.142 301.902 186.896C312.49 192.897 326.165 177.902 332.908 169.033C333.837 167.872 334.577 167.566 334.269 169.891C332.696 178.093 332.258 187.243 343.402 186.248C352.606 184.208 361.029 172.115 366.559 164.172C368.884 160.953 367.174 166.851 367.086 167.914C366.151 173.27 366.648 180.791 372.433 182.851C386.339 186.039 397.158 165.345 404.954 155.495C408.166 151.723 403.913 161.345 403.664 162.205C401.487 168.331 400.417 177.37 407.03 179.656C413.383 181.879 420.132 178.524 423.19 172.828C427.336 165.765 428.454 156.733 431.873 149.375C438.125 136.143 459.567 96.3186 474.911 98.0299C479.956 100.189 476.277 109.241 474.538 112.902C469.729 122.609 460.963 130.519 454.261 139.01C448.323 146.822 442.236 156.589 441.035 166.413C440.16 172.704 444.046 177.936 450.304 178.791C465.524 180.352 479.856 162.488 488.817 152.409C492.1 148.592 490.343 154.696 490.059 157.016C489.557 160.249 489.586 163.852 490.26 166.875C491.781 175.539 500.387 178.091 507.834 175.772C521.338 171.388 533.848 151.279 542.579 139.747C543.17 139.059 543.508 138.935 543.519 139.474C543.502 140.029 543.23 141.516 542.916 142.35C535.783 167.22 515.11 203.793 485.268 196.936C480.518 195.599 475.757 192.895 471.119 191.104C463.595 187.796 456.296 189.059 451.523 195.933C444.709 204.972 446.962 218.636 456.184 225.517C466.979 233.899 481.826 232.88 493.993 228.721C534.085 215.518 540.461 169.763 556.184 135.82C563.347 120.256 575.632 107.988 584.014 93.2079C586.818 88.1159 589.42 81.6893 586.912 76.4454V76.4217ZM245.224 158.392C242.42 145.506 261.969 112.203 275.645 112.873L275.746 112.887C280.909 113.77 281.128 120.666 280.028 124.628C278.845 132.405 253.901 177.114 245.224 158.392ZM329.969 155.689C327.354 157.394 323.243 157.725 320.723 155.545L320.647 155.473C317.24 151.674 319.848 145.1 321.634 139.949C325.84 129.504 334.624 114.276 344.484 109.129C346.395 108.299 348.672 108.096 350.736 108.505C359.798 110.491 352.747 125.099 349.695 131.032C345.709 138.216 336.398 151.636 329.963 155.695L329.969 155.689ZM544.466 119.826C539.207 129.667 530.151 143.819 520.149 145.686C517.109 146.112 513.607 144.589 512.738 141.403C510.567 132.77 516.523 119.924 521.125 112.739C526.342 105.258 532.725 95.803 540.668 94.1078L540.781 94.092C555.042 92.4715 548.157 112.335 544.46 119.82L544.466 119.826Z" fill="black"></path>
+<path d="M147.04 54.9596C145.36 54.1257 143.58 53.2664 141.906 52.4326C140.593 51.7767 139.901 51.3564 140.096 51.2001L140.114 51.1826C140.776 50.999 142.296 51.1261 143.136 51.1822C147.3 51.3554 151.908 51.1637 155.268 49.0571C161.603 44.6953 159.349 38.6985 151.991 37.8188C143.704 36.8104 136.233 41.3181 130.076 46.2392C128.893 47.0054 127.639 47.3147 126.267 47.1902C89.3449 40.5647 29.6503 68.9842 46.378 112.681C55.1559 134.54 87.7419 127.69 83.1045 103.745C82.0339 98.372 77.8579 94.9447 76.4146 90.2755C71.4341 73.405 101.352 57.546 113.94 59.1087C115.685 59.6065 115.04 61.0209 114.229 62.3142C106.428 72.9569 101.92 85.3253 96.2951 97.1064C84.9973 119.437 67.3054 155.085 48.5134 166.027C42.7758 169.063 36.0504 169.708 30.1353 172.137C21.523 175.246 16.6431 185.514 18.6247 194.174C21.4284 208.197 37.5232 214.24 49.9566 210.268C53.3992 209.222 56.611 207.527 59.61 205.367C71.8541 196.269 79.4254 181.765 85.4173 168.582C90.6225 157.456 94.4082 145.158 98.1051 133.503C99.087 132.396 100.471 137.153 101.512 138.361C101.979 139.085 102.506 139.75 103.086 140.382C112.082 150.229 126.409 150.231 137.629 145.167C172.534 129.898 185.784 73.7445 147.058 54.9481L147.04 54.9596ZM110.799 125.851C108.575 124.925 106.398 123.656 104.937 121.862C102.482 118.808 103.369 115.741 104.221 112.194C106.215 104.603 109.172 96.6804 111.769 89.2184C113.94 83.2812 121.546 63.1282 126.793 60.9658C130.732 60.1117 138.233 65.1114 140.871 67.9675L140.954 68.0518C159.438 87.0097 140.037 136.454 110.805 125.845L110.799 125.851Z" fill="black"></path>
+<path d="M420.711 78.9811C426.538 79.142 432.612 72.6517 434.274 64.4872C435.937 56.3226 432.559 49.5727 426.727 49.4117C420.901 49.2509 414.826 55.7411 413.164 63.9057C411.502 72.0702 414.879 78.8201 420.711 78.9811Z" fill="black"></path>
+<path d="M222.961 61.4045C219.652 66.4197 212.483 72.4256 211.317 77.6974C210.785 81.6673 214.178 84.077 217.841 82.7069C223.592 80.4664 225.178 71.593 227.73 66.2647C230.887 60.332 236.366 52.3172 241.783 49.8452C242.935 49.4308 244.454 49.2745 244.893 50.6616C246.382 57.7154 232.259 65.2302 230.662 74.3835C229.971 77.1944 230.688 81.1956 234.104 81.6802C239.96 82.3404 244.568 75.6258 248.43 72.2126C249.081 71.5995 249.515 71.7519 249.748 72.86C250.975 81.1414 258.089 82.3221 264.874 78.2714C270.597 74.8052 280.432 64.1812 281.71 57.8097C281.971 55.9718 281.572 53.8993 279.286 54.1182C276.788 54.2574 274.507 57.2447 274.118 59.5576C273.812 61.5751 274.474 63.5691 273.325 65.4437C270.835 69.8804 263.67 72.3053 259.516 69.0275C258.284 68.0967 258.127 66.9947 259.53 66.1716C266.681 61.7806 276.931 52.4911 279.549 44.7232C279.95 42.9922 279.96 40.8295 279.167 39.1798C277.261 35.7537 273.076 36.6114 269.591 38.1437C260.936 42.4348 253.102 55.6056 250.182 64.8047C249.919 65.6785 249.935 66.7805 249.138 67.3672C247.521 68.284 244.497 68.4971 243.106 67.7297C242.351 67.3081 242.092 66.3231 242.142 65.4597C242.329 61.8969 246.246 59.0639 248.29 56.4998C250.614 53.6225 253.527 49.5279 254.123 46.1906C254.617 43.7419 252.618 41.6509 250.175 41.6985C244.312 41.665 239.334 47.8152 235.053 51.4182C233.923 52.2793 231.763 53.9273 230.735 54.7071C230.669 54.763 230.123 55.1665 230.251 54.986L230.256 54.9765C232.003 52.8417 233.886 50.5241 235.884 48.5979C241.04 43.3554 251.253 37.4295 250.752 29.3697C250.626 28.2872 250.042 27.268 249.18 26.8161C238.536 22.8671 228.378 53.7638 222.959 61.4068L222.961 61.4045ZM264.347 48.8407C265.8 47.7264 268.845 45.7662 270.514 46.9801C273.648 51.3844 264.456 58.812 261.107 61.2061C260.088 61.9172 258.362 63.0813 257.351 63.5338C257.069 63.6547 256.706 63.7837 256.497 63.4999L256.482 63.4782C255.341 57.8266 260.297 52.2292 264.349 48.8383L264.347 48.8407Z" fill="black"></path>
+<path d="M197.534 82.6208C201.485 81.7757 204.082 79.7459 206.698 76.4866C212.478 69.282 217.078 57.5909 220.732 50.7409C223.728 45.2541 227.224 39.6122 230.826 34.4874C231.711 33.2611 232.556 31.9771 233.496 30.7851C233.921 30.2654 234.299 29.9087 234.883 29.653C235.903 29.2268 237.275 28.9493 238.462 28.5094C241.268 27.4543 244.29 24.8195 245.036 22.0309C245.271 20.9784 245.064 19.9302 244.525 18.9046C243.842 17.6201 242.712 16.6222 241.294 16.3315C235.599 15.2112 231.896 21.3931 229.363 25.9312C229.147 26.3192 228.874 26.7489 228.523 26.9707C227.801 27.4472 226.84 27.1313 225.848 26.9026C218.909 25.1101 211.835 21.6104 204.58 23.6871C198.268 25.3647 191.654 30.1758 191.139 37.0355C190.88 40.5068 192.73 43.8796 196.49 44.1756C202.812 44.775 205.432 37.8619 210.014 34.8601C213.259 32.5615 217.145 31.4944 221.1 31.1504C222.189 31.053 223.298 31.0012 224.414 30.9874C224.832 30.9994 225.418 30.9456 225.696 31.2899L225.708 31.3115C225.893 31.6139 225.541 32.2251 225.328 32.5775C221.37 39.2014 217.273 45.7777 212.665 51.97C209.525 55.7329 205.473 62.9345 200.388 63.3918C197.674 63.5534 195.077 62.2141 192.45 63.4384C188.739 65.0546 186.052 69.1436 185.936 72.5059C185.409 78.9855 191.082 84.1369 197.53 82.6231L197.534 82.6208Z" fill="black"></path>
+<defs>
+<filter id="filter0_dddd_3325_11626" x="0" y="0" width="606" height="259.056" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+<feOffset></feOffset>
+<feGaussianBlur stdDeviation="0.5"></feGaussianBlur>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"></feColorMatrix>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_3325_11626"></feBlend>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+<feOffset dy="2"></feOffset>
+<feGaussianBlur stdDeviation="1"></feGaussianBlur>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.09 0"></feColorMatrix>
+<feBlend mode="normal" in2="effect1_dropShadow_3325_11626" result="effect2_dropShadow_3325_11626"></feBlend>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+<feOffset dy="5"></feOffset>
+<feGaussianBlur stdDeviation="1.5"></feGaussianBlur>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0"></feColorMatrix>
+<feBlend mode="normal" in2="effect2_dropShadow_3325_11626" result="effect3_dropShadow_3325_11626"></feBlend>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+<feOffset dy="9"></feOffset>
+<feGaussianBlur stdDeviation="1.5"></feGaussianBlur>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.01 0"></feColorMatrix>
+<feBlend mode="normal" in2="effect3_dropShadow_3325_11626" result="effect4_dropShadow_3325_11626"></feBlend>
+<feBlend mode="normal" in="SourceGraphic" in2="effect4_dropShadow_3325_11626" result="shape"></feBlend>
+</filter>
+<radialGradient id="paint0_radial_3325_11626" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(303 124.028) rotate(152.988) scale(301.757 735.823)">
+<stop stop-color="white"></stop>
+<stop offset="1" stop-color="white" stop-opacity="0.9"></stop>
+</radialGradient>
+</defs>
+</svg>
+             
+          </a>
+        </div>
+         
+        <div class="cn11" data-cid="n11">
+          <ul class="cn12" data-cid="n12">
+            <li class="cn13" data-cid="n13">
+              <a class="cn14" data-cid="n14" aria-label="About" href="https://pudding.cool/about" target="_self">
+                <img class="cn15" data-cid="n15" alt="about sticker" src="public/assets/cloned/images/7a76be268ad7.png" />
+              </a>
+            </li>
+            <li class="cn16" data-cid="n16">
+              <a class="cn17" data-cid="n17" aria-label="subscribe" href="https://pudding.cool/subscribe" rel="external" target="_self">
+                <img class="cn18" data-cid="n18" alt="subscribe sticker" src="public/assets/cloned/images/eb5ed6497a29.png" />
+              </a>
+            </li>
+            <li class="cn19" data-cid="n19">
+              <button class="cn20" data-cid="n20" aria-controls="nav-content" aria-label="open menu">
+                <img class="cn21" data-cid="n21" alt="more sticker" src="public/assets/cloned/images/07919fe11f25.png" />
+              </button>
+            </li>
+          </ul>
+        </div>
+      </header>
+       
+      <div class="cn22" data-cid="n22">
+        <div class="cn23" data-cid="n23">
+          <p class="cn24" data-cid="n24">
+            A digital publication that...
+            <br class="cn25" data-cid="n25" />
+             
+            <strong class="cn26" data-cid="n26">
+              is the best internet rabbit hole
+            </strong>
+          </p>
+        </div>
+      </div>
+       
+      <main class="cn27" data-cid="n27" id="content">
+        <div class="cn28" data-cid="n28">
+          <div class="cn29" data-cid="n29">
+            <div class="cn30" data-cid="n30">
+              <img class="cn31" data-cid="n31" alt="" aria-hidden="true" src="public/assets/cloned/images/2a13d719f4ad.png" />
+               
+              <input class="cn32" data-cid="n32" placeholder="Find a story..." type="text" />
+            </div>
+             
+            <div class="cn33" data-cid="n33">
+              <div class="cn34" data-cid="n34">
+                <button class="cn35" data-cid="n35">
+                  <img class="cn36" data-cid="n36" alt="our_faves sticker" src="public/assets/cloned/images/252a52396fa3.png" />
+                   
+                  <span class="cn37" data-cid="n37">
+                    Our Faves
+                  </span>
+                </button>
+                <button class="cn38" data-cid="n38">
+                  <img class="cn39" data-cid="n39" alt="popular sticker" src="public/assets/cloned/images/5dd886854cff.png" />
+                   
+                  <span class="cn40" data-cid="n40">
+                    Popular
+                  </span>
+                </button>
+                <button class="cn41" data-cid="n41">
+                  <img class="cn42" data-cid="n42" alt="updating sticker" src="public/assets/cloned/images/1ebf67cc6f8c.png" />
+                   
+                  <span class="cn43" data-cid="n43">
+                    Updating
+                  </span>
+                </button>
+                <button class="cn44" data-cid="n44">
+                  <img class="cn45" data-cid="n45" alt="your_input sticker" src="public/assets/cloned/images/e862cbe07147.png" />
+                   
+                  <span class="cn46" data-cid="n46">
+                    Your Input
+                  </span>
+                </button>
+                <button class="cn47" data-cid="n47">
+                  <img class="cn48" data-cid="n48" alt="video sticker" src="public/assets/cloned/images/a2a45f79e07a.png" />
+                   
+                  <span class="cn49" data-cid="n49">
+                    Video
+                  </span>
+                </button>
+                <button class="cn50" data-cid="n50">
+                  <img class="cn51" data-cid="n51" alt="audio sticker" src="public/assets/cloned/images/1b11ef625297.png" />
+                   
+                  <span class="cn52" data-cid="n52">
+                    Audio
+                  </span>
+                </button>
+              </div>
+               
+              <div class="cn53" data-cid="n53">
+                <select class="cn54" data-cid="n54" id="filter-select">
+                  <option class="cn55" data-cid="n55" value="">
+                    All
+                  </option>
+                  <option class="cn56" data-cid="n56" value="our_faves">
+                    Our Faves
+                  </option>
+                  <option class="cn57" data-cid="n57" value="popular">
+                    Popular
+                  </option>
+                  <option class="cn58" data-cid="n58" value="updating">
+                    Updating
+                  </option>
+                  <option class="cn59" data-cid="n59" value="your_input">
+                    Your Input
+                  </option>
+                  <option class="cn60" data-cid="n60" value="video">
+                    Video
+                  </option>
+                  <option class="cn61" data-cid="n61" value="audio">
+                    Audio
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+           
+          <div class="cn62" data-cid="n62">
+            <section class="cn63" data-cid="n63" id="stories">
+              <ul class="cn64" data-cid="n64">
+                <li class="cn65" data-cid="n65">
+                  <div class="cn66" data-cid="n66">
+                    <div class="cn67" data-cid="n67">
+                      <p class="cn68" data-cid="n68">
+                        #223
+                      </p>
+                       
+                      <p class="cn69" data-cid="n69">
+                        Jun 2026
+                      </p>
+                    </div>
+                     
+                    <a class="cn70" data-cid="n70" href="https://pudding.cool/2026/06/ethical-champions" rel="external" target="_blank">
+                      <div class="cn71" data-cid="n71">
+                        <img class="cn72" data-cid="n72" alt="thumbnail for story" src="public/assets/cloned/images/7459b6aa199f.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn73" data-cid="n73">
+                        <h3 class="cn74" data-cid="n74">
+                          <strong class="cn75" data-cid="n75">
+                            ethical nba champions
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn76" data-cid="n76">
+                          Which teams don’t need asterisks by their title?
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn77" data-cid="n77">
+                  <div class="cn78" data-cid="n78">
+                    <div class="cn79" data-cid="n79">
+                      <p class="cn80" data-cid="n80">
+                        #222
+                      </p>
+                       
+                      <p class="cn81" data-cid="n81">
+                        Jun 2026
+                      </p>
+                    </div>
+                     
+                    <a class="cn82" data-cid="n82" href="http://pudding.cool/2026/06/mow/game" rel="external" target="_blank">
+                      <div class="cn83" data-cid="n83">
+                        <img class="cn84" data-cid="n84" alt="thumbnail for story" src="public/assets/cloned/images/bbd671f2fbb1.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn85" data-cid="n85">
+                        <h3 class="cn86" data-cid="n86">
+                          <strong class="cn87" data-cid="n87">
+                            lawn mowing game
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn88" data-cid="n88">
+                          Mow a series of lawns as efficiently as you can. We will publish the analysis in a few weeks.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn89" data-cid="n89">
+                  <div class="cn90" data-cid="n90">
+                    <div class="cn91" data-cid="n91">
+                      <p class="cn92" data-cid="n92">
+                        #221
+                      </p>
+                       
+                      <p class="cn93" data-cid="n93">
+                        Jun 2026
+                      </p>
+                    </div>
+                     
+                    <a class="cn94" data-cid="n94" href="https://pudding.cool/2026/06/menu-story" rel="external" target="_blank">
+                      <div class="cn95" data-cid="n95">
+                        <img class="cn96" data-cid="n96" alt="thumbnail for story" src="public/assets/cloned/images/699090b68073.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn97" data-cid="n97">
+                        <h3 class="cn98" data-cid="n98">
+                          <strong class="cn99" data-cid="n99">
+                            restaurant menu history
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn100" data-cid="n100">
+                          What do America’s earliest restaurant menus teach us about America?
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn101" data-cid="n101">
+                  <div class="cn102" data-cid="n102">
+                    <div class="cn103" data-cid="n103">
+                      <p class="cn104" data-cid="n104">
+                        #220
+                      </p>
+                       
+                      <p class="cn105" data-cid="n105">
+                        Jun 2026
+                      </p>
+                    </div>
+                     
+                    <a class="cn106" data-cid="n106" href="https://pudding.cool/2026/06/menu-collection" rel="external" target="_blank">
+                      <div class="cn107" data-cid="n107">
+                        <img class="cn108" data-cid="n108" alt="thumbnail for story" src="public/assets/cloned/images/6587286fd1f7.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn109" data-cid="n109">
+                        <h3 class="cn110" data-cid="n110">
+                          <strong class="cn111" data-cid="n111">
+                            5,000 restaurant menus
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn112" data-cid="n112">
+                          Explore the Buttolph Collection from the New York Public Library's archive of historic menus.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn113" data-cid="n113">
+                  <div class="cn114" data-cid="n114">
+                    <div class="cn115" data-cid="n115">
+                      <p class="cn116" data-cid="n116">
+                        #219
+                      </p>
+                       
+                      <p class="cn117" data-cid="n117">
+                        Jun 2026
+                      </p>
+                    </div>
+                     
+                    <a class="cn118" data-cid="n118" href="https://pudding.cool/2026/06/love-story" rel="external" target="_blank">
+                      <div class="cn119" data-cid="n119">
+                        <img class="cn120" data-cid="n120" alt="thumbnail for story" src="public/assets/cloned/images/5ab1025621db.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn121" data-cid="n121">
+                        <h3 class="cn122" data-cid="n122">
+                          <strong class="cn123" data-cid="n123">
+                            love story
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn124" data-cid="n124">
+                          Tracking 1,000+ people through the ups and downs of their relationships.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn125" data-cid="n125">
+                  <div class="cn126" data-cid="n126">
+                    <div class="cn127" data-cid="n127">
+                      <p class="cn128" data-cid="n128">
+                        #218
+                      </p>
+                       
+                      <p class="cn129" data-cid="n129">
+                        May 2026
+                      </p>
+                    </div>
+                     
+                    <a class="cn130" data-cid="n130" href="https://pudding.cool/2026/05/kpop-generations" rel="external" target="_blank">
+                      <div class="cn131" data-cid="n131">
+                        <img class="cn132" data-cid="n132" alt="thumbnail for story" src="public/assets/cloned/images/f64b1faca8ae.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn133" data-cid="n133">
+                        <h3 class="cn134" data-cid="n134">
+                          <strong class="cn135" data-cid="n135">
+                            k-pop generations
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn136" data-cid="n136">
+                          Two friends tell the story of their friendship through every generation of K-pop.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn137" data-cid="n137">
+                  <div class="cn138" data-cid="n138">
+                    <div class="cn139" data-cid="n139">
+                      <p class="cn140" data-cid="n140">
+                        #217
+                      </p>
+                       
+                      <p class="cn141" data-cid="n141">
+                        May 2026
+                      </p>
+                    </div>
+                     
+                    <a class="cn142" data-cid="n142" href="https://pudding.cool/2026/05/similes" rel="external" target="_blank">
+                      <div class="cn143" data-cid="n143">
+                        <img class="cn144" data-cid="n144" alt="thumbnail for story" src="public/assets/cloned/images/0105f4999868.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn145" data-cid="n145">
+                        <h3 class="cn146" data-cid="n146">
+                          <strong class="cn147" data-cid="n147">
+                            similes
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn148" data-cid="n148">
+                          An analysis of 200,000 similes from popular fiction.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn149" data-cid="n149">
+                  <div class="cn150" data-cid="n150">
+                    <div class="cn151" data-cid="n151">
+                      <img class="cn152" data-cid="n152" alt="mailbox sticker" src="public/assets/cloned/images/c174b0e6a27a.png" />
+                    </div>
+                     
+                    <p class="cn153" data-cid="n153">
+                      Get The Pudding 
+                      <br class="cn154" data-cid="n154" />
+                      in your inbox:
+                    </p>
+                     
+                    <form class="cn155" data-cid="n155">
+                      <input class="cn156" data-cid="n156" name="email" placeholder="you@example.com" type="email" />
+                       
+                      <label class="cn157" data-cid="n157" for="bd-email">
+                        Prove you‘re human:
+                      </label>
+                       
+                      <input class="cn158" data-cid="n158" id="captcha" name="metadata__captcha" placeholder="What is 1+1?" step="1" type="number" />
+                       
+                      <input class="cn159" data-cid="n159" type="submit" value="Subscribe" />
+                    </form>
+                  </div>
+                </li>
+                <li class="cn160" data-cid="n160">
+                  <div class="cn161" data-cid="n161">
+                    <div class="cn162" data-cid="n162">
+                      <p class="cn163" data-cid="n163">
+                        #216
+                      </p>
+                       
+                      <p class="cn164" data-cid="n164">
+                        Mar 2026
+                      </p>
+                    </div>
+                     
+                    <a class="cn165" data-cid="n165" href="https://pudding.cool/2026/03/ivf" rel="external" target="_blank">
+                      <div class="cn166" data-cid="n166">
+                        <img class="cn167" data-cid="n167" alt="thumbnail for story" src="public/assets/cloned/images/620d2b506633.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn168" data-cid="n168">
+                        <h3 class="cn169" data-cid="n169">
+                          <strong class="cn170" data-cid="n170">
+                            infertility journey
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn171" data-cid="n171">
+                          An interactive journey about IVF, told from two perspectives.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn172" data-cid="n172">
+                  <div class="cn173" data-cid="n173">
+                    <div class="cn174" data-cid="n174">
+                      <p class="cn175" data-cid="n175">
+                        #215
+                      </p>
+                       
+                      <p class="cn176" data-cid="n176">
+                        Feb 2026
+                      </p>
+                    </div>
+                     
+                    <a class="cn177" data-cid="n177" href="https://pudding.cool/2026/02/happy-map" rel="external" target="_blank">
+                      <div class="cn178" data-cid="n178">
+                        <img class="cn179" data-cid="n179" alt="thumbnail for story" src="public/assets/cloned/images/731003556a0f.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn180" data-cid="n180">
+                        <h3 class="cn181" data-cid="n181">
+                          <strong class="cn182" data-cid="n182">
+                            happy map
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn183" data-cid="n183">
+                          Mapping 100,000 moments of human happiness.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn184" data-cid="n184">
+                  <div class="cn185" data-cid="n185">
+                    <div class="cn186" data-cid="n186">
+                      <p class="cn187" data-cid="n187">
+                        #214
+                      </p>
+                       
+                      <p class="cn188" data-cid="n188">
+                        Feb 2026
+                      </p>
+                    </div>
+                     
+                    <a class="cn189" data-cid="n189" href="https://pudding.cool/2026/02/womens-sizing" rel="external" target="_blank">
+                      <div class="cn190" data-cid="n190">
+                        <img class="cn191" data-cid="n191" alt="thumbnail for story" src="public/assets/cloned/images/27d5a7e42d71.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn192" data-cid="n192">
+                        <h3 class="cn193" data-cid="n193">
+                          <strong class="cn194" data-cid="n194">
+                            women's sizing
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn195" data-cid="n195">
+                          The inter-generational struggle to find clothes that fit more than a tiny portion of women.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn196" data-cid="n196">
+                  <div class="cn197" data-cid="n197">
+                    <div class="cn198" data-cid="n198">
+                      <p class="cn199" data-cid="n199">
+                        #213
+                      </p>
+                       
+                      <p class="cn200" data-cid="n200">
+                        Dec 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn201" data-cid="n201" href="https://pudding.cool/2025/12/motifs" rel="external" target="_blank">
+                      <div class="cn202" data-cid="n202">
+                        <img class="cn203" data-cid="n203" alt="thumbnail for story" src="public/assets/cloned/images/568d308aa03b.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn204" data-cid="n204">
+                        <h3 class="cn205" data-cid="n205">
+                          <strong class="cn206" data-cid="n206">
+                            musical motifs
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn207" data-cid="n207">
+                          Visualizing how musicals use motifs to tell stories.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn208" data-cid="n208">
+                  <div class="cn209" data-cid="n209">
+                    <div class="cn210" data-cid="n210">
+                      <p class="cn211" data-cid="n211">
+                        #212
+                      </p>
+                       
+                      <p class="cn212" data-cid="n212">
+                        Nov 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn213" data-cid="n213" href="https://pudding.cool/2025/11/democracy" rel="external" target="_blank">
+                      <div class="cn214" data-cid="n214">
+                        <img class="cn215" data-cid="n215" alt="thumbnail for story" src="public/assets/cloned/images/9965bedb420a.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn216" data-cid="n216">
+                        <h3 class="cn217" data-cid="n217">
+                          <strong class="cn218" data-cid="n218">
+                            democracy
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn219" data-cid="n219">
+                          Every time someone said 'democracy' in Congress.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn220" data-cid="n220">
+                  <div class="cn221" data-cid="n221">
+                    <div class="cn222" data-cid="n222">
+                      <p class="cn223" data-cid="n223">
+                        #211
+                      </p>
+                       
+                      <p class="cn224" data-cid="n224">
+                        Oct 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn225" data-cid="n225" href="https://pudding.cool/2025/10/walk" rel="external" target="_blank">
+                      <div class="cn226" data-cid="n226">
+                        <img class="cn227" data-cid="n227" alt="thumbnail for story" src="public/assets/cloned/images/34c6b93adc98.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn228" data-cid="n228">
+                        <h3 class="cn229" data-cid="n229">
+                          <strong class="cn230" data-cid="n230">
+                            walkachusetts
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn231" data-cid="n231">
+                          A visually-aided journal of a very long walk home.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn232" data-cid="n232">
+                  <div class="cn233" data-cid="n233">
+                    <div class="cn234" data-cid="n234">
+                      <p class="cn235" data-cid="n235">
+                        #210
+                      </p>
+                       
+                      <p class="cn236" data-cid="n236">
+                        Aug 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn237" data-cid="n237" href="https://pudding.cool/2025/08/onions" rel="external" target="_blank">
+                      <div class="cn238" data-cid="n238">
+                        <img class="cn239" data-cid="n239" alt="thumbnail for story" src="public/assets/cloned/images/617f12ffd1ec.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn240" data-cid="n240">
+                        <h3 class="cn241" data-cid="n241">
+                          <strong class="cn242" data-cid="n242">
+                            dicing onions
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn243" data-cid="n243">
+                          What is the best way to dice an onion to get the most uniform piece sizes?
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn244" data-cid="n244">
+                  <div class="cn245" data-cid="n245">
+                    <p class="cn246" data-cid="n246">
+                      Some of my favorite projects: 
+                      <a class="cn247" data-cid="n247" href="https://pudding.cool/2023/05/country-radio" rel="external">
+                        country radio diversity
+                      </a>
+                      , 
+                      <a class="cn248" data-cid="n248" href="https://pudding.cool/2018/08/pockets" rel="external">
+                        women's pockets
+                      </a>
+                       and 
+                      <a class="cn249" data-cid="n249" href="https://pudding.cool/2018/09/jordans" rel="external">
+                        morphing air jordans
+                      </a>
+                      .
+                    </p>
+                     
+                    <div class="cn250" data-cid="n250">
+                      <a class="cn251" data-cid="n251" href="https://pudding.cool/author/jan-diehm">
+                        <img class="cn252" data-cid="n252" alt="headshot of Jan Diehm" src="public/assets/cloned/images/3c246abc9ab7.jpg" />
+                         
+                        <p class="cn253" data-cid="n253">
+                          Jan Diehm
+                        </p>
+                         
+                        <p class="cn254" data-cid="n254">
+                          Pudding Staff
+                        </p>
+                      </a>
+                    </div>
+                  </div>
+                </li>
+                <li class="cn255" data-cid="n255">
+                  <div class="cn256" data-cid="n256">
+                    <div class="cn257" data-cid="n257">
+                      <p class="cn258" data-cid="n258">
+                        #209
+                      </p>
+                       
+                      <p class="cn259" data-cid="n259">
+                        Jul 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn260" data-cid="n260" href="https://pudding.cool/2025/07/street-view" rel="external" target="_blank">
+                      <div class="cn261" data-cid="n261">
+                        <img class="cn262" data-cid="n262" alt="thumbnail for story" src="public/assets/cloned/images/969797183b75.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn263" data-cid="n263">
+                        <h3 class="cn264" data-cid="n264">
+                          <strong class="cn265" data-cid="n265">
+                            nyc street view
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn266" data-cid="n266">
+                          What if you could search every visible word on New York City’s streets?
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn267" data-cid="n267">
+                  <div class="cn268" data-cid="n268">
+                    <div class="cn269" data-cid="n269">
+                      <p class="cn270" data-cid="n270">
+                        #208
+                      </p>
+                       
+                      <p class="cn271" data-cid="n271">
+                        Jul 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn272" data-cid="n272" href="https://pudding.cool/2025/07/kids-books" rel="external" target="_blank">
+                      <div class="cn273" data-cid="n273">
+                        <img class="cn274" data-cid="n274" alt="thumbnail for story" src="public/assets/cloned/images/9603c453f167.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn275" data-cid="n275">
+                        <h3 class="cn276" data-cid="n276">
+                          <strong class="cn277" data-cid="n277">
+                            kids book animals
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn278" data-cid="n278">
+                          How and why do we gender animals in stories?
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn279" data-cid="n279">
+                  <div class="cn280" data-cid="n280">
+                    <div class="cn281" data-cid="n281">
+                      <p class="cn282" data-cid="n282">
+                        #207
+                      </p>
+                       
+                      <p class="cn283" data-cid="n283">
+                        Jun 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn284" data-cid="n284" href="https://pudding.cool/2025/06/hello-stranger" rel="external" target="_blank">
+                      <div class="cn285" data-cid="n285">
+                        <img class="cn286" data-cid="n286" alt="thumbnail for story" src="public/assets/cloned/images/c41728a91f04.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn287" data-cid="n287">
+                        <h3 class="cn288" data-cid="n288">
+                          <strong class="cn289" data-cid="n289">
+                            strangers talking
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn290" data-cid="n290">
+                          Watch hundreds of strangers talk for 30 minutes, and track how their moods change.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn291" data-cid="n291">
+                  <div class="cn292" data-cid="n292">
+                    <div class="cn293" data-cid="n293">
+                      <p class="cn294" data-cid="n294">
+                        #206
+                      </p>
+                       
+                      <p class="cn295" data-cid="n295">
+                        Jun 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn296" data-cid="n296" href="https://www.youtube.com/watch?v=h7w339vE2F8" rel="external" target="_blank">
+                      <div class="cn297" data-cid="n297">
+                        <img class="cn298" data-cid="n298" alt="thumbnail for story" src="public/assets/cloned/images/5d8b802107c8.jpg" />
+                         
+                        <span class="cn299" data-cid="n299">
+                          <svg class="cn300" data-cid="n300" fill="none" height="65" viewBox="0 0 65 65" width="65" xmlns="http://www.w3.org/2000/svg">
+<path d="M32.75 0.855957C15.086 0.855957 0.75 15.192 0.75 32.856C0.75 50.52 15.086 64.856 32.75 64.856C50.414 64.856 64.75 50.52 64.75 32.856C64.75 15.192 50.414 0.855957 32.75 0.855957ZM26.35 47.256V18.456L45.55 32.856L26.35 47.256Z" fill="white" fill-opacity="0.9"></path>
+</svg>
+                           
+                        </span>
+                      </div>
+                       
+                      <div class="cn301" data-cid="n301">
+                        <h3 class="cn302" data-cid="n302">
+                          <strong class="cn303" data-cid="n303">
+                            loneliness video
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn304" data-cid="n304">
+                          A six-minute video about the loneliness epidemic, in data.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn305" data-cid="n305">
+                  <div class="cn306" data-cid="n306">
+                    <div class="cn307" data-cid="n307">
+                      <p class="cn308" data-cid="n308">
+                        #205
+                      </p>
+                       
+                      <p class="cn309" data-cid="n309">
+                        May 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn310" data-cid="n310" href="https://pudding.cool/2025/05/aapi-casting" rel="external" target="_blank">
+                      <div class="cn311" data-cid="n311">
+                        <img class="cn312" data-cid="n312" alt="thumbnail for story" src="public/assets/cloned/images/d91ccf311e39.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn313" data-cid="n313">
+                        <h3 class="cn314" data-cid="n314">
+                          <strong class="cn315" data-cid="n315">
+                            asian representation
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn316" data-cid="n316">
+                          How accurately are Asian Americans cast in Hollywood?
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn317" data-cid="n317">
+                  <div class="cn318" data-cid="n318">
+                    <div class="cn319" data-cid="n319">
+                      <p class="cn320" data-cid="n320">
+                        #204
+                      </p>
+                       
+                      <p class="cn321" data-cid="n321">
+                        May 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn322" data-cid="n322" href="https://pudding.cool/2025/04/birthday-effect" rel="external" target="_blank">
+                      <div class="cn323" data-cid="n323">
+                        <img class="cn324" data-cid="n324" alt="thumbnail for story" src="public/assets/cloned/images/58abd1270d9d.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn325" data-cid="n325">
+                        <h3 class="cn326" data-cid="n326">
+                          <strong class="cn327" data-cid="n327">
+                            birthday effect
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn328" data-cid="n328">
+                          Are you more likely to die on your birthday? Yes.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn329" data-cid="n329">
+                  <div class="cn330" data-cid="n330">
+                    <div class="cn331" data-cid="n331">
+                      <p class="cn332" data-cid="n332">
+                        #203
+                      </p>
+                       
+                      <p class="cn333" data-cid="n333">
+                        Apr 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn334" data-cid="n334" href="https://pudding.cool/2025/04/wine-animals" rel="external" target="_blank">
+                      <div class="cn335" data-cid="n335">
+                        <img class="cn336" data-cid="n336" alt="thumbnail for story" src="public/assets/cloned/images/341e9e109081.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn337" data-cid="n337">
+                        <h3 class="cn338" data-cid="n338">
+                          <strong class="cn339" data-cid="n339">
+                            wine animals
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn340" data-cid="n340">
+                          We try to predict the price and quality of a bottle of wine based on the animal on the label.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn341" data-cid="n341">
+                  <div class="cn342" data-cid="n342">
+                    <div class="cn343" data-cid="n343">
+                      <p class="cn344" data-cid="n344">
+                        #202
+                      </p>
+                       
+                      <p class="cn345" data-cid="n345">
+                        Apr 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn346" data-cid="n346" href="https://pudding.cool/2025/04/music-dna" rel="external" target="_blank">
+                      <div class="cn347" data-cid="n347">
+                        <img class="cn348" data-cid="n348" alt="thumbnail for story" src="public/assets/cloned/images/9bd3e304784b.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn349" data-cid="n349">
+                        <h3 class="cn350" data-cid="n350">
+                          <strong class="cn351" data-cid="n351">
+                            music dna legacies
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn352" data-cid="n352">
+                          We trace musical DNA from the classical "Hall of the Mountain King" to 2pac's "Hit Em Up." 
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn353" data-cid="n353">
+                  <div class="cn354" data-cid="n354">
+                    <div class="cn355" data-cid="n355">
+                      <p class="cn356" data-cid="n356">
+                        #201
+                      </p>
+                       
+                      <p class="cn357" data-cid="n357">
+                        Mar 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn358" data-cid="n358" href="https://pudding.cool/2025/03/housewives" rel="external" target="_blank">
+                      <div class="cn359" data-cid="n359">
+                        <img class="cn360" data-cid="n360" alt="thumbnail for story" src="public/assets/cloned/images/f3f82c718c92.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn361" data-cid="n361">
+                        <h3 class="cn362" data-cid="n362">
+                          <strong class="cn363" data-cid="n363">
+                            tv apologies
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn364" data-cid="n364">
+                          What we can learn from watching reality stars apologize.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn365" data-cid="n365">
+                  <div class="cn366" data-cid="n366">
+                    <div class="cn367" data-cid="n367">
+                      <p class="cn368" data-cid="n368">
+                        #200
+                      </p>
+                       
+                      <p class="cn369" data-cid="n369">
+                        Mar 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn370" data-cid="n370" href="https://pudding.cool/2025/03/language" rel="external" target="_blank">
+                      <div class="cn371" data-cid="n371">
+                        <img class="cn372" data-cid="n372" alt="thumbnail for story" src="public/assets/cloned/images/a8265bcdb3f9.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn373" data-cid="n373">
+                        <h3 class="cn374" data-cid="n374">
+                          <strong class="cn375" data-cid="n375">
+                            animal sounds
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn376" data-cid="n376">
+                          Analyzing animal onomatopoeia across languages can demystify how we shape sound into meaning.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn377" data-cid="n377">
+                  <div class="cn378" data-cid="n378">
+                    <p class="cn379" data-cid="n379">
+                      If you like our stories,
+                      <br class="cn380" data-cid="n380" />
+                       you’ll love our merch
+                    </p>
+                     
+                    <div class="cn381" data-cid="n381">
+                      <img class="cn382" data-cid="n382" alt="pudding tee with a skeleton working on a computer" src="public/assets/cloned/images/f0ae8beffca1.png" />
+                       
+                      <img class="cn383" data-cid="n383" alt="a red and yellow technical sticker that reads The Pudding: Visual Data Stories About Just About Everything" src="public/assets/cloned/images/8795fc690d83.png" />
+                       
+                      <img class="cn384" data-cid="n384" alt="a green blob sticker that reads Pudding Dot Cool" src="public/assets/cloned/images/cd3e865ad9a0.png" />
+                    </div>
+                     
+                    <a class="cn385" data-cid="n385" href="https://the-pudding.printify.me/products">
+                      Shop our swag
+                    </a>
+                  </div>
+                </li>
+                <li class="cn386" data-cid="n386">
+                  <div class="cn387" data-cid="n387">
+                    <div class="cn388" data-cid="n388">
+                      <p class="cn389" data-cid="n389">
+                        #199
+                      </p>
+                       
+                      <p class="cn390" data-cid="n390">
+                        Mar 2025
+                      </p>
+                    </div>
+                     
+                    <a class="cn391" data-cid="n391" href="https://pudding.cool/2025/02/middle-school" rel="external" target="_blank">
+                      <div class="cn392" data-cid="n392">
+                        <img class="cn393" data-cid="n393" alt="thumbnail for story" src="public/assets/cloned/images/be61b370d94e.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn394" data-cid="n394">
+                        <h3 class="cn395" data-cid="n395">
+                          <strong class="cn396" data-cid="n396">
+                            middle school sucks
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn397" data-cid="n397">
+                          Follow hundreds of kids as they navigate their trecherous middle school years.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn398" data-cid="n398">
+                  <div class="cn399" data-cid="n399">
+                    <div class="cn400" data-cid="n400">
+                      <p class="cn401" data-cid="n401">
+                        #198
+                      </p>
+                       
+                      <p class="cn402" data-cid="n402">
+                        Nov 2024
+                      </p>
+                    </div>
+                     
+                    <a class="cn403" data-cid="n403" href="https://pudding.cool/2024/11/sitters-standers" rel="external" target="_blank">
+                      <div class="cn404" data-cid="n404">
+                        <img class="cn405" data-cid="n405" alt="thumbnail for story" src="public/assets/cloned/images/98594c47eca7.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn406" data-cid="n406">
+                        <h3 class="cn407" data-cid="n407">
+                          <strong class="cn408" data-cid="n408">
+                            sitters vs standers
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn409" data-cid="n409">
+                          The American worker divide: Those who sit, and those who stand.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                <li class="cn410" data-cid="n410">
+                  <div class="cn411" data-cid="n411">
+                    <div class="cn412" data-cid="n412">
+                      <p class="cn413" data-cid="n413">
+                        #197
+                      </p>
+                       
+                      <p class="cn414" data-cid="n414">
+                        Nov 2024
+                      </p>
+                    </div>
+                     
+                    <a class="cn415" data-cid="n415" href="https://pudding.cool/2024/11/love-songs" rel="external" target="_blank">
+                      <div class="cn416" data-cid="n416">
+                        <img class="cn417" data-cid="n417" alt="thumbnail for story" src="public/assets/cloned/images/9d95a24b390e.jpg" />
+                         
+                      </div>
+                       
+                      <div class="cn418" data-cid="n418">
+                        <h3 class="cn419" data-cid="n419">
+                          <strong class="cn420" data-cid="n420">
+                            love songs
+                          </strong>
+                        </h3>
+                         
+                        <p class="cn421" data-cid="n421">
+                          Is love dead in pop music? We checked all 5,141 Top 10 hits since 1958.
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+              </ul>
+            </section>
+          </div>
+           
+          <div class="cn422" data-cid="n422">
+            <button class="cn423" data-cid="n423">
+              <svg class="cn424" data-cid="n424" fill="none" height="24" stroke="currentColor" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+               
+              <span class="cn425" data-cid="n425">
+                Load More Stories
+              </span>
+            </button>
+          </div>
+        </div>
+      </main>
+       
+      <footer class="cn426" data-cid="n426">
+        <div class="cn427" data-cid="n427">
+          <div class="cn428" data-cid="n428"></div>
+           
+          <div class="cn429" data-cid="n429">
+            <div class="cn430" data-cid="n430">
+              <section class="cn431" data-cid="n431">
+                <div class="cn432" data-cid="n432">
+                  <a class="cn433" data-cid="n433" href="https://patreon.com/thepudding">
+                    <img class="cn434" data-cid="n434" alt="donate sticker" src="public/assets/cloned/images/3e5d23b3a031.png" />
+                  </a>
+                </div>
+                 
+                <div class="cn435" data-cid="n435">
+                  <p class="cn436" data-cid="n436">
+                    <a class="cn437" data-cid="n437" href="https://patreon.com/thepudding">
+                      Support us on Patreon
+                    </a>
+                     
+                    <span class="cn438" data-cid="n438">
+                      <svg class="cn439" data-cid="n439" fill="none" height="24" stroke="currentColor" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+                    </span>
+                  </p>
+                   
+                  <p class="cn440" data-cid="n440">
+                    We pour our heart into these stories, but they take time and money. For just $2/month, you can help support us. Join our growing community of data-driven enthusiasts.
+                  </p>
+                </div>
+              </section>
+               
+              <section class="cn441" data-cid="n441">
+                <div class="cn442" data-cid="n442">
+                  <a class="cn443" data-cid="n443" href="https://pudding.cool/subscribe">
+                    <img class="cn444" data-cid="n444" alt="donate sticker" src="public/assets/cloned/images/79733bb2020d.png" />
+                  </a>
+                </div>
+                 
+                <div class="cn445" data-cid="n445">
+                  <p class="cn446" data-cid="n446">
+                    <a class="cn447" data-cid="n447" href="https://pudding.cool/subscribe">
+                      Subscribe to our newsletter
+                    </a>
+                     
+                    <span class="cn448" data-cid="n448">
+                      <svg class="cn449" data-cid="n449" fill="none" height="24" stroke="currentColor" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+                    </span>
+                  </p>
+                   
+                  <p class="cn450" data-cid="n450">
+                    Get all our latest stories in your inbox. Plus get links to some of our favorite projects from around the web.
+                  </p>
+                </div>
+              </section>
+            </div>
+             
+            <section class="cn451" data-cid="n451">
+              <div class="cn452" data-cid="n452">
+                <span class="cn453" data-cid="n453">
+                  <svg class="cn454" data-cid="n454" fill="none" height="260" viewBox="0 0 606 260" width="606" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_dddd_3325_11626)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M223.342 8.32435C227.137 4.49333 234.197 -0.342233 243.763 1.3462L244.222 1.43153L244.281 1.44358L244.341 1.45564C250.904 2.80179 255.325 7.125 257.709 11.3645L257.933 11.7745L257.952 11.8106L257.971 11.8459C258.556 12.9588 259.081 14.2063 259.488 15.5631C262.236 17.8972 263.955 20.8246 264.922 23.6384C267.449 22.65 271.08 21.5646 275.162 21.6175C280.957 21.6928 288.047 24.2298 292.242 31.4541L292.44 31.8009L292.66 32.1979L292.856 32.6069C295.489 38.0845 295.248 43.6983 294.505 47.422C294.719 47.7897 294.916 48.156 295.094 48.5192C295.996 50.3608 296.49 52.1809 296.742 53.8418C301.955 50.5147 308.301 48.9272 315.437 49.8807L315.438 49.8797C315.474 49.8844 315.51 49.8897 315.546 49.8946C315.55 49.8951 315.555 49.8958 315.559 49.8964C325.472 51.2235 335.429 58.1511 338.132 70.0796L338.255 70.6537L338.324 70.9932L338.378 71.3363C338.648 73.0535 338.758 74.7578 338.736 76.4392C340.363 75.9698 342.056 75.568 343.819 75.2446L344.368 75.1444L344.923 75.0841C347.918 74.7598 351.189 74.8616 354.465 75.5349C354.717 74.6703 354.971 73.8213 355.226 73.0131C357.773 64.942 362.994 50.9121 377.338 45.3844L377.567 45.2963L377.799 45.2156C382.767 43.483 387.785 43.6318 391.803 44.4755C395.395 45.2297 399.273 46.7644 402.695 49.3233C404.013 47.0844 405.554 45.0113 407.283 43.1631C411.406 38.7581 417.989 34.2801 426.328 34.2234L427.14 34.2318L427.587 34.2485C436.931 34.6825 443.586 40.5507 446.893 47.1558C449.796 52.955 450.411 59.5187 449.489 65.6557C452.218 65.5449 455.172 65.8589 458.219 66.8781L458.877 67.109L458.936 67.1313L458.995 67.1526C461.621 68.1403 463.905 69.5427 465.846 71.2334C470.422 68.219 475.52 65.5938 481.012 64.0289C490.636 61.1207 501.76 61.9358 510.293 68.7293C511.907 70.014 513.325 71.4306 514.553 72.9529C516.844 71.0977 519.337 69.3701 522.06 67.8185L522.182 67.7499C528.698 64.1161 540.718 59.5514 552.729 63.7498C556.768 60.0308 561.574 57.2088 566.653 55.6494C571.985 54.0126 578.363 53.5536 584.757 55.7681C591.362 58.056 596.633 62.7389 600.145 68.9722C602.736 75.3833 603.878 81.4685 602.234 88.4005C601.082 93.2561 598.979 97.531 597.319 100.546L597.273 100.63L597.225 100.713C592.486 109.07 586.627 116.734 581.903 123.197C576.925 130.007 572.871 135.903 569.981 142.182L569.973 142.199L569.966 142.216C566.345 150.032 563.23 158.601 559.714 168.089C556.295 177.314 552.523 187.326 547.841 196.794C538.4 215.885 524.311 234.68 498.902 243.108C498.878 243.116 498.855 243.123 498.832 243.131C498.801 243.141 498.77 243.153 498.739 243.163L498.738 243.162C484.794 247.894 463.813 250.517 447.089 237.703C447.044 237.669 446.999 237.635 446.954 237.601C446.922 237.576 446.89 237.553 446.859 237.528C432.416 226.565 427.834 205.653 437.324 189.846C435.537 188.684 433.924 187.316 432.506 185.779C425.432 193.631 413.936 198.157 402.058 194.026L402.005 194.008C399.506 193.138 397.395 191.962 395.617 190.588C389.218 195.719 380.178 200.227 369.031 197.671L368.166 197.472L367.331 197.176C364.916 196.316 362.853 195.153 361.095 193.803C357.18 196.95 352.348 199.838 346.684 201.093L345.725 201.306L344.746 201.393C340.06 201.811 334.627 201.354 329.586 198.513C328.548 197.928 327.597 197.281 326.727 196.587C319.943 201.294 307.39 207.485 294.404 200.126L294.257 200.042L294.112 199.956C292.46 198.971 291.014 197.867 289.745 196.686C285.587 200.102 280.713 203.045 274.995 204.861L274.996 204.863C274.946 204.88 274.895 204.894 274.845 204.911C274.824 204.917 274.803 204.924 274.782 204.931L274.781 204.93C267.63 207.215 259.012 206.991 252.145 201.462C245.061 206.604 234.803 210.922 222.751 206.286L222.124 206.045L221.52 205.749C219.168 204.597 217.194 203.176 215.537 201.609C213.719 203.165 211.786 204.637 209.735 205.958C205.778 208.611 200.283 211.006 194.134 211.304C188.859 211.561 182.696 210.184 177.649 205.887C171.028 211.203 161.392 216.13 149.382 213.138L148.521 212.924L147.691 212.61C139.827 209.643 134.819 203.786 132.347 197.145C130.115 191.151 130.08 184.976 130.519 180.16C131.089 173.898 132.778 167.35 134.267 162.279C125.168 164.429 114.744 164.406 105.236 160.266C103.421 165.231 101.428 170.214 99.1811 175.018C93.1845 188.198 84.2951 205.96 68.667 217.573L68.5761 217.64L68.4852 217.706C64.4293 220.627 59.7971 223.135 54.5735 224.751L54.5744 224.753C54.5371 224.764 54.4986 224.775 54.4613 224.787C54.4304 224.796 54.3994 224.807 54.3685 224.817L54.3676 224.815C44.4615 227.919 33.4769 227.056 24.2467 222.747C14.7373 218.309 6.24255 209.724 3.72503 197.2C0.454513 182.053 8.39405 164.069 24.6029 157.992C28.6252 156.369 32.9011 155.328 35.4355 154.646C38.3062 153.873 39.942 153.329 41.1468 152.731C45.001 150.395 49.5025 145.845 54.4019 139.377C45.1304 136.405 36.7521 129.512 32.2711 118.353L32.2247 118.238L32.1811 118.123C26.5943 103.529 27.2368 89.4119 32.6912 76.9845C37.9791 64.9365 47.332 55.4523 57.7157 48.4663C76.7332 35.6717 102.476 29.0821 124.298 31.5663C131.185 26.6684 141.427 21.2483 153.788 22.7406C153.79 22.741 153.794 22.7413 153.797 22.7416C153.805 22.7425 153.82 22.7444 153.82 22.7444C174.601 23.8904 175.359 26.3283 185.48 17.1639C189.929 13.1355 195.293 10.4877 200.392 9.08949V9.08764C200.455 9.06948 200.52 9.05341 200.583 9.0357C200.612 9.02783 200.642 9.01844 200.671 9.01066C207.743 7.05689 214.147 7.95762 218.83 9.06723C219.893 9.31911 220.93 9.59932 221.908 9.87968C222.364 9.35204 222.841 8.82969 223.342 8.32435Z" fill="url(#paint0_radial_3325_11626)"></path>
+</g>
+<path d="M586.912 76.4217C579.382 63.0563 562.116 70.9722 557.538 82.8247C556.911 83.8609 556.574 84.701 555.586 84.3051C554.19 83.3993 551.907 79.7211 549.535 78.8633C543.265 75.6539 535.38 77.7821 529.589 81.0117C506.864 93.9614 503.977 124.846 489.19 140.85C486.173 144.253 476.762 150.874 473.45 144.817C469.108 129.804 501.304 114.322 504.853 95.5473C508.136 82.0748 497.4 74.8238 485.221 78.6222C475.627 81.3417 466.79 89.174 459.898 95.9931C459.271 96.556 458.615 97.3314 457.881 97.5197C457.68 97.5339 457.598 97.4024 457.562 97.2124C457.379 96.31 458.704 92.754 458.816 90.8392C459.39 87.0689 457.249 82.7188 453.652 81.3663C448.672 79.5401 443.029 82.6481 439.225 85.7112C419.493 103.097 423.965 139.014 397.998 151.013C392.52 153.184 388.125 151.001 388.457 144.807C389.853 127.308 409.91 116.264 416.299 100.213C418.641 94.8352 420.351 86.0739 412.797 84.0194L412.685 83.9878C395.472 82.0901 386.777 122.291 378.62 134.33C375.083 140.19 361.218 163.617 354.368 152.66C352.878 145.724 358.497 136.575 361.88 130.789C373.474 112.457 390.533 96.9594 396.773 75.4988C397.962 70.7276 398.116 65.2462 394.1 61.881C391.231 59.4172 386.298 58.3372 382.808 59.5541C368.694 64.993 368.854 88.5767 362.33 100.354C362.064 100.639 361.727 100.657 361.478 100.351C360.792 99.6585 360.082 97.0195 358.852 95.2528C356.155 91.2124 351.363 89.6617 346.566 90.1813C317.559 95.5022 314.282 130.521 299.506 150.412C296.111 155.429 283.672 168.138 280.04 157.107C278.248 133.459 326.84 95.747 323.373 73.6851C322.362 68.7336 318.257 65.5561 313.495 64.9405C295.064 62.4062 294.573 93.0482 287.919 105.977C287.173 107.1 286.262 105.031 285.6 103.676C279.448 90.5539 264.093 94.9535 255.031 103.291C237.174 118.668 231.335 157.245 212.685 166.917C209.385 168.309 205.126 167.885 204.043 163.915C200.731 142.997 233.394 127.44 234.121 106.339C234.157 103.181 232.85 99.8567 229.91 98.7287C225.899 97.162 220.919 99.82 217.743 102.356C206.007 112.131 202.423 129.81 195.774 143.005C191.113 151.928 183.483 163.946 176.491 169.267C174.291 170.909 170.955 172.217 168.287 171.2C163.301 168.333 167.69 158.601 170.245 154.605C178.189 140.823 198.584 124.815 197.839 108.161C197.087 100.788 187.972 100.736 183.039 103.791C167.873 113.051 156.51 143.527 150.773 160.269C147.46 171.192 139.682 193.335 153.062 198.384C167.258 201.921 177.514 182.951 186.269 173.289C186.754 172.717 187.99 171.325 187.623 172.626C185.228 178.832 181.909 187.003 186.056 192.677C189.723 198.007 196.874 196.327 201.376 193.264C208.811 188.531 214.247 181.03 219.783 174.11C220.121 173.696 220.44 173.323 220.724 173.038C221.233 172.521 221.623 172.273 221.865 172.396C222.569 173.354 222.09 174.949 222.102 176.985C222.001 182.479 222.741 189.413 228.212 192.094C241.971 197.386 253.535 178.48 260.674 168.63C261.833 166.935 263.206 164.663 261.804 168.91C260.745 172.53 258.899 177.059 258.651 180.344C257.924 187.756 262.182 193.066 270.268 190.414C281.56 186.896 288.297 176.501 294.626 167.17C295.046 166.538 295.957 165.288 296.46 165.191C297.052 164.899 296.975 167.4 296.762 168.645C296.022 174.98 295.608 183.142 301.902 186.896C312.49 192.897 326.165 177.902 332.908 169.033C333.837 167.872 334.577 167.566 334.269 169.891C332.696 178.093 332.258 187.243 343.402 186.248C352.606 184.208 361.029 172.115 366.559 164.172C368.884 160.953 367.174 166.851 367.086 167.914C366.151 173.27 366.648 180.791 372.433 182.851C386.339 186.039 397.158 165.345 404.954 155.495C408.166 151.723 403.913 161.345 403.664 162.205C401.487 168.331 400.417 177.37 407.03 179.656C413.383 181.879 420.132 178.524 423.19 172.828C427.336 165.765 428.454 156.733 431.873 149.375C438.125 136.143 459.567 96.3186 474.911 98.0299C479.956 100.189 476.277 109.241 474.538 112.902C469.729 122.609 460.963 130.519 454.261 139.01C448.323 146.822 442.236 156.589 441.035 166.413C440.16 172.704 444.046 177.936 450.304 178.791C465.524 180.352 479.856 162.488 488.817 152.409C492.1 148.592 490.343 154.696 490.059 157.016C489.557 160.249 489.586 163.852 490.26 166.875C491.781 175.539 500.387 178.091 507.834 175.772C521.338 171.388 533.848 151.279 542.579 139.747C543.17 139.059 543.508 138.935 543.519 139.474C543.502 140.029 543.23 141.516 542.916 142.35C535.783 167.22 515.11 203.793 485.268 196.936C480.518 195.599 475.757 192.895 471.119 191.104C463.595 187.796 456.296 189.059 451.523 195.933C444.709 204.972 446.962 218.636 456.184 225.517C466.979 233.899 481.826 232.88 493.993 228.721C534.085 215.518 540.461 169.763 556.184 135.82C563.347 120.256 575.632 107.988 584.014 93.2079C586.818 88.1159 589.42 81.6893 586.912 76.4454V76.4217ZM245.224 158.392C242.42 145.506 261.969 112.203 275.645 112.873L275.746 112.887C280.909 113.77 281.128 120.666 280.028 124.628C278.845 132.405 253.901 177.114 245.224 158.392ZM329.969 155.689C327.354 157.394 323.243 157.725 320.723 155.545L320.647 155.473C317.24 151.674 319.848 145.1 321.634 139.949C325.84 129.504 334.624 114.276 344.484 109.129C346.395 108.299 348.672 108.096 350.736 108.505C359.798 110.491 352.747 125.099 349.695 131.032C345.709 138.216 336.398 151.636 329.963 155.695L329.969 155.689ZM544.466 119.826C539.207 129.667 530.151 143.819 520.149 145.686C517.109 146.112 513.607 144.589 512.738 141.403C510.567 132.77 516.523 119.924 521.125 112.739C526.342 105.258 532.725 95.803 540.668 94.1078L540.781 94.092C555.042 92.4715 548.157 112.335 544.46 119.82L544.466 119.826Z" fill="black"></path>
+<path d="M147.04 54.9596C145.36 54.1257 143.58 53.2664 141.906 52.4326C140.593 51.7767 139.901 51.3564 140.096 51.2001L140.114 51.1826C140.776 50.999 142.296 51.1261 143.136 51.1822C147.3 51.3554 151.908 51.1637 155.268 49.0571C161.603 44.6953 159.349 38.6985 151.991 37.8188C143.704 36.8104 136.233 41.3181 130.076 46.2392C128.893 47.0054 127.639 47.3147 126.267 47.1902C89.3449 40.5647 29.6503 68.9842 46.378 112.681C55.1559 134.54 87.7419 127.69 83.1045 103.745C82.0339 98.372 77.8579 94.9447 76.4146 90.2755C71.4341 73.405 101.352 57.546 113.94 59.1087C115.685 59.6065 115.04 61.0209 114.229 62.3142C106.428 72.9569 101.92 85.3253 96.2951 97.1064C84.9973 119.437 67.3054 155.085 48.5134 166.027C42.7758 169.063 36.0504 169.708 30.1353 172.137C21.523 175.246 16.6431 185.514 18.6247 194.174C21.4284 208.197 37.5232 214.24 49.9566 210.268C53.3992 209.222 56.611 207.527 59.61 205.367C71.8541 196.269 79.4254 181.765 85.4173 168.582C90.6225 157.456 94.4082 145.158 98.1051 133.503C99.087 132.396 100.471 137.153 101.512 138.361C101.979 139.085 102.506 139.75 103.086 140.382C112.082 150.229 126.409 150.231 137.629 145.167C172.534 129.898 185.784 73.7445 147.058 54.9481L147.04 54.9596ZM110.799 125.851C108.575 124.925 106.398 123.656 104.937 121.862C102.482 118.808 103.369 115.741 104.221 112.194C106.215 104.603 109.172 96.6804 111.769 89.2184C113.94 83.2812 121.546 63.1282 126.793 60.9658C130.732 60.1117 138.233 65.1114 140.871 67.9675L140.954 68.0518C159.438 87.0097 140.037 136.454 110.805 125.845L110.799 125.851Z" fill="black"></path>
+<path d="M420.711 78.9811C426.538 79.142 432.612 72.6517 434.274 64.4872C435.937 56.3226 432.559 49.5727 426.727 49.4117C420.901 49.2509 414.826 55.7411 413.164 63.9057C411.502 72.0702 414.879 78.8201 420.711 78.9811Z" fill="black"></path>
+<path d="M222.961 61.4045C219.652 66.4197 212.483 72.4256 211.317 77.6974C210.785 81.6673 214.178 84.077 217.841 82.7069C223.592 80.4664 225.178 71.593 227.73 66.2647C230.887 60.332 236.366 52.3172 241.783 49.8452C242.935 49.4308 244.454 49.2745 244.893 50.6616C246.382 57.7154 232.259 65.2302 230.662 74.3835C229.971 77.1944 230.688 81.1956 234.104 81.6802C239.96 82.3404 244.568 75.6258 248.43 72.2126C249.081 71.5995 249.515 71.7519 249.748 72.86C250.975 81.1414 258.089 82.3221 264.874 78.2714C270.597 74.8052 280.432 64.1812 281.71 57.8097C281.971 55.9718 281.572 53.8993 279.286 54.1182C276.788 54.2574 274.507 57.2447 274.118 59.5576C273.812 61.5751 274.474 63.5691 273.325 65.4437C270.835 69.8804 263.67 72.3053 259.516 69.0275C258.284 68.0967 258.127 66.9947 259.53 66.1716C266.681 61.7806 276.931 52.4911 279.549 44.7232C279.95 42.9922 279.96 40.8295 279.167 39.1798C277.261 35.7537 273.076 36.6114 269.591 38.1437C260.936 42.4348 253.102 55.6056 250.182 64.8047C249.919 65.6785 249.935 66.7805 249.138 67.3672C247.521 68.284 244.497 68.4971 243.106 67.7297C242.351 67.3081 242.092 66.3231 242.142 65.4597C242.329 61.8969 246.246 59.0639 248.29 56.4998C250.614 53.6225 253.527 49.5279 254.123 46.1906C254.617 43.7419 252.618 41.6509 250.175 41.6985C244.312 41.665 239.334 47.8152 235.053 51.4182C233.923 52.2793 231.763 53.9273 230.735 54.7071C230.669 54.763 230.123 55.1665 230.251 54.986L230.256 54.9765C232.003 52.8417 233.886 50.5241 235.884 48.5979C241.04 43.3554 251.253 37.4295 250.752 29.3697C250.626 28.2872 250.042 27.268 249.18 26.8161C238.536 22.8671 228.378 53.7638 222.959 61.4068L222.961 61.4045ZM264.347 48.8407C265.8 47.7264 268.845 45.7662 270.514 46.9801C273.648 51.3844 264.456 58.812 261.107 61.2061C260.088 61.9172 258.362 63.0813 257.351 63.5338C257.069 63.6547 256.706 63.7837 256.497 63.4999L256.482 63.4782C255.341 57.8266 260.297 52.2292 264.349 48.8383L264.347 48.8407Z" fill="black"></path>
+<path d="M197.534 82.6208C201.485 81.7757 204.082 79.7459 206.698 76.4866C212.478 69.282 217.078 57.5909 220.732 50.7409C223.728 45.2541 227.224 39.6122 230.826 34.4874C231.711 33.2611 232.556 31.9771 233.496 30.7851C233.921 30.2654 234.299 29.9087 234.883 29.653C235.903 29.2268 237.275 28.9493 238.462 28.5094C241.268 27.4543 244.29 24.8195 245.036 22.0309C245.271 20.9784 245.064 19.9302 244.525 18.9046C243.842 17.6201 242.712 16.6222 241.294 16.3315C235.599 15.2112 231.896 21.3931 229.363 25.9312C229.147 26.3192 228.874 26.7489 228.523 26.9707C227.801 27.4472 226.84 27.1313 225.848 26.9026C218.909 25.1101 211.835 21.6104 204.58 23.6871C198.268 25.3647 191.654 30.1758 191.139 37.0355C190.88 40.5068 192.73 43.8796 196.49 44.1756C202.812 44.775 205.432 37.8619 210.014 34.8601C213.259 32.5615 217.145 31.4944 221.1 31.1504C222.189 31.053 223.298 31.0012 224.414 30.9874C224.832 30.9994 225.418 30.9456 225.696 31.2899L225.708 31.3115C225.893 31.6139 225.541 32.2251 225.328 32.5775C221.37 39.2014 217.273 45.7777 212.665 51.97C209.525 55.7329 205.473 62.9345 200.388 63.3918C197.674 63.5534 195.077 62.2141 192.45 63.4384C188.739 65.0546 186.052 69.1436 185.936 72.5059C185.409 78.9855 191.082 84.1369 197.53 82.6231L197.534 82.6208Z" fill="black"></path>
+<defs>
+<filter id="filter0_dddd_3325_11626" x="0" y="0" width="606" height="259.056" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+<feOffset></feOffset>
+<feGaussianBlur stdDeviation="0.5"></feGaussianBlur>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"></feColorMatrix>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_3325_11626"></feBlend>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+<feOffset dy="2"></feOffset>
+<feGaussianBlur stdDeviation="1"></feGaussianBlur>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.09 0"></feColorMatrix>
+<feBlend mode="normal" in2="effect1_dropShadow_3325_11626" result="effect2_dropShadow_3325_11626"></feBlend>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+<feOffset dy="5"></feOffset>
+<feGaussianBlur stdDeviation="1.5"></feGaussianBlur>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0"></feColorMatrix>
+<feBlend mode="normal" in2="effect2_dropShadow_3325_11626" result="effect3_dropShadow_3325_11626"></feBlend>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+<feOffset dy="9"></feOffset>
+<feGaussianBlur stdDeviation="1.5"></feGaussianBlur>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.01 0"></feColorMatrix>
+<feBlend mode="normal" in2="effect3_dropShadow_3325_11626" result="effect4_dropShadow_3325_11626"></feBlend>
+<feBlend mode="normal" in="SourceGraphic" in2="effect4_dropShadow_3325_11626" result="shape"></feBlend>
+</filter>
+<radialGradient id="paint0_radial_3325_11626" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(303 124.028) rotate(152.988) scale(301.757 735.823)">
+<stop stop-color="white"></stop>
+<stop offset="1" stop-color="white" stop-opacity="0.9"></stop>
+</radialGradient>
+</defs>
+</svg>
+                   
+                </span>
+              </div>
+               
+              <div class="cn455" data-cid="n455">
+                <div class="cn456" data-cid="n456">
+                  <p class="cn457" data-cid="n457">
+                    About Us
+                  </p>
+                   
+                  <ul class="cn458" data-cid="n458">
+                    <li class="cn459" data-cid="n459">
+                      <a class="cn460" data-cid="n460" href="https://pudding.cool/about">
+                        Our Team
+                      </a>
+                    </li>
+                    <li class="cn461" data-cid="n461">
+                      <a class="cn462" data-cid="n462" href="https://pudding.cool/resources/">
+                        Our Resources
+                      </a>
+                    </li>
+                    <li class="cn463" data-cid="n463">
+                      <a class="cn464" data-cid="n464" href="https://pudding.cool/pitch/">
+                        Pitch a Story
+                      </a>
+                    </li>
+                    <li class="cn465" data-cid="n465">
+                      <a class="cn466" data-cid="n466" href="https://polygraph.cool/">
+                        Brand Partnerships
+                      </a>
+                    </li>
+                    <li class="cn467" data-cid="n467">
+                      <a class="cn468" data-cid="n468" href="https://pudding.cool/privacy/">
+                        Privacy Policy
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                 
+                <div class="cn469" data-cid="n469">
+                  <p class="cn470" data-cid="n470">
+                    Follow Us
+                  </p>
+                   
+                  <ul class="cn471" data-cid="n471">
+                    <li class="cn472" data-cid="n472">
+                      <a class="cn473" data-cid="n473" href="https://www.instagram.com/the.pudding">
+                        Instagram
+                      </a>
+                    </li>
+                    <li class="cn474" data-cid="n474">
+                      <a class="cn475" data-cid="n475" href="https://twitter.com/puddingviz/">
+                        Twitter/X
+                      </a>
+                    </li>
+                    <li class="cn476" data-cid="n476">
+                      <a class="cn477" data-cid="n477" href="https://www.tiktok.com/@the_pudding">
+                        TikTok
+                      </a>
+                    </li>
+                    <li class="cn478" data-cid="n478">
+                      <a class="cn479" data-cid="n479" href="https://www.youtube.com/@thepudding">
+                        YouTube
+                      </a>
+                    </li>
+                    <li class="cn480" data-cid="n480">
+                      <a class="cn481" data-cid="n481" href="https://bsky.app/profile/pudding.cool">
+                        Bluesky
+                      </a>
+                    </li>
+                    <li class="cn482" data-cid="n482">
+                      <a class="cn483" data-cid="n483" href="https://pudding.cool/feed/index.xml">
+                        RSS
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </footer>
+       
+      <div class="cn484" data-cid="n484" aria-atomic="true" aria-live="assertive" id="svelte-announcer"></div>
+       
+    </div>
+     
+</body>
+</html>

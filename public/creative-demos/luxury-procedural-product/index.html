@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luxury Procedural Product — Watch</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    background: #0a0a0a;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #fff;
+  }
+  #canvas-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+  }
+  canvas { display: block; }
+  #scroll-container {
+    position: relative;
+    z-index: 2;
+    height: 400vh;
+  }
+  .section {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .section-content {
+    text-align: center;
+    max-width: 600px;
+    padding: 2rem;
+    background: rgba(10,10,10,0.4);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .section-content h1, .section-content h2 {
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .section-content h1 { font-size: 2.5rem; }
+  .section-content h2 { font-size: 1.8rem; }
+  .section-content p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+    font-weight: 300;
+  }
+  .material-badge {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.05);
+  }
+  #overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 10;
+    pointer-events: none;
+  }
+  #hover-info {
+    position: absolute;
+    padding: 0.8rem 1.2rem;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+  }
+  #scroll-indicator {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    animation: bounce 2s infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-10px); }
+  }
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    width: 0%;
+    z-index: 20;
+    background: #D4AF37;
+    transition: background 0.5s;
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+<div class="progress-bar" id="progress-bar"></div>
+
+<div id="canvas-container"></div>
+
+<div id="overlay">
+  <div id="hover-info">Material</div>
+</div>
+
+<div id="scroll-indicator">Scroll to explore</div>
+
+<div id="scroll-container">
+  <div class="section">
+    <div class="section-content">
+      <h1>Chronos</h1>
+      <p>A procedural masterpiece forged from pure geometry. Scroll to witness the metamorphosis across gold, steel, and sapphire.</p>
+      <div class="material-badge" style="color:#D4AF37;border-color:rgba(212,175,55,0.4);">Gold Edition</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-content">
+      <h2>Steel</h2>
+      <p>Cool precision. The industrial soul of modern horology, rendered in brushed silver ridges and platinum tones.</p>
+      <div class="material-badge" style="color:#A8B0B8;border-color:rgba(168,176,184,0.4);">Steel Edition</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-content">
+      <h2>Sapphire</h2>
+      <p>Deep oceanic basins of teal and midnight. The rarest form, where light refracts through crystalline depths.</p>
+      <div class="material-badge" style="color:#4A90C8;border-color:rgba(74,144,200,0.4);">Sapphire Edition</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-content">
+      <h2>Atelier</h2>
+      <p>10,000 particles drift in the flow-field atmosphere. Click the watch to pulse. Hover to reveal material composition.</p>
+      <div class="material-badge" style="color:#fff;border-color:rgba(255,255,255,0.3);">Interactive</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// Inline Simplex Noise Implementation
+// ============================================
+class SimplexNoise {
+  constructor() {
+    this.grad3 = [
+      [1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],
+      [1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],
+      [0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]
+    ];
+    this.p = [];
+    for (let i = 0; i < 256; i++) this.p[i] = Math.floor(Math.random() * 256);
+    this.perm = [];
+    for (let i = 0; i < 512; i++) this.perm[i] = this.p[i & 255];
+  }
+  dot(g, x, y, z) { return g[0]*x + g[1]*y + g[2]*z; }
+  noise(xin, yin, zin) {
+    let n0, n1, n2, n3;
+    const F3 = 1.0/3.0, G3 = 1.0/6.0;
+    let s = (xin + yin + zin) * F3;
+    let i = Math.floor(xin + s), j = Math.floor(yin + s), k = Math.floor(zin + s);
+    let t = (i + j + k) * G3;
+    let X0 = i - t, Y0 = j - t, Z0 = k - t;
+    let x0 = xin - X0, y0 = yin - Y0, z0 = zin - Z0;
+    let i1, j1, k1, i2, j2, k2;
+    if (x0 >= y0) {
+      if (y0 >= z0) { i1=1; j1=0; k1=0; i2=1; j2=1; k2=0; }
+      else if (x0 >= z0) { i1=1; j1=0; k1=0; i2=1; j2=0; k2=1; }
+      else { i1=0; j1=0; k1=1; i2=1; j2=0; k2=1; }
+    } else {
+      if (y0 < z0) { i1=0; j1=0; k1=1; i2=0; j2=1; k2=1; }
+      else if (x0 < z0) { i1=0; j1=1; k1=0; i2=0; j2=1; k2=1; }
+      else { i1=0; j1=1; k1=0; i2=1; j2=1; k2=0; }
+    }
+    let x1 = x0 - i1 + G3, y1 = y0 - j1 + G3, z1 = z0 - k1 + G3;
+    let x2 = x0 - i2 + 2.0*G3, y2 = y0 - j2 + 2.0*G3, z2 = z0 - k2 + 2.0*G3;
+    let x3 = x0 - 1.0 + 3.0*G3, y3 = y0 - 1.0 + 3.0*G3, z3 = z0 - 1.0 + 3.0*G3;
+    let ii = i & 255, jj = j & 255, kk = k & 255;
+    let gi0 = this.perm[ii+this.perm[jj+this.perm[kk]]] % 12;
+    let gi1 = this.perm[ii+i1+this.perm[jj+j1+this.perm[kk+k1]]] % 12;
+    let gi2 = this.perm[ii+i2+this.perm[jj+j2+this.perm[kk+k2]]] % 12;
+    let gi3 = this.perm[ii+1+this.perm[jj+1+this.perm[kk+1]]] % 12;
+    let t0 = 0.6 - x0*x0 - y0*y0 - z0*z0;
+    if (t0 < 0) n0 = 0.0;
+    else { t0 *= t0; n0 = t0 * t0 * this.dot(this.grad3[gi0], x0, y0, z0); }
+    let t1 = 0.6 - x1*x1 - y1*y1 - z1*z1;
+    if (t1 < 0) n1 = 0.0;
+    else { t1 *= t1; n1 = t1 * t1 * this.dot(this.grad3[gi1], x1, y1, z1); }
+    let t2 = 0.6 - x2*x2 - y2*y2 - z2*z2;
+    if (t2 < 0) n2 = 0.0;
+    else { t2 *= t2; n2 = t2 * t2 * this.dot(this.grad3[gi2], x2, y2, z2); }
+    let t3 = 0.6 - x3*x3 - y3*y3 - z3*z3;
+    if (t3 < 0) n3 = 0.0;
+    else { t3 *= t3; n3 = t3 * t3 * this.dot(this.grad3[gi3], x3, y3, z3); }
+    return 32.0 * (n0 + n1 + n2 + n3);
+  }
+}
+
+// ============================================
+// Scene Setup
+// ============================================
+const container = document.getElementById('canvas-container');
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x0a0a0a, 0.02);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 3, 8);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+container.appendChild(renderer.domElement);
+
+// ============================================
+// Lights
+// ============================================
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+scene.add(ambientLight);
+
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+keyLight.position.set(5, 10, 7);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.width = 2048;
+keyLight.shadow.mapSize.height = 2048;
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0x4A90C8, 0.5);
+fillLight.position.set(-5, 5, -5);
+scene.add(fillLight);
+
+const rimLight = new THREE.SpotLight(0xD4AF37, 2.0);
+rimLight.position.set(0, 8, -8);
+rimLight.lookAt(0, 0, 0);
+scene.add(rimLight);
+
+const pointLight1 = new THREE.PointLight(0xD4AF37, 0.8, 20);
+pointLight1.position.set(3, 2, 3);
+scene.add(pointLight1);
+
+const pointLight2 = new THREE.PointLight(0x0F52BA, 0.6, 20);
+pointLight2.position.set(-3, 2, -3);
+scene.add(pointLight2);
+
+// ============================================
+// Palette Definitions
+// ============================================
+const PALETTES = {
+  gold: {
+    primary: new THREE.Color(0xD4AF37),
+    secondary: new THREE.Color(0xC9A227),
+    highlight: new THREE.Color(0xF9E076),
+    shadow: new THREE.Color(0x8B6914),
+    deep: new THREE.Color(0x3D2B0F),
+    terrainColors: [0xD4AF37, 0xC9A227, 0xF9E076, 0x8B6914, 0x3D2B0F]
+  },
+  steel: {
+    primary: new THREE.Color(0xA8B0B8),
+    secondary: new THREE.Color(0x7A8A9A),
+    highlight: new THREE.Color(0xD0D5DB),
+    shadow: new THREE.Color(0x4A5568),
+    deep: new THREE.Color(0x1A202C),
+    terrainColors: [0xA8B0B8, 0x7A8A9A, 0xD0D5DB, 0x4A5568, 0x1A202C]
+  },
+  sapphire: {
+    primary: new THREE.Color(0x1E3A5F),
+    secondary: new THREE.Color(0x2E5C8A),
+    highlight: new THREE.Color(0x4A90C8),
+    shadow: new THREE.Color(0x0F1F3A),
+    deep: new THREE.Color(0x0A1628),
+    terrainColors: [0x1E3A5F, 0x2E5C8A, 0x4A90C8, 0x0F1F3A, 0x0A1628]
+  }
+};
+
+// ============================================
+// Procedural Watch
+// ============================================
+const watchGroup = new THREE.Group();
+scene.add(watchGroup);
+
+// Materials
+const goldMaterial = new THREE.MeshStandardMaterial({
+  color: 0xD4AF37, metalness: 1.0, roughness: 0.2, envMapIntensity: 1.0
+});
+const steelMaterial = new THREE.MeshStandardMaterial({
+  color: 0xA8B0B8, metalness: 0.9, roughness: 0.3, envMapIntensity: 0.8
+});
+const sapphireMaterial = new THREE.MeshStandardMaterial({
+  color: 0x1E3A5F, metalness: 0.6, roughness: 0.1, envMapIntensity: 0.6, transparent: true, opacity: 0.9
+});
+const dialMaterial = new THREE.MeshStandardMaterial({
+  color: 0x0a0a0a, metalness: 0.5, roughness: 0.4
+});
+const glassMaterial = new THREE.MeshPhysicalMaterial({
+  color: 0xffffff, metalness: 0, roughness: 0, transmission: 0.9, transparent: true, opacity: 0.3
+});
+const strapMaterial = new THREE.MeshStandardMaterial({
+  color: 0x1a1a1a, metalness: 0.2, roughness: 0.8
+});
+
+// Case (cylinder)
+const caseGeo = new THREE.CylinderGeometry(1.6, 1.6, 0.5, 64);
+const caseMesh = new THREE.Mesh(caseGeo, steelMaterial);
+caseMesh.rotation.x = Math.PI / 2;
+caseMesh.castShadow = true;
+caseMesh.receiveShadow = true;
+caseMesh.userData = { name: 'Case', material: 'Platinum Steel' };
+watchGroup.add(caseMesh);
+
+// Bezel (torus)
+const bezelGeo = new THREE.TorusGeometry(1.6, 0.12, 16, 100);
+const bezelMesh = new THREE.Mesh(bezelGeo, goldMaterial);
+bezelMesh.userData = { name: 'Bezel', material: '18k Gold' };
+watchGroup.add(bezelMesh);
+
+// Dial face
+const dialGeo = new THREE.CylinderGeometry(1.45, 1.45, 0.05, 64);
+const dialMesh = new THREE.Mesh(dialGeo, dialMaterial);
+dialMesh.rotation.x = Math.PI / 2;
+dialMesh.position.z = 0.26;
+dialMesh.userData = { name: 'Dial', material: 'Onyx' };
+watchGroup.add(dialMesh);
+
+// Crystal
+const crystalGeo = new THREE.CylinderGeometry(1.55, 1.55, 0.08, 64);
+const crystalMesh = new THREE.Mesh(crystalGeo, glassMaterial);
+crystalMesh.rotation.x = Math.PI / 2;
+crystalMesh.position.z = 0.32;
+crystalMesh.userData = { name: 'Crystal', material: 'Sapphire Glass' };
+watchGroup.add(crystalMesh);
+
+// Hour markers
+for (let i = 0; i < 12; i++) {
+  const angle = (i / 12) * Math.PI * 2;
+  const r = 1.2;
+  const markerGeo = new THREE.BoxGeometry(0.06, 0.18, 0.04);
+  const markerMat = new THREE.MeshStandardMaterial({ color: 0xD4AF37, metalness: 1, roughness: 0.2 });
+  const marker = new THREE.Mesh(markerGeo, markerMat);
+  marker.position.set(Math.cos(angle) * r, Math.sin(angle) * r, 0.3);
+  marker.rotation.z = angle - Math.PI / 2;
+  marker.userData = { name: 'Marker', material: 'Gold Index' };
+  watchGroup.add(marker);
+}
+
+// Hands
+const hourHandGeo = new THREE.BoxGeometry(0.08, 0.8, 0.03);
+const handMat = new THREE.MeshStandardMaterial({ color: 0xD4AF37, metalness: 1, roughness: 0.2 });
+const hourHand = new THREE.Mesh(hourHandGeo, handMat);
+hourHand.position.set(0, 0.3, 0.32);
+hourHand.userData = { name: 'Hour Hand', material: 'Gold' };
+watchGroup.add(hourHand);
+
+const minuteHandGeo = new THREE.BoxGeometry(0.06, 1.15, 0.03);
+const minuteHand = new THREE.Mesh(minuteHandGeo, handMat);
+minuteHand.position.set(0, 0.45, 0.34);
+minuteHand.userData = { name: 'Minute Hand', material: 'Gold' };
+watchGroup.add(minuteHand);
+
+const secondHandGeo = new THREE.BoxGeometry(0.02, 1.25, 0.02);
+const secondHandMat = new THREE.MeshStandardMaterial({ color: 0xC0C0C0, metalness: 0.9, roughness: 0.3 });
+const secondHand = new THREE.Mesh(secondHandGeo, secondHandMat);
+secondHand.position.set(0, 0.35, 0.36);
+secondHand.userData = { name: 'Second Hand', material: 'Steel' };
+watchGroup.add(secondHand);
+
+// Crown
+const crownGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.25, 16);
+const crownMesh = new THREE.Mesh(crownGeo, goldMaterial);
+crownMesh.rotation.z = Math.PI / 2;
+crownMesh.position.set(1.7, 0, 0);
+crownMesh.userData = { name: 'Crown', material: 'Gold' };
+watchGroup.add(crownMesh);
+
+// Straps (box geometry)
+const strapGeo = new THREE.BoxGeometry(1.0, 2.8, 0.25);
+const strapTop = new THREE.Mesh(strapGeo, strapMaterial);
+strapTop.position.set(0, 2.5, 0);
+strapTop.rotation.z = 0.1;
+strapTop.userData = { name: 'Strap', material: 'Alligator Leather' };
+watchGroup.add(strapTop);
+
+const strapBottom = new THREE.Mesh(strapGeo, strapMaterial);
+strapBottom.position.set(0, -2.5, 0);
+strapBottom.rotation.z = -0.1;
+strapBottom.userData = { name: 'Strap', material: 'Alligator Leather' };
+watchGroup.add(strapBottom);
+
+// Lugs
+const lugGeo = new THREE.BoxGeometry(0.3, 0.5, 0.4);
+const lugTopLeft = new THREE.Mesh(lugGeo, steelMaterial);
+lugTopLeft.position.set(-0.9, 1.7, 0);
+watchGroup.add(lugTopLeft);
+const lugTopRight = new THREE.Mesh(lugGeo, steelMaterial);
+lugTopRight.position.set(0.9, 1.7, 0);
+watchGroup.add(lugTopRight);
+const lugBottomLeft = new THREE.Mesh(lugGeo, steelMaterial);
+lugBottomLeft.position.set(-0.9, -1.7, 0);
+watchGroup.add(lugBottomLeft);
+const lugBottomRight = new THREE.Mesh(lugGeo, steelMaterial);
+lugBottomRight.position.set(0.9, -1.7, 0);
+watchGroup.add(lugBottomRight);
+
+// ============================================
+// Procedural Terrain
+// ============================================
+const terrainSize = 80;
+const terrainSegments = 128;
+const terrainGeo = new THREE.PlaneGeometry(terrainSize, terrainSize, terrainSegments, terrainSegments);
+const terrainPos = terrainGeo.attributes.position;
+const simplex = new SimplexNoise();
+
+function updateTerrainHeight(time = 0) {
+  for (let i = 0; i < terrainPos.count; i++) {
+    const x = terrainPos.getX(i);
+    const y = terrainPos.getY(i);
+    const n1 = simplex.noise(x * 0.05, y * 0.05, time * 0.1);
+    const n2 = simplex.noise(x * 0.15 + 100, y * 0.15 + 100, time * 0.05);
+    const n3 = simplex.noise(x * 0.03 + 200, y * 0.03 + 200, time * 0.02);
+    const h = n1 * 3.5 + n2 * 1.0 + n3 * 0.5;
+    terrainPos.setZ(i, h);
+  }
+  terrainPos.needsUpdate = true;
+  terrainGeo.computeVertexNormals();
+}
+
+updateTerrainHeight(0);
+
+const terrainMat = new THREE.MeshStandardMaterial({
+  color: 0xD4AF37,
+  metalness: 0.6,
+  roughness: 0.7,
+  flatShading: true,
+  side: THREE.DoubleSide
+});
+const terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
+terrainMesh.rotation.x = -Math.PI / 2;
+terrainMesh.position.y = -4;
+terrainMesh.receiveShadow = true;
+scene.add(terrainMesh);
+
+// ============================================
+// 10,000 Particle Atmosphere
+// ============================================
+const particleCount = 10000;
+const particleGeo = new THREE.BufferGeometry();
+const particlePositions = new Float32Array(particleCount * 3);
+const particleVelocities = new Float32Array(particleCount * 3);
+const particleOrigins = new Float32Array(particleCount * 3);
+
+for (let i = 0; i < particleCount; i++) {
+  const x = (Math.random() - 0.5) * 40;
+  const y = (Math.random() - 0.5) * 30 + 5;
+  const z = (Math.random() - 0.5) * 40;
+  particlePositions[i * 3] = x;
+  particlePositions[i * 3 + 1] = y;
+  particlePositions[i * 3 + 2] = z;
+  particleOrigins[i * 3] = x;
+  particleOrigins[i * 3 + 1] = y;
+  particleOrigins[i * 3 + 2] = z;
+  particleVelocities[i * 3] = 0;
+  particleVelocities[i * 3 + 1] = 0;
+  particleVelocities[i * 3 + 2] = 0;
+}
+
+particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+
+const particleMat = new THREE.PointsMaterial({
+  color: 0xD4AF37,
+  size: 0.08,
+  transparent: true,
+  opacity: 0.6,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
+});
+
+const particles = new THREE.Points(particleGeo, particleMat);
+scene.add(particles);
+
+// ============================================
+// Click Pulse Animation
+// ============================================
+const pulseGroup = new THREE.Group();
+scene.add(pulseGroup);
+
+function createPulse(position) {
+  const ringGeo = new THREE.RingGeometry(0.1, 0.15, 64);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0xD4AF37, transparent: true, opacity: 0.8, side: THREE.DoubleSide
+  });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.position.copy(position);
+  ring.lookAt(camera.position);
+  pulseGroup.add(ring);
+
+  gsap.to(ring.scale, { x: 15, y: 15, duration: 1.5, ease: 'power2.out' });
+  gsap.to(ringMat, { opacity: 0, duration: 1.5, ease: 'power2.out', onComplete: () => {
+    pulseGroup.remove(ring);
+    ringGeo.dispose();
+    ringMat.dispose();
+  }});
+}
+
+// ============================================
+// Hover Overlay
+// ============================================
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const hoverInfo = document.getElementById('hover-info');
+let hoveredObj = null;
+
+function onMouseMove(event) {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(watchGroup.children, true);
+
+  if (intersects.length > 0) {
+    const obj = intersects[0].object;
+    if (obj.userData && obj.userData.name) {
+      hoveredObj = obj;
+      hoverInfo.style.opacity = '1';
+      hoverInfo.style.left = (event.clientX + 15) + 'px';
+      hoverInfo.style.top = (event.clientY + 15) + 'px';
+      hoverInfo.innerHTML = `<strong>${obj.userData.name}</strong><br>${obj.userData.material || ''}`;
+      document.body.style.cursor = 'pointer';
+    }
+  } else {
+    hoveredObj = null;
+    hoverInfo.style.opacity = '0';
+    document.body.style.cursor = 'default';
+  }
+}
+
+function onClick(event) {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(watchGroup.children, true);
+  if (intersects.length > 0) {
+    createPulse(intersects[0].point);
+    gsap.to(watchGroup.scale, { x: 1.08, y: 1.08, z: 1.08, duration: 0.15, yoyo: true, repeat: 1 });
+  }
+}
+
+window.addEventListener('mousemove', onMouseMove);
+window.addEventListener('click', onClick);
+
+// ============================================
+// Color Utilities
+// ============================================
+function lerpColor(c1, c2, t) {
+  return c1.clone().lerp(c2, t);
+}
+
+function hexToColor(hex) {
+  return new THREE.Color(hex);
+}
+
+function getPaletteMix(scrollProgress) {
+  // 0-0.33: gold -> steel
+  // 0.33-0.66: steel -> sapphire
+  // 0.66-1.0: sapphire -> gold
+  let p1, p2, t;
+  if (scrollProgress < 0.333) {
+    p1 = PALETTES.gold;
+    p2 = PALETTES.steel;
+    t = scrollProgress / 0.333;
+  } else if (scrollProgress < 0.666) {
+    p1 = PALETTES.steel;
+    p2 = PALETTES.sapphire;
+    t = (scrollProgress - 0.333) / 0.333;
+  } else {
+    p1 = PALETTES.sapphire;
+    p2 = PALETTES.gold;
+    t = (scrollProgress - 0.666) / 0.334;
+  }
+  return { p1, p2, t };
+}
+
+// ============================================
+// GSAP ScrollTrigger Camera Animation
+// ============================================
+gsap.registerPlugin(ScrollTrigger);
+
+const scrollProgress = { value: 0 };
+
+ScrollTrigger.create({
+  trigger: '#scroll-container',
+  start: 'top top',
+  end: 'bottom bottom',
+  scrub: 1,
+  onUpdate: (self) => {
+    scrollProgress.value = self.progress;
+  }
+});
+
+// Camera path keyframes
+const cameraPath = [
+  { x: 0, y: 3, z: 8, rx: 0, ry: 0, rz: 0 },      // Section 1: front
+  { x: 5, y: 2, z: 5, rx: 0, ry: Math.PI / 4, rz: 0 }, // Section 2: angled
+  { x: 0, y: 1, z: -6, rx: 0, ry: Math.PI, rz: 0 },   // Section 3: back
+  { x: -4, y: 4, z: 4, rx: -0.5, ry: -Math.PI / 3, rz: 0 } // Section 4: top angle
+];
+
+// ============================================
+// Resize Handler
+// ============================================
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ============================================
+// Animation Loop
+// ============================================
+const clock = new THREE.Clock();
+let idleTime = 0;
+let lastScrollValue = 0;
+let isScrolling = false;
+let scrollTimeout;
+
+window.addEventListener('scroll', () => {
+  isScrolling = true;
+  idleTime = 0;
+  clearTimeout(scrollTimeout);
+  scrollTimeout = setTimeout(() => { isScrolling = false; }, 150);
+});
+
+function animate() {
+  requestAnimationFrame(animate);
+  const elapsed = clock.getElapsedTime();
+  const delta = clock.getDelta();
+
+  // Update progress bar
+  const progressBar = document.getElementById('progress-bar');
+  progressBar.style.width = (scrollProgress.value * 100) + '%';
+
+  // Determine palette mix
+  const { p1, p2, t } = getPaletteMix(scrollProgress.value);
+  const currentPrimary = lerpColor(p1.primary, p2.primary, t);
+  const currentSecondary = lerpColor(p1.secondary, p2.secondary, t);
+  const currentHighlight = lerpColor(p1.highlight, p2.highlight, t);
+  const currentShadow = lerpColor(p1.shadow, p2.shadow, t);
+  const currentDeep = lerpColor(p1.deep, p2.deep, t);
+
+  // Update terrain color
+  terrainMat.color.copy(currentPrimary);
+  terrainMat.emissive = currentDeep.clone().multiplyScalar(0.2);
+
+  // Update particle color
+  particleMat.color.copy(currentHighlight);
+
+  // Update lights
+  pointLight1.color.copy(currentPrimary);
+  pointLight2.color.copy(currentSecondary);
+  rimLight.color.copy(currentHighlight);
+
+  // Update progress bar color
+  progressBar.style.background = '#' + currentPrimary.getHexString();
+
+  // Update watch materials
+  goldMaterial.color.copy(currentPrimary);
+  steelMaterial.color.copy(currentSecondary);
+  sapphireMaterial.color.copy(currentSecondary);
+
+  // Update terrain
+  updateTerrainHeight(elapsed);
+
+  // Update camera based on scroll
+  const sp = scrollProgress.value;
+  const segment = sp * 3;
+  const idx = Math.floor(segment);
+  const localT = segment - idx;
+  const i1 = Math.min(idx, 3);
+  const i2 = Math.min(idx + 1, 3);
+  const cp1 = cameraPath[i1];
+  const cp2 = cameraPath[i2];
+  const smoothT = localT * localT * (3 - 2 * localT);
+
+  const targetX = cp1.x + (cp2.x - cp1.x) * smoothT;
+  const targetY = cp1.y + (cp2.y - cp1.y) * smoothT;
+  const targetZ = cp1.z + (cp2.z - cp1.z) * smoothT;
+  const targetRY = cp1.ry + (cp2.ry - cp1.ry) * smoothT;
+
+  // Smooth camera interpolation
+  camera.position.x += (targetX - camera.position.x) * 0.05;
+  camera.position.y += (targetY - camera.position.y) * 0.05;
+  camera.position.z += (targetZ - camera.position.z) * 0.05;
+
+  // Look at watch with slight offset based on scroll
+  const lookTarget = new THREE.Vector3(0, 0, 0);
+  lookTarget.x = Math.sin(elapsed * 0.3) * 0.5;
+  lookTarget.y = Math.cos(elapsed * 0.2) * 0.3;
+  camera.lookAt(lookTarget);
+
+  // Idle orbit when not scrolling
+  if (!isScrolling) {
+    idleTime += 0.01;
+    camera.position.x += Math.sin(idleTime) * 0.005;
+    camera.position.y += Math.cos(idleTime * 0.7) * 0.005;
+  }
+
+  // Watch animation: gentle float and rotation
+  watchGroup.position.y = Math.sin(elapsed * 0.5) * 0.2;
+  watchGroup.rotation.y = elapsed * 0.1;
+  watchGroup.rotation.x = Math.sin(elapsed * 0.3) * 0.05;
+
+  // Watch hands animation
+  hourHand.rotation.z = -elapsed * 0.05;
+  minuteHand.rotation.z = -elapsed * 0.3;
+  secondHand.rotation.z = -elapsed * 3;
+
+  // Particle flow-field drift
+  const posAttr = particleGeo.attributes.position;
+  for (let i = 0; i < particleCount; i++) {
+    const px = posAttr.getX(i);
+    const py = posAttr.getY(i);
+    const pz = posAttr.getZ(i);
+    const noiseX = simplex.noise(px * 0.05, py * 0.05, elapsed * 0.1);
+    const noiseY = simplex.noise(py * 0.05, pz * 0.05, elapsed * 0.1 + 100);
+    const noiseZ = simplex.noise(pz * 0.05, px * 0.05, elapsed * 0.1 + 200);
+    particleVelocities[i * 3] += noiseX * 0.002;
+    particleVelocities[i * 3 + 1] += noiseY * 0.002;
+    particleVelocities[i * 3 + 2] += noiseZ * 0.002;
+    // Damping
+    particleVelocities[i * 3] *= 0.98;
+    particleVelocities[i * 3 + 1] *= 0.98;
+    particleVelocities[i * 3 + 2] *= 0.98;
+    // Update position
+    let nx = px + particleVelocities[i * 3];
+    let ny = py + particleVelocities[i * 3 + 1];
+    let nz = pz + particleVelocities[i * 3 + 2];
+    // Wrap around
+    if (nx > 20) nx = -20; if (nx < -20) nx = 20;
+    if (ny > 20) ny = -10; if (ny < -10) ny = 20;
+    if (nz > 20) nz = -20; if (nz < -20) nz = 20;
+    posAttr.setXYZ(i, nx, ny, nz);
+  }
+  posAttr.needsUpdate = true;
+
+  // Pulse group faces camera
+  pulseGroup.children.forEach(p => p.lookAt(camera.position));
+
+  renderer.render(scene, camera);
+}
+
+animate();
+
+// Hide scroll indicator after some scroll
+window.addEventListener('scroll', () => {
+  const ind = document.getElementById('scroll-indicator');
+  if (window.scrollY > 50 && ind) {
+    ind.style.opacity = '0';
+    ind.style.transition = 'opacity 0.5s';
+  }
+});
+</script>
+</body>
+</html>

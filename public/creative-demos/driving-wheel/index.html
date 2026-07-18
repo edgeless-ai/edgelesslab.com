@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Driving Wheel — 3D Car Physics + Conic Gradient Palette</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #202126; }
+    canvas { display: block; }
+    #instructions {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: #e7e1d8;
+      font-family: monospace;
+      font-size: 14px;
+      pointer-events: none;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <div id="instructions">WASD / Arrows to drive</div>
+  <script>
+    // ============================================================================
+    // DRIVING WHEEL — 3D Car Physics + Conic Gradient Palette
+    //
+    // Primary technique: Simplified 3D driving physics with camera-looping
+    // infinite ground (Bruno Simon camera-looping trick). The ground is a finite
+    // 200×200 plane whose position is snapped to the nearest 200-unit grid cell
+    // around the camera. This creates a seamless open-world feel with bounded
+    // geometry.
+    //
+    // Secondary technique: Poline-style conic gradient palette generated as a
+    // 256×1 canvas texture. Two HSL anchors (#e7e1d8 warm parchment → #202126
+    // dark charcoal) are interpolated with a sinusoidal position function instead
+    // of a linear mix. The texture is applied to the ground (repeating UVs) and
+    // the car body (planar UV mapping), making it the sole color source.
+    //
+    // 3% Weirdness: The car body is a THREE.Sprite (always faces the camera) with
+    // a canvas-drawn 2D car silhouette. This creates a "paper cutout diorama"
+    // effect inside the 3D world. The wheels remain true 3D cylinders that roll
+    // and turn, creating an unexpected contrast between flat paper and solid 3D.
+    // ============================================================================
+
+    // --- Scene Setup ---
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x202126);
+    // Fog unifies the far edge of the ground plane with the sky color.
+    scene.fog = new THREE.Fog(0x202126, 40, 90);
+
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    document.body.appendChild(renderer.domElement);
+
+    // --- Color Utilities ---
+    function hexToHSL(hex) {
+      const r = parseInt(hex.slice(1, 3), 16) / 255;
+      const g = parseInt(hex.slice(3, 5), 16) / 255;
+      const b = parseInt(hex.slice(5, 7), 16) / 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+      if (max === min) {
+        h = s = 0;
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+      return [h, s, l];
+    }
+
+    function hslToRGB(h, s, l) {
+      let r, g, b;
+      if (s === 0) {
+        r = g = b = l;
+      } else {
+        const hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+      }
+      return [r, g, b];
+    }
+
+    // Sinusoidal position function (Poline default) — produces a smooth ease-in
+    // ease-out curve instead of a straight linear mix.
+    function sinusoidalPosition(t) {
+      return 0.5 * (1 - Math.cos(Math.PI * t));
+    }
+
+    // --- Palette Generation ---
+    // We create a 256×1 canvas texture by interpolating between two HSL anchors
+    // using the sinusoidal position function. This 1D texture is the only color
+    // source for the entire scene.
+    const anchorA = hexToHSL('#e7e1d8'); // warm parchment
+    const anchorB = hexToHSL('#202126'); // dark charcoal
+
+    const paletteCanvas = document.createElement('canvas');
+    paletteCanvas.width = 256;
+    paletteCanvas.height = 1;
+    const pCtx = paletteCanvas.getContext('2d');
+
+    for (let i = 0; i < 256; i++) {
+      const t = i / 255;
+      const st = sinusoidalPosition(t);
+      const h = anchorA[0] + (anchorB[0] - anchorA[0]) * st;
+      const s = anchorA[1] + (anchorB[1] - anchorA[1]) * st;
+      const l = anchorA[2] + (anchorB[2] - anchorA[2]) * st;
+      const [r, g, b] = hslToRGB(h, s, l);
+      pCtx.fillStyle = `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`;
+      pCtx.fillRect(i, 0, 1, 1);
+    }
+
+    const paletteTexture = new THREE.CanvasTexture(paletteCanvas);
+    paletteTexture.magFilter = THREE.LinearFilter;
+    paletteTexture.minFilter = THREE.LinearFilter;
+    paletteTexture.wrapS = THREE.RepeatWrapping;
+    paletteTexture.wrapT = THREE.RepeatWrapping;
+    // We will set repeat per-material (ground vs car body).
+
+    // --- Ground Plane ---
+    // A finite 200×200 plane that uses the camera-looping trick. Instead of
+    // making the ground infinite, we snap its position to the nearest 200-unit
+    // grid cell around the camera every frame. This creates a seamless open-world
+    // feel with bounded geometry.
+    const groundGeo = new THREE.PlaneGeometry(200, 200);
+    const groundMat = new THREE.MeshBasicMaterial({
+      map: paletteTexture,
+      side: THREE.DoubleSide
+    });
+    // Repeating UVs: tile the palette 200 times across the ground so the
+    // gradient creates a fine, continuous texture.
+    groundMat.map.repeat.set(200, 200);
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = 0;
+    scene.add(ground);
+
+    // --- Car Setup ---
+    const car = new THREE.Group();
+    scene.add(car);
+
+    // Car body: a THREE.Sprite with a canvas-drawn 2D side-view car silhouette.
+    // The sprite always faces the camera, creating a "paper cutout diorama"
+    // effect inside the 3D world.
+    const carCanvas = document.createElement('canvas');
+    carCanvas.width = 128;
+    carCanvas.height = 64;
+    const cCtx = carCanvas.getContext('2d');
+
+    // Draw the side-view car silhouette.
+    // Body (warm parchment #e7e1d8) — main hull and cabin.
+    cCtx.fillStyle = '#e7e1d8';
+    // Main hull
+    cCtx.beginPath();
+    cCtx.moveTo(8, 32);
+    cCtx.lineTo(118, 32);
+    cCtx.lineTo(118, 52);
+    cCtx.lineTo(8, 52);
+    cCtx.closePath();
+    cCtx.fill();
+    // Cabin
+    cCtx.beginPath();
+    cCtx.moveTo(22, 12);
+    cCtx.lineTo(72, 12);
+    cCtx.lineTo(72, 32);
+    cCtx.lineTo(22, 32);
+    cCtx.closePath();
+    cCtx.fill();
+    // Hood slope
+    cCtx.beginPath();
+    cCtx.moveTo(72, 12);
+    cCtx.lineTo(92, 22);
+    cCtx.lineTo(92, 32);
+    cCtx.lineTo(72, 32);
+    cCtx.closePath();
+    cCtx.fill();
+    // Trunk slope
+    cCtx.beginPath();
+    cCtx.moveTo(22, 12);
+    cCtx.lineTo(8, 22);
+    cCtx.lineTo(8, 32);
+    cCtx.lineTo(22, 32);
+    cCtx.closePath();
+    cCtx.fill();
+
+    // Wheels (black #000000) — drawn on the sprite so the 3D wheels blend in.
+    cCtx.fillStyle = '#000000';
+    cCtx.beginPath();
+    cCtx.arc(28, 52, 10, 0, Math.PI * 2);
+    cCtx.fill();
+    cCtx.beginPath();
+    cCtx.arc(92, 52, 10, 0, Math.PI * 2);
+    cCtx.fill();
+
+    // Headlights (white #FFFFFF emissive)
+    cCtx.fillStyle = '#FFFFFF';
+    cCtx.fillRect(116, 34, 4, 6);
+    cCtx.fillRect(116, 44, 4, 6);
+
+    const carTexture = new THREE.CanvasTexture(carCanvas);
+    const carSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: carTexture,
+      transparent: true,
+      depthWrite: false // prevent sprite from occluding the 3D wheels behind it
+    }));
+    // Scale the sprite to 4×2 world units (matching the car's 2×1×4 bounding box).
+    carSprite.scale.set(4, 2, 1);
+    carSprite.position.set(0, 1, 0); // centered vertically so the bottom sits at y=0
+    car.add(carSprite);
+
+    // Wheels: true 3D cylinders that roll and turn. The contrast between the flat
+    // paper sprite body and the solid 3D wheels is the 3% weirdness.
+    const wheelGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.3, 16);
+    const wheelMat = new THREE.MeshLambertMaterial({ color: 0x000000 });
+    // We rotate the cylinder so its axis aligns with the car's lateral (x) axis.
+    // A default Three.js cylinder is oriented along the y-axis; rotating by z=π/2
+    // makes it face sideways like a real wheel.
+    const wheelOffsets = [
+      { x: -1.2, z:  2.0 }, // front left
+      { x:  1.2, z:  2.0 }, // front right
+      { x: -1.2, z: -2.0 }, // rear left
+      { x:  1.2, z: -2.0 }  // rear right
+    ];
+    const wheels = [];
+    wheelOffsets.forEach((offset, index) => {
+      const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+      // Rotate cylinder to face sideways (rolling axis = x).
+      wheel.rotation.z = Math.PI / 2;
+      wheel.position.set(offset.x, 0.5, offset.z);
+      car.add(wheel);
+      wheels.push(wheel);
+      // Mark front wheels (index 0 and 1) for steering.
+      wheel.userData.isFront = index < 2;
+    });
+
+    // --- Controls ---
+    const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowLeft: false, ArrowDown: false, ArrowRight: false };
+    window.addEventListener('keydown', (e) => {
+      if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
+    });
+    window.addEventListener('keyup', (e) => {
+      if (keys.hasOwnProperty(e.key)) keys[e.key] = false;
+    });
+
+    // --- Physics State ---
+    let speed = 0;
+    let steeringAngle = 0;
+    const maxSpeed = 0.8;
+    const acceleration = 0.02;
+    const friction = 0.96;
+    const reverseMaxSpeed = 0.3;
+    const reverseAcceleration = 0.01;
+    const turnSpeed = 0.04;
+    const maxSteerAngle = Math.PI / 6;
+
+    // --- Animation Loop ---
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05); // clamp delta to avoid large jumps
+
+      // Input
+      const forward = keys.w || keys.ArrowUp;
+      const backward = keys.s || keys.ArrowDown;
+      const left = keys.a || keys.ArrowLeft;
+      const right = keys.d || keys.ArrowRight;
+
+      // Acceleration
+      if (forward) {
+        speed += acceleration;
+        if (speed > maxSpeed) speed = maxSpeed;
+      } else if (backward) {
+        speed -= reverseAcceleration;
+        if (speed < -reverseMaxSpeed) speed = -reverseMaxSpeed;
+      } else {
+        // Coast / brake
+        speed *= friction;
+        if (Math.abs(speed) < 0.001) speed = 0;
+      }
+
+      // Steering
+      const steerInput = (right ? 1 : 0) - (left ? 1 : 0);
+      if (steerInput !== 0) {
+        steeringAngle += steerInput * turnSpeed;
+        steeringAngle = Math.max(-maxSteerAngle, Math.min(maxSteerAngle, steeringAngle));
+      } else {
+        // Return steering to center
+        steeringAngle *= 0.9;
+        if (Math.abs(steeringAngle) < 0.001) steeringAngle = 0;
+      }
+
+      // Apply steering to car heading only when moving
+      if (Math.abs(speed) > 0.001) {
+        // Steering effectiveness is proportional to speed
+        const steerFactor = speed / maxSpeed;
+        car.rotation.y -= steeringAngle * steerFactor * 0.5;
+      }
+
+      // Move car along its local forward axis (+z in local space)
+      car.position.x += Math.sin(car.rotation.y) * speed;
+      car.position.z += Math.cos(car.rotation.y) * speed;
+
+      // Wheel animation
+      wheels.forEach((wheel) => {
+        // Roll the wheel based on speed
+        wheel.rotation.x += speed / 0.5;
+        // Turn the front wheels
+        if (wheel.userData.isFront) {
+          wheel.rotation.y = steeringAngle;
+        }
+      });
+
+      // Camera chase: lerp the camera to a position behind and above the car.
+      const chaseDistance = 10;
+      const chaseHeight = 5;
+      const targetCamX = car.position.x - Math.sin(car.rotation.y) * chaseDistance;
+      const targetCamZ = car.position.z - Math.cos(car.rotation.y) * chaseDistance;
+      const targetCamY = chaseHeight;
+      camera.position.x += (targetCamX - camera.position.x) * 0.08;
+      camera.position.z += (targetCamZ - camera.position.z) * 0.08;
+      camera.position.y += (targetCamY - camera.position.y) * 0.08;
+      camera.lookAt(car.position.x, car.position.y + 0.5, car.position.z);
+
+      // Ground looping trick: snap the ground plane to the nearest 200-unit grid
+      // cell around the camera. This keeps the ground always directly beneath the
+      // car without needing infinite geometry.
+      ground.position.x = Math.round(camera.position.x / 200) * 200;
+      ground.position.z = Math.round(camera.position.z / 200) * 200;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // --- Resize Handler ---
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

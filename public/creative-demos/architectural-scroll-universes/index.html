@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architectural Scroll Universes</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow-x: hidden; }
+  body { background: #000; color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+
+  /* Three.js canvas container */
+  #canvas-container {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1;
+  }
+  #canvas-container canvas { display: block; width: 100%; height: 100%; }
+
+  /* Scroll spacer */
+  #scroll-spacer { height: 600vh; position: relative; z-index: 0; }
+
+  /* Persistent floor plan mini-map */
+  #minimap {
+    position: fixed;
+    top: 24px; right: 24px;
+    width: 180px; height: 260px;
+    z-index: 100;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 12px;
+    backdrop-filter: blur(4px);
+    pointer-events: none;
+  }
+  #minimap svg { width: 100%; height: 100%; overflow: visible; }
+  .room-shape { fill: none; stroke: rgba(255,255,255,0.6); stroke-width: 1.5; }
+  .room-label { fill: rgba(255,255,255,0.7); font-size: 8px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+  .room-label.active { fill: #fff; font-weight: 700; }
+  #minimap-dot {
+    fill: #FF0000;
+    filter: drop-shadow(0 0 3px rgba(255,0,0,0.7));
+    transition: transform 0.1s linear;
+  }
+
+  /* DOM overlay headlines */
+  .headline {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 50;
+    font-size: clamp(2rem, 6vw, 5rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    mix-blend-mode: difference;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .headline.active { opacity: 1; }
+
+  /* Material dissolve overlay panels */
+  .dissolve-panel {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100vh;
+    z-index: 40;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .dissolve-panel.active { opacity: 1; }
+
+  #lobby-gradient { background: linear-gradient(135deg, #FF0000 0%, #8B0000 100%); }
+  #corridor-gradient { background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%); }
+  #chamber-gradient { background: linear-gradient(135deg, #000080 0%, #000033 100%); }
+
+  /* Material label */
+  .material-label {
+    position: fixed;
+    bottom: 32px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    mix-blend-mode: difference;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .material-label.active { opacity: 1; }
+
+  /* Progress bar */
+  #progress-bar {
+    position: fixed;
+    bottom: 0; left: 0;
+    height: 3px;
+    background: #FF0000;
+    z-index: 100;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+</style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<div id="scroll-spacer"></div>
+
+<!-- Dissolve overlay panels -->
+<div class="dissolve-panel" id="lobby-gradient"></div>
+<div class="dissolve-panel" id="corridor-gradient"></div>
+<div class="dissolve-panel" id="chamber-gradient"></div>
+
+<!-- Headlines -->
+<div class="headline" id="headline-lobby">The Lobby</div>
+<div class="headline" id="headline-corridor">The Corridor</div>
+<div class="headline" id="headline-chamber">The Chamber</div>
+
+<!-- Material labels -->
+<div class="material-label" id="label-lobby">Concrete</div>
+<div class="material-label" id="label-corridor">Glass</div>
+<div class="material-label" id="label-chamber">Timber</div>
+
+<!-- Floor plan mini-map -->
+<div id="minimap">
+  <svg viewBox="0 0 180 260">
+    <!-- Lobby (wide square) -->
+    <rect x="10" y="10" width="160" height="70" rx="2" class="room-shape" id="shape-lobby"/>
+    <text x="90" y="48" text-anchor="middle" class="room-label" id="text-lobby">Lobby</text>
+
+    <!-- Corridor (narrow) -->
+    <rect x="55" y="90" width="70" height="70" rx="2" class="room-shape" id="shape-corridor"/>
+    <text x="90" y="128" text-anchor="middle" class="room-label" id="text-corridor">Corridor</text>
+
+    <!-- Chamber (wide square) -->
+    <rect x="10" y="170" width="160" height="70" rx="2" class="room-shape" id="shape-chamber"/>
+    <text x="90" y="208" text-anchor="middle" class="room-label" id="text-chamber">Chamber</text>
+
+    <!-- Red navigation dot -->
+    <circle id="minimap-dot" cx="90" cy="45" r="5"/>
+  </svg>
+</div>
+
+<div id="progress-bar"></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import gsap from 'https://unpkg.com/gsap@3.12.5/index.js';
+import { ScrollTrigger } from 'https://unpkg.com/gsap@3.12.5/ScrollTrigger.js';
+
+gsap.registerPlugin(ScrollTrigger);
+
+// ============================================================
+// SCENE SETUP
+// ============================================================
+const container = document.getElementById('canvas-container');
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x000000, 0.015);
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+container.appendChild(renderer.domElement);
+
+// ============================================================
+// LIGHTING
+// ============================================================
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+scene.add(ambientLight);
+
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+dirLight.position.set(10, 20, 10);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.width = 1024;
+dirLight.shadow.mapSize.height = 1024;
+scene.add(dirLight);
+
+const pointLight1 = new THREE.PointLight(0xffffff, 0.8, 30);
+pointLight1.position.set(0, 5, 0);
+scene.add(pointLight1);
+
+const pointLight2 = new THREE.PointLight(0xffffff, 0.6, 30);
+pointLight2.position.set(15, 5, 5);
+scene.add(pointLight2);
+
+// ============================================================
+// ROOM BUILDER
+// ============================================================
+function createRoom({ x, z, width, depth, height, wallColor, floorColor, ceilingColor, opacity = 1.0, transparent = false }) {
+  const roomGroup = new THREE.Group();
+  roomGroup.position.set(x, 0, z);
+
+  const wallMat = new THREE.MeshStandardMaterial({
+    color: wallColor,
+    roughness: 0.8,
+    metalness: 0.1,
+    transparent: transparent,
+    opacity: opacity,
+    side: THREE.DoubleSide
+  });
+  const floorMat = new THREE.MeshStandardMaterial({
+    color: floorColor,
+    roughness: 0.9,
+    metalness: 0.0,
+    side: THREE.DoubleSide
+  });
+  const ceilingMat = new THREE.MeshStandardMaterial({
+    color: ceilingColor,
+    roughness: 0.9,
+    metalness: 0.0,
+    side: THREE.DoubleSide
+  });
+
+  // Floor
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), floorMat);
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  roomGroup.add(floor);
+
+  // Ceiling
+  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), ceilingMat);
+  ceiling.rotation.x = Math.PI / 2;
+  ceiling.position.y = height;
+  ceiling.receiveShadow = true;
+  roomGroup.add(ceiling);
+
+  // Walls (BoxGeometry, hollow by using planes for inside/outside)
+  const wallThickness = 0.3;
+  const halfW = width / 2;
+  const halfD = depth / 2;
+  const halfH = height / 2;
+
+  // Front wall
+  const frontWall = new THREE.Mesh(new THREE.BoxGeometry(width, height, wallThickness), wallMat);
+  frontWall.position.set(0, halfH, halfD);
+  frontWall.castShadow = true;
+  frontWall.receiveShadow = true;
+  roomGroup.add(frontWall);
+
+  // Back wall
+  const backWall = new THREE.Mesh(new THREE.BoxGeometry(width, height, wallThickness), wallMat);
+  backWall.position.set(0, halfH, -halfD);
+  backWall.castShadow = true;
+  backWall.receiveShadow = true;
+  roomGroup.add(backWall);
+
+  // Left wall
+  const leftWall = new THREE.Mesh(new THREE.BoxGeometry(wallThickness, height, depth), wallMat);
+  leftWall.position.set(-halfW, halfH, 0);
+  leftWall.castShadow = true;
+  leftWall.receiveShadow = true;
+  roomGroup.add(leftWall);
+
+  // Right wall
+  const rightWall = new THREE.Mesh(new THREE.BoxGeometry(wallThickness, height, depth), wallMat);
+  rightWall.position.set(halfW, halfH, 0);
+  rightWall.castShadow = true;
+  rightWall.receiveShadow = true;
+  roomGroup.add(rightWall);
+
+  return roomGroup;
+}
+
+// ============================================================
+// BUILD 3 ROOMS
+// ============================================================
+// Lobby: concrete, wide, red tones
+const lobby = createRoom({
+  x: 0, z: 0,
+  width: 16, depth: 16, height: 8,
+  wallColor: 0x8a8a8a,
+  floorColor: 0x555555,
+  ceilingColor: 0x777777
+});
+scene.add(lobby);
+
+// Corridor: glass, narrow, bronze tones
+const corridor = createRoom({
+  x: 0, z: -22,
+  width: 6, depth: 14, height: 8,
+  wallColor: 0xcd7f32,
+  floorColor: 0x8b4513,
+  ceilingColor: 0xa0522d,
+  opacity: 0.6,
+  transparent: true
+});
+scene.add(corridor);
+
+// Chamber: timber, enclosed, navy tones
+const chamber = createRoom({
+  x: 0, z: -42,
+  width: 14, depth: 14, height: 8,
+  wallColor: 0x5c3a21,
+  floorColor: 0x3e2723,
+  ceilingColor: 0x4e342e
+});
+scene.add(chamber);
+
+// ============================================================
+// EXTRA GEOMETRY: columns, beams, details
+// ============================================================
+function addColumn(x, z, height, color) {
+  const colGeo = new THREE.BoxGeometry(0.6, height, 0.6);
+  const colMat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.7, metalness: 0.2 });
+  const col = new THREE.Mesh(colGeo, colMat);
+  col.position.set(x, height/2, z);
+  col.castShadow = true;
+  col.receiveShadow = true;
+  scene.add(col);
+}
+
+// Lobby columns
+addColumn(-5, 5, 8, 0x999999);
+addColumn(5, 5, 8, 0x999999);
+addColumn(-5, -5, 8, 0x999999);
+addColumn(5, -5, 8, 0x999999);
+
+// Corridor glass panels (translucent planes)
+const glassGeo = new THREE.PlaneGeometry(4, 6);
+const glassMat = new THREE.MeshStandardMaterial({
+  color: 0xcd7f32,
+  transparent: true,
+  opacity: 0.25,
+  side: THREE.DoubleSide
+});
+for (let z = -18; z >= -26; z -= 4) {
+  const g1 = new THREE.Mesh(glassGeo, glassMat);
+  g1.position.set(-2, 4, z);
+  scene.add(g1);
+  const g2 = new THREE.Mesh(glassGeo, glassMat);
+  g2.position.set(2, 4, z);
+  scene.add(g2);
+}
+
+// Chamber timber beams
+function addBeam(x, y, z, w, h, d, color) {
+  const bGeo = new THREE.BoxGeometry(w, h, d);
+  const bMat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.85, metalness: 0.0 });
+  const beam = new THREE.Mesh(bGeo, bMat);
+  beam.position.set(x, y, z);
+  beam.castShadow = true;
+  beam.receiveShadow = true;
+  scene.add(beam);
+}
+addBeam(0, 7, -42, 12, 0.4, 0.4, 0x5c3a21);
+addBeam(-4, 3, -42, 0.4, 6, 0.4, 0x5c3a21);
+addBeam(4, 3, -42, 0.4, 6, 0.4, 0x5c3a21);
+
+// ============================================================
+// DISSOLVE SHADER MATERIALS (material-driven transitions)
+// ============================================================
+const dissolveVertexShader = `
+  varying vec2 vUv;
+  varying vec3 vPosition;
+  void main() {
+    vUv = uv;
+    vPosition = position;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const dissolveFragmentShader = `
+  uniform float uProgress;
+  uniform vec3 uColor;
+  uniform float uOpacity;
+  varying vec2 vUv;
+  varying vec3 vPosition;
+
+  float random(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+  }
+
+  void main() {
+    float r = random(vUv * 3.0 + vPosition.xy * 0.1);
+    float dissolve = step(uProgress, r);
+    float edge = smoothstep(uProgress - 0.15, uProgress, r);
+    vec3 finalColor = mix(uColor * 0.3, uColor, edge);
+    gl_FragColor = vec4(finalColor, dissolve * uOpacity);
+  }
+`;
+
+function createDissolveMaterial(color, initialOpacity = 1.0) {
+  return new THREE.ShaderMaterial({
+    vertexShader: dissolveVertexShader,
+    fragmentShader: dissolveFragmentShader,
+    uniforms: {
+      uProgress: { value: 0.0 },
+      uColor: { value: new THREE.Color(color) },
+      uOpacity: { value: initialOpacity }
+    },
+    transparent: true,
+    side: THREE.DoubleSide
+  });
+}
+
+// Dissolve planes for each room transition
+const lobbyDissolve = new THREE.Mesh(
+  new THREE.PlaneGeometry(18, 10),
+  createDissolveMaterial(0xFF0000, 0.0)
+);
+lobbyDissolve.position.set(0, 4, 0);
+scene.add(lobbyDissolve);
+
+const corridorDissolve = new THREE.Mesh(
+  new THREE.PlaneGeometry(8, 10),
+  createDissolveMaterial(0xCD7F32, 0.0)
+);
+corridorDissolve.position.set(0, 4, -22);
+scene.add(corridorDissolve);
+
+const chamberDissolve = new THREE.Mesh(
+  new THREE.PlaneGeometry(16, 10),
+  createDissolveMaterial(0x000080, 0.0)
+);
+chamberDissolve.position.set(0, 4, -42);
+scene.add(chamberDissolve);
+
+// ============================================================
+// CAMERA SPLINE (Catmull-Rom)
+// ============================================================
+const splinePoints = [
+  new THREE.Vector3(0, 2.5, 6),      // Lobby entrance
+  new THREE.Vector3(0, 2.5, 0),      // Lobby center
+  new THREE.Vector3(0, 2.5, -8),     // Lobby back
+  new THREE.Vector3(0, 2.5, -16),    // Corridor entrance
+  new THREE.Vector3(0, 2.5, -22),   // Corridor center
+  new THREE.Vector3(0, 2.5, -28),   // Corridor back
+  new THREE.Vector3(0, 2.5, -36),   // Chamber entrance
+  new THREE.Vector3(0, 2.5, -42),   // Chamber center
+  new THREE.Vector3(0, 2.5, -48),   // Chamber back
+];
+
+const cameraPath = new THREE.CatmullRomCurve3(splinePoints);
+cameraPath.tension = 0.5;
+
+// Camera lookAt target spline (slightly ahead)
+const lookPoints = splinePoints.map((p, i) => {
+  if (i < splinePoints.length - 1) {
+    const next = splinePoints[i + 1];
+    return new THREE.Vector3(
+      (p.x + next.x) * 0.5,
+      2.5,
+      (p.z + next.z) * 0.5 - 2
+    );
+  }
+  return new THREE.Vector3(p.x, 2.5, p.z - 4);
+});
+const lookPath = new THREE.CatmullRomCurve3(lookPoints);
+
+// ============================================================
+// GSAP SCROLLTRIGGER SETUP
+// ============================================================
+const totalScroll = 600;
+
+// Main camera scroll animation
+const cameraObj = { t: 0 };
+const lookObj = { t: 0 };
+
+gsap.to(cameraObj, {
+  t: 1,
+  ease: 'none',
+  scrollTrigger: {
+    trigger: '#scroll-spacer',
+    start: 'top top',
+    end: 'bottom bottom',
+    scrub: 1,
+    onUpdate: (self) => {
+      const progress = self.progress;
+      // Progress bar
+      document.getElementById('progress-bar').style.width = (progress * 100) + '%';
+
+      // Mini-map dot: y maps from 45 (lobby) to 208 (chamber)
+      const dotY = 45 + progress * (208 - 45);
+      const dot = document.getElementById('minimap-dot');
+      dot.setAttribute('cy', dotY);
+
+      // Room highlighting
+      const lobbyEnd = 0.30;
+      const corridorEnd = 0.65;
+
+      // Reset labels
+      document.querySelectorAll('.room-label').forEach(l => l.classList.remove('active'));
+      document.querySelectorAll('.room-shape').forEach(s => s.style.stroke = 'rgba(255,255,255,0.6)');
+      document.querySelectorAll('.room-shape').forEach(s => s.style.strokeWidth = '1.5');
+      document.querySelectorAll('.headline').forEach(h => h.classList.remove('active'));
+      document.querySelectorAll('.material-label').forEach(m => m.classList.remove('active'));
+      document.querySelectorAll('.dissolve-panel').forEach(d => d.classList.remove('active'));
+
+      if (progress < lobbyEnd) {
+        document.getElementById('text-lobby').classList.add('active');
+        document.getElementById('shape-lobby').style.stroke = '#FF0000';
+        document.getElementById('shape-lobby').style.strokeWidth = '3';
+        document.getElementById('headline-lobby').classList.add('active');
+        document.getElementById('label-lobby').classList.add('active');
+        document.getElementById('lobby-gradient').classList.add('active');
+      } else if (progress < corridorEnd) {
+        document.getElementById('text-corridor').classList.add('active');
+        document.getElementById('shape-corridor').style.stroke = '#CD7F32';
+        document.getElementById('shape-corridor').style.strokeWidth = '3';
+        document.getElementById('headline-corridor').classList.add('active');
+        document.getElementById('label-corridor').classList.add('active');
+        document.getElementById('corridor-gradient').classList.add('active');
+      } else {
+        document.getElementById('text-chamber').classList.add('active');
+        document.getElementById('shape-chamber').style.stroke = '#000080';
+        document.getElementById('shape-chamber').style.strokeWidth = '3';
+        document.getElementById('headline-chamber').classList.add('active');
+        document.getElementById('label-chamber').classList.add('active');
+        document.getElementById('chamber-gradient').classList.add('active');
+      }
+    }
+  }
+});
+
+// Dissolve shader animations
+// Lobby dissolve
+ScrollTrigger.create({
+  trigger: '#scroll-spacer',
+  start: 'top top',
+  end: '20% top',
+  scrub: true,
+  onUpdate: (self) => {
+    lobbyDissolve.material.uniforms.uProgress.value = self.progress;
+    lobbyDissolve.material.uniforms.uOpacity.value = self.progress * 0.6;
+  }
+});
+
+// Corridor dissolve
+ScrollTrigger.create({
+  trigger: '#scroll-spacer',
+  start: '30% top',
+  end: '50% top',
+  scrub: true,
+  onUpdate: (self) => {
+    corridorDissolve.material.uniforms.uProgress.value = self.progress;
+    corridorDissolve.material.uniforms.uOpacity.value = self.progress * 0.6;
+  }
+});
+
+// Chamber dissolve
+ScrollTrigger.create({
+  trigger: '#scroll-spacer',
+  start: '60% top',
+  end: '80% top',
+  scrub: true,
+  onUpdate: (self) => {
+    chamberDissolve.material.uniforms.uProgress.value = self.progress;
+    chamberDissolve.material.uniforms.uOpacity.value = self.progress * 0.6;
+  }
+});
+
+// ============================================================
+// ANIMATION LOOP
+// ============================================================
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const t = cameraObj.t;
+  const pos = cameraPath.getPointAt(t);
+  const lookPos = lookPath.getPointAt(t);
+
+  camera.position.copy(pos);
+  camera.lookAt(lookPos);
+
+  // Subtle camera bob
+  const time = clock.getElapsedTime();
+  camera.position.y += Math.sin(time * 0.8) * 0.03;
+
+  // Pulse the dissolve materials
+  const pulse = (Math.sin(time * 1.5) + 1) * 0.5;
+  lobbyDissolve.material.uniforms.uColor.value.setHSL(0.0, 1.0, 0.3 + pulse * 0.1);
+  corridorDissolve.material.uniforms.uColor.value.setHSL(0.08, 0.6, 0.3 + pulse * 0.1);
+  chamberDissolve.material.uniforms.uColor.value.setHSL(0.67, 1.0, 0.15 + pulse * 0.05);
+
+  renderer.render(scene, camera);
+}
+
+animate();
+
+// ============================================================
+// RESIZE
+// ============================================================
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ============================================================
+// KEYBOARD NAVIGATION (optional, for testing)
+// ============================================================
+window.addEventListener('keydown', (e) => {
+  const scrollStep = window.innerHeight * 0.5;
+  if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+    window.scrollBy({ top: scrollStep, behavior: 'smooth' });
+  } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+    window.scrollBy({ top: -scrollStep, behavior: 'smooth' });
+  } else if (e.key === 'Home') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else if (e.key === 'End') {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+});
+
+console.log('Architectural Scroll Universes loaded. Scroll to navigate.');
+</script>
+</body>
+</html>

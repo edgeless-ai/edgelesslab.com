@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alphabet Glacier — Typography as Terrain</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<style>
+  body { margin: 0; overflow: hidden; background: #FFFFF0; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<script>
+let seed;
+let t = 0;
+let riverAmp, curveAmp, riverAng;
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  textAlign(CENTER, CENTER);
+  textFont('Georgia, serif');
+  resetTerrain();
+}
+
+function resetTerrain() {
+  seed = floor(random(100000));
+  noiseSeed(seed);
+  t = 0;
+  riverAmp = random(800, 1200);
+  curveAmp = random(100, 200);
+  riverAng = random(-PI, PI);
+}
+
+function draw() {
+  background('#FFFFF0');
+  t++;
+  let progress1 = constrain(t / 300, 0, 1);
+  let progress2 = constrain((t - 300) / 300, 0, 1);
+  
+  // Phase 1: Mountain ridges made of letterforms
+  if (t <= 300) {
+    for (let y = 0; y < height * progress1; y += 14) {
+      for (let x = 0; x < width; x += 22) {
+        let n = noise(x * 0.003, y * 0.003, seed);
+        let h = map(n, 0, 1, 0, 140);
+        let damp = sin(map(y, 0, height, 0, PI));
+        h *= damp;
+        let char = String.fromCharCode(65 + floor(noise(x * 0.01, y * 0.01, seed) * 26));
+        let strokeAlpha = 150;
+        stroke(12, 63, 71, strokeAlpha);
+        noFill();
+        textSize(8 + h * 0.06);
+        push();
+        translate(x, y - h);
+        rotate(n * PI * 0.5);
+        text(char, 0, 0);
+        pop();
+      }
+    }
+  }
+  
+  // Phase 2: Ice sheet + carved river
+  if (t > 300 && t <= 600) {
+    // Redraw mountains faintly
+    for (let y = 0; y < height; y += 14) {
+      for (let x = 0; x < width; x += 22) {
+        let n = noise(x * 0.003, y * 0.003, seed);
+        let h = map(n, 0, 1, 0, 140) * sin(map(y, 0, height, 0, PI));
+        let char = String.fromCharCode(65 + floor(noise(x * 0.01, y * 0.01, seed) * 26));
+        stroke(12, 63, 71, 40);
+        noFill();
+        textSize(8 + h * 0.06);
+        push();
+        translate(x, y - h);
+        rotate(n * PI * 0.5);
+        text(char, 0, 0);
+        pop();
+      }
+    }
+    // Draw ice sheet
+    for (let y = height * 0.2; y < height * 0.2 + height * 0.6 * progress2; y += 10) {
+      for (let x = 0; x < width; x += 18) {
+        let n = noise(x * 0.004, y * 0.004, seed + 100);
+        let iceH = map(n, 0, 1, 0, 80);
+        let curve = sin((x / width) * PI + riverAng) * curveAmp;
+        let riverOffset = (abs(x - width / 2) < width / 6) ? -30 : 0;
+        let char = String.fromCharCode(33 + floor(n * 15)); // punctuation
+        let px = x + curve;
+        let py = y + riverOffset + iceH;
+        stroke(12, 63, 71, 150);
+        noFill();
+        textSize(10);
+        push();
+        translate(px, py);
+        rotate(n * 0.3);
+        text(char, 0, 0);
+        pop();
+      }
+    }
+  }
+  
+  // Hold and reset
+  if (t > 650) {
+    resetTerrain();
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+</script>
+</body>
+</html>

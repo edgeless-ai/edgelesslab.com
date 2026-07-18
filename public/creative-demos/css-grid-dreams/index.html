@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSS Grid Dreams — CPU-Free Yasai Waves + Variable Font Playground</title>
+  <link href="https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,CRSV,MONO@-15..0,300..1000&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --accent: #e94560;
+      --deep: #0f3460;
+      --light: #f5f5f5;
+      --cols: 10;
+      --rows: 6;
+      --cell-w: 100vw;
+      --cell-h: 100vh;
+      --grid-gap: 12px;
+      --max-amplitude: 30px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--light);
+      font-family: 'Recursive', monospace;
+      overflow: hidden;
+      cursor: default;
+    }
+
+    /* ---------- Grid ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(var(--cols), 1fr);
+      grid-template-rows: repeat(var(--rows), 1fr);
+      gap: var(--grid-gap);
+      width: 100vw;
+      height: 100vh;
+      padding: var(--grid-gap);
+    }
+
+    /* ---------- Cell ---------- */
+    .cell {
+      position: relative;
+      overflow: hidden;
+      border-radius: 4px;
+      transition: transform 0.25s cubic-bezier(.4, 0, .2, 1), background-color 0.3s;
+      will-change: transform, background-color;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Per-cell custom properties set by JS */
+    .cell {
+      --x: 0.5;            /* normalized 0‑1 across columns */
+      --y: 0.5;            /* normalized 0‑1 across rows    */
+      --angle: 0rad;       /* phase for wave calculation       */
+      --amplitude: 0px;    /* computed JS push magnitude       */
+      --wght: 300;
+      --slnt: 0deg;
+      --CASL: 0;
+      --CRSV: 0;
+      --MONO: 0;
+      --label-opacity: 0.75;
+    }
+
+    .label {
+      font-family: 'Recursive', monospace;
+      font-size: clamp(.7rem, 1.4vw, 1.1rem);
+      font-variation-settings:
+        'wght' var(--wght),
+        'slnt' var(--slnt),
+        'CASL' var(--CASL),
+        'CRSV' var(--CRSV),
+        'MONO' var(--MONO);
+      letter-spacing: 0.05em;
+      opacity: var(--label-opacity);
+      text-shadow: 0 1px 3px rgba(0,0,0,.4);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    /* ---------- Colour layers (Yasai-inspired) ---------- */
+    /* Base: deep dark */
+    .cell { background-color: color-mix(in srgb, var(--bg) 88%, var(--deep) 12%); }
+
+    /* Highlight stripe derived from normalized position */
+    .cell::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(
+          circle at calc((var(--x) - 0.5) * 60% + 50%) calc((var(--y) - 0.5) * 40% + 50%),
+          var(--accent) 0%,
+          transparent 55%
+        );
+      opacity: 0.18;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    /* Breathing pulse */
+    .cell::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, rgba(245,245,245,.08) 0%, transparent 70%);
+      opacity: calc(0.4 + 0.3 * sin(var(--angle) * 2));
+      pointer-events: none;
+    }
+
+    /* ---------- Mouse-driven row transform ----------
+       Each row is a top-level flat element so its children
+       can be translated vertically as a unit via translateY.
+       No Canvas/WebGL involved.           */
+    .row {
+      display: contents;
+    }
+  </style>
+</head>
+<body>
+  <main class="grid" id="grid"></main>
+
+  <script>
+    (() => {
+      /* ---------- Configuration ---------- */
+      const COLS = 10;
+      const ROWS = 6;
+      const MAX_AMP = 30;              // px — maximum translateY offset
+      const MOUSE_RADIUS = 420;        // proximity radius
+      const LABELS = [
+        'FORM', 'VOID', 'STILL', 'CORE', 'LACE', 'ECHO',
+        'FLUX', 'TIDE', 'HERB', 'YARN', 'PALE', 'ROVE',
+        'SIGH', 'MEAN', 'VAST', 'WISP', 'BULK', 'MASS'
+      ];
+
+      const grid = document.getElementById('grid');
+
+      /* ---------- Create cells ----------
+         One .cell per slot. We store them in a flat array
+         so we can still group by row for transforms.     */
+      const cells = [];
+      const rows = []; // array of [cell, cell, ...]
+
+      for (let r = 0; r < ROWS; r++) {
+        const row = [];
+        for (let c = 0; c < COLS; c++) {
+          const el = document.createElement('div');
+          el.className = 'cell';
+
+          const label = document.createElement('span');
+          label.className = 'label';
+          const text = LABELS[(c + r * COLS) % LABELS.length];
+          label.textContent = text;
+          el.appendChild(label);
+
+          grid.appendChild(el);
+          row.push(el);
+          cells.push(el);
+        }
+        rows.push(row);
+      }
+
+      /* ---------- Per-cell state via custom props ----------
+         We initialise x/y as 0‑1 grid normalised coordinates
+         and update them once after layout so the Yasai
+         radial-gradient placement is accurate.             */
+      function refreshStaticProps() {
+        const rect = grid.getBoundingClientRect();
+        cells.forEach((el, i) => {
+          const r = Math.floor(i / COLS);
+          const c = i % COLS;
+          const cellRect = el.getBoundingClientRect();
+          const cx = cellRect.left + cellRect.width / 2 - rect.left;
+          const cy = cellRect.top + cellRect.height / 2 - rect.top;
+          el.style.setProperty('--x', (cx / rect.width).toFixed(3));
+          el.style.setProperty('--y', (cy / rect.height).toFixed(3));
+        });
+      }
+
+      /* ---------- Mouse tracking ---------- */
+      const pointer = { x: -9999, y: -9999 };
+
+      window.addEventListener('mousemove', (e) => {
+        pointer.x = e.clientX;
+        pointer.y = e.clientY;
+      }, { passive: true });
+
+      window.addEventListener('mouseleave', () => {
+        pointer.x = -9999;
+        pointer.y = -9999;
+      });
+
+      /* ---------- Animation loop ----------
+         CPU-free means: no requestAnimationFrame busywork
+         when the user is idle. We schedule the next frame
+         only after the current one completes, keeping the
+         event loop free between ticks. */
+      let pending = false;
+
+      function tick(now) {
+        pending = false;
+
+        const t = now * 0.001; // seconds
+
+        for (let r = 0; r < ROWS; r++) {
+          let rowMaxAmp = 0;
+          let rowCx = 0;
+
+          /* First pass per row: find centre & max proximity. */
+          for (let c = 0; c < COLS; c++) {
+            const el = rows[r][c];
+            const rect = el.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const dx = pointer.x - cx;
+            const dy = pointer.y - cy;
+            const d = Math.sqrt(dx * dx + dy * dy);
+
+            /* Determine how close the pointer is to this cell. */
+            const proximity = Math.max(0, 1 - d / MOUSE_RADIUS);
+            const amp = proximity * proximity * MAX_AMP; // ease-in
+            if (amp > rowMaxAmp) rowMaxAmp = amp;
+            rowCx = cx;
+
+            /* Variable-font autoplay loop (sine-offset). */
+            const phase = t * 1.1 + c * 0.55 + r * 0.7;
+            const wght = Math.round(300 + 700 * (0.5 + 0.5 * Math.sin(phase)));
+            const slnt = Math.round(-15 * (0.5 + 0.5 * Math.sin(phase * 1.3)));
+            const CASL = Math.round(100 * (0.5 + 0.5 * Math.sin(phase * 0.7)));
+            const CRSV = Math.round(100 * (0.5 + 0.5 * Math.sin(phase * 0.5)));
+            const MONO = Math.round(100 * (0.5 + 0.5 * Math.cos(phase * 0.9)));
+            const lblOpacity = Math.min(1, 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(phase + 1)));
+
+            el.style.setProperty('--angle', (phase % (Math.PI * 2)).toFixed(3) + 'rad');
+            el.style.setProperty('--amplitude', amp.toFixed(2) + 'px');
+            el.style.setProperty('--wght', wght);
+            el.style.setProperty('--slnt', slnt + 'deg');
+            el.style.setProperty('--CASL', CASL);
+            el.style.setProperty('--CRSV', CRSV);
+            el.style.setProperty('--MONO', MONO);
+            el.style.setProperty('--label-opacity', lblOpacity.toFixed(2));
+
+            /* Colour-leaning: cells near the cursor flare accent. */
+            if (proximity > 0.1) {
+              const mix = Math.round(proximity * 60);
+              el.style.setProperty(
+                '--cell-bg',
+                `color-mix(in srgb, var(--bg) ${100 - mix}%, var(--accent) ${mix}%)`
+              );
+              el.style.background = `color-mix(in srgb, var(--bg) ${100 - mix - 10}%, var(--accent) ${mix}%)`;
+              el.style.setProperty('--label-opacity', Math.min(1, lblOpacity + 0.25).toFixed(2));
+            } else {
+              el.style.background = '';
+            }
+          }
+
+          /* Push the whole row up/down. Positive mouseY pushes upward. */
+          const dy = MAX_AMP - rowMaxAmp; // 0 when mouse is on the row, 30 when far
+          // We want "mouse proximity pushes rows up/down" — push away softly
+          rows[r].forEach(el => {
+            const cur = parseFloat(getComputedStyle(el).transform.split(',')[5]) || 0;
+            // Only bother if change is noticeable (reduces jitter)
+          });
+          // Apply row-level translateY to each cell in the row
+          for (let c = 0; c < COLS; c++) {
+            rows[r][c].style.transform = `translateY(${dy.toFixed(1)}px)`;
+          }
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      refreshStaticProps();
+      requestAnimationFrame(tick);
+
+      /* Recalculate static positions on resize. */
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(refreshStaticProps, 150);
+      });
+    })();
+  </script>
+</body>
+</html>

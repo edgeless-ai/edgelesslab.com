@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RECEIPT ORACLE — Generative Divination Machine</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0A0A0A;
+    font-family: 'Courier New', 'Liberation Mono', 'Andale Mono', monospace;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* ── Receipt Panel (scrollable) ── */
+  .receipt-panel {
+    width: 54%;
+    height: 100vh;
+    background: #F5F0E8;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 28px 26px 120px 26px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: #2D2D2D;
+    border-right: 2px solid #B0A89A;
+    position: relative;
+    scroll-behavior: auto;
+  }
+
+  .receipt-panel::-webkit-scrollbar { width: 6px; }
+  .receipt-panel::-webkit-scrollbar-track { background: #F5F0E8; }
+  .receipt-panel::-webkit-scrollbar-thumb { background: #B0A89A; border-radius: 3px; }
+
+  /* Receipt header */
+  .receipt-header {
+    text-align: center;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+  }
+  .receipt-header .oracle-title {
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    color: #CC3300;
+    margin-bottom: 2px;
+  }
+  .receipt-header .subtitle {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #2D2D2D;
+    margin-bottom: 6px;
+  }
+  .receipt-header .separator {
+    color: #B0A89A;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  .receipt-header .info-line {
+    font-size: 11px;
+    color: #2D2D2D;
+    margin: 1px 0;
+  }
+
+  /* Receipt lines */
+  #receiptLines { min-height: 200px; }
+  #receiptLines .line {
+    white-space: pre;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 0.5px 0;
+    letter-spacing: 0.3px;
+  }
+  #receiptLines .line.cycle   { color: #2D2D2D; font-weight: bold; }
+  #receiptLines .line.split   { color: #CC3300; }
+  #receiptLines .line.insert  { color: #CC3300; padding-left: 18px; }
+  #receiptLines .line.sep     { color: #B0A89A; }
+  #receiptLines .line.status  { color: #B0A89A; font-style: italic; }
+  #receiptLines .line.header  { color: #2D2D2D; text-align: center; font-weight: bold; }
+
+  /* Sticky status bar at bottom of receipt */
+  .receipt-status {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent 0%, #F5F0E8 40%);
+    padding: 20px 0 8px 0;
+    font-size: 11px;
+    color: #B0A89A;
+    text-align: center;
+    letter-spacing: 1px;
+    pointer-events: none;
+  }
+  .receipt-status .arrow { color: #CC3300; }
+
+  /* ── Growth Panel (sticky) ── */
+  .growth-panel {
+    width: 46%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  #growthCanvas {
+    flex: 1;
+    width: 100%;
+    display: block;
+    background: #0A0A0A;
+    cursor: default;
+  }
+
+  /* Barcode area */
+  .barcode-area {
+    height: 82px;
+    background: #F5F0E8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-top: 1px dashed #B0A89A;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .barcode-area:hover {
+    background: #EEEEEE;
+  }
+  .barcode-area:active {
+    background: #E0D8C8;
+  }
+  .barcode-area .barcode-hint {
+    position: absolute;
+    bottom: 4px;
+    font-size: 9px;
+    color: #B0A89A;
+    letter-spacing: 1px;
+    pointer-events: none;
+  }
+  #barcodeCanvas {
+    width: 100%;
+    height: 64px;
+    display: block;
+  }
+
+  /* Replay indicator overlay */
+  .replay-indicator {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #CC3300;
+    color: #F5F0E8;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    letter-spacing: 2px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .replay-indicator.active { opacity: 1; }
+
+  /* Tooltip */
+  .tooltip {
+    position: absolute;
+    background: #2D2D2D;
+    color: #EEEEEE;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    padding: 4px 8px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 20;
+  }
+  .tooltip.visible { opacity: 0.92; }
+</style>
+</head>
+<body>
+
+<!-- ═══ RECEIPT PANEL ═══ -->
+<div class="receipt-panel" id="receiptPanel">
+  <div class="receipt-header">
+    <div class="oracle-title">RECEIPT ORACLE</div>
+    <div class="subtitle">GENERATIVE DIVINATION MACHINE v1.0</div>
+    <div class="separator">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+    <div class="info-line">TERMINAL: SILENCIO-NET-01</div>
+    <div class="info-line">DATE: <span id="receiptDate">----.--.-- --:--:--</span></div>
+    <div class="info-line">CASHIER: AUTO-RITUAL</div>
+    <div class="separator">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+    <div class="info-line" style="margin-top:4px;">DIFFERENTIAL GROWTH AUDIT TRAIL</div>
+    <div class="info-line">GRID: 12×8 → ORGANIC TOPOLOGY</div>
+    <div class="separator">────────────────────────────────────────</div>
+  </div>
+
+  <div id="receiptLines"></div>
+
+  <div class="receipt-status" id="receiptStatus">
+    <span class="arrow">▼</span> SCROLL TO DIVINE <span class="arrow">▼</span>
+  </div>
+</div>
+
+<!-- ═══ GROWTH PANEL ═══ -->
+<div class="growth-panel" id="growthPanel">
+  <canvas id="growthCanvas"></canvas>
+  <div class="barcode-area" id="barcodeArea" title="Click barcode to replay growth from origin">
+    <canvas id="barcodeCanvas"></canvas>
+    <div class="barcode-hint">[ CLICK TO REPLAY GROWTH ]</div>
+  </div>
+  <div class="replay-indicator" id="replayIndicator">▶ REPLAY</div>
+  <div class="tooltip" id="tooltip"></div>
+</div>
+
+<script>
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  RECEIPT ORACLE — Generative Divination Machine                 ║
+// ║  SILENCIO Brutalist Receipt-as-UI × Differential Growth         ║
+// ║  Vanilla Canvas API · Scroll-driven · Self-contained            ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+// ── Technique #12: Null Guards on all force/degenerate cases ──
+const GUARD = {
+  zeroDiv: (val, fallback) => (Math.abs(val) < 1e-9) ? fallback : val,
+  nan: (val, fallback) => (isNaN(val) || !isFinite(val)) ? fallback : val,
+  clamp: (val, lo, hi) => Math.max(lo, Math.min(hi, val)),
+  dist: (dx, dy) => {
+    const d = Math.sqrt(dx * dx + dy * dy);
+    return d < 1e-6 ? 1e-6 : d;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// PALETTE
+// ═══════════════════════════════════════════════════════════════════
+const PAL = {
+  THERMAL:   '#F5F0E8',
+  CHARCOAL:  '#2D2D2D',
+  RED:       '#CC3300',
+  VOID:      '#0A0A0A',
+  WHITE:     '#EEEEEE',
+  FADED:     '#B0A89A',
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// DIFFERENTIAL GROWTH ENGINE
+// ═══════════════════════════════════════════════════════════════════
+const GrowthEngine = {
+  nodes: [],
+  edges: [],
+  cols: 12,
+  rows: 8,
+  spacing: 42,
+  width: 0,
+  height: 0,
+  cycleCount: 0,
+  events: [],
+  maxEdgeLen: 68,
+  minEdgeLen: 16,
+  repRadius: 64,
+  repStrength: 900,
+  attStrength: 0.012,
+  damping: 0.84,
+  boundsMargin: 18,
+
+  init(w, h) {
+    this.width = w;
+    this.height = h;
+    this.nodes = [];
+    this.edges = [];
+    this.cycleCount = 0;
+    this.events = [];
+
+    const ox = (w - (this.cols - 1) * this.spacing) / 2;
+    const oy = (h - (this.rows - 1) * this.spacing) / 2;
+
+    for (let r = 0; r < this.rows; r++) {
+      for (let c = 0; c < this.cols; c++) {
+        this.nodes.push({
+          x: ox + c * this.spacing + (Math.random() - 0.5) * 3,
+          y: oy + r * this.spacing + (Math.random() - 0.5) * 3,
+          vx: 0, vy: 0
+        });
+      }
+    }
+
+    for (let r = 0; r < this.rows; r++) {
+      for (let c = 0; c < this.cols; c++) {
+        const i = r * this.cols + c;
+        if (c < this.cols - 1) this.edges.push([i, i + 1]);
+        if (r < this.rows - 1) this.edges.push([i, i + this.cols]);
+      }
+    }
+
+    this._logInit();
+  },
+
+  _logInit() {
+    this.events.push({
+      type: 'INIT',
+      cycle: 0,
+      nodeCount: this.nodes.length,
+      edgeCount: this.edges.length,
+      cols: this.cols,
+      rows: this.rows
+    });
+  },
+
+  runCycle() {
+    this.cycleCount++;
+    const n = this.nodes.length;
+
+    // ── Technique #12: guard against empty node set ──
+    if (n === 0) return { splits: 0, nodes: 0, edges: 0 };
+
+    const forces = new Array(n);
+    for (let i = 0; i < n; i++) forces[i] = { fx: 0, fy: 0 };
+
+    // Repulsion: all pairs within radius
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const dx = this.nodes[j].x - this.nodes[i].x;
+        const dy = this.nodes[j].y - this.nodes[i].y;
+        const dist = GUARD.dist(dx, dy);
+
+        if (dist < this.repRadius) {
+          // Technique #12: guard against degenerate zero distance
+          const force = this.repStrength / (dist * dist + 1);
+          const fx = (dx / dist) * force;
+          const fy = (dy / dist) * force;
+
+          // Null guard: skip NaN forces
+          if (isNaN(fx) || isNaN(fy)) continue;
+
+          forces[i].fx -= fx;
+          forces[i].fy -= fy;
+          forces[j].fx += fx;
+          forces[j].fy += fy;
+        }
+      }
+    }
+
+    // Attraction along edges
+    for (let e = 0; e < this.edges.length; e++) {
+      const [a, b] = this.edges[e];
+
+      // Technique #12: guard invalid edge indices
+      if (a >= n || b >= n || a < 0 || b < 0) continue;
+
+      const dx = this.nodes[b].x - this.nodes[a].x;
+      const dy = this.nodes[b].y - this.nodes[a].y;
+      const dist = GUARD.dist(dx, dy);
+
+      const force = this.attStrength * (dist - this.spacing);
+      const fx = GUARD.nan((dx / dist) * force, 0);
+      const fy = GUARD.nan((dy / dist) * force, 0);
+
+      forces[a].fx += fx;
+      forces[a].fy += fy;
+      forces[b].fx -= fx;
+      forces[b].fy -= fy;
+    }
+
+    // Apply forces with damping
+    for (let i = 0; i < n; i++) {
+      this.nodes[i].vx = GUARD.nan((this.nodes[i].vx + forces[i].fx) * this.damping, 0);
+      this.nodes[i].vy = GUARD.nan((this.nodes[i].vy + forces[i].fy) * this.damping, 0);
+      this.nodes[i].x += this.nodes[i].vx;
+      this.nodes[i].y += this.nodes[i].vy;
+
+      // Bounds
+      this.nodes[i].x = GUARD.clamp(this.nodes[i].x, this.boundsMargin, this.width - this.boundsMargin);
+      this.nodes[i].y = GUARD.clamp(this.nodes[i].y, this.boundsMargin, this.height - this.boundsMargin);
+    }
+
+    // Edge splitting
+    const newEdges = [];
+    const removeSet = new Set();
+    let splits = 0;
+
+    for (let e = 0; e < this.edges.length; e++) {
+      const [a, b] = this.edges[e];
+      if (a >= n || b >= n) continue;
+
+      const dx = this.nodes[b].x - this.nodes[a].x;
+      const dy = this.nodes[b].y - this.nodes[a].y;
+      const dist = GUARD.dist(dx, dy);
+
+      if (dist > this.maxEdgeLen) {
+        const mx = (this.nodes[a].x + this.nodes[b].x) / 2;
+        const my = (this.nodes[a].y + this.nodes[b].y) / 2;
+        const ni = this.nodes.length;
+
+        this.nodes.push({ x: mx, y: my, vx: 0, vy: 0 });
+        removeSet.add(e);
+        newEdges.push([a, ni], [ni, b]);
+        splits++;
+
+        this.events.push({
+          type: 'SPLIT',
+          cycle: this.cycleCount,
+          edgeA: a, edgeB: b, newNode: ni,
+          oldLen: dist, newLen: dist / 2,
+          x: mx, y: my
+        });
+      }
+    }
+
+    if (removeSet.size > 0) {
+      this.edges = this.edges.filter((_, i) => !removeSet.has(i));
+      this.edges.push(...newEdges);
+    }
+
+    // Log cycle
+    const logCycle = splits > 0 || this.cycleCount <= 3 || this.cycleCount % 8 === 0;
+    if (logCycle) {
+      this.events.push({
+        type: 'CYCLE',
+        cycle: this.cycleCount,
+        nodeCount: this.nodes.length,
+        edgeCount: this.edges.length,
+        splits
+      });
+    }
+
+    return { splits, nodes: this.nodes.length, edges: this.edges.length };
+  },
+
+  getSnapshot() {
+    return {
+      nodes: this.nodes.map(n => ({ x: n.x, y: n.y, vx: n.vx, vy: n.vy })),
+      edges: this.edges.map(e => [e[0], e[1]]),
+      cycleCount: this.cycleCount,
+      events: this.events.map(e => ({ ...e }))
+    };
+  },
+
+  restoreSnapshot(snap) {
+    this.nodes = snap.nodes.map(n => ({ ...n }));
+    this.edges = snap.edges.map(e => [e[0], e[1]]);
+    this.cycleCount = snap.cycleCount;
+    this.events = snap.events.map(e => ({ ...e }));
+    // Restore computed dimensions from first node set
+    if (snap.nodes.length > 0) {
+      // Keep width/height whatever was set during init
+    }
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// RECEIPT PRINTER
+// ═══════════════════════════════════════════════════════════════════
+const ReceiptPrinter = {
+  linesEl: null,
+  statusEl: null,
+  dateEl: null,
+  lastRenderedEventIdx: -1,
+  totalEvents: 0,
+
+  init(linesEl, statusEl, dateEl) {
+    this.linesEl = linesEl;
+    this.statusEl = statusEl;
+    this.dateEl = dateEl;
+    this.lastRenderedEventIdx = -1;
+    this.totalEvents = 0;
+
+    // Set date
+    const now = new Date();
+    const ds = now.getFullYear() + '-' +
+      String(now.getMonth() + 1).padStart(2, '0') + '-' +
+      String(now.getDate()).padStart(2, '0') + ' ' +
+      String(now.getHours()).padStart(2, '0') + ':' +
+      String(now.getMinutes()).padStart(2, '0') + ':' +
+      String(now.getSeconds()).padStart(2, '0');
+    this.dateEl.textContent = ds;
+  },
+
+  renderNewEvents(events, fromIdx) {
+    const start = Math.max(0, fromIdx + 1);
+    for (let i = start; i < events.length; i++) {
+      const ev = events[i];
+      this._appendEvent(ev);
+    }
+    this.lastRenderedEventIdx = events.length - 1;
+    this.totalEvents = events.length;
+    this._updateStatus();
+  },
+
+  clear() {
+    this.linesEl.innerHTML = '';
+    this.lastRenderedEventIdx = -1;
+    this.totalEvents = 0;
+  },
+
+  _appendEvent(ev) {
+    const div = document.createElement('div');
+    div.className = 'line';
+
+    switch (ev.type) {
+      case 'INIT': {
+        div.className += ' header';
+        div.textContent =
+          'INIT  GRID ' + ev.cols + '×' + ev.rows +
+          '  [' + ev.nodeCount + ' nodes · ' + ev.edgeCount + ' edges]';
+        break;
+      }
+      case 'CYCLE': {
+        div.className += ' cycle';
+        const cn = String(ev.cycle).padStart(3, '0');
+        const nn = String(ev.nodeCount).padStart(3, ' ');
+        const en = String(ev.edgeCount).padStart(3, ' ');
+        div.textContent =
+          'CYCLE ' + cn + '  │  ' + nn + ' NODES  ·  ' + en + ' EDGES' +
+          (ev.splits > 0 ? '  [+' + ev.splits + ' splits]' : '');
+        this._maybeSeparator(ev.cycle);
+        break;
+      }
+      case 'SPLIT': {
+        div.className += ' split';
+        const old = ev.oldLen.toFixed(1);
+        const half = ev.newLen.toFixed(1);
+        div.textContent =
+          'SPLIT  edge[' + ev.edgeA + '→' + ev.edgeB + ']' +
+          '  Δ' + old + 'px → 2×' + half + 'px';
+        // Sub-line for new node
+        const sub = document.createElement('div');
+        sub.className = 'line insert';
+        sub.textContent =
+          'NODE[' + ev.newNode + ']  @ (' +
+          ev.x.toFixed(1) + ', ' + ev.y.toFixed(1) + ')';
+        this.linesEl.appendChild(div);
+        this.linesEl.appendChild(sub);
+        return;
+      }
+      default: {
+        div.textContent = JSON.stringify(ev);
+        break;
+      }
+    }
+
+    this.linesEl.appendChild(div);
+  },
+
+  _maybeSeparator(cycle) {
+    if (cycle % 15 === 0 && cycle > 0) {
+      const sep = document.createElement('div');
+      sep.className = 'line sep';
+      sep.textContent = '─'.repeat(40);
+      this.linesEl.appendChild(sep);
+    }
+  },
+
+  _updateStatus() {
+    if (this.totalEvents === 0) {
+      this.statusEl.innerHTML = '<span class="arrow">▼</span> SCROLL TO DIVINE <span class="arrow">▼</span>';
+    } else {
+      this.statusEl.innerHTML =
+        '<span class="arrow">▼</span> CYCLE ' + GrowthEngine.cycleCount +
+        ' · ' + GrowthEngine.nodes.length + ' NODES' +
+        ' <span class="arrow">▼</span>';
+    }
+  },
+
+  renderAll(events) {
+    this.clear();
+    for (const ev of events) {
+      this._appendEvent(ev);
+    }
+    this.lastRenderedEventIdx = events.length - 1;
+    this.totalEvents = events.length;
+    this._updateStatus();
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// CANVAS RENDERER — Growth Preview
+// ═══════════════════════════════════════════════════════════════════
+const GrowthRenderer = {
+  canvas: null,
+  ctx: null,
+  highlightEdges: [], // [{a, b, t}] for split animation
+  pulseNodes: [],     // [{idx, t}] for new node pulse
+
+  init(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this._resize();
+  },
+
+  _resize() {
+    const rect = this.canvas.parentElement.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const w = rect.width;
+    const h = rect.height - 82; // minus barcode area
+    this.canvas.width = w * dpr;
+    this.canvas.height = h * dpr;
+    this.canvas.style.width = w + 'px';
+    this.canvas.style.height = h + 'px';
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  },
+
+  render(engine) {
+    // Technique #9: Drawing State Reset — every render pass
+    const ctx = this.ctx;
+    const w = this.canvas.width / (window.devicePixelRatio || 1);
+    const h = this.canvas.height / (window.devicePixelRatio || 1);
+
+    ctx.save();
+    ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
+
+    // Technique #9: mandatory reset
+    ctx.setLineDash([]);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#000';
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = '12px monospace';
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+    ctx.globalAlpha = 1;
+
+    // Dark Void Rule: void black background
+    ctx.fillStyle = PAL.VOID;
+    ctx.fillRect(0, 0, w, h);
+
+    const nodes = engine.nodes;
+    const edges = engine.edges;
+
+    // Technique #12: guard empty state
+    if (!nodes || nodes.length === 0) {
+      ctx.restore();
+      return;
+    }
+
+    // Draw edges
+    ctx.lineWidth = 0.7;
+    ctx.strokeStyle = PAL.FADED;
+    ctx.globalAlpha = 0.45;
+    ctx.beginPath();
+
+    for (let i = 0; i < edges.length; i++) {
+      const [a, b] = edges[i];
+      if (a >= nodes.length || b >= nodes.length) continue; // Technique #12
+
+      const na = nodes[a];
+      const nb = nodes[b];
+
+      // Technique #12: null guard on nodes
+      if (!na || !nb || isNaN(na.x) || isNaN(nb.x)) continue;
+
+      ctx.moveTo(na.x, na.y);
+      ctx.lineTo(nb.x, nb.y);
+    }
+    ctx.stroke();
+
+    // Highlight recent splits
+    const now = performance.now();
+    const activeHighlights = [];
+    for (const hEdge of this.highlightEdges) {
+      if (now - hEdge.t < 1200) {
+        activeHighlights.push(hEdge);
+      }
+    }
+    this.highlightEdges = activeHighlights;
+
+    if (activeHighlights.length > 0) {
+      ctx.strokeStyle = PAL.RED;
+      ctx.lineWidth = 1.8;
+      ctx.globalAlpha = 0.8;
+      ctx.beginPath();
+      for (const hl of activeHighlights) {
+        const age = now - hl.t;
+        const fade = Math.max(0, 1 - age / 1200);
+        ctx.globalAlpha = 0.8 * fade;
+        if (hl.a < nodes.length && hl.b < nodes.length) {
+          const na = nodes[hl.a];
+          const nb = nodes[hl.b];
+          if (na && nb && !isNaN(na.x) && !isNaN(nb.x)) {
+            ctx.moveTo(na.x, na.y);
+            ctx.lineTo(nb.x, nb.y);
+          }
+        }
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // Draw nodes
+    for (let i = 0; i < nodes.length; i++) {
+      const n = nodes[i];
+      if (!n || isNaN(n.x)) continue; // Technique #12
+
+      // Check for pulse
+      let pulseAlpha = 0;
+      for (const p of this.pulseNodes) {
+        if (p.idx === i && now - p.t < 1500) {
+          const age = now - p.t;
+          pulseAlpha = Math.max(0, 1 - age / 1500);
+          break;
+        }
+      }
+
+      if (pulseAlpha > 0) {
+        ctx.fillStyle = PAL.RED;
+        ctx.globalAlpha = 0.9 * pulseAlpha;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      } else {
+        ctx.fillStyle = PAL.WHITE;
+        ctx.globalAlpha = 0.7;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    // Draw cycle counter
+    ctx.fillStyle = PAL.FADED;
+    ctx.globalAlpha = 0.5;
+    ctx.font = '10px "Courier New", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('CYCLE ' + String(engine.cycleCount).padStart(3, '0'), w - 12, h - 10);
+
+    // Stats
+    ctx.textAlign = 'left';
+    ctx.fillText(engine.nodes.length + ' nodes', 12, h - 10);
+
+    ctx.restore();
+  },
+
+  addHighlight(a, b) {
+    this.highlightEdges.push({ a, b, t: performance.now() });
+    // Keep max 20
+    if (this.highlightEdges.length > 20) {
+      this.highlightEdges = this.highlightEdges.slice(-20);
+    }
+  },
+
+  addPulse(idx) {
+    this.pulseNodes.push({ idx, t: performance.now() });
+    if (this.pulseNodes.length > 30) {
+      this.pulseNodes = this.pulseNodes.slice(-30);
+    }
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// BARCODE ENCODER
+// ═══════════════════════════════════════════════════════════════════
+const BarcodeEncoder = {
+  canvas: null,
+  ctx: null,
+  bins: 64,
+
+  init(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this._resize();
+  },
+
+  _resize() {
+    const rect = this.canvas.parentElement.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const w = rect.width;
+    const h = 64;
+    this.canvas.width = w * dpr;
+    this.canvas.height = h * dpr;
+    this.canvas.style.width = w + 'px';
+    this.canvas.style.height = h + 'px';
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  },
+
+  render(nodes, width) {
+    const ctx = this.ctx;
+    const w = this.canvas.width / (window.devicePixelRatio || 1);
+    const h = this.canvas.height / (window.devicePixelRatio || 1);
+
+    ctx.save();
+    ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
+
+    // Technique #9: reset
+    ctx.setLineDash([]);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#000';
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = '12px monospace';
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+    ctx.globalAlpha = 1;
+
+    // Thermal paper background
+    ctx.fillStyle = PAL.THERMAL;
+    ctx.fillRect(0, 0, w, h);
+
+    // Technique #12: guard empty
+    if (!nodes || nodes.length === 0 || !width || width <= 0) {
+      ctx.restore();
+      return;
+    }
+
+    // Bin node x-positions
+    const counts = new Array(this.bins).fill(0);
+    for (const n of nodes) {
+      if (!n || isNaN(n.x)) continue; // Technique #12
+      const bin = Math.floor((n.x / width) * this.bins);
+      if (bin >= 0 && bin < this.bins) {
+        counts[bin]++;
+      }
+    }
+
+    const maxCount = Math.max(1, ...counts);
+    const barW = (w - 24) / this.bins;
+    const maxBarH = h - 16;
+
+    // Draw bars
+    for (let i = 0; i < this.bins; i++) {
+      const barH = (counts[i] / maxCount) * maxBarH;
+      const x = 12 + i * barW;
+      const y = h - 8 - barH;
+
+      ctx.fillStyle = PAL.CHARCOAL;
+      ctx.fillRect(x + 1, y, barW - 2, barH);
+    }
+
+    // Label
+    ctx.fillStyle = PAL.FADED;
+    ctx.font = '8px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('POSITION SIGNATURE', w / 2, h - 1);
+
+    ctx.restore();
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// MAIN CONTROLLER
+// ═══════════════════════════════════════════════════════════════════
+
+const receiptPanel = document.getElementById('receiptPanel');
+const receiptLines = document.getElementById('receiptLines');
+const receiptStatus = document.getElementById('receiptStatus');
+const receiptDate = document.getElementById('receiptDate');
+const growthCanvas = document.getElementById('growthCanvas');
+const barcodeCanvas = document.getElementById('barcodeCanvas');
+const barcodeArea = document.getElementById('barcodeArea');
+const replayIndicator = document.getElementById('replayIndicator');
+const tooltip = document.getElementById('tooltip');
+
+// State
+let cyclesRun = 0;
+let targetCycles = 0;
+let maxScrollReached = 0;
+let isReplaying = false;
+let replaySnapshot = null;
+let replayCyclesRun = 0;
+let replayTotalCycles = 0;
+let lastEventCount = 0;
+let animFrameId = null;
+
+// Initialize
+function initAll() {
+  GrowthRenderer.init(growthCanvas);
+  BarcodeEncoder.init(barcodeCanvas);
+  ReceiptPrinter.init(receiptLines, receiptStatus, receiptDate);
+
+  // Resize growth canvas and init engine
+  const rect = growthCanvas.parentElement.getBoundingClientRect();
+  const w = rect.width;
+  const h = rect.height - 82;
+  GrowthEngine.init(w, h);
+
+  // Save initial snapshot for replay
+  replaySnapshot = GrowthEngine.getSnapshot();
+
+  // Render initial receipt
+  ReceiptPrinter.renderAll(GrowthEngine.events);
+  lastEventCount = GrowthEngine.events.length;
+
+  // Initial render
+  GrowthRenderer.render(GrowthEngine);
+  BarcodeEncoder.render(GrowthEngine.nodes, GrowthEngine.width);
+
+  // Start loop
+  animFrameId = requestAnimationFrame(mainLoop);
+}
+
+// Main loop
+function mainLoop(timestamp) {
+  if (!isReplaying) {
+    // ── Normal mode: scroll-driven growth ──
+    const scrollY = receiptPanel.scrollTop;
+    const scrollHeight = receiptPanel.scrollHeight;
+    const clientHeight = receiptPanel.clientHeight;
+    const maxScroll = Math.max(0, scrollHeight - clientHeight);
+
+    // Track max scroll
+    if (scrollY > maxScrollReached + 5) {
+      maxScrollReached = scrollY;
+    }
+
+    // Calculate target cycles from scroll progress
+    // Each ~60px of scroll = 1 cycle (adjusted for content growth)
+    const scrollProgress = maxScroll > 0 ? maxScrollReached / Math.max(1, maxScroll * 0.6) : 0;
+    targetCycles = Math.floor(scrollProgress * 80) + Math.floor(maxScrollReached / 50);
+
+    // Ensure we don't regress
+    targetCycles = Math.max(targetCycles, cyclesRun);
+
+    // Run pending cycles (throttled: max 3 per frame)
+    let ran = 0;
+    while (cyclesRun < targetCycles && ran < 3) {
+      const prevNodeCount = GrowthEngine.nodes.length;
+      const result = GrowthEngine.runCycle();
+
+      // Track highlights for renderer
+      if (result.splits > 0) {
+        const newEvents = GrowthEngine.events;
+        for (let i = newEvents.length - 1; i >= 0; i--) {
+          if (newEvents[i].type === 'SPLIT' && newEvents[i].cycle === GrowthEngine.cycleCount) {
+            GrowthRenderer.addHighlight(newEvents[i].edgeA, newEvents[i].edgeB);
+            GrowthRenderer.addPulse(newEvents[i].newNode);
+          }
+          if (newEvents[i].type !== 'SPLIT') break;
+        }
+      }
+
+      cyclesRun++;
+      ran++;
+    }
+
+    // Render new receipt events
+    if (GrowthEngine.events.length > lastEventCount) {
+      ReceiptPrinter.renderNewEvents(GrowthEngine.events, lastEventCount);
+      lastEventCount = GrowthEngine.events.length;
+    }
+
+    // Auto-scroll to show latest content (only if user is near bottom)
+    const newMaxScroll = receiptPanel.scrollHeight - receiptPanel.clientHeight;
+    const distFromBottom = newMaxScroll - receiptPanel.scrollTop;
+    if (distFromBottom < 120 && ran > 0) {
+      // User is near bottom, auto-scroll gently
+      receiptPanel.scrollTop = receiptPanel.scrollHeight;
+      maxScrollReached = receiptPanel.scrollTop;
+    }
+  } else {
+    // ── Replay mode ──
+    const replaySpeed = 4; // cycles per frame
+    let ran = 0;
+    while (replayCyclesRun < replayTotalCycles && ran < replaySpeed) {
+      GrowthEngine.runCycle();
+      replayCyclesRun++;
+      ran++;
+    }
+
+    // Render receipt incrementally during replay
+    if (GrowthEngine.events.length > lastEventCount) {
+      ReceiptPrinter.renderNewEvents(GrowthEngine.events, lastEventCount);
+      lastEventCount = GrowthEngine.events.length;
+      receiptPanel.scrollTop = receiptPanel.scrollHeight;
+    }
+
+    // Check if replay is done
+    if (replayCyclesRun >= replayTotalCycles) {
+      isReplaying = false;
+      replayIndicator.classList.remove('active');
+      cyclesRun = replayTotalCycles;
+      targetCycles = replayTotalCycles;
+      maxScrollReached = receiptPanel.scrollHeight;
+      receiptPanel.scrollTop = receiptPanel.scrollHeight;
+    }
+  }
+
+  // Render growth preview
+  GrowthRenderer.render(GrowthEngine);
+
+  // Render barcode
+  BarcodeEncoder.render(GrowthEngine.nodes, GrowthEngine.width);
+
+  // Schedule next frame
+  animFrameId = requestAnimationFrame(mainLoop);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EVENT HANDLERS
+// ═══════════════════════════════════════════════════════════════════
+
+// Scroll handler — we use the main loop polling, but also update on scroll
+receiptPanel.addEventListener('scroll', () => {
+  // The main loop handles growth advancement via polling scrollTop
+  // Just update maxScrollReached immediately for responsiveness
+  const scrollY = receiptPanel.scrollTop;
+  if (scrollY > maxScrollReached) {
+    maxScrollReached = scrollY;
+  }
+}, { passive: true });
+
+// Wheel handler — captures excess scroll when at bottom to drive growth
+// This ensures "scroll to divine" works even before content is scrollable
+receiptPanel.addEventListener('wheel', (e) => {
+  if (isReplaying) return;
+
+  const atBottom = receiptPanel.scrollTop + receiptPanel.clientHeight >= receiptPanel.scrollHeight - 10;
+
+  if (e.deltaY > 0 && atBottom) {
+    // User is at bottom and trying to scroll down — accumulate virtual distance
+    maxScrollReached += e.deltaY;
+    e.preventDefault();
+  }
+}, { passive: false });
+
+// Barcode click → replay
+barcodeArea.addEventListener('click', () => {
+  if (isReplaying) return; // Already replaying
+
+  // Save current state to restore after? No, replay shows the journey.
+  // Reset engine to initial snapshot
+  if (replaySnapshot) {
+    GrowthEngine.restoreSnapshot(replaySnapshot);
+  } else {
+    // Re-init
+    const rect = growthCanvas.parentElement.getBoundingClientRect();
+    GrowthEngine.init(rect.width, rect.height - 82);
+  }
+
+  // Clear receipt
+  ReceiptPrinter.clear();
+  ReceiptPrinter.renderAll(GrowthEngine.events);
+  lastEventCount = GrowthEngine.events.length;
+
+  // Reset scroll
+  receiptPanel.scrollTop = 0;
+  maxScrollReached = 0;
+
+  // Set replay params
+  isReplaying = true;
+  replayCyclesRun = 0;
+  replayTotalCycles = cyclesRun; // Replay up to current cycle count
+  cyclesRun = 0;
+  targetCycles = 0;
+
+  // Show indicator
+  replayIndicator.classList.add('active');
+
+  // Re-render
+  GrowthRenderer.render(GrowthEngine);
+  BarcodeEncoder.render(GrowthEngine.nodes, GrowthEngine.width);
+});
+
+// Tooltip on growth canvas hover
+growthCanvas.addEventListener('mousemove', (e) => {
+  const rect = growthCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  // Find nearest node
+  let nearest = null;
+  let nearestDist = 30;
+  for (let i = 0; i < GrowthEngine.nodes.length; i++) {
+    const n = GrowthEngine.nodes[i];
+    if (!n || isNaN(n.x)) continue;
+    const dx = x - n.x;
+    const dy = y - n.y;
+    const d = Math.sqrt(dx * dx + dy * dy);
+    if (d < nearestDist) {
+      nearestDist = d;
+      nearest = { idx: i, x: n.x, y: n.y };
+    }
+  }
+
+  if (nearest) {
+    const panelRect = growthPanel.getBoundingClientRect();
+    tooltip.textContent = 'NODE[' + nearest.idx + ']  (' +
+      nearest.x.toFixed(1) + ', ' + nearest.y.toFixed(1) + ')';
+    tooltip.style.left = (nearest.x + rect.left - panelRect.left + 14) + 'px';
+    tooltip.style.top = (nearest.y + rect.top - panelRect.top - 12) + 'px';
+    tooltip.classList.add('visible');
+  } else {
+    tooltip.classList.remove('visible');
+  }
+});
+
+growthCanvas.addEventListener('mouseleave', () => {
+  tooltip.classList.remove('visible');
+});
+
+// Resize handler
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    GrowthRenderer._resize();
+    BarcodeEncoder._resize();
+
+    const rect = growthCanvas.parentElement.getBoundingClientRect();
+    GrowthEngine.width = rect.width;
+    GrowthEngine.height = rect.height - 82;
+
+    // Re-render
+    GrowthRenderer.render(GrowthEngine);
+    BarcodeEncoder.render(GrowthEngine.nodes, GrowthEngine.width);
+  }, 300);
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// STARTUP
+// ═══════════════════════════════════════════════════════════════════
+
+// Small delay for layout to settle
+setTimeout(initAll, 100);
+
+console.log('%cRECEIPT ORACLE%c v1.0',
+  'color:#CC3300;font-size:16px;font-weight:bold;',
+  'color:#B0A89A;');
+console.log('%cGenerative Divination Machine%c — SILENCIO × Differential Growth',
+  'color:#2D2D2D;', 'color:#B0A89A;');
+console.log('%cScroll the receipt to divine. Click the barcode to replay.',
+  'color:#B0A89A;font-style:italic;');
+</script>
+</body>
+</html>

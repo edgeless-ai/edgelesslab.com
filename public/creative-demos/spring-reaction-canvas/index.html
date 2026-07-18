@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Reaction Canvas — Scroll-Driven Gray-Scott</title>
+<script src="https://cdn.jsdelivr.net/npm/p5@1.11/lib/p5.min.js"></script>
+<style>
+:root { --bg:#0d0d0d; --text:#c8c8c8; --accent:#FFB74D; --panel:rgba(18,18,18,0.94); }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:Georgia,Times,serif;overflow-x:hidden}
+#app{display:flex;min-height:100vh}
+#content-column{width:38%;padding:40px 36px 120px 40px;line-height:1.75;font-size:15px;color:#aaa;user-select:none}
+#content-column h1{font-size:22px;color:#ddd;margin-bottom:24px;font-weight:400;letter-spacing:0.5px}
+#content-column p{margin-bottom:18px}
+#content-column em{color:var(--accent);font-style:normal}
+#canvas-panel{position:fixed;right:0;top:0;width:62%;height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a1510 0%,#0a0a0a 70%);border-left:1px solid #222}
+#canvas-panel canvas{display:block;max-width:100%;max-height:100%}
+#hud{position:fixed;bottom:28px;right:36px;background:var(--panel);border:1px solid #333;border-radius:8px;padding:14px 20px;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:13px;color:#bbb;min-width:180px;z-index:10;pointer-events:none}
+#hud .row{display:flex;justify-content:space-between;margin-bottom:4px}
+#hud .row:last-child{margin-bottom:0}
+#hud .label{color:#777}
+#hud .value{color:var(--accent)}
+#hud .warn{color:#e05555;font-size:11px;margin-top:6px;display:none}
+#controls{position:fixed;bottom:28px;left:36px;background:var(--panel);border:1px solid #333;border-radius:8px;padding:14px 20px;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:12px;color:#999;z-index:10}
+#controls .ctrl{margin-bottom:10px}
+#controls .ctrl:last-child{margin-bottom:0}
+#controls label{display:block;margin-bottom:2px;color:#777}
+#controls input[type=range]{width:160px;accent-color:var(--accent)}
+#controls .key-hint{font-size:10px;color:#555;margin-top:8px;line-height:1.6}
+#controls .key-hint span{color:var(--accent)}
+@media(max-width:768px){#content-column{width:100%;padding:24px 20px 40px}#canvas-panel{position:relative;width:100%;height:60vh;border-left:none;border-top:1px solid #222}#app{flex-direction:column}#hud{bottom:16px;right:12px;padding:10px 14px;font-size:11px}#controls{bottom:16px;left:12px;padding:10px 14px;font-size:10px}}
+</style>
+</head>
+<body>
+
+<div id="app">
+ <div id="content-column">
+  <h1>Spring &amp; Scroll — A Chemical Canvas</h1>
+  <p><em>Scroll this text.</em> Scroll velocity drives a spring-physics model that feeds into a Gray-Scott reaction-diffusion simulation on the right. Fast scrolling stirs the chemicals; stillness lets patterns crystallize.</p>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+  <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris.</p>
+  <p>Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam. <em>Maecenas fermentum consequat mi.</em> Donec fermentum.</p>
+  <p>Duis sapien sem, aliquet nec, commodo eget, consequat quis, neque. Aliquam faucibus, elit ut dictum aliquet, felis nisl adipiscing sapien, sed malesuada diam lacus eget erat. <em>Scroll slowly</em> to deposit dense catalyst; scroll fast for sweeping patterns.</p>
+  <p>Vivamus luctus egestas leo. Maecenas sollicitudin. Pellentesque sed dui ut mauris cursus mattis. Aliquam erat volutpat. Fusce suscipit, wisi nec facilisis facilisis, est dui fermentum leo, quis tempor ligula erat quis odio. Nunc porta vulputate tellus.</p>
+  <p>Sed bibendum. Aliquam posuere. Nunc aliquet, augue nec adipiscing interdum, lacus tellus malesuada massa, quis varius mi purus non ipsum. <em>Scroll up</em> to compress the spring and increase the kill rate — patterns become more sparse.</p>
+  <p>Proin quam. Etiam ultrices. Suspendisse in justo eu magna luctus suscipit. Sed lectus. Integer euismod lacus luctus magna. Quisque cursus, metus vitae pharetra auctor, sem massa mattis sem, at interdum magna augue eget diam.</p>
+  <p>Morbi lacinia molestie dui. Praesent blandit dolor. Sed non quam. In vel mi sit amet augue congue elementum. <em>Mouse over the canvas</em> to finger-paint catalyst directly into the simulation.</p>
+  <p>Vestibulum tincidunt malesuada tellus. Ut ultrices ultrices enim. Curabitur sit amet mauris. Morbi in dui quis est pulvinar ullamcorper. Nulla facilisi. Integer lacinia sollicitudin massa. Cras metus.</p>
+  <p>Morbi mi. Quisque nisl felis, venenatis tristique, dignissim in, ultrices sit amet, augue. Proin sodales libero eget ante. Nulla quam. Aenean laoreet. Ut orci risus, accumsan porttitor, cursus quis.</p>
+  <p>Sed pretium blandit orci. Ut eu diam at pede suscipit sodales. Aenean lectus elit, fermentum non, convallis id, sagittis at, neque. Nullam mauris orci, aliquet et, iaculis et, viverra vitae, ligula. <em>Click the canvas</em> to seed a burst of catalyst.</p>
+  <p>Maecenas aliquet mollis lectus. Vivamus consectetuer risus et tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam.</p>
+  <p>Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent.</p>
+  <p>Sed dignissim lacinia nunc. Curabitur tortor. Pellentesque nibh. Aenean quam. In scelerisque sem at dolor. Maecenas mattis. Sed convallis tristique sem. <em>The canvas remembers.</em> Patterns you seed evolve autonomously.</p>
+ </div>
+ <div id="canvas-panel"><!-- p5 canvas injected here --></div>
+</div>
+
+<div id="hud">
+ <div class="row"><span class="label">Feed (F)</span><span class="value" id="fv">0.038</span></div>
+ <div class="row"><span class="label">Kill (k)</span><span class="value" id="kv">0.062</span></div>
+ <div class="row"><span class="label">Spring</span><span class="value" id="sv">1.000</span></div>
+ <div class="row"><span class="label">Trail pts</span><span class="value" id="tv">0</span></div>
+ <div class="row"><span class="label">Status</span><span class="value" id="st">⚡ running</span></div>
+ <div class="warn" id="float-warn">⚠ Half-float fallback — reduced precision</div>
+</div>
+
+<div id="controls">
+ <div class="ctrl"><label>Spring Stiffness <span id="stiff-val">0.12</span></label><input type="range" id="stiff-slider" min="0.05" max="0.25" step="0.01" value="0.12"></div>
+ <div class="ctrl"><label>Sim Speed <span id="speed-val">1.0</span>&times;</label><input type="range" id="speed-slider" min="0.1" max="5.0" step="0.1" value="1.0"></div>
+ <div class="key-hint"><span>1</span> Spots &nbsp; <span>2</span> Waves &nbsp; <span>3</span> Mitosis &nbsp; <span>4</span> Labyrinth<br><span>Space</span> Pause &nbsp; <span>R</span> Reset</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  Shared vertex shader
+// ═══════════════════════════════════════════
+const VERT = `attribute vec3 aPosition;attribute vec2 aTexCoord;uniform mat4 uModelViewMatrix;uniform mat4 uProjectionMatrix;varying vec2 vTexCoord;void main(){vTexCoord=aTexCoord;gl_Position=uProjectionMatrix*uModelViewMatrix*vec4(aPosition,1.0);}`;
+
+// ═══════════════════════════════════════════
+//  Gray-Scott simulation shader (ping-pong)
+//  + scroll trail injection + mouse + click
+// ═══════════════════════════════════════════
+const SIM_FRAG = `#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+uniform sampler2D u_tex;
+uniform vec2 u_ts;
+uniform float u_du,u_dv,u_feed,u_kill,u_dt;
+uniform vec2 u_trailPos[120];
+uniform float u_trailAge[120];
+uniform vec2 u_mousePos;
+uniform float u_mouseActive;
+uniform vec2 u_clickPos;
+uniform float u_clickStr;
+varying vec2 vTexCoord;
+void main(){
+  vec4 C=texture2D(u_tex,vTexCoord);
+  vec4 N=texture2D(u_tex,vTexCoord+vec2(0.,u_ts.y));
+  vec4 S=texture2D(u_tex,vTexCoord-vec2(0.,u_ts.y));
+  vec4 E=texture2D(u_tex,vTexCoord+vec2(u_ts.x,0.));
+  vec4 W=texture2D(u_tex,vTexCoord-vec2(u_ts.x,0.));
+  vec4 NE=texture2D(u_tex,vTexCoord+u_ts);
+  vec4 NW=texture2D(u_tex,vTexCoord+vec2(-u_ts.x,u_ts.y));
+  vec4 SE=texture2D(u_tex,vTexCoord+vec2(u_ts.x,-u_ts.y));
+  vec4 SW=texture2D(u_tex,vTexCoord-u_ts);
+  float dw=0.70710678;
+  vec4 lap=(N+S+E+W)+dw*(NE+NW+SE+SW)-(4.+4.*dw)*C;
+  float U=C.r,V=C.g,R=U*V*V;
+  float nU=clamp(U+u_dt*(u_du*lap.r-R+u_feed*(1.-U)),0.,1.);
+  float nV=clamp(V+u_dt*(u_dv*lap.g+R-(u_feed+u_kill)*V),0.,1.);
+  for(int i=0;i<120;i++){
+    float age=u_trailAge[i];
+    float act=step(0.,age)*step(age,2.);
+    float fd=clamp(1.-age/2.,0.,1.)*act;
+    float d=distance(vTexCoord,u_trailPos[i]);
+    nV=clamp(nV+exp(-d*d*800.)*.45*fd,0.,1.);
+  }
+  if(u_mouseActive>.5){float d=distance(vTexCoord,u_mousePos);nV=clamp(nV+exp(-d*d*1200.)*.3,0.,1.);}
+  if(u_clickStr>.01){float d=distance(vTexCoord,u_clickPos);nV=clamp(nV+exp(-d*d*200.)*u_clickStr,0.,1.);}
+  gl_FragColor=vec4(nU,nV,0.,1.);
+}`;
+
+// ═══════════════════════════════════════════
+//  Display shader — HSV warm→cool mapping
+// ═══════════════════════════════════════════
+const DISP_FRAG = `precision highp float;
+uniform sampler2D u_tex;
+varying vec2 vTexCoord;
+vec3 hsv2rgb(vec3 c){vec4 K=vec4(1.,2./3.,1./3.,3.);vec3 p=abs(fract(c.xxx+K.xyz)*6.-K.www);return c.z*mix(K.xxx,clamp(p-K.xxx,0.,1.),c.y);}
+void main(){
+  vec4 s=texture2D(u_tex,vTexCoord);
+  float eU=s.r*.5,eV=s.g*2.;
+  float h=mix(0.,.33,eV/(eU+eV+.001));
+  float v=mix(.08,1.,(eU+eV)*.5);
+  gl_FragColor=vec4(hsv2rgb(vec3(h,.8,v)),1.);
+}`;
+
+// ═══════════════════════════════════════════
+//  Init shader — seed center catalyst
+// ═══════════════════════════════════════════
+const INIT_FRAG = `precision highp float;varying vec2 vTexCoord;
+void main(){
+  vec2 uv=vTexCoord;
+  float d1=length(uv-vec2(.5));float s1=exp(-d1*d1*200.)*.25;
+  float d2=length(uv-vec2(.47,.53));float s2=exp(-d2*d2*300.)*.18;
+  float V=max(s1,s2);gl_FragColor=vec4(1.,V,0.,1.);
+}`;
+
+// ═══════════════════════════════════════════
+//  Global state
+// ═══════════════════════════════════════════
+let simShader, dispShader, initShader, fboA, fboB;
+let simRes=512, useFloat=true;
+let targetScaleY=1.,currentScaleY=1.,springVel=0.;
+const STIFF_DEF=0.12,DAMPING=0.85,SENS=0.002;
+let springStiff=STIFF_DEF;
+const SPRING_MIN=0.85,SPRING_MAX=1.30;
+let F=0.038,kV=0.062;
+const F_DEF=0.038,K_DEF=0.062,DU=0.16,DV=0.08;
+let lastScrollY=0,scrollHist=[],docH=1000;
+const TRAIL_MAX=120;
+let paused=false,simSpd=1.0;
+let mouseOn=false,mxN=.5,myN=.5;
+let clickBurst=null;
+const CLICK_DECAY=1.5;
+window.__p5=null;
+
+// ═══════════════════════════════════════════
+//  p5 sketch
+// ═══════════════════════════════════════════
+new p5(function(p){
+ window.__p5=p;
+
+ p.setup=function(){
+  let panel=document.getElementById('canvas-panel');
+  let sz=Math.min(panel.clientWidth-32,panel.clientHeight-32,640);
+  sz=Math.max(sz,280);
+  simRes=sz;
+  let c=p.createCanvas(simRes,simRes,p.WEBGL);
+  c.parent('canvas-panel');
+
+  // Float texture check
+  let gl=p._renderer.GL;
+  useFloat=!!gl.getExtension('OES_texture_float');
+  if(!useFloat) document.getElementById('float-warn').style.display='block';
+
+  simShader =p.createShader(VERT,SIM_FRAG);
+  dispShader=p.createShader(VERT,DISP_FRAG);
+  initShader=p.createShader(VERT,INIT_FRAG);
+
+  let fboOpts={width:simRes,height:simRes};
+  if(useFloat) fboOpts.format='float';
+  try{
+   fboA=p.createFramebuffer(fboOpts);
+   fboB=p.createFramebuffer(fboOpts);
+  }catch(e){
+   useFloat=false;
+   document.getElementById('float-warn').style.display='block';
+   fboA=p.createFramebuffer({width:simRes,height:simRes});
+   fboB=p.createFramebuffer({width:simRes,height:simRes});
+  }
+  initFBOs();
+
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onResize);
+
+  let el=p.canvas;
+  el.addEventListener('mouseenter',()=>{mouseOn=true;});
+  el.addEventListener('mouseleave',()=>{mouseOn=false;});
+  el.addEventListener('mousemove',e=>{
+   let r=el.getBoundingClientRect();
+   mxN=(e.clientX-r.left)/r.width;myN=(e.clientY-r.top)/r.height;
+   mouseOn=true;
+  });
+  el.addEventListener('click',e=>{
+   let r=el.getBoundingClientRect();
+   clickBurst={x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height,str:.6,t:0};
+  });
+  el.addEventListener('touchmove',e=>{
+   e.preventDefault();
+   let r=el.getBoundingClientRect();
+   mxN=(e.touches[0].clientX-r.left)/r.width;myN=(e.touches[0].clientY-r.top)/r.height;
+   mouseOn=true;
+  },{passive:false});
+  el.addEventListener('touchend',()=>{mouseOn=false;});
+  el.addEventListener('touchcancel',()=>{mouseOn=false;});
+
+  document.getElementById('stiff-slider').addEventListener('input',function(){
+   springStiff=parseFloat(this.value);
+   document.getElementById('stiff-val').textContent=springStiff.toFixed(2);
+  });
+  document.getElementById('speed-slider').addEventListener('input',function(){
+   simSpd=parseFloat(this.value);
+   document.getElementById('speed-val').textContent=simSpd.toFixed(1);
+  });
+
+  docH=Math.max(document.body.scrollHeight,window.innerHeight);
+  lastScrollY=window.scrollY;
+  targetScaleY=1.;currentScaleY=1.;
+ };
+
+ p.keyPressed=function(){
+  if(p.key===' '){paused=!paused;return false;}
+  if(p.key==='r'||p.key==='R'){resetAll();return false;}
+  if(p.key==='1'){preset(1);return false;}
+  if(p.key==='2'){preset(2);return false;}
+  if(p.key==='3'){preset(3);return false;}
+  if(p.key==='4'){preset(4);return false;}
+  return true;
+ };
+
+ p.draw=function(){
+  docH=Math.max(document.body.scrollHeight,window.innerHeight);
+
+  // Spring physics
+  if(!paused){
+   let force=(targetScaleY-currentScaleY)*springStiff;
+   springVel+=force;springVel*=DAMPING;
+   currentScaleY+=springVel;
+   currentScaleY=Math.max(SPRING_MIN,Math.min(SPRING_MAX,currentScaleY));
+   if(Math.abs(currentScaleY-targetScaleY)<1e-4&&Math.abs(springVel)<1e-4){
+    currentScaleY=targetScaleY;springVel=0;
+   }
+  }
+  if(targetScaleY!==1.&&Math.abs(springVel)<.001&&Math.abs(currentScaleY-targetScaleY)<.002){
+   targetScaleY=1.;
+  }
+
+  // Map to F/k
+  if(!paused){
+   let d=currentScaleY-1.;
+   F=F_DEF+Math.max(0,d)*.15;
+   kV=K_DEF+Math.max(0,-d)*.12;
+  }
+  F=Math.max(.01,Math.min(.1,F));
+  kV=Math.max(.03,Math.min(.08,kV));
+
+  // Age trail
+  let dt=p.deltaTime/1000;
+  for(let pt of scrollHist) pt.age+=dt;
+  scrollHist=scrollHist.filter(pt=>pt.age<2.);
+
+  // Decay click burst
+  if(clickBurst){clickBurst.t+=dt;clickBurst.str=Math.max(0,.6-clickBurst.t/CLICK_DECAY);if(clickBurst.str<=0)clickBurst=null;}
+
+  // Build uniform arrays
+  let tPos=new Float32Array(TRAIL_MAX*2),tAge=new Float32Array(TRAIL_MAX);
+  for(let i=0;i<TRAIL_MAX;i++){
+   if(i<scrollHist.length){tPos[i*2]=scrollHist[i].x;tPos[i*2+1]=scrollHist[i].y;tAge[i]=scrollHist[i].age;}
+   else{tPos[i*2]=0;tPos[i*2+1]=0;tAge[i]=-1.;}
+  }
+
+  // Simulation pass A→B
+  fboB.begin();
+  p.push();p.resetMatrix();p.ortho(-1,1,-1,1,-1,1);
+  p.shader(simShader);
+  simShader.setUniform('u_tex',fboA);
+  simShader.setUniform('u_ts',[1/simRes,1/simRes]);
+  simShader.setUniform('u_du',DU);simShader.setUniform('u_dv',DV);
+  simShader.setUniform('u_feed',F);simShader.setUniform('u_kill',kV);
+  simShader.setUniform('u_dt',simSpd);
+  simShader.setUniform('u_mousePos',[mxN,myN]);
+  simShader.setUniform('u_mouseActive',mouseOn?1.:0.);
+  simShader.setUniform('u_clickPos',clickBurst?[clickBurst.x,clickBurst.y]:[0,0]);
+  simShader.setUniform('u_clickStr',clickBurst?clickBurst.str:0.);
+  // Raw GL for uniform arrays
+  let gl=p._renderer.GL;
+  gl.useProgram(simShader._glProgram);
+  let pl=gl.getUniformLocation(simShader._glProgram,'u_trailPos[0]');
+  let al=gl.getUniformLocation(simShader._glProgram,'u_trailAge[0]');
+  if(pl) gl.uniform2fv(pl,tPos);
+  if(al) gl.uniform1fv(al,tAge);
+  p.rect(-1,-1,2,2);
+  p.pop();
+  fboB.end();
+  [fboA,fboB]=[fboB,fboA];
+
+  // Display pass
+  p.push();p.resetMatrix();p.ortho(-1,1,-1,1,-1,1);
+  p.shader(dispShader);
+  dispShader.setUniform('u_tex',fboA);
+  p.rect(-1,-1,2,2);
+  p.pop();
+
+  updHUD();
+ };
+
+ p.windowResized=function(){onResize();};
+});
+
+// ═══════════════════════════════════════════
+//  Initialize framebuffers with seed
+// ═══════════════════════════════════════════
+function initFBOs(){
+ if(!fboA||!initShader||!window.__p5) return;
+ let p=window.__p5;
+ p.push();fboA.begin();p.resetMatrix();p.ortho(-1,1,-1,1,-1,1);p.shader(initShader);p.rect(-1,-1,2,2);fboA.end();p.pop();
+ p.push();fboB.begin();p.resetMatrix();p.ortho(-1,1,-1,1,-1,1);p.shader(initShader);p.rect(-1,-1,2,2);fboB.end();p.pop();
+}
+
+// ═══════════════════════════════════════════
+//  Reset simulation
+// ═══════════════════════════════════════════
+function resetAll(){
+ scrollHist=[];F=F_DEF;kV=K_DEF;
+ targetScaleY=1.;currentScaleY=1.;springVel=0;
+ clickBurst=null;paused=false;
+ initFBOs();
+ document.getElementById('st').textContent='⚡ running';
+}
+
+// ═══════════════════════════════════════════
+//  Parameter presets
+// ═══════════════════════════════════════════
+function preset(n){
+ const P={1:{f:.038,k:.062,n:'stable spots'},2:{f:.022,k:.053,n:'traveling waves'},3:{f:.030,k:.060,n:'mitosis'},4:{f:.054,k:.065,n:'labyrinth'}};
+ let pr=P[n];if(!pr)return;
+ F=pr.f;kV=pr.k;targetScaleY=1.;currentScaleY=1.;springVel=0;
+ console.log('Preset '+n+': '+pr.n+' (F='+pr.f+', k='+pr.k+')');
+}
+
+// ═══════════════════════════════════════════
+//  Scroll handler
+// ═══════════════════════════════════════════
+function onScroll(){
+ let cy=window.scrollY,delta=cy-lastScrollY;lastScrollY=cy;
+ if(!paused) targetScaleY=Math.max(SPRING_MIN,Math.min(SPRING_MAX,1.+delta*SENS));
+ let ny=cy/Math.max(docH,1);
+ let t=performance.now()/1000;
+ let xb=.5+.35*Math.sin(t*1.3);
+ scrollHist.push({x:xb,y:ny,age:0});
+ while(scrollHist.length>TRAIL_MAX) scrollHist.shift();
+}
+
+// ═══════════════════════════════════════════
+//  Resize handler
+// ═══════════════════════════════════════════
+function onResize(){
+ docH=Math.max(document.body.scrollHeight,window.innerHeight);
+ let panel=document.getElementById('canvas-panel');
+ let sz=Math.min(panel.clientWidth-32,panel.clientHeight-32,640);
+ sz=Math.max(sz,256);
+ if(sz!==simRes){
+  simRes=sz;
+  let p=window.__p5;
+  if(p){
+   p.resizeCanvas(simRes,simRes);
+   let fboOpts={width:simRes,height:simRes};
+   if(useFloat) fboOpts.format='float';
+   try{fboA=p.createFramebuffer(fboOpts);fboB=p.createFramebuffer(fboOpts);}
+   catch(e){fboA=p.createFramebuffer({width:simRes,height:simRes});fboB=p.createFramebuffer({width:simRes,height:simRes});}
+   initFBOs();
+  }
+ }
+}
+
+// ═══════════════════════════════════════════
+//  HUD update
+// ═══════════════════════════════════════════
+function updHUD(){
+ document.getElementById('fv').textContent=F.toFixed(3);
+ document.getElementById('kv').textContent=kV.toFixed(3);
+ document.getElementById('sv').textContent=currentScaleY.toFixed(3);
+ document.getElementById('tv').textContent=scrollHist.length;
+ document.getElementById('st').textContent=paused?'⏸ paused':'⚡ running';
+}
+
+// Init on load
+docH=Math.max(document.body.scrollHeight,window.innerHeight);
+lastScrollY=window.scrollY;
+</script>
+</body>
+</html>

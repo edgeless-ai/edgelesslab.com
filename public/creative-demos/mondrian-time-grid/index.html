@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mondrian Time Grid — Neoplastic Perlin Noise</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background: #0a0a0a;
+      color: #F5F5F5;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    canvas {
+      display: block;
+      margin: 10px auto;
+      border: 4px solid #0a0a0a;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    }
+    .ui {
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    .ui span {
+      margin: 0 12px;
+      padding: 4px 8px;
+      border: 1px solid #F5F5F5;
+      border-radius: 2px;
+      background: #0a0a0a;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <div class="ui">
+    <span>R — Regenerate</span>
+    <span>S — Save Snapshot</span>
+    <span>Click — Subdivide</span>
+    <span>Double-click — Merge</span>
+  </div>
+
+<script>
+/* ============================================================
+   NEOPLASTIC RULES (Piet Mondrian, De Stijl)
+   ============================================================
+   1. GRID: The canvas is divided into a hierarchy of rectangles.
+      Lines are always horizontal or vertical — no diagonals.
+   2. COLOR PALETTE: Only primary colors (red, blue, yellow) plus
+      black, white, and (occasionally) grey. Here we use:
+        #E20000 — Red (dominant primary)
+        #0047AB — Blue (dominant primary)
+        #FFC30F — Yellow (dominant primary)
+        #0a0a0a — Black (structure / lines)
+        #F5F5F5 — White (rest / negative space)
+   3. ASYMMETRY: Balance is achieved through asymmetrical placement
+      of colored rectangles and unequal line weights.
+   4. UNIVERSALITY: The composition aims for a universal visual
+      harmony expressed through pure abstraction.
+   ============================================================
+   PERLIN NOISE SEEDING
+   ============================================================
+   - We seed the p5 noise generator with `noiseSeed(hour)`, so the
+     entire grid morphology and color distribution change every hour.
+   - Inside each recursive generation step, `noise(x, y)` is sampled
+     to decide:
+       a) WHETHER to split (high noise → split)
+       b) WHICH AXIS to split on (x-noise vs y-noise)
+       c) WHERE to split (ratio of noise value)
+       d) COLOR of the resulting leaf rectangle
+   - Because `noiseSeed` is deterministic for a given hour, the grid
+     is reproducible across the day while still evolving smoothly.
+   ============================================================ */
+
+const PALETTE = ['#E20000', '#0047AB', '#FFC30F', '#0a0a0a', '#F5F5F5'];
+
+let cells = [];         // Array of { x, y, w, h, color }
+let cellGrid = [];      // 2D lookup for merge neighbors
+let cols, rows;         // resolution of the lookup grid
+let cellSize = 60;      // base resolution for lookup grid (px)
+let currentHour;
+let lastClickTime = 0;
+let lastClickCell = null;
+
+function setup() {
+  createCanvas(windowWidth, Math.min(900, windowHeight - 40));
+  windowResized();
+  regenerate();
+}
+
+function windowResized() {
+  // Recreate canvas on resize
+  let h = Math.min(900, windowHeight - 40);
+  resizeCanvas(windowWidth, h);
+  // Rebuild lookup resolution based on new size
+  cols = Math.ceil(width / cellSize);
+  rows = Math.ceil(height / cellSize);
+}
+
+// Derive a deterministic seed from the current hour (0-23)
+function getHourSeed() {
+  let now = new Date();
+  return now.getHours(); // 0 to 23
+}
+
+function regenerate() {
+  currentHour = getHourSeed();
+  noiseSeed(currentHour);
+  
+  cells = [];
+  cellGrid = Array.from({ length: rows }, () => Array(cols).fill(null));
+  
+  // Start with one full-canvas cell. Recursive split.
+  buildGrid(0, 0, width, height, 0);
+  
+  // Assign final colors as leaf cells
+  assignColors();
+}
+
+// Recursive grid builder using perceptual (noise) bias
+function buildGrid(x, y, w, h, depth) {
+  const minDim = 40; // minimum side length to keep splitting
+  
+  // If too small, stop splitting
+  if (w < minDim * 1.5 && h < minDim * 1.5) {
+    cells.push({ x, y, w, h, color: null, isLeaf: true });
+    return;
+  }
+  
+  // If very thin, force minimal split on long axis
+  let canSplit = true;
+  if (w < minDim || h < minDim) {
+    canSplit = false;
+  }
+  
+  if (!canSplit) {
+    cells.push({ x, y, w, h, color: null, isLeaf: true });
+    return;
+  }
+  
+  // Noise to decide split strength: higher noise → more likely split
+  // We sample noise at the cell center to bias the decision by position
+  let nx = (x + w * 0.5) / width;
+  let ny = (y + h * 0.5) / height;
+  let splitBias = noise(nx * 4, ny * 4, depth * 0.7);
+  
+  // Randomize direction based on noise comparison
+  let splitHorizontal = noise(nx * 3 + 10, ny * 3, depth) > 0.5;
+  
+  // Decide whether to split at all: noise above a threshold
+  let threshold = map(depth, 0, 6, 0.35, 0.55);
+  let willSplit = splitBias > threshold && depth < 6;
+  
+  // Also force split on very large cells
+  if (w > 300 && h > 300) willSplit = true;
+  if (depth > 8) willSplit = false;
+  
+  if (!willSplit) {
+    cells.push({ x, y, w, h, color: null, isLeaf: true });
+    return;
+  }
+  
+  // Determine split position
+  let ratio;
+  if (splitHorizontal) {
+    ratio = noise(nx * 5, ny * 5, depth * 0.3) * 0.6 + 0.2; // 0.2 - 0.8
+    ratio = constrain(ratio, 0.2, 0.8);
+    let splitY = y + h * ratio;
+    buildGrid(x, y, w, splitY - y, depth + 1);
+    buildGrid(x, splitY, w, y + h - splitY, depth + 1);
+  } else {
+    ratio = noise(nx * 5 + 50, ny * 5, depth * 0.3) * 0.6 + 0.2;
+    ratio = constrain(ratio, 0.2, 0.8);
+    let splitX = x + w * ratio;
+    buildGrid(x, y, splitX - x, h, depth + 1);
+    buildGrid(splitX, y, x + w - splitX, h, depth + 1);
+  }
+}
+
+function assignColors() {
+  // For each leaf cell, sample noise to pick a color index.
+  // We bias toward white and black for structure, with occasional primary color.
+  for (let c of cells) {
+    if (!c.isLeaf) continue;
+    let nx = (c.x + c.w * 0.5) / width;
+    let ny = (c.y + c.h * 0.5) / height;
+    let n = noise(nx * 3, ny * 3, currentHour * 0.5);
+    
+    // Bias heavily toward neutral whites/blacks for neoplastic feel
+    let colorIdx;
+    if (n < 0.25) {
+      colorIdx = 4; // white
+    } else if (n < 0.45) {
+      colorIdx = 3; // black
+    } else if (n < 0.55) {
+      colorIdx = random([0, 1, 2]); // primary
+    } else {
+      colorIdx = 4; // white (dominant)
+    }
+    
+    c.color = PALETTE[colorIdx];
+  }
+}
+
+function draw() {
+  background('#0a0a0a');
+  
+  // Draw filled cells
+  for (let c of cells) {
+    if (!c.isLeaf) continue;
+    fill(c.color);
+    noStroke();
+    rect(c.x, c.y, c.w, c.h);
+  }
+  
+  // Draw black structural grid lines on top
+  for (let c of cells) {
+    if (!c.isLeaf) continue;
+    stroke('#0a0a0a');
+    strokeWeight(3);
+    noFill();
+    rect(c.x, c.y, c.w, c.h);
+  }
+  
+  // Highlight hovered cell
+  let mx = mouseX;
+  let my = mouseY;
+  if (mx > 0 && mx < width && my > 0 && my < height) {
+    let hovered = getCellAt(mx, my);
+    if (hovered) {
+      stroke(255, 100);
+      strokeWeight(2);
+      noFill();
+      rect(hovered.x, hovered.y, hovered.w, hovered.h);
+    }
+  }
+  
+  // Show current hour
+  fill(255);
+  noStroke();
+  textSize(12);
+  textAlign(LEFT, TOP);
+  text(`Hour: ${currentHour} | Cells: ${cells.filter(c => c.isLeaf).length}`, 8, 8);
+}
+
+function getCellAt(px, py) {
+  // Use the lookup grid for fast hit-test
+  let col = Math.floor(px / cellSize);
+  let row = Math.floor(py / cellSize);
+  if (col < 0 || col >= cols || row < 0 || row >= rows) return null;
+  if (!cellGrid[row][col]) return null;
+  
+  // cellGrid stores the cell object for the lookup region.
+  // We verify exact bounds.
+  let candidates = cellGrid[row][col];
+  for (let c of cells) {
+    if (!c.isLeaf) continue;
+    if (c === candidates) {
+      if (px >= c.x && px <= c.x + c.w && py >= c.y && py <= c.y + c.h) {
+        return c;
+      }
+    }
+  }
+  return null;
+}
+
+function rebuildGridLookup() {
+  // Reset and assign each leaf cell into the lookup grid
+  cellGrid = Array.from({ length: rows }, () => Array(cols).fill(null));
+  for (let c of cells) {
+    if (!c.isLeaf) continue;
+    let startC = Math.floor(c.x / cellSize);
+    let endC = Math.floor((c.x + c.w) / cellSize);
+    let startR = Math.floor(c.y / cellSize);
+    let endR = Math.floor((c.y + c.h) / cellSize);
+    for (let r = Math.max(0, startR); r <= Math.min(rows - 1, endR); r++) {
+      for (let cc = Math.max(0, startC); cc <= Math.min(cols - 1, endC); cc++) {
+        cellGrid[r][cc] = c;
+      }
+    }
+  }
+}
+
+function mousePressed() {
+  let mx = mouseX;
+  let my = mouseY;
+  if (mx < 0 || mx > width || my < 0 || my > height) return;
+  let clicked = getCellAt(mx, my);
+  if (!clicked) return;
+  
+  let now = millis();
+  
+  // Double-click: merge neighbors
+  if (lastClickCell === clicked && now - lastClickTime < 350) {
+    mergeWithNeighbors(clicked);
+    lastClickCell = null;
+    lastClickTime = 0;
+    rebuildGridLookup();
+    return;
+  }
+  
+  // Single click: subdivide
+  subdivideCell(clicked);
+  rebuildGridLookup();
+  
+  lastClickCell = clicked;
+  lastClickTime = now;
+}
+
+function subdivideCell(cell) {
+  let x = cell.x, y = cell.y, w = cell.w, h = cell.h;
+  
+  // Cannot subdivide if already tiny
+  if (w < 50 && h < 50) return;
+  
+  // Decide split axis based on aspect ratio + noise
+  let n = noise(x * 0.01, y * 0.01, currentHour * 0.1);
+  let splitHorizontal = n > 0.5 ? false : true;
+  
+  // If one dimension is much larger, split along that one
+  if (w > h * 1.4) splitHorizontal = false;
+  else if (h > w * 1.4) splitHorizontal = true;
+  
+  // Find ratio
+  let ratio;
+  if (splitHorizontal) {
+    ratio = noise(x * 0.05, y * 0.05, 1) * 0.5 + 0.25; // 0.25 - 0.75
+    ratio = constrain(ratio, 0.25, 0.75);
+    let splitY = y + h * ratio;
+    let c1 = { x: x, y: y, w: w, h: splitY - y, color: null, isLeaf: true };
+    let c2 = { x: x, y: splitY, w: w, h: y + h - splitY, color: null, isLeaf: true };
+    cells = cells.filter(c => c !== cell);
+    colorFromNeighbors(c1);
+    colorFromNeighbors(c2);
+    cells.push(c1, c2);
+  } else {
+    ratio = noise(x * 0.05, y * 0.05, 2) * 0.5 + 0.25;
+    ratio = constrain(ratio, 0.25, 0.75);
+    let splitX = x + w * ratio;
+    let c1 = { x: x, y: y, w: splitX - x, h: h, color: null, isLeaf: true };
+    let c2 = { x: splitX, y: y, w: x + w - splitX, h: h, color: null, isLeaf: true };
+    cells = cells.filter(c => c !== cell);
+    colorFromNeighbors(c1);
+    colorFromNeighbors(c2);
+    cells.push(c1, c2);
+  }
+}
+
+function colorFromNeighbors(cell) {
+  // Sample noise at cell center to choose a color.
+  // We blend cell-position noise with hour noise, so doubling the hour
+  // (e.g., going from hour 3 to hour 6) shifts which colors appear.
+  let nx = (cell.x + cell.w * 0.5) / width;
+  let ny = (cell.y + cell.h * 0.5) / height;
+  let n = noise(nx * 3 + 100, ny * 3, currentHour * 0.33);
+  
+  let idx;
+  if (n < 0.3) idx = 4;       // white
+  else if (n < 0.5) idx = 3;  // black
+  else if (n < 0.65) idx = floor(random(3)); // primary
+  else idx = 4;               // white bias
+  
+  cell.color = PALETTE[idx];
+}
+
+// Find 4-directionally adjacent cells that share a full edge
+function getMergableNeighbors(cell) {
+  let neighbors = [];
+  let x = cell.x, y = cell.y, w = cell.w, h = cell.h;
+  for (let c of cells) {
+    if (!c.isLeaf || c === cell) continue;
+    let cx = c.x, cy = c.y, cw = c.w, ch = c.h;
+    
+    let sharesFullEdge = false;
+    let merged = null;
+    
+    // c is above cell: shares bottom edge of c with top edge of cell
+    if (cy + ch === y && cx === x && cw === w) {
+      sharesFullEdge = true;
+      merged = { x: x, y: cy, w: w, h: h + ch, color: null, isLeaf: true };
+    }
+    // c is below cell
+    else if (y + h === cy && cx === x && cw === w) {
+      sharesFullEdge = true;
+      merged = { x: x, y: y, w: w, h: h + ch, color: null, isLeaf: true };
+    }
+    // c is left
+    else if (cx + cw === x && cy === y && ch === h) {
+      sharesFullEdge = true;
+      merged = { x: cx, y: y, w: w + cw, h: h, color: null, isLeaf: true };
+    }
+    // c is right
+    else if (x + w === cx && cy === y && ch === h) {
+      sharesFullEdge = true;
+      merged = { x: x, y: y, w: w + cw, h: h, color: null, isLeaf: true };
+    }
+    
+    if (sharesFullEdge) {
+      neighbors.push({ neighbor: c, merged });
+    }
+  }
+  return neighbors;
+}
+
+function mergeWithNeighbors(cell) {
+  let candidates = getMergableNeighbors(cell);
+  if (candidates.length === 0) return;
+  
+  // Pick the neighbor whose color matches or a random one
+  let pick;
+  let sameColor = candidates.filter(c => c.neighbor.color === cell.color);
+  if (sameColor.length > 0) {
+    pick = random(sameColor);
+  } else {
+    pick = random(candidates);
+  }
+  
+  let newCell = pick.merged;
+  colorFromNeighbors(newCell);
+  
+  cells = cells.filter(c => c !== cell && c !== pick.neighbor);
+  cells.push(newCell);
+}
+
+function keyPressed() {
+  if (key === 'r' || key === 'R') {
+    regenerate();
+  } else if (key === 's' || key === 'S') {
+    saveCanvas('mondrian-time-grid', 'png');
+  }
+}
+</script>
+</body>
+</html>

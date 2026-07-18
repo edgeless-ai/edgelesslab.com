@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase-Drift — Typography with a Slow Metabolism</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0f0f0f;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  canvas {
+    display: block;
+  }
+
+  /* Subtle hint that fades out */
+  .hint {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #4d4d4d;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 2s ease;
+    z-index: 10;
+  }
+  .hint.fade {
+    opacity: 0;
+  }
+</style>
+</head>
+<body>
+<div class="hint" id="hint">Move mouse up/down — the typography breathes</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script>
+// ──────────────────────────────────────────────
+// Phase-Drift — Typography with a Slow Metabolism
+// Based on creative prompt c4-04 (2026-06-12)
+// ──────────────────────────────────────────────
+
+// ── Content ───────────────────────────────────
+const WORDS = [
+  "NOVA", "COMET", "PHASE", "DRIFT", "WAVE", "MASS",
+  "CORE", "FLUX", "VOID", "SIGN", "ECHO", "PULSE",
+  "AXIS", "WELL", "RIFT", "WARP", "GLOW", "BURN",
+  "FADE", "RISE"
+];
+
+// ── Palette ───────────────────────────────────
+const BG        = "#0f0f0f";  // near-black canvas
+const UNFOCUSED = "#4d4d4d";  // muted gray — letters recede when far from center
+const FOCUSED   = "#ffffff";  // pure white — maximum contrast near center
+const ACCENT    = "#ff6b35";  // warm orange glow on the center-adjacent letter
+
+// ── Wave Parameters ───────────────────────────
+const FREQUENCY      = 0.5;    // spatial frequency multiplier (how many wave cycles across all letters)
+const AMPLITUDE       = 55;    // max Y displacement in pixels
+const SCROLL_SPEED    = 3.5;   // how many wave cycles per full scroll range
+const DRIFT_SPEED     = 0.02;  // LFO frequency in Hz (~50-second cycle)
+const WEIGHT_MIN      = 100;   // DM Sans wght axis minimum
+const WEIGHT_MAX      = 900;   // DM Sans wght axis maximum
+const PROXIMITY_RANGE = 180;   // mouse proximity radius for weight amplification (px)
+const PROXIMITY_BOOST = 200;   // extra weight range when letter is near cursor
+
+// ── Globals ───────────────────────────────────
+let allLetters = [];   // { char, wordIndex, letterIndex, globalIndex, baseX, baseY }
+let fontSize = 48;
+let charSpacing = 0;
+let wordSpacing = 0;
+let startY = 0;
+let centerX = 0;
+let variableFontSupported = false;
+
+// ── Hint fade-out ─────────────────────────────
+let hintEl;
+let hintTimer = null;
+
+function fadeHint() {
+  if (!hintEl) return;
+  if (hintTimer) clearTimeout(hintTimer);
+  hintEl.classList.remove('fade');
+  hintTimer = setTimeout(() => {
+    hintEl.classList.add('fade');
+  }, 8000);
+}
+
+// ── p5.js Sketch ──────────────────────────────
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  textAlign(CENTER, CENTER);
+  pixelDensity(1);
+
+  hintEl = document.getElementById('hint');
+  fadeHint();
+
+  // Feature-detect variable font support on canvas
+  const testCtx = drawingContext;
+  variableFontSupported = (
+    typeof testCtx.fontVariationSettings !== 'undefined' ||
+    typeof testCtx.fontVariationSettings === 'string'
+  );
+  // Double-check by trying to set it
+  if (variableFontSupported) {
+    try {
+      testCtx.fontVariationSettings = '"wght" 400';
+      variableFontSupported = true;
+    } catch (e) {
+      variableFontSupported = false;
+    }
+  }
+  console.log('Variable font canvas support:', variableFontSupported);
+
+  recomputeLayout();
+  buildLetterArray();
+}
+
+function recomputeLayout() {
+  // Calculate font size so all words fit in ~85% of viewport height
+  fontSize = min(
+    width * 0.07,
+    (height * 0.85) / (WORDS.length * 1.35)
+  );
+  fontSize = constrain(fontSize, 20, 72);
+
+  charSpacing = fontSize * 0.62;
+  wordSpacing = (height * 0.82) / max(WORDS.length - 1, 1);
+  startY = (height - wordSpacing * (WORDS.length - 1)) / 2;
+  centerX = width / 2;
+}
+
+function buildLetterArray() {
+  allLetters = [];
+  let globalIdx = 0;
+  for (let wi = 0; wi < WORDS.length; wi++) {
+    const word = WORDS[wi];
+    const wordBaseY = startY + wi * wordSpacing;
+    const wordWidth = word.length * charSpacing;
+    const wordStartX = centerX - wordWidth / 2 + charSpacing / 2;
+
+    for (let li = 0; li < word.length; li++) {
+      allLetters.push({
+        char: word[li],
+        wordIndex: wi,
+        letterIndex: li,
+        globalIndex: globalIdx,
+        baseX: wordStartX + li * charSpacing,
+        baseY: wordBaseY
+      });
+      globalIdx++;
+    }
+  }
+}
+
+function draw() {
+  background(BG);
+
+  const t = millis() / 1000.0;
+
+  // ── Primary input: mouse Y as scroll proxy (0 = top, 1 = bottom) ──
+  const scrollProgress = constrain(mouseY / height, 0, 1);
+  const scrollPhase = scrollProgress * SCROLL_SPEED * TWO_PI;
+
+  // ── Secondary input: slow LFO phase drift ──
+  const drift = 0.5 * sin(t * DRIFT_SPEED * TWO_PI);  // range: -0.5 to 0.5
+
+  const totalLetters = allLetters.length;
+
+  // ── First pass: calculate all positions and find the focused letter ──
+  let focusedLetterIdx = 0;
+  let minDistFromCenter = Infinity;
+  const computed = [];  // { x, y, weight, distFromCenter }
+
+  for (let i = 0; i < totalLetters; i++) {
+    const letter = allLetters[i];
+    const normIndex = letter.globalIndex / max(totalLetters - 1, 1);
+    const phaseOffset = normIndex * FREQUENCY * PI;
+
+    // Position wave (standard Codrops sine wave formula)
+    const yOffset = AMPLITUDE * sin(scrollPhase + phaseOffset);
+    const y = letter.baseY + yOffset;
+
+    // Weight wave — same formula but with time-varying phase offset
+    const weightPhase = scrollPhase + phaseOffset + drift;
+    let weightNorm = (sin(weightPhase) + 1.0) / 2.0;  // 0 to 1
+    let weight = lerp(WEIGHT_MIN, WEIGHT_MAX, weightNorm);
+
+    // ── Tertiary input: mouse proximity amplification ──
+    const distToMouse = dist(mouseX, mouseY, letter.baseX, y);
+    if (distToMouse < PROXIMITY_RANGE) {
+      const proximityFactor = 1.0 - (distToMouse / PROXIMITY_RANGE);
+      // Ease the proximity factor for a smoother response
+      const eased = proximityFactor * proximityFactor;
+      // Push weight toward extremes: if already heavy, make heavier; if light, make lighter
+      if (weightNorm > 0.5) {
+        weight += PROXIMITY_BOOST * eased;
+      } else {
+        weight -= PROXIMITY_BOOST * eased;
+      }
+    }
+    weight = constrain(weight, WEIGHT_MIN, WEIGHT_MAX);
+
+    // Distance from viewport vertical center (for focus coloring)
+    const distFromCenter = abs(y - height / 2);
+
+    computed.push({
+      x: letter.baseX,
+      y: y,
+      weight: weight,
+      weightNorm: weightNorm,
+      distFromCenter: distFromCenter,
+      char: letter.char,
+      wordIndex: letter.wordIndex
+    });
+
+    if (distFromCenter < minDistFromCenter) {
+      minDistFromCenter = distFromCenter;
+      focusedLetterIdx = i;
+    }
+  }
+
+  // ── Second pass: draw all letters ──
+  const focusZone = height * 0.35;  // vertical zone where letters get focused coloring
+  const unfocusedColor = color(UNFOCUSED);
+  const focusedColor = color(FOCUSED);
+  const accentColor = color(ACCENT);
+
+  for (let i = 0; i < totalLetters; i++) {
+    const c = computed[i];
+    const isFocused = (i === focusedLetterIdx && c.distFromCenter < focusZone);
+
+    // ── Color: interpolate based on distance from viewport center ──
+    let letterColor;
+    if (c.distFromCenter < focusZone) {
+      const t_focus = 1.0 - (c.distFromCenter / focusZone);
+      // Use eased interpolation for a smoother focus gradient
+      const eased = t_focus * t_focus * (3 - 2 * t_focus);  // smoothstep
+      letterColor = lerpColor(unfocusedColor, focusedColor, eased);
+    } else {
+      letterColor = unfocusedColor;
+    }
+
+    // ── Accent glow on the focused letter ──
+    if (isFocused) {
+      drawingContext.shadowBlur = 28;
+      drawingContext.shadowColor = ACCENT;
+      letterColor = accentColor;
+    } else {
+      drawingContext.shadowBlur = 0;
+    }
+
+    // ── Set variable font weight per character ──
+    drawingContext.font = `${fontSize}px "DM Sans"`;
+    if (variableFontSupported) {
+      try {
+        drawingContext.fontVariationSettings = `"wght" ${Math.round(c.weight)}`;
+      } catch (e) {
+        // Silently fall back
+      }
+    }
+
+    // ── Draw the character ──
+    fill(letterColor);
+    noStroke();
+    text(c.char, c.x, c.y);
+  }
+
+  // Reset shadow after drawing all letters
+  drawingContext.shadowBlur = 0;
+
+  // ── Debug overlay (shows drift phase as a subtle indicator) ──
+  // Draw a very subtle dot that moves to visualize the drift
+  const indicatorX = width - 40;
+  const indicatorY = 30;
+  const driftIndicator = sin(t * DRIFT_SPEED * TWO_PI);  // -1 to 1
+  const dotY = indicatorY + driftIndicator * 12;
+
+  noStroke();
+  fill(77, 77, 77, 40);
+  circle(indicatorX, indicatorY, 6);
+  fill(255, 107, 53, 120);
+  circle(indicatorX, dotY, 4);
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  recomputeLayout();
+  buildLetterArray();
+}
+
+function mouseMoved() {
+  fadeHint();
+  // Returning false allows default behavior — but p5 prevents default
+  return false;
+}
+
+function mouseDragged() {
+  fadeHint();
+  return false;
+}
+
+// ── Pause/resume on visibility change to save CPU ──
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    noLoop();
+  } else {
+    loop();
+  }
+});
+
+console.log('Phase-Drift demo ready.');
+console.log('Move mouse vertically to scroll the wave.');
+console.log('Move mouse horizontally near letters for proximity weight effect.');
+console.log('Watch the slow phase drift over ~50 seconds.');
+</script>
+</body>
+</html>

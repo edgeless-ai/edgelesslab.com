@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telemetry Jelly Terminal</title>
+  <!-- Sour Gummy Variable Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wdth,wght@0,62..150,100..900;1,62..150,100..900&display=swap" rel="stylesheet">
+  <!-- Tweakpane -->
+  <script type="module">
+    import {Pane} from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.4/dist/tweakpane.min.js';
+    window.Pane = Pane;
+  </script>
+  <style>
+    /* ============================================================
+       TELEMETRY JELLY TERMINAL
+       Hybrid: CSS variable-font physics (Jelly Text) + Apollo HUD
+       ============================================================ */
+
+    /* --- CSS Reset & Base --------------------------------------- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      /* Palette — exact from prompt */
+      --bg: #000000;
+      --hud-text: #FFF3EA;
+      --frame: #E4B592;
+      --alert: #EE1212;
+      --secondary: #DAD0C8;
+      --jelly-surface: oklch(70% 0.38 232 / 0.65);
+      --jelly-shadow: oklch(16% 0.15 232 / 0.3);
+
+      /* Physics parameters — exposed for Tweakpane / JS */
+      --squash-scale-x: 1.0;
+      --squash-scale-y: 0.92;
+      --stretch-scale-x: 1.08;
+      --stretch-scale-y: 1.05;
+      --base-wdth: 100;
+      --base-wght: 400;
+      --stretch-wght: 700;
+      --telemetry-speed: 1.0;
+      --stagger: 0.03s;
+      --jiggle-amp: 1.15;
+      --jiggle-dur: 0.35s;
+      --force-dur: 0.6s;
+      --alert-flash-dur: 0.5s;
+      --glow-hue: 232;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: 'Sour Gummy', sans-serif;
+      color: var(--hud-text);
+      cursor: default;
+    }
+
+    /* --- HUD Frame ---------------------------------------------- */
+    .hud-frame {
+      position: absolute;
+      inset: 24px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Bronze corner brackets — analog separation */
+    .corner {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      border-color: var(--frame);
+      opacity: 0.85;
+      animation: corner-pulse 4s ease-in-out infinite;
+    }
+    .corner.tl { top: 0; left: 0; border-top: 2px solid; border-left: 2px solid; }
+    .corner.tr { top: 0; right: 0; border-top: 2px solid; border-right: 2px solid; }
+    .corner.bl { bottom: 0; left: 0; border-bottom: 2px solid; border-left: 2px solid; }
+    .corner.br { bottom: 0; right: 0; border-bottom: 2px solid; border-right: 2px solid; }
+
+    @keyframes corner-pulse {
+      0%, 100% { opacity: 0.85; }
+      50% { opacity: 1.0; }
+    }
+
+    /* Red status LEDs — critical alerts */
+    .led {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--alert);
+      box-shadow: 0 0 6px var(--alert);
+      transition: opacity 0.1s;
+    }
+    .led.tl { top: 8px; left: 8px; }
+    .led.tr { top: 8px; right: 8px; }
+    .led.bl { bottom: 8px; left: 8px; }
+    .led.br { bottom: 8px; right: 8px; }
+    .led.alerting {
+      animation: led-flash var(--alert-flash-dur) ease-in-out 1;
+    }
+    @keyframes led-flash {
+      0%, 100% { opacity: 1; }
+      25%, 75% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+
+    /* Coordinate readouts — AkkuratMonoLL style (monospace) */
+    .coord {
+      position: absolute;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--hud-text);
+      opacity: 0.8;
+      white-space: pre;
+      text-transform: uppercase;
+    }
+    .coord.tl { top: 12px; left: 60px; }
+    .coord.tr { top: 12px; right: 60px; text-align: right; }
+    .coord.bl { bottom: 12px; left: 60px; }
+    .coord.br { bottom: 12px; right: 60px; text-align: right; }
+
+    /* Secondary data labels — warm grey */
+    .label {
+      position: absolute;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      color: var(--secondary);
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+    .label.tl { top: 12px; left: 60px; transform: translateY(-14px); }
+    .label.tr { top: 12px; right: 60px; text-align: right; transform: translateY(-14px); }
+    .label.bl { bottom: 12px; left: 60px; transform: translateY(14px); }
+    .label.br { bottom: 12px; right: 60px; text-align: right; transform: translateY(14px); }
+
+    /* --- Central Word Stage ------------------------------------- */
+    .stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+    }
+
+    .word-container {
+      position: relative;
+      display: inline-flex;
+      cursor: pointer;
+      user-select: none;
+      /* Telemetry-driven continuous squash/stretch */
+      transform:
+        scaleX(var(--squash-scale-x))
+        scaleY(var(--squash-scale-y));
+      transition: transform 0.05s linear;
+      font-variation-settings:
+        'wdth' var(--base-wdth),
+        'wght' var(--base-wght);
+      will-change: transform, font-variation-settings;
+    }
+
+    /* Individual letters — split for per-letter hover */
+    .letter {
+      display: inline-block;
+      position: relative;
+      font-size: clamp(48px, 12vw, 160px);
+      line-height: 1;
+      color: var(--jelly-surface);
+      /* Pseudo-element base for glossy 3D */
+      --letter-i: 0;
+    }
+
+    /* --- Glossy Pseudo-Element 3D (Jelly Text technique) -------- */
+    /* ::before = radial gradient shadow (multiply) */
+    .letter::before {
+      content: attr(data-char);
+      position: absolute;
+      inset: 0;
+      color: var(--jelly-shadow);
+      mix-blend-mode: multiply;
+      background: radial-gradient(circle at 30% 30%, var(--jelly-shadow) 0%, transparent 60%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      pointer-events: none;
+      z-index: -1;
+      transform: translate(0.03em, 0.05em);
+      filter: blur(1px);
+    }
+
+    /* ::after = linear + radial highlight (color-dodge) */
+    .letter::after {
+      content: attr(data-char);
+      position: absolute;
+      inset: 0;
+      mix-blend-mode: color-dodge;
+      color: oklch(85% 0.25 var(--glow-hue) / 0.7);
+      background:
+        linear-gradient(180deg, oklch(95% 0.05 var(--glow-hue) / 0.5) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 0%, oklch(90% 0.2 var(--glow-hue) / 0.6) 0%, transparent 60%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      pointer-events: none;
+      z-index: 1;
+      filter: blur(0.3px);
+    }
+
+    /* --- Hover Jiggle (single-letter sensor ping) --------------- */
+    .letter:hover {
+      animation: jiggle var(--jiggle-dur) ease-out forwards;
+    }
+    @keyframes jiggle {
+      0% { transform: scale(1) translateY(0); }
+      30% { transform: scale(var(--jiggle-amp)) translateY(-8%); }
+      60% { transform: scale(0.92) translateY(4%); }
+      100% { transform: scale(1) translateY(0); }
+    }
+
+    /* --- Click Force-Jelly (seismic wave propagation) ----------- */
+    .word-container.force-jelly .letter {
+      animation: force-jelly var(--force-dur) ease-out forwards;
+      animation-delay: calc(var(--letter-i) * var(--stagger));
+    }
+    @keyframes force-jelly {
+      0% { transform: scale(1) translateY(0); font-variation-settings: 'wdth' var(--base-wdth), 'wght' var(--base-wght); }
+      20% { transform: scale(var(--jiggle-amp)) translateY(-15%); font-variation-settings: 'wdth' calc(var(--base-wdth) + 20), 'wght' var(--stretch-wght); }
+      50% { transform: scale(0.85) translateY(10%); font-variation-settings: 'wdth' calc(var(--base-wdth) - 10), 'wght' calc(var(--base-wght) + 100); }
+      80% { transform: scale(1.05) translateY(-3%); font-variation-settings: 'wdth' var(--base-wdth), 'wght' var(--base-wght); }
+      100% { transform: scale(1) translateY(0); font-variation-settings: 'wdth' var(--base-wdth), 'wght' var(--base-wght); }
+    }
+
+    /* --- Scroll Timeline Indicator ------------------------------- */
+    .timeline-bar {
+      position: absolute;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 240px;
+      height: 2px;
+      background: var(--secondary);
+      opacity: 0.4;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .timeline-progress {
+      height: 100%;
+      background: var(--alert);
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+    .timeline-labels {
+      position: absolute;
+      bottom: 56px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 32px;
+      font-family: 'Courier New', monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--secondary);
+      opacity: 0.5;
+      z-index: 10;
+      pointer-events: none;
+      text-transform: uppercase;
+    }
+    .timeline-labels .active {
+      color: var(--hud-text);
+      opacity: 1;
+    }
+
+    /* --- Tweakpane container ------------------------------------ */
+    #tp-container {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 100;
+    }
+    #tp-container.hidden {
+      display: none;
+    }
+
+    /* --- Scroll indicator overlay ------------------------------ */
+    .scroll-hint {
+      position: absolute;
+      bottom: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      color: var(--secondary);
+      opacity: 0.35;
+      letter-spacing: 0.15em;
+      z-index: 10;
+      pointer-events: none;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HUD Frame -->
+  <div class="hud-frame" id="hud-frame">
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+    <div class="led tl" id="led-tl"></div>
+    <div class="led tr" id="led-tr"></div>
+    <div class="led bl" id="led-bl"></div>
+    <div class="led br" id="led-br"></div>
+    <div class="label tl">ALT</div>
+    <div class="label tr">VEL</div>
+    <div class="label bl">LAT</div>
+    <div class="label br">LON</div>
+    <div class="coord tl" id="coord-alt">ALT 00000.0</div>
+    <div class="coord tr" id="coord-vel">VEL 00000.0</div>
+    <div class="coord bl" id="coord-lat">LAT +00.0000</div>
+    <div class="coord br" id="coord-lon">LON +00.0000</div>
+  </div>
+
+  <!-- Central Word -->
+  <div class="stage">
+    <div class="word-container" id="word-container">
+      <!-- Letters injected by JS -->
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline-bar">
+    <div class="timeline-progress" id="timeline-progress"></div>
+  </div>
+  <div class="timeline-labels" id="timeline-labels">
+    <span data-phase="0">Orbit</span>
+    <span data-phase="1">Descent</span>
+    <span data-phase="2">Landing</span>
+    <span data-phase="3">Surface</span>
+  </div>
+  <div class="scroll-hint">Scroll to advance timeline</div>
+
+  <!-- Tweakpane Container -->
+  <div id="tp-container"></div>
+
+  <script type="module">
+    /* ============================================================
+       TELEMETRY JELLY TERMINAL — JavaScript
+       ============================================================ */
+
+    /* --- State --------------------------------------------------- */
+    const WORDS = ['ORBIT', 'DESCENT', 'LANDING', 'SURFACE'];
+    const PHASES = [
+      { gravity: 0.3, pressure: 0.2, speed: 0.5 },  // orbit: low gravity, slow
+      { gravity: 0.6, pressure: 0.6, speed: 0.8 },  // descent: ramping up
+      { gravity: 1.0, pressure: 1.0, speed: 1.2 },// landing: high gravity, fast
+      { gravity: 0.4, pressure: 0.3, speed: 0.4 }  // surface: settled
+    ];
+
+    const state = {
+      phase: 2,          // start at LANDING
+      word: WORDS[2],
+      gravity: PHASES[2].gravity,
+      pressure: PHASES[2].pressure,
+      telemetrySpeed: PHASES[2].speed,
+      time: 0,
+      paneVisible: true,
+      // derived telemetry values
+      altitude: 0,
+      velocity: 0,
+      lat: 0,
+      lon: 0,
+    };
+
+    // DOM refs
+    const container = document.getElementById('word-container');
+    const coordAlt = document.getElementById('coord-alt');
+    const coordVel = document.getElementById('coord-vel');
+    const coordLat = document.getElementById('coord-lat');
+    const coordLon = document.getElementById('coord-lon');
+    const timelineProgress = document.getElementById('timeline-progress');
+    const timelineLabels = document.querySelectorAll('.timeline-labels span');
+    const leds = [
+      document.getElementById('led-tl'),
+      document.getElementById('led-tr'),
+      document.getElementById('led-bl'),
+      document.getElementById('led-br')
+    ];
+
+    /* --- Word Rendering ------------------------------------------ */
+    function renderWord(word) {
+      container.innerHTML = '';
+      const chars = word.split('');
+      chars.forEach((ch, i) => {
+        const span = document.createElement('span');
+        span.className = 'letter';
+        span.textContent = ch;
+        span.setAttribute('data-char', ch);
+        span.style.setProperty('--letter-i', i);
+        container.appendChild(span);
+      });
+    }
+    renderWord(state.word);
+
+    /* --- Telemetry Engine ---------------------------------------- */
+    // Two sine/cosine oscillators simulate altitude and velocity
+    function updateTelemetry(dt) {
+      state.time += dt * state.telemetrySpeed;
+      // Altitude = slow sine → drives wdth + scaleY squash
+      state.altitude = Math.sin(state.time * 1.2) * 0.5 + 0.5;
+      // Velocity = fast cosine → drives wght + scaleX stretch
+      state.velocity = Math.cos(state.time * 2.5) * 0.5 + 0.5;
+    }
+
+    function applyPhysics() {
+      const root = document.documentElement;
+      const g = state.gravity;
+      const p = state.pressure;
+      const alt = state.altitude;
+      const vel = state.velocity;
+
+      // Altitude drives wdth and scaleY squash
+      const wdth = 80 + alt * 40 * g;                // 80..120 base
+      const squashY = 0.88 + alt * 0.12 * g;         // 0.88..1.0
+      // Velocity drives wght and scaleX stretch
+      const wght = 300 + vel * 600 * p;              // 300..900
+      const stretchX = 1.0 + vel * 0.10 * p;         // 1.0..1.10
+
+      root.style.setProperty('--base-wdth', wdth.toFixed(2));
+      root.style.setProperty('--base-wght', wght.toFixed(0));
+      root.style.setProperty('--squash-scale-y', squashY.toFixed(3));
+      root.style.setProperty('--squash-scale-x', stretchX.toFixed(3));
+      // Atmospheric pressure tints glow hue
+      const hue = 210 + p * vel * 40;                // 210..250
+      root.style.setProperty('--glow-hue', hue.toFixed(1));
+    }
+
+    /* --- Coordinate Jitter (radio static) ------------------------ */
+    let lastCoordUpdate = 0;
+    function updateCoordinates(now) {
+      if (now - lastCoordUpdate < 500) return;
+      lastCoordUpdate = now;
+      const jitter = () => (Math.random() - 0.5) * 0.4;
+      const altVal = (state.altitude * 12000 + jitter() * 100).toFixed(1);
+      const velVal = (state.velocity * 4500 + jitter() * 30).toFixed(1);
+      const latVal = (20.0 + state.altitude * 2.0 + jitter()).toFixed(4);
+      const lonVal = (-30.0 + state.velocity * 1.5 + jitter()).toFixed(4);
+      coordAlt.textContent = `ALT ${altVal.padStart(7, '0')}`;
+      coordVel.textContent = `VEL ${velVal.padStart(7, '0')}`;
+      coordLat.textContent = `LAT ${latVal >= 0 ? '+' : ''}${latVal}`;
+      coordLon.textContent = `LON ${lonVal >= 0 ? '+' : ''}${lonVal}`;
+    }
+
+    /* --- Timeline / Scroll --------------------------------------- */
+    let scrollAccumulator = 0;
+    const SCROLL_THRESHOLD = 120;
+    window.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      scrollAccumulator += e.deltaY;
+      if (Math.abs(scrollAccumulator) >= SCROLL_THRESHOLD) {
+        const dir = Math.sign(scrollAccumulator);
+        const newPhase = Math.max(0, Math.min(3, state.phase + dir));
+        if (newPhase !== state.phase) {
+          setPhase(newPhase);
+        }
+        scrollAccumulator = 0;
+      }
+    }, { passive: false });
+
+    function setPhase(idx) {
+      state.phase = idx;
+      state.word = WORDS[idx];
+      const cfg = PHASES[idx];
+      state.gravity = cfg.gravity;
+      state.pressure = cfg.pressure;
+      state.telemetrySpeed = cfg.speed;
+      renderWord(state.word);
+      // Sync Tweakpane if available
+      if (pane) {
+        pane.refresh();
+      }
+      updateTimelineUI();
+    }
+
+    function updateTimelineUI() {
+      const pct = (state.phase / (WORDS.length - 1)) * 100;
+      timelineProgress.style.width = pct + '%';
+      timelineLabels.forEach((el, i) => {
+        el.classList.toggle('active', i === state.phase);
+      });
+    }
+    updateTimelineUI();
+
+    /* --- Click Interaction (seismic force-jelly) ----------------- */
+    container.addEventListener('click', () => {
+      // Trigger force-jelly animation
+      container.classList.remove('force-jelly');
+      void container.offsetWidth; // force reflow
+      container.classList.add('force-jelly');
+      // Flash red LEDs
+      leds.forEach(led => {
+        led.classList.remove('alerting');
+        void led.offsetWidth;
+        led.classList.add('alerting');
+      });
+      // Auto-remove class after animation completes
+      setTimeout(() => {
+        container.classList.remove('force-jelly');
+      }, parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--force-dur')) * 1000 + 300);
+    });
+
+    /* --- Tweakpane Panel ----------------------------------------- */
+    let pane;
+    async function initPane() {
+      const {Pane} = await import('https://cdn.jsdelivr.net/npm/tweakpane@4.0.4/dist/tweakpane.min.js');
+      pane = new Pane({
+        container: document.getElementById('tp-container'),
+        title: 'Telemetry',
+        expanded: true,
+      });
+      pane.addBinding(state, 'gravity', { min: 0, max: 2, step: 0.05, label: 'Gravity' });
+      pane.addBinding(state, 'pressure', { min: 0, max: 2, step: 0.05, label: 'Atmospheric Pressure' });
+      pane.addBinding(state, 'telemetrySpeed', { min: 0.1, max: 3, step: 0.1, label: 'Telemetry Speed' });
+      // Refresh CSS on any change
+      pane.on('change', () => applyPhysics());
+    }
+    initPane();
+
+    /* --- Keyboard Controls --------------------------------------- */
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        const tp = document.getElementById('tp-container');
+        state.paneVisible = !state.paneVisible;
+        tp.classList.toggle('hidden', !state.paneVisible);
+      }
+      if (e.key === 'r' || e.key === 'R') {
+        // Reset to current phase defaults
+        const cfg = PHASES[state.phase];
+        state.gravity = cfg.gravity;
+        state.pressure = cfg.pressure;
+        state.telemetrySpeed = cfg.speed;
+        if (pane) pane.refresh();
+        applyPhysics();
+      }
+    });
+
+    /* --- Main Animation Loop ------------------------------------- */
+    let lastFrame = performance.now();
+    function loop(now) {
+      const dt = (now - lastFrame) / 1000;
+      lastFrame = now;
+      updateTelemetry(dt);
+      applyPhysics();
+      updateCoordinates(now);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

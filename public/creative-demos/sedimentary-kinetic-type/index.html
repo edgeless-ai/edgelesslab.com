@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sedimentary Kinetic Type</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background: #0A0A0A;
+      overflow: hidden;
+      font-family: 'Courier New', monospace;
+    }
+    #ui {
+      position: absolute;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    input {
+      background: #141414;
+      color: #F5F5F5;
+      border: 1px solid #333;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-family: 'Courier New', monospace;
+      width: 280px;
+      text-align: center;
+      outline: none;
+    }
+    input:focus {
+      border-color: #00FF88;
+    }
+    #status {
+      color: #888;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    <input type="text" id="wordInput" value="SEDIMENT" maxlength="10" />
+    <div id="status">Loading font...</div>
+  </div>
+  <script>
+    let font;
+    let glyphs = [];
+    let currentWord = "SEDIMENT";
+    let fontSize = 150;
+    let globalState = "accumulate";
+    let globalTimer = 0;
+    const D_ACC = 120; // accumulate: 2s
+    const D_HLD = 60;  // hold: 1s
+    const D_DIS = 120; // dissipate: 2s
+    const MAX_PARTICLES = 5000;
+
+    const MINT = [0, 255, 136];
+    const PINK = [255, 51, 102];
+
+    function isVowel(c) {
+      return "aeiouAEIOU".indexOf(c) !== -1;
+    }
+
+    function preload() {
+      font = loadFont(
+        "https://raw.githubusercontent.com/google/fonts/main/ofl/lato/Lato-Regular.ttf",
+        () => { document.getElementById("status").textContent = ""; },
+        () => { document.getElementById("status").textContent = "Font load failed"; }
+      );
+    }
+
+    function setup() {
+      let c = createCanvas(windowWidth, windowHeight);
+      c.style("display", "block");
+      textFont(font);
+      initWord(currentWord);
+
+      let input = document.getElementById("wordInput");
+      input.addEventListener("input", (e) => {
+        let w = e.target.value.trim();
+        if (w.length > 0 && w !== currentWord) {
+          currentWord = w;
+          initWord(currentWord);
+        }
+      });
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      initWord(currentWord);
+    }
+
+    function initWord(word) {
+      glyphs = [];
+      let y = height / 2 + fontSize * 0.35;
+      let totalWidth = 0;
+      let widths = [];
+      for (let i = 0; i < word.length; i++) {
+        let bb = font.textBounds(word[i], 0, 0, fontSize);
+        widths.push(bb.w);
+        totalWidth += bb.w + 20;
+      }
+      totalWidth -= 20;
+      let x = (width - totalWidth) / 2;
+
+      for (let i = 0; i < word.length; i++) {
+        let c = word[i];
+        let pts = font.textToPoints(c, x, y, fontSize, { sampleFactor: 0.2 });
+        let col = isVowel(c) ? MINT : PINK;
+        let bb = font.textBounds(c, x, y, fontSize);
+        glyphs.push({
+          char: c,
+          x: x,
+          y: y,
+          points: pts,
+          color: col,
+          particles: [],
+          frozen: false,
+          frozenTimer: 0,
+          bx: bb.x,
+          by: bb.y,
+          bw: bb.w,
+          bh: bb.h,
+          sigma: 0.6
+        });
+        x += widths[i] + 20;
+      }
+      globalState = "accumulate";
+      globalTimer = 0;
+    }
+
+    function draw() {
+      let fade = 4;
+      if (globalState === "hold") fade = 2;
+      if (globalState === "dissipate") fade = 16;
+
+      noStroke();
+      fill(10, 10, 10, fade);
+      rect(0, 0, width, height);
+
+      globalTimer++;
+      if (globalState === "accumulate" && globalTimer > D_ACC) {
+        globalState = "hold";
+        globalTimer = 0;
+      } else if (globalState === "hold" && globalTimer > D_HLD) {
+        globalState = "dissipate";
+        globalTimer = 0;
+      } else if (globalState === "dissipate" && globalTimer > D_DIS) {
+        globalState = "accumulate";
+        globalTimer = 0;
+        for (let g of glyphs) g.particles = [];
+      }
+
+      let mx = mouseX;
+      let my = mouseY;
+      for (let g of glyphs) {
+        g.hovered = (mx > g.bx && mx < g.bx + g.bw && my > g.by && my < g.by + g.bh);
+        g.sigma = g.hovered ? 2.2 : 0.6;
+      }
+
+      for (let g of glyphs) {
+        if (g.frozen) {
+          g.frozenTimer--;
+          if (g.frozenTimer <= 0) g.frozen = false;
+          continue;
+        }
+
+        if (globalState === "accumulate" && g.points.length > 0) {
+          for (let i = 0; i < g.points.length; i++) {
+            if (random() > 0.25) continue;
+            let p = g.points[i];
+            let prev = g.points[max(0, i - 1)];
+            let next = g.points[min(g.points.length - 1, i + 1)];
+            let dx = next.x - prev.x;
+            let dy = next.y - prev.y;
+            let len = sqrt(dx * dx + dy * dy);
+            let px = 0, py = 0;
+            if (len > 0) {
+              px = -dy / len;
+              py = dx / len;
+            }
+            let dist = randomGaussian() * 3.5;
+            g.particles.push({
+              x: p.x + px * dist,
+              y: p.y + py * dist,
+              life: 255,
+              color: g.color,
+              baseX: p.x,
+              baseY: p.y,
+              sigma: g.sigma
+            });
+          }
+        }
+
+        for (let p of g.particles) {
+          p.x += randomGaussian() * p.sigma;
+          p.y += randomGaussian() * p.sigma;
+          p.x += (p.baseX - p.x) * 0.02;
+          p.y += (p.baseY - p.y) * 0.02;
+          if (globalState === "dissipate") p.life -= 2.5;
+        }
+
+        g.particles = g.particles.filter(p => p.life > 0);
+        if (g.particles.length > MAX_PARTICLES) {
+          g.particles.splice(0, g.particles.length - MAX_PARTICLES);
+        }
+      }
+
+      blendMode(ADD);
+      for (let g of glyphs) {
+        for (let p of g.particles) {
+          let a = globalState === "dissipate" ? min(p.life, 35) : 28;
+          stroke(p.color[0], p.color[1], p.color[2], a);
+          strokeWeight(1.4);
+          point(p.x, p.y);
+        }
+      }
+      blendMode(BLEND);
+    }
+
+    function mousePressed() {
+      let mx = mouseX;
+      let my = mouseY;
+      for (let g of glyphs) {
+        if (mx > g.bx && mx < g.bx + g.bw && my > g.by && my < g.by + g.bh) {
+          g.frozen = true;
+          g.frozenTimer = 180;
+        }
+      }
+    }
+  </script>
+</body>
+</html>

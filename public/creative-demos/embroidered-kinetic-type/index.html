@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Embroidered Kinetic Type</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #F5F5F0;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <script>
+  /*
+   * EMBROIDERED KINETIC TYPE
+   * ==========================
+   * A parametric typography generator where the user sews letterforms onto
+   * a digital canvas with a needle-cursor. Two extreme weights of the same
+   * headline interpolate based on mouse speed. The stitch path is rendered
+   * as a sand-spline texture (jittered dots), and a Halton-sequence stipple
+   * fill appears inside the letterforms.
+   *
+   * Palette (from Niccolò Miranda — gallery void):
+   *   Background:  #F5F5F0  (warm off-white / linen)
+   *   Main stitch: #111111  (near-black)
+   *   Accent:      #FF6B6B  (warm red)
+   *   Stipple:     #333333  (dark gray)
+   *
+   * Techniques:
+   *   - Two-font interpolation driven by mouse speed
+   *   - Chaikin smoothing (3 iterations) on the outline path
+   *   - Sand-spline stitch texture (perpendicular jitter)
+   *   - Halton sequence stipple fill (bases 2 & 3)
+   *   - Poster composition (asymmetric centred headline)
+   */
+
+  /* ── Configuration ───────────────────────────────────────────────────────── */
+  const HEADLINE = "THREAD";
+  const SUBLINE  = "stitch by stitch";
+  const FONT_SIZE = 220;
+  const SUB_SIZE  = 28;
+  const CONDENSED_SCALE = 0.55;
+  const WIDE_SCALE      = 1.45;
+  const CHAIKIN_ITERS = 3;
+  const SAND_DENSITY_SLOW = 0.8;   // dots per pixel when moving slowly
+  const SAND_DENSITY_FAST = 0.15;  // dots per pixel when moving fast
+  const STIPPLE_MAX_DOTS  = 1200;
+  const NEEDLE_LERP       = 0.15;  // how fast the needle catches the cursor
+
+  /* ── Palette ───────────────────────────────────────────────────────────── */
+  const BG       = "#F5F5F0";
+  const STITCH   = "#111111";
+  const ACCENT   = "#FF6B6B";
+  const STIPPLE  = "#333333";
+
+  /* ── Globals ───────────────────────────────────────────────────────────── */
+  let myFont;
+  let rawPoints, condensedPts, widePts;
+  let needle = { x: 0, y: 0 };
+  let mouseSpeed = 0;
+  let interp = 0;          // interpolation factor 0 = condensed, 1 = wide
+  let isDragging = false;
+  let stitches = [];       // array of stitch dot objects {x, y, col, alpha}
+  let stippleDots = [];    // array of stipple dots
+  let showStipple = false;
+  let resetBtn;
+  let seed = 0;
+
+  /* ── p5.js lifecycle ───────────────────────────────────────────────────── */
+
+  function preload() {
+    // Load a reliable open-source TTF from jsdelivr CDN
+    try {
+      myFont = loadFont("https://cdn.jsdelivr.net/npm/roboto-font@0.1.0/fonts/Roboto/roboto-regular-webfont.ttf");
+    } catch(e) {
+      console.warn("Font load failed, will use fallback");
+    }
+  }
+
+  function setup() {
+    createCanvas(windowWidth, windowHeight);
+    noCursor();
+    if (myFont) {
+      textFont(myFont);
+    } else {
+      textFont("sans-serif");
+    }
+    textSize(FONT_SIZE);
+    textAlign(CENTER, CENTER);
+    buildPoints();
+    needle.x = width / 2;
+    needle.y = height / 2;
+    createResetButton();
+  }
+
+  function draw() {
+    background(BG);
+
+    // 1. Update mouse speed & interpolation
+    updateMouseSpeed();
+    interp = lerp(interp, map(mouseSpeed, 0, 40, 0, 1, true), 0.08);
+
+    // 2. Compute current interpolated points (Chaikin-smoothed)
+    let current = interpolatePoints(condensedPts, widePts, interp);
+
+    // 3. Draw poster subline (bottom-right)
+    push();
+    noStroke();
+    fill(ACCENT);
+    textSize(SUB_SIZE);
+    textAlign(RIGHT, BOTTOM);
+    textFont(myFont);
+    text(SUBLINE, width - 40, height - 40);
+    pop();
+
+    // 4. (Outline guide removed — the stitched headline is the only visible form)
+    //    The Chaikin-smoothed path is used for interaction geometry only.
+
+    // 5. Stipple fill (appears on mouse release)
+    if (showStipple) {
+      drawStipple();
+    }
+
+    // 6. Live stitches while dragging (sand-spline texture)
+    if (isDragging) {
+      addStitches(current);
+    }
+    drawStitches();
+
+    // 7. Needle cursor
+    updateNeedle();
+    drawNeedle();
+
+    // 8. Reset button
+    drawResetButton();
+  }
+
+  function mousePressed() {
+    if (overResetBtn()) return;
+    isDragging = true;
+    showStipple = false;
+    stitches = [];
+    stippleDots = [];
+  }
+
+  function mouseReleased() {
+    isDragging = false;
+    showStipple = true;
+    generateStipple(interpolatePoints(condensedPts, widePts, interp));
+  }
+
+  function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    buildPoints();
+    createResetButton();
+  }
+
+  /* ── Point generation ──────────────────────────────────────────────────── */
+
+  function buildPoints() {
+    let cx = width / 2 + 30;
+    let cy = height / 2;
+
+    if (myFont && myFont.textToPoints) {
+      let opts = { sampleFactor: 0.25, simplifyThreshold: 0 };
+      rawPoints = myFont.textToPoints(HEADLINE, cx, cy, FONT_SIZE, opts);
+    } else {
+      // Fallback: create a rectangular grid of points simulating text bounds
+      rawPoints = [];
+      let tw = textWidth(HEADLINE);
+      let th = FONT_SIZE;
+      let x0 = cx - tw / 2;
+      let y0 = cy - th / 2;
+      for (let x = x0; x <= x0 + tw; x += 6) {
+        for (let y = y0; y <= y0 + th; y += 6) {
+          rawPoints.push({ x: x, y: y, z: 0 });
+        }
+      }
+    }
+
+    // Normalise to centroid so scaling is uniform
+    let centroid = getCentroid(rawPoints);
+    condensedPts = [];
+    widePts = [];
+    for (let p of rawPoints) {
+      let dx = p.x - centroid.x;
+      let dy = p.y - centroid.y;
+      condensedPts.push({
+        x: centroid.x + dx * CONDENSED_SCALE,
+        y: centroid.y + dy,
+        z: p.z || 0
+      });
+      widePts.push({
+        x: centroid.x + dx * WIDE_SCALE,
+        y: centroid.y + dy,
+        z: p.z || 0
+      });
+    }
+
+    // Apply Chaikin smoothing
+    condensedPts = chaikinSmooth(condensedPts, CHAIKIN_ITERS);
+    widePts = chaikinSmooth(widePts, CHAIKIN_ITERS);
+  }
+
+  function getCentroid(pts) {
+    let x = 0, y = 0;
+    for (let p of pts) { x += p.x; y += p.y; }
+    return { x: x / pts.length, y: y / pts.length };
+  }
+
+  /* ── Chaikin Smoothing ─────────────────────────────────────────────────── */
+
+  function chaikinSmooth(pts, iterations) {
+    if (pts.length < 2) return pts;
+    let result = pts.slice();
+    for (let i = 0; i < iterations; i++) {
+      let smoothed = [];
+      for (let j = 0; j < result.length; j++) {
+        let p0 = result[j];
+        let p1 = result[(j + 1) % result.length];
+        smoothed.push({
+          x: p0.x + 0.25 * (p1.x - p0.x),
+          y: p0.y + 0.25 * (p1.y - p0.y),
+          z: 0
+        });
+        smoothed.push({
+          x: p0.x + 0.75 * (p1.x - p0.x),
+          y: p0.y + 0.75 * (p1.y - p0.y),
+          z: 0
+        });
+      }
+      result = smoothed;
+    }
+    return result;
+  }
+
+  /* ── Interpolation ───────────────────────────────────────────────────────── */
+
+  function interpolatePoints(a, b, t) {
+    let out = [];
+    for (let i = 0; i < a.length; i++) {
+      out.push({
+        x: lerp(a[i].x, b[i].x, t),
+        y: lerp(a[i].y, b[i].y, t),
+        z: 0
+      });
+    }
+    return out;
+  }
+
+  /* ── Mouse speed ─────────────────────────────────────────────────────────── */
+
+  function updateMouseSpeed() {
+    let dx = mouseX - pmouseX;
+    let dy = mouseY - pmouseY;
+    let speed = Math.sqrt(dx * dx + dy * dy);
+    mouseSpeed = lerp(mouseSpeed, speed, 0.15);
+  }
+
+  /* ── Sand-Spline Stitch Texture ──────────────────────────────────────────── */
+
+  function addStitches(pts) {
+    // Find closest point on outline to needle
+    let closest = 0;
+    let best = Infinity;
+    for (let i = 0; i < pts.length; i++) {
+      let d = dist(needle.x, needle.y, pts[i].x, pts[i].y);
+      if (d < best) { best = d; closest = i; }
+    }
+
+    // Density: slow = dense, fast = sparse
+    let density = map(mouseSpeed, 0, 30, SAND_DENSITY_SLOW, SAND_DENSITY_FAST, true);
+    let jitterAmt = map(mouseSpeed, 0, 30, 1.5, 4, true);
+
+    // Walk along the outline near the needle, adding dots
+    let span = Math.floor(pts.length * 0.08); // local segment around needle
+    for (let i = -span; i <= span; i++) {
+      let idx = (closest + i + pts.length) % pts.length;
+      let p = pts[idx];
+      let prev = pts[(idx - 1 + pts.length) % pts.length];
+      let dx = p.x - prev.x;
+      let dy = p.y - prev.y;
+      let len = Math.sqrt(dx * dx + dy * dy) || 1;
+      // Perpendicular unit vector
+      let px = -dy / len;
+      let py = dx / len;
+
+      // Number of dots for this segment
+      let nDots = Math.floor(density * 2);
+      for (let n = 0; n < nDots; n++) {
+        let offset = random(-jitterAmt, jitterAmt);
+        stitches.push({
+          x: p.x + px * offset,
+          y: p.y + py * offset,
+          col: STITCH,
+          alpha: random(120, 255)
+        });
+      }
+    }
+  }
+
+  function drawStitches() {
+    noStroke();
+    for (let s of stitches) {
+      fill(s.col);
+      drawingContext.globalAlpha = s.alpha / 255;
+      ellipse(s.x, s.y, 2.2, 2.2);
+    }
+    drawingContext.globalAlpha = 1;
+  }
+
+  /* ── Halton Stipple Fill ───────────────────────────────────────────────── */
+
+  function generateStipple(pts) {
+    let bounds = getBounds(pts);
+    let density = map(interp, 0, 1, 0.3, 1.0, true);
+    let total = Math.floor(STIPPLE_MAX_DOTS * density);
+    stippleDots = [];
+    let i = 0;
+    let attempts = 0;
+    while (stippleDots.length < total && attempts < total * 5) {
+      let hx = halton(i, 2);
+      let hy = halton(i, 3);
+      let x = bounds.x + hx * bounds.w;
+      let y = bounds.y + hy * bounds.h;
+      if (pointInPolygon(x, y, pts)) {
+        stippleDots.push({ x, y, alpha: random(40, 120) });
+      }
+      i++;
+      attempts++;
+    }
+  }
+
+  function drawStipple() {
+    noStroke();
+    for (let s of stippleDots) {
+      fill(STIPPLE);
+      drawingContext.globalAlpha = s.alpha / 255;
+      ellipse(s.x, s.y, 1.5, 1.5);
+    }
+    drawingContext.globalAlpha = 1;
+  }
+
+  function getBounds(pts) {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (let p of pts) {
+      minX = Math.min(minX, p.x);
+      minY = Math.min(minY, p.y);
+      maxX = Math.max(maxX, p.x);
+      maxY = Math.max(maxY, p.y);
+    }
+    return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+  }
+
+  /* Halton sequence: radical inverse function */
+  function halton(index, base) {
+    let result = 0;
+    let f = 1 / base;
+    let i = index;
+    while (i > 0) {
+      result = result + f * (i % base);
+      i = Math.floor(i / base);
+      f = f / base;
+    }
+    return result;
+  }
+
+  /* Ray-casting point-in-polygon test */
+  function pointInPolygon(x, y, poly) {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      let xi = poly[i].x, yi = poly[i].y;
+      let xj = poly[j].x, yj = poly[j].y;
+      if (((yi > y) !== (yj > y)) &&
+          (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+        inside = !inside;
+      }
+    }
+    return inside;
+  }
+
+  /* ── Needle Cursor ─────────────────────────────────────────────────────── */
+
+  function updateNeedle() {
+    needle.x += (mouseX - needle.x) * NEEDLE_LERP;
+    needle.y += (mouseY - needle.y) * NEEDLE_LERP;
+  }
+
+  function drawNeedle() {
+    push();
+    noFill();
+    stroke(ACCENT);
+    strokeWeight(2);
+    // Needle eye (small circle)
+    ellipse(needle.x, needle.y, 10, 10);
+    // Needle shaft (short line)
+    let shaftLen = 20;
+    let angle = Math.atan2(mouseY - needle.y, mouseX - needle.x);
+    let sx = needle.x - Math.cos(angle) * shaftLen;
+    let sy = needle.y - Math.sin(angle) * shaftLen;
+    line(sx, sy, needle.x, needle.y);
+    // Tip
+    fill(ACCENT);
+    noStroke();
+    ellipse(sx, sy, 3, 3);
+    pop();
+  }
+
+  /* ── Reset Button ──────────────────────────────────────────────────────── */
+
+  function createResetButton() {
+    resetBtn = { x: 20, y: 20, w: 70, h: 30 };
+  }
+
+  function drawResetButton() {
+    push();
+    let hover = overResetBtn();
+    fill(hover ? "#222" : "#111");
+    noStroke();
+    rect(resetBtn.x, resetBtn.y, resetBtn.w, resetBtn.h, 4);
+    fill("#F5F5F0");
+    textAlign(CENTER, CENTER);
+    textFont(myFont);
+    textSize(13);
+    text("RESET", resetBtn.x + resetBtn.w / 2, resetBtn.y + resetBtn.h / 2 + 1);
+    pop();
+  }
+
+  function overResetBtn() {
+    return mouseX > resetBtn.x && mouseX < resetBtn.x + resetBtn.w &&
+           mouseY > resetBtn.y && mouseY < resetBtn.y + resetBtn.h;
+  }
+
+  function mouseClicked() {
+    if (overResetBtn()) {
+      resetDemo();
+      return false;
+    }
+  }
+
+  function resetDemo() {
+    seed = Math.random() * 10000;
+    randomSeed(seed);
+    stitches = [];
+    stippleDots = [];
+    showStipple = false;
+    isDragging = false;
+    interp = 0;
+    mouseSpeed = 0;
+    buildPoints();
+  }
+  </script>
+</body>
+</html>

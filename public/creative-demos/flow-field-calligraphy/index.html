@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flow Field Calligraphy — Typographic Flow Choreography</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1A1A1A;
+    overflow: hidden;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    cursor: crosshair;
+  }
+  #p5-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 1;
+  }
+  #p5-container canvas { display: block; }
+  #svg-overlay {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 75vw;
+    max-width: 560px;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.10;
+  }
+  #info {
+    position: fixed;
+    bottom: 24px; left: 24px;
+    color: rgba(255,255,255,0.35);
+    font-size: 13px;
+    z-index: 20;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="p5-container"></div>
+
+<!-- Single-stroke SVG letterforms: "FLOW" -->
+<svg id="svg-overlay" viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- F: single continuous stroke, top bar → stem → mid bar → back to stem → down -->
+    <path id="glyph-F" d="M 100,35 L 55,35 L 55,100 L 95,100 L 55,100 L 55,175" />
+    <!-- L: vertical stem down, horizontal bottom bar -->
+    <path id="glyph-L" d="M 155,35 L 155,175 L 205,175" />
+    <!-- O: single-stroke oval -->
+    <path id="glyph-O" d="M 275,35 C 320,35 320,175 275,175 C 230,175 230,35 275,35" />
+    <!-- W: zigzag down-up-down-up -->
+    <path id="glyph-W" d="M 360,35 L 375,175 L 395,105 L 415,175 L 430,35" />
+  </g>
+</svg>
+
+<div id="info">⟳  flow field calligraphy  ·  move mouse  ·  scroll to shift turbulence  ·  «FLOW»</div>
+
+<script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
+<script>
+// ──────────────────────────────────────────────
+// Flow Field Calligraphy — p5.js instance mode
+// Fuses kinetic SVG multi-pass typography with
+// Tyler Hobbs flow fields + 3% weirdness warp.
+// ──────────────────────────────────────────────
+
+const sketch = (p) => {
+
+  // ── Constants ───────────────────────────────
+  const PARTICLE_COUNT   = 300;
+  const STEP_LENGTH      = 1.8;
+  const STAMP_SCALE      = 0.095;
+  const FLOW_RESOLUTION  = 0.022;      // ~2% of canvas width
+  const NOISE_SCALE      = 0.0045;     // base Perlin frequency
+  const NOISE_OCTAVES    = 3;
+  const NOISE_MAGNITUDE  = 2.9;        // angle = noise * TWO_PI * MAG
+  const WARP_RADIUS      = 80;         // px in SVG coords
+  const WARP_WEIGHT_MAX  = 0.16;       // 3% weirdness cap
+  const RING_SIZE        = 12;
+
+  const HEX_PINK  = '#e97777';
+  const HEX_GOLD  = '#ffc777';
+  const HEX_CREAM = '#fffad7';
+
+  // Pre-parsed RGB
+  const RGB = {
+    pink:  [0xe9, 0x77, 0x77],
+    gold:  [0xff, 0xc7, 0x77],
+    cream: [0xff, 0xfa, 0xd7]
+  };
+
+  // ── Globals ─────────────────────────────────
+  let glyphs       = [];
+  let flowField    = null;
+  let particles    = [];
+  let svgEl;
+  let noiseOffX    = 0;
+  let noiseOffY    = 0;
+  let targetNoiseOffX = 0;
+  let targetNoiseOffY = 0;
+  let noiseScale   = NOISE_SCALE;
+  let targetNoiseScale = NOISE_SCALE;
+  let frameCount   = 0;
+
+  // ── Utility ─────────────────────────────────
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const clamp = (v, lo, hi) => v < lo ? lo : v > hi ? hi : v;
+
+  // ── RingBuffer ──────────────────────────────
+  class RingBuffer {
+    constructor(size) {
+      this.size = size;
+      this.buf  = new Array(size).fill(null);
+      this.head = 0;
+      this.count = 0;
+    }
+    push(x, y, angle) {
+      this.head = (this.head + 1) % this.size;
+      this.buf[this.head] = { x, y, angle };
+      if (this.count < this.size) this.count++;
+    }
+    getFramesAgo(n) {
+      if (n >= this.count) return null;
+      const idx = (this.head - n + this.size) % this.size;
+      return this.buf[idx];
+    }
+  }
+
+  // ── GlyphData ───────────────────────────────
+  class GlyphData {
+    constructor(pathEl) {
+      this.el = pathEl;
+      this.totalLength = pathEl.getTotalLength();
+      const numSamples = 60;
+      this.points = [];
+      for (let i = 0; i < numSamples; i++) {
+        const dist = (i / numSamples) * this.totalLength;
+        const pt = pathEl.getPointAtLength(dist);
+        this.points.push({ x: pt.x, y: pt.y });
+      }
+      // Tangents (forward difference, wrap at end)
+      this.tangents = [];
+      for (let i = 0; i < numSamples; i++) {
+        const j = (i + 1) % numSamples;
+        const dx = this.points[j].x - this.points[i].x;
+        const dy = this.points[j].y - this.points[i].y;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        this.tangents.push({ dx: dx / len, dy: dy / len });
+      }
+      // Bounding box center
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      for (const pt of this.points) {
+        if (pt.x < minX) minX = pt.x;
+        if (pt.y < minY) minY = pt.y;
+        if (pt.x > maxX) maxX = pt.x;
+        if (pt.y > maxY) maxY = pt.y;
+      }
+      this.cx = (minX + maxX) / 2;
+      this.cy = (minY + maxY) / 2;
+    }
+    // Return nearest sampled point index & distance (in SVG coords)
+    nearestIndex(svgX, svgY) {
+      let best = 0, bestDist = Infinity;
+      for (let i = 0; i < this.points.length; i++) {
+        const dx = this.points[i].x - svgX;
+        const dy = this.points[i].y - svgY;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < bestDist) { bestDist = d2; best = i; }
+      }
+      return { idx: best, dist: Math.sqrt(bestDist) };
+    }
+    // Random point on the glyph path (SVG coords)
+    randomPoint() {
+      const i = Math.floor(p.random(this.points.length));
+      return { x: this.points[i].x, y: this.points[i].y };
+    }
+  }
+
+  // ── FlowField ───────────────────────────────
+  class FlowField {
+    constructor(canvasW, canvasH, resolution, noiseScale) {
+      this.res = Math.max(resolution * canvasW, 8);
+      // Extended bounds: ±60% beyond canvas
+      this.margin = 0.6;
+      this.x0 = -canvasW * this.margin;
+      this.y0 = -canvasH * this.margin;
+      this.w  = canvasW * (1 + 2 * this.margin);
+      this.h  = canvasH * (1 + 2 * this.margin);
+      this.cols = Math.ceil(this.w / this.res) + 1;
+      this.rows = Math.ceil(this.h / this.res) + 1;
+      this.grid = new Float32Array(this.cols * this.rows);
+      this.ns = noiseScale;
+      this.rebuild();
+    }
+    rebuild() {
+      for (let row = 0; row < this.rows; row++) {
+        for (let col = 0; col < this.cols; col++) {
+          const wx = this.x0 + col * this.res;
+          const wy = this.y0 + row * this.res;
+          let val = 0, amp = 0.5, freq = 1, maxAmp = 0;
+          for (let o = 0; o < NOISE_OCTAVES; o++) {
+            val += amp * p.noise(
+              (wx * this.ns * freq) + noiseOffX,
+              (wy * this.ns * freq) + noiseOffY
+            );
+            maxAmp += amp;
+            amp *= 0.5;
+            freq *= 2.1;
+          }
+          this.grid[row * this.cols + col] = (val / maxAmp) * p.TWO_PI * NOISE_MAGNITUDE;
+        }
+      }
+    }
+    // Bilinear interpolation of angles (via component vectors)
+    getAngle(wx, wy) {
+      const gx = (wx - this.x0) / this.res;
+      const gy = (wy - this.y0) / this.res;
+      const x0 = clamp(Math.floor(gx), 0, this.cols - 1);
+      const y0 = clamp(Math.floor(gy), 0, this.rows - 1);
+      const x1 = clamp(x0 + 1, 0, this.cols - 1);
+      const y1 = clamp(y0 + 1, 0, this.rows - 1);
+      const fx = gx - x0;
+      const fy = gy - y0;
+
+      const a00 = this.grid[y0 * this.cols + x0];
+      const a10 = this.grid[y0 * this.cols + x1];
+      const a01 = this.grid[y1 * this.cols + x0];
+      const a11 = this.grid[y1 * this.cols + x1];
+
+      const vx = lerp(lerp(Math.cos(a00), Math.cos(a10), fx),
+                      lerp(Math.cos(a01), Math.cos(a11), fx), fy);
+      const vy = lerp(lerp(Math.sin(a00), Math.sin(a10), fx),
+                      lerp(Math.sin(a01), Math.sin(a11), fx), fy);
+      return Math.atan2(vy, vx);
+    }
+    // Self-referential warped angle (the 3% weirdness)
+    getWarpedAngle(wx, wy, glyph, svgRect) {
+      let angle = this.getAngle(wx, wy);
+      if (!svgRect || svgRect.width === 0) return angle;
+
+      // Map world → SVG coords
+      const svgX = ((wx - svgRect.left) / svgRect.width)  * 500;
+      const svgY = ((wy - svgRect.top)  / svgRect.height) * 200;
+
+      const { idx, dist } = glyph.nearestIndex(svgX, svgY);
+      if (dist < WARP_RADIUS) {
+        const weight = (1 - dist / WARP_RADIUS) * WARP_WEIGHT_MAX;
+        const t = glyph.tangents[idx];
+        const tangentAngle = Math.atan2(t.dy, t.dx);
+        let diff = tangentAngle - angle;
+        while (diff >  Math.PI) diff -= p.TWO_PI;
+        while (diff < -Math.PI) diff += p.TWO_PI;
+        angle += diff * weight;
+      }
+      return angle;
+    }
+    resize(canvasW, canvasH) {
+      this.res = Math.max(FLOW_RESOLUTION * canvasW, 8);
+      this.x0 = -canvasW * this.margin;
+      this.y0 = -canvasH * this.margin;
+      this.w  = canvasW * (1 + 2 * this.margin);
+      this.h  = canvasH * (1 + 2 * this.margin);
+      this.cols = Math.ceil(this.w / this.res) + 1;
+      this.rows = Math.ceil(this.h / this.res) + 1;
+      this.grid = new Float32Array(this.cols * this.rows);
+      this.rebuild();
+    }
+  }
+
+  // ── Particle ────────────────────────────────
+  class Particle {
+    constructor(glyph, x, y) {
+      this.glyph  = glyph;
+      this.x      = x;
+      this.y      = y;
+      this.ring   = new RingBuffer(RING_SIZE);
+      this.life   = 0;
+    }
+    update(flowField, svgRect) {
+      const angle = flowField.getWarpedAngle(this.x, this.y, this.glyph, svgRect);
+      const vx = Math.cos(angle) * STEP_LENGTH;
+      const vy = Math.sin(angle) * STEP_LENGTH;
+      this.x += vx;
+      this.y += vy;
+      this.ring.push(this.x, this.y, angle);
+      this.life++;
+    }
+    isOffScreen(w, h, margin = 120) {
+      return (this.x < -margin || this.x > w + margin ||
+              this.y < -margin || this.y > h + margin);
+    }
+    respawn(glyph, svgRect) {
+      this.glyph = glyph;
+      const pt = glyph.randomPoint();
+      if (svgRect && svgRect.width > 0) {
+        this.x = svgRect.left + (pt.x / 500) * svgRect.width;
+        this.y = svgRect.top  + (pt.y / 200) * svgRect.height;
+      } else {
+        this.x = p.random(p.width);
+        this.y = p.random(p.height);
+      }
+      this.ring = new RingBuffer(RING_SIZE);
+      this.life = 0;
+    }
+    stamp(px, py, angle, scale) {
+      p.push();
+      p.translate(px, py);
+      p.rotate(angle);
+      p.scale(scale);
+      p.translate(-this.glyph.cx, -this.glyph.cy);
+      p.beginShape();
+      for (const pt of this.glyph.points) {
+        p.vertex(pt.x, pt.y);
+      }
+      p.endShape();
+      p.pop();
+    }
+  }
+
+  // ── Spawn helpers ───────────────────────────
+  function spawnParticle(svgRect) {
+    const g = p.random(glyphs);
+    const pt = g.randomPoint();
+    let wx, wy;
+    if (svgRect && svgRect.width > 0) {
+      wx = svgRect.left + (pt.x / 500) * svgRect.width;
+      wy = svgRect.top  + (pt.y / 200) * svgRect.height;
+    } else {
+      wx = p.random(p.width);
+      wy = p.random(p.height);
+    }
+    return new Particle(g, wx, wy);
+  }
+
+  function spawnAll(svgRect) {
+    particles = [];
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push(spawnParticle(svgRect));
+    }
+  }
+
+  // ── Extract glyph data from inline SVG ──────
+  function extractGlyphs() {
+    const pathEls = svgEl.querySelectorAll('path[id^="glyph-"]');
+    glyphs = [];
+    for (const el of pathEls) {
+      glyphs.push(new GlyphData(el));
+    }
+  }
+
+  // ── p5 Lifecycle ────────────────────────────
+  p.setup = () => {
+    const canvas = p.createCanvas(p.windowWidth, p.windowHeight);
+    canvas.parent('p5-container');
+    p.pixelDensity(1);
+
+    svgEl = document.getElementById('svg-overlay');
+    if (svgEl) {
+      extractGlyphs();
+    }
+
+    flowField = new FlowField(p.width, p.height, FLOW_RESOLUTION, noiseScale);
+
+    const svgRect = svgEl ? svgEl.getBoundingClientRect() : null;
+    spawnAll(svgRect);
+
+    p.strokeWeight(1.2);
+    p.noFill();
+  };
+
+  p.draw = () => {
+    frameCount++;
+    p.background('#1A1A1A');
+
+    // Smooth mouse / scroll drift
+    noiseOffX = lerp(noiseOffX, targetNoiseOffX, 0.06);
+    noiseOffY = lerp(noiseOffY, targetNoiseOffY, 0.06);
+    noiseScale = lerp(noiseScale, targetNoiseScale, 0.08);
+
+    flowField.ns = noiseScale;
+    flowField.rebuild();
+
+    const svgRect = svgEl ? svgEl.getBoundingClientRect() : null;
+
+    // ── Update particles ──────────────────────
+    for (const pt of particles) {
+      pt.update(flowField, svgRect);
+      if (pt.isOffScreen(p.width, p.height)) {
+        const g = p.random(glyphs);
+        pt.respawn(g, svgRect);
+      }
+    }
+
+    // ── Three-color multi-pass rendering ──────
+    p.blendMode(p.ADD);
+
+    // Pass 1: Pink — 1 frame behind (leading ghost)
+    p.stroke(RGB.pink[0], RGB.pink[1], RGB.pink[2], 70);
+    for (const pt of particles) {
+      const h = pt.ring.getFramesAgo(1);
+      if (h) pt.stamp(h.x, h.y, h.angle, STAMP_SCALE);
+    }
+
+    // Pass 2: Gold — 5 frames behind (transitional trail)
+    p.stroke(RGB.gold[0], RGB.gold[1], RGB.gold[2], 110);
+    for (const pt of particles) {
+      const h = pt.ring.getFramesAgo(5);
+      if (h) pt.stamp(h.x, h.y, h.angle, STAMP_SCALE);
+    }
+
+    // Pass 3: Cream — 10 frames behind (lingering)
+    p.stroke(RGB.cream[0], RGB.cream[1], RGB.cream[2], 155);
+    for (const pt of particles) {
+      const h = pt.ring.getFramesAgo(10);
+      if (h) pt.stamp(h.x, h.y, h.angle, STAMP_SCALE);
+    }
+
+    p.blendMode(p.BLEND);
+  };
+
+  // ── Interactions ────────────────────────────
+  p.mouseMoved = () => {
+    // Subtle noise-field drift toward cursor
+    targetNoiseOffX = (p.mouseX / p.width  - 0.5) * 2.5;
+    targetNoiseOffY = (p.mouseY / p.height - 0.5) * 2.5;
+  };
+
+  p.mouseWheel = (event) => {
+    // Scroll up → broader flows; scroll down → more turbulent
+    const delta = event.delta > 0 ? 0.001 : -0.001;
+    targetNoiseScale = clamp(targetNoiseScale + delta, 0.0015, 0.025);
+    return false; // prevent page scroll
+  };
+
+  p.windowResized = () => {
+    p.resizeCanvas(p.windowWidth, p.windowHeight);
+    flowField.resize(p.width, p.height);
+    targetNoiseOffX = 0;
+    targetNoiseOffY = 0;
+    noiseOffX = 0;
+    noiseOffY = 0;
+  };
+
+  // Touch support: basic drift
+  p.touchMoved = () => {
+    if (p.touches.length > 0) {
+      targetNoiseOffX = (p.touches[0].x / p.width  - 0.5) * 2.5;
+      targetNoiseOffY = (p.touches[0].y / p.height - 0.5) * 2.5;
+    }
+    return false;
+  };
+};
+
+// ── Boot ──────────────────────────────────────
+new p5(sketch, document.getElementById('p5-container'));
+</script>
+</body>
+</html>

@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inkblot Mirror — Rorschach Particle System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #030303;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'JetBrains Mono', monospace;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  #container {
+    position: relative;
+    display: inline-block;
+    box-shadow: 0 0 60px rgba(168, 85, 247, 0.15), 0 0 120px rgba(168, 85, 247, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  canvas {
+    display: block;
+    border-radius: 8px;
+  }
+
+  /* Info overlay */
+  #info {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    color: #78909C;
+    font-size: 11px;
+    line-height: 1.6;
+    pointer-events: none;
+    z-index: 10;
+  }
+  #info .accent { color: #A855F7; }
+  #info .warn { color: #FF8A65; }
+
+  /* Prompt overlay for capture interpretation */
+  #prompt-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(3, 3, 3, 0.92);
+    z-index: 20;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+  #prompt-overlay.active { display: flex; }
+
+  #prompt-overlay h2 {
+    color: #E5E7EB;
+    font-size: 16px;
+    font-weight: 400;
+  }
+  #prompt-overlay textarea {
+    width: 500px;
+    height: 80px;
+    background: #1a1a2e;
+    border: 1px solid #A855F7;
+    border-radius: 6px;
+    color: #E5E7EB;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 10px;
+    resize: none;
+    outline: none;
+  }
+  #prompt-overlay textarea:focus {
+    border-color: #C084FC;
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+  }
+  #prompt-overlay .btn-row {
+    display: flex;
+    gap: 12px;
+  }
+  #prompt-overlay button {
+    background: #A855F7;
+    color: #E5E7EB;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  #prompt-overlay button:hover { background: #C084FC; }
+  #prompt-overlay button.cancel {
+    background: transparent;
+    border: 1px solid #78909C;
+    color: #78909C;
+  }
+  #prompt-overlay button.cancel:hover { border-color: #E5E7EB; color: #E5E7EB; }
+  #prompt-overlay .char-count {
+    color: #78909C;
+    font-size: 10px;
+  }
+
+  /* Gallery overlay */
+  #gallery-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(3, 3, 3, 0.95);
+    z-index: 25;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 24px;
+  }
+  #gallery-overlay.active { display: flex; }
+
+  #gallery-overlay h2 {
+    color: #E5E7EB;
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  #gallery-overlay .gallery-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+  }
+  #gallery-overlay .gallery-item {
+    background: #1a1a2e;
+    border: 1px solid #263238;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  #gallery-overlay .gallery-item:hover {
+    border-color: #A855F7;
+  }
+  #gallery-overlay .gallery-item img {
+    width: 160px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+  }
+  #gallery-overlay .gallery-item .caption {
+    color: #78909C;
+    font-size: 10px;
+    margin-top: 6px;
+    max-width: 160px;
+    word-wrap: break-word;
+    line-height: 1.4;
+  }
+  #gallery-overlay .gallery-empty {
+    color: #78909C;
+    font-size: 12px;
+    text-align: center;
+    padding: 40px;
+  }
+  #gallery-overlay .gallery-close {
+    color: #A855F7;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 16px;
+    cursor: pointer;
+  }
+  #gallery-overlay .storage-warn {
+    color: #FF8A65;
+    font-size: 10px;
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  /* Instructions hint */
+  #hint {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #78909C;
+    font-size: 10px;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0.8;
+    transition: opacity 1s;
+  }
+  #hint.fading { opacity: 0; }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="info"></div>
+  <div id="hint">click: ink · double-click: heavy ink · drag: smear · scroll: noise · 1-5: presets · C: capture · G: gallery · space: symmetry</div>
+
+  <!-- Capture interpretation prompt -->
+  <div id="prompt-overlay">
+    <h2>What do you see in this inkblot?</h2>
+    <textarea id="interpret-input" maxlength="200" placeholder="Describe what you see..."></textarea>
+    <span class="char-count" id="char-count">0 / 200</span>
+    <div class="btn-row">
+      <button id="save-capture">Save to Gallery</button>
+      <button class="cancel" id="cancel-capture">Discard</button>
+    </div>
+  </div>
+
+  <!-- Gallery view -->
+  <div id="gallery-overlay">
+    <h2>🖼 Inkblot Gallery</h2>
+    <div class="gallery-grid" id="gallery-grid"></div>
+    <div class="gallery-empty" id="gallery-empty">No captures yet. Press <span style="color:#A855F7">C</span> to capture an inkblot.</div>
+    <div class="storage-warn" id="storage-warn"></div>
+    <div class="gallery-close" id="gallery-close">[ press G or click here to close ]</div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  INKBLOT MIRROR — Symmetric Particle Rorschach Inkblots
+//  p5.js Canvas 2D · FlatArray particle system · Perlin noise field
+// ═══════════════════════════════════════════════════════════════
+
+// ─── Constants ─────────────────────────────────────────────────
+const MAX_PARTICLES = 5000;
+const W = 800;
+const H = 600;
+const MID = W / 2;  // symmetry axis
+
+// Noise grid
+const NW = 128;
+const NH = 64;
+const NOISE_SIZE = NW * NH;
+
+// Spatial bins
+const BINS_X = 32;
+const BINS_Y = 32;
+const BIN_W = W / BINS_X;   // 25
+const BIN_H = H / BINS_Y;   // 18.75
+
+// ─── Particle Flat Arrays ──────────────────────────────────────
+let px, py, vx, vy, born, lifetime, colorType;
+let count = 0;
+
+// ─── Noise Field ───────────────────────────────────────────────
+let nfx, nfy;             // force components per grid cell
+let noiseZ = 0;           // z-offset for 3D noise
+let noiseScale = 0.005;   // adjustable with scroll wheel
+let noisePreset = 1;      // 1-5
+
+// ─── Spatial Bins ──────────────────────────────────────────────
+let binCounts;             // Uint16Array, BINS_X * BINS_Y
+
+// ─── State Machine ─────────────────────────────────────────────
+const State = Object.freeze({
+  IDLE:       'idle',
+  DROPPING:   'dropping',
+  EVOLVING:   'evolving',
+  FADING:     'fading',
+  ARCHIVING:  'archiving',
+  REFLECTING: 'reflecting'
+});
+let state = State.IDLE;
+
+// ─── Interaction State ─────────────────────────────────────────
+let symmetryEnabled = true;
+let mouseIsDown = false;
+let pmx = 0, pmy = 0;     // previous mouse position
+let smearActive = false;
+let paused = false;
+
+// ─── Gallery ───────────────────────────────────────────────────
+let captures = [];
+let showGallery = false;
+let captureDataURL = null;
+
+// ─── DOM refs (set after canvas created) ───────────────────────
+let infoEl, hintEl, promptOverlay, interpretInput, charCountEl;
+let galleryOverlay, galleryGrid, galleryEmpty, storageWarn;
+
+// ═══════════════════════════════════════════════════════════════
+//  p5.js LIFECYCLE
+// ═══════════════════════════════════════════════════════════════
+
+function setup() {
+  let c = createCanvas(W, H);
+  c.parent('container');
+
+  // Init particle arrays
+  px       = new Float32Array(MAX_PARTICLES);
+  py       = new Float32Array(MAX_PARTICLES);
+  vx       = new Float32Array(MAX_PARTICLES);
+  vy       = new Float32Array(MAX_PARTICLES);
+  born     = new Float32Array(MAX_PARTICLES);
+  lifetime = new Float32Array(MAX_PARTICLES);
+  colorType = new Uint8Array(MAX_PARTICLES);
+
+  // Init noise field
+  nfx = new Float32Array(NOISE_SIZE);
+  nfy = new Float32Array(NOISE_SIZE);
+
+  // Init bins
+  binCounts = new Uint16Array(BINS_X * BINS_Y);
+
+  // DOM refs
+  infoEl = document.getElementById('info');
+  hintEl = document.getElementById('hint');
+  promptOverlay = document.getElementById('prompt-overlay');
+  interpretInput = document.getElementById('interpret-input');
+  charCountEl = document.getElementById('char-count');
+  galleryOverlay = document.getElementById('gallery-overlay');
+  galleryGrid = document.getElementById('gallery-grid');
+  galleryEmpty = document.getElementById('gallery-empty');
+  storageWarn = document.getElementById('storage-warn');
+
+  // DOM event listeners
+  interpretInput.addEventListener('input', () => {
+    charCountEl.textContent = interpretInput.value.length + ' / 200';
+  });
+  document.getElementById('save-capture').addEventListener('click', saveCapture);
+  document.getElementById('cancel-capture').addEventListener('click', cancelCapture);
+  document.getElementById('gallery-close').addEventListener('click', toggleGallery);
+  document.getElementById('gallery-overlay').addEventListener('click', (e) => {
+    if (e.target === galleryOverlay) toggleGallery();
+  });
+  // Close prompt on Enter
+  interpretInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      saveCapture();
+    }
+    if (e.key === 'Escape') {
+      cancelCapture();
+    }
+  });
+
+  // Load gallery from localStorage
+  loadGallery();
+
+  // Init noise field
+  updateNoiseField(true);
+
+  // Drawing defaults
+  noStroke();
+  textFont('JetBrains Mono');
+  textAlign(LEFT, BASELINE);
+  textSize(11);
+
+  state = State.IDLE;
+}
+
+function draw() {
+  // ── Reset drawing state (rule 1) ──
+  noStroke();
+  noFill();
+  textAlign(LEFT, BASELINE);
+  textSize(11);
+
+  if (paused && !showGallery && !promptOverlay.classList.contains('active')) {
+    // Draw static frame
+    drawBackground();
+    drawSymmetryAxis();
+    drawUI();
+    return;
+  }
+
+  // ── Update noise field every 3 frames ──
+  if (frameCount % 3 === 0) {
+    updateNoiseField(false);
+  }
+
+  // ── Smear force computation ──
+  let smearDx = 0, smearDy = 0;
+  if (smearActive && mouseIsDown) {
+    smearDx = mouseX - pmx;
+    smearDy = mouseY - pmy;
+  }
+
+  // ── Update particles ──
+  updateParticles(smearDx, smearDy);
+
+  // ── Spatial binning ──
+  computeBins();
+
+  // ── Render ──
+  drawBackground();
+  drawSymmetryAxis();
+  drawParticles();
+
+  // ── Reset blend mode for UI ──
+  blendMode(BLEND);
+  drawUI();
+
+  // ── Update previous mouse ──
+  pmx = mouseX;
+  pmy = mouseY;
+
+  // ── Auto-fade hint ──
+  if (frameCount > 300 && !hintEl.classList.contains('fading')) {
+    hintEl.classList.add('fading');
+  }
+
+  // ── State transitions ──
+  if (state === State.DROPPING && count > 0) {
+    state = State.EVOLVING;
+  }
+  if (state === State.EVOLVING && count === 0 && frameCount > 60) {
+    state = State.IDLE;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PARTICLE SYSTEM
+// ═══════════════════════════════════════════════════════════════
+
+function spawnParticles(x, y, n, opts = {}) {
+  // opts: spread, ltMult, colorIdx
+  const spread  = opts.spread  || 15;
+  const ltMult  = opts.ltMult  || 1.0;
+  const colorIdx = opts.colorIdx || 0;
+
+  for (let i = 0; i < n; i++) {
+    if (count >= MAX_PARTICLES) break;
+
+    // Gaussian spread
+    let sx = randomGaussian(0, spread);
+    let sy = randomGaussian(0, spread);
+    let pxVal = x + sx;
+    let pyVal = y + sy;
+
+    // Clamp to left half (enforce symmetry storage)
+    pxVal = constrain(pxVal, 2, MID - 2);
+    pyVal = constrain(pyVal, 2, H - 2);
+
+    // Initial velocity (small random)
+    let vxVal = randomGaussian(0, 0.3);
+    let vyVal = randomGaussian(0, 0.3);
+
+    // Lifetime: 180-360 frames base, scaled by ltMult
+    let lt = (180 + random() * 180) * ltMult;
+
+    // 10% chance of firefly accent if normal ink
+    let cType = colorIdx;
+    if (cType === 0 && random() < 0.08) {
+      cType = 2; // coral firefly
+      lt *= 0.5;
+      vxVal *= 2;
+      vyVal *= 2;
+    }
+
+    let idx = count;
+    px[idx] = pxVal;
+    py[idx] = pyVal;
+    vx[idx] = vxVal;
+    vy[idx] = vyVal;
+    born[idx] = frameCount;
+    lifetime[idx] = lt;
+    colorType[idx] = cType;
+    count++;
+  }
+}
+
+function updateParticles(smearDx, smearDy) {
+  const FORCE_SCALE = 0.35;
+  const DRAG = 0.98;
+  const JITTER = 0.6;
+  const SMEAR_RADIUS = 60;
+  const SMEAR_FORCE = 0.04;
+
+  for (let i = 0; i < count; i++) {
+    // ── Sample noise field (bilinear) ──
+    let gx = (px[i] / W) * (NW - 1);
+    let gy = (py[i] / H) * (NH - 1);
+    let fx = bilinearSample(nfx, gx, gy, NW, NH);
+    let fy = bilinearSample(nfy, gx, gy, NW, NH);
+
+    // ── Brownian jitter ──
+    vx[i] += (Math.random() - 0.5) * 2 * JITTER;
+    vy[i] += (Math.random() - 0.5) * 2 * JITTER;
+
+    // ── Viscous drag ──
+    vx[i] *= DRAG;
+    vy[i] *= DRAG;
+
+    // ── Noise force ──
+    vx[i] += fx * FORCE_SCALE;
+    vy[i] += fy * FORCE_SCALE;
+
+    // ── Smear force (directional from mouse drag) ──
+    if (smearActive && (Math.abs(smearDx) > 0.5 || Math.abs(smearDy) > 0.5)) {
+      let dx = px[i] - mouseX;
+      let dy = py[i] - mouseY;
+      let dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < SMEAR_RADIUS) {
+        let falloff = 1 - (dist / SMEAR_RADIUS);
+        falloff = falloff * falloff; // quadratic falloff
+        vx[i] += smearDx * SMEAR_FORCE * falloff;
+        vy[i] += smearDy * SMEAR_FORCE * falloff;
+      }
+    }
+
+    // ── Update position ──
+    px[i] += vx[i];
+    py[i] += vy[i];
+
+    // ── Enforce left-half storage ──
+    if (symmetryEnabled) {
+      if (px[i] > MID) px[i] = W - px[i];
+      if (px[i] < 0) px[i] = -px[i];
+      px[i] = constrain(px[i], 0.5, MID - 0.5);
+    } else {
+      px[i] = constrain(px[i], 0.5, W - 0.5);
+    }
+    py[i] = constrain(py[i], 0.5, H - 0.5);
+
+    // ── Check death ──
+    let age = frameCount - born[i];
+    if (age >= lifetime[i]) {
+      removeParticle(i);
+      i--; // re-check swapped particle
+    }
+  }
+}
+
+function removeParticle(idx) {
+  count--;
+  if (idx === count) return; // was last particle
+  // Swap with last
+  px[idx]       = px[count];
+  py[idx]       = py[count];
+  vx[idx]       = vx[count];
+  vy[idx]       = vy[count];
+  born[idx]     = born[count];
+  lifetime[idx] = lifetime[count];
+  colorType[idx] = colorType[count];
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  NOISE FIELD
+// ═══════════════════════════════════════════════════════════════
+
+function updateNoiseField(forceUpdate) {
+  // forceUpdate is true on first call or preset change
+  if (!forceUpdate) {
+    noiseZ += 0.08;
+  }
+
+  let scaleAdj;
+  switch (noisePreset) {
+    case 1: scaleAdj = 3.0; break;   // gentle
+    case 2: scaleAdj = 6.0; break;   // turbulent
+    case 3: scaleAdj = 4.0; break;   // streaks
+    case 4: scaleAdj = 3.0; break;   // spiral
+    case 5: scaleAdj = 4.0; break;   // random
+    default: scaleAdj = 3.0;
+  }
+
+  let baseScale = noiseScale * scaleAdj;
+
+  for (let j = 0; j < NH; j++) {
+    for (let i = 0; i < NW; i++) {
+      let idx = j * NW + i;
+      let nx = i / (NW - 1);
+      let ny = j / (NH - 1);
+
+      if (noisePreset === 4) {
+        // Spiral: use noise to set angle, creating swirling patterns
+        let angleNoise = noise(nx * baseScale * 0.8, ny * baseScale * 0.8, noiseZ);
+        let angle = angleNoise * Math.PI * 4 - Math.PI * 2;
+        let mag = noise(nx * baseScale * 0.5, ny * baseScale * 0.5, noiseZ + 50) * 0.7 + 0.3;
+        nfx[idx] = Math.cos(angle) * mag;
+        nfy[idx] = Math.sin(angle) * mag;
+      } else if (noisePreset === 3) {
+        // Streaks: anisotropic scaling — stronger horizontal, weaker vertical
+        nfx[idx] = (noise(nx * baseScale * 1.5, ny * baseScale * 0.3, noiseZ) - 0.5) * 2.4;
+        nfy[idx] = (noise(nx * baseScale * 0.3, ny * baseScale * 0.8, noiseZ + 100) - 0.5) * 1.2;
+      } else {
+        nfx[idx] = (noise(nx * baseScale, ny * baseScale, noiseZ) - 0.5) * 2;
+        nfy[idx] = (noise(nx * baseScale, ny * baseScale, noiseZ + 100) - 0.5) * 2;
+      }
+    }
+  }
+}
+
+function bilinearSample(field, gx, gy, gridW, gridH) {
+  let x0 = Math.floor(gx);
+  let y0 = Math.floor(gy);
+  let x1 = Math.min(x0 + 1, gridW - 1);
+  let y1 = Math.min(y0 + 1, gridH - 1);
+  let fx = gx - x0;
+  let fy = gy - y0;
+
+  // Guard against out-of-bounds (shouldn't happen with proper clamping)
+  x0 = Math.max(0, Math.min(x0, gridW - 1));
+  y0 = Math.max(0, Math.min(y0, gridH - 1));
+
+  let a = field[y0 * gridW + x0];
+  let b = field[y0 * gridW + x1];
+  let c = field[y1 * gridW + x0];
+  let d = field[y1 * gridW + x1];
+
+  // Bilinear interpolation
+  let top = a + (b - a) * fx;
+  let bot = c + (d - c) * fx;
+  return top + (bot - top) * fy;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SPATIAL BINNING
+// ═══════════════════════════════════════════════════════════════
+
+function computeBins() {
+  binCounts.fill(0);
+
+  for (let i = 0; i < count; i++) {
+    let bx = Math.floor(px[i] / BIN_W);
+    let by = Math.floor(py[i] / BIN_H);
+    bx = Math.max(0, Math.min(bx, BINS_X - 1));
+    by = Math.max(0, Math.min(by, BINS_Y - 1));
+    binCounts[by * BINS_X + bx]++;
+
+    // Also count mirror position (right half)
+    if (symmetryEnabled) {
+      let mx = W - px[i];
+      let mbx = Math.floor(mx / BIN_W);
+      mbx = Math.max(0, Math.min(mbx, BINS_X - 1));
+      binCounts[by * BINS_X + mbx]++;
+    }
+  }
+}
+
+function getBinDensity(pxVal, pyVal) {
+  let bx = Math.floor(pxVal / BIN_W);
+  let by = Math.floor(pyVal / BIN_H);
+  bx = Math.max(0, Math.min(bx, BINS_X - 1));
+  by = Math.max(0, Math.min(by, BINS_Y - 1));
+  return binCounts[by * BINS_X + bx] || 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDERING
+// ═══════════════════════════════════════════════════════════════
+
+function drawBackground() {
+  blendMode(BLEND);
+  noStroke();
+  fill(3, 3, 3, 255);
+  rect(0, 0, W, H);
+}
+
+function drawSymmetryAxis() {
+  blendMode(BLEND);
+  noFill();
+  stroke(38, 50, 56, 30); // #263238, very subtle
+  strokeWeight(1);
+  line(MID, 0, MID, H);
+  noStroke();
+}
+
+function drawParticles() {
+  blendMode(ADD);
+  noStroke();
+
+  for (let i = 0; i < count; i++) {
+    let age = frameCount - born[i];
+    let lt = lifetime[i];
+    if (lt <= 0) continue;
+
+    let alphaFade = 1.0 - (age / lt);
+    if (alphaFade <= 0) continue;
+
+    // Check bin density for color
+    let density = getBinDensity(px[i], py[i]);
+    let isDense = density > 15;
+
+    let r, g, b;
+    let cType = colorType[i];
+
+    if (cType === 1) {
+      // Blue-grey (heavy ink from double-click)
+      r = 176; g = 190; b = 197; // #B0BEC5
+    } else if (cType === 2) {
+      // Coral firefly
+      r = 255; g = 138; b = 101; // #FF8A65
+    } else if (isDense) {
+      // Golden glow for dense regions
+      r = 255; g = 213; b = 79; // #FFD54F
+    } else {
+      // White ink
+      r = 255; g = 255; b = 255;
+    }
+
+    // Additive alpha: low so overlapping builds brightness
+    let alpha = alphaFade * 0.18;
+    if (cType === 2) alpha = alphaFade * 0.25; // fireflies slightly brighter
+
+    fill(r, g, b, alpha * 255);
+
+    let sz = 3;
+    if (cType === 2) sz = 2; // fireflies are smaller
+
+    // Draw left-half particle
+    circle(px[i], py[i], sz);
+
+    // Draw mirrored twin
+    if (symmetryEnabled) {
+      circle(W - px[i], py[i], sz);
+    }
+  }
+
+  blendMode(BLEND);
+}
+
+function drawUI() {
+  noStroke();
+  noFill();
+  textAlign(LEFT, BASELINE);
+
+  // State and count
+  let statusColor = state === State.IDLE ? '#78909C' : '#A855F7';
+  let statusText = state === State.IDLE ? '● idle' :
+                   state === State.EVOLVING ? '● evolving' :
+                   state === State.DROPPING ? '● dropping' : '● ' + state;
+
+  fill(120, 144, 156); // #78909C
+  textSize(11);
+  text(statusText, 16, 20);
+
+  // Particle count
+  fill(120, 144, 156, 180);
+  textSize(10);
+  text('particles: ' + count + ' / ' + MAX_PARTICLES, 16, 36);
+
+  // Noise info
+  let presetNames = ['', 'gentle', 'turbulent', 'streaks', 'spiral', 'random'];
+  text('noise: ' + presetNames[noisePreset] + ' (scale ' + noiseScale.toFixed(4) + ')', 16, 50);
+
+  // Symmetry indicator
+  fill(symmetryEnabled ? '#A855F7' : '#78909C');
+  textSize(10);
+  text(symmetryEnabled ? '⟷ symmetry on' : '⟷ symmetry off', 16, 64);
+
+  // Smear indicator
+  if (smearActive) {
+    fill('#FF8A65');
+    textSize(10);
+    text('~ smear active ~', 16, 78);
+  }
+
+  // Paused indicator
+  if (paused) {
+    fill('#FFD54F');
+    textSize(12);
+    textAlign(CENTER, CENTER);
+    text('⏸ PAUSED', W/2, H/2 - 30);
+    textAlign(LEFT, BASELINE);
+  }
+
+  // Gallery hint when gallery is open
+  if (showGallery) {
+    fill('#E5E7EB');
+    textSize(12);
+    textAlign(CENTER, CENTER);
+    text('Press G to close gallery', W/2, H - 30);
+    textAlign(LEFT, BASELINE);
+  }
+
+  // Reset drawing state
+  noStroke();
+  noFill();
+  textAlign(LEFT, BASELINE);
+  textSize(11);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INTERACTION HANDLERS
+// ═══════════════════════════════════════════════════════════════
+
+function mousePressed() {
+  // Right-click: clear all
+  if (mouseButton === RIGHT) {
+    count = 0;
+    state = State.IDLE;
+    return false; // prevent context menu
+  }
+
+  // Ignore if gallery or prompt is open
+  if (showGallery || promptOverlay.classList.contains('active')) return;
+
+  mouseIsDown = true;
+  pmx = mouseX;
+  pmy = mouseY;
+  smearActive = false; // reset smear until drag detected
+
+  // Spawn initial ink drop
+  let spawnX = mouseX;
+  if (symmetryEnabled && spawnX > MID) {
+    // Click on right side: spawn on mirrored left position
+    spawnX = W - spawnX;
+  }
+  spawnX = constrain(spawnX, 5, MID - 5);
+
+  spawnParticles(spawnX, mouseY, 30, { spread: 15, ltMult: 1.0, colorIdx: 0 });
+  state = State.DROPPING;
+
+  return false;
+}
+
+function mouseDragged() {
+  if (!mouseIsDown) return;
+  if (showGallery || promptOverlay.classList.contains('active')) return;
+
+  // Detect smear: mouse moved enough while held
+  let dx = mouseX - pmx;
+  let dy = mouseY - pmy;
+  if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+    smearActive = true;
+  }
+}
+
+function mouseReleased() {
+  mouseIsDown = false;
+  smearActive = false;
+}
+
+function doubleClicked() {
+  if (showGallery || promptOverlay.classList.contains('active')) return;
+
+  // Heavy ink: 80 particles, blue-grey, longer lifetime
+  let spawnX = mouseX;
+  if (symmetryEnabled && spawnX > MID) {
+    spawnX = W - spawnX;
+  }
+  spawnX = constrain(spawnX, 5, MID - 5);
+
+  spawnParticles(spawnX, mouseY, 80, { spread: 20, ltMult: 2.5, colorIdx: 1 });
+  state = State.DROPPING;
+
+  return false;
+}
+
+function keyPressed() {
+  // If prompt is open, let the DOM handlers deal with it
+  if (promptOverlay.classList.contains('active')) return;
+
+  // Gallery mode: G toggles
+  if (key === 'g' || key === 'G') {
+    toggleGallery();
+    return false;
+  }
+
+  // If gallery is open, only G works
+  if (showGallery) return;
+
+  // Spacebar: toggle symmetry
+  if (key === ' ') {
+    symmetryEnabled = !symmetryEnabled;
+    // Reflect all existing particles to left half if re-enabling
+    if (symmetryEnabled) {
+      for (let i = 0; i < count; i++) {
+        if (px[i] > MID) {
+          px[i] = W - px[i];
+        }
+      }
+    }
+    return false;
+  }
+
+  // C key: capture
+  if (key === 'c' || key === 'C') {
+    captureInkblot();
+    return false;
+  }
+
+  // 1-5: noise presets
+  if (key >= '1' && key <= '5') {
+    noisePreset = parseInt(key);
+    switch (noisePreset) {
+      case 1: noiseScale = 0.003; break;
+      case 2: noiseScale = 0.008; break;
+      case 3: noiseScale = 0.012; break;
+      case 4: noiseScale = 0.006; break;
+      case 5: noiseScale = Math.random() * 0.02 + 0.002; break;
+    }
+    updateNoiseField(true);
+    return false;
+  }
+
+  return true;
+}
+
+function mouseWheel(event) {
+  if (showGallery || promptOverlay.classList.contains('active')) return;
+
+  // Adjust noise scale
+  let delta = event.delta > 0 ? -0.0008 : 0.0008;
+  noiseScale = constrain(noiseScale + delta, 0.001, 0.03);
+  updateNoiseField(true);
+  return false;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GALLERY
+// ═══════════════════════════════════════════════════════════════
+
+function captureInkblot() {
+  paused = true;
+  // Capture canvas
+  captureDataURL = canvas.toDataURL('image/png');
+  // Show prompt overlay
+  interpretInput.value = '';
+  charCountEl.textContent = '0 / 200';
+  promptOverlay.classList.add('active');
+  interpretInput.focus();
+}
+
+function saveCapture() {
+  let interpretation = interpretInput.value.trim();
+  if (!interpretation) interpretation = '(no interpretation)';
+
+  let entry = {
+    data: captureDataURL,
+    interpretation: interpretation,
+    timestamp: Date.now()
+  };
+
+  captures.push(entry);
+
+  // Limit to 15 captures
+  while (captures.length > 15) {
+    captures.shift();
+  }
+
+  saveGallery();
+  renderGallery();
+
+  promptOverlay.classList.remove('active');
+  captureDataURL = null;
+  paused = false;
+}
+
+function cancelCapture() {
+  promptOverlay.classList.remove('active');
+  captureDataURL = null;
+  paused = false;
+}
+
+function toggleGallery() {
+  showGallery = !showGallery;
+  if (showGallery) {
+    paused = true;
+    renderGallery();
+    galleryOverlay.classList.add('active');
+  } else {
+    galleryOverlay.classList.remove('active');
+    paused = false;
+  }
+}
+
+function renderGallery() {
+  if (!galleryGrid) return;
+
+  galleryGrid.innerHTML = '';
+
+  if (captures.length === 0) {
+    if (galleryEmpty) galleryEmpty.style.display = 'block';
+    if (storageWarn) storageWarn.textContent = '';
+    return;
+  }
+
+  if (galleryEmpty) galleryEmpty.style.display = 'none';
+
+  // Display in reverse chronological order
+  for (let i = captures.length - 1; i >= 0; i--) {
+    let entry = captures[i];
+    if (!entry || !entry.data) continue;
+
+    let item = document.createElement('div');
+    item.className = 'gallery-item';
+
+    let img = document.createElement('img');
+    img.src = entry.data;
+    img.alt = 'Inkblot capture';
+    img.title = entry.interpretation || '';
+
+    let caption = document.createElement('div');
+    caption.className = 'caption';
+    caption.textContent = entry.interpretation || '';
+
+    // Click thumbnail to view full size
+    item.addEventListener('click', () => {
+      let win = window.open('', '_blank');
+      if (win) {
+        win.document.write('<html><head><title>Inkblot</title><style>body{background:#030303;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;}</style></head><body><img src="' + entry.data + '" style="max-width:100%;max-height:100vh;" alt="inkblot"></body></html>');
+      }
+    });
+
+    item.appendChild(img);
+    item.appendChild(caption);
+    galleryGrid.appendChild(item);
+  }
+
+  // Storage warning
+  if (storageWarn) {
+    let used = new Blob([JSON.stringify(captures)]).size;
+    let limitKB = 4500; // ~4.5MB safe limit
+    if (used > limitKB * 1024) {
+      storageWarn.textContent = '⚠ Storage nearing limit (' + (used / 1024).toFixed(0) + ' KB used). Old captures will be removed on next save.';
+    } else {
+      storageWarn.textContent = '';
+    }
+  }
+}
+
+function saveGallery() {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    localStorage.setItem('inkblot-mirror-gallery', JSON.stringify(captures));
+  } catch (e) {
+    // Storage full: remove oldest captures
+    while (captures.length > 3) {
+      captures.shift();
+    }
+    try {
+      localStorage.setItem('inkblot-mirror-gallery', JSON.stringify(captures));
+    } catch (e2) {
+      // If still failing, clear entirely
+      captures = [];
+      localStorage.removeItem('inkblot-mirror-gallery');
+    }
+  }
+}
+
+function loadGallery() {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    let raw = localStorage.getItem('inkblot-mirror-gallery');
+    if (raw) {
+      captures = JSON.parse(raw);
+      if (!Array.isArray(captures)) captures = [];
+    }
+  } catch (e) {
+    captures = [];
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  UTILITY
+// ═══════════════════════════════════════════════════════════════
+
+// Box-Muller Gaussian random
+function randomGaussian(mean = 0, stdev = 1) {
+  let u = 1 - Math.random();
+  let v = Math.random();
+  let z = Math.sqrt(-2.0 * Math.log(Math.max(u, 0.0001))) * Math.cos(2.0 * Math.PI * v);
+  return z * stdev + mean;
+}
+
+// Prevent context menu on canvas
+document.addEventListener('contextmenu', (e) => {
+  if (e.target.tagName === 'CANVAS') {
+    e.preventDefault();
+    return false;
+  }
+});
+
+// Handle window blur — release mouse
+window.addEventListener('blur', () => {
+  mouseIsDown = false;
+  smearActive = false;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morphogenic Hero — BECOME</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght,wdth,slnt,GRAD@8..144,100..900,25..151,-10..0,0..200&display=swap" rel="stylesheet">
+<style>
+/* ===== 1. Reset & Base ===== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-family:'Roboto Flex',sans-serif;scroll-behavior:smooth}
+body{
+  scroll-snap-type:y mandatory;
+  overflow-y:scroll;
+  height:100vh;
+  background:#0a0a12;
+  color:#e8e0f0;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale
+}
+
+/* Font loading gate */
+body:not(.fonts-loaded) #hero{opacity:0 !important}
+body:not(.fonts-loaded) .panel-content h2{opacity:0}
+
+/* ===== 2. Progress Bar (CSS scroll-driven) ===== */
+#progress{
+  position:fixed;top:0;left:0;height:2px;
+  background:linear-gradient(90deg,#7c3aed,#06b6d4);
+  transform-origin:0% 50%;
+  animation:progress-grow auto linear;
+  animation-timeline:scroll();
+  z-index:100;
+  box-shadow:0 0 12px rgba(124,58,237,0.4)
+}
+@keyframes progress-grow{
+  from{transform:scaleX(0)}
+  to{transform:scaleX(1)}
+}
+
+/* ===== 3. Hero Text ===== */
+#hero{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-family:'Roboto Flex',sans-serif;
+  font-size:clamp(4rem,15vw,12rem);
+  color:#e8e0f0;
+  text-rendering:geometricPrecision;
+  z-index:10;pointer-events:none;
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+  will-change:font-variation-settings,transform,opacity,filter;
+  user-select:none;
+  font-variation-settings:'wght' 100,'wdth' 151,'slnt' -10,'GRAD' 0;
+  opacity:0;
+  filter:blur(20px);
+  text-shadow:0 0 40px rgba(124,58,237,0.15);
+  transition:opacity 0.3s ease
+}
+
+/* ===== 4. Canvas Overlay ===== */
+canvas#gpu{
+  position:fixed;top:0;left:0;
+  width:100vw;height:100vh;
+  mix-blend-mode:screen;
+  pointer-events:none;
+  z-index:5
+}
+
+/* ===== 5. Panels ===== */
+.panel{
+  scroll-snap-align:start;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+  overflow:hidden;
+  padding:2rem
+}
+.panel::after{
+  content:attr(data-label);
+  position:absolute;bottom:2rem;right:2.5rem;
+  font-size:0.75rem;font-weight:300;letter-spacing:0.15em;
+  color:rgba(232,224,240,0.25);
+  font-variant-numeric:tabular-nums;
+  font-family:'Roboto Flex',sans-serif;
+  transition:opacity 0.8s ease,transform 0.8s ease
+}
+
+/* Decorative rules */
+.panel .panel-rule{
+  position:absolute;top:33.33%;left:10%;right:10%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(232,224,240,0.12),transparent);
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform 0.8s cubic-bezier(0.65,0,0.35,1)
+}
+.panel.rule-visible .panel-rule{transform:scaleX(1)}
+.panel .panel-rule-bottom{
+  position:absolute;bottom:33.33%;left:10%;right:10%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(232,224,240,0.06),transparent);
+  transform:scaleX(0);
+  transform-origin:right;
+  transition:transform 0.8s cubic-bezier(0.65,0,0.35,1) 0.15s
+}
+.panel.rule-visible .panel-rule-bottom{transform:scaleX(1)}
+
+/* Panel background depth variation */
+.panel:nth-child(4){background:radial-gradient(ellipse at 50% 0%,rgba(26,10,46,0.6) 0%,#0a0a12 60%)}
+.panel:nth-child(5){background:radial-gradient(ellipse at 50% 0%,rgba(26,10,46,0.8) 0%,#0a0a12 60%)}
+.panel:nth-child(6){background:radial-gradient(ellipse at 50% 100%,rgba(26,10,46,0.4) 0%,#0a0a12 60%)}
+.panel:nth-child(7){background:radial-gradient(ellipse at 50% 50%,rgba(124,58,237,0.08) 0%,#0a0a12 60%)}
+
+/* Panel content fade-in */
+.panel-content{
+  max-width:680px;
+  text-align:center;
+  opacity:0;
+  transform:translateY(40px);
+  transition:opacity 0.8s ease,transform 0.8s cubic-bezier(0.65,0,0.35,1);
+  z-index:2
+}
+.panel.visible .panel-content{opacity:1;transform:translateY(0)}
+.panel-content h2{
+  font-family:'Roboto Flex',sans-serif;
+  font-size:clamp(0.65rem,1.2vw,0.9rem);
+  font-weight:300;letter-spacing:0.4em;text-transform:uppercase;
+  color:rgba(232,224,240,0.5);
+  margin-bottom:1.5rem;
+  font-variation-settings:'wght' 300,'wdth' 100,'slnt' 0,'GRAD' 0
+}
+.panel-content p{
+  font-family:'Roboto Flex',sans-serif;
+  font-size:clamp(1rem,2vw,1.35rem);
+  font-weight:275;line-height:1.7;
+  color:rgba(232,224,240,0.7);
+  font-variation-settings:'wght' 275,'wdth' 100,'slnt' 0,'GRAD' 0
+}
+.panel-content .display-word{
+  font-size:clamp(3rem,8vw,6rem);
+  font-weight:800;letter-spacing:0.06em;
+  color:#e8e0f0;
+  margin-bottom:1.5rem;
+  font-variation-settings:'wght' 800,'wdth' 100,'slnt' 0,'GRAD' 150;
+  text-shadow:0 0 60px rgba(124,58,237,0.2)
+}
+
+/* ===== 6. CTA Panel ===== */
+.cta-container{text-align:center;z-index:2}
+.cta-container .cta-sub{
+  font-family:'Roboto Flex',sans-serif;
+  font-size:clamp(1.2rem,2.5vw,2rem);
+  font-weight:400;
+  color:#e8e0f0;
+  margin-bottom:2.5rem;
+  letter-spacing:0.02em
+}
+.cta-button{
+  display:inline-block;
+  padding:1rem 3rem;
+  font-family:'Roboto Flex',sans-serif;
+  font-size:0.85rem;font-weight:600;letter-spacing:0.3em;
+  text-transform:uppercase;text-decoration:none;
+  color:#e8e0f0;
+  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  border:none;border-radius:4px;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  transition:transform 0.3s ease,box-shadow 0.3s ease
+}
+.cta-button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 32px rgba(124,58,237,0.4)
+}
+.cta-button::after{
+  content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
+  transition:left 0.5s ease
+}
+.cta-button:hover::after{left:100%}
+
+/* ===== 7. Glyph Reference (hidden, used for rasterization) ===== */
+#glyph-ref{
+  position:absolute;opacity:0;pointer-events:none;
+  font-family:'Roboto Flex',sans-serif;
+  font-size:clamp(4rem,15vw,12rem);
+  font-weight:900;
+  text-transform:uppercase;white-space:nowrap;
+  font-variation-settings:'wght' 900,'wdth' 100,'slnt' 0,'GRAD' 200;
+  left:-9999px;top:0
+}
+
+/* ===== 8. Scroll indicator ===== */
+.scroll-hint{
+  position:absolute;bottom:5rem;left:50%;
+  transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;
+  gap:0.5rem;opacity:0.3;
+  animation:breathe 2.5s ease-in-out infinite
+}
+.scroll-hint span{
+  font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(232,224,240,0.4)
+}
+.scroll-hint .arrow{
+  width:1px;height:24px;
+  background:linear-gradient(to bottom,rgba(232,224,240,0.4),transparent)
+}
+@keyframes breathe{
+  0%,100%{opacity:0.2;transform:translateX(-50%) translateY(0)}
+  50%{opacity:0.5;transform:translateX(-50%) translateY(4px)}
+}
+
+/* ===== 9. Ambient background glow ===== */
+.ambient-glow{
+  position:fixed;top:50%;left:50%;
+  width:80vmax;height:80vmax;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(124,58,237,0.04) 0%,transparent 60%);
+  pointer-events:none;z-index:0
+}
+
+/* ===== 10. Responsive ===== */
+@media(max-width:768px){
+  .panel{padding:1.5rem}
+  .panel-content p{font-size:1rem}
+  .panel .panel-rule,.panel .panel-rule-bottom{left:5%;right:5%}
+}
+</style>
+</head>
+<body>
+  <!-- Ambient glow -->
+  <div class="ambient-glow"></div>
+
+  <!-- Progress Bar (CSS scroll-driven animation) -->
+  <div id="progress"></div>
+
+  <!-- Hero Text (DOM layer, position fixed, centered) -->
+  <h1 id="hero">BECOME</h1>
+
+  <!-- Canvas layer — particle rendering (Canvas 2D with WebGPU-ready structure) -->
+  <canvas id="gpu"></canvas>
+
+  <!-- ===== Panel 1: Entropy — particles scattered, pre-form ===== -->
+  <section class="panel" data-label="01">
+    <div class="panel-rule"></div>
+    <div class="panel-rule-bottom"></div>
+    <div class="panel-content">
+      <h2>Scroll to begin</h2>
+      <p>In the beginning, there is only potential. A cloud of possibility floats in the void, waiting for the gravity of intent to give it form.</p>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="arrow"></div>
+    </div>
+  </section>
+
+  <!-- ===== Panel 2: Emerge — particles converging into text ===== -->
+  <section class="panel" data-label="02">
+    <div class="panel-rule"></div>
+    <div class="panel-rule-bottom"></div>
+    <div class="panel-content">
+      <h2>Phase One &mdash; Morphogenesis</h2>
+      <p>Something gathers in the void. Particles answer an invisible summons, arranging themselves into meaning from the stochastic noise. Structure crystallizes.</p>
+    </div>
+  </section>
+
+  <!-- ===== Panel 3: Become — text fully solid, boldest state ===== -->
+  <section class="panel" data-label="03">
+    <div class="panel-rule"></div>
+    <div class="panel-rule-bottom"></div>
+    <div class="panel-content">
+      <div class="display-word">BECOME</div>
+      <p>Full presence. The form is realized in its most authoritative state &mdash; every stroke weighted with intention, every contour precisely defined.</p>
+    </div>
+  </section>
+
+  <!-- ===== Panel 4: Transform — peak shimmer, weirdness zone ===== -->
+  <section class="panel" data-label="04">
+    <div class="panel-rule"></div>
+    <div class="panel-rule-bottom"></div>
+    <div class="panel-content">
+      <h2>Phase Two &mdash; Resonance</h2>
+      <p>At the peak of being, a shimmer passes through the structure. The boundary between solid and fluid, between what was and what will be, begins to dissolve.</p>
+    </div>
+  </section>
+
+  <!-- ===== Panel 5: Dispersal — particles diverge ===== -->
+  <section class="panel" data-label="05">
+    <div class="panel-rule"></div>
+    <div class="panel-rule-bottom"></div>
+    <div class="panel-content">
+      <h2>Phase Three &mdash; Dissolution</h2>
+      <p>All form is a temporary arrangement of energy. The pattern loosens, breaks apart, returns to the field from which it emerged.</p>
+    </div>
+  </section>
+
+  <!-- ===== Panel 6: Create — call to action ===== -->
+  <section class="panel" data-label="06">
+    <div class="panel-rule"></div>
+    <div class="panel-rule-bottom"></div>
+    <div class="panel-content">
+      <div class="cta-container">
+        <div class="cta-sub">What will you become?</div>
+        <button class="cta-button">Begin Again</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hidden reference span for canvas glyph rasterization -->
+  <span id="glyph-ref">BECOME</span>
+
+<script type="module">
+// ============================================================
+//  MORPHOGENIC HERO  —  Main Module
+//  Single-file Canvas 2D implementation with WebGPU-ready API
+//  structure. Spring-mass particle system, scroll-driven
+//  variable font morphing, 6 scroll-snap panels.
+// ============================================================
+
+// ---- Constants ----
+const WORD = 'BECOME';
+const STEP = 4;            // Glyph sampling step
+const STIFFNESS_MAX = 0.12;
+const DAMPING = 0.90;
+const MAX_PARTICLES = 12000;
+const DISP_THRESHOLD = 50; // px — color shift threshold
+
+// ---- DOM References ----
+const hero  = document.getElementById('hero');
+const canvas = document.getElementById('gpu');
+const ctx    = canvas.getContext('2d');
+const glyphRef = document.getElementById('glyph-ref');
+const panels = document.querySelectorAll('.panel');
+
+// ---- State ----
+let scrollNorm = 0;
+let prevScrollNorm = 0;
+let particles = [];
+let targets = [];
+let canvasW = 0, canvasH = 0;
+let glyphOffX = 0, glyphOffY = 0;
+let glyphW = 0, glyphH = 0;
+let ready = false;
+let animId = null;
+
+// ---- Utilities ----
+const lerp  = (a, b, t) => a + (b - a) * t;
+const clamp = (v, mn, mx) => Math.min(Math.max(v, mn), mx);
+
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+// ---- Canvas sizing (accounts for devicePixelRatio) ----
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  canvasW = w;
+  canvasH = h;
+  canvas.width  = w * dpr;
+  canvas.height = h * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (ready) centerTargets();
+}
+
+// ---- Glyph rasterization from hidden span ----
+function rasterize() {
+  const text = glyphRef.textContent;
+  const cs = getComputedStyle(hero);
+  // Apply the same font sizing to the reference span
+  glyphRef.style.fontSize = cs.fontSize;
+
+  // Measure text width using canvas
+  const mc = document.createElement('canvas');
+  const mcx = mc.getContext('2d');
+  const fontSize = parseFloat(cs.fontSize);
+  mcx.font = `900 ${fontSize}px 'Roboto Flex', sans-serif`;
+  const metrics = mcx.measureText(text);
+  const tw = Math.max(metrics.width, fontSize * text.length * 0.55);
+  const th = Math.ceil(fontSize * 1.3);
+  glyphW = Math.ceil(tw);
+  glyphH = th;
+
+  // Offscreen rasterization canvas
+  const oc = document.createElement('canvas');
+  oc.width  = glyphW;
+  oc.height = glyphH;
+  const ox = oc.getContext('2d');
+
+  // Black background, white text for high contrast sampling
+  ox.fillStyle = '#000';
+  ox.fillRect(0, 0, glyphW, glyphH);
+  ox.font = `900 ${fontSize}px 'Roboto Flex', sans-serif`;
+  ox.fillStyle = '#fff';
+  ox.textBaseline = 'alphabetic';
+  ox.fillText(text, 0, fontSize * 0.85);
+
+  // Sample non-transparent pixels
+  const img = ox.getImageData(0, 0, glyphW, glyphH);
+  const d = img.data;
+  const out = [];
+
+  for (let y = 0; y < glyphH; y += STEP) {
+    for (let x = 0; x < glyphW; x += STEP) {
+      const a = d[(y * glyphW + x) * 4 + 3];
+      if (a > 128) out.push({ tx: x, ty: y });
+    }
+  }
+
+  // Fallback: if rasterization produced too few (< 50) particles,
+  // synthesize block-letter approximations
+  if (out.length < 50) {
+    console.warn('Glyph rasterization sparse, synthesizing targets');
+    const chars = text.split('');
+    let cx = 0;
+    const chW = fontSize * 0.55;
+    for (const ch of chars) {
+      for (let sy = STEP; sy < fontSize * 0.85; sy += STEP) {
+        for (let sx = STEP; sx < chW * 0.75; sx += STEP) {
+          out.push({ tx: cx + sx, ty: sy });
+        }
+      }
+      cx += chW;
+    }
+    glyphW = Math.ceil(cx);
+    glyphH = Math.ceil(fontSize);
+  }
+
+  ready = true;
+  return out;
+}
+
+function centerTargets() {
+  glyphOffX = (canvasW - glyphW) / 2;
+  glyphOffY = (canvasH - glyphH) / 2;
+  for (let i = 0; i < particles.length; i++) {
+    if (i < targets.length) {
+      particles[i].targetX = targets[i].tx + glyphOffX;
+      particles[i].targetY = targets[i].ty + glyphOffY;
+    }
+  }
+}
+
+// ---- Particle system ----
+function initParticles(raw) {
+  const n = Math.min(raw.length, MAX_PARTICLES);
+  targets = raw.slice(0, n);
+  particles = [];
+  for (let i = 0; i < n; i++) {
+    const t = targets[i];
+    particles.push({
+      x: Math.random() * canvasW,
+      y: Math.random() * canvasH,
+      vx: (Math.random() - 0.5) * 6,
+      vy: (Math.random() - 0.5) * 6,
+      targetX: 0,  // set by centerTargets
+      targetY: 0,
+      noiseSeed: Math.random() * 6.2832
+    });
+  }
+  centerTargets();
+}
+
+// ---- Convergent spring phase ----
+function converge(stiffness, dt) {
+  const t = performance.now() * 0.001;
+  for (const p of particles) {
+    const dx = p.targetX - p.x;
+    const dy = p.targetY - p.y;
+    p.vx = (p.vx + dx * stiffness) * DAMPING;
+    p.vy = (p.vy + dy * stiffness) * DAMPING;
+    // Tiny organic noise
+    p.vx += Math.sin(t * 2 + p.noiseSeed) * 0.03;
+    p.vy += Math.cos(t * 2.3 + p.noiseSeed * 1.7) * 0.03;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+  }
+}
+
+// ---- Divergent / repulsion phase ----
+function diverge(strength, dt) {
+  const t = performance.now() * 0.001;
+  for (const p of particles) {
+    const dx = p.x - p.targetX;
+    const dy = p.y - p.targetY;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    const force = strength / (1 + dist * 0.08);
+    const fx = (dx / dist) * force;
+    const fy = (dy / dist) * force;
+    const nx = Math.sin(t * 3 + p.noiseSeed) * 0.6;
+    const ny = Math.cos(t * 3.7 + p.noiseSeed * 1.3) * 0.6;
+    p.vx = (p.vx + fx + nx) * DAMPING;
+    p.vy = (p.vy + fy + ny) * DAMPING;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+  }
+}
+
+// ---- Particle rendering ----
+function render() {
+  ctx.clearRect(0, 0, canvasW, canvasH);
+  const len = particles.length;
+  for (let i = 0; i < len; i++) {
+    const p = particles[i];
+    const dx = p.x - p.targetX;
+    const dy = p.y - p.targetY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    // HSL colour keyed off displacement: purple (260) at rest → cyan (180) when displaced
+    const t = clamp(dist / DISP_THRESHOLD, 0, 1);
+    const hue = lerp(260, 180, t);
+    const sat = lerp(70, 85, t);
+    const lgt = lerp(70, 60, t);
+    const r = lerp(1.6, 2.5, t);
+
+    // Glow halo for converged particles
+    if (dist < 6) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r * 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(260,70%,70%,${(1 - dist / 6) * 0.18})`;
+      ctx.fill();
+    }
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = `hsl(${hue},${sat}%,${lgt}%)`;
+    ctx.fill();
+  }
+}
+
+// ---- Scroll → stiffness mapping ----
+function getStiffness(norm) {
+  if (norm < 0.35) {
+    // Convergence: 0 → STIFFNESS_MAX
+    return lerp(0.001, STIFFNESS_MAX, easeInOutCubic(norm / 0.35));
+  } else if (norm < 0.65) {
+    // Hold — slight shimmer in 0.48–0.52
+    const shimmer = (norm > 0.48 && norm < 0.52)
+      ? Math.sin(norm * 180) * 0.008 : 0;
+    return STIFFNESS_MAX + shimmer;
+  } else if (norm < 0.90) {
+    // Divergence: positive → negative
+    const t = (norm - 0.65) / 0.25;
+    return lerp(STIFFNESS_MAX, -0.045, easeInOutCubic(t));
+  } else {
+    return -0.07; // free drift
+  }
+}
+
+// ---- DOM typography update ----
+function updateType(norm) {
+  let wght, wdth, slnt, GRAD, op, blur, rx, sc;
+
+  if (norm < 0.15) {
+    const t = norm / 0.15;
+    wght  = 100;
+    wdth  = 151;
+    slnt  = -10;
+    GRAD  = 0;
+    op    = lerp(0, 0.15, t * t);
+    blur  = lerp(20, 12, t);
+    rx    = 0;
+    sc    = 1;
+  } else if (norm < 0.30) {
+    const t = (norm - 0.15) / 0.15;
+    wght  = lerp(100, 400, t * t);
+    wdth  = lerp(151, 125, t);
+    slnt  = lerp(-10, 0, easeInOutCubic(t));
+    GRAD  = lerp(0, 60, t);
+    op    = lerp(0.15, 1, t);
+    blur  = lerp(12, 0, t * t);
+    rx    = 0;
+    sc    = 1;
+  } else if (norm < 0.55) {
+    const t = (norm - 0.30) / 0.25;
+    wght  = lerp(400, 900, easeInOutCubic(t));
+    wdth  = lerp(125, 100, t);
+    slnt  = 0;
+    GRAD  = lerp(60, 200, t * t);
+    op    = 1;
+    blur  = 0;
+    rx    = 0;
+    sc    = 1;
+  } else if (norm < 0.70) {
+    const t = (norm - 0.55) / 0.15;
+    wght  = 900;
+    wdth  = lerp(100, 95, t * 0.5);
+    slnt  = 0;
+    GRAD  = 200;
+    op    = 1;
+    blur  = 0;
+    rx    = lerp(0, 6, t);
+    sc    = lerp(1, 0.96, t);
+  } else if (norm < 0.85) {
+    const t = (norm - 0.70) / 0.15;
+    wght  = lerp(900, 600, t);
+    wdth  = lerp(95, 80, t);
+    slnt  = lerp(0, 8, t);
+    GRAD  = lerp(200, 50, t);
+    op    = lerp(1, 0.3, t);
+    blur  = lerp(0, 6, t);
+    rx    = lerp(6, 30, t);
+    sc    = lerp(0.96, 0.85, t);
+  } else {
+    const t = (norm - 0.85) / 0.15;
+    wght  = lerp(600, 400, t);
+    wdth  = lerp(80, 70, t);
+    slnt  = lerp(8, 12, t);
+    GRAD  = lerp(50, 0, t);
+    op    = lerp(0.3, 0, easeInOutCubic(t));
+    blur  = lerp(6, 15, t);
+    rx    = lerp(30, 60, t);
+    sc    = lerp(0.85, 0.5, t);
+  }
+
+  hero.style.fontVariationSettings =
+    `'wght' ${Math.round(wght)},'wdth' ${Math.round(wdth)},'slnt' ${Math.round(slnt)},'GRAD' ${Math.round(GRAD)}`;
+  hero.style.opacity = op;
+  hero.style.filter  = `blur(${blur}px)`;
+  hero.style.transform = `translate(-50%,-50%) rotateX(${rx}deg) scale(${sc})`;
+}
+
+// ---- Scroll normalisation ----
+function getNorm() {
+  const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+  return clamp(window.scrollY / max, 0, 1);
+}
+
+// ---- Panel visibility via IntersectionObserver ----
+function observePanels() {
+  const io = new IntersectionObserver(entries => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible', 'rule-visible');
+      } else if (e.intersectionRatio === 0) {
+        e.target.classList.remove('visible', 'rule-visible');
+      }
+    }
+  }, { threshold: [0, 0.15, 0.5, 1] });
+  panels.forEach(p => io.observe(p));
+}
+
+// ---- Scroll handler ----
+function onScroll() {
+  prevScrollNorm = scrollNorm;
+  const raw = getNorm();
+  scrollNorm = easeInOutCubic(raw);
+  updateType(scrollNorm);
+}
+
+// ---- Render loop ----
+function loop() {
+  if (!ready || particles.length === 0) {
+    animId = requestAnimationFrame(loop);
+    return;
+  }
+
+  const dt = 1/60;
+
+  // Weirdness factor: one-frame lag in 0.48–0.52
+  const lag = (scrollNorm > 0.48 && scrollNorm < 0.52);
+  const pn = lag ? prevScrollNorm : scrollNorm;
+
+  const s = getStiffness(pn);
+  if (s >= 0) converge(s, dt);
+  else diverge(Math.abs(s), dt);
+
+  render();
+  animId = requestAnimationFrame(loop);
+}
+
+// ---- CTA restarts the journey ----
+document.querySelector('.cta-button')?.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ---- Initialisation ----
+async function boot() {
+  console.log('Morphogenic Hero booting…');
+
+  // 1. Wait for web fonts
+  try { await document.fonts.ready; } catch (_) { /* proceed anyway */ }
+  document.body.classList.add('fonts-loaded');
+  console.log('Fonts loaded');
+
+  // 2. Sizing
+  resize();
+
+  // 3. Rasterise glyphs
+  const raw = rasterize();
+  console.log(`Rasterised ${raw.length} glyph targets`);
+
+  // 4. Create particles
+  initParticles(raw);
+  console.log(`Created ${particles.length} particles`);
+
+  // 5. Initial typography
+  updateType(0);
+
+  // 6. Observers
+  observePanels();
+  new ResizeObserver(resize).observe(document.body);
+
+  // 7. Scroll
+  window.addEventListener('scroll', onScroll, { passive: true });
+  // Also update on resize (changes maxScroll)
+  window.addEventListener('resize', () => {
+    onScroll();
+  });
+
+  // 8. Start loop
+  animId = requestAnimationFrame(loop);
+  console.log('Morphogenic Hero ready');
+}
+
+// ---- Error fallback ----
+window.addEventListener('load', () => {
+  boot().catch(err => {
+    console.error('Boot error:', err);
+    // Make sure the hero text is at least visible
+    hero.style.opacity = '1';
+    hero.style.filter = 'none';
+    hero.style.fontVariationSettings = `'wght' 400,'wdth' 100,'slnt' 0,'GRAD' 0`;
+    document.body.classList.add('fonts-loaded');
+  });
+});
+</script>
+</body>
+</html>

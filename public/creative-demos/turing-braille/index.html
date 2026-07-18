@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turing Braille — Emergent Text from Chemical Chaos</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: #030303;
+    overflow: hidden;
+    font-family: 'JetBrains Mono', monospace;
+    color: #E5E7EB;
+    user-select: none;
+    -webkit-user-select: none;
+    height: 100vh;
+    width: 100vw;
+}
+
+#main-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+}
+
+#overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+#braille-display {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(3,3,3,0.85);
+    border: 1px solid rgba(168,85,247,0.3);
+    border-radius: 8px;
+    padding: 16px;
+    max-height: 70vh;
+    overflow: hidden;
+}
+
+#braille-text {
+    font-family: 'Braille', 'Apple Braille', 'Segoe UI Symbol', monospace;
+    font-size: 18px;
+    line-height: 1.4;
+    letter-spacing: 2px;
+    color: #00E5FF;
+    white-space: pre-wrap;
+    text-align: left;
+}
+
+#controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 20;
+    pointer-events: all;
+    background: rgba(3,3,3,0.9);
+    border: 1px solid rgba(168,85,247,0.25);
+    border-radius: 8px;
+    padding: 16px;
+    min-width: 220px;
+    font-size: 12px;
+}
+
+#controls label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    color: #E5E7EB;
+    gap: 8px;
+}
+
+#controls input[type="range"] {
+    -webkit-appearance: none;
+    width: 100px;
+    height: 4px;
+    background: #1A3A4A;
+    border-radius: 2px;
+    outline: none;
+    accent-color: #A855F7;
+}
+
+#controls input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #A855F7;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid #FFB74D;
+}
+
+#controls .value {
+    color: #FFB74D;
+    font-weight: 700;
+    min-width: 40px;
+    text-align: right;
+}
+
+#state-indicator {
+    margin-top: 12px;
+    padding: 8px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 4px;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #FFB74D;
+    border: 1px solid rgba(255,183,77,0.3);
+}
+
+#help-text {
+    color: #6B7280;
+    font-size: 10px;
+    margin-top: 12px;
+    line-height: 1.6;
+}
+
+#help-text span {
+    color: #A855F7;
+}
+
+canvas {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<canvas id="main-canvas"></canvas>
+
+<div id="overlay">
+    <div id="braille-display">
+        <div id="braille-text">⠚⠥⠎⠞ ⠁ ⠍⠕⠍⠑⠝⠞</div>
+    </div>
+</div>
+
+<div id="controls">
+    <label>F (feed) <span class="value" id="f-value">0.035</span></label>
+    <input type="range" id="f-slider" min="0.010" max="0.100" step="0.001" value="0.035">
+
+    <label>k (kill) <span class="value" id="k-value">0.062</span></label>
+    <input type="range" id="k-slider" min="0.040" max="0.070" step="0.001" value="0.062">
+
+    <label>dt (step) <span class="value" id="dt-value">0.50</span></label>
+    <input type="range" id="dt-slider" min="0.10" max="1.00" step="0.05" value="0.50">
+
+    <div id="state-indicator">◉ EMERGING</div>
+
+    <div id="help-text">
+        <span>Space</span> pause &nbsp; <span>R</span> reset<br>
+        <span>Click</span> seed &nbsp; <span>Right-click</span> presets
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.1/p5.min.js"></script>
+<script>
+// ──────────────────────────────────────
+// TURING BRAILLE — Gray-Scott + Braille
+// ──────────────────────────────────────
+(function() {
+    const SIM_W = 512;
+    const SIM_H = 512;
+    const BRAILLE_ROWS = 28;
+    const BRAILLE_COLS = 20;
+    const DECODE_INTERVAL = 8;
+
+    // Braille dot patterns for preset "HELLO"
+    // H=⠓(1,2,5) E=⠑(1,5) L=⠇(1,2,3) O=⠕(1,3,5)
+    const HELLO_PATTERNS = [
+        [true, true, false, false, true, false],  // H: dots 1,2,5
+        [true, false, false, false, true, false],  // E: dots 1,5
+        [true, true, true, false, false, false],   // L: dots 1,2,3
+        [true, true, true, false, false, false],   // L: dots 1,2,3
+        [true, false, true, false, true, false],   // O: dots 1,3,5
+    ];
+
+    // ─── Shader Sources ───
+    const vertShaderSrc = /* glsl */`
+        attribute vec3 aPosition;
+        attribute vec2 aTexCoord;
+        varying vec2 vTexCoord;
+        void main() {
+            vTexCoord = aTexCoord;
+            gl_Position = vec4(aPosition, 1.0);
+        }
+    `;
+
+    const simFragShaderSrc = /* glsl */`
+        precision highp float;
+        varying vec2 vTexCoord;
+        uniform sampler2D uSource;
+        uniform vec2 uTexelSize;
+        uniform float uF;
+        uniform float uK;
+        uniform float uDt;
+
+        void main() {
+            vec2 uv = vTexCoord;
+            vec2 ts = uTexelSize;
+
+            vec4 sNW = texture2D(uSource, uv + vec2(-ts.x, -ts.y));
+            vec4 sN  = texture2D(uSource, uv + vec2(0.0, -ts.y));
+            vec4 sNE = texture2D(uSource, uv + vec2(ts.x, -ts.y));
+            vec4 sW  = texture2D(uSource, uv + vec2(-ts.x, 0.0));
+            vec4 sC  = texture2D(uSource, uv);
+            vec4 sE  = texture2D(uSource, uv + vec2(ts.x, 0.0));
+            vec4 sSW = texture2D(uSource, uv + vec2(-ts.x, ts.y));
+            vec4 sS  = texture2D(uSource, uv + vec2(0.0, ts.y));
+            vec4 sSE = texture2D(uSource, uv + vec2(ts.x, ts.y));
+
+            float u = sC.r;
+            float v = sC.g;
+
+            // 9-point Laplacian: [0.05, 0.2, 0.05; 0.2, -1.0, 0.2; 0.05, 0.2, 0.05]
+            float lapU = sNW.r*0.05 + sN.r*0.2 + sNE.r*0.05
+                       + sW.r*0.2 - u + sE.r*0.2
+                       + sSW.r*0.05 + sS.r*0.2 + sSE.r*0.05;
+            float lapV = sNW.g*0.05 + sN.g*0.2 + sNE.g*0.05
+                       + sW.g*0.2 - v + sE.g*0.2
+                       + sSW.g*0.05 + sS.g*0.2 + sSE.g*0.05;
+
+            float Du = 0.16;
+            float Dv = 0.08;
+            float uvv = u * v * v;
+
+            float du = Du * lapU - uvv + uF * (1.0 - u);
+            float dv = Dv * lapV + uvv - (uF + uK) * v;
+
+            float newU = clamp(u + du * uDt, 0.0, 1.0);
+            float newV = clamp(v + dv * uDt, 0.0, 1.0);
+
+            gl_FragColor = vec4(newU, newV, 0.0, 1.0);
+        }
+    `;
+
+    const displayFragShaderSrc = /* glsl */`
+        precision highp float;
+        varying vec2 vTexCoord;
+        uniform sampler2D uTexture;
+        uniform float uBloom;
+
+        void main() {
+            vec4 data = texture2D(uTexture, vTexCoord);
+            float v = data.g;
+
+            vec3 darkVoid   = vec3(0.012, 0.012, 0.012);
+            vec3 deepTeal   = vec3(0.102, 0.227, 0.290);
+            vec3 deepPurple = vec3(0.290, 0.078, 0.549);
+            vec3 cyan       = vec3(0.0, 0.898, 1.0);
+            vec3 bright     = vec3(0.4, 0.95, 1.0);
+
+            vec3 color = darkVoid;
+            float t;
+            if (v < 0.08) {
+                t = v / 0.08;
+                color = mix(darkVoid, deepTeal, t);
+            } else if (v < 0.25) {
+                t = (v - 0.08) / 0.17;
+                color = mix(deepTeal, deepPurple, t);
+            } else if (v < 0.55) {
+                t = (v - 0.25) / 0.30;
+                color = mix(deepPurple, cyan, t);
+            } else {
+                t = min((v - 0.55) / 0.45, 1.0);
+                color = mix(cyan, bright, t);
+            }
+
+            float bloom = data.r * uBloom;
+            gl_FragColor = vec4(color + bloom, 1.0);
+        }
+    `;
+
+    // ─── p5.js sketch ───
+    const sketch = function(p) {
+        let simShader, displayShader;
+        let fboA, fboB;
+        let F = 0.035, K = 0.062, DT = 0.5;
+        let paused = false;
+        let frameCount = 0;
+        let state = 'SEEDING';
+        let stateTimer = 0;
+        let prevAvgV = 0;
+        let canvasElement;
+
+        // Braille computed data
+        let brailleChars = [];     // array of Unicode code points
+        let brailleRaised = [];    // [row][col] = 6-bit mask (or array of 6 bools)
+        let cellW, cellH;          // pixel size of each Braille cell in sim
+
+        // Pre-computed dot sample positions in sim pixel coords
+        let dotSamples = []; // [row][col][dotIdx] = {x, y}
+
+        // Display constants for visual Braille grid
+        const GRID_X0 = 24;
+        const GRID_Y0 = 50;
+        const CELL_DW = 13;
+        const CELL_DH = 19;
+        const DOT_R  = 2.8;
+
+        // ─── setup ───
+        p.setup = function() {
+            canvasElement = document.getElementById('main-canvas');
+            p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL, canvasElement);
+            p.pixelDensity(1);
+            p.noLights(); // Disable default lighting for exact color output
+
+            // Compile shaders
+            simShader = p.createShader(vertShaderSrc, simFragShaderSrc);
+            displayShader = p.createShader(vertShaderSrc, displayFragShaderSrc);
+
+            // Create ping-pong framebuffers
+            fboA = p.createFramebuffer({ width: SIM_W, height: SIM_H });
+            fboB = p.createFramebuffer({ width: SIM_W, height: SIM_H });
+
+            // Pre-compute Braille dot sample positions
+            cellW = SIM_W / BRAILLE_COLS;
+            cellH = SIM_H / BRAILLE_ROWS;
+            computeDotSamples();
+
+            // Initialize braille data structures
+            brailleRaised = new Array(BRAILLE_ROWS);
+            for (let r = 0; r < BRAILLE_ROWS; r++) {
+                brailleRaised[r] = new Array(BRAILLE_COLS);
+            }
+            brailleChars = new Array(BRAILLE_ROWS * BRAILLE_COLS);
+
+            // Initialize simulation
+            initSimulation('spots');
+
+            // Wire DOM controls
+            wireControls();
+        };
+
+        function computeDotSamples() {
+            dotSamples = new Array(BRAILLE_ROWS);
+            for (let row = 0; row < BRAILLE_ROWS; row++) {
+                dotSamples[row] = new Array(BRAILLE_COLS);
+                for (let col = 0; col < BRAILLE_COLS; col++) {
+                    let x0 = col * cellW;
+                    let y0 = row * cellH;
+                    // dot positions (2 cols × 3 rows) within the cell
+                    dotSamples[row][col] = [
+                        { x: x0 + cellW * 0.30, y: y0 + cellH * 0.20 }, // dot1: top-left
+                        { x: x0 + cellW * 0.30, y: y0 + cellH * 0.50 }, // dot2: mid-left
+                        { x: x0 + cellW * 0.30, y: y0 + cellH * 0.80 }, // dot3: bot-left
+                        { x: x0 + cellW * 0.70, y: y0 + cellH * 0.20 }, // dot4: top-right
+                        { x: x0 + cellW * 0.70, y: y0 + cellH * 0.50 }, // dot5: mid-right
+                        { x: x0 + cellW * 0.70, y: y0 + cellH * 0.80 }, // dot6: bot-right
+                    ];
+                }
+            }
+        }
+
+        function wireControls() {
+            const fSlider = document.getElementById('f-slider');
+            const kSlider = document.getElementById('k-slider');
+            const dtSlider = document.getElementById('dt-slider');
+            const fValue = document.getElementById('f-value');
+            const kValue = document.getElementById('k-value');
+            const dtValue = document.getElementById('dt-value');
+
+            fSlider.addEventListener('input', () => {
+                F = parseFloat(fSlider.value);
+                fValue.textContent = F.toFixed(3);
+            });
+            kSlider.addEventListener('input', () => {
+                K = parseFloat(kSlider.value);
+                kValue.textContent = K.toFixed(3);
+            });
+            dtSlider.addEventListener('input', () => {
+                DT = parseFloat(dtSlider.value);
+                dtValue.textContent = DT.toFixed(2);
+            });
+        }
+
+        // ─── draw ───
+        p.draw = function() {
+            // 1. Update simulation
+            if (!paused) {
+                updateSimulation();
+                frameCount++;
+            }
+
+            // 2. Braille decode (throttled)
+            if (frameCount % DECODE_INTERVAL === 0 && frameCount > 0) {
+                decodeBraille();
+            }
+
+            // 3. Update state machine
+            updateState();
+
+            // 4. Display everything
+            displayVField();
+            displayBrailleGrid();
+            displayBrailleText();
+
+            // 5. Update DOM state indicator
+            updateDOMState();
+        };
+
+        // ─── Simulation update ───
+        function updateSimulation() {
+            // Render Gray-Scott pass: fboA → fboB
+            fboB.begin();
+            p.push();
+            p.resetMatrix();
+            p.ortho(-SIM_W/2, SIM_W/2, -SIM_H/2, SIM_H/2, -1, 1);
+            p.shader(simShader);
+            simShader.setUniform('uSource', fboA.color);
+            simShader.setUniform('uTexelSize', [1.0 / SIM_W, 1.0 / SIM_H]);
+            simShader.setUniform('uF', F);
+            simShader.setUniform('uK', K);
+            simShader.setUniform('uDt', DT);
+            p.noStroke();
+            // Fullscreen quad; shader receives UV 0→1 via aTexCoord
+            p.rect(-SIM_W/2, -SIM_H/2, SIM_W, SIM_H);
+            p.pop();
+            fboB.end();
+
+            // Swap ping-pong
+            let tmp = fboA;
+            fboA = fboB;
+            fboB = tmp;
+        }
+
+        // ─── Braille decoding ───
+        function decodeBraille() {
+            // Read back V channel from fboA
+            fboA.loadPixels();
+            let px = fboA.pixels;
+            if (!px || px.length === 0) return;
+
+            let charIdx = 0;
+            for (let row = 0; row < BRAILLE_ROWS; row++) {
+                for (let col = 0; col < BRAILLE_COLS; col++) {
+                    let mask = 0;
+                    let raised = [];
+                    for (let d = 0; d < 6; d++) {
+                        let s = dotSamples[row][col][d];
+                        let ix = p.constrain(Math.floor(s.x), 0, SIM_W - 1);
+                        let iy = p.constrain(Math.floor(s.y), 0, SIM_H - 1);
+                        let idx = (iy * SIM_W + ix) * 4 + 1; // green channel
+                        let v = px[idx] / 255.0;
+                        let isRaised = v > 0.30;
+                        raised.push(isRaised);
+                        if (isRaised) {
+                            // dot1=bit0, dot2=bit1, ..., dot6=bit5
+                            mask |= (1 << d);
+                        }
+                    }
+                    brailleRaised[row][col] = raised;
+                    brailleChars[charIdx] = 0x2800 + mask;
+                    charIdx++;
+                }
+            }
+            // Don't null pixels — let p5.js manage it
+        }
+
+        // ─── State machine ───
+        function updateState() {
+            // Compute approximate avg V from previous braille decode
+            if (frameCount < 5) {
+                state = 'SEEDING';
+                return;
+            }
+
+            // Estimate avg V from a subset of samples
+            if (frameCount % DECODE_INTERVAL !== 0) return;
+
+            let sumV = 0, count = 0;
+            // Sample a 32x32 grid from the most recent pixels
+            if (fboA.pixels && fboA.pixels.length > 0) {
+                let px = fboA.pixels;
+                let step = Math.floor(SIM_W / 32);
+                for (let y = 0; y < SIM_H; y += step) {
+                    for (let x = 0; x < SIM_W; x += step) {
+                        let idx = (y * SIM_W + x) * 4 + 1;
+                        sumV += px[idx] / 255.0;
+                        count++;
+                    }
+                }
+            }
+            if (count === 0) return;
+            let avgV = sumV / count;
+
+            if (avgV < 0.003) {
+                state = 'DISSOLVED';
+            } else if (avgV < 0.02 && state === 'SEEDING') {
+                state = 'SEEDING';
+            } else if (avgV < 0.02 && state !== 'SEEDING') {
+                state = 'DECAYING';
+            } else if (avgV >= 0.02 && avgV > prevAvgV * 1.01) {
+                state = 'EMERGING';
+            } else if (avgV >= 0.02 && avgV < prevAvgV * 0.99) {
+                state = 'DECAYING';
+            } else {
+                state = 'EMERGING';
+            }
+            prevAvgV = avgV;
+            stateTimer++;
+        }
+
+        function updateDOMState() {
+            let el = document.getElementById('state-indicator');
+            if (!el) return;
+            const icons = {
+                'SEEDING': '◎',
+                'EMERGING': '◉',
+                'DECAYING': '◑',
+                'DISSOLVED': '○',
+                'RESET': '↺',
+                'PAUSED': '❚❚'
+            };
+            let displayState = paused ? 'PAUSED' : state;
+            el.textContent = (icons[displayState] || '●') + ' ' + displayState;
+        }
+
+        // ─── Display V-field ───
+        function displayVField() {
+            p.push();
+            p.resetMatrix();
+            p.ortho(-p.width/2, p.width/2, -p.height/2, p.height/2, -1, 1);
+            p.shader(displayShader);
+            displayShader.setUniform('uTexture', fboA.color);
+            displayShader.setUniform('uBloom', 0.03);
+
+            // Draw full screen
+            let w = p.width;
+            let h = p.height;
+            p.noStroke();
+            p.rect(-w/2, -h/2, w, h);
+            p.pop();
+        }
+
+        // ─── Display Braille grid (visual dots) ───
+        function displayBrailleGrid() {
+            p.push();
+            p.resetMatrix();
+            // Orthographic projection for screen-space drawing
+            p.ortho(0, p.width, p.height, 0, -1, 1);
+
+            // Draw background panel
+            let gridW = BRAILLE_COLS * CELL_DW + 20;
+            let gridH = BRAILLE_ROWS * CELL_DH + 20;
+            let gx = GRID_X0;
+            let gy = GRID_Y0;
+
+            p.noStroke();
+            p.fill(3, 3, 3, 220);
+            p.rect(gx - 10, gy - 10, gridW, gridH, 6);
+
+            // Draw dots
+            p.noStroke();
+            for (let row = 0; row < BRAILLE_ROWS; row++) {
+                for (let col = 0; col < BRAILLE_COLS; col++) {
+                    let cx = gx + col * CELL_DW;
+                    let cy = gy + row * CELL_DH;
+
+                    let raised = brailleRaised[row] ? brailleRaised[row][col] : null;
+                    if (!raised) raised = [false, false, false, false, false, false];
+
+                    // dot positions within display cell
+                    let dots = [
+                        { dx: CELL_DW * 0.30, dy: CELL_DH * 0.20 }, // dot1 TL
+                        { dx: CELL_DW * 0.30, dy: CELL_DH * 0.50 }, // dot2 ML
+                        { dx: CELL_DW * 0.30, dy: CELL_DH * 0.80 }, // dot3 BL
+                        { dx: CELL_DW * 0.70, dy: CELL_DH * 0.20 }, // dot4 TR
+                        { dx: CELL_DW * 0.70, dy: CELL_DH * 0.50 }, // dot5 MR
+                        { dx: CELL_DW * 0.70, dy: CELL_DH * 0.80 }, // dot6 BR
+                    ];
+
+                    for (let d = 0; d < 6; d++) {
+                        let dx = cx + dots[d].dx;
+                        let dy = cy + dots[d].dy;
+
+                        if (raised[d]) {
+                            // Raised dot: electric cyan with glow
+                            p.fill(0, 229, 255, 255); // #00E5FF
+                            p.circle(dx, dy, DOT_R * 2.2);
+
+                            // Subtle outer glow
+                            p.fill(0, 229, 255, 40);
+                            p.circle(dx, dy, DOT_R * 3.5);
+                        } else {
+                            // Flat dot: very subtle
+                            p.fill(26, 58, 74, 60); // #1A3A4A
+                            p.circle(dx, dy, DOT_R * 1.4);
+                        }
+                    }
+                }
+            }
+
+            p.pop();
+        }
+
+        // ─── Display Braille text (as string) ───
+        function displayBrailleText() {
+            // Build text string from brailleChars
+            let lines = [];
+            for (let row = 0; row < BRAILLE_ROWS; row++) {
+                let line = '';
+                for (let col = 0; col < BRAILLE_COLS; col++) {
+                    let idx = row * BRAILLE_COLS + col;
+                    let cp = brailleChars[idx] || 0x2800;
+                    line += String.fromCodePoint(cp);
+                }
+                lines.push(line);
+            }
+            let text = lines.join('\n');
+
+            let el = document.getElementById('braille-text');
+            if (el) {
+                el.textContent = text;
+            }
+        }
+
+        // ─── Initialization ───
+        function initSimulation(type) {
+            state = 'SEEDING';
+            stateTimer = 0;
+            prevAvgV = 0;
+
+            // Helper to draw into a framebuffer
+            function drawIntoFBO(fbo) {
+                fbo.begin();
+                p.push();
+                p.resetMatrix();
+                p.ortho(-SIM_W/2, SIM_W/2, -SIM_H/2, SIM_H/2, -1, 1);
+                p.noStroke();
+
+                // Clear with U=1.0 (R=255), V=0.0 (G=0)
+                p.fill(255, 0, 0);
+                p.rect(-SIM_W/2, -SIM_H/2, SIM_W, SIM_H);
+
+                if (type === 'random') {
+                    // Many small random seeds
+                    p.fill(255, 64, 0); // V=0.25
+                    for (let i = 0; i < 40; i++) {
+                        let x = p.random(-SIM_W/2, SIM_W/2);
+                        let y = p.random(-SIM_H/2, SIM_H/2);
+                        let r = p.random(3, 12);
+                        p.circle(x, y, r * 2);
+                    }
+                } else if (type === 'spots') {
+                    // Grid of spots near center — known to produce stable patterns
+                    p.fill(255, 64, 0);
+                    for (let i = 0; i < 14; i++) {
+                        let x = p.random(-150, 150);
+                        let y = p.random(-150, 150);
+                        p.circle(x, y, p.random(6, 16));
+                    }
+                    // Central big seed
+                    p.fill(255, 80, 0);
+                    p.circle(0, 0, 28);
+                } else if (type === 'stripes') {
+                    // Horizontal stripe seeds
+                    for (let s = 0; s < 6; s++) {
+                        p.fill(255, 64, 0);
+                        let y = p.map(s, 0, 5, -SIM_H/2 + 60, SIM_H/2 - 60);
+                        p.rect(-SIM_W/2 + 40, y - 6, SIM_W - 80, 12);
+                    }
+                } else if (type === 'hello') {
+                    // Seed "HELLO" in Braille at center
+                    let startCol = 7;
+                    let startRow = 13;
+                    for (let ci = 0; ci < 5; ci++) {
+                        let col = startCol + ci;
+                        let row = startRow;
+                        let pattern = HELLO_PATTERNS[ci];
+                        // Cell top-left in pixel space
+                        let cx = col * cellW;
+                        let cy = row * cellH;
+                        let dots = [
+                            { dx: cellW * 0.30, dy: cellH * 0.20 },
+                            { dx: cellW * 0.30, dy: cellH * 0.50 },
+                            { dx: cellW * 0.30, dy: cellH * 0.80 },
+                            { dx: cellW * 0.70, dy: cellH * 0.20 },
+                            { dx: cellW * 0.70, dy: cellH * 0.50 },
+                            { dx: cellW * 0.70, dy: cellH * 0.80 },
+                        ];
+                        for (let d = 0; d < 6; d++) {
+                            if (pattern[d]) {
+                                p.fill(255, 128, 0); // V=0.5
+                                // Convert pixel→ortho: orthoX = px - SIM_W/2, orthoY = SIM_H/2 - py
+                                let dx = (cx + dots[d].dx) - SIM_W/2;
+                                let dy = SIM_H/2 - (cy + dots[d].dy);
+                                p.circle(dx, dy, 4);
+                            }
+                        }
+                    }
+                }
+
+                p.pop();
+                fbo.end();
+            }
+
+            drawIntoFBO(fboA);
+            drawIntoFBO(fboB);
+        }
+
+        // ─── Seed perturbation at click position ───
+        function seedAtScreenPos(sx, sy) {
+            // Map screen position to simulation coordinates
+            // screen (sx, sy) → sim (simX, simY)
+            let simX = p.map(sx, 0, p.width, 0, SIM_W);
+            let simY = p.map(sy, 0, p.height, 0, SIM_H);
+
+            // Convert to framebuffer drawing coords (center-origin ortho)
+            // ortho: X∈[-SIM_W/2, SIM_W/2], Y∈[-SIM_H/2(bottom), SIM_H/2(top)]
+            let dx = simX - SIM_W/2;
+            let dy = SIM_H/2 - simY; // invert: simY=0(top) → dy=SIM_H/2
+
+            // Draw seed into fboA (active buffer after swap?)
+            // Always draw into both buffers
+            [fboA, fboB].forEach(fbo => {
+                fbo.begin();
+                p.push();
+                p.resetMatrix();
+                p.ortho(-SIM_W/2, SIM_W/2, -SIM_H/2, SIM_H/2, -1, 1);
+                p.noStroke();
+                p.fill(255, 128, 0); // V=0.5
+                p.circle(dx, dy, 14);
+                // Slightly larger diffuse halo
+                p.fill(255, 80, 0);
+                p.circle(dx, dy, 22);
+                p.pop();
+                fbo.end();
+            });
+
+            state = 'SEEDING';
+            stateTimer = 0;
+        }
+
+        // ─── Event handlers ───
+        p.keyPressed = function() {
+            if (p.key === ' ') {
+                paused = !paused;
+                p.setTimeout(() => { if (paused) updateDOMState(); }, 50);
+                return false;
+            }
+            if (p.key === 'r' || p.key === 'R') {
+                initSimulation('spots');
+                paused = false;
+                return false;
+            }
+        };
+
+        p.mousePressed = function() {
+            if (p.mouseButton === p.LEFT) {
+                // Check if click is outside control panel
+                let controls = document.getElementById('controls');
+                if (controls) {
+                    let rect = controls.getBoundingClientRect();
+                    if (p.mouseX >= rect.left && p.mouseX <= rect.right &&
+                        p.mouseY >= rect.top && p.mouseY <= rect.bottom) {
+                        return; // Click on controls, don't seed
+                    }
+                }
+                // Also check braille display area
+                let bd = document.getElementById('braille-display');
+                if (bd) {
+                    let rect = bd.getBoundingClientRect();
+                    if (p.mouseX >= rect.left && p.mouseX <= rect.right &&
+                        p.mouseY >= rect.top && p.mouseY <= rect.bottom) {
+                        return;
+                    }
+                }
+                seedAtScreenPos(p.mouseX, p.mouseY);
+                return false;
+            }
+            if (p.mouseButton === p.RIGHT) {
+                cyclePreset();
+                return false;
+            }
+        };
+
+        let presetIndex = 0;
+        const presets = ['spots', 'random', 'stripes', 'hello'];
+
+        function cyclePreset() {
+            presetIndex = (presetIndex + 1) % presets.length;
+            let type = presets[presetIndex];
+            initSimulation(type);
+            paused = false;
+
+            // Flash state indicator
+            let el = document.getElementById('state-indicator');
+            if (el) {
+                let names = { spots: 'SPOTS', random: 'NOISE', stripes: 'STRIPES', hello: 'HELLO' };
+                el.textContent = '◎ PRESET: ' + (names[type] || type);
+                p.setTimeout(() => updateDOMState(), 1200);
+            }
+        }
+
+        // ─── Window resize ───
+        p.windowResized = function() {
+            p.resizeCanvas(p.windowWidth, p.windowHeight);
+        };
+    };
+
+    // ─── Boot ───
+    new p5(sketch);
+})();
+</script>
+</body>
+</html>

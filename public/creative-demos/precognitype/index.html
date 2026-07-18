@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Precognitype — Audio-Reactive Variable Font</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Recursive:wght,CASL,CRSV,MONO,slnt,wght@300..1000&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  @property --breath-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+  @property --accent-r {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 100;
+  }
+  @property --accent-g {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 180;
+  }
+  @property --accent-b {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 255;
+  }
+  body {
+    background: #08080a;
+    overflow: hidden;
+    width: 100vw; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Recursive', monospace;
+  }
+  #container {
+    position: relative;
+    width: 80vw;
+    height: 50vh;
+    display: flex; align-items: center; justify-content: center;
+    --breath-angle: 0deg;
+    animation: breathe 8s linear infinite;
+    clip-path: polygon(
+      calc(50% + 48% * sin(var(--breath-angle) * 1 + 0rad)),
+      calc(50% + 48% * cos(var(--breath-angle) * 1 + 0rad)),
+      calc(50% + 48% * sin(var(--breath-angle) * 1 + 1.047rad)),
+      calc(50% + 48% * cos(var(--breath-angle) * 1 + 1.047rad)),
+      calc(50% + 48% * sin(var(--breath-angle) * 1 + 2.094rad)),
+      calc(50% + 48% * cos(var(--breath-angle) * 1 + 2.094rad)),
+      calc(50% + 48% * sin(var(--breath-angle) * 1 + 3.142rad)),
+      calc(50% + 48% * cos(var(--breath-angle) * 1 + 3.142rad)),
+      calc(50% + 48% * sin(var(--breath-angle) * 1 + 4.189rad)),
+      calc(50% + 48% * cos(var(--breath-angle) * 1 + 4.189rad)),
+      calc(50% + 48% * sin(var(--breath-angle) * 1 + 5.236rad)),
+      calc(50% + 48% * cos(var(--breath-angle) * 1 + 5.236rad))
+    );
+    filter: drop-shadow(0 0 40px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15));
+  }
+  @keyframes breathe {
+    0% { --breath-angle: 0deg; }
+    100% { --breath-angle: 360deg; }
+  }
+  .text-layer {
+    position: absolute;
+    font-family: 'Recursive', monospace;
+    font-size: min(40vw, 240px);
+    font-weight: 400;
+    user-select: none;
+    white-space: nowrap;
+    line-height: 1;
+    transition: filter 0.08s ease;
+  }
+  #primary {
+    color: #fff;
+    z-index: 2;
+    text-shadow: 0 0 60px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
+  }
+  #shadow {
+    color: #fff;
+    opacity: 0.5;
+    z-index: 1;
+    mix-blend-mode: difference;
+    transform: translate(6px, 3px);
+    transition: transform 0.2s ease;
+  }
+  #shadow.glitching {
+    transform: translate(6px, 3px) scale(1.06);
+    filter: blur(4px);
+  }
+  #primary.blurred {
+    filter: blur(3px);
+  }
+  #status {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.12);
+    font-family: 'Recursive', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    z-index: 100;
+    text-align: center;
+    line-height: 1.8;
+    pointer-events: none;
+  }
+  #status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    transition: all 0.3s;
+  }
+  .dot.active { background: rgba(100, 200, 255, 0.6); box-shadow: 0 0 6px rgba(100,200,255,0.3); }
+  .dot.clairvoyant { background: rgba(255, 200, 100, 0.8); box-shadow: 0 0 12px rgba(255,200,100,0.5); }
+  #mic-prompt {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(255,255,255,0.3);
+    font-family: 'Recursive', monospace;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-align: center;
+    z-index: 200;
+    pointer-events: none;
+  }
+  #mic-prompt.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div id="container">
+  <div id="primary" class="text-layer">LISTEN</div>
+  <div id="shadow" class="text-layer">LISTEN</div>
+</div>
+
+<div id="status">
+  <span id="mode-label">listening</span>
+  <div id="status-bar">
+    <span class="dot" id="dot-0"></span>
+    <span class="dot" id="dot-1"></span>
+    <span class="dot" id="dot-2"></span>
+    <span class="dot" id="dot-3"></span>
+    <span class="dot" id="dot-4"></span>
+  </div>
+</div>
+
+<div id="mic-prompt">click to activate microphone</div>
+
+<script>
+// ─── State ───
+const primary = document.getElementById('primary');
+const shadow = document.getElementById('shadow');
+const container = document.getElementById('container');
+const modeLabel = document.getElementById('mode-label');
+const micPrompt = document.getElementById('mic-prompt');
+
+// Font axis values for primary (real-time) and shadow (predicted)
+const axisHistory = { wght: [], wdth: [], slnt: [], opsz: [] };
+const MAX_HISTORY = 1800; // 30s at 60fps
+const PRIMARY_DELAY_FRAMES = 12; // ~200ms at 60fps
+const SHADOW_PREDICTION_FRAMES = 30; // ~500ms
+
+let currentAxes = { wght: 500, wdth: 100, slnt: 0, opsz: 36 };
+let shadowAxes = { wght: 500, wdth: 100, slnt: 0, opsz: 36 };
+let predictionError = 0;
+let lowErrorTime = 0;
+let clairvoyant = false;
+let audioActive = false;
+
+// Ring buffer for delayed primary values (for shadow timing)
+const primaryRing = [];
+
+// ─── Linear Predictor ───
+function linearPredict(history, lookback = 30, lookahead = 30) {
+  if (history.length < lookback + 1) return history[history.length - 1] || 0;
+  const recent = history.slice(-lookback);
+  const n = recent.length;
+  const indices = Array.from({ length: n }, (_, i) => i);
+  const sumX = indices.reduce((a, b) => a + b, 0);
+  const sumY = recent.reduce((a, b) => a + b, 0);
+  const sumXY = indices.reduce((s, i) => s + i * recent[i], 0);
+  const sumXX = indices.reduce((s, i) => s + i * i, 0);
+  const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+  return intercept + slope * (n + lookahead);
+}
+
+function predictAxes() {
+  const result = {};
+  for (const axis of ['wght', 'wdth', 'slnt', 'opsz']) {
+    const hist = axisHistory[axis];
+    const lookahead = clairvoyant ? 120 : SHADOW_PREDICTION_FRAMES; // 2s if clairvoyant
+    result[axis] = linearPredict(hist, 30, lookahead);
+  }
+  return result;
+}
+
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+function updatePredictionError(predicted, actual) {
+  let totalError = 0;
+  for (const axis of ['wght', 'wdth', 'slnt', 'opsz']) {
+    totalError += Math.abs(predicted[axis] - actual[axis]);
+  }
+  predictionError = totalError;
+
+  // Track low-error streaks
+  if (totalError < 150) {
+    lowErrorTime += 1/60;
+  } else {
+    lowErrorTime = Math.max(0, lowErrorTime - 0.5);
+  }
+
+  // Clairvoyant state after 30s of low error
+  if (lowErrorTime > 30 && !clairvoyant) {
+    clairvoyant = true;
+    modeLabel.textContent = '✦ clairvoyant';
+    document.querySelectorAll('.dot').forEach(d => d.classList.add('clairvoyant'));
+  } else if (lowErrorTime < 5 && clairvoyant) {
+    clairvoyant = false;
+    modeLabel.textContent = 'listening';
+    document.querySelectorAll('.dot').forEach(d => d.classList.remove('clairvoyant'));
+  }
+
+  // Visual feedback
+  const errorNorm = Math.min(totalError / 300, 1);
+  const dots = document.querySelectorAll('.dot');
+  const activeDots = Math.floor((1 - errorNorm) * 5);
+  dots.forEach((d, i) => {
+    d.classList.toggle('active', i < activeDots);
+  });
+
+  // Glitch on high error
+  if (totalError > 200) {
+    shadow.classList.add('glitching');
+    primary.classList.add('blurred');
+    setTimeout(() => {
+      shadow.classList.remove('glitching');
+      primary.classList.remove('blurred');
+    }, 150);
+  }
+}
+
+// ─── Apply Font Axes ───
+function applyAxes(el, axes) {
+  const wght = clamp(Math.round(axes.wght), 300, 1000);
+  const wdth = clamp(Math.round(axes.wdth), 75, 125);
+  const slnt = clamp(Math.round(axes.slnt), -15, 15);
+  const opsz = clamp(Math.round(axes.opsz), 12, 144);
+  el.style.fontVariationSettings = `'wght' ${wght}, 'wdth' ${wdth}, 'slnt' ${slnt}, 'opsz' ${opsz}`;
+}
+
+// ─── Audio Analysis ───
+let analyser, dataArray;
+let audioCtx;
+
+async function initAudio() {
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const source = audioCtx.createMediaStreamSource(stream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
+    source.connect(analyser);
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    audioActive = true;
+    micPrompt.classList.add('hidden');
+    modeLabel.textContent = 'listening';
+  } catch (e) {
+    console.warn('Mic access denied, using fallback audio');
+    fallbackAudio();
+  }
+}
+
+let fallbackOsc;
+function fallbackAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 1024;
+  dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+  // Create a more interesting soundscape
+  const osc1 = audioCtx.createOscillator();
+  const osc2 = audioCtx.createOscillator();
+  const noise = audioCtx.createBufferSource();
+  const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate, audioCtx.sampleRate);
+  const data = noiseBuffer.getChannelData(0);
+  for (let i = 0; i < audioCtx.sampleRate; i++) data[i] = Math.random() * 2 - 1;
+  noise.buffer = noiseBuffer;
+  noise.loop = true;
+
+  osc1.type = 'sine';
+  osc1.frequency.value = 110;
+  osc2.type = 'triangle';
+  osc2.frequency.value = 220;
+
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.03;
+
+  osc1.connect(gain);
+  osc2.connect(gain);
+  noise.connect(gain);
+  gain.connect(analyser);
+  gain.connect(audioCtx.destination);
+  osc1.start();
+  osc2.start();
+  noise.start();
+  fallbackOsc = { osc1, osc2, noise };
+  audioActive = true;
+  micPrompt.classList.add('hidden');
+  modeLabel.textContent = '⋮ fallback';
+}
+
+function analyzeAudio() {
+  if (!analyser || !dataArray || !audioActive) return { low: 0, mid: 0, high: 0, overall: 0 };
+  analyser.getByteFrequencyData(dataArray);
+  const bins = analyser.frequencyBinCount;
+  let low = 0, mid = 0, high = 0;
+  const lowEnd = Math.floor(bins * 0.15);
+  const midEnd = Math.floor(bins * 0.5);
+  for (let i = 0; i < bins; i++) {
+    const v = dataArray[i] / 255;
+    if (i < lowEnd) low += v;
+    else if (i < midEnd) mid += v;
+    else high += v;
+  }
+  const countLow = lowEnd || 1;
+  const countMid = midEnd - lowEnd || 1;
+  const countHigh = bins - midEnd || 1;
+  return {
+    low: low / countLow,
+    mid: mid / countMid,
+    high: high / countHigh,
+    overall: (low + mid + high) / bins
+  };
+}
+
+// ─── Main Loop ───
+function loop() {
+  const audio = analyzeAudio();
+
+  // Map audio to axes
+  // Low → wght (200-900), Mid → wdth (75-125), High → slnt (-15 to 15), Overall → opsz (12-144)
+  const targetWght = 300 + 700 * audio.low;
+  const targetWdth = 75 + 50 * audio.mid;
+  const targetSlnt = -15 + 30 * audio.high;
+  const targetOpsz = 12 + 132 * audio.overall;
+
+  // Smooth (EMA)
+  const alpha = 0.3;
+  currentAxes.wght += (targetWght - currentAxes.wght) * alpha;
+  currentAxes.wdth += (targetWdth - currentAxes.wdth) * alpha;
+  currentAxes.slnt += (targetSlnt - currentAxes.slnt) * alpha;
+  currentAxes.opsz += (targetOpsz - currentAxes.opsz) * alpha;
+
+  // Store history
+  for (const axis of ['wght', 'wdth', 'slnt', 'opsz']) {
+    axisHistory[axis].push(currentAxes[axis]);
+    if (axisHistory[axis].length > MAX_HISTORY) axisHistory[axis].shift();
+  }
+
+  // Ring buffer for delayed shadow
+  primaryRing.push({ ...currentAxes });
+  if (primaryRing.length > PRIMARY_DELAY_FRAMES + 1) primaryRing.shift();
+
+  // Get delayed axes for shadow baseline
+  const delayedIdx = Math.max(0, primaryRing.length - PRIMARY_DELAY_FRAMES - 1);
+  const delayedAxes = primaryRing[delayedIdx] || currentAxes;
+
+  // Predict future axes
+  const predicted = predictAxes();
+
+  // Compute prediction error from delayed vs predicted
+  updatePredictionError(predicted, delayedAxes);
+
+  // Apply primary (real-time)
+  applyAxes(primary, currentAxes);
+
+  // Shadow = predicted
+  const shadowTarget = {
+    wght: predicted.wght || delayedAxes.wght,
+    wdth: predicted.wdth || delayedAxes.wdth,
+    slnt: predicted.slnt || delayedAxes.slnt,
+    opsz: predicted.opsz || delayedAxes.opsz
+  };
+  // Smooth shadow
+  shadowAxes.wght += (shadowTarget.wght - shadowAxes.wght) * 0.2;
+  shadowAxes.wdth += (shadowTarget.wdth - shadowAxes.wdth) * 0.2;
+  shadowAxes.slnt += (shadowTarget.slnt - shadowAxes.slnt) * 0.2;
+  shadowAxes.opsz += (shadowTarget.opsz - shadowAxes.opsz) * 0.2;
+  applyAxes(shadow, shadowAxes);
+
+  // Update container glow color based on audio
+  const r = Math.floor(100 + 155 * audio.low);
+  const g = Math.floor(180 - 80 * audio.mid);
+  const b = Math.floor(255 - 100 * audio.high);
+  document.documentElement.style.setProperty('--accent-r', r);
+  document.documentElement.style.setProperty('--accent-g', g);
+  document.documentElement.style.setProperty('--accent-b', b);
+
+  requestAnimationFrame(loop);
+}
+
+// ─── Click to start ───
+document.addEventListener('click', () => {
+  if (!audioActive) initAudio();
+}, { once: true });
+
+// Start rendering immediately (audio will kick in on click)
+requestAnimationFrame(loop);
+
+// Safety: load a Recursive variable font fallback even before audio
+primary.style.fontVariationSettings = "'wght' 400, 'wdth' 100, 'slnt' 0, 'opsz' 36";
+shadow.style.fontVariationSettings = "'wght' 400, 'wdth' 100, 'slnt' 0, 'opsz' 36";
+</script>
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amber Growth — Noise-Driven Glass Reef</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: #F5F1E8;
+    overflow-x: hidden;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #4A7C8C;
+  }
+  #canvas-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+  }
+  .scroll-spacer {
+    position: relative;
+    z-index: 2;
+    height: 500vh;
+    pointer-events: none;
+  }
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2rem;
+  }
+  .overlay h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #4A7C8C;
+    opacity: 0.8;
+  }
+  .overlay .subtitle {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #D96C48;
+    opacity: 0.6;
+    letter-spacing: 0.05em;
+  }
+  .overlay .scroll-hint {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #D96C48;
+    opacity: 0.5;
+    animation: pulse 3s ease-in-out infinite;
+  }
+  .overlay .hint {
+    text-align: right;
+    font-size: 0.7rem;
+    color: #4A7C8C;
+    opacity: 0.4;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+  }
+</style>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<div class="scroll-spacer"></div>
+
+<div class="overlay">
+  <div>
+    <h1>Amber Growth</h1>
+    <div class="subtitle">Noise-Driven Glass Reef</div>
+  </div>
+  <div class="scroll-hint">Scroll to evolve</div>
+  <div class="hint">Move mouse to shift light · Click to scar</div>
+</div>
+
+<script type="x-shader/x-vertex" id="vertexShader">
+uniform float uTime;
+uniform float uEvolution;
+uniform float uAmplitude;
+uniform float uNoiseScale;
+
+varying vec3 vNormal;
+varying vec3 vWorldPosition;
+varying float vNoise;
+
+float hash(float n) {
+    return fract(sin(n) * 43758.5453123);
+}
+
+float noise(vec3 x) {
+    vec3 p = floor(x);
+    vec3 f = fract(x);
+    f = f * f * (3.0 - 2.0 * f);
+    float n = p.x + p.y * 57.0 + p.z * 113.0;
+    return mix(
+        mix(
+            mix(hash(n + 0.0), hash(n + 1.0), f.x),
+            mix(hash(n + 57.0), hash(n + 58.0), f.x),
+            f.y
+        ),
+        mix(
+            mix(hash(n + 113.0), hash(n + 114.0), f.x),
+            mix(hash(n + 170.0), hash(n + 171.0), f.x),
+            f.y
+        ),
+        f.z
+    );
+}
+
+float fbm(vec3 p) {
+    float f = 0.0;
+    f += 0.5000 * noise(p); p *= 2.02;
+    f += 0.2500 * noise(p); p *= 2.03;
+    f += 0.1250 * noise(p); p *= 2.01;
+    f += 0.0625 * noise(p);
+    return f;
+}
+
+void main() {
+    vNormal = normalize(normalMatrix * normal);
+    vec3 pos = position;
+    float n = fbm(pos * uNoiseScale + vec3(0.0, uEvolution * 2.0, uEvolution * 3.0));
+    vNoise = n;
+    pos += normal * (n - 0.5) * uAmplitude;
+    vec4 worldPos = modelMatrix * vec4(pos, 1.0);
+    vWorldPosition = worldPos.xyz;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+}
+</script>
+
+<script type="x-shader/x-fragment" id="fragmentShader">
+uniform float uTime;
+uniform float uEvolution;
+uniform vec3 uLightDir;
+uniform vec3 uColorTeal;
+uniform vec3 uColorTerracotta;
+uniform vec3 uColorLavender;
+uniform vec3 uColorOchre;
+
+varying vec3 vNormal;
+varying vec3 vWorldPosition;
+varying float vNoise;
+
+void main() {
+    vec3 viewDir = normalize(cameraPosition - vWorldPosition);
+    vec3 normal = normalize(vNormal);
+
+    // Fresnel term
+    float fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), 3.0);
+
+    // Light direction
+    vec3 lightDir = normalize(uLightDir);
+    float diff = max(dot(normal, lightDir), 0.0);
+
+    // Base growth color: mix teal and terracotta by noise
+    vec3 color = mix(uColorTeal, uColorTerracotta, vNoise * 0.8 + 0.1);
+
+    // Lavender glass tint
+    color = mix(color, uColorLavender, fresnel * 0.4 + 0.1);
+
+    // Ochre fresnel edge glow
+    color += uColorOchre * fresnel * 1.5;
+
+    // Light response
+    color += uColorLavender * diff * 0.25;
+    color += uColorOchre * diff * fresnel * 0.3;
+
+    // Chromatic dispersion (RGB channel offsets at glancing angles)
+    float dispersion = fresnel * 0.12;
+    vec3 colorR = mix(color, uColorTerracotta, dispersion * 2.0);
+    vec3 colorB = mix(color, uColorTeal, dispersion * 2.0);
+    color = vec3(colorR.r, color.g, colorB.b);
+
+    // Alpha modulation for glass feel
+    float alpha = 0.7 + fresnel * 0.3;
+
+    gl_FragColor = vec4(color, alpha);
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+// Setup
+const container = document.getElementById('canvas-container');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xF5F1E8);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 0, 3.5);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = THREE.NoToneMapping;
+container.appendChild(renderer.domElement);
+
+// Post-processing
+const composer = new EffectComposer(renderer);
+const renderPass = new RenderPass(scene, camera);
+composer.addPass(renderPass);
+
+const bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    0.6, 0.5, 0.85
+);
+bloomPass.threshold = 0.9;
+bloomPass.strength = 0.5;
+bloomPass.radius = 0.6;
+composer.addPass(bloomPass);
+
+// Geometry & Material
+const geometry = new THREE.IcosahedronGeometry(1.0, 2);
+
+const material = new THREE.ShaderMaterial({
+    vertexShader: document.getElementById('vertexShader').textContent,
+    fragmentShader: document.getElementById('fragmentShader').textContent,
+    uniforms: {
+        uTime: { value: 0 },
+        uEvolution: { value: 0 },
+        uAmplitude: { value: 0.35 },
+        uNoiseScale: { value: 2.2 },
+        uLightDir: { value: new THREE.Vector3(1, 1, 1).normalize() },
+        uColorTeal: { value: new THREE.Color(0x4A7C8C) },
+        uColorTerracotta: { value: new THREE.Color(0xD96C48) },
+        uColorLavender: { value: new THREE.Color(0xE5DDF9) },
+        uColorOchre: { value: new THREE.Color(0xD4A04A) }
+    },
+    transparent: true,
+    side: THREE.DoubleSide,
+    depthWrite: false
+});
+
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+
+// Secondary inner glow shell for extra depth
+const innerGeometry = new THREE.IcosahedronGeometry(0.85, 2);
+const innerMaterial = new THREE.ShaderMaterial({
+    vertexShader: document.getElementById('vertexShader').textContent,
+    fragmentShader: document.getElementById('fragmentShader').textContent,
+    uniforms: {
+        uTime: { value: 0 },
+        uEvolution: { value: 0 },
+        uAmplitude: { value: 0.25 },
+        uNoiseScale: { value: 3.5 },
+        uLightDir: { value: new THREE.Vector3(1, 1, 1).normalize() },
+        uColorTeal: { value: new THREE.Color(0x4A7C8C) },
+        uColorTerracotta: { value: new THREE.Color(0xD96C48) },
+        uColorLavender: { value: new THREE.Color(0xE5DDF9) },
+        uColorOchre: { value: new THREE.Color(0xD4A04A) }
+    },
+    transparent: true,
+    side: THREE.BackSide,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+});
+const innerMesh = new THREE.Mesh(innerGeometry, innerMaterial);
+scene.add(innerMesh);
+
+// Particles & scars
+const particles = [];
+const scars = [];
+const raycaster = new THREE.Raycaster();
+const mouseNDC = new THREE.Vector2();
+
+// Mouse light
+window.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth) * 2 - 1;
+    const y = -(e.clientY / window.innerHeight) * 2 + 1;
+    const dir = new THREE.Vector3(x, y, 0.8).normalize();
+    material.uniforms.uLightDir.value.copy(dir);
+    innerMaterial.uniforms.uLightDir.value.copy(dir);
+});
+
+// Click: spawn burst + scar
+window.addEventListener('click', (e) => {
+    mouseNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouseNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mouseNDC, camera);
+    const intersects = raycaster.intersectObject(mesh);
+    if (intersects.length === 0) return;
+
+    const point = intersects[0].point;
+    const normal = intersects[0].face.normal.clone().transformDirection(mesh.matrixWorld).normalize();
+
+    // Transparent scar
+    const scarGeo = new THREE.SphereGeometry(0.08, 16, 16);
+    const scarMat = new THREE.MeshBasicMaterial({
+        color: 0xF5F1E8,
+        transparent: true,
+        opacity: 0.35,
+        depthWrite: false
+    });
+    const scar = new THREE.Mesh(scarGeo, scarMat);
+    scar.position.copy(point);
+    scar.userData.life = 1.0;
+    scar.userData.maxLife = 1.0;
+    scene.add(scar);
+    scars.push(scar);
+
+    // Burst particles
+    const pGeo = new THREE.SphereGeometry(0.015, 6, 6);
+    const pCount = 18;
+    for (let i = 0; i < pCount; i++) {
+        const pMat = new THREE.MeshBasicMaterial({
+            color: 0xD4A04A,
+            transparent: true,
+            opacity: 0.9,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+        const p = new THREE.Mesh(pGeo, pMat);
+        p.position.copy(point);
+        const spread = new THREE.Vector3(
+            (Math.random() - 0.5) * 0.08,
+            (Math.random() - 0.5) * 0.08,
+            (Math.random() - 0.5) * 0.08
+        );
+        p.userData.velocity = spread.add(normal.clone().multiplyScalar(0.04 + Math.random() * 0.03));
+        p.userData.life = 1.0 + Math.random() * 0.5;
+        p.userData.maxLife = p.userData.life;
+        scene.add(p);
+        particles.push(p);
+    }
+});
+
+// ScrollTrigger
+if (window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.to(material.uniforms.uEvolution, {
+        value: 1,
+        ease: 'none',
+        scrollTrigger: {
+            trigger: '.scroll-spacer',
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: true
+        }
+    });
+    gsap.to(innerMaterial.uniforms.uEvolution, {
+        value: 1,
+        ease: 'none',
+        scrollTrigger: {
+            trigger: '.scroll-spacer',
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: true
+        }
+    });
+}
+
+// Resize
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    composer.setSize(window.innerWidth, window.innerHeight);
+    bloomPass.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Animation loop
+const clock = new THREE.Clock();
+
+function animate() {
+    requestAnimationFrame(animate);
+    const elapsed = clock.getElapsedTime();
+    material.uniforms.uTime.value = elapsed;
+    innerMaterial.uniforms.uTime.value = elapsed;
+
+    // Subtle rotation
+    mesh.rotation.y = elapsed * 0.08;
+    mesh.rotation.z = elapsed * 0.03;
+    innerMesh.rotation.y = elapsed * 0.06 + 0.5;
+    innerMesh.rotation.z = elapsed * 0.04 - 0.3;
+
+    // Particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.position.add(p.userData.velocity);
+        p.userData.velocity.multiplyScalar(0.96);
+        p.userData.life -= 0.015;
+        p.material.opacity = (p.userData.life / p.userData.maxLife) * 0.9;
+        const s = 1.0 + (1.0 - p.userData.life / p.userData.maxLife) * 0.5;
+        p.scale.setScalar(s);
+        if (p.userData.life <= 0) {
+            scene.remove(p);
+            p.geometry.dispose();
+            p.material.dispose();
+            particles.splice(i, 1);
+        }
+    }
+
+    // Scars fade very slowly
+    for (let i = scars.length - 1; i >= 0; i--) {
+        const s = scars[i];
+        s.userData.life -= 0.002;
+        s.material.opacity = (s.userData.life / s.userData.maxLife) * 0.35;
+        if (s.userData.life <= 0) {
+            scene.remove(s);
+            s.geometry.dispose();
+            s.material.dispose();
+            scars.splice(i, 1);
+        }
+    }
+
+    composer.render();
+}
+
+animate();
+</script>
+</body>
+</html>

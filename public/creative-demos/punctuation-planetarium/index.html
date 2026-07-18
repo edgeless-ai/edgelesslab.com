@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Punctuation Planetarium</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<style>
+  body { margin: 0; overflow: hidden; background: #0D1B2A; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  #panel { position: absolute; top: 12px; right: 12px; background: rgba(13,27,42,0.9); color: #fff; padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); font-size: 13px; pointer-events: none; backdrop-filter: blur(4px); z-index: 10; }
+  #panel h2 { margin: 0 0 10px; font-size: 15px; font-weight: 600; letter-spacing: 0.5px; color: #F4D03F; }
+  #epoch { margin-bottom: 10px; font-variant-numeric: tabular-nums; opacity: 0.9; }
+  .planet-row { display: flex; align-items: center; margin-bottom: 6px; }
+  .planet-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; }
+  .planet-name { opacity: 0.85; }
+  #hint { position: absolute; bottom: 12px; left: 12px; color: rgba(255,255,255,0.4); font-size: 11px; pointer-events: none; z-index: 10; }
+</style>
+</head>
+<body>
+<div id="panel">
+  <h2>Punctuation Planetarium</h2>
+  <div id="epoch">Epoch: 0%</div>
+  <div id="planets"></div>
+</div>
+<div id="hint">Scroll to advance time &middot; Hover planets to reveal</div>
+<script>
+  // ==========================================
+  // Punctuation Planetarium
+  // Hybrid generative art demo combining
+  // Patchwork-style autonomous walkers with
+  // Hubtown-style mouse-reveal interactions.
+  // ==========================================
+
+  // --- Configuration ---
+  const COLS = 24;
+  const ROWS = 16;
+  const LOG_W = 960;
+  const LOG_H = 640;
+  const SEED = 42;
+  const SUN_COLOR = '#F4D03F';
+  const BG_COLOR = '#0D1B2A';
+  const UNCLAIMED_COLOR = '#1B263B';
+
+  // --- Palette (4 seeded pastels) ---
+  const PALETTE = [
+    '#E07A5F', // coral
+    '#3DCCC7', // teal
+    '#9B5DE5', // lavender
+    '#F15BB5', // hot pink
+  ];
+
+  // --- State ---
+  let tiles = [];       // tile geometry (center, bounds)
+  let verts = [];       // shared vertex grid
+  let tileState = [];   // claim state per tile
+  let walkers = [];     // autonomous walker planets
+  let stars = [];       // background starfield
+  let scrollEpoch = 0;  // 0..1 scroll-driven time
+  let haloRadius = 0;   // animated mouse-reveal halo
+  let haloX = 0, haloY = 0; // last halo position
+
+  // --- DOM refs ---
+  let panelEpoch, panelPlanets;
+
+  function setup() {
+    createCanvas(windowWidth, windowHeight);
+    randomSeed(SEED);
+
+    panelEpoch = document.getElementById('epoch');
+    panelPlanets = document.getElementById('planets');
+
+    initState();
+    initGrid();
+    initStars();
+    initWalkers();
+    updatePanel();
+  }
+
+  // ==========================================
+  // Grid & Tile State
+  // ==========================================
+
+  function initState() {
+    tileState = [];
+    for (let j = 0; j < ROWS; j++) {
+      let row = [];
+      for (let i = 0; i < COLS; i++) {
+        row.push({
+          claimed_by: null,
+          claim_time: -999,
+          color: color(UNCLAIMED_COLOR)
+        });
+      }
+      tileState.push(row);
+    }
+  }
+
+  function initGrid() {
+    verts = [];
+    let vw = LOG_W / COLS;
+    let vh = LOG_H / ROWS;
+
+    // Create vertex grid with Gaussian jitter (non-uniform)
+    for (let j = 0; j <= ROWS; j++) {
+      let row = [];
+      for (let i = 0; i <= COLS; i++) {
+        let x = i * vw;
+        let y = j * vh;
+        let ox = randomGaussian(0, vw * 0.08);
+        let oy = randomGaussian(0, vh * 0.08);
+        row.push({ x: x + ox, y: y + oy });
+      }
+      verts.push(row);
+    }
+
+    // Laplacian relaxation: 1 iteration
+    // Each vertex is nudged toward the average of its neighbors
+    let newVerts = [];
+    for (let j = 0; j <= ROWS; j++) {
+      let row = [];
+      for (let i = 0; i <= COLS; i++) {
+        let v = verts[j][i];
+        let sumX = v.x, sumY = v.y, count = 1;
+        if (i > 0) { sumX += verts[j][i-1].x; sumY += verts[j][i-1].y; count++; }
+        if (i < COLS) { sumX += verts[j][i+1].x; sumY += verts[j][i+1].y; count++; }
+        if (j > 0) { sumX += verts[j-1][i].x; sumY += verts[j-1][i].y; count++; }
+        if (j < ROWS) { sumX += verts[j+1][i].x; sumY += verts[j+1][i].y; count++; }
+        let avgX = sumX / count;
+        let avgY = sumY / count;
+        row.push({ x: lerp(v.x, avgX, 0.5), y: lerp(v.y, avgY, 0.5) });
+      }
+      newVerts.push(row);
+    }
+    verts = newVerts;
+
+    // Build tile centers from vertices
+    tiles = [];
+    for (let j = 0; j < ROWS; j++) {
+      let row = [];
+      for (let i = 0; i < COLS; i++) {
+        let cx = (verts[j][i].x + verts[j][i+1].x + verts[j+1][i+1].x + verts[j+1][i].x) / 4;
+        let cy = (verts[j][i].y + verts[j][i+1].y + verts[j+1][i+1].y + verts[j+1][i].y) / 4;
+        row.push({ i, j, cx, cy });
+      }
+      tiles.push(row);
+    }
+  }
+
+  // ==========================================
+  // Starfield
+  // ==========================================
+
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < 120; i++) {
+      stars.push({
+        x: random(LOG_W),
+        y: random(LOG_H),
+        size: random(1, 2.5),
+        twinkle: random(100)
+      });
+    }
+  }
+
+  // ==========================================
+  // Punctuation Masks
+  // ==========================================
+
+  function makeMask(cx, cy, offsets) {
+    let set = new Set();
+    for (let o of offsets) {
+      let c = cx + o[0];
+      let r = cy + o[1];
+      if (c >= 0 && c < COLS && r >= 0 && r < ROWS) {
+        set.add(c + "," + r);
+      }
+    }
+    return set;
+  }
+
+  // 5x5 low-resolution punctuation silhouettes
+  // Each mask is a set of offsets from a center cell.
+  const MASK_ASTERISK  = [[0,-2],[-1,-1],[1,-1],[-2,0],[-1,0],[0,0],[1,0],[2,0],[-1,1],[1,1],[0,2]];
+  const MASK_EXCLAM    = [[0,-2],[0,-1],[0,0],[0,2]];
+  const MASK_AMPERSAND = [[0,-2],[-1,-1],[1,-1],[-2,0],[0,0],[-1,1],[1,1],[0,2]];
+  const MASK_SEMICOLON = [[0,-2],[0,-1],[0,1],[-1,2],[0,2]];
+
+  // ==========================================
+  // Walkers (Planet Autonomous Agents)
+  // ==========================================
+
+  function initWalkers() {
+    walkers = [];
+    let centerC = floor(COLS / 2);
+    let centerR = floor(ROWS / 2);
+
+    // Four planets, each assigned a corner region and punctuation mask
+    let defs = [
+      { name: 'Planet Asterisk',    mask: makeMask(6, 4, MASK_ASTERISK),  hex: PALETTE[0] },
+      { name: 'Planet Exclamation', mask: makeMask(18, 4, MASK_EXCLAM),  hex: PALETTE[1] },
+      { name: 'Planet Ampersand',   mask: makeMask(6, 12, MASK_AMPERSAND), hex: PALETTE[2] },
+      { name: 'Planet Semicolon',   mask: makeMask(18, 12, MASK_SEMICOLON), hex: PALETTE[3] },
+    ];
+
+    for (let i = 0; i < defs.length; i++) {
+      let d = defs[i];
+      walkers.push({
+        index: i,
+        name: d.name,
+        col: centerC,
+        row: centerR,
+        color: color(d.hex),
+        hex: d.hex,
+        mask: d.mask,
+        moveTimer: 0,
+        moveInterval: 12,
+      });
+    }
+  }
+
+  function moveWalker(w) {
+    let candidates = [];
+    let dirs = [[0,-1],[0,1],[-1,0],[1,0]];
+    let cx = COLS / 2;
+    let cy = ROWS / 2;
+
+    // Tangent vector for orbital bias
+    let dx = w.col - cx;
+    let dy = w.row - cy;
+    let dist = sqrt(dx*dx + dy*dy);
+    let tx = -dy;
+    let ty = dx;
+    let tlen = sqrt(tx*tx + ty*ty);
+    if (tlen > 0) { tx /= tlen; ty /= tlen; }
+
+    for (let d of dirs) {
+      let nc = w.col + d[0];
+      let nr = w.row + d[1];
+      if (nc < 0 || nc >= COLS || nr < 0 || nr >= ROWS) continue;
+
+      let score = 1.0;
+
+      // Orbital bias: prefer curved path around the sun
+      if (dist > 1) {
+        let ndx = nc - w.col;
+        let ndy = nr - w.row;
+        let ndlen = sqrt(ndx*ndx + ndy*ndy);
+        if (ndlen > 0) {
+          ndx /= ndlen; ndy /= ndlen;
+          let dot = ndx * tx + ndy * ty;
+          score += dot * 0.5;
+        }
+      }
+
+      // Mask preference: strongly favor target silhouette tiles
+      if (w.mask.has(nc + "," + nr)) {
+        score += 2.5;
+      }
+
+      // Unclaimed preference
+      let ts = tileState[nr][nc];
+      if (ts.claimed_by === null) {
+        score += 0.6;
+      } else if (ts.claimed_by === w.index) {
+        score += 0.1;
+      } else {
+        score -= 0.8; // avoid other territories
+      }
+
+      candidates.push({ col: nc, row: nr, score: max(0.1, score) });
+    }
+
+    // Weighted random selection
+    let total = candidates.reduce((sum, c) => sum + c.score, 0);
+    let pick = random() * total;
+    let acc = 0;
+    let chosen = candidates[0];
+    for (let c of candidates) {
+      acc += c.score;
+      if (pick <= acc) {
+        chosen = c;
+        break;
+      }
+    }
+
+    w.col = chosen.col;
+    w.row = chosen.row;
+
+    // Claim the current tile
+    let ts = tileState[w.row][w.col];
+    if (ts.claimed_by === null) {
+      ts.claimed_by = w.index;
+      ts.claim_time = frameCount;
+      ts.color = w.color;
+    }
+  }
+
+  // ==========================================
+  // Interaction & Scroll
+  // ==========================================
+
+  function mouseWheel(event) {
+    scrollEpoch += event.deltaY * 0.001;
+    scrollEpoch = constrain(scrollEpoch, 0, 1);
+    if (event.preventDefault) event.preventDefault();
+    return false;
+  }
+
+  function getMouseLogical() {
+    let s = min(width / LOG_W, height / LOG_H);
+    let offsetX = (width - LOG_W * s) / 2;
+    let offsetY = (height - LOG_H * s) / 2;
+    return {
+      x: (mouseX - offsetX) / s,
+      y: (mouseY - offsetY) / s
+    };
+  }
+
+  // ==========================================
+  // Rendering
+  // ==========================================
+
+  function draw() {
+    background(13, 27, 42);
+
+    // Scale to logical coordinates (responsive)
+    let scaleFactor = min(width / LOG_W, height / LOG_H);
+    let offsetX = (width - LOG_W * scaleFactor) / 2;
+    let offsetY = (height - LOG_H * scaleFactor) / 2;
+
+    push();
+    translate(offsetX, offsetY);
+    scale(scaleFactor);
+
+    // Draw starfield
+    let starAlpha = 150 + 100 * scrollEpoch;
+    noStroke();
+    for (let s of stars) {
+      let a = constrain(starAlpha + 50 * sin(frameCount * 0.05 + s.twinkle), 0, 255);
+      fill(255, 255, 255, a);
+      circle(s.x, s.y, s.size);
+    }
+
+    // Draw sun at center
+    let sunC = floor(COLS / 2);
+    let sunR = floor(ROWS / 2);
+    let sunX = tiles[sunR][sunC].cx;
+    let sunY = tiles[sunR][sunC].cy;
+    for (let r = 45; r > 0; r -= 6) {
+      let alpha = map(r, 0, 45, 70, 0);
+      fill(244, 208, 63, alpha);
+      circle(sunX, sunY, r * 2);
+    }
+    fill(244, 208, 63);
+    circle(sunX, sunY, 18);
+
+    // Mouse reveal: find hovered planet
+    let m = getMouseLogical();
+    let activeWalker = null;
+    for (let w of walkers) {
+      let wx = tiles[w.row][w.col].cx;
+      let wy = tiles[w.row][w.col].cy;
+      if (dist(m.x, m.y, wx, wy) < 150) {
+        activeWalker = w;
+        break;
+      }
+    }
+
+    // Draw tiles
+    for (let j = 0; j < ROWS; j++) {
+      for (let i = 0; i < COLS; i++) {
+        let t = tiles[j][i];
+        let ts = tileState[j][i];
+
+        let drawScale = 1.0;
+
+        // Claim pulse animation (0.8 -> 1.0 over 20 frames)
+        if (ts.claimed_by !== null && frameCount - ts.claim_time < 20) {
+          let p = (frameCount - ts.claim_time) / 20;
+          drawScale = 0.8 + 0.2 * p;
+        }
+
+        // Mouse reveal zoom for active walker's nearby tiles
+        if (activeWalker !== null && ts.claimed_by === activeWalker.index) {
+          let wx = tiles[activeWalker.row][activeWalker.col].cx;
+          let wy = tiles[activeWalker.row][activeWalker.col].cy;
+          let td = dist(t.cx, t.cy, wx, wy);
+          if (td < 180) {
+            drawScale *= 1.2;
+          }
+        }
+
+        // Epoch fade: old territories fade slightly
+        let age = frameCount - ts.claim_time;
+        let baseAlpha = 255;
+        if (age > 0 && age < 600) {
+          baseAlpha = map(age, 0, 600, 255, 220);
+        } else if (age >= 600) {
+          baseAlpha = 220;
+        }
+        baseAlpha -= scrollEpoch * 30;
+        baseAlpha = constrain(baseAlpha, 160, 255);
+
+        // Get tile vertices
+        let v = [
+          verts[j][i],
+          verts[j][i+1],
+          verts[j+1][i+1],
+          verts[j+1][i]
+        ];
+
+        // Draw tile with scale transform
+        push();
+        translate(t.cx, t.cy);
+        scale(drawScale);
+        translate(-t.cx, -t.cy);
+
+        noStroke();
+        let c = ts.color;
+        fill(red(c), green(c), blue(c), baseAlpha);
+        beginShape();
+        for (let p of v) vertex(p.x, p.y);
+        endShape(CLOSE);
+
+        // Tile border
+        stroke(13, 27, 42, 80);
+        strokeWeight(1);
+        noFill();
+        beginShape();
+        for (let p of v) vertex(p.x, p.y);
+        endShape(CLOSE);
+
+        pop();
+      }
+    }
+
+    // Draw walkers
+    for (let w of walkers) {
+      let wx = tiles[w.row][w.col].cx;
+      let wy = tiles[w.row][w.col].cy;
+
+      // Walker glow
+      for (let r = 28; r > 0; r -= 4) {
+        let alpha = map(r, 0, 28, 50, 0);
+        fill(red(w.color), green(w.color), blue(w.color), alpha);
+        circle(wx, wy, r * 2);
+      }
+
+      fill(255);
+      circle(wx, wy, 10);
+
+      // Mouse reveal label
+      if (activeWalker === w) {
+        fill(255);
+        noStroke();
+        textAlign(CENTER, BOTTOM);
+        textSize(13);
+        text(w.name, wx, wy - 22);
+      }
+    }
+
+    // Mouse reveal halo (lerp-based smooth radius)
+    if (activeWalker !== null) {
+      haloRadius = lerp(haloRadius, 150, 0.1);
+      haloX = tiles[activeWalker.row][activeWalker.col].cx;
+      haloY = tiles[activeWalker.row][activeWalker.col].cy;
+    } else {
+      haloRadius = lerp(haloRadius, 0, 0.15);
+    }
+    if (haloRadius > 1) {
+      noFill();
+      stroke(255, 255, 255, 25);
+      strokeWeight(2);
+      circle(haloX, haloY, haloRadius * 2);
+    }
+
+    pop();
+
+    // Update walkers
+    for (let w of walkers) {
+      w.moveTimer++;
+      let interval = max(2, w.moveInterval - scrollEpoch * 8);
+      if (w.moveTimer >= interval) {
+        w.moveTimer = 0;
+        moveWalker(w);
+      }
+    }
+
+    // Update panel
+    if (frameCount % 10 === 0) {
+      updatePanel();
+    }
+  }
+
+  function updatePanel() {
+    if (panelEpoch) {
+      panelEpoch.textContent = 'Epoch: ' + Math.round(scrollEpoch * 100) + '%';
+    }
+    if (panelPlanets && panelPlanets.children.length === 0) {
+      for (let w of walkers) {
+        let row = document.createElement('div');
+        row.className = 'planet-row';
+        let dot = document.createElement('div');
+        dot.className = 'planet-dot';
+        dot.style.backgroundColor = w.hex;
+        let name = document.createElement('div');
+        name.className = 'planet-name';
+        name.textContent = w.name;
+        row.appendChild(dot);
+        row.appendChild(name);
+        panelPlanets.appendChild(row);
+      }
+    }
+  }
+
+  function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+  }
+</script>
+</body>
+</html>

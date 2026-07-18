@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scroll Depth Waterfall — Audio-Reactive Shader × Scroll Funnel</title>
+<style>
+/* ===== Reset & Base ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  background:#0A0A0F;
+  color:#E8E8E8;
+  overflow-x:hidden;
+}
+
+/* ===== Canvas Layer ===== */
+#canvas-container{
+  position:fixed;top:0;left:0;width:100vw;height:100vh;
+  z-index:0;pointer-events:none;
+}
+#canvas-container canvas{display:block}
+
+/* ===== Content Overlay ===== */
+#content-overlay{
+  position:relative;z-index:1;
+  padding-top:100vh;
+}
+
+/* ===== Scroll Sections ===== */
+.scroll-section{
+  min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:6rem 2rem;
+  opacity:0;
+  transform:translateY(40px);
+  transition:opacity 0.8s ease-out,transform 0.8s ease-out;
+}
+.scroll-section.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* Section content panels */
+.section-panel{
+  background:rgba(10,10,15,0.85);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  padding:3rem 2.5rem;
+  max-width:720px;width:100%;
+  text-align:center;
+}
+
+/* ===== Hero Section ===== */
+.split-hero{
+  font-size:clamp(2.5rem,6vw,5rem);
+  font-weight:900;letter-spacing:-0.03em;
+  color:#FFFFFF;
+  line-height:1.1;
+}
+.split-hero code{
+  font-family:'SF Mono','Fira Code','Cascadia Code',monospace;
+  color:#00E676;
+  background:rgba(0,230,118,0.1);
+  padding:0.1em 0.3em;border-radius:6px;
+}
+.subtitle{
+  margin-top:1rem;
+  font-size:1.2rem;
+  color:rgba(255,255,255,0.5);
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+}
+
+/* ===== Stats Section ===== */
+.stat-grid{
+  display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;
+  margin-top:2rem;
+}
+.stat{
+  background:rgba(26,58,74,0.4);
+  border:1px solid rgba(77,208,225,0.2);
+  border-radius:12px;
+  padding:1.5rem 2rem;
+  min-width:160px;
+  text-align:center;
+}
+.stat .counter{
+  font-size:3rem;font-weight:900;
+  color:#FFFFFF;
+  font-variant-numeric:tabular-nums;
+}
+.stat .label{
+  font-size:0.85rem;color:rgba(255,255,255,0.5);
+  margin-top:0.25rem;
+  text-transform:uppercase;letter-spacing:0.1em;
+}
+
+/* ===== Portrait Card Grid ===== */
+.portrait-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:1.5rem;
+  margin-top:2rem;
+  width:100%;
+}
+.card{
+  background:rgba(26,58,74,0.35);
+  border:1px solid rgba(171,71,188,0.2);
+  border-radius:12px;
+  padding:2rem 1.5rem;
+  text-align:center;
+  opacity:0;
+  transform:translateY(30px) scale(0.95);
+  transition:opacity 0.6s ease-out,transform 0.6s ease-out,border-color 0.4s;
+}
+.card.revealed{
+  opacity:1;
+  transform:translateY(0) scale(1);
+}
+.card:hover{
+  border-color:rgba(171,71,188,0.6);
+  background:rgba(26,58,74,0.55);
+}
+.card .card-icon{
+  font-size:2.5rem;margin-bottom:0.75rem;
+}
+.card h3{
+  color:#FFFFFF;font-size:1.1rem;margin-bottom:0.5rem;
+}
+.card p{
+  color:rgba(255,255,255,0.5);font-size:0.9rem;
+}
+
+/* ===== CTA Section ===== */
+.cta{
+  display:inline-block;
+  margin-top:2rem;
+  padding:1rem 3rem;
+  font-size:1.1rem;font-weight:700;
+  letter-spacing:0.1em;
+  color:#FFFFFF;
+  background:linear-gradient(135deg,#AB47BC,#E61A1A);
+  border:none;border-radius:50px;
+  cursor:pointer;
+  transition:transform 0.2s,box-shadow 0.3s;
+}
+.cta:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 40px rgba(230,26,26,0.4);
+}
+
+/* ===== Section Depth Indicator ===== */
+.depth-indicator{
+  position:fixed;right:1.5rem;top:50%;transform:translateY(-50%);
+  z-index:10;
+  display:flex;flex-direction:column;gap:1rem;
+}
+.depth-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:rgba(255,255,255,0.2);
+  transition:background 0.3s,transform 0.3s;
+}
+.depth-dot.active{transform:scale(1.5)}
+.depth-dot:nth-child(1).active{background:#1A4DE6}
+.depth-dot:nth-child(2).active{background:#4DD0E1}
+.depth-dot:nth-child(3).active{background:#AB47BC}
+.depth-dot:nth-child(4).active{background:#E61A1A}
+
+/* ===== Mic Overlay (Privacy-First) ===== */
+#mic-overlay{
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
+  z-index:20;
+  background:rgba(10,10,15,0.9);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(77,208,225,0.3);
+  border-radius:50px;
+  padding:0.75rem 1.5rem;
+  display:flex;align-items:center;gap:0.75rem;
+  cursor:pointer;
+  transition:border-color 0.3s,background 0.3s;
+}
+#mic-overlay:hover{
+  border-color:rgba(77,208,225,0.7);
+  background:rgba(10,10,15,0.95);
+}
+#mic-overlay.active{
+  border-color:rgba(230,26,26,0.5);
+}
+.mic-icon{
+  width:12px;height:12px;border-radius:50%;
+  background:#4DD0E1;
+  transition:background 0.3s;
+}
+#mic-overlay.active .mic-icon{
+  background:#E61A1A;
+  animation:mic-pulse 0.8s ease-in-out infinite;
+}
+#mic-overlay.active .mic-label{color:#E8E8E8}
+.mic-label{
+  font-size:0.85rem;color:rgba(255,255,255,0.6);
+}
+.mic-status{
+  font-size:0.75rem;color:rgba(255,255,255,0.4);
+}
+
+@keyframes mic-pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(230,26,26,0.6)}
+  50%{box-shadow:0 0 0 8px rgba(230,26,26,0)}
+}
+
+/* ===== Scroll Spacer at Bottom ===== */
+#scroll-spacer{height:30vh}
+</style>
+</head>
+<body>
+
+<!-- Canvas container for p5.js -->
+<div id="canvas-container"></div>
+
+<!-- Depth indicator dots -->
+<div class="depth-indicator" id="depth-indicator">
+  <div class="depth-dot" data-index="0"></div>
+  <div class="depth-dot" data-index="1"></div>
+  <div class="depth-dot" data-index="2"></div>
+  <div class="depth-dot" data-index="3"></div>
+</div>
+
+<!-- Content overlay -->
+<div id="content-overlay">
+
+  <!-- Section 0: Hero / Hook -->
+  <section class="scroll-section" data-depth="0" data-section="0">
+    <div class="section-panel">
+      <h1 class="split-hero">THIS IS A <code>WATERFALL</code></h1>
+      <p class="subtitle">Scroll to descend into the depths</p>
+    </div>
+  </section>
+
+  <!-- Section 1: Mission / Context -->
+  <section class="scroll-section" data-depth="0.25" data-section="1">
+    <div class="section-panel">
+      <h2 style="color:#4DD0E1;font-size:2rem;margin-bottom:1rem;">The Rapids</h2>
+      <p style="color:#E8E8E8;font-size:1.1rem;line-height:1.7;">
+        Every waterfall tells a story of gravity, time, and transformation.
+        As you descend, the water accelerates — from a <span style="color:#1A4DE6;">calm blue source</span>,
+        through <span style="color:#4DD0E1;">cyan rapids</span>,
+        into <span style="color:#AB47BC;">purple churn</span>,
+        and finally to <span style="color:#E61A1A;">red intensity</span> at the basin.
+      </p>
+    </div>
+  </section>
+
+  <!-- Section 2: Stats / Data -->
+  <section class="scroll-section" data-depth="0.5" data-section="2">
+    <div class="section-panel">
+      <h2 style="color:#AB47BC;font-size:2rem;margin-bottom:1rem;">The Numbers</h2>
+      <div class="stat-grid">
+        <div class="stat" data-target="42">
+          <div class="counter">0</div>
+          <div class="label">Million Gallons Flow Daily</div>
+        </div>
+        <div class="stat" data-target="7">
+          <div class="counter">0</div>
+          <div class="label">Continents Touched</div>
+        </div>
+        <div class="stat" data-target="12000">
+          <div class="counter">0</div>
+          <div class="label">Years Flowing</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Portrait Grid / Testimonials -->
+  <section class="scroll-section" data-depth="0.75" data-section="3">
+    <div class="section-panel">
+      <h2 style="color:#E61A1A;font-size:2rem;margin-bottom:1rem;">Witnesses of the Fall</h2>
+      <div class="portrait-grid">
+        <div class="card" data-card="0">
+          <div class="card-icon">🌊</div>
+          <h3>The Hydrologist</h3>
+          <p>"I've measured flows for 40 years. This fall defies all models."</p>
+        </div>
+        <div class="card" data-card="1">
+          <div class="card-icon">🧗</div>
+          <h3>The Climber</h3>
+          <p>"You don't conquer the waterfall. You surrender to it."</p>
+        </div>
+        <div class="card" data-card="2">
+          <div class="card-icon">🎨</div>
+          <h3>The Artist</h3>
+          <p>"Every color exists in the mist at the bottom."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: CTA -->
+  <section class="scroll-section" data-depth="0.9" data-section="4">
+    <div class="section-panel">
+      <h2 style="color:#FFFFFF;font-size:2.5rem;margin-bottom:0.5rem;">Dive In</h2>
+      <p style="color:rgba(255,255,255,0.5);">The water is waiting. The descent is the destination.</p>
+      <button class="cta" onclick="window.scrollTo({top:0,behavior:'smooth'})">ASCEND &amp; FALL AGAIN</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- Mic activation overlay -->
+<div id="mic-overlay" onclick="toggleMic()" title="Click to enable microphone interaction">
+  <div class="mic-icon"></div>
+  <span class="mic-label">Voice Ripple</span>
+  <span class="mic-status" id="mic-status">click to activate</span>
+</div>
+
+<!-- Scroll spacer for depth -->
+<div id="scroll-spacer"></div>
+
+<!-- p5.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
+
+<script>
+// ============================================================
+// GLSL SHADERS
+// ============================================================
+
+const vertShaderSrc = `
+attribute vec3 aPosition;
+attribute vec2 aTexCoord;
+uniform mat4 uModelViewMatrix;
+uniform mat4 uProjectionMatrix;
+varying vec2 vTexCoord;
+void main() {
+  vTexCoord = aTexCoord;
+  gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
+}`;
+
+const fragShaderSrc = `
+precision highp float;
+
+uniform float uScrollDepth;
+uniform float uVolume;
+uniform float uTime;
+uniform vec2  uResolution;
+uniform float uSplashIntensity;
+uniform vec2  uSplashPos;
+uniform float uSplashTime;
+
+varying vec2 vTexCoord;
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / uResolution;
+
+  // ---- Layer 1: Multi-frequency sine displacement ----
+  float amplitude = 0.02 + uScrollDepth * 0.15 + uVolume * 0.08;
+
+  float d1 = sin(uv.y * 12.0  + uTime * 1.2) * 0.5;
+  float d2 = sin(uv.x * 8.0   + uv.y * 6.0 + uTime * 0.8) * 0.3;
+  float d3 = sin(uv.x * 20.0  + uTime * 2.0) * 0.2;
+  float displacement = (d1 + d2 + d3) * amplitude;
+
+  vec2 distortedUV = uv + vec2(displacement, displacement * 0.5);
+
+  // ---- Layer 2: Height-based intensity falloff ----
+  // At scroll=0, intensity uniform. At scroll=1, bottom is much stronger.
+  float heightIntensity = mix(1.0, 1.0 - distortedUV.y, uScrollDepth * 0.7);
+  float localIntensity = uVolume * heightIntensity + uScrollDepth * 0.5;
+  localIntensity = clamp(localIntensity, 0.0, 1.0);
+
+  // ---- Layer 3: Scroll-driven 4-stage color temperature ----
+  vec3 coolBlue  = vec3(0.102, 0.302, 0.902);  // #1A4DE6
+  vec3 cyanMid   = vec3(0.302, 0.816, 0.882);  // #4DD0E1
+  vec3 purpleMid = vec3(0.671, 0.278, 0.737);  // #AB47BC
+  vec3 hotRed    = vec3(0.902, 0.102, 0.102);  // #E61A1A
+
+  vec3 color;
+  if (uScrollDepth < 0.33) {
+    float t = uScrollDepth / 0.33;
+    color = mix(coolBlue, cyanMid, t);
+  } else if (uScrollDepth < 0.66) {
+    float t = (uScrollDepth - 0.33) / 0.33;
+    color = mix(cyanMid, purpleMid, t);
+  } else {
+    float t = (uScrollDepth - 0.66) / 0.34;
+    color = mix(purpleMid, hotRed, t);
+  }
+
+  // ---- Audio volume pulse (modulates color) ----
+  color += vec3(uVolume * 0.2, uVolume * 0.1, -uVolume * 0.1);
+
+  // ---- Displacement glow ----
+  float glow = abs(displacement) * 3.0;
+  color += vec3(glow * 0.1, glow * 0.15, glow * 0.2);
+
+  // ---- Splash ripple (stone-in-water effect) ----
+  if (uSplashIntensity > 0.01) {
+    float splashDist = length(uv - uSplashPos);
+    float splashAge = uTime - uSplashTime;
+    // Expanding ring that fades
+    float ringRadius = splashAge * 0.35;
+    float ringThickness = 0.04 + splashAge * 0.03;
+    float ring = 1.0 - smoothstep(ringRadius - ringThickness, ringRadius + ringThickness, splashDist);
+    float fade = exp(-splashAge * 2.0);
+    float splashGlow = ring * fade * uSplashIntensity;
+    // White-blue flash at splash center
+    color += vec3(splashGlow * 0.5, splashGlow * 0.7, splashGlow * 1.0);
+    // Add slight displacement from splash
+    displacement += ring * fade * uSplashIntensity * 0.015;
+  }
+
+  // ---- Apply overall intensity modulation ----
+  color *= 0.7 + localIntensity * 0.5;
+
+  // ---- Darken edges for depth feel ----
+  float vignette = 1.0 - length((uv - 0.5) * 1.3) * 0.4;
+  color *= vignette;
+
+  gl_FragColor = vec4(color, 1.0);
+}`;
+
+// ============================================================
+// GLOBAL STATE
+// ============================================================
+let theShader;
+let mic, amplitude;
+let micActive = false;
+let micActivated = false; // user explicitly clicked
+let smoothVol = 0.0;
+let rawVol = 0.0;
+
+// Splash tracking
+let splashIntensity = 0.0;
+let splashPos = { x: 0.5, y: 0.5 };
+let splashTime = 0.0;
+
+// Counters that need animation
+let activeCounters = [];
+
+// ============================================================
+// p5.js SKETCH
+// ============================================================
+function setup() {
+  const c = createCanvas(windowWidth, windowHeight, WEBGL);
+  c.parent('canvas-container');
+  pixelDensity(1);
+
+  // Create shader
+  theShader = createShader(vertShaderSrc, fragShaderSrc);
+
+  // Setup microphone (but don't start yet — privacy-first)
+  try {
+    mic = new p5.AudioIn();
+    amplitude = new p5.Amplitude();
+    amplitude.setInput(mic);
+  } catch (e) {
+    console.warn('Microphone not available:', e);
+    mic = null;
+    amplitude = null;
+  }
+}
+
+function draw() {
+  // Calculate scroll depth [0, 1]
+  const scrollHeight = document.body.scrollHeight - windowHeight;
+  let scrollDepth = scrollHeight > 0
+    ? window.scrollY / scrollHeight
+    : 0;
+  scrollDepth = constrain(scrollDepth, 0, 1);
+
+  // Audio volume
+  let vol = 0.15; // ambient when mic is off
+  if (micActive && amplitude) {
+    rawVol = amplitude.getLevel();
+    smoothVol = lerp(smoothVol, rawVol, 0.1);
+    vol = smoothVol * 3.0; // amplify for visible effect
+    vol = constrain(vol, 0, 1);
+  }
+
+  // Decay splash intensity
+  if (splashIntensity > 0.001) {
+    splashIntensity *= 0.94;
+  } else {
+    splashIntensity = 0.0;
+  }
+
+  // Set shader uniforms
+  shader(theShader);
+  theShader.setUniform('uScrollDepth', scrollDepth);
+  theShader.setUniform('uVolume', vol);
+  theShader.setUniform('uTime', millis() / 1000.0);
+  theShader.setUniform('uResolution', [width, height]);
+  theShader.setUniform('uSplashIntensity', splashIntensity);
+  theShader.setUniform('uSplashPos', [splashPos.x, splashPos.y]);
+  theShader.setUniform('uSplashTime', splashTime);
+
+  // Draw fullscreen quad (orthographic projection for pixel-perfect coverage)
+  push();
+  ortho(-width/2, width/2, -height/2, height/2, -100, 100);
+  translate(0, 0, 0);
+  noStroke();
+  plane(width, height);
+  pop();
+
+  // Update depth indicator dots
+  updateDepthDots(scrollDepth);
+
+  // Animate active counters
+  updateCounters();
+}
+
+function windowResized() {
+  windowWidth = window.innerWidth;
+  windowHeight = window.innerHeight;
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+// ============================================================
+// MICROPHONE TOGGLE (Privacy-First)
+// ============================================================
+function toggleMic() {
+  if (!mic) {
+    document.getElementById('mic-status').textContent = 'mic unavailable';
+    return;
+  }
+
+  const overlay = document.getElementById('mic-overlay');
+  const status = document.getElementById('mic-status');
+
+  if (!micActivated) {
+    // First click: request permission
+    userStartAudio().then(() => {
+      mic.start();
+      micActive = true;
+      micActivated = true;
+      overlay.classList.add('active');
+      status.textContent = 'listening...';
+    }).catch((err) => {
+      console.warn('Mic permission denied:', err);
+      status.textContent = 'permission denied';
+    });
+  } else {
+    // Toggle on/off
+    micActive = !micActive;
+    if (micActive) {
+      overlay.classList.add('active');
+      status.textContent = 'listening...';
+    } else {
+      overlay.classList.remove('active');
+      status.textContent = 'paused — click to resume';
+      smoothVol = 0.0;
+    }
+  }
+}
+
+// ============================================================
+// DEPTH INDICATOR DOTS
+// ============================================================
+function updateDepthDots(scrollDepth) {
+  const dots = document.querySelectorAll('.depth-dot');
+  const thresholds = [0.0, 0.25, 0.5, 0.75];
+  dots.forEach((dot, i) => {
+    const threshold = thresholds[i];
+    const nextThreshold = thresholds[i + 1] || 1.0;
+    if (scrollDepth >= threshold && scrollDepth < nextThreshold + 0.1) {
+      dot.classList.add('active');
+    } else {
+      dot.classList.remove('active');
+    }
+  });
+}
+
+// ============================================================
+// INTERSECTION OBSERVER — Section Reveals
+// ============================================================
+const sectionObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      const section = entry.target;
+      const depth = parseFloat(section.dataset.depth || '0');
+      const delay = depth * 250;
+
+      setTimeout(() => {
+        section.classList.add('visible');
+
+        // Trigger counters in this section
+        section.querySelectorAll('.counter').forEach(c => {
+          const parent = c.closest('.stat');
+          if (parent && parent.dataset.target) {
+            startCounter(c, parseInt(parent.dataset.target));
+          }
+        });
+
+        // Trigger card reveals + splash
+        const cards = section.querySelectorAll('.card');
+        cards.forEach((card, i) => {
+          setTimeout(() => {
+            card.classList.add('revealed');
+            // Trigger splash at card position
+            triggerSplashForElement(card);
+          }, i * 200);
+        });
+      }, delay);
+
+      // Unobserve after triggering
+      sectionObserver.unobserve(section);
+    }
+  });
+}, { threshold: 0.2 });
+
+// Observe all scroll sections
+document.querySelectorAll('.scroll-section').forEach(section => {
+  sectionObserver.observe(section);
+});
+
+// ============================================================
+// SPLASH TRIGGER — Stone-in-water metaphor
+// ============================================================
+function triggerSplashForElement(el) {
+  const rect = el.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  splashPos = {
+    x: cx / windowWidth,
+    y: cy / windowHeight
+  };
+  splashTime = millis() / 1000.0;
+  splashIntensity = 0.7;
+}
+
+// ============================================================
+// COUNTER ANIMATION
+// ============================================================
+function startCounter(el, target) {
+  const existing = activeCounters.find(c => c.el === el);
+  if (existing) {
+    existing.target = target;
+    existing.startValue = existing.currentValue;
+    existing.startTime = performance.now();
+    existing.duration = 2000;
+    return;
+  }
+  activeCounters.push({
+    el: el,
+    target: target,
+    currentValue: 0,
+    startValue: 0,
+    startTime: performance.now(),
+    duration: 2000
+  });
+}
+
+function updateCounters() {
+  const now = performance.now();
+  for (let i = activeCounters.length - 1; i >= 0; i--) {
+    const c = activeCounters[i];
+    const elapsed = now - c.startTime;
+    const progress = Math.min(elapsed / c.duration, 1.0);
+    // Ease-out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    c.currentValue = Math.round(c.startValue + (c.target - c.startValue) * eased);
+    c.el.textContent = c.currentValue.toLocaleString();
+    if (progress >= 1.0) {
+      activeCounters.splice(i, 1);
+    }
+  }
+}
+
+// ============================================================
+// RESIZE HANDLER — update splash pos reference
+// ============================================================
+let windowWidth = window.innerWidth;
+let windowHeight = window.innerHeight;
+window.addEventListener('resize', () => {
+  windowWidth = window.innerWidth;
+  windowHeight = window.innerHeight;
+});
+</script>
+
+</body>
+</html>

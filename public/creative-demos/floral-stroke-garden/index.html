@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Floral Stroke Garden</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #000500;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    canvas {
+      display: block;
+    }
+    #wordInput {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: transparent;
+      border: 1px solid #ffffff;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 8px 16px;
+      text-align: center;
+      outline: none;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      z-index: 10;
+    }
+    #wordInput::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    #label {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #f5f5f5;
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 10;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <input type="text" id="wordInput" value="LILY" maxlength="6">
+  <div id="label">The word is alive. Click to prune.</div>
+  <script>
+    let flowers = [];
+    let gridSpacing = 40;
+    let time = 0;
+    let input;
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      textFont('Helvetica Neue');
+      input = document.getElementById('wordInput');
+      input.addEventListener('input', (e) => {
+        generateComposition(e.target.value.toUpperCase());
+      });
+      generateComposition(input.value.toUpperCase());
+    }
+
+    function draw() {
+      background(0, 5, 0, 10);
+      time += 0.01;
+
+      drawGrid();
+
+      // Draw stems with dashed line pattern
+      drawingContext.setLineDash([2, 3]);
+      for (let f of flowers) {
+        if (f.pruned || f.stemAlpha <= 0) continue;
+        let neighbors = getNearestNeighbors(f, 2, 40);
+        for (let n of neighbors) {
+          let other = n.flower;
+          if (other.pruned || other.stemAlpha <= 0) continue;
+          // Draw each stem only once
+          if (f.id < other.id) {
+            drawStem(f, other);
+          }
+        }
+      }
+      drawingContext.setLineDash([]);
+
+      // Update and draw flowers
+      for (let f of flowers) {
+        f.update();
+        f.display();
+      }
+    }
+
+    function drawGrid() {
+      stroke(51);
+      strokeWeight(0.5);
+      for (let x = 0; x < width; x += gridSpacing) {
+        line(x, 0, x, height);
+      }
+      for (let y = 0; y < height; y += gridSpacing) {
+        line(0, y, width, y);
+      }
+    }
+
+    function drawStem(a, b) {
+      let alpha = min(a.stemAlpha, b.stemAlpha);
+      if (alpha <= 0) return;
+      stroke(255, 200 * alpha);
+      strokeWeight(1);
+      let x1 = a.pos.x + map(noise(a.id * 0.1, time), 0, 1, -2, 2);
+      let y1 = a.pos.y + map(noise(a.id * 0.1 + 100, time), 0, 1, -2, 2);
+      let x2 = b.pos.x + map(noise(b.id * 0.1, time), 0, 1, -2, 2);
+      let y2 = b.pos.y + map(noise(b.id * 0.1 + 100, time), 0, 1, -2, 2);
+      line(x1, y1, x2, y2);
+    }
+
+    function getNearestNeighbors(flower, count, maxDist) {
+      let dists = [];
+      for (let other of flowers) {
+        if (other === flower || other.pruned) continue;
+        let d = p5.Vector.dist(flower.pos, other.pos);
+        if (d < maxDist) {
+          dists.push({ flower: other, dist: d });
+        }
+      }
+      dists.sort((a, b) => a.dist - b.dist);
+      return dists.slice(0, count);
+    }
+
+    function generateComposition(word) {
+      flowers = [];
+      if (!word || word.trim() === '') return;
+
+      let pg = createGraphics(width, height);
+      pg.pixelDensity(1);
+      pg.textFont('Helvetica Neue');
+      pg.textSize(200);
+      pg.textAlign(CENTER, CENTER);
+      pg.textStyle(BOLD);
+      pg.background(255);
+      pg.fill(0);
+      pg.noStroke();
+      pg.text(word, width / 2, height / 2);
+
+      let points = [];
+      let useFallback = false;
+
+      try {
+        points = pg.textToPoints(word, width / 2, height / 2, 200, {
+          sampleFactor: 0.25,
+          simplifyThreshold: 0
+        });
+      } catch (e) {
+        useFallback = true;
+      }
+
+      if (!useFallback && points && points.length > 0) {
+        for (let p of points) {
+          let x = p.x + randomGaussian(0, 5);
+          let y = p.y + randomGaussian(0, 5);
+          flowers.push(new Flower(x, y, flowers.length));
+        }
+      } else {
+        pg.loadPixels();
+        let step = 4;
+        for (let y = 0; y < pg.height; y += step) {
+          for (let x = 0; x < pg.width; x += step) {
+            let idx = (y * pg.width + x) * 4;
+            let r = pg.pixels[idx];
+            let g = pg.pixels[idx + 1];
+            let b = pg.pixels[idx + 2];
+            // Collect non-white pixels (text is black on white background)
+            if (r < 200 || g < 200 || b < 200) {
+              let fx = x + randomGaussian(0, 5);
+              let fy = y + randomGaussian(0, 5);
+              flowers.push(new Flower(fx, fy, flowers.length));
+            }
+          }
+        }
+      }
+    }
+
+    function mousePressed() {
+      for (let f of flowers) {
+        if (f.pruned) continue;
+        let d = dist(mouseX, mouseY, f.pos.x, f.pos.y);
+        if (d < 15) {
+          f.prune();
+          break;
+        }
+      }
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      generateComposition(input.value.toUpperCase());
+    }
+
+    class Flower {
+      constructor(x, y, id) {
+        this.pos = createVector(x, y);
+        this.id = id;
+        this.scale = 0;
+        this.targetScale = 1;
+        this.growthFrame = 0;
+        this.maxGrowthFrames = 30;
+        this.pruned = false;
+        this.pruneFrame = 0;
+        this.maxPruneFrames = 15;
+        this.stemAlpha = 1;
+        this.petalCount = floor(random(5, 7));
+        this.petalSize = random(3, 8);
+        this.petalColor = random(['#ffffff', '#f4d03f', '#a569bd']);
+        this.centerColor = random(['#f4d03f', '#a569bd']);
+        this.angleOffset = random(TWO_PI);
+      }
+
+      update() {
+        if (!this.pruned) {
+          if (this.growthFrame < this.maxGrowthFrames) {
+            this.growthFrame++;
+            let t = this.growthFrame / this.maxGrowthFrames;
+            this.scale = 1 - pow(1 - t, 3);
+          }
+        } else {
+          if (this.pruneFrame < this.maxPruneFrames) {
+            this.pruneFrame++;
+            let t = this.pruneFrame / this.maxPruneFrames;
+            this.scale = 1 - pow(t, 2);
+            this.stemAlpha = 1 - t;
+          } else {
+            this.scale = 0;
+            this.stemAlpha = 0;
+          }
+        }
+      }
+
+      display() {
+        if (this.scale <= 0.001) return;
+        push();
+        let swayX = map(noise(this.id * 0.1, time * 2), 0, 1, -1, 1);
+        let swayY = map(noise(this.id * 0.1 + 50, time * 2), 0, 1, -1, 1);
+        translate(this.pos.x + swayX, this.pos.y + swayY);
+        scale(this.scale);
+        noStroke();
+        fill(this.petalColor);
+        for (let i = 0; i < this.petalCount; i++) {
+          let a = this.angleOffset + (TWO_PI / this.petalCount) * i;
+          let px = cos(a) * this.petalSize * 0.5;
+          let py = sin(a) * this.petalSize * 0.5;
+          ellipse(px, py, this.petalSize, this.petalSize * 0.6);
+        }
+        fill(this.centerColor);
+        circle(0, 0, 3);
+        pop();
+      }
+
+      prune() {
+        this.pruned = true;
+        this.pruneFrame = 0;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scroll-Driven Noise Jukebox</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; background: #050505; color: #FFFFFF; font-family: 'Helvetica Neue', Arial, sans-serif; overflow-x: hidden; }
+    canvas { position: fixed; top: 0; left: 0; z-index: 0; display: block; }
+    #scroll-container { position: relative; z-index: 1; height: 500vh; }
+    #sticky-text { position: fixed; top: 40px; left: 50%; transform: translateX(-50%); z-index: 2; text-align: center; pointer-events: none; max-width: 600px; width: 90%; }
+    #sticky-text h1 { font-size: 1.5rem; margin: 0; color: #FFFFFF; text-shadow: 0 2px 8px rgba(0,0,0,0.6); letter-spacing: 1px; }
+    #sticky-text p { font-size: 0.9rem; margin: 8px 0 0; color: #F5F5F0; opacity: 0.9; text-shadow: 0 1px 4px rgba(0,0,0,0.6); line-height: 1.4; }
+    #tooltip { position: absolute; background: rgba(5,5,5,0.9); color: #FFFFFF; padding: 8px 12px; border-radius: 4px; font-size: 12px; pointer-events: none; display: none; z-index: 3; border: 1px solid #444444; white-space: nowrap; }
+    #instructions { position: fixed; bottom: 20px; right: 20px; z-index: 2; font-size: 12px; color: #F5F5F0; opacity: 0.7; text-align: right; pointer-events: none; }
+    .genre-key { position: fixed; bottom: 20px; left: 20px; z-index: 2; background: rgba(5,5,5,0.7); padding: 10px 14px; border-radius: 6px; border: 1px solid #444; font-size: 12px; pointer-events: none; }
+    .genre-key span { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <div id="scroll-container"></div>
+  <div id="sticky-text">
+    <h1 id="act-title">Intro</h1>
+    <p id="act-desc">The cosmos of popular music awaits.</p>
+  </div>
+  <div id="tooltip"></div>
+  <div id="instructions">Scroll to explore • Click a node to solo • Hover for details • Press R to reset</div>
+  <div class="genre-key">
+    <div><span style="background:#FF6F61;"></span>Pop</div>
+    <div><span style="background:#F4D03F;"></span>Rock</div>
+    <div><span style="background:#FF00FF;"></span>Hip Hop</div>
+    <div><span style="background:#9CAF88;"></span>Country</div>
+    <div><span style="background:#00FFFF;"></span>Ghost</div>
+  </div>
+
+  <script>
+    const songs = [
+      // Pop (15)
+      { title: "I Want to Hold Your Hand", artist: "The Beatles", year: 1963, genre: "Pop" },
+      { title: "Like a Prayer", artist: "Madonna", year: 1989, genre: "Pop" },
+      { title: "Billie Jean", artist: "Michael Jackson", year: 1983, genre: "Pop" },
+      { title: "...Baby One More Time", artist: "Britney Spears", year: 1998, genre: "Pop" },
+      { title: "Rolling in the Deep", artist: "Adele", year: 2010, genre: "Pop" },
+      { title: "Uptown Funk", artist: "Mark Ronson ft. Bruno Mars", year: 2014, genre: "Pop" },
+      { title: "Bad Romance", artist: "Lady Gaga", year: 2009, genre: "Pop" },
+      { title: "Watermelon Sugar", artist: "Harry Styles", year: 2019, genre: "Pop" },
+      { title: "Shape of You", artist: "Ed Sheeran", year: 2017, genre: "Pop" },
+      { title: "Levitating", artist: "Dua Lipa", year: 2020, genre: "Pop" },
+      { title: "Toxic", artist: "Britney Spears", year: 2003, genre: "Pop" },
+      { title: "Material Girl", artist: "Madonna", year: 1984, genre: "Pop" },
+      { title: "Beat It", artist: "Michael Jackson", year: 1983, genre: "Pop" },
+      { title: "Can't Stop the Feeling", artist: "Justin Timberlake", year: 2016, genre: "Pop" },
+      { title: "Love Yourself", artist: "Justin Bieber", year: 2015, genre: "Pop" },
+      // Rock (15)
+      { title: "Like a Rolling Stone", artist: "Bob Dylan", year: 1965, genre: "Rock" },
+      { title: "Stairway to Heaven", artist: "Led Zeppelin", year: 1971, genre: "Rock" },
+      { title: "Bohemian Rhapsody", artist: "Queen", year: 1975, genre: "Rock" },
+      { title: "Hotel California", artist: "Eagles", year: 1976, genre: "Rock" },
+      { title: "Smells Like Teen Spirit", artist: "Nirvana", year: 1991, genre: "Rock" },
+      { title: "Sweet Child O' Mine", artist: "Guns N' Roses", year: 1987, genre: "Rock" },
+      { title: "Born to Run", artist: "Bruce Springsteen", year: 1975, genre: "Rock" },
+      { title: "Wonderwall", artist: "Oasis", year: 1995, genre: "Rock" },
+      { title: "Livin' on a Prayer", artist: "Bon Jovi", year: 1986, genre: "Rock" },
+      { title: "Seven Nation Army", artist: "The White Stripes", year: 2003, genre: "Rock" },
+      { title: "Creep", artist: "Radiohead", year: 1992, genre: "Rock" },
+      { title: "Paint It Black", artist: "The Rolling Stones", year: 1966, genre: "Rock" },
+      { title: "Baba O'Riley", artist: "The Who", year: 1971, genre: "Rock" },
+      { title: "Back in Black", artist: "AC/DC", year: 1980, genre: "Rock" },
+      { title: "Everlong", artist: "Foo Fighters", year: 1997, genre: "Rock" },
+      // Hip Hop (15)
+      { title: "Rapper's Delight", artist: "The Sugarhill Gang", year: 1979, genre: "Hip Hop" },
+      { title: "The Message", artist: "Grandmaster Flash", year: 1982, genre: "Hip Hop" },
+      { title: "Nuthin' But a 'G' Thang", artist: "Dr. Dre", year: 1992, genre: "Hip Hop" },
+      { title: "Juicy", artist: "The Notorious B.I.G.", year: 1994, genre: "Hip Hop" },
+      { title: "California Love", artist: "2Pac", year: 1995, genre: "Hip Hop" },
+      { title: "Lose Yourself", artist: "Eminem", year: 2002, genre: "Hip Hop" },
+      { title: "Empire State of Mind", artist: "Jay-Z", year: 2009, genre: "Hip Hop" },
+      { title: "Sicko Mode", artist: "Travis Scott", year: 2018, genre: "Hip Hop" },
+      { title: "Old Town Road", artist: "Lil Nas X", year: 2019, genre: "Hip Hop" },
+      { title: "HUMBLE.", artist: "Kendrick Lamar", year: 2017, genre: "Hip Hop" },
+      { title: "Gin and Juice", artist: "Snoop Dogg", year: 1993, genre: "Hip Hop" },
+      { title: "In Da Club", artist: "50 Cent", year: 2003, genre: "Hip Hop" },
+      { title: "Hotline Bling", artist: "Drake", year: 2015, genre: "Hip Hop" },
+      { title: "Stronger", artist: "Kanye West", year: 2007, genre: "Hip Hop" },
+      { title: "Mo Money Mo Problems", artist: "The Notorious B.I.G.", year: 1997, genre: "Hip Hop" },
+      // Country (15)
+      { title: "I Walk the Line", artist: "Johnny Cash", year: 1956, genre: "Country" },
+      { title: "Jolene", artist: "Dolly Parton", year: 1973, genre: "Country" },
+      { title: "The Gambler", artist: "Kenny Rogers", year: 1978, genre: "Country" },
+      { title: "Friends in Low Places", artist: "Garth Brooks", year: 1990, genre: "Country" },
+      { title: "Man! I Feel Like a Woman!", artist: "Shania Twain", year: 1997, genre: "Country" },
+      { title: "Before He Cheats", artist: "Carrie Underwood", year: 2006, genre: "Country" },
+      { title: "Need You Now", artist: "Lady A", year: 2009, genre: "Country" },
+      { title: "Wagon Wheel", artist: "Old Crow Medicine Show", year: 2004, genre: "Country" },
+      { title: "Take Me Home, Country Roads", artist: "John Denver", year: 1971, genre: "Country" },
+      { title: "Ring of Fire", artist: "Johnny Cash", year: 1963, genre: "Country" },
+      { title: "Crazy", artist: "Patsy Cline", year: 1961, genre: "Country" },
+      { title: "The Dance", artist: "Garth Brooks", year: 1989, genre: "Country" },
+      { title: "Stand By Your Man", artist: "Tammy Wynette", year: 1968, genre: "Country" },
+      { title: "Fancy", artist: "Reba McEntire", year: 1990, genre: "Country" },
+      { title: "Strawberry Wine", artist: "Deana Carter", year: 1996, genre: "Country" },
+      // 2 Ghosts
+      { title: "NULL_SONG", artist: "Z3PH", year: 3042, genre: "Quantum", isGhost: true },
+      { title: "GH0ST_TRACK", artist: "VOID", year: 2999, genre: "Quantum", isGhost: true }
+    ];
+
+    let nodes = [];
+    let scrollProgress = 0;
+    let distortion = 0;
+    let noiseScale = 0.003;
+    let soloNode = null;
+    let soloTimer = 0;
+    let cVoid, cAmber, cTeal;
+
+    const acts = [
+      { title: "Intro", desc: "The cosmos of popular music awaits." },
+      { title: "Golden Age", desc: "1965–1975 — The explosion of rock and pop." },
+      { title: "Jazz & Soul", desc: "1975–1990 — Genre diversification and the rise of hip-hop." },
+      { title: "Outliers", desc: "The data fractures — impossible songs appear." },
+      { title: "Dissolution", desc: "The archive dissolves into noise." }
+    ];
+    const actThresholds = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0];
+
+    function setup() {
+      let c = createCanvas(windowWidth, windowHeight);
+      c.elt.setAttribute('aria-label', 'Scroll-driven noise jukebox visualization');
+      cVoid = color('#050505');
+      cAmber = color('#D4A017');
+      cTeal = color('#00FFFF');
+      generateNodes();
+    }
+
+    function draw() {
+      let maxScroll = document.getElementById('scroll-container').offsetHeight - window.innerHeight;
+      scrollProgress = maxScroll > 0 ? constrain(window.scrollY / maxScroll, 0, 1) : 0;
+
+      let targetDistortion = map(scrollProgress, 0, 1, 0, 2.0);
+      if (soloNode) targetDistortion = 5.0;
+      distortion = lerp(distortion, targetDistortion, 0.05);
+
+      fill(5, 20);
+      noStroke();
+      rect(0, 0, width, height);
+
+      drawNoise();
+      updatePhysics();
+      updateStickyText();
+
+      for (let n of nodes) {
+        if (!n.visible) continue;
+        let col = getNoiseColor(n.x, n.y);
+        if (soloNode && n !== soloNode) {
+          col = color(red(col), green(col), blue(col), 76);
+        }
+        if (soloNode && n === soloNode) {
+          n.rotation += 0.05;
+        }
+        drawNode(n, col);
+      }
+
+      updateTooltip();
+
+      if (soloNode) {
+        soloTimer--;
+        if (soloTimer <= 0) soloNode = null;
+      }
+    }
+
+    function generateNodes() {
+      let genres = ['Pop', 'Rock', 'Hip Hop', 'Country'];
+      for (let i = 0; i < songs.length; i++) {
+        let s = songs[i];
+        let cluster = genres.indexOf(s.genre);
+        if (s.genre === 'Quantum') cluster = -1;
+        let shape = 'circle';
+        if (s.genre === 'Pop') shape = 'star';
+        if (s.genre === 'Rock') shape = 'spiral';
+        if (s.genre === 'Hip Hop') shape = 'diamond';
+        if (s.genre === 'Country') shape = 'circle';
+        if (s.genre === 'Quantum') shape = 'mandelbrot';
+        nodes.push({
+          title: s.title,
+          artist: s.artist,
+          year: s.year,
+          genre: s.genre,
+          isGhost: s.isGhost || false,
+          cluster: cluster,
+          shape: shape,
+          x: width / 2 + random(-60, 60),
+          y: height / 2 + random(-60, 60),
+          vx: 0,
+          vy: 0,
+          radius: random(8, 14),
+          visible: !s.isGhost,
+          alpha: s.isGhost ? 0 : 255,
+          targetAlpha: s.isGhost ? 0 : 255,
+          rotation: 0
+        });
+      }
+    }
+
+    function getNoiseColor(x, y) {
+      let n = getNoise(x, y);
+      let c1, c2, t;
+      if (n < 0.33) {
+        c1 = cVoid;
+        c2 = cAmber;
+        t = map(n, 0, 0.33, 0, 1);
+      } else if (n < 0.66) {
+        c1 = cAmber;
+        c2 = cTeal;
+        t = map(n, 0.33, 0.66, 0, 1);
+      } else {
+        c1 = cTeal;
+        c2 = cTeal;
+        t = 0;
+      }
+      return lerpColor(c1, c2, t);
+    }
+
+    function getNoise(x, y) {
+      let nx = x * noiseScale;
+      let ny = y * noiseScale;
+      let v = 0;
+      let amp = 0.5;
+      let freq = 1;
+      for (let i = 0; i < 4; i++) {
+        let wx = noise(ny * freq + i * 100);
+        let wy = noise(nx * freq + i * 200);
+        v += amp * noise((nx + distortion * wx) * freq, (ny + distortion * wy) * freq);
+        amp *= 0.5;
+        freq *= 2;
+      }
+      return v / 0.9375;
+    }
+
+    function drawNoise() {
+      let step = 20;
+      noStroke();
+      for (let y = 0; y < height + step; y += step) {
+        for (let x = 0; x < width + step; x += step) {
+          let col = getNoiseColor(x, y);
+          fill(col);
+          rect(x, y, step, step);
+        }
+      }
+    }
+
+    function updatePhysics() {
+      let t = scrollProgress;
+      let radius = map(t, 0, 1, 0, min(width, height) * 0.35);
+      let centroids = [];
+      for (let i = 0; i < 4; i++) {
+        let angle = i * HALF_PI + t * PI;
+        centroids.push({
+          x: width / 2 + cos(angle) * radius,
+          y: height / 2 + sin(angle) * radius
+        });
+      }
+
+      for (let n of nodes) {
+        if (!n.visible) continue;
+        if (n.isGhost) continue;
+        let c = centroids[n.cluster];
+        if (!c) continue;
+        let dx = c.x - n.x;
+        let dy = c.y - n.y;
+        n.vx += dx * 0.03;
+        n.vy += dy * 0.03;
+      }
+
+      for (let i = 0; i < nodes.length; i++) {
+        let n1 = nodes[i];
+        if (!n1.visible) continue;
+        for (let j = i + 1; j < nodes.length; j++) {
+          let n2 = nodes[j];
+          if (!n2.visible) continue;
+          let dx = n2.x - n1.x;
+          let dy = n2.y - n1.y;
+          let d = sqrt(dx * dx + dy * dy);
+          let minDist = (n1.radius + n2.radius) * 2.5;
+          if (d < minDist && d > 0) {
+            let force = (minDist - d) / minDist;
+            let repulse = 1.0;
+            if (n1.isGhost || n2.isGhost) repulse = 10.0;
+            let fx = (dx / d) * force * repulse * 0.5;
+            let fy = (dy / d) * force * repulse * 0.5;
+            n1.vx -= fx;
+            n1.vy -= fy;
+            n2.vx += fx;
+            n2.vy += fy;
+          }
+        }
+      }
+
+      for (let n of nodes) {
+        if (!n.visible) continue;
+        let d = dist(mouseX, mouseY, n.x, n.y);
+        if (d < 150) {
+          let f = (150 - d) / 150 * 0.02;
+          let angle = atan2(mouseY - n.y, mouseX - n.x);
+          n.vx += cos(angle) * f;
+          n.vy += sin(angle) * f;
+        }
+      }
+
+      if (scrollProgress >= 0.6) {
+        for (let n of nodes) {
+          if (n.isGhost && n.visible) {
+            let angle = atan2(mouseY - n.y, mouseX - n.x);
+            n.vx += cos(angle) * 0.005;
+            n.vy += sin(angle) * 0.005;
+          }
+        }
+      }
+
+      for (let n of nodes) {
+        n.vx *= 0.94;
+        n.vy *= 0.94;
+        n.x += n.vx;
+        n.y += n.vy;
+      }
+
+      let ghostTarget = (scrollProgress >= 0.6 && scrollProgress < 0.9) ? 255 : 0;
+      for (let n of nodes) {
+        if (n.isGhost) {
+          n.targetAlpha = ghostTarget;
+          n.alpha = lerp(n.alpha, n.targetAlpha, 0.05);
+          n.visible = n.alpha > 10;
+        }
+      }
+    }
+
+    function drawNode(n, col) {
+      let r = n.radius;
+      if (soloNode && n === soloNode) r *= 1.2;
+      push();
+      translate(n.x, n.y);
+      rotate(n.rotation);
+      if (n.shape === 'star') {
+        fill(col);
+        noStroke();
+        drawStar(0, 0, r, r * 0.5, 5);
+      } else if (n.shape === 'spiral') {
+        noFill();
+        stroke(col);
+        strokeWeight(max(2, r / 3));
+        drawSpiral(0, 0, r);
+      } else if (n.shape === 'diamond') {
+        fill(col);
+        noStroke();
+        drawDiamond(0, 0, r);
+      } else if (n.shape === 'circle') {
+        fill(col);
+        noStroke();
+        drawCircle(0, 0, r);
+      } else if (n.shape === 'mandelbrot') {
+        fill(col);
+        noStroke();
+        drawMandelbrot(0, 0, r);
+      }
+      pop();
+    }
+
+    function drawStar(x, y, outer, inner, points) {
+      beginShape();
+      for (let i = 0; i < points * 2; i++) {
+        let angle = map(i, 0, points * 2, 0, TWO_PI) - HALF_PI;
+        let r = (i % 2 === 0) ? outer : inner;
+        vertex(x + cos(angle) * r, y + sin(angle) * r);
+      }
+      endShape(CLOSE);
+    }
+
+    function drawSpiral(x, y, r) {
+      beginShape();
+      for (let i = 0; i <= 24; i++) {
+        let angle = i * 0.5;
+        let rad = map(i, 0, 24, 0, r);
+        vertex(x + cos(angle) * rad, y + sin(angle) * rad);
+      }
+      endShape();
+    }
+
+    function drawDiamond(x, y, r) {
+      beginShape();
+      vertex(x, y - r);
+      vertex(x + r, y);
+      vertex(x, y + r);
+      vertex(x - r, y);
+      endShape(CLOSE);
+    }
+
+    function drawCircle(x, y, r) {
+      beginShape();
+      for (let i = 0; i < 12; i++) {
+        let angle = map(i, 0, 12, 0, TWO_PI);
+        vertex(x + cos(angle) * r, y + sin(angle) * r);
+      }
+      endShape(CLOSE);
+    }
+
+    function drawMandelbrot(x, y, r) {
+      beginShape();
+      for (let i = 0; i < 16; i++) {
+        let angle = map(i, 0, 16, 0, TWO_PI);
+        let rad = r + sin(angle * 3) * r * 0.3;
+        vertex(x + cos(angle) * rad, y + sin(angle) * rad);
+      }
+      endShape(CLOSE);
+    }
+
+    function updateStickyText() {
+      let title = document.getElementById('act-title');
+      let desc = document.getElementById('act-desc');
+      let idx = 0;
+      for (let i = 0; i < actThresholds.length - 1; i++) {
+        if (scrollProgress >= actThresholds[i] && scrollProgress < actThresholds[i+1]) {
+          idx = i;
+          break;
+        }
+      }
+      if (scrollProgress >= 1.0) idx = acts.length - 1;
+      title.textContent = acts[idx].title;
+      desc.textContent = acts[idx].desc;
+    }
+
+    function updateTooltip() {
+      let tooltip = document.getElementById('tooltip');
+      let hovered = null;
+      for (let n of nodes) {
+        if (!n.visible) continue;
+        let d = dist(mouseX, mouseY, n.x, n.y);
+        if (d < n.radius + 6) {
+          hovered = n;
+          break;
+        }
+      }
+      if (hovered) {
+        tooltip.style.display = 'block';
+        tooltip.style.left = (hovered.x + 15) + 'px';
+        tooltip.style.top = (hovered.y - 10) + 'px';
+        tooltip.innerHTML = `<strong>${hovered.title}</strong><br>${hovered.artist}<br>${hovered.year} • ${hovered.genre}`;
+        if (hovered.isGhost) tooltip.innerHTML += '<br><em>⚠ GHOST NODE</em>';
+      } else {
+        tooltip.style.display = 'none';
+      }
+    }
+
+    function mousePressed() {
+      for (let n of nodes) {
+        if (!n.visible) continue;
+        let d = dist(mouseX, mouseY, n.x, n.y);
+        if (d < n.radius + 6) {
+          soloNode = n;
+          soloTimer = 120;
+          return;
+        }
+      }
+    }
+
+    function keyPressed() {
+      if (key === 'r' || key === 'R') {
+        resetSimulation();
+      }
+    }
+
+    function resetSimulation() {
+      window.scrollTo(0, 0);
+      soloNode = null;
+      soloTimer = 0;
+      for (let n of nodes) {
+        n.x = width / 2 + random(-60, 60);
+        n.y = height / 2 + random(-60, 60);
+        n.vx = 0;
+        n.vy = 0;
+        n.rotation = 0;
+        if (n.isGhost) {
+          n.alpha = 0;
+          n.targetAlpha = 0;
+          n.visible = false;
+        }
+      }
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+    }
+  </script>
+</body>
+</html>

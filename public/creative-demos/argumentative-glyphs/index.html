@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Argumentative Glyphs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght,wdth,slnt,GRAD@8..144,100..1000,25..151,-10..0,0..200&display=swap">
+  <style>
+    /* === RESET & BASE === */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #0b0b14;
+      color: #e0e0e0;
+      font-family: 'Roboto Flex', sans-serif;
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+      height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* === FIXED WORDS (the argument) === */
+    #light-word, #shadow-word {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      font-family: 'Roboto Flex', sans-serif;
+      font-size: clamp(3rem, 12vw, 10rem);
+      font-weight: 400;
+      font-variation-settings: "wght" 400, "wdth" 100, "slnt" 0, "GRAD" 0;
+      letter-spacing: -0.02em;
+      pointer-events: none;
+      user-select: none;
+      will-change: font-variation-settings, text-shadow;
+      transition: text-shadow 0.3s ease;
+    }
+    #light-word {
+      left: 5vw;
+      text-align: left;
+      color: #a78bfa;  /* violet-400 */
+      text-shadow: 0 0 40px rgba(167, 139, 250, 0.3);
+    }
+    #shadow-word {
+      right: 5vw;
+      text-align: right;
+      color: #22d3ee;  /* cyan-400 */
+      text-shadow: 0 0 40px rgba(34, 211, 238, 0.3);
+    }
+
+    /* === BACKGROUND CANVAS === */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: block;
+    }
+
+    /* === BACKGROUND GRADIENT OVERLAY === */
+    #bg-gradient {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: linear-gradient(90deg, rgba(120, 80, 255, 0.04) 0%, transparent 50%, rgba(0, 200, 255, 0.04) 100%);
+      transition: opacity 0.5s;
+    }
+
+    /* === SCROLL PROGRESS BAR === */
+    #scroll-progress {
+      position: fixed;
+      right: 12px;
+      top: 20vh;
+      bottom: 20vh;
+      width: 1px;
+      z-index: 20;
+      background: rgba(167, 139, 250, 0.15);
+      overflow: visible;
+    }
+    #scroll-progress::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: calc(var(--scroll-progress, 0%) * 100%);
+      background: linear-gradient(to bottom, #a78bfa, #22d3ee);
+      transition: height 0.05s linear;
+      will-change: height;
+    }
+    #scroll-progress.pulse {
+      animation: progressPulse 0.4s ease-out;
+    }
+    @keyframes progressPulse {
+      0%   { filter: brightness(1); }
+      50%  { filter: brightness(2.5); }
+      100% { filter: brightness(1); }
+    }
+
+    /* === PANEL LAYOUT === */
+    section.panel {
+      position: relative;
+      z-index: 5;
+      height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 2rem;
+    }
+
+    /* === PANEL NARRATIVE TEXT === */
+    .panel-narrative {
+      font-family: 'Roboto Flex', sans-serif;
+      font-size: clamp(1.2rem, 3vw, 2.2rem);
+      font-weight: 300;
+      font-variation-settings: "wght" 300, "wdth" 100, "slnt" 0, "GRAD" 0;
+      color: rgba(224, 224, 240, 0.85);
+      text-align: center;
+      max-width: 640px;
+      line-height: 1.6;
+      letter-spacing: 0.02em;
+      transform: translateY(20px);
+      opacity: 0;
+      will-change: transform, opacity;
+      clip-path: inset(0 0 100% 0);
+      transition: clip-path 1s cubic-bezier(0.22, 1, 0.36, 1), opacity 1s cubic-bezier(0.22, 1, 0.36, 1), transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .panel-narrative.reveal {
+      clip-path: inset(0 0 0 0);
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* === PANEL ACT LABEL === */
+    .panel-act-label {
+      position: absolute;
+      bottom: 3rem;
+      right: 3rem;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 0.75rem;
+      letter-spacing: 4px;
+      color: rgba(224, 224, 240, 0.25);
+      text-transform: uppercase;
+      transform: translateY(10px);
+      opacity: 0;
+      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s, opacity 0.6s ease 0.3s;
+      will-change: transform, opacity;
+    }
+    .panel-act-label.reveal {
+      transform: translateY(0);
+      opacity: 0.3;
+    }
+
+    /* === AMBIENT GLOW SPOTS (behind narrative) === */
+    .panel-glow {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0;
+      transition: opacity 1s ease 0.2s;
+      pointer-events: none;
+      z-index: -1;
+    }
+    .panel-glow.reveal { opacity: 0.6; }
+    .panel-glow.left {
+      left: -80px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: radial-gradient(circle, rgba(167, 139, 250, 0.15), transparent);
+    }
+    .panel-glow.right {
+      right: -80px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: radial-gradient(circle, rgba(34, 211, 238, 0.15), transparent);
+    }
+
+    /* === SCROLLBAR STYLING === */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(167, 139, 250, 0.3); border-radius: 2px; }
+
+    /* === FONT FALLBACK === */
+    .wf-loading #light-word, .wf-loading #shadow-word { visibility: hidden; }
+    .wf-active #light-word, .wf-active #shadow-word { visibility: visible; }
+  </style>
+</head>
+<body>
+
+  <!-- Fixed Typography (the argument) -->
+  <h1 id="light-word">LIGHT</h1>
+  <h1 id="shadow-word">SHADOW</h1>
+
+  <!-- Canvas for ambient particles -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Background gradient overlay -->
+  <div id="bg-gradient"></div>
+
+  <!-- Scroll progress bar -->
+  <div id="scroll-progress"></div>
+
+  <!-- Panel 1: Accusation -->
+  <section class="panel" data-act="1">
+    <div class="panel-glow left"></div>
+    <div class="panel-glow right"></div>
+    <p class="panel-narrative">You consume everything you touch. Nothing is safe from your reach — you pull all into yourself and call it order.</p>
+    <span class="panel-act-label">01 / ACCUSATION</span>
+  </section>
+
+  <!-- Panel 2: Rebuttal -->
+  <section class="panel" data-act="2">
+    <div class="panel-glow left"></div>
+    <div class="panel-glow right"></div>
+    <p class="panel-narrative">I illuminate what you would hide. Without me, your edges dissolve into nothing — I give form to what you only obscure.</p>
+    <span class="panel-act-label">02 / REBUTTAL</span>
+  </section>
+
+  <!-- Panel 3: Resolution -->
+  <section class="panel" data-act="3">
+    <div class="panel-glow left"></div>
+    <div class="panel-glow right"></div>
+    <p class="panel-narrative">Without shadow, light is blinding. Without light, shadow is nothing. Together we hold the world in balance — each breath defined by the other's silence.</p>
+    <span class="panel-act-label">03 / RESOLUTION</span>
+  </section>
+
+  <script>
+    // === 1. FONT LOADING ===
+    (function() {
+      document.documentElement.classList.add('wf-loading');
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght,wdth,slnt,GRAD@8..144,100..1000,25..151,-10..0,0..200&display=swap';
+      link.onload = () => {
+        document.documentElement.classList.remove('wf-loading');
+        document.documentElement.classList.add('wf-active');
+      };
+      link.onerror = () => {
+        // Fallback: still try without variable axes
+        document.documentElement.classList.remove('wf-loading');
+        document.documentElement.classList.add('wf-active');
+      };
+      document.head.appendChild(link);
+    })();
+
+    // === 2. DOM REFS ===
+    const lightEl = document.getElementById('light-word');
+    const shadowEl = document.getElementById('shadow-word');
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    const progressBar = document.getElementById('scroll-progress');
+    const progressFill = progressBar;
+    const panelSections = document.querySelectorAll('.panel');
+    const narratives = document.querySelectorAll('.panel-narrative');
+    const actLabels = document.querySelectorAll('.panel-act-label');
+    const glows = document.querySelectorAll('.panel-glow');
+    const bgGradient = document.getElementById('bg-gradient');
+
+    // === 3. CANVAS RESIZE ===
+    let W, H, dpr;
+
+    function resizeCanvas() {
+      dpr = window.devicePixelRatio || 1;
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+    }
+    resizeCanvas();
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    // === 4. PRESSURE SIMULATION (Lotka-Volterra oscillator) ===
+    let u = 0.55;  // lightPressure (prey)
+    let v = 0.45;  // shadowPressure (predator)
+    let scrollNorm = 0;
+    let frameCount = 0;
+    let weirdnessActive = false;
+    let weirdnessTimer = 0;
+
+    // Per-axis smoothed values for typography
+    const smooth = {
+      lightWght: 400, shadowWght: 400,
+      lightWdth: 100, shadowWdth: 100,
+      slnt: 0, grad: 100,
+      lightGlow: 0.3, shadowGlow: 0.3
+    };
+
+    function stepSimulation(dt) {
+      const scrollFactor = scrollNorm;
+      // Light (prey) growth rate increases with scroll → resolution brings growth
+      const alpha = 0.08 + scrollFactor * 0.04;
+      // Predation rate
+      let beta = 0.055 + (1 - scrollFactor) * 0.025;
+      // Shadow (predator) conversion efficiency
+      let delta = 0.050 + scrollFactor * 0.02;
+      // Shadow death rate
+      const gamma = 0.062 - scrollFactor * 0.025;
+
+      // === WEIRDNESS FACTOR: every ~47th frame, invert one parameter briefly ===
+      const weirdPrimes = [47, 59, 73, 89];
+      const isWeirdFrame = weirdPrimes.some(p => frameCount % p === 0);
+      
+      if (isWeirdFrame && !weirdnessActive) {
+        weirdnessActive = true;
+        weirdnessTimer = 2; // stay inverted for 2 frames
+        // Swap and amplify: feed becomes kill, kill becomes feed — creates argument spike
+        const tmp = beta;
+        beta = gamma * 2.5;
+        delta = tmp * 0.1;
+      }
+      if (weirdnessActive) {
+        weirdnessTimer--;
+        if (weirdnessTimer <= 0) weirdnessActive = false;
+      }
+
+      // Lotka-Volterra: du/dt = αu - βuv, dv/dt = δuv - γv
+      const du = (alpha * u - beta * u * v) * dt;
+      const dv = (delta * u * v - gamma * v) * dt;
+
+      u = Math.max(0.05, Math.min(1.0, u + du));
+      v = Math.max(0.05, Math.min(1.0, v + dv));
+
+      // Mutual inhibition coupling: when one is very high, it subtly suppresses the other
+      if (u > 0.8) v *= 0.998;
+      if (v > 0.8) u *= 0.998;
+
+      frameCount++;
+    }
+
+    // === 5. PARTICLE SYSTEM (4000 ambient particles) ===
+    const PARTICLE_COUNT = 4000;
+    // positions: Float32Array [x, y, phase, seed]
+    let particleData;
+
+    function initParticles() {
+      particleData = new Float32Array(PARTICLE_COUNT * 4);
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const idx = i * 4;
+        particleData[idx]     = Math.random() * W;         // x
+        particleData[idx + 1] = 0.2 * H + Math.random() * 0.6 * H; // y (middle 60%)
+        particleData[idx + 2] = Math.random() * Math.PI * 2; // phase
+        particleData[idx + 3] = Math.random() * 1000;      // seed
+      }
+    }
+
+    function updateParticles(dt) {
+      const diff = u - v;  // positive = light winning, negative = shadow winning
+      const leftCenterX = W * 0.15;
+      const rightCenterX = W * 0.85;
+      const centerY = H * 0.5;
+      const flowStrength = Math.abs(diff) * 60 + 15;
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const idx = i * 4;
+        let px = particleData[idx];
+        let py = particleData[idx + 1];
+        const phase = particleData[idx + 2];
+        const seed = particleData[idx + 3];
+
+        // Determine side: left half flows right, right half flows left
+        const isLeft = px < W * 0.5;
+        const targetX = isLeft ? rightCenterX : leftCenterX;
+        const dirX = targetX - px;
+        const dirY = centerY - py;
+
+        // Attraction toward opposite word's region
+        const dist = Math.sqrt(dirX * dirX + dirY * dirY) + 1;
+        const normX = dirX / dist;
+        const normY = dirY / dist;
+
+        // Flow field: cross-stream with oscillation
+        const flowX = normX * flowStrength * (0.5 + 0.5 * Math.sin(phase + frameCount * 0.002));
+        const flowY = normY * flowStrength * 0.3 + Math.sin(phase + frameCount * 0.003 + seed) * 20;
+        
+        // Horizontal drift based on pressure difference
+        const driftX = diff * 30;
+
+        // Noise
+        const noiseX = (Math.sin(seed + frameCount * 0.005) * 2 + Math.sin(seed * 1.7 + frameCount * 0.003) * 1.5);
+        const noiseY = (Math.cos(seed * 2.3 + frameCount * 0.004) * 2 + Math.sin(seed * 0.9 + frameCount * 0.006) * 1.5);
+
+        // Weirdness spike: when weirdness active, particles near a random region speed up
+        let weirdBoost = 1;
+        if (weirdnessActive) {
+          const weirdRegion = (frameCount % 47) * 0.01;
+          const particleRegion = px / W;
+          if (Math.abs(particleRegion - weirdRegion) < 0.05) {
+            weirdBoost = 4 + 3 * Math.sin(seed + frameCount);
+          }
+        }
+
+        const vx = (flowX + driftX + noiseX * 8) * dt * weirdBoost;
+        const vy = (flowY + noiseY * 8) * dt * weirdBoost;
+
+        particleData[idx]     = px + vx;
+        particleData[idx + 1] = py + vy;
+        particleData[idx + 2] = phase + dt * (0.5 + seed * 0.001);
+
+        // Wrap around horizontally
+        if (particleData[idx] < -50) particleData[idx] = W + 50;
+        if (particleData[idx] > W + 50) particleData[idx] = -50;
+        // Vertical containment with soft bounce
+        if (particleData[idx + 1] < -20) particleData[idx + 1] = -20;
+        if (particleData[idx + 1] > H + 20) particleData[idx + 1] = H + 20;
+      }
+    }
+
+    function renderParticles() {
+      // Clear canvas completely each frame
+      ctx.fillStyle = '#0b0b14';
+      ctx.fillRect(0, 0, W, H);
+
+      // Sort or batch — just draw directly
+      const glowIntensity = 0.4 + (u + v) * 0.4;
+
+      // Draw particles in two batches: left-side hue and right-side hue
+      // use fillStyle per particle since colors vary
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const idx = i * 4;
+        const px = particleData[idx];
+        const py = particleData[idx + 1];
+        const seed = particleData[idx + 3];
+
+        // Hue transitions from purple (~260) to cyan (~190) based on x-ratio
+        const xRatio = px / W;
+        const hue = 260 - xRatio * 70; // 260→190
+        const sat = 70 + 20 * Math.sin(seed + frameCount * 0.002);
+        // Opacity based on local "concentration" — simulated via x position and pressure
+        const uField = u * (1 - xRatio);
+        const vField = v * xRatio;
+        const concentration = Math.min(1, (uField + vField) * 1.5);
+        const opacity = 0.35 + concentration * 0.5;
+        
+        // Weirdness flash: particles in affected region brighten
+        let flash = 1;
+        if (weirdnessActive) {
+          const weirdRegion = (frameCount % 47) * 0.01;
+          const particleRegion = px / W;
+          if (Math.abs(particleRegion - weirdRegion) < 0.05) {
+            flash = 2 + Math.sin(seed + frameCount * 2);
+          }
+        }
+
+        ctx.globalAlpha = Math.min(1, opacity * flash);
+        ctx.fillStyle = `hsl(${hue}, ${sat}%, ${55 + concentration * 20}%)`;
+        ctx.fillRect(px, py, 2, 2);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // === 6. TYPOGRAPHY UPDATE ===
+    function updateTypography() {
+      const targetLW = 100 + u * 800;       // 100–900
+      const targetSW = 100 + v * 800;       // 100–900
+      const diff = u - v;
+
+      // Width: winner widens (151), loser narrows (50–151)
+      const wdthDiff = Math.abs(diff) * 101;
+      const targetLWdth = u > v ? 151 : 151 - wdthDiff;
+      const targetSWdth = v > u ? 151 : 151 - wdthDiff;
+
+      // Slant: tension creates italic lean
+      const tension = Math.abs(diff) * 10;
+      const targetSlnt = -Math.min(10, tension);
+
+      // Grade: combined intensity
+      const targetGrad = (u + v) * 100;     // 0–200
+
+      // Glow pulse
+      const targetLGlow = 0.2 + u * 0.5;
+      const targetSGlow = 0.2 + v * 0.5;
+
+      // EMA smoothing (different rates per axis as specified)
+      smooth.lightWght  += (targetLW - smooth.lightWght) * 0.08;
+      smooth.shadowWght += (targetSW - smooth.shadowWght) * 0.08;
+      smooth.lightWdth  += (targetLWdth - smooth.lightWdth) * 0.15;
+      smooth.shadowWdth += (targetSWdth - smooth.shadowWdth) * 0.15;
+      smooth.slnt       += (targetSlnt - smooth.slnt) * 0.04;
+      smooth.grad       += (targetGrad - smooth.grad) * 0.12;
+      smooth.lightGlow  += (targetLGlow - smooth.lightGlow) * 0.06;
+      smooth.shadowGlow += (targetSGlow - smooth.shadowGlow) * 0.06;
+
+      // Apply to DOM
+      lightEl.style.fontVariationSettings =
+        `"wght" ${Math.round(smooth.lightWght)}, "wdth" ${Math.round(smooth.lightWdth)}, "slnt" ${smooth.slnt.toFixed(1)}, "GRAD" ${Math.round(smooth.grad)}`;
+      shadowEl.style.fontVariationSettings =
+        `"wght" ${Math.round(smooth.shadowWght)}, "wdth" ${Math.round(smooth.shadowWdth)}, "slnt" ${smooth.slnt.toFixed(1)}, "GRAD" ${Math.round(smooth.grad)}`;
+
+      // Pulsing glow
+      lightEl.style.textShadow = `0 0 ${20 + u * 40}px rgba(167, 139, 250, ${smooth.lightGlow})`;
+      shadowEl.style.textShadow = `0 0 ${20 + v * 40}px rgba(34, 211, 238, ${smooth.shadowGlow})`;
+
+      // Update progress bar
+      progressFill.style.setProperty('--scroll-progress', scrollNorm);
+    }
+
+    // === 7. SCROLL HANDLER ===
+    let scrollSnapTimer = null;
+
+    function handleScroll() {
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      scrollNorm = maxScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
+
+      // Scroll-snap boundary pulse detection
+      if (scrollSnapTimer === null) {
+        progressFill.classList.add('pulse');
+        scrollSnapTimer = setTimeout(() => {
+          progressFill.classList.remove('pulse');
+          scrollSnapTimer = null;
+        }, 400);
+      }
+
+      // Shift background gradient with scroll
+      const shift = scrollNorm * 20;
+      bgGradient.style.background = `linear-gradient(90deg, rgba(120, 80, 255, ${0.02 + scrollNorm * 0.03}) 0%, transparent 50%, rgba(0, 200, 255, ${0.02 + (1 - scrollNorm) * 0.03}) 100%)`;
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // === 8. INTERSECTION OBSERVER (narrative reveals) ===
+    const observerOptions = {
+      threshold: 0.3,
+      rootMargin: '0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const target = entry.target;
+        if (entry.isIntersecting) {
+          target.classList.add('reveal');
+          // Also reveal associated elements
+          if (target.classList.contains('panel-narrative')) {
+            const panel = target.closest('.panel');
+            if (panel) {
+              const label = panel.querySelector('.panel-act-label');
+              const glowEls = panel.querySelectorAll('.panel-glow');
+              if (label) label.classList.add('reveal');
+              glowEls.forEach(g => g.classList.add('reveal'));
+            }
+          }
+        } else {
+          // Optionally remove reveal when scrolled past (for re-reveal on scroll back)
+          // Commented out to keep revealed state sticky
+          // target.classList.remove('reveal');
+        }
+      });
+    }, observerOptions);
+
+    narratives.forEach(n => observer.observe(n));
+
+    // === 9. MAIN ANIMATION LOOP ===
+    let lastTime = 0;
+    const DT = 0.016; // ~60fps timestep
+
+    function frame(time) {
+      const dt = lastTime === 0 ? DT : Math.min(0.05, (time - lastTime) / 1000);
+      lastTime = time;
+
+      // Step simulation
+      stepSimulation(dt);
+
+      // Update particles
+      updateParticles(dt);
+
+      // Render
+      renderParticles();
+
+      // Update typography
+      updateTypography();
+
+      requestAnimationFrame(frame);
+    }
+
+    // === 10. START ===
+    // Wait for font then start
+    function start() {
+      initParticles();
+      requestAnimationFrame(frame);
+    }
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(start).catch(start);
+    } else {
+      // Fallback: start immediately
+      setTimeout(start, 500);
+    }
+
+    // Initial scroll handler call
+    handleScroll();
+  </script>
+</body>
+</html>

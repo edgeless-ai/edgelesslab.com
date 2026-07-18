@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Specimen as Galaxy — ORBIT</title>
+<style>
+  /* @import must come before ALL other rules */
+  @import url('https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,MONO,XTRA@0..15,300..1000,0..1,0..1,0..1&display=swap');
+
+  /* ============================================================
+     RESET & BASE
+     ============================================================ */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #04040A;
+    font-family: 'Recursive', 'Courier New', monospace;
+    color: #fff;
+    cursor: default;
+  }
+
+  /* ============================================================
+     STARFIELD
+     ============================================================ */
+  #starfield {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: radial-gradient(ellipse at 50% 50%, #0a0a1a 0%, #04040A 100%);
+    pointer-events: none;
+  }
+  #starfield .star-layer {
+    position: absolute;
+    inset: 0;
+  }
+  #starfield .star-layer::before {
+    content: '';
+    position: absolute;
+    width: 1px; height: 1px;
+    border-radius: 50%;
+    background: transparent;
+    animation: twinkle var(--dur, 4s) ease-in-out infinite alternate;
+    animation-delay: var(--delay, 0s);
+  }
+
+  @keyframes twinkle {
+    0%   { opacity: 0.1; transform: scale(0.6); }
+    100% { opacity: 1;   transform: scale(1.4); }
+  }
+
+  /* ============================================================
+     SVG LAYER
+     ============================================================ */
+  #svg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  #svg-layer .orbit-path {
+    fill: none;
+    stroke: rgba(255,255,255,0.07);
+    stroke-width: 1.2;
+  }
+  #svg-layer .constellation-line {
+    stroke: rgba(255,255,255,0.2);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    transition: opacity 0.8s ease, stroke 0.8s ease;
+  }
+  #svg-layer .constellation-line.syzygy {
+    stroke: rgba(255,215,0,0.5);
+    stroke-width: 2.5;
+  }
+
+  /* ============================================================
+     LETTERS — ANCHOR POSITIONING (primary) + TRANSFORM (fallback)
+     ============================================================ */
+  .letters-viewport {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    transition: none;
+    will-change: transform;
+    pointer-events: none;
+  }
+
+  /* Anchor elements — invisible, positioned by JS via transform */
+  .anchor-pt {
+    position: absolute;
+    width: 0; height: 0;
+    top: 0; left: 0;
+    pointer-events: none;
+  }
+
+  /* Letter elements */
+  .letter {
+    position: absolute;
+    top: 0; left: 0;
+    /* transform set by JS as fallback */
+    transform: translate(0px, 0px);
+    font-family: 'Recursive', 'Courier New', monospace;
+    font-size: clamp(3rem, 7vw, 7rem);
+    line-height: 1;
+    font-variation-settings: 'wght' 500, 'slnt' 0, 'CASL' 0.5, 'MONO' 0.5, 'XTRA' 0.5;
+    pointer-events: auto;
+    cursor: pointer;
+    user-select: none;
+    text-shadow: 0 0 30px currentColor, 0 0 60px currentColor, 0 0 90px currentColor;
+    transition: text-shadow 0.6s ease, opacity 0.6s ease;
+    will-change: transform;
+    z-index: 10;
+  }
+  .letter:hover {
+    text-shadow: 0 0 40px currentColor, 0 0 80px currentColor, 0 0 130px currentColor;
+    z-index: 20;
+  }
+  .letter:focus-visible {
+    outline: 2px solid rgba(255,255,255,0.4);
+    outline-offset: 8px;
+  }
+
+  /* Depth dimming */
+  .letter.dim {
+    opacity: 0.4;
+    filter: blur(1.5px);
+  }
+
+  /* ============================================================
+     CSS ANCHOR POSITIONING — when supported, overrides JS transform
+     ============================================================ */
+  @supports (anchor-name: --o) and (position-anchor: --o) {
+    .letter {
+      /* Override JS inline transform — anchor handles placement */
+      transform: translate(0px, 0px) !important;
+      inset-area: center;
+      position-area: center;
+    }
+  }
+
+  /* ============================================================
+     SYZYGY OVERLAY
+     ============================================================ */
+  #syzygy-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    background: radial-gradient(ellipse at center, rgba(255,215,0,0.03) 0%, transparent 70%);
+  }
+  #syzygy-overlay.active {
+    opacity: 1;
+  }
+  #syzygy-overlay .syzygy-word {
+    font-family: 'Recursive', 'Courier New', monospace;
+    font-size: clamp(4rem, 14vw, 14rem);
+    font-variation-settings: 'wght' 700, 'slnt' 0, 'CASL' 0.2, 'MONO' 0.1, 'XTRA' 0.2;
+    letter-spacing: 0.18em;
+    color: rgba(255,215,0,0.65);
+    text-shadow: 0 0 80px rgba(255,215,0,0.25), 0 0 160px rgba(255,215,0,0.1);
+    opacity: 0;
+    transform: scale(0.7);
+    transition: opacity 1.5s ease, transform 1.5s ease;
+  }
+  #syzygy-overlay.active .syzygy-word {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* ============================================================
+     INFO / HUD
+     ============================================================ */
+  #info {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    font-size: 11px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    pointer-events: none;
+    font-family: 'Recursive', 'Courier New', monospace;
+    font-variation-settings: 'wght' 300, 'MONO' 1, 'CASL' 0;
+    text-align: center;
+    transition: opacity 0.8s ease;
+    line-height: 1.6;
+  }
+  #info .highlight {
+    color: rgba(255,215,0,0.35);
+    font-size: 9px;
+  }
+  #info .syzygy-countdown {
+    color: rgba(255,215,0,0.6);
+    font-weight: 700;
+  }
+  #info.hidden {
+    opacity: 0;
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 600px) {
+    .letter { font-size: clamp(2rem, 14vw, 4rem); }
+  }
+</style>
+</head>
+<body>
+
+  <!-- STARFIELD -->
+  <div id="starfield">
+    <div class="star-layer" id="star-layer-0"></div>
+    <div class="star-layer" id="star-layer-1"></div>
+    <div class="star-layer" id="star-layer-2"></div>
+  </div>
+
+  <!-- SVG: orbits + constellation + central star -->
+  <svg id="svg-layer" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <radialGradient id="sun-grad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"   stop-color="rgba(255,200,100,0.25)"/>
+        <stop offset="40%"  stop-color="rgba(255,200,100,0.06)"/>
+        <stop offset="100%" stop-color="rgba(255,200,100,0)"/>
+      </radialGradient>
+    </defs>
+    <g id="orbit-paths"></g>
+    <g id="constellation-lines"></g>
+    <ellipse id="focus-marker" cx="50" cy="50" rx="4" ry="4" fill="url(#sun-grad)" />
+    <circle id="focus-glow" cx="50" cy="50" r="2.5" fill="rgba(255,200,100,0.35)">
+      <animate attributeName="r"    values="1.5;4;1.5"   dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.2;0.6;0.2" dur="4s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+
+  <!-- LETTERS VIEWPORT (parent for pan) -->
+  <div class="letters-viewport" id="letters-viewport">
+
+    <!-- Anchor points — inline anchor-name set, positioned by JS -->
+    <div class="anchor-pt" id="anchor-O" style="anchor-name: --o;"></div>
+    <div class="anchor-pt" id="anchor-R" style="anchor-name: --r;"></div>
+    <div class="anchor-pt" id="anchor-B" style="anchor-name: --b;"></div>
+    <div class="anchor-pt" id="anchor-I" style="anchor-name: --i;"></div>
+    <div class="anchor-pt" id="anchor-T" style="anchor-name: --t;"></div>
+
+    <!-- Letter O -->
+    <div class="letter" id="letter-O"
+         style="color:#FF6B6B; position-anchor:--o;"
+         tabindex="0" role="button" aria-label="Letter O">
+      <span class="letter-char">O</span>
+    </div>
+
+    <!-- Letter R -->
+    <div class="letter" id="letter-R"
+         style="color:#4ECDC4; position-anchor:--r;"
+         tabindex="0" role="button" aria-label="Letter R">
+      <span class="letter-char">R</span>
+    </div>
+
+    <!-- Letter B -->
+    <div class="letter" id="letter-B"
+         style="color:#45B7D1; position-anchor:--b;"
+         tabindex="0" role="button" aria-label="Letter B">
+      <span class="letter-char">B</span>
+    </div>
+
+    <!-- Letter I -->
+    <div class="letter" id="letter-I"
+         style="color:#96CEB4; position-anchor:--i;"
+         tabindex="0" role="button" aria-label="Letter I">
+      <span class="letter-char">I</span>
+    </div>
+
+    <!-- Letter T -->
+    <div class="letter" id="letter-T"
+         style="color:#FFEAA7; position-anchor:--t;"
+         tabindex="0" role="button" aria-label="Letter T">
+      <span class="letter-char">T</span>
+    </div>
+
+  </div>
+
+  <!-- SYZYGY OVERLAY -->
+  <div id="syzygy-overlay">
+    <div class="syzygy-word">ORBIT</div>
+  </div>
+
+  <!-- INFO -->
+  <div id="info">
+    <span>✦ click a letter to focus  ·  syzygy in <span class="syzygy-countdown" id="syzygy-countdown">30</span>s</span>
+    <br>
+    <span class="highlight">recursive variable font  ·  keplerian orbits  ·  n-body perturbation</span>
+  </div>
+
+<script>
+/* =============================================================
+   SPECIMEN AS GALAXY — ORBIT
+   ============================================================= */
+(function() {
+  'use strict';
+
+  // ── DOM refs ──────────────────────────────────────────────────
+  const viewport  = document.getElementById('letters-viewport');
+  const infoEl    = document.getElementById('info');
+  const countEl   = document.getElementById('syzygy-countdown');
+  const constelG  = document.getElementById('constellation-lines');
+  const orbPathG  = document.getElementById('orbit-paths');
+  const svgEl     = document.getElementById('svg-layer');
+  const overlayEl = document.getElementById('syzygy-overlay');
+  const starLayers = [
+    document.getElementById('star-layer-0'),
+    document.getElementById('star-layer-1'),
+    document.getElementById('star-layer-2'),
+  ];
+
+  // ── Per-letter orbital configuration ─────────────────────────
+  const CONFIG = [
+    { id:'letter-O', anchor:'anchor-O', char:'O', color:'#FF6B6B',
+      a:240, e:0.18, inc:6,  omega:30,  Omega:0,   M0:0,   mass:1.0 },
+    { id:'letter-R', anchor:'anchor-R', char:'R', color:'#4ECDC4',
+      a:310, e:0.28, inc:14, omega:70,  Omega:72,  M0:80,  mass:1.3 },
+    { id:'letter-B', anchor:'anchor-B', char:'B', color:'#45B7D1',
+      a:190, e:0.10, inc:9,  omega:120, Omega:144, M0:150, mass:0.8 },
+    { id:'letter-I', anchor:'anchor-I', char:'I', color:'#96CEB4',
+      a:360, e:0.32, inc:20, omega:160, Omega:216, M0:220, mass:1.5 },
+    { id:'letter-T', anchor:'anchor-T', char:'T', color:'#FFEAA7',
+      a:270, e:0.22, inc:12, omega:200, Omega:288, M0:300, mass:1.1 },
+  ];
+
+  // ── State ────────────────────────────────────────────────────
+  let W, H, cx, cy;
+  let elapsed = 0;                  // wall-clock seconds
+  const TIME_SCALE = 0.55;          // sim speed
+  let lastTime = 0;
+
+  // Syzygy finite-state machine
+  let syzygyPhase = 'idle';         // idle → converging → aligned → diverging → idle
+  let syzygyTimer = 0;
+  const SYZYGY_INTERVAL = 30;       // seconds between events
+  const SYZYGY_CONVERGE = 2.5;      // converge duration
+  const SYZYGY_HOLD    = 4.0;       // hold duration
+  const SYZYGY_DIVERGE = 2.0;       // diverge duration
+
+  // Pan
+  let focusedLetter = null;
+  let panX = 0, panY = 0;
+  let tgtPanX = 0, tgtPanY = 0;
+  const PAN_LERP = 0.035;
+
+  // ── OrbitalBody class ────────────────────────────────────────
+  class OrbitalBody {
+    constructor(cfg) {
+      this.name  = cfg.char;
+      this.el    = document.getElementById(cfg.id);
+      this.anchor= document.getElementById(cfg.anchor);
+      this.char  = cfg.char;
+      this.color = cfg.color;
+
+      // Keplerian elements
+      this.a     = cfg.a;
+      this.e     = cfg.e;
+      this.inc   = cfg.inc * Math.PI / 180;
+      this.omega = cfg.omega * Math.PI / 180;
+      this.Omega = cfg.Omega * Math.PI / 180;
+      this.M     = cfg.M0 * Math.PI / 180;
+      this.mass  = cfg.mass;
+
+      // N-body perturbation
+      this.px = 0; this.py = 0; this.pz = 0;
+      this.vx = 0; this.vy = 0; this.vz = 0;
+
+      // World-space position (relative to centre)
+      this.x = 0; this.y = 0; this.z = 0;
+      // Previous position for velocity
+      this.px_ = 0; this.py_ = 0;
+      // Depth scale
+      this.scale = 1;
+
+      // Font axes (updated each frame)
+      this.axes = { wght:500, slnt:0, casl:0.5, mono:0.5, xtra:0.5 };
+    }
+
+    /** Solve Kepler's equation M = E − e·sin(E) via Newton-Raphson */
+    _solveKepler(M, e) {
+      let E = M;
+      for (let i = 0; i < 50; i++) {
+        const dE = (M - E + e * Math.sin(E)) / (1 - e * Math.cos(E));
+        E += dE;
+        if (Math.abs(dE) < 1e-10) break;
+      }
+      return E;
+    }
+
+    /** Step simulation forward by dt seconds. Modifies .x .y .z .M .scale */
+    step(dt, all) {
+      // 1. Mean motion n = √(GM / a³),  GM = 1
+      this.M += dt * Math.sqrt(1 / (this.a * this.a * this.a));
+      this.M %= 2 * Math.PI;
+
+      // 2. Solve for eccentric anomaly E
+      const E = this._solveKepler(this.M, this.e);
+
+      // 3. Perifocal coordinates
+      const xP = this.a * (Math.cos(E) - this.e);
+      const yP = this.a * Math.sqrt(1 - this.e * this.e) * Math.sin(E);
+      const zP = 0;
+
+      // 4. Rotate perifocal → reference frame  (3-1-3)
+      const cw = Math.cos(this.omega), sw = Math.sin(this.omega);
+      const ci = Math.cos(this.inc),   si = Math.sin(this.inc);
+      const cO = Math.cos(this.Omega), sO = Math.sin(this.Omega);
+
+      // (a) argument of periapsis about z
+      const x1 = xP * cw - yP * sw;
+      const y1 = xP * sw + yP * cw;
+      const z1 = zP;
+
+      // (b) inclination about x
+      const x2 = x1;
+      const y2 = y1 * ci - z1 * si;
+      const z2 = y1 * si + z1 * ci;
+
+      // (c) ascending node about z
+      const xK = x2 * cO - y2 * sO;
+      const yK = x2 * sO + y2 * cO;
+      const zK = z2;
+
+      // Save previous world position
+      this.px_ = this.x;
+      this.py_ = this.y;
+
+      // 5. N-body perturbation
+      let fx = 0, fy = 0, fz = 0;
+      for (const o of all) {
+        if (o === this) continue;
+        const dx = (xK + this.px) - (o.x);
+        const dy = (yK + this.py) - (o.y);
+        const dz = (zK + this.pz) - (o.z);
+        const r  = Math.sqrt(dx*dx + dy*dy + dz*dz) + 20; // softening
+        const F  = o.mass / (r * r * r);
+        fx -= F * dx;
+        fy -= F * dy;
+        fz -= F * dz;
+      }
+
+      // Integrate perturbation (damped symplectic-ish)
+      const invM = 1 / (this.mass + 0.5);
+      this.vx += fx * invM * dt;
+      this.vy += fy * invM * dt;
+      this.vz += fz * invM * dt;
+
+      const damp = Math.exp(-0.0005 * dt);
+      this.vx *= damp; this.vy *= damp; this.vz *= damp;
+
+      this.px += this.vx * dt;
+      this.py += this.vy * dt;
+      this.pz += this.vz * dt;
+
+      // 6. Final world position
+      this.x = xK + this.px;
+      this.y = yK + this.py;
+      this.z = zK + this.pz;
+
+      // 7. Depth scale
+      const perspectiveDist = 500;
+      const d = perspectiveDist + this.z;
+      this.scale = perspectiveDist / Math.max(d, 40);
+    }
+
+    /** Compute font-variation-settings from orbital state */
+    computeAxes(all) {
+      const dist = Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
+      const maxD = Math.max(...all.map(b => b.a * 1.5));
+      const nDist = Math.min(1, dist / maxD);
+
+      const dx = this.x - this.px_;
+      const dy = this.y - this.py_;
+      const vel = Math.sqrt(dx*dx + dy*dy);
+      const nVel = Math.min(1, vel / 6);
+
+      const angle = Math.atan2(this.y, this.x);
+      const phase = (angle + Math.PI) / (2 * Math.PI);
+
+      const zNorm = Math.max(0, Math.min(1, (this.z + 250) / 500));
+
+      // Nearest-neighbour distance
+      let minD = Infinity;
+      for (const o of all) {
+        if (o === this) continue;
+        const dd = (this.x-o.x)**2 + (this.y-o.y)**2 + (this.z-o.z)**2;
+        if (dd < minD) minD = dd;
+      }
+      const nProx = Math.min(1, Math.sqrt(minD) / 400);
+
+      this.axes.wght = Math.round(300 + 700 * (1 - nDist * 0.85));
+      this.axes.slnt = Math.round(nVel * 15);
+      this.axes.casl = Math.max(0, Math.min(1, 0.2 + 0.8 * Math.sin(phase * Math.PI * 2)));
+      this.axes.mono = Math.max(0, Math.min(1, 0.1 + 0.9 * nProx));
+      this.axes.xtra = Math.max(0, Math.min(1, zNorm));
+    }
+
+    /** Push font axes into DOM */
+    applyAxes(sFactor) {
+      let { wght, slnt, casl, mono, xtra } = this.axes;
+
+      if (sFactor > 0) {
+        const t = Math.min(1, sFactor);
+        const e = t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
+        wght = Math.round(700 + (wght - 700) * (1 - e));
+        slnt = Math.round(0   + (slnt - 0)   * (1 - e));
+        casl = Math.max(0, Math.min(1, 0.5 + (casl - 0.5) * (1 - e)));
+        mono = Math.max(0, Math.min(1, 0.5 + (mono - 0.5) * (1 - e)));
+        xtra = Math.max(0, Math.min(1, 0.5 + (xtra - 0.5) * (1 - e)));
+      }
+
+      this.el.style.fontVariationSettings =
+        `'wght' ${wght},'slnt' ${slnt},'CASL' ${casl.toFixed(3)},'MONO' ${mono.toFixed(3)},'XTRA' ${xtra.toFixed(3)}`;
+
+      this.el.dataset.wght = wght;
+      this.el.dataset.slnt = slnt;
+    }
+
+    /** Set DOM position (transform fallback + anchor). sx,sy = absolute screen coords. */
+    place(sx, sy) {
+      const s = this.scale;
+      this.anchor.style.transform = `translate(${sx}px, ${sy}px)`;
+      this.el.style.transform     = `translate(${sx}px, ${sy}px) scale(${s})`;
+
+      if (s < 0.65) {
+        this.el.classList.add('dim');
+        this.el.style.zIndex = Math.round(s * 10);
+      } else {
+        this.el.classList.remove('dim');
+        this.el.style.zIndex = Math.round(10 + s * 10);
+      }
+    }
+  }
+
+  // ── Initialise bodies ────────────────────────────────────────
+  const bodies = CONFIG.map(c => new OrbitalBody(c));
+
+  // ── Starfield ────────────────────────────────────────────────
+  function genStars() {
+    const layers = [
+      { count:220, minS:0.4, maxS:1.0, minO:0.15, maxO:0.5, dur:7, dly:0 },
+      { count:160, minS:0.7, maxS:1.8, minO:0.25, maxO:0.65,dur:5, dly:2 },
+      { count: 70, minS:1.5, maxS:3.0, minO:0.35, maxO:0.85,dur:3, dly:4 },
+    ];
+    layers.forEach((cfg, idx) => {
+      const stars = [];
+      for (let i = 0; i < cfg.count; i++) {
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        const sz = cfg.minS + Math.random() * (cfg.maxS - cfg.minS);
+        const op = cfg.minO + Math.random() * (cfg.maxO - cfg.minO);
+        stars.push(`${x}% ${y}% 0 ${sz}px rgba(255,255,255,${op})`);
+      }
+      const st = document.createElement('style');
+      st.textContent = `#star-layer-${idx}::before { box-shadow:${stars.join(',')}; }`;
+      document.head.appendChild(st);
+      starLayers[idx].style.setProperty('--dur', `${cfg.dur}s`);
+      starLayers[idx].style.setProperty('--delay', `${Math.random()*cfg.dly}s`);
+    });
+  }
+  genStars();
+
+  // ── Viewport ─────────────────────────────────────────────────
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    cx = W / 2;
+    cy = H / 2;
+    svgEl.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    document.getElementById('focus-marker').setAttribute('cx', cx);
+    document.getElementById('focus-marker').setAttribute('cy', cy);
+    document.getElementById('focus-glow').setAttribute('cx', cx);
+    document.getElementById('focus-glow').setAttribute('cy', cy);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ── Orbit paths ──────────────────────────────────────────────
+  function drawOrbits() {
+    orbPathG.innerHTML = '';
+    bodies.forEach(b => {
+      const rx = b.a;
+      const ry = b.a * Math.sqrt(1 - b.e * b.e);
+      const el = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+      el.setAttribute('cx', cx);
+      el.setAttribute('cy', cy);
+      el.setAttribute('rx', rx);
+      el.setAttribute('ry', ry);
+      el.setAttribute('transform', `rotate(${b.Omega * 180 / Math.PI} ${cx} ${cy})`);
+      el.classList.add('orbit-path');
+      el.style.stroke = b.color;
+      orbPathG.appendChild(el);
+    });
+  }
+  drawOrbits();
+
+  // ── Constellation lines ──────────────────────────────────────
+  function drawConstel(sActive) {
+    constelG.innerHTML = '';
+    if (bodies.length < 2) return;
+    // Collect all pairs
+    const pairs = [];
+    for (let i = 0; i < bodies.length; i++) {
+      for (let j = i + 1; j < bodies.length; j++) {
+        const dx = bodies[i].x - bodies[j].x;
+        const dy = bodies[i].y - bodies[j].y;
+        pairs.push({ i, j, d: Math.sqrt(dx*dx + dy*dy),
+                     x1: bodies[i].x, y1: bodies[i].y,
+                     x2: bodies[j].x, y2: bodies[j].y });
+      }
+    }
+    pairs.sort((a, b) => a.d - b.d);
+    const keep = Math.min(6, pairs.length);
+
+    for (let k = 0; k < keep; k++) {
+      const p = pairs[k];
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      // Convert world coords to screen: x + cx
+      line.setAttribute('x1', p.x1 + cx);
+      line.setAttribute('y1', p.y1 + cy);
+      line.setAttribute('x2', p.x2 + cx);
+      line.setAttribute('y2', p.y2 + cy);
+      line.classList.add('constellation-line');
+      if (sActive) line.classList.add('syzygy');
+      const maxD = Math.min(...pairs.map(p => p.d)) * 3.5;
+      const op = Math.max(0.08, 1 - p.d / Math.max(maxD, 1));
+      line.style.opacity = op * 0.5;
+      constelG.appendChild(line);
+    }
+  }
+
+  // ── Syzygy ───────────────────────────────────────────────────
+  function syzygyTargets() {
+    const spread  = Math.min(W, H) * 0.35;
+    const arcH    = Math.min(W, H) * 0.05;
+    const out = [];
+    for (let i = 0; i < 5; i++) {
+      const f = (i / 4) - 0.5;
+      out.push({ x: f * spread, y: Math.sin(f * Math.PI) * arcH, z: 0 });
+    }
+    return out;
+  }
+
+  function startSyzygy() {
+    syzygyPhase = 'converging';
+    syzygyTimer = 0;
+    overlayEl.classList.add('active');
+  }
+
+  function tickSyzygy(dt) {
+    if (syzygyPhase === 'idle') return;
+
+    syzygyTimer += dt;
+
+    if (syzygyPhase === 'converging' && syzygyTimer >= SYZYGY_CONVERGE) {
+      syzygyPhase = 'aligned';
+      syzygyTimer = 0;
+    } else if (syzygyPhase === 'aligned' && syzygyTimer >= SYZYGY_HOLD) {
+      syzygyPhase = 'diverging';
+      syzygyTimer = 0;
+    } else if (syzygyPhase === 'diverging' && syzygyTimer >= SYZYGY_DIVERGE) {
+      syzygyPhase = 'idle';
+      syzygyTimer = 0;
+      overlayEl.classList.remove('active');
+    }
+  }
+
+  function syzygyFactor() {
+    if (syzygyPhase === 'idle') return 0;
+    if (syzygyPhase === 'converging') return easeCubic(Math.min(1, syzygyTimer / SYZYGY_CONVERGE));
+    if (syzygyPhase === 'aligned')    return 1;
+    /* diverging */                   return 1 - easeCubic(Math.min(1, syzygyTimer / SYZYGY_DIVERGE));
+  }
+
+  function easeCubic(t) {
+    return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+  }
+
+  // ── Click / focus ────────────────────────────────────────────
+  function focusBody(body) {
+    if (focusedLetter === body) {
+      focusedLetter = null;
+      tgtPanX = 0; tgtPanY = 0;
+      infoEl.classList.remove('hidden');
+      return;
+    }
+    focusedLetter = body;
+    // Compute target pan: letter is at (cx + body.x, cy + body.y)
+    // We want (cx + body.x + panX, cy + body.y + panY) = (cx, cy)
+    // → panX = -body.x, panY = -body.y
+    tgtPanX = -body.x;
+    tgtPanY = -body.y;
+    infoEl.classList.add('hidden');
+  }
+
+  document.addEventListener('click', (e) => {
+    let t = e.target;
+    while (t && !t.classList.contains('letter')) t = t.parentElement;
+    if (t) {
+      const idx = bodies.findIndex(b => b.el === t);
+      if (idx >= 0) { focusBody(bodies[idx]); return; }
+    }
+    if (focusedLetter) {
+      focusedLetter = null;
+      tgtPanX = 0; tgtPanY = 0;
+      infoEl.classList.remove('hidden');
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && focusedLetter) {
+      focusedLetter = null;
+      tgtPanX = 0; tgtPanY = 0;
+      infoEl.classList.remove('hidden');
+    }
+    if (e.key === 'f') {
+      if (!bodies.length) return;
+      let idx = focusedLetter ? bodies.indexOf(focusedLetter) : -1;
+      focusBody(bodies[(idx + 1) % bodies.length]);
+    }
+  });
+
+  // ── Animation loop ───────────────────────────────────────────
+  function loop(ts) {
+    if (!lastTime) lastTime = ts;
+    const realDt = Math.min((ts - lastTime) / 1000, 0.05);
+    lastTime = ts;
+    elapsed += realDt;
+
+    // Syzygy countdown & trigger
+    const remaining = SYZYGY_INTERVAL - (elapsed % SYZYGY_INTERVAL);
+    countEl.textContent = Math.ceil(remaining);
+    if (syzygyPhase === 'idle' && elapsed > 2 && remaining < 0.15) {
+      startSyzygy();
+    }
+
+    tickSyzygy(realDt);
+    const sFactor = syzygyFactor();
+    const targets = sFactor > 0 ? syzygyTargets() : null;
+
+    // ── Step physics ──
+    const simDt = realDt * TIME_SCALE;
+    bodies.forEach(b => b.step(simDt, bodies));
+
+    // ── Apply syzygy convergence ──
+    if (sFactor > 0 && targets) {
+      bodies.forEach((b, i) => {
+        const t = targets[i];
+        b.x += (t.x - b.x) * sFactor;
+        b.y += (t.y - b.y) * sFactor;
+        b.z += (t.z - b.z) * sFactor;
+        const d = 500 + b.z;
+        b.scale = 500 / Math.max(d, 40);
+      });
+    }
+
+    // ── Compute axes & place letters ──
+    bodies.forEach(b => {
+      b.computeAxes(bodies);
+      b.applyAxes(sFactor);
+      // Convert world (centre-relative) → absolute screen, then place
+      b.place(cx + b.x, cy + b.y);
+    });
+
+    // ── Pan toward focused letter ──
+    if (focusedLetter) {
+      tgtPanX = -focusedLetter.x;
+      tgtPanY = -focusedLetter.y;
+    }
+    panX += (tgtPanX - panX) * PAN_LERP;
+    panY += (tgtPanY - panY) * PAN_LERP;
+    viewport.style.transform = `translate(${panX}px, ${panY}px)`;
+
+    // ── Constellation lines ──
+    drawConstel(sFactor > 0.01);
+
+    requestAnimationFrame(loop);
+  }
+
+  // ── Bootstrap ────────────────────────────────────────────────
+  bodies.forEach(b => b.step(0.01, bodies));
+  bodies.forEach(b => {
+    b.place(cx + b.x, cy + b.y);
+    b.computeAxes(bodies);
+    b.applyAxes(0);
+  });
+  drawConstel(false);
+  resize();
+  requestAnimationFrame(loop);
+
+  // Re-draw orbits after fonts have a chance to load
+  setTimeout(() => { resize(); drawOrbits(); }, 600);
+
+  window.__gal = { bodies, syzygyFactor: () => syzygyFactor() };
+  console.log('✨ Specimen as Galaxy — ORBIT: ', bodies.length, 'bodies');
+})();
+</script>
+</body>
+</html>

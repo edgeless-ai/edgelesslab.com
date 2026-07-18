@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dalang's Shadow Grid — Cellular Automata Shadow Puppetry</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #030303;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'JetBrains Mono', monospace;
+    color: #E5E7EB;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  #container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  canvas {
+    border: 1px solid #1A1A2E;
+    border-radius: 4px;
+    cursor: none;
+  }
+
+  #ui {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    align-items: center;
+    font-size: 13px;
+    color: #80CBC4;
+  }
+
+  #ui .label {
+    color: #E5E7EB;
+    opacity: 0.6;
+  }
+
+  #ui .value {
+    color: #A855F7;
+    font-weight: 700;
+  }
+
+  #ui .divider {
+    width: 1px;
+    height: 20px;
+    background: #1A1A2E;
+  }
+
+  #instructions {
+    position: absolute;
+    bottom: -60px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 11px;
+    color: #80CBC4;
+    opacity: 0.7;
+    line-height: 1.8;
+  }
+
+  #instructions kbd {
+    background: #1A1A2E;
+    color: #A855F7;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+  }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="ui">
+    <span><span class="label">Rule:</span> <span class="value" id="rule-name">Game of Life</span></span>
+    <span class="divider"></span>
+    <span><span class="label">Shadow History:</span> <span class="value" id="shadow-state">OFF</span></span>
+    <span class="divider"></span>
+    <span><span class="label">Light:</span> <span class="value" id="light-level">100%</span></span>
+  </div>
+  <div id="p5-container"></div>
+  <div id="instructions">
+    <kbd>Click+Drag</kbd> draw puppet &nbsp;|&nbsp;
+    <kbd>Click+Drag</kbd> on puppet to move &nbsp;|&nbsp;
+    <kbd>Double-click</kbd> puppet to delete &nbsp;|&nbsp;
+    <kbd>Space</kbd> cycle rules &nbsp;|&nbsp;
+    <kbd>1-4</kbd> presets &nbsp;|&nbsp;
+    <kbd>R</kbd> reset &nbsp;|&nbsp;
+    <kbd>S</kbd> shadow history &nbsp;|&nbsp;
+    <kbd>Scroll</kbd> light intensity
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.2/p5.min.js"></script>
+<script>
+// =============================================================================
+// Dalang's Shadow Grid — Cellular Automata as Shadow Puppet Theatre
+// A p5.js Canvas 2D demo combining CA with Wayang Kulit aesthetics.
+// =============================================================================
+
+// ---------- Constants ----------
+const GRID_SIZE = 120;
+const CELL_SIZE = 4;
+const GAP = 1;
+const CELL_SPACING = CELL_SIZE + GAP; // 5px
+const CANVAS_SIZE = GRID_SIZE * CELL_SPACING; // 600px
+
+// ---------- Palette ----------
+const COLORS = {
+  void:       '#030303',
+  amber:      '#FFB74D',
+  dimOrange:  '#FF8A65',
+  indigo:     '#1A1A2E',
+  puppetFill: '#0D0D0D',
+  rimLight:   '#FF6F00',
+  glow:       '#FFF8E1',
+  uiText:     '#80CBC4',
+  accent:     '#A855F7',
+  wireBlue:   '#4FC3F7',
+  deadRed:    '#FF5252',
+};
+
+// ---------- CA Rule Names ----------
+const RULE_NAMES = ['Game of Life', "Brian's Brain", 'WireWorld', 'Seeds'];
+const RULE_IDS = {
+  LIFE: 0,
+  BRIANS_BRAIN: 1,
+  WIREWORLD: 2,
+  SEEDS: 3,
+};
+
+// ---------- State Machine ----------
+const STATE = {
+  IDLE: 'idle',
+  ILLUMINATING: 'illuminating',
+  PERFORMING: 'performing',
+  SHADOWING: 'shadowing',
+  CURTAIN_CALL: 'curtain_call',
+  RESET: 'reset',
+};
+
+// =============================================================================
+// GLOBAL STATE
+// =============================================================================
+let grid = [];           // current CA state: int[GRID_SIZE][GRID_SIZE]
+let nextGrid = [];       // next CA state
+let fossilGrid = [];     // accumulated shadow brightness: float[GRID_SIZE][GRID_SIZE]
+let shadowMap = [];      // boolean[GRID_SIZE][GRID_SIZE] — true = cell is shadowed
+
+let puppets = [];        // array of { points: [{x,y}], offsetX, offsetY, preset }
+let currentRule = RULE_IDS.LIFE;
+let appState = STATE.IDLE;
+
+let showShadowHistory = false;
+let lightIntensity = 1.0; // 0.0 to 1.0
+
+// Interaction state
+let isDragging = false;
+let isDrawingPuppet = false;
+let isMovingPuppet = false;
+let activePuppetIndex = -1;
+let drawingPoints = [];
+let dragStartX = 0;
+let dragStartY = 0;
+
+// Offscreen buffer for shadow detection
+let shadowBuffer;
+
+// Frame counter for animation
+let frameCountSinceReset = 0;
+
+// =============================================================================
+// PRESET PUPPET SHAPES (normalized to ~80x80, centered at origin)
+// =============================================================================
+const PRESETS = {
+  // 1: Bird / Garuda silhouette
+  bird: [
+    {x:0,y:-35}, {x:15,y:-25}, {x:30,y:-15}, {x:40,y:0},
+    {x:35,y:10}, {x:20,y:5}, {x:10,y:15}, {x:15,y:30},
+    {x:5,y:25}, {x:-5,y:35}, {x:-10,y:25}, {x:-15,y:15},
+    {x:-25,y:10}, {x:-30,y:0}, {x:-25,y:-10}, {x:-15,y:-20},
+    {x:-5,y:-30},
+  ],
+  // 2: Tree / Pohon Hayat
+  tree: [
+    {x:0,y:-40}, {x:8,y:-30}, {x:20,y:-25}, {x:10,y:-18},
+    {x:25,y:-12}, {x:12,y:-5}, {x:30,y:5}, {x:10,y:5},
+    {x:8,y:15}, {x:4,y:10}, {x:5,y:25}, {x:0,y:20},
+    {x:-5,y:25}, {x:-4,y:10}, {x:-8,y:15}, {x:-10,y:5},
+    {x:-30,y:5}, {x:-12,y:-5}, {x:-25,y:-12}, {x:-10,y:-18},
+    {x:-20,y:-25}, {x:-8,y:-30},
+  ],
+  // 3: Humanoid / Wayang figure
+  humanoid: [
+    {x:0,y:-40}, // head top
+    {x:8,y:-32}, {x:6,y:-28}, {x:12,y:-25}, // head + hair
+    {x:0,y:-22}, {x:-12,y:-25}, {x:-6,y:-28}, {x:-8,y:-32},
+    {x:3,y:-20}, // neck
+    {x:15,y:-15}, {x:25,y:-5}, {x:30,y:8}, // right arm
+    {x:18,y:5}, {x:12,y:0}, {x:8,y:-10},
+    {x:4,y:0}, {x:5,y:15}, {x:10,y:25}, // body right
+    {x:6,y:30}, {x:8,y:38}, // right leg
+    {x:0,y:35}, {x:-8,y:38}, // left leg
+    {x:-6,y:30}, {x:-10,y:25}, {x:-5,y:15}, {x:-4,y:0}, // body left
+    {x:-8,y:-10}, {x:-12,y:0}, {x:-18,y:5}, {x:-30,y:8}, {x:-25,y:-5}, {x:-15,y:-15}, // left arm
+    {x:-3,y:-20},
+  ],
+  // 4: Geometric / Gunungan-inspired
+  geometric: [
+    {x:0,y:-38}, {x:10,y:-30}, {x:20,y:-18}, {x:28,y:-5},
+    {x:35,y:10}, {x:30,y:20}, {x:22,y:28}, {x:10,y:35},
+    {x:0,y:38}, {x:-10,y:35}, {x:-22,y:28}, {x:-30,y:20},
+    {x:-35,y:10}, {x:-28,y:-5}, {x:-20,y:-18}, {x:-10,y:-30},
+  ],
+};
+
+const PRESET_NAMES = ['bird', 'tree', 'humanoid', 'geometric'];
+
+// =============================================================================
+// P5.JS LIFECYCLE
+// =============================================================================
+
+function setup() {
+  let cnv = createCanvas(CANVAS_SIZE, CANVAS_SIZE);
+  cnv.parent('p5-container');
+  cnv.elt.addEventListener('contextmenu', e => e.preventDefault());
+  pixelDensity(1);
+
+  // Offscreen buffer for shadow detection
+  shadowBuffer = createGraphics(CANVAS_SIZE, CANVAS_SIZE);
+  if (!shadowBuffer) {
+    console.error('Failed to create shadow buffer');
+    return;
+  }
+  shadowBuffer.pixelDensity(1);
+
+  // Initialize grids
+  initGrids();
+  resetSketch();
+}
+
+function draw() {
+  // Always reset drawing state between render passes
+  noStroke();
+  noFill();
+  textAlign(LEFT, BASELINE);
+  textSize(12);
+
+  // Background
+  background(COLORS.void);
+
+  // Update state machine
+  updateStateMachine();
+
+  // Compute shadow map (which cells are covered by puppets)
+  computeShadowMap();
+
+  // Update CA — illuminated cells evolve, shadowed cells freeze
+  updateCA();
+
+  // Accumulate fossils for shadowed cells
+  updateFossils();
+
+  // Render CA layer
+  renderCA();
+
+  // Render cursor glow (oil lamp)
+  renderCursorGlow();
+
+  // Render puppet silhouettes with rim light
+  renderPuppets();
+
+  // Render in-progress puppet drawing
+  renderDrawingPreview();
+
+  // Render UI overlay on canvas
+  renderOverlay();
+
+  frameCountSinceReset++;
+}
+
+// =============================================================================
+// GRID INITIALIZATION
+// =============================================================================
+
+function initGrids() {
+  grid = [];
+  nextGrid = [];
+  fossilGrid = [];
+  shadowMap = [];
+
+  for (let r = 0; r < GRID_SIZE; r++) {
+    grid[r] = new Array(GRID_SIZE).fill(0);
+    nextGrid[r] = new Array(GRID_SIZE).fill(0);
+    fossilGrid[r] = new Array(GRID_SIZE).fill(0);
+    shadowMap[r] = new Array(GRID_SIZE).fill(false);
+  }
+}
+
+function randomizeGrid(density) {
+  density = density !== undefined ? density : 0.3;
+  let maxState = getMaxState();
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      if (random() < density) {
+        // For Brian's Brain, randomize between states 1 and 2
+        // For WireWorld, randomize between states 1, 2, 3
+        if (currentRule === RULE_IDS.BRIANS_BRAIN) {
+          grid[r][c] = random() < 0.5 ? 1 : 2;
+        } else if (currentRule === RULE_IDS.WIREWORLD) {
+          let rnd = random();
+          grid[r][c] = rnd < 0.33 ? 1 : (rnd < 0.66 ? 2 : 3);
+        } else {
+          grid[r][c] = 1;
+        }
+      } else {
+        grid[r][c] = 0;
+      }
+    }
+  }
+}
+
+function getMaxState() {
+  switch (currentRule) {
+    case RULE_IDS.LIFE: return 1;
+    case RULE_IDS.BRIANS_BRAIN: return 2;
+    case RULE_IDS.WIREWORLD: return 3;
+    case RULE_IDS.SEEDS: return 1;
+    default: return 1;
+  }
+}
+
+function resetSketch() {
+  initGrids();
+  randomizeGrid(0.25);
+  puppets = [];
+  appState = STATE.IDLE;
+  frameCountSinceReset = 0;
+  showShadowHistory = false;
+  lightIntensity = 1.0;
+  updateUI();
+}
+
+// =============================================================================
+// STATE MACHINE
+// =============================================================================
+
+function updateStateMachine() {
+  let hasPuppets = puppets.length > 0;
+
+  switch (appState) {
+    case STATE.IDLE:
+      if (hasPuppets) {
+        appState = STATE.ILLUMINATING;
+      }
+      break;
+    case STATE.ILLUMINATING:
+      if (frameCountSinceReset > 60) {
+        appState = STATE.PERFORMING;
+      }
+      break;
+    case STATE.PERFORMING:
+      if (showShadowHistory && !hasPuppets) {
+        appState = STATE.SHADOWING;
+      }
+      break;
+    case STATE.SHADOWING:
+      if (hasPuppets) {
+        appState = STATE.PERFORMING;
+      }
+      break;
+    case STATE.CURTAIN_CALL:
+      // Allow reset
+      break;
+    case STATE.RESET:
+      appState = STATE.IDLE;
+      break;
+  }
+}
+
+// =============================================================================
+// SHADOW MAP COMPUTATION
+// =============================================================================
+
+function computeShadowMap() {
+  // Clear shadow map
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      shadowMap[r][c] = false;
+    }
+  }
+
+  if (puppets.length === 0) return;
+
+  // Render puppets to offscreen buffer (white fill on black background)
+  if (!shadowBuffer) return;
+  shadowBuffer.clear();
+  shadowBuffer.background(0);
+  shadowBuffer.noStroke();
+  shadowBuffer.fill(255);
+
+  for (let p of puppets) {
+    let pts = getTransformedPoints(p);
+    if (!pts || pts.length < 3) continue;
+    shadowBuffer.beginShape();
+    for (let pt of pts) {
+      shadowBuffer.vertex(pt.x, pt.y);
+    }
+    shadowBuffer.endShape(CLOSE);
+  }
+
+  // Load offscreen pixels
+  shadowBuffer.loadPixels();
+  if (!shadowBuffer.pixels) return;
+
+  // Sample at each cell center
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      let cx = c * CELL_SPACING + CELL_SIZE / 2;
+      let cy = r * CELL_SPACING + CELL_SIZE / 2;
+      let idx = 4 * (Math.floor(cy) * CANVAS_SIZE + Math.floor(cx));
+      if (idx >= 0 && idx + 2 < shadowBuffer.pixels.length) {
+        // Check if red channel is > 128 (white pixel means shadowed)
+        if (shadowBuffer.pixels[idx] > 128) {
+          shadowMap[r][c] = true;
+        }
+      }
+    }
+  }
+}
+
+function getTransformedPoints(puppet) {
+  if (!puppet || !puppet.points || puppet.points.length === 0) return null;
+  let ox = puppet.offsetX || 0;
+  let oy = puppet.offsetY || 0;
+  return puppet.points.map(pt => ({ x: pt.x + ox, y: pt.y + oy }));
+}
+
+function isPointInPuppet(px, py) {
+  for (let i = puppets.length - 1; i >= 0; i--) {
+    let pts = getTransformedPoints(puppets[i]);
+    if (!pts || pts.length < 3) continue;
+    if (pointInPolygon(px, py, pts)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+// Ray-casting point-in-polygon test
+function pointInPolygon(px, py, vertices) {
+  if (!vertices || vertices.length < 3) return false;
+  let inside = false;
+  let n = vertices.length;
+  for (let i = 0, j = n - 1; i < n; j = i++) {
+    let xi = vertices[i].x, yi = vertices[i].y;
+    let xj = vertices[j].x, yj = vertices[j].y;
+    if ((yi > py) !== (yj > py) && px < (xj - xi) * (py - yi) / (yj - yi) + xi) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}
+
+// =============================================================================
+// CA UPDATE
+// =============================================================================
+
+function updateCA() {
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      if (shadowMap[r][c]) {
+        // Shadowed cell: freeze (keep current state)
+        nextGrid[r][c] = grid[r][c];
+      } else {
+        // Illuminated cell: apply CA rule
+        nextGrid[r][c] = applyRule(r, c);
+      }
+    }
+  }
+
+  // Swap grids
+  let temp = grid;
+  grid = nextGrid;
+  nextGrid = temp;
+}
+
+function applyRule(r, c) {
+  switch (currentRule) {
+    case RULE_IDS.LIFE:
+      return applyLife(r, c);
+    case RULE_IDS.BRIANS_BRAIN:
+      return applyBriansBrain(r, c);
+    case RULE_IDS.WIREWORLD:
+      return applyWireWorld(r, c);
+    case RULE_IDS.SEEDS:
+      return applySeeds(r, c);
+    default:
+      return applyLife(r, c);
+  }
+}
+
+// Conway's Game of Life: B3/S23
+function applyLife(r, c) {
+  let alive = countNeighbors(r, c, [1]);
+  if (grid[r][c] === 1) {
+    return (alive === 2 || alive === 3) ? 1 : 0;
+  } else {
+    return (alive === 3) ? 1 : 0;
+  }
+}
+
+// Brian's Brain: /2/3 — 0=dead, 1=firing, 2=refractory
+function applyBriansBrain(r, c) {
+  let state = grid[r][c];
+  if (state === 1) return 2; // firing → refractory
+  if (state === 2) return 0; // refractory → dead
+  // dead cell: count firing (state 1) neighbors
+  let firing = countNeighbors(r, c, [1]);
+  return (firing === 2) ? 1 : 0;
+}
+
+// WireWorld: 0=empty, 1=head, 2=tail, 3=conductor
+function applyWireWorld(r, c) {
+  let state = grid[r][c];
+  if (state === 1) return 2; // head → tail
+  if (state === 2) return 3; // tail → conductor
+  if (state === 3) {
+    // conductor → head if 1 or 2 head neighbors
+    let heads = countNeighbors(r, c, [1]);
+    return (heads === 1 || heads === 2) ? 1 : 3;
+  }
+  return 0; // empty stays empty
+}
+
+// Seeds: B2/S — dead with exactly 2 neighbors → alive; alive always dies
+function applySeeds(r, c) {
+  if (grid[r][c] === 1) return 0; // always die
+  let alive = countNeighbors(r, c, [1]);
+  return (alive === 2) ? 1 : 0;
+}
+
+function countNeighbors(r, c, targetStates) {
+  let count = 0;
+  for (let dr = -1; dr <= 1; dr++) {
+    for (let dc = -1; dc <= 1; dc++) {
+      if (dr === 0 && dc === 0) continue;
+      let nr = (r + dr + GRID_SIZE) % GRID_SIZE;
+      let nc = (c + dc + GRID_SIZE) % GRID_SIZE;
+      if (targetStates.includes(grid[nr][nc])) {
+        count++;
+      }
+    }
+  }
+  return count;
+}
+
+// =============================================================================
+// FOSSIL ACCUMULATION
+// =============================================================================
+
+function updateFossils() {
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      if (shadowMap[r][c]) {
+        let brightness = getCellBrightness(grid[r][c]);
+        if (showShadowHistory) {
+          // Accumulate maximum brightness
+          fossilGrid[r][c] = max(fossilGrid[r][c], brightness);
+        } else {
+          // Just show current brightness
+          fossilGrid[r][c] = brightness;
+        }
+      } else if (!showShadowHistory) {
+        // Decay fossils when not in shadow history mode
+        fossilGrid[r][c] = max(0, fossilGrid[r][c] - 0.02);
+      }
+      // In shadow history mode, fossils persist even when not shadowed
+    }
+  }
+}
+
+function getCellBrightness(state) {
+  switch (currentRule) {
+    case RULE_IDS.LIFE:
+    case RULE_IDS.SEEDS:
+      return state > 0 ? 1.0 : 0.0;
+    case RULE_IDS.BRIANS_BRAIN:
+      if (state === 1) return 1.0;
+      if (state === 2) return 0.5;
+      return 0.0;
+    case RULE_IDS.WIREWORLD:
+      if (state === 1) return 1.0;  // head
+      if (state === 2) return 0.6;  // tail
+      if (state === 3) return 0.3;  // conductor
+      return 0.0;
+    default:
+      return state > 0 ? 1.0 : 0.0;
+  }
+}
+
+// =============================================================================
+// RENDERING
+// =============================================================================
+
+function renderCA() {
+  noStroke();
+
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      let x = c * CELL_SPACING;
+      let y = r * CELL_SPACING;
+      let state = grid[r][c];
+      let fossil = fossilGrid[r][c];
+
+      if (fossil > 0.01) {
+        // Render as fossil (indigo with opacity based on fossil brightness)
+        let alpha = constrain(fossil * 255, 20, 220);
+        fill(hexToRgb(COLORS.indigo, alpha));
+        rect(x, y, CELL_SIZE, CELL_SIZE);
+      } else if (state > 0) {
+        // Render as illuminated cell
+        let col = getStateColor(state);
+        fill(col);
+        rect(x, y, CELL_SIZE, CELL_SIZE);
+      }
+      // Dead cells are transparent (show void background)
+    }
+  }
+}
+
+function getStateColor(state) {
+  switch (currentRule) {
+    case RULE_IDS.LIFE:
+    case RULE_IDS.SEEDS:
+      return COLORS.amber;
+    case RULE_IDS.BRIANS_BRAIN:
+      return state === 1 ? COLORS.amber : COLORS.dimOrange;
+    case RULE_IDS.WIREWORLD:
+      if (state === 1) return COLORS.amber;
+      if (state === 2) return COLORS.dimOrange;
+      if (state === 3) return COLORS.wireBlue;
+      return COLORS.amber;
+    default:
+      return COLORS.amber;
+  }
+}
+
+function hexToRgb(hex, alpha) {
+  if (!hex) return color(0, 0, 0, alpha || 255);
+  let r = parseInt(hex.slice(1, 3), 16);
+  let g = parseInt(hex.slice(3, 5), 16);
+  let b = parseInt(hex.slice(5, 7), 16);
+  return color(r, g, b, alpha !== undefined ? alpha : 255);
+}
+
+function renderCursorGlow() {
+  if (lightIntensity <= 0.01) return;
+
+  push();
+  blendMode(SCREEN);
+
+  // Large soft radial gradient
+  let cx = mouseX;
+  let cy = mouseY;
+  let maxRadius = 200 * lightIntensity;
+
+  // Draw multiple concentric circles for a smooth gradient
+  let steps = 10;
+  for (let i = steps; i >= 1; i--) {
+    let t = i / steps;
+    let radius = maxRadius * t;
+    let alpha = 8 * lightIntensity * (1 - t);
+    noStroke();
+    fill(hexToRgb(COLORS.glow, alpha));
+    ellipse(cx, cy, radius * 2, radius * 2);
+  }
+
+  // Bright core
+  let coreAlpha = 40 * lightIntensity;
+  fill(hexToRgb(COLORS.glow, coreAlpha));
+  ellipse(cx, cy, 30, 30);
+
+  pop();
+
+  // Draw small oil lamp indicator at cursor
+  push();
+  noFill();
+  stroke(hexToRgb(COLORS.glow, 150 * lightIntensity));
+  strokeWeight(1);
+  ellipse(cx, cy, 8, 8);
+  // Small flame flicker
+  let flicker = sin(frameCount * 0.3) * 2;
+  stroke(hexToRgb(COLORS.rimLight, 180 * lightIntensity));
+  line(cx, cy - 4, cx + flicker, cy - 10 - flicker);
+  pop();
+}
+
+function renderPuppets() {
+  for (let p of puppets) {
+    let pts = getTransformedPoints(p);
+    if (!pts || pts.length < 3) continue;
+
+    // Rim light: draw offset silhouette in lighter color
+    push();
+    noStroke();
+    fill(hexToRgb(COLORS.rimLight, 180));
+    beginShape();
+    for (let pt of pts) {
+      vertex(pt.x + 2, pt.y + 2);
+    }
+    endShape(CLOSE);
+    pop();
+
+    // Main silhouette
+    push();
+    noStroke();
+    fill(COLORS.puppetFill);
+    beginShape();
+    for (let pt of pts) {
+      vertex(pt.x, pt.y);
+    }
+    endShape(CLOSE);
+    pop();
+
+    // Draw subtle outline
+    push();
+    noFill();
+    stroke(hexToRgb(COLORS.rimLight, 40));
+    strokeWeight(0.5);
+    beginShape();
+    for (let pt of pts) {
+      vertex(pt.x, pt.y);
+    }
+    endShape(CLOSE);
+    pop();
+  }
+}
+
+function renderDrawingPreview() {
+  if (!isDrawingPuppet || drawingPoints.length < 2) return;
+
+  push();
+  noFill();
+  stroke(hexToRgb(COLORS.uiText, 180));
+  strokeWeight(1.5);
+  beginShape();
+  for (let pt of drawingPoints) {
+    vertex(pt.x, pt.y);
+  }
+  endShape();
+  pop();
+
+  // Draw points as small dots
+  push();
+  noStroke();
+  fill(hexToRgb(COLORS.accent, 200));
+  for (let pt of drawingPoints) {
+    ellipse(pt.x, pt.y, 3, 3);
+  }
+  pop();
+
+  // Draw line to current mouse position
+  if (drawingPoints.length > 0) {
+    push();
+    stroke(hexToRgb(COLORS.uiText, 120));
+    strokeWeight(1);
+    let lastPt = drawingPoints[drawingPoints.length - 1];
+    line(lastPt.x, lastPt.y, mouseX, mouseY);
+    pop();
+  }
+}
+
+function renderOverlay() {
+  // State indicator at top left
+  push();
+  noStroke();
+  textAlign(LEFT, TOP);
+  textSize(10);
+  fill(hexToRgb(COLORS.uiText, 120));
+
+  let stateName = appState.charAt(0).toUpperCase() + appState.slice(1);
+  text('State: ' + stateName, 6, 6);
+
+  // Puppet count
+  text('Puppets: ' + puppets.length, 6, 20);
+
+  // Frame count
+  text('Frame: ' + frameCountSinceReset, 6, 34);
+
+  pop();
+}
+
+// =============================================================================
+// INTERACTION HANDLERS
+// =============================================================================
+
+function mousePressed() {
+  if (mouseButton !== LEFT) return false;
+
+  // Reset any lingering drag state (safety)
+  isDragging = false;
+  isDrawingPuppet = false;
+  isMovingPuppet = false;
+  activePuppetIndex = -1;
+  drawingPoints = [];
+
+  // Check if clicking on an existing puppet
+  let puppetIdx = isPointInPuppet(mouseX, mouseY);
+  if (puppetIdx >= 0) {
+    // Start moving puppet
+    isDragging = true;
+    isMovingPuppet = true;
+    isDrawingPuppet = false;
+    activePuppetIndex = puppetIdx;
+    dragStartX = mouseX;
+    dragStartY = mouseY;
+    return false;
+  }
+
+  // Start drawing new puppet
+  isDragging = true;
+  isDrawingPuppet = true;
+  isMovingPuppet = false;
+  activePuppetIndex = -1;
+  drawingPoints = [{ x: mouseX, y: mouseY }];
+  dragStartX = mouseX;
+  dragStartY = mouseY;
+
+  if (puppets.length === 0 && appState === STATE.IDLE) {
+    appState = STATE.ILLUMINATING;
+  }
+
+  return false;
+}
+
+function mouseDragged() {
+  if (!isDragging) return false;
+
+  if (isDrawingPuppet) {
+    // Add points to the drawing shape (sample every 10px to avoid too many points)
+    let lastPt = drawingPoints[drawingPoints.length - 1];
+    if (dist(mouseX, mouseY, lastPt.x, lastPt.y) > 8) {
+      drawingPoints.push({ x: mouseX, y: mouseY });
+    }
+  } else if (isMovingPuppet && activePuppetIndex >= 0 && activePuppetIndex < puppets.length) {
+    // Move the puppet
+    let dx = mouseX - dragStartX;
+    let dy = mouseY - dragStartY;
+    puppets[activePuppetIndex].offsetX += dx;
+    puppets[activePuppetIndex].offsetY += dy;
+    dragStartX = mouseX;
+    dragStartY = mouseY;
+  }
+
+  return false;
+}
+
+function mouseReleased() {
+  if (!isDragging) return false;
+
+  if (isDrawingPuppet) {
+    // Finalize the puppet shape
+    if (drawingPoints.length >= 3) {
+      // Simplify points (remove redundant colinear points)
+      let simplified = simplifyPolygon(drawingPoints, 2);
+      if (simplified.length >= 3) {
+        // Close the shape
+        puppets.push({
+          points: simplified,
+          offsetX: 0,
+          offsetY: 0,
+          preset: null,
+        });
+      }
+    }
+    drawingPoints = [];
+  }
+
+  isDragging = false;
+  isDrawingPuppet = false;
+  isMovingPuppet = false;
+  activePuppetIndex = -1;
+  updateUI();
+  return false;
+}
+
+function mouseWheel(event) {
+  // Adjust light intensity
+  if (event && event.preventDefault) event.preventDefault();
+  lightIntensity = constrain(lightIntensity - event.deltaY * 0.001, 0.05, 2.0);
+  updateUI();
+  return false;
+}
+
+function doubleClicked() {
+  // Delete puppet under cursor
+  let idx = isPointInPuppet(mouseX, mouseY);
+  if (idx >= 0) {
+    // Reset drag state in case mousePressed started a move
+    isDragging = false;
+    isDrawingPuppet = false;
+    isMovingPuppet = false;
+    activePuppetIndex = -1;
+    drawingPoints = [];
+
+    puppets.splice(idx, 1);
+    if (puppets.length === 0 && showShadowHistory) {
+      appState = STATE.SHADOWING;
+    }
+    updateUI();
+  }
+  return false;
+}
+
+function keyPressed() {
+  // Space: cycle CA rules
+  if (key === ' ') {
+    currentRule = (currentRule + 1) % RULE_NAMES.length;
+    // Re-randomize grid for new rule
+    initGrids();
+    randomizeGrid(0.25);
+    updateUI();
+    return false;
+  }
+
+  // R: reset
+  if (key === 'r' || key === 'R') {
+    resetSketch();
+    updateUI();
+    return false;
+  }
+
+  // S: toggle shadow history
+  if (key === 's' || key === 'S') {
+    showShadowHistory = !showShadowHistory;
+    if (!showShadowHistory) {
+      // Clear fossil grid
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          fossilGrid[r][c] = 0;
+        }
+      }
+    }
+    updateUI();
+    return false;
+  }
+
+  // 1-4: puppet presets
+  if (key === '1' || key === '2' || key === '3' || key === '4') {
+    let idx = parseInt(key) - 1;
+    let presetName = PRESET_NAMES[idx];
+    let presetPts = PRESETS[presetName];
+    if (presetPts) {
+      // Place at cursor position or center
+      let cx = mouseX || CANVAS_SIZE / 2;
+      let cy = mouseY || CANVAS_SIZE / 2;
+      puppets.push({
+        points: presetPts.map(pt => ({ x: pt.x, y: pt.y })),
+        offsetX: cx,
+        offsetY: cy,
+        preset: presetName,
+      });
+      if (appState === STATE.IDLE) {
+        appState = STATE.ILLUMINATING;
+      }
+    }
+    updateUI();
+    return false;
+  }
+
+  return true;
+}
+
+// =============================================================================
+// UTILITY FUNCTIONS
+// =============================================================================
+
+function simplifyPolygon(points, tolerance) {
+  if (!points || points.length < 3) return points || [];
+  tolerance = tolerance || 1;
+
+  // Use index-based Douglas-Peucker recursion
+  let result = douglasPeucker(points, 0, points.length - 1, tolerance);
+  return result;
+}
+
+function douglasPeucker(points, first, last, tolerance) {
+  let maxDist = 0;
+  let maxIdx = first;
+
+  for (let i = first + 1; i < last; i++) {
+    let d = perpendicularDistance(points[i], points[first], points[last]);
+    if (d > maxDist) {
+      maxDist = d;
+      maxIdx = i;
+    }
+  }
+
+  if (maxDist > tolerance) {
+    let left = douglasPeucker(points, first, maxIdx, tolerance);
+    let right = douglasPeucker(points, maxIdx, last, tolerance);
+    // Combine, dropping duplicate at split point
+    return left.slice(0, -1).concat(right);
+  } else {
+    return [points[first], points[last]];
+  }
+}
+
+function perpendicularDistance(point, lineStart, lineEnd) {
+  let dx = lineEnd.x - lineStart.x;
+  let dy = lineEnd.y - lineStart.y;
+  let len = Math.sqrt(dx * dx + dy * dy);
+  if (len < 0.001) return dist(point.x, point.y, lineStart.x, lineStart.y);
+  return Math.abs(dy * point.x - dx * point.y + lineEnd.x * lineStart.y - lineEnd.y * lineStart.x) / len;
+}
+
+// =============================================================================
+// UI UPDATE
+// =============================================================================
+
+function updateUI() {
+  let ruleEl = document.getElementById('rule-name');
+  let shadowEl = document.getElementById('shadow-state');
+  let lightEl = document.getElementById('light-level');
+
+  if (ruleEl) ruleEl.textContent = RULE_NAMES[currentRule];
+  if (shadowEl) shadowEl.textContent = showShadowHistory ? 'ON' : 'OFF';
+  if (lightEl) lightEl.textContent = Math.round(lightIntensity * 100) + '%';
+}
+
+// Prevent default browser behaviors on canvas
+// (handled in setup() above via contextmenu listener)
+</script>
+</body>
+</html>

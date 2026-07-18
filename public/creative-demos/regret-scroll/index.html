@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REGRET SCROLL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap" rel="stylesheet">
+<style>
+/* === Reset & Base === */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{background:#000;color:#fff;scroll-behavior:smooth;overflow-x:hidden}
+body{background:#000;min-height:100vh;overflow-x:hidden;font-family:'Inter',sans-serif}
+
+/* === Progress Bar (CSS scroll-driven) === */
+#progress{
+  position:fixed;top:0;left:0;height:2px;width:0%;z-index:100;
+  background:linear-gradient(to right,#44ddff,#ff44dd);
+  animation:progress-grow linear;
+  animation-timeline:scroll(root);
+  transform-origin:left center;
+  will-change:width;
+}
+@keyframes progress-grow{
+  from{width:0%}
+  to{width:100%}
+}
+
+/* === Canvas (particle render target) === */
+canvas#particle-canvas{
+  position:fixed;top:0;left:0;width:100vw;height:100vh;
+  z-index:10;display:block;
+  pointer-events:none;
+}
+
+/* === Page Title === */
+h1#title{
+  position:fixed;top:24px;left:24px;z-index:20;
+  font-size:clamp(12px,1.8vw,36px);font-weight:100;
+  opacity:0.12;letter-spacing:0.35em;
+  text-transform:uppercase;pointer-events:none;
+  font-family:'Inter',sans-serif;
+  color:#fff;
+  text-shadow:0 0 20px rgba(68,221,255,0.05);
+}
+
+/* === Subtitle (variable font, scroll-driven) === */
+p#motto{
+  position:fixed;bottom:clamp(24px,5vh,64px);left:50%;
+  transform:translateX(-50%);z-index:20;
+  font-size:clamp(14px,2.8vw,48px);
+  font-weight:100;
+  font-variation-settings:'wght' 100;
+  pointer-events:none;text-align:center;
+  color:#fff;white-space:nowrap;
+  text-rendering:geometricPrecision;
+  font-family:'Inter',sans-serif;
+  animation:motto-weight linear;
+  animation-timeline:scroll(root);
+  will-change:font-variation-settings,opacity;
+}
+@keyframes motto-weight{
+  0%{font-variation-settings:'wght' 100;opacity:0.85}
+  45%{font-variation-settings:'wght' 400;opacity:0.65}
+  50%{font-variation-settings:'wght' 500;opacity:0.60}
+  55%{font-variation-settings:'wght' 700;opacity:0.50}
+  100%{font-variation-settings:'wght' 1000;opacity:0.25}
+}
+
+/* === Scroll Hint === */
+#scroll-hint{
+  position:fixed;bottom:clamp(60px,10vh,120px);left:50%;
+  transform:translateX(-50%);z-index:15;
+  color:rgba(68,221,255,0.25);
+  font-size:clamp(8px,0.75vw,14px);
+  pointer-events:none;font-family:'Inter',sans-serif;
+  letter-spacing:0.3em;text-transform:uppercase;
+  animation:hint-pulse 2.5s ease-in-out infinite;
+  transition:opacity 1s ease;
+}
+@keyframes hint-pulse{
+  0%,100%{opacity:0.2;transform:translateX(-50%) translateY(0)}
+  50%{opacity:0.7;transform:translateX(-50%) translateY(-4px)}
+}
+
+/* === Renderer Badge === */
+#render-badge{
+  position:fixed;top:24px;right:24px;z-index:20;
+  font-size:10px;color:rgba(255,255,255,0.08);
+  pointer-events:none;font-family:'Inter',sans-serif;
+  letter-spacing:0.1em;text-transform:uppercase;
+}
+
+/* === Scroll Markers (invisible, no snap) === */
+.marker{
+  height:100vh;width:1px;
+  visibility:hidden;position:relative;
+  scroll-snap-align:none;
+}
+
+/* === Fallback Message === */
+#webgpu-fallback{
+  display:none;
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%);z-index:5;
+  color:rgba(255,255,255,0.04);
+  font-size:0.7rem;text-align:center;
+  pointer-events:none;font-family:'Inter',sans-serif;
+}
+
+/* === Responsive === */
+@media(max-width:600px){
+  h1#title{font-size:14px;top:16px;left:16px;letter-spacing:0.2em}
+  p#motto{font-size:16px;bottom:16px;white-space:normal}
+}
+</style>
+</head>
+<body>
+
+<canvas id="gpu-canvas"></canvas>
+<div id="progress"></div>
+<h1 id="title">REGRET SCROLL</h1>
+<p id="motto">you can still turn back</p>
+<p id="scroll-hint">↓ scroll to reveal</p>
+<div id="render-badge"></div>
+<div id="webgpu-fallback"></div>
+
+<div class="marker" data-fragment="0"></div>
+<div class="marker" data-fragment="1"></div>
+<div class="marker" data-fragment="2"></div>
+<div class="marker" data-fragment="3"></div>
+<div class="marker" data-fragment="4"></div>
+
+<script type="module">
+// ============================================================
+// REGRET SCROLL — Particle Elegy With Pull-to-Punish Physics
+// ============================================================
+// Canvas 2D fallback works via file://
+// WebGPU compute requires local HTTP server (python3 -m http.server)
+// ============================================================
+
+// === Configuration ===
+const FRAGMENTS = ['WHAT', 'YOU', 'COULD', 'HAVE', 'BEEN'];
+const PARTICLE_COUNT_2D = 6000;
+const PARTICLE_COUNT_WGPU = 100000;
+const ATTRACTOR_WIDTH = 600;
+const ATTRACTOR_HEIGHT = 160;
+const ATTRACTOR_STEP = 3;
+const DAMPING = 0.92;
+const SPRING_FORCE = 0.035;
+const REPULSION_FORCE = 4.0;
+const MAX_VELOCITY = 12;
+const REGRET_DURATION = 8000; // ms
+
+// === Utility Functions ===
+
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+
+function clamp(v, mn, mx) {
+  return Math.max(mn, Math.min(mx, v));
+}
+
+// Generate attractor points from text rendered on offscreen canvas
+function generateAttractors(text, width, height, step) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = '#fff';
+  // Use Inter if loaded, fallback to sans-serif
+  const fontSize = Math.floor(height * 0.65);
+  ctx.font = `bold ${fontSize}px "Inter", "Helvetica Neue", Arial, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, width / 2, height / 2);
+
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  const points = [];
+
+  for (let y = 0; y < height; y += step) {
+    for (let x = 0; x < width; x += step) {
+      const idx = (y * width + x) * 4;
+      if (data[idx + 3] > 128) {
+        points.push({ x, y });
+      }
+    }
+  }
+  return points;
+}
+
+// Scale attractor points from generation space to viewport
+function scaleAttractors(attractors, canvasW, canvasH) {
+  const scale = Math.min(
+    canvasW * 0.85 / ATTRACTOR_WIDTH,
+    canvasH * 0.65 / ATTRACTOR_HEIGHT
+  );
+  const offsetX = (canvasW - ATTRACTOR_WIDTH * scale) / 2;
+  const offsetY = (canvasH - ATTRACTOR_HEIGHT * scale) / 2;
+  return attractors.map(p => ({
+    x: p.x * scale + offsetX,
+    y: p.y * scale + offsetY
+  }));
+}
+
+// Color from velocity: slow=cyan(#44ddff), fast=magenta(#ff44dd)
+function velocityColor(vx, vy) {
+  const speed = Math.sqrt(vx * vx + vy * vy);
+  const t = clamp(speed / 6.0, 0, 1);
+  // Interpolate hue from 194 (cyan) to 312 (magenta)
+  const hue = 194 + t * 118;
+  const lightness = 50 + t * 30;
+  return `hsl(${hue}, 100%, ${lightness}%)`;
+}
+
+function velocityHsl(vx, vy) {
+  const speed = Math.sqrt(vx * vx + vy * vy);
+  const t = clamp(speed / 6.0, 0, 1);
+  const hue = 194 + t * 118;
+  const lightness = 50 + t * 30;
+  return [hue, 100, lightness];
+}
+
+// === Scroll State Manager ===
+class ScrollState {
+  constructor() {
+    this.activeFragment = -1;
+    this.fragmentScores = FRAGMENTS.map(() => 0);
+    this.scrollVelocity = 0;
+    this.scrollProgress = 0;
+    this.prevScrollY = window.scrollY || window.pageYOffset;
+    this.scrollHistory = [];
+    this.observer = null;
+    this.regretMode = false;
+    this.regretStartTime = 0;
+    this.hasSeenFragment4 = false;
+    this.fragment4SeenTime = 0;
+    this.mottoChanged = false;
+    this.prevActiveFragment = -1;
+    this.fragmentChanged = false;
+
+    this._setupIntersectionObserver();
+    this._setupScrollTracking();
+  }
+
+  _setupIntersectionObserver() {
+    const markers = document.querySelectorAll('.marker');
+    this.intersectionRatios = markers.map(() => 0);
+
+    this.observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        const idx = parseInt(entry.target.dataset.fragment);
+        this.intersectionRatios[idx] = entry.intersectionRatio;
+      }
+    }, { threshold: [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1] });
+
+    markers.forEach(m => this.observer.observe(m));
+  }
+
+  _setupScrollTracking() {
+    const track = () => {
+      const now = performance.now();
+      const sy = window.scrollY || window.pageYOffset;
+      this.scrollHistory.push({ y: sy, t: now });
+      if (this.scrollHistory.length > 12) {
+        this.scrollHistory.shift();
+      }
+      this.prevScrollY = sy;
+    };
+
+    window.addEventListener('wheel', track, { passive: true });
+    window.addEventListener('touchmove', track, { passive: true });
+    window.addEventListener('scroll', track, { passive: true });
+  }
+
+  update() {
+    // --- Fragment detection from intersection ratios ---
+    let maxRatio = 0;
+    let bestIdx = -1;
+    for (let i = 0; i < this.intersectionRatios.length; i++) {
+      const r = this.intersectionRatios[i];
+      if (r > maxRatio) {
+        maxRatio = r;
+        bestIdx = i;
+      }
+    }
+    
+    this.prevActiveFragment = this.activeFragment;
+    this.activeFragment = maxRatio > 0.02 ? bestIdx : -1;
+    this.fragmentChanged = this.activeFragment !== this.prevActiveFragment;
+
+    // --- Fragment scores (smooth blend) ---
+    for (let i = 0; i < FRAGMENTS.length; i++) {
+      // Blend toward current intersection ratio
+      this.fragmentScores[i] = lerp(this.fragmentScores[i], this.intersectionRatios[i], 0.08);
+    }
+
+    // Track if user has seen the last fragment (for regret cascade)
+    if (this.intersectionRatios[4] > 0.5) {
+      if (!this.hasSeenFragment4) {
+        this.hasSeenFragment4 = true;
+        this.fragment4SeenTime = performance.now();
+      }
+    }
+
+    // --- Scroll velocity (weighted average of last events) ---
+    const history = this.scrollHistory;
+    if (history.length >= 2) {
+      const newest = history[history.length - 1];
+      const oldest = history[0];
+      const dt = Math.max(newest.t - oldest.t, 16);
+      const dy = newest.y - oldest.y;
+      this.scrollVelocity = dy / dt; // px/ms
+
+      // Smooth with exponential moving average
+      if (this._smoothVelocity === undefined) {
+        this._smoothVelocity = this.scrollVelocity;
+      }
+      this._smoothVelocity = lerp(this._smoothVelocity, this.scrollVelocity, 0.3);
+      this.scrollVelocity = this._smoothVelocity;
+    }
+
+    // --- Scroll progress (0-1) ---
+    const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+    this.scrollProgress = clamp(window.scrollY / maxScroll, 0, 1);
+
+    // --- Regret detection ---
+    if (this.hasSeenFragment4 && !this.regretMode) {
+      const timeSinceLastFragment = performance.now() - this.fragment4SeenTime;
+      if (timeSinceLastFragment < 2000 && this.scrollProgress < 0.05 && this.scrollVelocity < -0.5) {
+        this.regretMode = true;
+        this.regretStartTime = performance.now();
+      }
+    }
+
+    // --- Regret timeout ---
+    if (this.regretMode) {
+      const elapsed = performance.now() - this.regretStartTime;
+      if (elapsed > REGRET_DURATION) {
+        this.regretMode = false;
+        this.hasSeenFragment4 = false;
+      }
+    }
+
+    // --- Subtitle text change ---
+    const motto = document.getElementById('motto');
+    if (this.scrollProgress > 0.45 && !this.mottoChanged) {
+      motto.textContent = 'there is no going back';
+      this.mottoChanged = true;
+    } else if (this.scrollProgress <= 0.45 && this.mottoChanged) {
+      motto.textContent = 'you can still turn back';
+      this.mottoChanged = false;
+    }
+
+    // --- Hide scroll hint after some scrolling ---
+    const hint = document.getElementById('scroll-hint');
+    if (this.scrollProgress > 0.08) {
+      hint.style.opacity = '0';
+    } else {
+      hint.style.opacity = '1';
+    }
+  }
+
+  get regretProgress() {
+    if (!this.regretMode) return 0;
+    return clamp((performance.now() - this.regretStartTime) / REGRET_DURATION, 0, 1);
+  }
+}
+
+// ============================================================
+// CANVAS 2D RENDERER
+// ============================================================
+class Canvas2DRenderer {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.particles = [];
+    this.scaledAttractors = FRAGMENTS.map(() => []);
+    this.canvasW = 0;
+    this.canvasH = 0;
+    this.particleAge = 0;
+  }
+
+  resize(w, h) {
+    this.canvasW = w;
+    this.canvasH = h;
+    const dpr = window.devicePixelRatio || 1;
+    this.canvas.width = w * dpr;
+    this.canvas.height = h * dpr;
+    this.canvas.style.width = w + 'px';
+    this.canvas.style.height = h + 'px';
+    this.ctx.scale(dpr, dpr);
+  }
+
+  setAttractors(allAttractors) {
+    for (let i = 0; i < FRAGMENTS.length; i++) {
+      this.scaledAttractors[i] = scaleAttractors(allAttractors[i], this.canvasW, this.canvasH);
+    }
+  }
+
+  initParticles(count) {
+    this.particles = [];
+    for (let i = 0; i < count; i++) {
+      const x = Math.random() * this.canvasW;
+      const y = Math.random() * this.canvasH;
+      this.particles.push({
+        x, y,
+        vx: (Math.random() - 0.5) * 3,
+        vy: (Math.random() - 0.5) * 3,
+        targetX: x,
+        targetY: y,
+        hasTarget: false,
+        trail: [],
+        initX: x,
+        initY: y,
+      });
+    }
+  }
+
+  assignTargets(fragmentIdx) {
+    const attrs = this.scaledAttractors[fragmentIdx];
+    if (attrs.length === 0) return;
+    for (let i = 0; i < this.particles.length; i++) {
+      const p = this.particles[i];
+      const attr = attrs[i % attrs.length];
+      p.targetX = attr.x;
+      p.targetY = attr.y;
+      p.hasTarget = true;
+    }
+  }
+
+  clearTargets() {
+    for (const p of this.particles) {
+      p.hasTarget = false;
+    }
+  }
+
+  update(state) {
+    this.particleAge++;
+
+    // Handle fragment transitions
+    if (state.fragmentChanged) {
+      if (state.activeFragment >= 0) {
+        this.assignTargets(state.activeFragment);
+      } else {
+        this.clearTargets();
+      }
+    }
+
+    // Auto-assign targets when active fragment is set but particles have no target
+    if (state.activeFragment >= 0 && this.particles.length > 0 && !this.particles[0].hasTarget) {
+      this.assignTargets(state.activeFragment);
+    }
+
+    // Regret mode: gradually return particles to initial positions
+    const regretT = state.regretProgress;
+    const isRegretting = state.regretMode;
+
+    for (const p of this.particles) {
+      let fx = 0, fy = 0;
+
+      if (isRegretting) {
+        // Regret mode: return to initial scattered positions
+        const targetX = lerp(p.x, p.initX, 0.03);
+        const targetY = lerp(p.y, p.initY, 0.03);
+        fx = (targetX - p.x) * SPRING_FORCE * 2;
+        fy = (targetY - p.y) * SPRING_FORCE * 2;
+        // Add some turbulence for visual interest
+        fx += (Math.sin(p.x * 0.01 + this.particleAge * 0.02)) * 0.3 * regretT;
+        fy += (Math.cos(p.y * 0.01 + this.particleAge * 0.03)) * 0.3 * regretT;
+      } else if (p.hasTarget) {
+        // Spring force toward target attractor
+        const dx = p.targetX - p.x;
+        const dy = p.targetY - p.y;
+        fx = dx * SPRING_FORCE;
+        fy = dy * SPRING_FORCE;
+
+        // Repulsive force when scrolling backward (up)
+        if (state.scrollVelocity < -0.2) {
+          const repulseStrength = Math.abs(state.scrollVelocity) * REPULSION_FORCE;
+          const angle = Math.random() * Math.PI * 2;
+          fx += Math.cos(angle) * repulseStrength;
+          fy += Math.sin(angle) * repulseStrength;
+        }
+
+        // Apply turbulence based on scroll velocity magnitude
+        const absVel = Math.abs(state.scrollVelocity);
+        if (absVel > 0.5) {
+          const turb = absVel * 0.5;
+          fx += (Math.sin(p.y * 0.02 + this.particleAge * 0.05)) * turb;
+          fy += (Math.cos(p.x * 0.02 + this.particleAge * 0.05)) * turb;
+        }
+      } else {
+        // No active fragment: gentle chaotic drift
+        fx += (Math.sin(p.y * 0.01 + this.particleAge * 0.01)) * 0.15;
+        fy += (Math.cos(p.x * 0.01 + this.particleAge * 0.01)) * 0.15;
+      }
+
+      // Apply forces
+      p.vx += fx;
+      p.vy += fy;
+
+      // Damping
+      p.vx *= DAMPING;
+      p.vy *= DAMPING;
+
+      // Clamp velocity
+      const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      if (speed > MAX_VELOCITY) {
+        p.vx = (p.vx / speed) * MAX_VELOCITY;
+        p.vy = (p.vy / speed) * MAX_VELOCITY;
+      }
+
+      // Update position
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Soft boundary constraints
+      const margin = 50;
+      if (p.x < -margin) { p.x = this.canvasW + margin; }
+      if (p.x > this.canvasW + margin) { p.x = -margin; }
+      if (p.y < -margin) { p.y = this.canvasH + margin; }
+      if (p.y > this.canvasH + margin) { p.y = -margin; }
+
+      // Store trail for regret visualization
+      if (state.regretMode && p.trail.length < 60) {
+        p.trail.push({ x: p.x, y: p.y });
+      }
+    }
+  }
+
+  render(state) {
+    const ctx = this.ctx;
+    const w = this.canvasW;
+    const h = this.canvasH;
+
+    // Clear
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, w, h);
+
+    // Draw subtle vignette
+    const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.7);
+    grad.addColorStop(0, 'rgba(0,0,0,0)');
+    grad.addColorStop(1, 'rgba(0,0,0,0.3)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Draw attraction field glow (subtle)
+    if (state.activeFragment >= 0 && this.particles.length > 0 && this.particles[0].hasTarget) {
+      const attrs = this.scaledAttractors[state.activeFragment];
+      if (attrs.length > 0) {
+        // Draw a few sample attractors as extremely faint dots
+        ctx.fillStyle = 'rgba(68, 221, 255, 0.015)';
+        for (let i = 0; i < Math.min(attrs.length, 200); i += 5) {
+          const a = attrs[i];
+          ctx.beginPath();
+          ctx.arc(a.x, a.y, 1, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    // Draw particles
+    for (const p of this.particles) {
+      const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      const t = clamp(speed / 6.0, 0, 1);
+      const hue = 194 + t * 118;
+      const lightness = 50 + t * 30;
+      const size = 1.5 + speed * 0.12;
+
+      ctx.fillStyle = `hsl(${hue}, 100%, ${lightness}%)`;
+      ctx.globalAlpha = clamp(0.5 + t * 0.3, 0.5, 1);
+
+      // Draw particle as small circle
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, Math.min(size, 4), 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.globalAlpha = 1;
+
+    // Draw regret cascade indicator
+    if (state.regretMode) {
+      ctx.fillStyle = `rgba(255, 68, 221, ${0.05 + 0.05 * Math.sin(performance.now() * 0.003)})`;
+      ctx.font = '12px "Inter", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('regret cascade • rewinding', w / 2, h - 120);
+    }
+  }
+}
+
+// ============================================================
+// WEBGPU RENDERER
+// ============================================================
+class WebGPURenderer {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.device = null;
+    this.context = null;
+    this.computePipeline = null;
+    this.renderPipeline = null;
+    this.bindGroup = null;
+    this.particleBuffers = [null, null];
+    this.uniformBuffer = null;
+    this.attractorBuffer = null;
+    this.readBuffer = 0; // ping-pong index
+    this.particleCount = PARTICLE_COUNT_WGPU;
+    this.canvasW = 0;
+    this.canvasH = 0;
+    this.initialized = false;
+    this.vertBuffer = null;
+    this.particleAge = 0;
+  }
+
+  async init(allAttractors, canvasW, canvasH) {
+    if (!navigator.gpu) {
+      throw new Error('WebGPU not supported');
+    }
+
+    this.canvasW = canvasW;
+    this.canvasH = canvasH;
+
+    const adapter = await navigator.gpu.requestAdapter();
+    if (!adapter) throw new Error('No GPU adapter found');
+
+    this.device = await adapter.requestDevice();
+    this.context = this.canvas.getContext('webgpu');
+    if (!this.context) throw new Error('No WebGPU context');
+
+    // Configure swap chain
+    this.context.configure({
+      device: this.device,
+      format: navigator.gpu.getPreferredCanvasFormat(),
+      alphaMode: 'premultiplied',
+    });
+
+    // Generate scaled attractor points for all fragments
+    const flatAttractors = [];
+    const fragmentOffsets = [];
+    for (let fi = 0; fi < FRAGMENTS.length; fi++) {
+      fragmentOffsets.push(flatAttractors.length);
+      const scaled = scaleAttractors(allAttractors[fi], canvasW, canvasH);
+      for (const a of scaled) {
+        flatAttractors.push(a.x, a.y);
+      }
+    }
+    fragmentOffsets.push(flatAttractors.length);
+
+    // Ensure at least some attractors exist
+    while (flatAttractors.length < 4) {
+      flatAttractors.push(0, 0);
+    }
+
+    // Attractor buffer (vec2<f32> array)
+    const attractorData = new Float32Array(flatAttractors);
+    this.attractorBuffer = this.device.createBuffer({
+      size: attractorData.byteLength,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    });
+    this.device.queue.writeBuffer(this.attractorBuffer, 0, attractorData);
+
+    // Attractor count and offsets per fragment
+    this.attractorOffsets = fragmentOffsets;
+    this.attractorCounts = [];
+    for (let i = 0; i < FRAGMENTS.length; i++) {
+      this.attractorCounts.push(fragmentOffsets[i + 1] / 2 - fragmentOffsets[i] / 2);
+    }
+
+    // Uniform buffer (24 floats = 96 bytes, room for 19 WGSL fields + padding)
+    const uniformData = new Float32Array(24);
+    this.uniformBuffer = this.device.createBuffer({
+      size: uniformData.byteLength,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+
+    // Particle buffers (ping-pong)
+    const particleByteSize = 32; // 2 vec4<f32> per particle
+    const particleBufferSize = this.particleCount * particleByteSize;
+
+    const initialParticleData = new Float32Array(this.particleCount * 8);
+    for (let i = 0; i < this.particleCount; i++) {
+      const base = i * 8;
+      initialParticleData[base] = Math.random() * canvasW;
+      initialParticleData[base + 1] = Math.random() * canvasH;
+      initialParticleData[base + 4] = (Math.random() - 0.5) * 3;
+      initialParticleData[base + 5] = (Math.random() - 0.5) * 3;
+    }
+
+    for (let b = 0; b < 2; b++) {
+      this.particleBuffers[b] = this.device.createBuffer({
+        size: particleBufferSize,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+      });
+      this.device.queue.writeBuffer(this.particleBuffers[b], 0, initialParticleData);
+    }
+
+    // Vertex buffer for the full-screen triangle / point rendering
+    // We'll use instanced rendering from storage buffers
+
+    // --- Shaders ---
+
+    // WGSL Compute Shader
+    const computeShaderCode = `
+      struct Particle {
+        pos: vec4<f32>,
+        vel: vec4<f32>,
+      };
+
+      struct Uniforms {
+        active_fragment: f32,
+        scroll_velocity: f32,
+        scroll_progress: f32,
+        particle_age: f32,
+        regret_mode: f32,
+        canvas_width: f32,
+        canvas_height: f32,
+        attractor_offset_0: f32,
+        attractor_count_0: f32,
+        attractor_offset_1: f32,
+        attractor_count_1: f32,
+        attractor_offset_2: f32,
+        attractor_count_2: f32,
+        attractor_offset_3: f32,
+        attractor_count_3: f32,
+        attractor_offset_4: f32,
+        attractor_count_4: f32,
+        _pad0: f32,
+        _pad1: f32,
+      };
+
+      @group(0) @binding(0) var<uniform> uniforms: Uniforms;
+      @group(0) @binding(1) var<storage, read> particlesA: array<Particle>;
+      @group(0) @binding(2) var<storage, read_write> particlesB: array<Particle>;
+      @group(0) @binding(3) var<storage, read> attractors: array<vec2<f32>>;
+
+      // Pseudo-random
+      fn rand(seed: u32) -> f32 {
+        let h = (seed * 1664525u + 1013904223u);
+        return f32(h & 0x7fffffffu) / f32(0x7fffffffu);
+      }
+
+      @compute @workgroup_size(256)
+      fn main(@builtin(global_invocation_id) id: vec3<u32>) {
+        let i = id.x;
+        let count = arrayLength(&particlesA);
+        if (i >= count) { return; }
+
+        var p = particlesA[i];
+        var pos = p.pos;
+        var vel = p.vel;
+
+        let activeIdx = i32(uniforms.active_fragment);
+        let scrollVel = uniforms.scroll_velocity;
+        let regret = uniforms.regret_mode;
+        let age = uniforms.particle_age;
+        let w = uniforms.canvas_width;
+        let h = uniforms.canvas_height;
+
+        var fx = 0.0;
+        var fy = 0.0;
+
+        if (regret > 0.5) {
+          // Regret mode: return toward initial state with turbulence
+          // Store initial pos in vel.z/w (we use vel.z as initX, vel.w as initY)
+          // Actually we didn't store init, so just add noise
+          fx = (rand(i * 3u + 7u) - 0.5) * 2.0;
+          fy = (rand(i * 5u + 11u) - 0.5) * 2.0;
+          // Damping
+          vel.x *= 0.96;
+          vel.y *= 0.96;
+        } else if (activeIdx >= 0 && activeIdx < 5) {
+          // Compute attractor offset and count for this fragment
+          var offset: f32 = 0.0;
+          var count_f: f32 = 0.0;
+          if (activeIdx == 0) { offset = uniforms.attractor_offset_0; count_f = uniforms.attractor_count_0; }
+          else if (activeIdx == 1) { offset = uniforms.attractor_offset_1; count_f = uniforms.attractor_count_1; }
+          else if (activeIdx == 2) { offset = uniforms.attractor_offset_2; count_f = uniforms.attractor_count_2; }
+          else if (activeIdx == 3) { offset = uniforms.attractor_offset_3; count_f = uniforms.attractor_count_3; }
+          else { offset = uniforms.attractor_offset_4; count_f = uniforms.attractor_count_4; }
+
+          let count_u = u32(count_f);
+          let offset_u = u32(offset);
+
+          if (count_u > 0u) {
+            let attractorIdx = i % count_u;
+            let target = attractors[offset_u + attractorIdx];
+            let dx = target.x - pos.x;
+            let dy = target.y - pos.y;
+            fx += dx * 0.035;
+            fy += dy * 0.035;
+
+            // Repulsion on scroll-up
+            if (scrollVel < 0.0) {
+              let repulse = abs(scrollVel) * 4.0;
+              let angle = rand(i * 7u + u32(age)) * 6.283185;
+              fx += cos(angle) * repulse;
+              fy += sin(angle) * repulse;
+            }
+
+            // Turbulence based on scroll speed
+            let absVel = abs(scrollVel);
+            if (absVel > 0.5) {
+              let turb = absVel * 0.5;
+              fx += sin(p.y * 0.02 + age * 0.05) * turb;
+              fy += cos(p.x * 0.02 + age * 0.05) * turb;
+            }
+          }
+        } else {
+          // Chaotic drift
+          fx += (sin(p.y * 0.01 + age * 0.01)) * 0.15;
+          fy += (cos(p.x * 0.01 + age * 0.01)) * 0.15;
+        }
+
+        // Apply forces
+        vel.x += fx;
+        vel.y += fy;
+
+        // Damping
+        vel.x *= 0.92;
+        vel.y *= 0.92;
+
+        // Clamp velocity
+        let speed = sqrt(vel.x * vel.x + vel.y * vel.y);
+        let maxV = 12.0;
+        if (speed > maxV) {
+          vel.x = (vel.x / speed) * maxV;
+          vel.y = (vel.y / speed) * maxV;
+        }
+
+        // Update position
+        pos.x += vel.x;
+        pos.y += vel.y;
+
+        // Boundary wrap
+        let margin = 50.0;
+        if (pos.x < -margin) { pos.x = w + margin; }
+        if (pos.x > w + margin) { pos.x = -margin; }
+        if (pos.y < -margin) { pos.y = h + margin; }
+        if (pos.y > h + margin) { pos.y = -margin; }
+
+        // Write output
+        particlesB[i].pos = pos;
+        particlesB[i].vel = vel;
+      }
+    `;
+
+    // WGSL Render Shader (point rendering)
+    const renderShaderCode = `
+      struct Particle {
+        pos: vec4<f32>,
+        vel: vec4<f32>,
+      };
+
+      struct Uniforms {
+        active_fragment: f32,
+        scroll_velocity: f32,
+        scroll_progress: f32,
+        particle_age: f32,
+        regret_mode: f32,
+        canvas_width: f32,
+        canvas_height: f32,
+        attractor_offset_0: f32,
+        attractor_count_0: f32,
+        attractor_offset_1: f32,
+        attractor_count_1: f32,
+        attractor_offset_2: f32,
+        attractor_count_2: f32,
+        attractor_offset_3: f32,
+        attractor_count_3: f32,
+        attractor_offset_4: f32,
+        attractor_count_4: f32,
+        _pad0: f32,
+        _pad1: f32,
+      };
+
+      @group(0) @binding(0) var<uniform> uniforms: Uniforms;
+      @group(0) @binding(1) var<storage, read> _particlesA: array<Particle>;
+      @group(0) @binding(2) var<storage, read> _particlesB: array<Particle>;
+      @group(0) @binding(3) var<storage, read> _attractors: array<vec2<f32>>;
+
+      struct VertexOutput {
+        @builtin(position) position: vec4<f32>,
+        @builtin(point_size) point_size: f32,
+        @location(0) color: vec3<f32>,
+      };
+
+      fn hslToRgb(h: f32, s: f32, l: f32) -> vec3<f32> {
+        let c = (1.0 - abs(2.0 * l - 1.0)) * s;
+        let h60 = h / 60.0;
+        let x = c * (1.0 - abs(mod(h60, 2.0) - 1.0));
+        let m = l - c * 0.5;
+        var r1: f32; var g1: f32; var b1: f32;
+        if (h60 < 1.0) { r1=c; g1=x; b1=0.0; }
+        else if (h60 < 2.0) { r1=x; g1=c; b1=0.0; }
+        else if (h60 < 3.0) { r1=0.0; g1=c; b1=x; }
+        else if (h60 < 4.0) { r1=0.0; g1=x; b1=c; }
+        else if (h60 < 5.0) { r1=x; g1=0.0; b1=c; }
+        else { r1=c; g1=0.0; b1=x; }
+        return vec3<f32>(r1 + m, g1 + m, b1 + m);
+      }
+
+      @vertex
+      fn vs(@location(0) pos: vec4<f32>, @location(1) vel: vec4<f32>) -> VertexOutput {
+        let speed = length(vel.xy);
+        let t = clamp(speed / 6.0, 0.0, 1.0);
+        let hue = 194.0 + t * 118.0;
+        let lightness = 50.0 + t * 30.0;
+        let halfW = uniforms.canvas_width / 2.0;
+        let halfH = uniforms.canvas_height / 2.0;
+
+        var out: VertexOutput;
+        out.position = vec4<f32>(
+          max(-1.0, min(1.0, (pos.x / halfW) - 1.0)),
+          max(-1.0, min(1.0, -(pos.y / halfH) + 1.0)),
+          0.0, 1.0
+        );
+        out.point_size = clamp(1.5 + speed * 0.12, 1.0, 4.0);
+        out.color = hslToRgb(hue, 1.0, lightness / 100.0);
+        return out;
+      }
+
+      @fragment
+      fn fs(@location(0) color: vec3<f32>) -> @location(0) vec4<f32> {
+        return vec4<f32>(color, 0.85);
+      }
+    `;
+
+    // Create compute shader module
+    const computeModule = this.device.createShaderModule({
+      code: computeShaderCode,
+    });
+
+    // Create render shader module
+    const renderModule = this.device.createShaderModule({
+      code: renderShaderCode,
+    });
+
+    // Compute pipeline
+    this.computePipeline = this.device.createComputePipeline({
+      layout: 'auto',
+      compute: { module: computeModule, entryPoint: 'main' },
+    });
+
+    // Render pipeline — reads particle storage buffer as vertex data
+    this.renderPipeline = this.device.createRenderPipeline({
+      layout: 'auto',
+      vertex: {
+        module: renderModule,
+        entryPoint: 'vs',
+        buffers: [
+          {
+            arrayStride: 32, // 2 vec4<f32> = 32 bytes
+            attributes: [
+              { shaderLocation: 0, offset: 0, format: 'float32x4' },
+              { shaderLocation: 1, offset: 16, format: 'float32x4' },
+            ],
+          },
+        ],
+      },
+      fragment: {
+        module: renderModule,
+        entryPoint: 'fs',
+        targets: [{ format: navigator.gpu.getPreferredCanvasFormat() }],
+      },
+      primitive: {
+        topology: 'point-list',
+      },
+    });
+
+    // Create shared bind group (same layout for compute and render pipelines)
+    const bindGroupLayout = this.computePipeline.getBindGroupLayout(0);
+    this.bindGroup = this.device.createBindGroup({
+      layout: bindGroupLayout,
+      entries: [
+        { binding: 0, resource: { buffer: this.uniformBuffer } },
+        { binding: 1, resource: { buffer: this.particleBuffers[0] } },
+        { binding: 2, resource: { buffer: this.particleBuffers[1] } },
+        { binding: 3, resource: { buffer: this.attractorBuffer } },
+      ],
+    });
+
+    this.initialized = true;
+    document.getElementById('render-badge').textContent = 'WebGPU';
+  }
+
+  resize(w, h) {
+    this.canvasW = w;
+    this.canvasH = h;
+    if (this.initialized) {
+      this.context.configure({
+        device: this.device,
+        format: navigator.gpu.getPreferredCanvasFormat(),
+        alphaMode: 'premultiplied',
+        size: [w * (window.devicePixelRatio || 1), h * (window.devicePixelRatio || 1)],
+      });
+    }
+  }
+
+  update(state) {
+    if (!this.initialized) return;
+    this.particleAge++;
+
+    const activeIdx = state.activeFragment >= 0 ? state.activeFragment : -1;
+
+    // Update uniform buffer (24 floats)
+    const uniformData = new Float32Array(24);
+    uniformData[0] = activeIdx;
+    uniformData[1] = state.scrollVelocity;
+    uniformData[2] = state.scrollProgress;
+    uniformData[3] = this.particleAge;
+    uniformData[4] = state.regretMode ? 1 : 0;
+    uniformData[5] = this.canvasW;
+    uniformData[6] = this.canvasH;
+
+    // Attractor offsets and counts per fragment
+    for (let i = 0; i < FRAGMENTS.length; i++) {
+      uniformData[7 + i * 2] = this.attractorOffsets[i] / 2; // in vec2 units
+      uniformData[8 + i * 2] = this.attractorCounts[i];
+    }
+    // Fill remaining with 0s (already zero-initialized)
+
+    this.device.queue.writeBuffer(this.uniformBuffer, 0, uniformData);
+
+    // Use shared bind group with current ping-pong state
+    const readBuf = this.particleBuffers[this.readBuffer];
+    const writeBuf = this.particleBuffers[1 - this.readBuffer];
+
+    this.bindGroup = this.device.createBindGroup({
+      layout: this.computePipeline.getBindGroupLayout(0),
+      entries: [
+        { binding: 0, resource: { buffer: this.uniformBuffer } },
+        { binding: 1, resource: { buffer: readBuf } },
+        { binding: 2, resource: { buffer: writeBuf } },
+        { binding: 3, resource: { buffer: this.attractorBuffer } },
+      ],
+    });
+
+    // Records commands
+    const commandEncoder = this.device.createCommandEncoder();
+
+    // ---- Compute pass ----
+    const computePass = commandEncoder.beginComputePass();
+    computePass.setPipeline(this.computePipeline);
+    computePass.setBindGroup(0, this.bindGroup);
+
+    const workgroupCount = Math.ceil(this.particleCount / 256);
+    computePass.dispatchWorkgroups(workgroupCount, 1, 1);
+    computePass.end();
+
+    // Render pass
+    const renderPass = commandEncoder.beginRenderPass({
+      colorAttachments: [{
+        view: this.context.getCurrentTexture().createView(),
+        loadOp: 'clear',
+        storeOp: 'store',
+        clearValue: { r: 0, g: 0, b: 0, a: 1 },
+      }],
+    });
+    renderPass.setPipeline(this.renderPipeline);
+    renderPass.setBindGroup(0, this.bindGroup);
+    renderPass.setVertexBuffer(0, writeBuf); // read from newly written buffer
+    renderPass.draw(this.particleCount, 1, 0, 0);
+    renderPass.end();
+
+    this.device.queue.submit([commandEncoder.finish()]);
+
+    // Swap ping-pong buffers
+    this.readBuffer = 1 - this.readBuffer;
+  }
+
+  render(state) {
+    // WebGPU rendering happens inside update() due to GPU architecture
+  }
+}
+
+// ============================================================
+// MAIN INIT
+// ============================================================
+async function main() {
+  const canvas = document.getElementById('particle-canvas');
+  const badge = document.getElementById('render-badge');
+
+  // Wait for fonts
+  try { await document.fonts.ready; } catch (_) { /* ignore */ }
+
+  // Generate attractor points for all fragments
+  const allAttractors = FRAGMENTS.map(text =>
+    generateAttractors(text, ATTRACTOR_WIDTH, ATTRACTOR_HEIGHT, ATTRACTOR_STEP)
+  );
+
+  // Log attractor counts
+  for (let i = 0; i < FRAGMENTS.length; i++) {
+    console.log(`[RegretScroll] "${FRAGMENTS[i]}": ${allAttractors[i].length} attractors`);
+  }
+
+  // Resize handler
+  let canvasW, canvasH;
+
+  function updateSize() {
+    canvasW = window.innerWidth;
+    canvasH = window.innerHeight;
+  }
+  updateSize();
+  window.addEventListener('resize', updateSize);
+
+  // Create scroll state
+  const scrollState = new ScrollState();
+
+  // Try WebGPU first
+  let renderer = null;
+  let usingWebGPU = false;
+
+  if (navigator.gpu) {
+    try {
+      const wgpuRenderer = new WebGPURenderer(canvas);
+      await wgpuRenderer.init(allAttractors, canvasW, canvasH);
+      renderer = wgpuRenderer;
+      usingWebGPU = true;
+      badge.textContent = 'WebGPU • 100k particles';
+      console.log('[RegretScroll] ✓ WebGPU initialized');
+    } catch (e) {
+      console.warn('[RegretScroll] WebGPU init failed:', e.message);
+      badge.textContent = 'WebGPU unavailable';
+    }
+  } else {
+    badge.textContent = 'WebGPU N/A';
+  }
+
+  // Fallback to Canvas 2D
+  if (!renderer) {
+    renderer = new Canvas2DRenderer(canvas);
+    renderer.resize(canvasW, canvasH);
+    renderer.setAttractors(allAttractors);
+    renderer.initParticles(PARTICLE_COUNT_2D);
+    badge.textContent = 'Canvas 2D • ' + PARTICLE_COUNT_2D + ' particles';
+    console.log(`[RegretScroll] ✓ Canvas 2D with ${PARTICLE_COUNT_2D} particles`);
+  }
+
+  // Resize observer
+  const resizeObserver = new ResizeObserver(() => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    updateSize();
+
+    if (renderer instanceof Canvas2DRenderer) {
+      renderer.resize(w, h);
+      renderer.setAttractors(allAttractors);
+    } else if (usingWebGPU) {
+      renderer.resize(w, h);
+    }
+  });
+  resizeObserver.observe(document.body);
+
+  // Animation loop
+  let frameCount = 0;
+  let lastFrameTime = performance.now();
+  let fps = 0;
+
+  function frame(time) {
+    frameCount++;
+
+    // FPS tracking
+    if (time - lastFrameTime >= 1000) {
+      fps = frameCount;
+      frameCount = 0;
+      lastFrameTime = time;
+    }
+
+    // Update scroll state
+    scrollState.update();
+
+    // Update and render
+    if (usingWebGPU) {
+      renderer.update(scrollState);
+    } else {
+      renderer.update(scrollState);
+      renderer.render(scrollState);
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+
+  console.log('[RegretScroll] ✓ Running — scroll down to reveal fragments');
+  console.log('[RegretScroll]   Scroll back up for repulsive force');
+  console.log('[RegretScroll]   Scroll past end then slam to top within 2s for regret cascade');
+}
+
+// Go
+main().catch(err => {
+  console.error('[RegretScroll] Fatal error:', err);
+  document.getElementById('webgpu-fallback').textContent =
+    'Error: ' + err.message;
+});
+</script>
+</body>
+</html>

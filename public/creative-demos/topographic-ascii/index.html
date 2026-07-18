@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topographic ASCII — Generative Terrain</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #000000;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    canvas {
+      display: block;
+      width: 100vw !important;
+      height: 100vh !important;
+      image-rendering: pixelated;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+</head>
+<body>
+<script>
+/* ============================================================
+   Topographic ASCII — Generative Terrain + Aniso Shader
+   ============================================================
+   Cross-Domain Fusion:
+   - Domain A: Perlin noise terrain with marching-squares contours
+   - Domain B: ASCII luminance-to-character mapping (Aniso style)
+
+   Technique Overview:
+   1. Generate a 2D heightfield on an 81×61 grid using p5.js noise().
+   2. Map heights to 5 elevation bands and render them as filled cells
+      with ascending grayscale brightness.
+   3. Run a simplified marching-squares pass at each threshold (0.2,
+      0.4, 0.6, 0.8): for every cell edge that straddles the threshold,
+      draw a small line segment at the interpolated crossing point.
+   4. Read the rendered canvas pixel buffer with loadPixels().
+   5. Downsample into 8×8 blocks. For each block compute average
+      brightness and map it to a character from the atlas " TERRAIN".
+   6. Clear the screen to black and redraw the entire frame as ASCII
+      characters in a monospace font.
+   7. Track the brightest block (mountain peak); override its
+      character with a blinking Terminal Green asterisk (*) that
+      pulses between 0.5 and 1.0 opacity every 0.5 s.
+   8. Highlight the cell under the mouse cursor in Signal Amber.
+
+   Color Palette (exact hexes):
+   - Void Black      #000000  background
+   - ASCII White     #FFFFFF  primary characters
+   - Terminal Green  #00FF41  peak accent
+   - Signal Amber    #FFB800  hover highlight
+   - Grid Gray       #1A1A1A  subtle contour underlay
+   ============================================================ */
+
+// Grid dimensions — logical 80×60 cells, canvas is 640×480 so that
+// 8×8 pixel blocks map 1:1 to the ASCII grid.
+const COLS = 80;
+const ROWS = 60;
+
+// Elevation thresholds (5 bands, 4 contour lines)
+const THRESHOLDS = [0.2, 0.4, 0.6, 0.8];
+
+// Grayscale fill for each elevation band (darkest → brightest)
+const BAND_COLORS = [
+  '#0A0A0A', // band 0: deep void
+  '#1A1A1A', // band 1: Grid Gray
+  '#333333', // band 2: mid gray
+  '#555555', // band 3: light gray
+  '#888888', // band 4: near-white
+];
+
+// The 9-character ASCII atlas (space + TERRAIN + space)
+const CHAR_ATLAS = ' TERRAIN ';
+
+// State
+let noiseValues = [];   // 2D array of noise samples
+let zOff = 0;           // 3rd dimension of noise for slow animation
+let cellW, cellH;       // pixel size of each logical cell
+let peak = { x: 0, y: 0, brightness: -1 };
+
+function setup() {
+  // Fixed-resolution pixel buffer: 640×480 = 80×60 cells × 8×8 pixels
+  createCanvas(640, 480);
+  noSmooth(); // keep edges crisp
+
+  cellW = width / COLS;
+  cellH = height / ROWS;
+
+  textFont('monospace');
+  textSize(8);
+  textAlign(CENTER, CENTER);
+  noStroke();
+
+  // CSS already scales the <canvas> element to fill the viewport
+  // while keeping the internal 640×480 pixel buffer intact.
+}
+
+function draw() {
+  // --------------------------------------------------------------
+  // 1. Terrain generation
+  // --------------------------------------------------------------
+  generateNoise();
+
+  // --------------------------------------------------------------
+  // 2. Terrain rendering (raster pass)
+  // --------------------------------------------------------------
+  renderTerrain();
+
+  // --------------------------------------------------------------
+  // 3. ASCII post-processing pass
+  // --------------------------------------------------------------
+  renderASCII();
+
+  // Slowly drift the noise field so the terrain morphs over time
+  zOff += 0.005;
+}
+
+/* =============================================================
+   NOISE GENERATION
+   Sample Perlin noise at each grid vertex (including the right
+   and bottom edge, so we need COLS+1 × ROWS+1 samples).
+   ============================================================= */
+function generateNoise() {
+  noiseValues = [];
+  for (let y = 0; y <= ROWS; y++) {
+    let row = [];
+    for (let x = 0; x <= COLS; x++) {
+      // noise() with a slow spatial scale so terrain is smooth
+      row.push(noise(x * 0.1, y * 0.1, zOff));
+    }
+    noiseValues.push(row);
+  }
+}
+
+/* =============================================================
+   TERRAIN RENDERING
+   Draw filled elevation bands, then overlay simplified marching-
+   squares contour lines at each threshold.
+   ============================================================= */
+function renderTerrain() {
+  background(0);
+
+  // --- Filled elevation bands ---
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      let val = noiseValues[y][x];
+      let band = floor(val * 5);
+      band = constrain(band, 0, 4);
+      fill(BAND_COLORS[band]);
+      // +1 prevents hairline gaps between cells
+      rect(x * cellW, y * cellH, cellW + 1, cellH + 1);
+    }
+  }
+
+  // --- Simplified marching-squares contour lines ---
+  // For each threshold, scan every cell edge.  If the edge straddles
+  // the threshold, draw a short line segment at the linearly
+  // interpolated crossing point.
+  stroke(255);
+  strokeWeight(1);
+  for (let t = 0; t < THRESHOLDS.length; t++) {
+    let thr = THRESHOLDS[t];
+
+    for (let y = 0; y < ROWS; y++) {
+      for (let x = 0; x < COLS; x++) {
+        let v = noiseValues[y][x];
+        let vRight = noiseValues[y][x + 1];
+        let vBottom = noiseValues[y + 1][x];
+
+        // Horizontal edge (top of cell, between x and x+1)
+        if ((v < thr && vRight >= thr) || (v >= thr && vRight < thr)) {
+          let interp = (thr - v) / (vRight - v); // 0..1 along edge
+          let px = (x + interp) * cellW;
+          let py = y * cellH;
+          // 2-pixel vertical tick mark at the crossing
+          line(px, py - 1, px, py + 1);
+        }
+
+        // Vertical edge (left of cell, between y and y+1)
+        if ((v < thr && vBottom >= thr) || (v >= thr && vBottom < thr)) {
+          let interp = (thr - v) / (vBottom - v);
+          let px = x * cellW;
+          let py = (y + interp) * cellH;
+          // 2-pixel horizontal tick mark at the crossing
+          line(px - 1, py, px + 1, py);
+        }
+      }
+    }
+  }
+}
+
+/* =============================================================
+   ASCII POST-PROCESSING PASS
+   Read the rendered terrain buffer, downsample into 8×8 blocks,
+   compute average brightness, and replace the canvas with ASCII
+   characters.  The brightest block is the peak.
+   ============================================================= */
+function renderASCII() {
+  const BLOCK = 8;
+  const asciiCols = width / BLOCK;
+  const asciiRows = height / BLOCK;
+
+  // Capture pixel buffer of the terrain we just drew
+  loadPixels();
+
+  // Reset peak tracker
+  peak = { x: 0, y: 0, brightness: -1 };
+
+  // Clear to Void Black for the ASCII overlay
+  background(0);
+  noStroke();
+  textAlign(CENTER, CENTER);
+  textSize(BLOCK * 0.8);
+
+  // Determine which ASCII cell the mouse is over (for hover highlight)
+  let mouseCol = floor(mouseX / BLOCK);
+  let mouseRow = floor(mouseY / BLOCK);
+
+  for (let ay = 0; ay < asciiRows; ay++) {
+    for (let ax = 0; ax < asciiCols; ax++) {
+      let px = ax * BLOCK;
+      let py = ay * BLOCK;
+      let total = 0;
+
+      // Average brightness inside the 8×8 block
+      for (let dy = 0; dy < BLOCK; dy++) {
+        for (let dx = 0; dx < BLOCK; dx++) {
+          let idx = 4 * ((py + dy) * width + (px + dx));
+          let r = pixels[idx];
+          let g = pixels[idx + 1];
+          let b = pixels[idx + 2];
+          total += (r + g + b) / 3;
+        }
+      }
+
+      let avg = total / (BLOCK * BLOCK);
+
+      // Track the single brightest block (mountain peak)
+      if (avg > peak.brightness) {
+        peak = { x: ax, y: ay, brightness: avg };
+      }
+
+      // Normalised brightness 0..1 mapped to 9 character indices
+      let norm = avg / 255;
+      let charIdx = floor(norm * 9);
+      charIdx = constrain(charIdx, 0, 8);
+      let ch = CHAR_ATLAS[charIdx];
+
+      // --- Signal Amber hover highlight ---
+      if (ax === mouseCol && ay === mouseRow) {
+        fill('#FFB800');
+      } else {
+        fill(255);
+      }
+
+      // Draw the character (even for the peak cell — the green
+      // asterisk will be overlaid on top afterwards).
+      text(ch, px + BLOCK / 2, py + BLOCK / 2);
+    }
+  }
+
+  // --- Terminal Green peak blink ---
+  // Pulses opacity 0.5 → 1.0 every 0.5 seconds
+  let pulse = (sin(millis() * 0.012566) + 1) / 2; // 0..1, period 500 ms
+  let alphaVal = 0.5 + 0.5 * pulse;               // 0.5..1.0
+  let peakCol = color('#00FF41');
+  peakCol.setAlpha(alphaVal * 255);
+  fill(peakCol);
+  noStroke();
+  text('*', peak.x * BLOCK + BLOCK / 2, peak.y * BLOCK + BLOCK / 2);
+}
+
+// Prevent context menu on right-click
+function mousePressed() {
+  if (mouseButton === RIGHT) return false;
+}
+</script>
+</body>
+</html>

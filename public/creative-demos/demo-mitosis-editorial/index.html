@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scroll-Driven Mitosis Editorial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: auto; }
+  body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+  section { position: relative; width: 100vw; height: 100vh; display: grid; overflow: hidden; }
+  .light { background: #F5F5F0; color: #000000; }
+  .dark { background: #0A0A0A; color: #F5F5F0; }
+  canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+  .content { position: relative; z-index: 1; max-width: 800px; padding: 40px; }
+  .content h1 { font-size: clamp(2.5rem, 8vw, 6rem); line-height: 0.9; margin-bottom: 0.5em; font-weight: 700; }
+  .content p { font-size: 1rem; line-height: 1.6; opacity: 0.8; }
+  .place-center { place-items: center; }
+  .place-bottom-left { place-items: end start; }
+  .place-top-right { place-items: start end; }
+  .place-top-left { place-items: start start; }
+</style>
+</head>
+<body aria-label="Scroll-driven mitosis editorial">
+
+<section class="light place-center" id="sec-0">
+  <canvas></canvas>
+  <div class="content">
+    <h1>The Origin</h1>
+    <p>A single cell. A single page. The recursion begins with a single rectangle, subdividing as you scroll.</p>
+  </div>
+</section>
+
+<section class="dark place-bottom-left" id="sec-1">
+  <canvas></canvas>
+  <div class="content">
+    <h1>Mitosis</h1>
+    <p>One becomes two. The grid splits, driven by the scroll's velocity. Fast scroll triggers a mitosis surge.</p>
+  </div>
+</section>
+
+<section class="light place-top-right" id="sec-2">
+  <canvas></canvas>
+  <div class="content">
+    <h1>Recursion</h1>
+    <p>Depth without end. Each cell divides into smaller cells, creating a dense lattice of geometric noise.</p>
+  </div>
+</section>
+
+<section class="dark place-center" id="sec-3">
+  <canvas></canvas>
+  <div class="content">
+    <h1>Velocity</h1>
+    <p>Speed is the mutagen. The faster you scroll, the deeper the recursion. The page metabolizes your motion.</p>
+  </div>
+</section>
+
+<section class="light place-top-left" id="sec-4">
+  <canvas></canvas>
+  <div class="content">
+    <h1>Equilibrium</h1>
+    <p>The final division. The pattern holds. The editorial rests in a state of generative equilibrium.</p>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script>
+  gsap.registerPlugin(ScrollTrigger);
+
+  const sections = [];
+  const mouse = { x: 0.5 };
+
+  let lastScrollY = window.scrollY;
+  let lastScrollTime = performance.now();
+  let scrollVelocity = 0;
+  window.addEventListener('scroll', () => {
+    const now = performance.now();
+    const dt = now - lastScrollTime;
+    if (dt > 0) {
+      scrollVelocity = Math.abs(window.scrollY - lastScrollY) / dt * 1000;
+      lastScrollY = window.scrollY;
+      lastScrollTime = now;
+    }
+  }, { passive: true });
+
+  function seededRandom(seed) {
+    const x = (seed * 9301 + 49297) % 233280;
+    return x / 233280;
+  }
+
+  function subdivide(ctx, x, y, w, h, depth, maxDepth, seed, section) {
+    if (depth >= maxDepth || w < 20 || h < 20) {
+      ctx.strokeRect(x, y, w, h);
+      const r = seededRandom(seed + depth);
+      if (r < 0.05) {
+        ctx.fillStyle = section.fillAccent;
+        ctx.fillRect(x + 1, y + 1, w - 2, h - 2);
+      } else if (r < 0.15) {
+        ctx.fillStyle = section.fillNormal;
+        ctx.fillRect(x + 1, y + 1, w - 2, h - 2);
+      }
+      return;
+    }
+
+    const r1 = seededRandom(seed + depth);
+    const r2 = seededRandom(seed + depth + 1);
+    const splitRatio = 0.3 + r1 * 0.4;
+    const preferVertical = mouse.x < 0.5;
+    const isVertical = r2 < (preferVertical ? 0.7 : 0.3);
+
+    if (isVertical) {
+      const w1 = w * splitRatio;
+      const w2 = w * (1 - splitRatio);
+      subdivide(ctx, x, y, w1, h, depth + 1, maxDepth, seed + 2, section);
+      subdivide(ctx, x + w1, y, w2, h, depth + 1, maxDepth, seed + 3, section);
+    } else {
+      const h1 = h * splitRatio;
+      const h2 = h * (1 - splitRatio);
+      subdivide(ctx, x, y, w, h1, depth + 1, maxDepth, seed + 2, section);
+      subdivide(ctx, x, y + h1, w, h2, depth + 1, maxDepth, seed + 3, section);
+    }
+  }
+
+  function animate() {
+    const velocity = Math.abs(scrollVelocity) / 1000;
+    const boost = Math.min(velocity * 2, 2);
+
+    for (const s of sections) {
+      s.targetDepth = s.baseDepth + boost;
+      s.targetDepth = Math.min(Math.max(s.targetDepth, 0), 10);
+      s.depth += (s.targetDepth - s.depth) * 0.1;
+
+      const w = s.el.offsetWidth;
+      const h = s.el.offsetHeight;
+      if (s.canvas.width !== w) s.canvas.width = w;
+      if (s.canvas.height !== h) s.canvas.height = h;
+
+      s.ctx.fillStyle = s.bgColor;
+      s.ctx.fillRect(0, 0, s.canvas.width, s.canvas.height);
+      s.ctx.strokeStyle = s.strokeColor;
+      s.ctx.lineWidth = 1;
+      s.ctx.fillStyle = s.fillNormal;
+
+      const maxDepth = Math.floor(s.depth);
+      if (maxDepth >= 0) {
+        subdivide(s.ctx, 0, 0, s.canvas.width, s.canvas.height, 0, maxDepth, s.seed, s);
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  const sectionEls = document.querySelectorAll('section');
+  for (let i = 0; i < sectionEls.length; i++) {
+    const el = sectionEls[i];
+    const canvas = el.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    const isDark = el.classList.contains('dark');
+
+    const s = {
+      el,
+      canvas,
+      ctx,
+      seed: i * 1000,
+      depth: 0,
+      targetDepth: 0,
+      baseDepth: 0,
+      bgColor: isDark ? '#0A0A0A' : '#F5F5F0',
+      strokeColor: isDark ? '#FFFFFF' : '#000000',
+      fillNormal: isDark ? '#F5F5F0' : '#0A0A0A',
+      fillAccent: '#E74C3C',
+    };
+    sections.push(s);
+
+    el.style.zIndex = String(i + 1);
+    canvas.style.clipPath = (i % 2 !== 0) ? 'inset(0% 0% 0% 50%)' : 'inset(0%)';
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: el,
+        start: 'top top',
+        end: '+=100%',
+        pin: true,
+        scrub: true,
+        onUpdate: (self) => {
+          s.baseDepth = self.progress * 8;
+        }
+      }
+    });
+
+    if (i % 2 === 0) {
+      tl.to(canvas, { clipPath: 'inset(0% 50% 0% 0%)', duration: 0.2, ease: 'none' }, 0.8);
+    } else {
+      tl.to(canvas, { clipPath: 'inset(0%)', duration: 0.2, ease: 'none' }, 0);
+    }
+  }
+
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX / window.innerWidth;
+  });
+
+  requestAnimationFrame(animate);
+</script>
+</body>
+</html>

@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elastic Latent Typography — Force-Directed Font Space</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #0A0A1A; font-family: 'Inter', system-ui, sans-serif; }
+  body { cursor: default; }
+  body.grabbing { cursor: grabbing; }
+  body.grabbing * { cursor: grabbing !important; }
+  body.hovering { cursor: pointer; }
+  canvas { display: block; }
+  #hud {
+    position: fixed; bottom: 24px; left: 24px; z-index: 10;
+    color: #8899AA; font-size: 13px; line-height: 1.6;
+    pointer-events: none; user-select: none; max-width: 360px;
+  }
+  #hud .name { color: #E8E8F0; font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+  #hud .tension { color: #00E5FF; }
+  #hud .critical { color: #FF5E5E; }
+  #hud .instructions { margin-top: 10px; opacity: 0.6; font-size: 11px; }
+  #snap-toast {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 20;
+    color: #FFFFFF; font-size: 18px; font-weight: 700; letter-spacing: 0.05em;
+    pointer-events: none; opacity: 0; transition: opacity 0.15s ease;
+    text-shadow: 0 0 20px rgba(255,255,255,0.8);
+  }
+  #snap-toast.show { opacity: 1; transition: opacity 0s; }
+</style>
+</head>
+<body>
+<div id="hud">
+  <div class="name" id="hud-name">Elastic Latent Typography</div>
+  <div id="hud-detail">Hover a node to preview</div>
+  <div class="instructions">🖱 Drag nodes &bull; Stretch edges to blend &bull; Snap to hybridize</div>
+</div>
+<div id="snap-toast">✦ HYBRID SPAWNED ✦</div>
+
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script>
+// ============================================================
+// ELASTIC LATENT TYPOGRAPHY
+// Force-Directed Font Space Navigator
+// ============================================================
+
+// --- PALETTE ---
+const PAL = {
+  void:       '#0A0A1A',
+  nodeRest:   '#7C5CFC',
+  nodeGrabbed:'#A78BFA',
+  edgeRest:   '#2D2D50',
+  edgeTension:'#00E5FF',
+  edgeCritical:'#FF5E5E',
+  mouseForce: '#FFD93D',
+  spawnFlash: '#FFFFFF',
+  previewBg:  '#12122A',
+  previewText:'#E8E8F0',
+  hud:        '#8899AA'
+};
+
+// --- CONSTANTS ---
+const K_NEAREST = 3;
+const SPRING_K = 0.08;
+const REPULSION_K = 4.5;
+const DAMPING = 0.88;
+const MOUSE_GRAVITY = 1.8;
+const GRAB_RADIUS = 1.3;
+const HOVER_RADIUS = 1.1;
+const TENSION_THRESHOLD = 1.35;
+const CRITICAL_THRESHOLD = 1.85;
+const SNAP_THRESHOLD = 2.6;
+const MAX_NODES = 40;
+const EDGE_THICKNESS = 0.06;
+const NODE_GLOW_SIZE = 256;
+const PREVIEW_CANVAS_W = 512;
+const PREVIEW_CANVAS_H = 128;
+
+// --- FONT DATA ---
+const FONT_NAMES = [
+  'Helvetica','Garamond','Bodoni','Futura','Caslon',
+  'Baskerville','Didot','Clarendon','Gill Sans','Optima',
+  'Palatino','Rockwell','Univers','Frutiger','Myriad',
+  'Minion','Trajan','Avant Garde','Century','Akzidenz'
+];
+
+function generateParams() {
+  const p = [];
+  for (let i = 0; i < 12; i++) p.push(Math.random());
+  return p;
+}
+
+function euclideanDist(a, b) {
+  let sum = 0;
+  for (let i = 0; i < a.length; i++) { const d = a[i] - b[i]; sum += d * d; }
+  // Null Guard (#12): guard against negative or NaN under extreme precision edge cases
+  const result = Math.sqrt(Math.max(0, sum));
+  return isNaN(result) ? 0 : result;
+}
+
+// --- THREE.JS SETUP ---
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(PAL.void);
+
+let frustumSize = 20;
+let aspect = window.innerWidth / window.innerHeight;
+const camera = new THREE.OrthographicCamera(
+  -frustumSize * aspect / 2, frustumSize * aspect / 2,
+  frustumSize / 2, -frustumSize / 2,
+  0.1, 100
+);
+camera.position.z = 10;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.domElement.style.display = 'block';
+document.body.prepend(renderer.domElement);
+
+// --- SHARED GLOW TEXTURES ---
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return { r, g, b };
+}
+
+function createGlowTexture(hexColor, size, alphaCore, alphaEdge) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  // Drawing State Reset (#9)
+  ctx.save();
+  ctx.clearRect(0, 0, size, size);
+  const half = size / 2;
+  const { r, g, b } = hexToRgb(hexColor);
+  const grad = ctx.createRadialGradient(half, half, half * 0.08, half, half, half);
+  grad.addColorStop(0, `rgba(${r},${g},${b},${alphaCore})`);
+  grad.addColorStop(0.35, `rgba(${r},${g},${b},${alphaCore * 0.85})`);
+  grad.addColorStop(0.65, `rgba(${r},${g},${b},${alphaEdge})`);
+  grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  ctx.restore();
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+// Shared white glow textures (tinted via material.color for performance)
+const sharedNodeTex = createGlowTexture('#FFFFFF', NODE_GLOW_SIZE, 1.0, 0.25);
+const sharedNodeTexActive = createGlowTexture('#FFFFFF', NODE_GLOW_SIZE, 1.0, 0.40);
+
+function createNodeSprite(hexColor) {
+  const mat = new THREE.SpriteMaterial({
+    map: sharedNodeTex,
+    blending: THREE.AdditiveBlending,
+    depthTest: false,
+    depthWrite: false,
+    transparent: true,
+    opacity: 0.95,
+    color: new THREE.Color(hexColor)
+  });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(1.3, 1.3, 1);
+  sprite.renderOrder = 2;
+  return sprite;
+}
+
+// --- HELPER: EDGE MESH ---
+function createEdgeMesh(colorHex) {
+  const geom = new THREE.PlaneGeometry(1, EDGE_THICKNESS);
+  const mat = new THREE.MeshBasicMaterial({
+    color: new THREE.Color(colorHex),
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.85,
+    depthTest: true,
+    depthWrite: true
+  });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.renderOrder = 1;
+  return mesh;
+}
+
+// --- HELPER: FLASH SPRITE ---
+function createFlashSprite() {
+  const tex = createGlowTexture(PAL.spawnFlash, 128, 1.0, 0.6);
+  const mat = new THREE.SpriteMaterial({
+    map: tex,
+    blending: THREE.AdditiveBlending,
+    depthTest: false,
+    depthWrite: false,
+    transparent: true,
+    opacity: 1.0
+  });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(0.2, 0.2, 1);
+  sprite.renderOrder = 5;
+  sprite.visible = false;
+  return sprite;
+}
+
+// --- HELPER: MOUSE GLOW ---
+function createMouseGlow() {
+  const tex = createGlowTexture(PAL.mouseForce, 128, 0.7, 0.15);
+  const mat = new THREE.SpriteMaterial({
+    map: tex,
+    blending: THREE.AdditiveBlending,
+    depthTest: false,
+    depthWrite: false,
+    transparent: true,
+    opacity: 0.5
+  });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(0.8, 0.8, 1);
+  sprite.renderOrder = 4;
+  sprite.visible = false;
+  return sprite;
+}
+
+// --- PREVIEW PANEL ---
+const previewCanvas = document.createElement('canvas');
+previewCanvas.width = PREVIEW_CANVAS_W;
+previewCanvas.height = PREVIEW_CANVAS_H;
+const previewCtx = previewCanvas.getContext('2d');
+const previewTexture = new THREE.CanvasTexture(previewCanvas);
+previewTexture.minFilter = THREE.LinearFilter;
+previewTexture.magFilter = THREE.LinearFilter;
+
+const previewGeom = new THREE.PlaneGeometry(7, 1.75);
+const previewMat = new THREE.MeshBasicMaterial({
+  map: previewTexture,
+  side: THREE.DoubleSide,
+  transparent: false,
+  depthTest: false,
+  depthWrite: false
+});
+const previewPanel = new THREE.Mesh(previewGeom, previewMat);
+previewPanel.renderOrder = 3;
+previewPanel.visible = true;
+scene.add(previewPanel);
+
+// --- GRAPH DATA ---
+let nodes = [];
+let edges = [];
+let nodeIdCounter = 0;
+let grabbedNode = null;
+let hoveredNode = null;
+let mouseWorldPos = new THREE.Vector3();
+let mouseOnScreen = false;
+let mouseDown = false;
+
+// Flash effects
+let flashes = [];
+
+// --- NODE / EDGE CREATION ---
+function createNode(name, params, position) {
+  const sprite = createNodeSprite(PAL.nodeRest);
+  sprite.position.copy(position);
+  scene.add(sprite);
+  const node = {
+    id: nodeIdCounter++,
+    name,
+    params,
+    position: position.clone(),
+    velocity: new THREE.Vector3(),
+    force: new THREE.Vector3(),
+    sprite,
+    isHybrid: false
+  };
+  return node;
+}
+
+function createEdge(source, target) {
+  const dist = source.position.distanceTo(target.position);
+  // Null Guard (#12): prevent zero rest length
+  const restLen = Math.max(dist, 0.01);
+  const mesh = createEdgeMesh(PAL.edgeRest);
+  // Initialize mesh position
+  const mid = new THREE.Vector3().addVectors(source.position, target.position).multiplyScalar(0.5);
+  mesh.position.copy(mid);
+  const dir = new THREE.Vector3().subVectors(target.position, source.position);
+  const angle = Math.atan2(dir.y, dir.x);
+  mesh.rotation.z = angle;
+  mesh.scale.x = dist;
+  scene.add(mesh);
+  return {
+    source,
+    target,
+    restLength: restLen,
+    currentLength: dist,
+    stretchRatio: 1.0,
+    snapped: false,
+    mesh
+  };
+}
+
+function edgeExists(a, b) {
+  for (const e of edges) {
+    if (e.snapped) continue;
+    if ((e.source === a && e.target === b) || (e.source === b && e.target === a)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// --- K-NN GRAPH CONSTRUCTION ---
+function buildKNNGraph(nodeList, k) {
+  const edgeSet = new Set();
+  const newEdges = [];
+  for (let i = 0; i < nodeList.length; i++) {
+    const src = nodeList[i];
+    const dists = [];
+    for (let j = 0; j < nodeList.length; j++) {
+      if (i === j) continue;
+      dists.push({ node: nodeList[j], dist: euclideanDist(src.params, nodeList[j].params) });
+    }
+    dists.sort((a, b) => a.dist - b.dist);
+    for (let n = 0; n < Math.min(k, dists.length); n++) {
+      const tgt = dists[n].node;
+      const key = src.id < tgt.id ? `${src.id}-${tgt.id}` : `${tgt.id}-${src.id}`;
+      if (!edgeSet.has(key)) {
+        edgeSet.add(key);
+        newEdges.push(createEdge(src, tgt));
+      }
+    }
+  }
+  return newEdges;
+}
+
+function computeKNNForNode(node, allNodes, k) {
+  const dists = [];
+  for (const other of allNodes) {
+    if (other === node) continue;
+    dists.push({ node: other, dist: euclideanDist(node.params, other.params) });
+  }
+  dists.sort((a, b) => a.dist - b.dist);
+  const newEdges = [];
+  for (let n = 0; n < Math.min(k, dists.length); n++) {
+    const tgt = dists[n].node;
+    if (!edgeExists(node, tgt)) {
+      newEdges.push(createEdge(node, tgt));
+    }
+  }
+  return newEdges;
+}
+
+// --- FLASH EFFECTS ---
+function createFlash(position) {
+  const sprite = createFlashSprite();
+  sprite.position.copy(position);
+  sprite.visible = true;
+  sprite.scale.set(0.3, 0.3, 1);
+  sprite.material.opacity = 1.0;
+  scene.add(sprite);
+  flashes.push({
+    sprite,
+    age: 0,
+    maxAge: 0.9,
+    position: position.clone()
+  });
+}
+
+function updateFlashes(dt) {
+  for (let i = flashes.length - 1; i >= 0; i--) {
+    const f = flashes[i];
+    f.age += dt;
+    const progress = f.age / f.maxAge;
+    if (progress >= 1) {
+      scene.remove(f.sprite);
+      if (f.sprite.material.map) f.sprite.material.map.dispose();
+      f.sprite.material.dispose();
+      flashes.splice(i, 1);
+      continue;
+    }
+    const scale = 0.3 + progress * 3.5;
+    f.sprite.scale.set(scale, scale, 1);
+    f.sprite.material.opacity = 1.0 - progress;
+  }
+}
+
+// --- EDGE SNAP ---
+function snapEdge(edge) {
+  if (nodes.length >= MAX_NODES) return;
+  edge.snapped = true;
+
+  const midPos = new THREE.Vector3().addVectors(edge.source.position, edge.target.position).multiplyScalar(0.5);
+  // Null Guard (#12): guard against NaN in blended params
+  const blendedParams = edge.source.params.map((p, i) => {
+    const avg = (p + edge.target.params[i]) / 2;
+    return isNaN(avg) ? 0.5 : avg;
+  });
+  const hybridName = edge.source.name.split('+')[0] + '+' + edge.target.name.split('+')[0];
+  const hybrid = createNode(hybridName, blendedParams, midPos);
+  hybrid.isHybrid = true;
+  nodes.push(hybrid);
+
+  // Remove snapped edge
+  scene.remove(edge.mesh);
+  if (edge.mesh.geometry) edge.mesh.geometry.dispose();
+  edge.mesh.material.dispose();
+  const idx = edges.indexOf(edge);
+  if (idx >= 0) edges.splice(idx, 1);
+
+  // Add edges from hybrid to source and target
+  edges.push(createEdge(hybrid, edge.source));
+  edges.push(createEdge(hybrid, edge.target));
+
+  // Recompute k-NN for hybrid
+  const knnEdges = computeKNNForNode(hybrid, nodes, K_NEAREST);
+  for (const e of knnEdges) edges.push(e);
+
+  // Spawn flash
+  createFlash(midPos);
+
+  // Show toast
+  const toast = document.getElementById('snap-toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 800);
+}
+
+// --- PHYSICS ---
+function applyForces(dt) {
+  // Clamp dt for stability
+  const step = Math.min(dt, 0.05);
+
+  // Reset force accumulators
+  for (const node of nodes) {
+    node.force.set(0, 0, 0);
+  }
+
+  // Hooke's Law spring forces along edges
+  for (const edge of edges) {
+    if (edge.snapped) continue;
+    const dir = new THREE.Vector3().subVectors(edge.target.position, edge.source.position);
+    const dist = dir.length();
+    // Null Guard (#12): avoid division by zero
+    if (dist < 0.0001) continue;
+    const stretch = dist - edge.restLength;
+    const forceMag = SPRING_K * stretch;
+    const forceDir = dir.normalize();
+    const f = forceDir.clone().multiplyScalar(forceMag);
+    edge.source.force.add(f);
+    edge.target.force.sub(f);
+  }
+
+  // Repulsion between all node pairs (inverse-square)
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dir = new THREE.Vector3().subVectors(nodes[j].position, nodes[i].position);
+      const dist = dir.length();
+      if (dist < 0.0001) continue;
+      const forceMag = REPULSION_K / (dist * dist + 0.01);
+      const forceDir = dir.normalize();
+      const f = forceDir.clone().multiplyScalar(forceMag);
+      nodes[i].force.sub(f);
+      nodes[j].force.add(f);
+    }
+  }
+
+  // Mouse gravitational pull (on non-grabbed nodes)
+  if (mouseOnScreen && mouseWorldPos) {
+    for (const node of nodes) {
+      if (node === grabbedNode) continue;
+      const dir = new THREE.Vector3().subVectors(mouseWorldPos, node.position);
+      const dist = dir.length();
+      if (dist < 0.0001) continue;
+      const forceMag = MOUSE_GRAVITY / (dist * dist + 0.15);
+      const forceDir = dir.normalize();
+      node.force.add(forceDir.clone().multiplyScalar(forceMag));
+    }
+  }
+
+  // Integrate — Euler with damping
+  const halfW = frustumSize * aspect / 2 - 0.8;
+  const halfH = frustumSize / 2 - 0.8;
+  for (const node of nodes) {
+    if (node === grabbedNode) {
+      node.position.copy(mouseWorldPos);
+      node.velocity.set(0, 0, 0);
+      continue;
+    }
+    node.velocity.add(node.force.clone().multiplyScalar(step));
+    node.velocity.multiplyScalar(DAMPING);
+    node.position.add(node.velocity.clone().multiplyScalar(step));
+    // Clamp to viewport
+    node.position.x = Math.max(-halfW, Math.min(halfW, node.position.x));
+    node.position.y = Math.max(-halfH, Math.min(halfH, node.position.y));
+  }
+}
+
+// --- VISUAL UPDATES ---
+function updateNodeVisuals() {
+  for (const node of nodes) {
+    node.sprite.position.copy(node.position);
+    const isActive = (node === grabbedNode || node === hoveredNode);
+    const isGrabbed = (node === grabbedNode);
+    const targetColor = isGrabbed ? PAL.nodeGrabbed : PAL.nodeRest;
+    // Tint shared texture via material.color (no per-frame texture creation)
+    node.sprite.material.color.set(targetColor);
+    node.sprite.material.map = isActive ? sharedNodeTexActive : sharedNodeTex;
+    node.sprite.material.opacity = isActive ? 0.95 : 0.78;
+    // Subtle scale pulse
+    const baseScale = isActive ? 1.55 : 1.3;
+    const pulse = 1 + Math.sin(Date.now() * 0.004 + node.id) * 0.06;
+    const s = baseScale * pulse;
+    node.sprite.scale.set(s, s, 1);
+  }
+}
+
+function updateEdgeVisuals() {
+  for (const edge of edges) {
+    if (edge.snapped) continue;
+    const sp = edge.source.position;
+    const tp = edge.target.position;
+    const mid = new THREE.Vector3().addVectors(sp, tp).multiplyScalar(0.5);
+    const dir = new THREE.Vector3().subVectors(tp, sp);
+    const len = dir.length();
+    if (len < 0.0001) continue; // Null Guard (#12)
+
+    edge.currentLength = len;
+    // Null Guard (#12): prevent division by zero in stretch ratio
+    const denom = Math.max(edge.restLength, 0.001);
+    edge.stretchRatio = len / denom;
+
+    const angle = Math.atan2(dir.y, dir.x);
+    edge.mesh.position.copy(mid);
+    edge.mesh.rotation.z = angle;
+    edge.mesh.scale.x = len;
+
+    // Color based on tension
+    const sr = edge.stretchRatio;
+    let color;
+    if (sr < TENSION_THRESHOLD) {
+      color = new THREE.Color(PAL.edgeRest);
+    } else if (sr < CRITICAL_THRESHOLD) {
+      const t = (sr - TENSION_THRESHOLD) / (CRITICAL_THRESHOLD - TENSION_THRESHOLD);
+      color = new THREE.Color(PAL.edgeRest).lerp(new THREE.Color(PAL.edgeTension), t);
+    } else {
+      const t = Math.min((sr - CRITICAL_THRESHOLD) / (SNAP_THRESHOLD - CRITICAL_THRESHOLD), 1.0);
+      color = new THREE.Color(PAL.edgeTension).lerp(new THREE.Color(PAL.edgeCritical), t);
+    }
+    edge.mesh.material.color.copy(color);
+    // Increase opacity with tension
+    edge.mesh.material.opacity = 0.7 + Math.min(sr - 1, 1) * 0.3;
+  }
+}
+
+// --- TYPE PREVIEW RENDERING ---
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+function renderTypePreview(params, fontName, blendRatio) {
+  const ctx = previewCtx;
+  const W = PREVIEW_CANVAS_W;
+  const H = PREVIEW_CANVAS_H;
+
+  // Drawing State Reset (#9)
+  ctx.save();
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  ctx.fillStyle = PAL.previewBg;
+  roundRect(ctx, 2, 2, W - 4, H - 4, 10);
+  ctx.fill();
+
+  // Border
+  ctx.strokeStyle = PAL.hud;
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.5;
+  roundRect(ctx, 2, 2, W - 4, H - 4, 10);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  // Derive visual properties from 12D params
+  // Null Guard (#12): clamp all param values
+  const clamp01 = (v) => Math.max(0, Math.min(1, isNaN(v) ? 0.5 : v));
+  const p = params.map(clamp01);
+
+  const serifWeight  = p[0];
+  const xHeight      = p[1];
+  const contrast     = p[2];
+  const aperture     = p[3];
+  const strokeMod    = p[4];
+  const ascender     = p[5];
+  const descender    = p[6];
+  const terminal     = p[7];
+  const axisAngle    = p[8];
+  const bowlCurve    = p[9];
+  const stemWidth    = p[10];
+  const counterOpen  = p[11];
+
+  const fontFamily = serifWeight > 0.45
+    ? '"Times New Roman", Georgia, serif'
+    : '"Helvetica Neue", Helvetica, Arial, sans-serif';
+  const fontWeight = Math.round(300 + stemWidth * 500);
+  const fontStyle = strokeMod > 0.55 ? 'italic' : 'normal';
+  const fontSize = Math.round(42 + xHeight * 28);
+  const letterSpacing = (aperture - 0.5) * 8;
+  const wordSpacing = (counterOpen - 0.5) * 8;
+
+  const fontString = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+  ctx.font = fontString;
+  ctx.fillStyle = PAL.previewText;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Axis rotation
+  ctx.translate(W / 2, H / 2);
+  ctx.rotate((axisAngle - 0.5) * 0.28);
+  ctx.translate(-W / 2, -H / 2);
+
+  // Contrast via subtle shadow
+  if (contrast > 0.25) {
+    ctx.shadowColor = 'rgba(232,232,240,0.3)';
+    ctx.shadowBlur = contrast * 5;
+    ctx.shadowOffsetX = contrast * 2.5;
+    ctx.shadowOffsetY = 0;
+  }
+
+  // Vertical offset from ascender/descender ratio
+  const yOff = (ascender - descender) * 18;
+  const sampleText = 'Aa Bb Cc Xx Yy';
+  ctx.fillText(sampleText, W / 2, H / 2 + yOff);
+
+  // Reset shadow for name
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+
+  // Font name below
+  ctx.font = `13px "Inter", system-ui, sans-serif`;
+  ctx.fillStyle = PAL.hud;
+  let displayName = fontName || 'Unknown';
+  if (blendRatio > 0.01) {
+    displayName += ` · blend ${Math.round(blendRatio * 100)}%`;
+  }
+  ctx.fillText(displayName, W / 2, H / 2 + 44);
+
+  // Small param bars at bottom
+  const barY = H - 14;
+  const barW = (W - 30) / 12;
+  for (let i = 0; i < 12; i++) {
+    const bx = 12 + i * (barW + 1);
+    ctx.fillStyle = PAL.hud;
+    ctx.globalAlpha = 0.3;
+    ctx.fillRect(bx, barY, barW, 4);
+    ctx.globalAlpha = 0.8;
+    ctx.fillStyle = blendRatio > 0.01
+      ? `rgb(${Math.round(124 + p[i] * 100)},${Math.round(92 + p[i] * 80)},${Math.round(252 - p[i] * 40)})`
+      : PAL.previewText;
+    ctx.fillRect(bx, barY, barW * p[i], 4);
+  }
+  ctx.globalAlpha = 1;
+
+  // Drawing State Reset (#9): restore canvas
+  ctx.restore();
+
+  previewTexture.needsUpdate = true;
+}
+
+function updatePreviewPanel() {
+  const activeNode = grabbedNode || hoveredNode;
+  if (!activeNode) {
+    // Show default
+    const defaultParams = new Array(12).fill(0.5);
+    renderTypePreview(defaultParams, 'Elastic Latent Typography', 0);
+    // Move panel to a neutral position
+    previewPanel.position.set(0, frustumSize / 2 - 2.5, 0.02);
+    return;
+  }
+
+  // Determine blend ratio from most-stretched edge
+  let blendRatio = 0;
+  let displayParams = activeNode.params;
+  let displayName = activeNode.name;
+
+  if (grabbedNode === activeNode) {
+    let maxSr = 1.0;
+    let bestEdge = null;
+    for (const edge of edges) {
+      if (edge.snapped) continue;
+      if (edge.source === activeNode || edge.target === activeNode) {
+        if (edge.stretchRatio > maxSr) {
+          maxSr = edge.stretchRatio;
+          bestEdge = edge;
+        }
+      }
+    }
+    if (bestEdge && maxSr > 1.03) {
+      blendRatio = Math.min((maxSr - 1.0) / (SNAP_THRESHOLD - 1.0), 0.5);
+      const neighbor = bestEdge.source === activeNode ? bestEdge.target : bestEdge.source;
+      // Null Guard (#12): guard against NaN in interpolation
+      displayParams = activeNode.params.map((v, i) => {
+        const interp = v * (1 - blendRatio) + neighbor.params[i] * blendRatio;
+        return isNaN(interp) ? v : interp;
+      });
+      displayName = `${activeNode.name} → ${neighbor.name}`;
+    }
+  }
+
+  renderTypePreview(displayParams, displayName, blendRatio);
+
+  // Position panel near the active node, offset
+  const offset = new THREE.Vector3(4.5, 2.8, 0.02);
+  const target = activeNode.position.clone().add(offset);
+  // Clamp to viewport
+  const hw = frustumSize * aspect / 2 - 4;
+  const hh = frustumSize / 2 - 2;
+  target.x = Math.max(-hw, Math.min(hw, target.x));
+  target.y = Math.max(-hh, Math.min(hh, target.y));
+  previewPanel.position.copy(target);
+}
+
+// --- HUD UPDATE ---
+function updateHUD() {
+  const nameEl = document.getElementById('hud-name');
+  const detailEl = document.getElementById('hud-detail');
+  const activeNode = grabbedNode || hoveredNode;
+
+  if (!activeNode) {
+    nameEl.textContent = 'Elastic Latent Typography';
+    detailEl.innerHTML = 'Hover a node to preview';
+    detailEl.className = '';
+    return;
+  }
+
+  nameEl.textContent = activeNode.name + (activeNode.isHybrid ? ' ✦' : '');
+
+  if (grabbedNode === activeNode) {
+    // Find most-stretched edge
+    let maxSr = 1.0;
+    for (const edge of edges) {
+      if (edge.snapped) continue;
+      if (edge.source === activeNode || edge.target === activeNode) {
+        if (edge.stretchRatio > maxSr) maxSr = edge.stretchRatio;
+      }
+    }
+    const tension = ((maxSr - 1) / (SNAP_THRESHOLD - 1)) * 100;
+    if (maxSr >= CRITICAL_THRESHOLD) {
+      detailEl.innerHTML = `⚠ <span class="critical">Critical tension ${Math.round(tension)}% — near snap</span>`;
+      detailEl.className = 'critical';
+    } else if (maxSr >= TENSION_THRESHOLD) {
+      detailEl.innerHTML = `<span class="tension">Tension ${Math.round(tension)}% — font blending</span>`;
+      detailEl.className = 'tension';
+    } else {
+      detailEl.textContent = 'Drag to stretch edges';
+      detailEl.className = '';
+    }
+  } else {
+    // Hovering
+    const neighborNames = [];
+    for (const edge of edges) {
+      if (edge.snapped) continue;
+      if (edge.source === activeNode) neighborNames.push(edge.target.name.split('+')[0]);
+      else if (edge.target === activeNode) neighborNames.push(edge.source.name.split('+')[0]);
+    }
+    detailEl.textContent = 'Connected: ' + (neighborNames.slice(0, 3).join(', ') || 'none');
+    detailEl.className = '';
+  }
+}
+
+// --- MOUSE INTERACTION ---
+function screenToWorld(sx, sy) {
+  const ndcX = (sx / window.innerWidth) * 2 - 1;
+  const ndcY = -(sy / window.innerHeight) * 2 + 1;
+  return new THREE.Vector3(
+    ndcX * frustumSize * aspect / 2,
+    ndcY * frustumSize / 2,
+    0
+  );
+}
+
+function findClosestNode(worldPos, maxDist) {
+  let best = null;
+  let bestDist = Infinity;
+  for (const node of nodes) {
+    const d = node.position.distanceTo(worldPos);
+    if (d < maxDist && d < bestDist) {
+      bestDist = d;
+      best = node;
+    }
+  }
+  return best;
+}
+
+// Check edge snaps after physics
+function checkEdgeSnaps() {
+  const toSnap = [];
+  for (const edge of edges) {
+    if (edge.snapped) continue;
+    // Null Guard (#12)
+    if (!isFinite(edge.stretchRatio)) continue;
+    if (edge.stretchRatio >= SNAP_THRESHOLD) {
+      toSnap.push(edge);
+    }
+  }
+  for (const edge of toSnap) {
+    snapEdge(edge);
+  }
+}
+
+// --- MOUSE GLOW ---
+const mouseGlow = createMouseGlow();
+scene.add(mouseGlow);
+
+function updateMouseGlow() {
+  if (!mouseOnScreen || grabbedNode) {
+    mouseGlow.visible = false;
+    return;
+  }
+  const near = nodes.some(n => n.position.distanceTo(mouseWorldPos) < 2.5);
+  mouseGlow.visible = near;
+  if (near) {
+    mouseGlow.position.copy(mouseWorldPos);
+    mouseGlow.material.opacity = 0.35 + Math.sin(Date.now() * 0.006) * 0.15;
+    const s = 0.7 + Math.sin(Date.now() * 0.005) * 0.15;
+    mouseGlow.scale.set(s, s, 1);
+  }
+}
+
+// --- EVENT HANDLERS ---
+renderer.domElement.addEventListener('mousedown', (e) => {
+  mouseDown = true;
+  const world = screenToWorld(e.clientX, e.clientY);
+  mouseWorldPos.copy(world);
+  const node = findClosestNode(world, GRAB_RADIUS);
+  if (node) {
+    grabbedNode = node;
+    document.body.classList.add('grabbing');
+    document.body.classList.remove('hovering');
+    e.preventDefault();
+  }
+});
+
+window.addEventListener('mousemove', (e) => {
+  const world = screenToWorld(e.clientX, e.clientY);
+  mouseWorldPos.copy(world);
+  mouseOnScreen = true;
+
+  if (grabbedNode) {
+    grabbedNode.position.copy(world);
+  } else {
+    const node = findClosestNode(world, HOVER_RADIUS);
+    if (node !== hoveredNode) {
+      hoveredNode = node;
+      if (hoveredNode) {
+        document.body.classList.add('hovering');
+      } else {
+        document.body.classList.remove('hovering');
+      }
+    }
+  }
+});
+
+window.addEventListener('mouseup', () => {
+  if (grabbedNode) {
+    grabbedNode.velocity.set(0, 0, 0);
+    grabbedNode = null;
+    document.body.classList.remove('grabbing');
+  }
+  mouseDown = false;
+});
+
+window.addEventListener('mouseleave', () => {
+  mouseOnScreen = false;
+  if (grabbedNode) {
+    grabbedNode.velocity.set(0, 0, 0);
+    grabbedNode = null;
+    document.body.classList.remove('grabbing');
+  }
+  hoveredNode = null;
+  document.body.classList.remove('hovering');
+  mouseDown = false;
+});
+
+// Touch support
+renderer.domElement.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 1) {
+    mouseDown = true;
+    const t = e.touches[0];
+    const world = screenToWorld(t.clientX, t.clientY);
+    mouseWorldPos.copy(world);
+    const node = findClosestNode(world, GRAB_RADIUS);
+    if (node) {
+      grabbedNode = node;
+      document.body.classList.add('grabbing');
+      e.preventDefault();
+    }
+  }
+}, { passive: false });
+
+window.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 1) {
+    const t = e.touches[0];
+    const world = screenToWorld(t.clientX, t.clientY);
+    mouseWorldPos.copy(world);
+    mouseOnScreen = true;
+    if (grabbedNode) {
+      grabbedNode.position.copy(world);
+      e.preventDefault();
+    }
+  }
+}, { passive: false });
+
+window.addEventListener('touchend', () => {
+  if (grabbedNode) {
+    grabbedNode.velocity.set(0, 0, 0);
+    grabbedNode = null;
+    document.body.classList.remove('grabbing');
+  }
+  mouseDown = false;
+});
+
+// Resize
+window.addEventListener('resize', () => {
+  aspect = window.innerWidth / window.innerHeight;
+  camera.left = -frustumSize * aspect / 2;
+  camera.right = frustumSize * aspect / 2;
+  camera.top = frustumSize / 2;
+  camera.bottom = -frustumSize / 2;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// --- INITIALIZATION ---
+function init() {
+  // Generate font nodes
+  const positions = fibonacciCircle(FONT_NAMES.length, 7);
+  for (let i = 0; i < FONT_NAMES.length; i++) {
+    const node = createNode(FONT_NAMES[i], generateParams(), positions[i]);
+    nodes.push(node);
+  }
+
+  // Build initial k-NN graph
+  edges = buildKNNGraph(nodes, K_NEAREST);
+
+  // Set initial preview
+  const defaultParams = new Array(12).fill(0.5);
+  renderTypePreview(defaultParams, 'Elastic Latent Typography', 0);
+  previewPanel.position.set(0, frustumSize / 2 - 2.5, 0.02);
+
+  // Let physics settle initially (run a few silent steps)
+  for (let step = 0; step < 40; step++) {
+    applyForces(0.016);
+    // Update edge visuals to track rest lengths
+    for (const edge of edges) {
+      const len = edge.source.position.distanceTo(edge.target.position);
+      if (len > 0.001) {
+        edge.currentLength = len;
+        edge.stretchRatio = len / Math.max(edge.restLength, 0.001);
+        const mid = new THREE.Vector3().addVectors(edge.source.position, edge.target.position).multiplyScalar(0.5);
+        const dir = new THREE.Vector3().subVectors(edge.target.position, edge.source.position);
+        edge.mesh.position.copy(mid);
+        edge.mesh.rotation.z = Math.atan2(dir.y, dir.x);
+        edge.mesh.scale.x = len;
+      }
+    }
+  }
+
+  // Reset rest lengths to current settled distances
+  for (const edge of edges) {
+    const dist = edge.source.position.distanceTo(edge.target.position);
+    edge.restLength = Math.max(dist, 0.01);
+    edge.stretchRatio = 1.0;
+    edge.currentLength = dist;
+  }
+}
+
+// Fibonacci spiral for initial node placement
+function fibonacciCircle(n, radius) {
+  const pts = [];
+  const phi = (1 + Math.sqrt(5)) / 2;
+  for (let i = 0; i < n; i++) {
+    const theta = 2 * Math.PI * i / phi;
+    const r = radius * Math.sqrt(i / Math.max(n - 1, 1));
+    pts.push(new THREE.Vector3(r * Math.cos(theta), r * Math.sin(theta), 0));
+  }
+  return pts;
+}
+
+// --- ANIMATION LOOP ---
+const clock = new THREE.Clock();
+let lastSnapCheck = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const dt = clock.getDelta();
+
+  // Physics
+  applyForces(dt);
+
+  // Check snaps (throttled slightly)
+  lastSnapCheck += dt;
+  if (lastSnapCheck > 0.08) {
+    lastSnapCheck = 0;
+    checkEdgeSnaps();
+  }
+
+  // Update visuals
+  updateNodeVisuals();
+  updateEdgeVisuals();
+  updatePreviewPanel();
+  updateFlashes(dt);
+  updateMouseGlow();
+  updateHUD();
+
+  // Render
+  renderer.render(scene, camera);
+}
+
+// --- BOOT ---
+init();
+animate();
+</script>
+</body>
+</html>

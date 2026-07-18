@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Living Globs — Biomorphic Grid + Conic Gradient Palettes</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0D0805;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      box-shadow: 0 0 40px rgba(246, 174, 81, 0.15);
+    }
+  </style>
+</head>
+<body>
+<script>
+// ============================================================
+// Living Globs — Biomorphic Grid + Conic Gradient Palettes
+// ============================================================
+// A fusion of:
+//   - Union Generative Poster "Glob" algorithm (tangent-interpolation
+//     biomorphic shapes connecting circular nodes)
+//   - Poline-style conic gradient palette fills with mouse-driven
+//     unified light source
+//
+// Technique: Given two circles, compute outer tangent points, derive
+// cubic-bezier control points, and draw a closed blob bridging them.
+// Each blob is filled with a conic gradient whose center is the mouse
+// cursor (shared across all blobs). Odd-indexed blobs invert gradient
+// rotation by 180°, creating a warm/cool checkerboard.
+// ============================================================
+
+// --- Palette (exact hexes from Union Generative Poster) ---
+const PALETTE = {
+  black:  '#0D0805',
+  orange: '#F6AE51',
+  red:    '#EF574D',
+  green:  '#5EBD8A',
+  pink:   '#F19CAB'
+};
+
+// Weighted selection: 40% black, 20% each accent
+const WEIGHTED_COLORS = [
+  PALETTE.black, PALETTE.black,          // 40%
+  PALETTE.orange,                         // 20%
+  PALETTE.red,                            // 20%
+  PALETTE.green,                          // 20%
+  PALETTE.pink                            // 20%
+];
+
+// --- Seeded PRNG (Linear Congruential Generator) ---
+// Reproducible compositions from a seed index.
+let seed = 0;
+function seedPRNG(s) {
+  seed = s >>> 0;
+  if (seed === 0) seed = 1;
+}
+function rand() {
+  // LCG constants (Numerical Recipes)
+  seed = (seed * 1664525 + 1013904223) >>> 0;
+  return (seed & 0x7fffffff) / 0x7fffffff;
+}
+function randInt(min, max) {
+  return Math.floor(rand() * (max - min + 1)) + min;
+}
+function pickWeighted() {
+  return WEIGHTED_COLORS[randInt(0, WEIGHTED_COLORS.length - 1)];
+}
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// --- Geometry helpers ---
+
+// Compute outer tangent points between two circles.
+// Returns {a1, a2, b1, b2} where a1/a2 are on circle A, b1/b2 on circle B.
+// The "sides" parameter (1 or -1) selects which tangent pair.
+function outerTangents(ax, ay, ar, bx, by, br, sides) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist < Math.abs(ar - br) || dist === 0) return null;
+
+  const angle = Math.atan2(dy, dx);
+  const theta = Math.acos((ar - br) / dist) * sides;
+
+  const a1 = {
+    x: ax + ar * Math.cos(angle + theta),
+    y: ay + ar * Math.sin(angle + theta)
+  };
+  const a2 = {
+    x: ax + ar * Math.cos(angle - theta),
+    y: ay + ar * Math.sin(angle - theta)
+  };
+  const b1 = {
+    x: bx + br * Math.cos(angle + theta),
+    y: by + br * Math.sin(angle + theta)
+  };
+  const b2 = {
+    x: bx + br * Math.cos(angle - theta),
+    y: by + br * Math.sin(angle - theta)
+  };
+
+  return { a1, a2, b1, b2 };
+}
+
+// Cubic-bezier control point interpolation factor.
+// aP = 0.5, bP = 0.5 are the Union defaults.
+function computeControlPoints(a1, b1, aCenter, bCenter, aR, bR, aP, bP) {
+  const abx = bCenter.x - aCenter.x;
+  const aby = bCenter.y - aCenter.y;
+  const len = Math.sqrt(abx * abx + aby * aby);
+  const nx = abx / len;
+  const ny = aby / len;
+
+  const cp1 = {
+    x: a1.x + nx * aR * aP,
+    y: a1.y + ny * aR * aP
+  };
+  const cp2 = {
+    x: b1.x - nx * bR * bP,
+    y: b1.y - ny * bR * bP
+  };
+  return { cp1, cp2 };
+}
+
+// Self-intersection check using line-segment intersection.
+// If any non-adjacent edges of the blob polygon cross, reject.
+function segmentsIntersect(p1, p2, p3, p4) {
+  const d1 = (p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x);
+  const d2 = (p4.x - p3.x) * (p2.y - p3.y) - (p4.y - p3.y) * (p2.x - p3.x);
+  const d3 = (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
+  const d4 = (p2.x - p1.x) * (p4.y - p1.y) - (p2.y - p1.y) * (p4.x - p1.x);
+  if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
+      ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) {
+    return true;
+  }
+  return false;
+}
+
+// Build a polygon sampling along the Glob path for intersection testing.
+// We sample both bezier curves and the arc segments.
+function sampleGlobPath(ax, ay, ar, bx, by, br, tan, cp_a1, cp_b1, cp_a2, cp_b2, samples) {
+  const pts = [];
+  // Sample first arc (circle A, from a1 to a2)
+  const a1a = Math.atan2(tan.a1.y - ay, tan.a1.x - ax);
+  const a2a = Math.atan2(tan.a2.y - ay, tan.a2.x - ax);
+  let aDiff = a2a - a1a;
+  while (aDiff > Math.PI) aDiff -= Math.PI * 2;
+  while (aDiff < -Math.PI) aDiff += Math.PI * 2;
+  for (let i = 0; i <= samples; i++) {
+    const t = i / samples;
+    const ang = a1a + aDiff * t;
+    pts.push({ x: ax + ar * Math.cos(ang), y: ay + ar * Math.sin(ang) });
+  }
+  // Sample first bezier (a2 -> b2)
+  for (let i = 0; i <= samples; i++) {
+    const t = i / samples;
+    const mt = 1 - t;
+    pts.push({
+      x: mt * mt * mt * tan.a2.x + 3 * mt * mt * t * cp_a2.x + 3 * mt * t * t * cp_b2.x + t * t * t * tan.b2.x,
+      y: mt * mt * mt * tan.a2.y + 3 * mt * mt * t * cp_a2.y + 3 * mt * t * t * cp_b2.y + t * t * t * tan.b2.y
+    });
+  }
+  // Sample second arc (circle B, from b2 to b1)
+  const b1a = Math.atan2(tan.b1.y - by, tan.b1.x - bx);
+  const b2a = Math.atan2(tan.b2.y - by, tan.b2.x - bx);
+  let bDiff = b1a - b2a; // reversed
+  while (bDiff > Math.PI) bDiff -= Math.PI * 2;
+  while (bDiff < -Math.PI) bDiff += Math.PI * 2;
+  for (let i = 0; i <= samples; i++) {
+    const t = i / samples;
+    const ang = b2a + bDiff * t;
+    pts.push({ x: bx + br * Math.cos(ang), y: by + br * Math.sin(ang) });
+  }
+  // Sample second bezier (b1 -> a1)
+  for (let i = 0; i <= samples; i++) {
+    const t = i / samples;
+    const mt = 1 - t;
+    pts.push({
+      x: mt * mt * mt * tan.b1.x + 3 * mt * mt * t * cp_b1.x + 3 * mt * t * t * cp_a1.x + t * t * t * tan.a1.x,
+      y: mt * mt * mt * tan.b1.y + 3 * mt * mt * t * cp_b1.y + 3 * mt * t * t * cp_a1.y + t * t * t * tan.a1.y
+    });
+  }
+  return pts;
+}
+
+function isSelfIntersecting(ax, ay, ar, bx, by, br, tan, cp_a1, cp_b1, cp_a2, cp_b2) {
+  const pts = sampleGlobPath(ax, ay, ar, bx, by, br, tan, cp_a1, cp_b1, cp_a2, cp_b2, 8);
+  for (let i = 0; i < pts.length; i++) {
+    const p1 = pts[i];
+    const p2 = pts[(i + 1) % pts.length];
+    for (let j = i + 2; j < pts.length; j++) {
+      const p3 = pts[j];
+      const p4 = pts[(j + 1) % pts.length];
+      if (i === 0 && j === pts.length - 1) continue;
+      if (segmentsIntersect(p1, p2, p3, p4)) return true;
+    }
+  }
+  return false;
+}
+
+// --- Glob class ---
+class Glob {
+  constructor(ax, ay, ar, bx, by, br, color, palette, index) {
+    this.ax = ax; this.ay = ay; this.ar = ar;
+    this.bx = bx; this.by = by; this.br = br;
+    this.color = color;
+    this.palette = palette;
+    this.index = index;
+
+    const aCenter = { x: ax, y: ay };
+    const bCenter = { x: bx, y: by };
+
+    const t1 = outerTangents(ax, ay, ar, bx, by, br, 1);
+    const t2 = outerTangents(ax, ay, ar, bx, by, br, -1);
+    this.tan = t1;
+
+    // Compute control points for both bridges
+    // Bridge 1: a1 -> b1
+    let c = computeControlPoints(t1.a1, t1.b1, aCenter, bCenter, ar, br, 0.5, 0.5);
+    this.cp_a1 = c.cp1; // near a1
+    this.cp_b1 = c.cp2; // near b1
+
+    // Bridge 2: a2 -> b2
+    c = computeControlPoints(t1.a2, t1.b2, aCenter, bCenter, ar, br, 0.5, 0.5);
+    this.cp_a2 = c.cp1; // near a2
+    this.cp_b2 = c.cp2; // near b2
+
+    // Check self-intersection; if so try the other tangent pair
+    if (isSelfIntersecting(ax, ay, ar, bx, by, br, this.tan, this.cp_a1, this.cp_b1, this.cp_a2, this.cp_b2)) {
+      this.tan = t2;
+      c = computeControlPoints(t2.a1, t2.b1, aCenter, bCenter, ar, br, 0.5, 0.5);
+      this.cp_a1 = c.cp1;
+      this.cp_b1 = c.cp2;
+      c = computeControlPoints(t2.a2, t2.b2, aCenter, bCenter, ar, br, 0.5, 0.5);
+      this.cp_a2 = c.cp1;
+      this.cp_b2 = c.cp2;
+    }
+  }
+
+  draw(ctx, cx, cy) {
+    const tan = this.tan;
+
+    ctx.beginPath();
+
+    // Arc on circle A from a1 to a2
+    const a1a = Math.atan2(tan.a1.y - this.ay, tan.a1.x - this.ax);
+    const a2a = Math.atan2(tan.a2.y - this.ay, tan.a2.x - this.ax);
+    let aDiff = a2a - a1a;
+    while (aDiff > Math.PI) aDiff -= Math.PI * 2;
+    while (aDiff < -Math.PI) aDiff += Math.PI * 2;
+    ctx.arc(this.ax, this.ay, this.ar, a1a, a1a + aDiff, aDiff < 0);
+
+    // Bezier from a2 to b2
+    ctx.bezierCurveTo(this.cp_a2.x, this.cp_a2.y, this.cp_b2.x, this.cp_b2.y, tan.b2.x, tan.b2.y);
+
+    // Arc on circle B from b2 to b1 (reversed direction)
+    const b1a = Math.atan2(tan.b1.y - this.by, tan.b1.x - this.bx);
+    const b2a = Math.atan2(tan.b2.y - this.by, tan.b2.x - this.bx);
+    let bDiff = b1a - b2a;
+    while (bDiff > Math.PI) bDiff -= Math.PI * 2;
+    while (bDiff < -Math.PI) bDiff += Math.PI * 2;
+    ctx.arc(this.bx, this.by, this.br, b2a, b2a + bDiff, bDiff < 0);
+
+    // Bezier from b1 to a1 (reversed, so swap control points)
+    ctx.bezierCurveTo(this.cp_b1.x, this.cp_b1.y, this.cp_a1.x, this.cp_a1.y, tan.a1.x, tan.a1.y);
+
+    ctx.closePath();
+
+    // --- Conic gradient fill ---
+    // The gradient center is the mouse cursor (shared across all globs).
+    // Odd-indexed globs invert rotation by 180° (Math.PI).
+    const angleOffset = (this.index % 2 === 1) ? Math.PI : 0;
+    const gradient = ctx.createConicGradient(angleOffset, cx, cy);
+
+    // Add 5 color stops from the palette
+    const stops = this.palette.slice(0, 5);
+    stops.forEach((col, i) => {
+      gradient.addColorStop(i / (stops.length - 1), col);
+    });
+
+    // Save context, clip to path, fill gradient, restore
+    ctx.save();
+    ctx.clip();
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+    ctx.restore();
+
+    // Subtle stroke for definition
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+}
+
+// --- Composition state ---
+let globs = [];
+let currentSeed = 42;
+const CANVAS_W = 800;
+const CANVAS_H = 800;
+const GRID_COLS = 3;
+const GRID_ROWS = 3;
+const PADDING = 64;
+
+function generateComposition(seedIndex) {
+  seedPRNG(seedIndex);
+  globs = [];
+
+  const cellW = (CANVAS_W - PADDING * 2) / GRID_COLS;
+  const cellH = (CANVAS_H - PADDING * 2) / GRID_ROWS;
+  const nodeR = Math.min(cellW, cellH) / 2 - 16; // 16px internal margin
+  const scaledR = nodeR * 0.75;
+
+  // Build all cells
+  const cells = [];
+  for (let row = 0; row < GRID_ROWS; row++) {
+    for (let col = 0; col < GRID_COLS; col++) {
+      cells.push({
+        row, col,
+        cx: PADDING + col * cellW + cellW / 2,
+        cy: PADDING + row * cellH + cellH / 2,
+        hasNode: false,
+        node: null
+      });
+    }
+  }
+
+  // Randomly decide which cells get a node
+  const activeCells = [];
+  cells.forEach(c => {
+    if (rand() > 0.2) { // ~80% fill
+      c.hasNode = true;
+      c.node = {
+        x: c.cx + (rand() - 0.5) * cellW * 0.4,
+        y: c.cy + (rand() - 0.5) * cellH * 0.4,
+        r: scaledR * (0.6 + rand() * 0.6)
+      };
+      activeCells.push(c);
+    }
+  });
+
+  // Shuffle active cells for random pairing order
+  const shuffled = shuffle(activeCells);
+
+  // Create connections between neighboring cells (distance <= diagonal)
+  const maxDist = Math.sqrt(cellW * cellW + cellH * cellH) * 1.2;
+  const connections = [];
+  const connected = new Set();
+
+  for (let i = 0; i < shuffled.length; i++) {
+    const a = shuffled[i];
+    // Find valid neighbors
+    const neighbors = shuffled.filter(b => {
+      if (b === a) return false;
+      const dx = b.cx - a.cx;
+      const dy = b.cy - a.cy;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      return d <= maxDist;
+    });
+
+    if (neighbors.length === 0) continue;
+
+    // Pick 1-2 random neighbors
+    const numLinks = randInt(1, Math.min(2, neighbors.length));
+    const picks = shuffle(neighbors).slice(0, numLinks);
+
+    picks.forEach(b => {
+      const key = [a.row * 3 + a.col, b.row * 3 + b.col].sort().join('-');
+      if (!connected.has(key)) {
+        connected.add(key);
+        connections.push({ a, b });
+      }
+    });
+  }
+
+  // Ensure every active cell has at least one connection
+  activeCells.forEach(a => {
+    const hasConn = connections.some(c => c.a === a || c.b === a);
+    if (!hasConn && activeCells.length > 1) {
+      const others = activeCells.filter(b => b !== a);
+      const b = others[randInt(0, others.length - 1)];
+      const key = [a.row * 3 + a.col, b.row * 3 + b.col].sort().join('-');
+      if (!connected.has(key)) {
+        connected.add(key);
+        connections.push({ a, b });
+      }
+    }
+  });
+
+  // Generate palette for this composition (5 stops)
+  const palette = [];
+  for (let i = 0; i < 5; i++) {
+    palette.push(pickWeighted());
+  }
+
+  // Build Globs from connections
+  connections.forEach((conn, idx) => {
+    const color = pickWeighted();
+    const g = new Glob(
+      conn.a.node.x, conn.a.node.y, conn.a.node.r,
+      conn.b.node.x, conn.b.node.y, conn.b.node.r,
+      color, palette, idx
+    );
+    globs.push(g);
+  });
+
+  // Also draw standalone nodes as simple circles
+  activeCells.forEach(c => {
+    const hasConn = connections.some(conn => conn.a === c || conn.b === c);
+    if (!hasConn) {
+      // Draw a standalone circle
+      const color = pickWeighted();
+      // We store these as simple objects for the draw loop
+      globs.push({
+        isCircle: true,
+        x: c.node.x, y: c.node.y, r: c.node.r,
+        color: color, palette: palette, index: globs.length
+      });
+    }
+  });
+}
+
+// ============================================================
+// p5.js setup / draw
+// ============================================================
+let canvasEl;
+
+function setup() {
+  canvasEl = createCanvas(CANVAS_W, CANVAS_H);
+  canvasEl.position((windowWidth - CANVAS_W) / 2, (windowHeight - CANVAS_H) / 2);
+  generateComposition(currentSeed);
+}
+
+function draw() {
+  background(PALETTE.black);
+
+  // Use native Canvas API for conic gradients (p5.js doesn't expose them)
+  const ctx = drawingContext;
+
+  // Gradient center follows mouse (clamped to canvas)
+  const cx = constrain(mouseX, 0, width);
+  const cy = constrain(mouseY, 0, height);
+
+  globs.forEach(g => {
+    if (g.isCircle) {
+      // Standalone circle with conic gradient
+      const angleOffset = (g.index % 2 === 1) ? Math.PI : 0;
+      const gradient = ctx.createConicGradient(angleOffset, cx, cy);
+      g.palette.forEach((col, i) => {
+        gradient.addColorStop(i / (g.palette.length - 1), col);
+      });
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(g.x, g.y, g.r, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+      ctx.restore();
+      ctx.strokeStyle = g.color;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    } else {
+      g.draw(ctx, cx, cy);
+    }
+  });
+
+  // Title / instructions
+  noStroke();
+  fill(PALETTE.pink);
+  textAlign(LEFT, TOP);
+  textSize(12);
+  textFont('monospace');
+  text("Living Globs — move mouse to shift light source", 12, 12);
+  text("Click to regenerate (seed: " + currentSeed + ")", 12, 28);
+}
+
+function mousePressed() {
+  currentSeed = Math.floor(Math.random() * 100000);
+  generateComposition(currentSeed);
+}
+
+function windowResized() {
+  canvasEl.position((windowWidth - CANVAS_W) / 2, (windowHeight - CANVAS_H) / 2);
+}
+
+// Initial generation on page load is handled by setup()
+</script>
+</body>
+</html>

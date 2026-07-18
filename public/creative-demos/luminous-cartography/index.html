@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Luminous Cartography</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght,GRAD,XTRA,XOPQ@8..144,100..1000,-200..150,323..1000,27..205&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    :root {
+      --bg: #0a1020;
+      --surface: #0f1729;
+      --text: #c8d6e5;
+      --accent: #f6a623;
+      --blue: #1f6f9c;
+      --teal: #4ecdc4;
+      --amber: #f6a623;
+      --mid: #334466;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Roboto Flex', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    #canvas-container canvas {
+      display: block;
+    }
+
+    #webcam-preview {
+      display: none;
+    }
+
+    #scroll-track {
+      position: relative;
+      z-index: 1;
+    }
+
+    .section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem 2rem;
+      max-width: 720px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .section h1 {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      line-height: 1.05;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    }
+
+    .section h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 300;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .section p {
+      font-size: clamp(1rem, 1.4vw, 1.25rem);
+      font-weight: 300;
+      color: #aabbd0;
+      max-width: 56ch;
+    }
+
+    .label-plate {
+      font-family: 'Roboto Flex', system-ui, sans-serif;
+      font-variation-settings: "wdth" 100;
+      transition: font-variation-settings 0.1s ease-out;
+      color: var(--teal);
+      text-shadow: 0 0 10px rgba(78, 205, 196, 0.4);
+      pointer-events: none;
+      white-space: nowrap;
+      position: absolute;
+      z-index: 2;
+    }
+
+    .meta {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-bottom: 2rem;
+    }
+
+    .indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+      margin-bottom: 2rem;
+    }
+
+    .spacer { height: 50vh; }
+
+    a { color: var(--teal); text-decoration: none; }
+
+    @media (max-width: 600px) {
+      .section { padding: 3rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <video id="webcam-preview" playsinline autoplay muted></video>
+
+  <div id="scroll-track">
+    <section class="section" data-index="0">
+      <div class="meta">Luminous Cartography</div>
+      <div class="indicator"></div>
+      <h1>Your face<br>is the city terrain</h1>
+      <p>Scroll to explore. Allow camera access to let your own features sculpt the skyline. Metro stops pulse with the city's hidden light.</p>
+    </section>
+
+    <section class="section" data-index="1">
+      <div class="meta">District · 01</div>
+      <h2>Hubtown Blue</h2>
+      <p>Webcam luminance becomes elevation. Darker regions rise as towers; brighter spaces open into plazas. The map breathes with you.</p>
+    </section>
+
+    <section class="section" data-index="2">
+      <div class="meta">District · 02</div>
+      <h2>Teal Transit</h2>
+      <p>SDF grid cells shade metro stops from the inside out. Each node knows its neighbors, each line a river of light flowing through the ridge lines.</p>
+    </section>
+
+    <section class="section" data-index="3">
+      <div class="meta">District · 03</div>
+      <h2>Amber Scale</h2>
+      <p>Variable typography breathes with the zoom. Width stretches like a spring as you draw nearer, collapsing again as you recede into the broader map.</p>
+    </section>
+
+    <section class="section" data-index="4">
+      <div class="meta">Fin</div>
+      <h2>Luminous Cartography</h2>
+      <p>A remix of Hubtown scroll narratives, Wheel2 luminance fields, Claus Wilke SDF logic, and the Variable Font Playground. Built with p5.js.</p>
+      <p style="margin-top: 2rem; font-size: 0.9rem;">Move the mouse to tilt the terrain.</p>
+    </section>
+
+    <div class="spacer"></div>
+  </div>
+
+  <script>
+    /* =========================================================
+       LUMINOUS CARTOGRAPHY
+       Standalone p5.js — scroll driven zoom + webcam luminance
+       ========================================================= */
+
+    const PREVIEW = document.getElementById('webcam-preview');
+    const SECTIONS = Array.from(document.querySelectorAll('.section'));
+    let LUMINANCE_GRID = null;
+    let LUMINANCE_GRID_W = 24;
+    let LUMINANCE_GRID_H = 16;
+    const GRID_COLS = 32;
+    const GRID_ROWS = 24;
+    const CELL_SIZE_BASE = 40;
+
+    // Metro stops (col, row) in grid coordinates
+    const METRO_STOPS = [
+      { col: 4, row: 5, name: 'AURORA' },
+      { col: 10, row: 8, name: 'MIKKA' },
+      { col: 18, row: 6, name: 'ZETA' },
+      { col: 22, row: 12, name: 'LUNA' },
+      { col: 14, row: 16, name: 'DRIFT' },
+      { col: 7, row: 14, name: 'EMBER' },
+      { col: 26, row: 9, name: 'SABLE' },
+      { col: 16, row: 3, name: 'RAIN' },
+      { col: 28, row: 18, name: 'FROST' },
+      { col: 11, row: 11, name: 'NEXUS' },
+    ];
+
+    // Adjacency for metro lines
+    const METRO_LINES = [
+      [0, 1, 9, 4, 3, 6],
+      [1, 5, 2],
+      [9, 2, 7, 8],
+      [4, 3],
+      [0, 5, 9]
+    ];
+
+    const PALETTE = {
+      bg: [10, 16, 32],
+      blue: [31, 111, 156],
+      teal: [78, 205, 196],
+      amber: [246, 166, 35],
+      surface: [15, 23, 41],
+      mid: [51, 68, 102],
+      light: [200, 214, 229],
+    };
+
+    // Create empty luminance grid
+    function initLuminanceGrid() {
+      const g = [];
+      for (let r = 0; r < LUMINANCE_GRID_H; r++) {
+        const row = [];
+        for (let c = 0; c < LUMINANCE_GRID_W; c++) {
+          row.push(0.15 + Math.random() * 0.1); // idle noise
+        }
+        g.push(row);
+      }
+      LUMINANCE_GRID = g;
+    }
+
+    function sampleLuminanceFromVideo() {
+      if (!PREVIEW.videoWidth) return;
+      try {
+        const tmpCanvas = document.createElement('canvas');
+        tmpCanvas.width = LUMINANCE_GRID_W;
+        tmpCanvas.height = LUMINANCE_GRID_H;
+        const ctx = tmpCanvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(PREVIEW, 0, 0, LUMINANCE_GRID_W, LUMINANCE_GRID_H);
+        const imgData = ctx.getImageData(0, 0, LUMINANCE_GRID_W, LUMINANCE_GRID_H);
+        const pixels = imgData.data;
+        for (let r = 0; r < LUMINANCE_GRID_H; r++) {
+          for (let c = 0; c < LUMINANCE_GRID_W; c++) {
+            const i = (r * LUMINANCE_GRID_W + c) * 4;
+            const rr = pixels[i];
+            const gg = pixels[i + 1];
+            const bb = pixels[i + 2];
+            const lum = 0.299 * rr + 0.587 * gg + 0.114 * bb;
+            // lerp towards new sample
+            const prev = LUMINANCE_GRID[r][c];
+            LUMINANCE_GRID[r][c] = prev * 0.6 + (lum / 255) * 0.4;
+          }
+        }
+      } catch (e) {
+        // cross-origin or read not allowed
+      }
+    }
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    function mapRange(v, inMin, inMax, outMin, outMax) {
+      const t = (v - inMin) / (inMax - inMin);
+      return lerp(outMin, outMax, Math.max(0, Math.min(1, t)));
+    }
+
+    // p5 sketch
+    let zoomLevel = 1;
+    let targetZoom = 1;
+    let mouseTiltX = 0;
+    let mouseTiltY = 0;
+    let targetTiltX = 0;
+    let targetTiltY = 0;
+
+    function setup() {
+      const container = document.getElementById('canvas-container');
+      const c = createCanvas(container.clientWidth, container.clientHeight);
+      c.parent('canvas-container');
+      pixelDensity(1);
+      initLuminanceGrid();
+      noStroke();
+    }
+
+    function draw() {
+      // Smooth follow for zoom driven by scroll
+      targetZoom = mapRange(window.scrollY, 0, Math.max(1, document.body.scrollHeight - window.innerHeight), 1.2, 4.5);
+      zoomLevel = lerp(zoomLevel, targetZoom, 0.06);
+
+      targetTiltX = mapRange(mouseX, 0, width, -0.15, 0.15);
+      targetTiltY = mapRange(mouseY, 0, height, -0.15, 0.15);
+      mouseTiltX = lerp(mouseTiltX, targetTiltX, 0.05);
+      mouseTiltY = lerp(mouseTiltY, targetTiltY, 0.05);
+
+      sampleLuminanceFromVideo();
+
+      background(...PALETTE.bg);
+
+      const cx = width / 2;
+      const cy = height / 2 + 40;
+      const cellSize = CELL_SIZE_BASE * zoomLevel;
+
+      // Update variable font labels
+      const wdthVal = Math.round(mapRange(zoomLevel, 1.2, 4.5, 50, 150));
+      document.querySelectorAll('.label-plate').forEach(el => {
+        el.style.fontVariationSettings = `"wdth" ${wdthVal}`;
+      });
+
+      push();
+      translate(cx + mouseTiltX * 80, cy + mouseTiltY * 80);
+
+      // Draw grid cells (terrain blocks)
+      for (let r = 0; r < GRID_ROWS; r++) {
+        for (let c = 0; c < GRID_COLS; c++) {
+          // Map grid to luminance grid
+          const lc = floor(map(c, 0, GRID_COLS, 0, LUMINANCE_GRID_W));
+          const lr = floor(map(r, 0, GRID_ROWS, 0, LUMINANCE_GRID_H));
+          const lum = LUMINANCE_GRID[Math.min(lr, LUMINANCE_GRID_H - 1)][Math.min(lc, LUMINANCE_GRID_W - 1)];
+
+          const x = (c - GRID_COLS / 2) * cellSize;
+          const y = (r - GRID_ROWS / 2) * cellSize;
+          const h = map(lum, 0, 1, 8, cellSize * 2.4);
+
+          // Base grid block
+          const colA = color(`rgba(15, 23, 41, 0.9)`);
+          const colB = color(`rgba(31, 111, 156, ${map(lum, 0, 1, 0.05, 0.25)})`);
+          const inter = lerpColor(colA, colB, lum);
+          fill(inter.levels[0] || 15, inter.levels[1] || 23, inter.levels[2] || 41, 180);
+          rect(x, y - h, cellSize - 1, h + cellSize - 1);
+
+          // Terrain highlight for higher blocks
+          if (lum > 0.35) {
+            fill(78, 205, 196, map(lum, 0.35, 1, 20, 60));
+            rect(x, y - h, cellSize - 1, 2);
+          }
+        }
+      }
+
+      // Draw metro lines (behind stops)
+      strokeWeight(2);
+      METRO_LINES.forEach(line => {
+        beginShape(LINES);
+        line.forEach(idx => {
+          const stop = METRO_STOPS[idx];
+          if (!stop) return;
+          const x = (stop.col - GRID_COLS / 2) * cellSize;
+          const y = (stop.row - GRID_ROWS / 2) * cellSize;
+          stroke(...PALETTE.amber);
+          vertex(x, y);
+        });
+        endShape();
+      });
+
+      // Draw SDF-style metro stops
+      METRO_STOPS.forEach((stop, i) => {
+        const x = (stop.col - GRID_COLS / 2) * cellSize;
+        const y = (stop.row - GRID_ROWS / 2) * cellSize;
+
+        // Outer glow (simulated SDF ring)
+        noStroke();
+        for (let g = 5; g >= 1; g--) {
+          const alpha = map(g, 1, 5, 80, 10);
+          fill(246, 166, 35, alpha);
+          circle(x, y, cellSize * 0.6 + g * 6 * zoomLevel);
+        }
+
+        // Core
+        fill(255);
+        circle(x, y, cellSize * 0.25);
+
+        // Station label
+        const fontSize = Math.round(map(zoomLevel, 1.2, 4.5, 10, 22));
+        textSize(fontSize);
+        fill(...PALETTE.light);
+        textAlign(LEFT, CENTER);
+        text(stop.name, x + cellSize * 0.35, y);
+
+        // Update or create floating label plate
+        let plate = document.getElementById(`plate-${i}`);
+        if (!plate) {
+          plate = document.createElement('div');
+          plate.className = 'label-plate';
+          plate.id = `plate-${i}`;
+          document.body.appendChild(plate);
+        }
+
+        // Convert scene position to screen
+        const screenX = cx + x + mouseTiltX * 80;
+        const screenY = cy + y + mouseTiltY * 80;
+        plate.style.left = `${screenX + cellSize * 0.35}px`;
+        plate.style.top = `${screenY - fontSize / 2}px`;
+        plate.textContent = `${stop.name} · ${Math.round(zoomLevel * 10) / 10}x`;
+      });
+
+      pop();
+
+      // Scanline overlay (subtle)
+      stroke(10, 16, 32, 20);
+      strokeWeight(1);
+      for (let y = 0; y < height; y += 4) {
+        line(0, y, width, y);
+      }
+    }
+
+    function windowResized() {
+      const container = document.getElementById('canvas-container');
+      resizeCanvas(container.clientWidth, container.clientHeight);
+    }
+
+    // Webcam init
+    async function initWebcam() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240, facingMode: 'user' } });
+        PREVIEW.srcObject = stream;
+        PREVIEW.play();
+      } catch (e) {
+        console.warn('Webcam unavailable. Using idle noise terrain.', e.message);
+      }
+    }
+
+    // Intersection observer for scroll fade-in of sections
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.section').forEach(sec => {
+      sec.style.opacity = '0';
+      sec.style.transform = 'translateY(24px)';
+      sec.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+      observer.observe(sec);
+    });
+
+    initWebcam();
+  </script>
+</body>
+</html>

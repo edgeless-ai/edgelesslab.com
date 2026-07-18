@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vector Field Type</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; }
+    body { background: #000; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<script>
+/* ============================================================
+ * PROMPT-02: VECTOR FIELD TYPE
+ * ============================================================
+ * TECHNIQUE — vector-field-to-glyph
+ *
+ * 1. Offscreen Glyph Mask
+ *    The word 'SIGNAL' is rendered to an offscreen p5.Graphics
+ *    buffer (pg). We use this buffer to sample interior pixels
+ *    and to extract the edge/contour pixels of the letterforms.
+ *
+ * 2. Outline Point Extraction
+ *    By scanning pg.pixels we collect every pixel that is
+ *    inside the glyph and adjacent to a background pixel. These
+ *    edge pixels become our set of "outline points" (O = {o_i}).
+ *    This avoids loading external font files and works with any
+ *    browser-default typeface.
+ *
+ * 3. Distance Field & Flow Field
+ *    For every grid cell (x,y) across the canvas we create a
+ *    flow-field vector v(x,y):
+ *      n(x,y) = normalize( closest(o_i, x,y) - (x,y) )
+ *      v(x,y) = rotate90( n(x,y) )
+ *    In words: the vector at any location is perpendicular to the
+ *    direction that points toward the nearest outline point.
+ *    Because gradients of distance are orthogonal to contours,
+ *    these vectors flow tangentially along the letter outlines.
+ *    Cells far from any outline fall back to Perlin noise so the
+ *    surrounding space remains animated rather than static.
+ *
+ * 4. Particle System
+ *    Thousands of particles are spawned randomly inside the glyph
+ *    mask. Each frame they integrate:
+ *      a) The base flow-field force (v(x,y) * strength)
+ *      b) A mouse-centric warp force that spirals, accelerates,
+ *         and slows nearby particles—creating dynamic interaction
+ *         without destroying the underlying legibility.
+ *
+ * 5. Legibility Constraint
+ *    Any particle that escapes the glyph mask is immediately
+ *    respawned at a new interior position, so the typography
+ *    remains sharp and readable even as particles swirl.
+ * ============================================================ */
+
+let pg;                  // offscreen glyph mask
+let edgePoints = [];     // contour points derived from the mask
+let flowField = [];      // grid-based flow vectors
+let cols, rows;          // grid dimensions
+let scl = 20;            // flow-field resolution (px per cell)
+let particles = [];
+const NUM_PARTICLES = 2800;
+const TEXT_SIZE = 200;
+const COLOR_ACCENT = [255, 87, 51]; // #FF5733
+
+function setup() {
+  createCanvas(800, 500);
+  pixelDensity(1);
+  
+  // ------------------------------------------
+  // Step 1: Build offscreen glyph mask
+  // ------------------------------------------
+  pg = createGraphics(width, height);
+  pg.pixelDensity(1);
+  pg.background(0);
+  pg.noStroke();
+  pg.fill(255);
+  
+  pg.textSize(TEXT_SIZE);
+  pg.textAlign(CENTER, CENTER);
+  pg.text('SIGNAL', width / 2, height / 2);
+  pg.loadPixels();
+  
+  // ------------------------------------------
+  // Step 2: Extract outline / contour points
+  // ------------------------------------------
+  for (let y = 1; y < pg.height - 1; y++) {
+    for (let x = 1; x < pg.width - 1; x++) {
+      let idx = (y * pg.width + x) * 4;
+      if (pg.pixels[idx] > 128) {
+        let top    = pg.pixels[((y-1) * pg.width + x) * 4];
+        let bottom = pg.pixels[((y+1) * pg.width + x) * 4];
+        let left   = pg.pixels[(y * pg.width + (x-1)) * 4];
+        let right  = pg.pixels[(y * pg.width + (x+1)) * 4];
+        if (top < 128 || bottom < 128 || left < 128 || right < 128) {
+          edgePoints.push(createVector(x, y));
+        }
+      }
+    }
+  }
+  
+  // ------------------------------------------
+  // Step 3: Build flow-field grid
+  // ------------------------------------------
+  cols = floor(width / scl);
+  rows = floor(height / scl);
+  flowField = new Array(cols * rows);
+  
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      let xPos = x * scl + scl * 0.5;
+      let yPos = y * scl + scl * 0.5;
+      
+      let bestDist = Infinity;
+      let bestPt = null;
+      for (let i = 0; i < edgePoints.length; i++) {
+        let dx = xPos - edgePoints[i].x;
+        let dy = yPos - edgePoints[i].y;
+        let d = dx*dx + dy*dy;
+        if (d < bestDist) {
+          bestDist = d;
+          bestPt = edgePoints[i];
+        }
+      }
+      
+      let idx = x + y * cols;
+      if (bestPt) {
+        let dx = bestPt.x - xPos;
+        let dy = bestPt.y - yPos;
+        // Perpendicular to direction-to-outline => tangent to contour
+        let angle = atan2(dy, dx) + HALF_PI;
+        let v = p5.Vector.fromAngle(angle);
+        
+        let d = sqrt(bestDist);
+        // Fade to noise far from outlines so empty space stays alive
+        if (d > 120) {
+          let n = noise(xPos * 0.003, yPos * 0.003) * TWO_PI * 2;
+          v = p5.Vector.fromAngle(n);
+        } else {
+          // Stronger influence right at the stroke edge
+          v.mult(map(d, 0, 120, 1.4, 0.5));
+        }
+        
+        flowField[idx] = v;
+      } else {
+        let n = noise(xPos * 0.003, yPos * 0.003) * TWO_PI * 2;
+        flowField[idx] = p5.Vector.fromAngle(n);
+      }
+    }
+  }
+  
+  // ------------------------------------------
+  // Step 4: Spawn particles inside glyph
+  // ------------------------------------------
+  for (let i = 0; i < NUM_PARTICLES; i++) {
+    let p = new Particle();
+    p.respawnInside();
+    particles.push(p);
+  }
+}
+
+class Particle {
+  constructor() {
+    this.pos = createVector(random(width), random(height));
+    this.vel = createVector(0, 0);
+    this.acc = createVector(0, 0);
+  }
+  
+  respawnInside() {
+    let safety = 0;
+    while (safety < 200) {
+      this.pos.set(random(width), random(height));
+      let px = floor(this.pos.x);
+      let py = floor(this.pos.y);
+      if (px >= 0 && px < pg.width && py >= 0 && py < pg.height) {
+        let idx = (py * pg.width + px) * 4;
+        if (pg.pixels[idx] > 128) {
+          this.vel.mult(0);
+          return;
+        }
+      }
+      safety++;
+    }
+    this.pos.set(width / 2, height / 2);
+    this.vel.mult(0);
+  }
+  
+  follow() {
+    let x = floor(constrain(this.pos.x / scl, 0, cols - 1));
+    let y = floor(constrain(this.pos.y / scl, 0, rows - 1));
+    let idx = x + y * cols;
+    let v = flowField[idx];
+    if (v) {
+      this.applyForce(v.copy().mult(0.15));
+    }
+  }
+  
+  warp(mousePos) {
+    let dir = p5.Vector.sub(this.pos, mousePos);
+    let d = dir.mag();
+    let radius = 180;
+    if (d < radius) {
+      let strength = map(d, 0, radius, 2.0, 0);
+      // Spiral: rotate direction 90 deg around mouse
+      let tangential = dir.copy();
+      tangential.rotate(HALF_PI);
+      tangential.mult(strength);
+      
+      // Radial: subtle inward pull / outward push for acceleration
+      let radial = dir.copy().normalize().mult(strength * 0.4);
+      
+      this.applyForce(tangential);
+      this.applyForce(radial);
+    }
+  }
+  
+  update() {
+    let mousePos = createVector(mouseX, mouseY);
+    // Ignore warping until mouse actually enters canvas
+    if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+      this.warp(mousePos);
+    }
+    
+    this.follow();
+    
+    this.vel.add(this.acc);
+    this.vel.limit(2.5);
+    this.pos.add(this.vel);
+    this.acc.mult(0);
+    
+    // Enforce glyph boundary: respawn if escaped
+    let px = floor(this.pos.x);
+    let py = floor(this.pos.y);
+    if (px < 0 || px >= pg.width || py < 0 || py >= pg.height) {
+      this.respawnInside();
+      return;
+    }
+    let idx = (py * pg.width + px) * 4;
+    if (pg.pixels[idx] < 128) {
+      this.respawnInside();
+    }
+  }
+  
+  draw() {
+    stroke(COLOR_ACCENT[0], COLOR_ACCENT[1], COLOR_ACCENT[2], 180);
+    strokeWeight(1.5);
+    point(this.pos.x, this.pos.y);
+  }
+}
+
+function draw() {
+  // Semi-transparent background for subtle motion trails;
+  // keeps typography legible while suggesting velocity.
+  background(10, 15);
+  
+  for (let p of particles) {
+    p.update();
+    p.draw();
+  }
+  
+  // Subtle mouse indicator
+  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+    noFill();
+    stroke(COLOR_ACCENT[0], COLOR_ACCENT[1], COLOR_ACCENT[2], 30);
+    strokeWeight(1);
+    ellipse(mouseX, mouseY, 360, 360);
+  }
+}
+</script>
+</body>
+</html>

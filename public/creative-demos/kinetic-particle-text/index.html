@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinetic Particle Text</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #0a0a0a;
+    overflow: hidden;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  canvas {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+  #ui {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #888;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    z-index: 10;
+    pointer-events: none;
+    transition: opacity 0.8s;
+  }
+  #quote-indicator {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    color: #FF5733;
+    font-size: 11px;
+    letter-spacing: 1px;
+    z-index: 10;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui">scroll to distort</div>
+<div id="quote-indicator"></div>
+
+<script>
+/**
+ * KINETIC PARTICLE TEXT
+ * Vanilla JS + Canvas single-file demo
+ *
+ * Architecture:
+ * - Offscreen canvas at 2x resolution renders crisp text
+ * - Pixel data is sampled to extract glyph positions
+ * - A particle system of ~20k particles interpolates between
+ *   the "home" positions (glyph shape) and a displaced state
+ *   driven by scroll velocity.
+ *
+ * Text-to-particle-position computation (documented below)
+ */
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+const uiEl = document.getElementById('ui');
+const quoteEl = document.getElementById('quote-indicator');
+
+let W, H, DPR;
+
+// ---------- Configuration ----------
+const PARTICLE_COUNT = 20000;
+const GLYPH_COLOR    = { r: 255, g: 255, b: 255 };    // white particles
+const ACCENT_COLOR   = { r: 255, g: 87,  b: 34  };    // #FF5733
+const ACCENT_RATE    = 0.02;                            // ~2% accent
+const SAMPLE_STEP    = 3;                              // pixel skip when reading glyph bitmap
+const SETTLE_SPEED   = 0.06;                           // lerp back to glyph shape
+const SCATTER_FORCE  = 28.0;                           // max displacement force
+
+const QUOTES = [
+  "The only way to do great work\nis to love what you do",
+  "Simplicity is the ultimate sophistication",
+  "Think different\nmake waves"
+];
+
+// ---------- State ----------
+let activeQuoteIdx = 0;
+let glyphHome = [];         // [{x,y,accent}]
+let particles = [];         // [{x,y,vx,vy,homeIdx}]
+let scrollAccum = 0;
+let lastScrollY = window.scrollY || 0;
+let quoteTimer = 0;
+let quoteOpacity = 1;
+let fadingOut = false;
+
+// ---------- Resize ----------
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width  = W * DPR;
+  canvas.height = H * DPR;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  rebuildGlyph();
+}
+
+// ----------------------------------------------------------------
+// TEXT-TO-PARTICLE-POSITION COMPUTATION
+//
+// Goal: derive "home" (x,y) positions for each particle so that,
+// when particles rest at homes, they form the shaped glyphs.
+//
+// Steps:
+//   1. Render the target text onto an offscreen 2x canvas.
+//      Large font size ensures enough pixel coverage.
+//
+//   2. Read the bitmap via `getImageData`.
+//      We iterate over the alpha channel with a stride (`SAMPLE_STEP`)
+//      to collect every non-transparent pixel coordinate.
+//
+//   3. For each collected pixel, we jitter its position within the
+//      sample step radius to avoid a perfectly regular lattice.
+//      This gives the field its "dense grain" aesthetic.
+//
+//   4. We compute the bounding box of the text so we can center it
+//      on the viewport.
+//
+//   5. Each particle is assigned:
+//        - `homeIdx` -> which glyph pixel it belongs to
+//        - `accent`  -> randomly selected (~2%) to be #FF5733
+//
+//   6. If the number of sampled glyph pixels is smaller than the
+//      desired particle count, duplicate homes and jitter again,
+//      distributing extra particles across the existing shape so
+//      density stays visually uniform.
+// ----------------------------------------------------------------
+
+function rebuildGlyph() {
+  const quote = QUOTES[activeQuoteIdx];
+
+  // Offscreen canvas at 2x for crisp rendering
+  const off = document.createElement('canvas');
+  const octx = off.getContext('2d');
+  off.width  = W * 2;
+  off.height = H * 2;
+
+  const fontSize = Math.min(W / (quote.length * 0.55 + 1), H * 0.35, 220);
+  octx.fillStyle = '#000';
+  octx.fillRect(0, 0, off.width, off.height);
+  octx.font = `bold ${fontSize * 2}px Helvetica, Arial, sans-serif`;
+  octx.fillStyle = '#fff';
+  octx.textAlign = 'center';
+  octx.textBaseline = 'middle';
+
+  // Handle multi-line quotes
+  const lines = quote.split('\n');
+  const lineHeight = fontSize * 2 * 1.15;
+  const totalH = lines.length * lineHeight;
+  const startY = (off.height - totalH) / 2 + lineHeight / 2;
+
+  lines.forEach((line, i) => {
+    octx.fillText(line, off.width / 2, startY + i * lineHeight);
+  });
+
+  const imgData = octx.getImageData(0, 0, off.width, off.height);
+  const data = imgData.data;
+
+  const homes = [];
+  // Scan bitmap, collect non-transparent pixels
+  for (let y = 0; y < off.height; y += SAMPLE_STEP * 2) {
+    for (let x = 0; x < off.width; x += SAMPLE_STEP * 2) {
+      const i = (y * off.width + x) * 4;
+      if (data[i + 3] > 80) {
+        // Jitter within the sample-step cell to dense-grain the field
+        const jx = (Math.random() - 0.5) * SAMPLE_STEP * 2;
+        const jy = (Math.random() - 0.5) * SAMPLE_STEP * 2;
+        homes.push({
+          x: (x + jx) / 2,
+          y: (y + jy) / 2,
+          accent: Math.random() < ACCENT_RATE
+        });
+      }
+    }
+  }
+
+  // Center the text within viewport
+  if (homes.length === 0) {
+    glyphHome = [];
+    return;
+  }
+
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const h of homes) {
+    if (h.x < minX) minX = h.x;
+    if (h.x > maxX) maxX = h.x;
+    if (h.y < minY) minY = h.y;
+    if (h.y > maxY) maxY = h.y;
+  }
+  const textW = maxX - minX;
+  const textH = maxY - minY;
+  const offsetX = (W - textW) / 2 - minX;
+  const offsetY = (H - textH) / 2 - minY;
+
+  for (const h of homes) {
+    h.x += offsetX;
+    h.y += offsetY;
+  }
+
+  glyphHome = homes;
+
+  // If we have fewer homes than desired particle count,
+  // particle distribution will duplicate homes inside allocate().
+  allocateParticles();
+}
+
+function allocateParticles() {
+  const target = PARTICLE_COUNT;
+  const homeCount = glyphHome.length;
+
+  particles = new Array(target);
+  for (let i = 0; i < target; i++) {
+    const h = glyphHome[i % homeCount];
+    // Duplicate homes duplicate the accent flag, but we can also
+    // re-roll for a fresher look on duplicated entries:
+    particles[i] = {
+      x:  h.x + (Math.random() - 0.5) * 80,
+      y:  h.y + (Math.random() - 0.5) * 80,
+      vx: 0,
+      vy: 0,
+      homeIdx: i % homeCount
+    };
+  }
+}
+
+// ---------- Physics / Scroll ----------
+function onScroll() {
+  const sy = window.scrollY || (window.pageYOffset || 0);
+  const dy = sy - lastScrollY;
+  lastScrollY = sy;
+
+  // Accumulated absolute scroll as "turbulence"
+  scrollAccum += Math.min(Math.abs(dy), 40);
+  if (scrollAccum > 400) scrollAccum = 400;
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+
+// ---------- Cycle quotes ----------
+function cycleQuote() {
+  if (fadingOut) return;
+  fadingOut = true;
+  quoteOpacity = 1;
+  uiEl.style.opacity = '0';
+
+  setTimeout(() => {
+    activeQuoteIdx = (activeQuoteIdx + 1) % QUOTES.length;
+    rebuildGlyph();
+    fadeBackIn();
+  }, 900);
+}
+
+function fadeBackIn() {
+  quoteOpacity = 0;
+  fadingOut = false;
+}
+
+// ---------- Render loop ----------
+function frame() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Scroll decay
+  scrollAccum *= 0.92;
+  if (scrollAccum < 0.05) scrollAccum = 0;
+
+  // Advance quote cycling (12s per quote)
+  quoteTimer += 1 / 60;
+  if (quoteTimer > 12) {
+    quoteTimer = 0;
+    cycleQuote();
+  }
+
+  // Opacity during transitions
+  if (fadingOut) {
+    quoteOpacity = Math.max(0, quoteOpacity - 0.04);
+    if (quoteOpacity <= 0) {
+      quoteEl.textContent = '';
+    } else {
+      quoteEl.textContent = QUOTES[activeQuoteIdx].replace(/\n/g, ' ');
+    }
+    uiEl.style.opacity = String(Math.max(0, quoteOpacity - 0.5));
+  } else {
+    quoteOpacity = Math.min(1, quoteOpacity + 0.04);
+    quoteEl.textContent = QUOTES[activeQuoteIdx].replace(/\n/g, ' ');
+    uiEl.style.opacity = String(Math.max(0, quoteOpacity - 0.5));
+  }
+
+  const force = Math.min(scrollAccum / 120, 1); // 0..1 normalized
+  const inv = 1 - force;
+
+  for (let i = 0, len = particles.length; i < len; i++) {
+    const p = particles[i];
+    const home = glyphHome[p.homeIdx];
+    if (!home) continue;
+
+    // Target position blends between home glyph shape and
+    // a radial scatter around the home. Scatter is strongest
+    // when scroll velocity is high.
+    const scatterR = force * SCATTER_FORCE * 60;
+    const angle = (i * 0.137) + (home.x * 0.01); // pseudo-random angle per particle
+    const sx = home.x + Math.cos(angle) * scatterR;
+    const sy = home.y + Math.sin(angle) * scatterR;
+
+    // Lerp toward target
+    const ax = (sx - p.x) * SETTLE_SPEED * inv;
+    const ay = (sy - p.y) * SETTLE_SPEED * inv;
+
+    p.vx += ax;
+    p.vy += ay;
+
+    // Mild damping to prevent jitter
+    p.vx *= 0.85;
+    p.vy *= 0.85;
+
+    p.x += p.vx;
+    p.y += p.vy;
+  }
+
+  // Draw particles
+  for (let i = 0, len = particles.length; i < len; i++) {
+    const p = particles[i];
+    const home = glyphHome[p.homeIdx];
+    if (!home) continue;
+
+    if (home.accent) {
+      ctx.fillStyle = '#FF5733';
+    } else {
+      ctx.fillStyle = `rgba(${GLYPH_COLOR.r},${GLYPH_COLOR.g},${GLYPH_COLOR.b},${0.35 + force * 0.45})`;
+    }
+
+    // Size modulates with velocity / scatter
+    const size = (force > 0.2)
+      ? 1.2 + force * 1.8
+      : 1.1;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  requestAnimationFrame(frame);
+}
+
+// ---------- Init ----------
+window.addEventListener('resize', resize);
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault();
+    quoteTimer = 0;
+    cycleQuote();
+  }
+});
+
+resize();
+quoteEl.textContent = QUOTES[0].replace(/\n/g, ' ');
+frame();
+</script>
+</body>
+</html>

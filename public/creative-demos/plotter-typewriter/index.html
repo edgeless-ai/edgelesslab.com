@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plotter Typewriter — Neural Geometry × Split-Character Typography</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #080A0E; overflow: hidden;
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh; font-family: system-ui, sans-serif;
+    }
+    canvas { display: block; }
+    #overlay {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      color: #4FC3F7; font-family: 'Courier New', monospace;
+      font-size: 13px; text-align: center; opacity: 0.7;
+      pointer-events: none; z-index: 10;
+    }
+    #overlay span { color: #F4A261; }
+  </style>
+</head>
+<body>
+  <div id="overlay">
+    <span id="mode-indicator">AUTO</span> &nbsp;|&nbsp;
+    MOUSE X → nudge &nbsp;|&nbsp; CLICK → stamp &nbsp;|&nbsp; SPACE → toggle
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script>
+// ══════════════════════════════════════════════════════════════
+//  PLOTTER TYPEWRITER — A mechanical drafting machine that
+//  types a headline one character at a time with semantic
+//  type switching (body vs code words get different stamps).
+//
+//  Technique: Neural Geometry Constructor (lerp-chain rail-
+//  carriage-head triad) × AND2ES/Cure51 split-char typography
+// ══════════════════════════════════════════════════════════════
+
+// ── Palette (parsed after p5 init) ────────────────────────
+const PAL = {
+  bg:        '#080A0E',
+  grid:      '#1A2A4A',
+  mech:      '#E3F2FD',
+  glowBody:  '#4FC3F7',
+  finalBody: '#2979FF',
+  edge:      '#82B1FF',
+  laser:     '#00E5FF',
+  codeFinal: '#1A1A1A',
+  codeGlow:  '#F4A261',
+};
+
+// Pre-parsed colors (filled in setup)
+let C = {};
+
+function parseHex(h) {
+  return [
+    parseInt(h.slice(1,3), 16),
+    parseInt(h.slice(3,5), 16),
+    parseInt(h.slice(5,7), 16)
+  ];
+}
+
+// ── Layout ────────────────────────────────────────────────
+let railY, baselineY, startX;
+const CHAR_W_BODY = 30;
+const CHAR_W_CODE = 24;
+
+// ── Machine state ─────────────────────────────────────────
+let carriage, head;
+let currentIdx = 0;
+let charSeq = [];         // { char, style, tx, ty }
+let stamps = [];          // { char, x, y, style, age, phase }
+let allDone = false;
+let pauseAfterDone = 0;
+
+let mState = 'travel';    // travel | dwell | poststamp
+let dwellCt = 0;
+let postCt = 0;
+const DWELL_NEEDED = 24;
+const POST_PAUSE = 15;
+const STAMP_DIST = 10;
+
+let auto = true;
+let forceNow = false;
+
+// ── Phrases ───────────────────────────────────────────────
+const PHRASES = [
+  [ {t:'THIS',s:'body'},{t:'IS',s:'body'},{t:'A',s:'body'},{t:'DRAFT',s:'code'},{t:'BY',s:'body'},{t:'MACHINE',s:'code'} ],
+  [ {t:'THE',s:'body'},{t:'PLOTTER',s:'code'},{t:'TYPES',s:'body'},{t:'LIKE',s:'body'},{t:'CODE',s:'code'} ],
+  [ {t:'NEURAL',s:'code'},{t:'GEO',s:'body'},{t:'METRY',s:'body'},{t:'BUILDS',s:'code'},{t:'WORDS',s:'body'} ],
+  [ {t:'A',s:'body'},{t:'DRAFTING',s:'body'},{t:'TYPE',s:'code'},{t:'WRITER',s:'body'},{t:'2026',s:'code'} ],
+  [ {t:'CURE',s:'body'},{t:'51',s:'code'},{t:'MEETS',s:'body'},{t:'AND',s:'body'},{t:'2ES',s:'code'} ],
+];
+let pIdx = 0;
+
+// ═════════════════════════════════════════════════════════
+//  P5 LIFECYCLE
+// ═════════════════════════════════════════════════════════
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  textAlign(CENTER, CENTER);
+  rectMode(CENTER);
+
+  // Parse palette into p5 color objects
+  for (let k in PAL) C[k] = parseHex(PAL[k]);
+
+  computeLayout();
+  loadPhrase(0);
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  computeLayout();
+  recomputeTargets();
+}
+
+function computeLayout() {
+  railY   = height * 0.14;
+  baselineY = height * 0.42;
+  startX  = width * 0.1;
+  carriage = { x: startX, y: railY };
+  head     = { x: startX, y: baselineY };
+}
+
+// ═════════════════════════════════════════════════════════
+//  PHRASE LOADING
+// ═════════════════════════════════════════════════════════
+
+function loadPhrase(idx) {
+  pIdx = ((idx % PHRASES.length) + PHRASES.length) % PHRASES.length;
+  const words = PHRASES[pIdx];
+
+  charSeq = [];
+  words.forEach(w => {
+    w.t.split('').forEach(ch => {
+      charSeq.push({ char: ch, style: w.s });
+    });
+  });
+
+  recomputeTargets();
+
+  currentIdx = 0;
+  stamps = [];
+  allDone = false;
+  pauseAfterDone = 0;
+  mState = 'travel';
+  dwellCt = 0;
+  postCt = 0;
+  forceNow = false;
+
+  carriage.x = startX;
+  head.x = startX;
+  head.y = baselineY;
+}
+
+function recomputeTargets() {
+  let cx = startX;
+  charSeq.forEach(e => {
+    const cw = e.style === 'code' ? CHAR_W_CODE : CHAR_W_BODY;
+    e.tx = cx;
+    e.ty = baselineY + (e.style === 'code' ? -4 : 0);
+    cx += cw;
+  });
+}
+
+// ═════════════════════════════════════════════════════════
+//  DRAW LOOP
+// ═════════════════════════════════════════════════════════
+
+function draw() {
+  let [br,bg,bb] = C.bg;
+  background(br, bg, bb);
+
+  const nudgeX = (mouseX - width / 2) * 0.08;
+  // Mouse Y adjusts stamping speed: faster near bottom, slower near top
+  const speedFactor = map(mouseY, 0, height, 0.5, 2.0, true);
+
+  drawGrid();
+  updateMachine(nudgeX, speedFactor);
+  drawMachine(nudgeX);
+  drawStamps();
+  drawEdges();
+  drawHUD();
+
+  // Auto phrase cycle
+  if (allDone && auto) {
+    pauseAfterDone++;
+    if (pauseAfterDone > 140) loadPhrase(pIdx + 1);
+  }
+}
+
+// ── Blueprint Grid ──────────────────────────────────────
+
+function drawGrid() {
+  const step = 40;
+  const [gr, gg, gb] = C.grid;
+
+  // Fine grid
+  stroke(gr, gg, gb, 38);   // ~15% opacity
+  strokeWeight(0.4);
+  for (let x = step; x < width; x += step)  line(x, 0, x, height);
+  for (let y = step; y < height; y += step) line(0, y, width, y);
+
+  // Major grid (every 5th)
+  stroke(gr, gg, gb, 64);
+  strokeWeight(0.7);
+  for (let x = step*5; x < width; x += step*5)  line(x, 0, x, height);
+  for (let y = step*5; y < height; y += step*5) line(0, y, width, y);
+
+  // Rail guide line
+  let [mr,mg,mb] = C.mech;
+  stroke(mr, mg, mb, 48);
+  strokeWeight(1);
+  line(0, railY, width, railY);
+}
+
+// ── Machine Update (lerp-chain state machine) ───────────
+
+function updateMachine(nudgeX, speedFactor) {
+  if (currentIdx >= charSeq.length) {
+    allDone = true;
+    return;
+  }
+
+  const tgt = charSeq[currentIdx];
+  const tx = tgt.tx + nudgeX;
+  const ty = tgt.ty;
+
+  // Force-stamp (click)
+  if (forceNow) {
+    carriage.x = tx;
+    head.x = tx;
+    head.y = ty;
+    doStamp(currentIdx);
+    forceNow = false;
+    mState = 'poststamp';
+    postCt = 0;
+    return;
+  }
+
+  const d = dist(head.x, head.y, tx, ty);
+
+  if (mState === 'travel') {
+    // Carriage: slow, weighted lerp toward target X
+    carriage.x = lerp(carriage.x, tx, 0.045 * speedFactor);
+    // Head follows carriage with slightly faster lerp (lag effect)
+    head.x = lerp(head.x, carriage.x, 0.055 * speedFactor);
+    // Head Y: articulate toward baseline with micro-oscillation
+    head.y = lerp(head.y, ty, 0.06 * speedFactor);
+    head.y += sin(frameCount * 0.08) * 2;
+
+    if (d < STAMP_DIST) {
+      mState = 'dwell';
+      dwellCt = 0;
+    }
+
+  } else if (mState === 'dwell') {
+    // Hold near target, gentle oscillation
+    carriage.x = lerp(carriage.x, tx, 0.1 * speedFactor);
+    head.x = lerp(head.x, carriage.x, 0.12 * speedFactor);
+    head.y = lerp(head.y, ty, 0.1 * speedFactor);
+    head.y += sin(frameCount * 0.14) * 1.2;
+
+    dwellCt++;
+    // Speed factor inversely affects dwell: faster factor = fewer frames needed
+    const needed = max(8, floor(DWELL_NEEDED / speedFactor));
+    if (auto && dwellCt >= needed) {
+      doStamp(currentIdx);
+      mState = 'poststamp';
+      postCt = 0;
+    }
+    // Manual: forceNow handled above
+
+  } else if (mState === 'poststamp') {
+    head.y = lerp(head.y, ty, 0.2);
+    head.y += sin(frameCount * 0.14) * 1;
+
+    postCt++;
+    if (postCt >= POST_PAUSE) {
+      currentIdx++;
+      if (currentIdx >= charSeq.length) {
+        allDone = true;
+        pauseAfterDone = 0;
+      } else {
+        mState = 'travel';
+      }
+    }
+  }
+}
+
+// ── Stamp Character ────────────────────────────────────
+
+function doStamp(idx) {
+  const e = charSeq[idx];
+  stamps.push({
+    char: e.char,
+    x: e.tx,
+    y: e.ty,
+    style: e.style,
+    age: 0,
+    phase: 'impact'
+  });
+}
+
+// ═════════════════════════════════════════════════════════
+//  RENDER: MACHINE
+// ═════════════════════════════════════════════════════════
+
+function drawMachine(nudgeX) {
+  push();
+  let [mr, mg, mb] = C.mech;
+
+  // ── Rail ──
+  stroke(mr, mg, mb, 100);
+  strokeWeight(2);
+  line(0, railY, width, railY);
+
+  // Rail end-caps
+  const railPts = [startX - 20, width - 20];
+  railPts.forEach(rx => {
+    noStroke();
+    fill(mr, mg, mb, 80);
+    rect(rx, railY, 6, 12, 1);
+  });
+
+  // ── Carriage (on rail) ──
+  noStroke();
+  fill(mr, mg, mb, 220);
+  rect(carriage.x, railY, 30, 11, 3);
+
+  // Carriage wheels
+  fill(mr, mg, mb, 180);
+  ellipse(carriage.x - 12, railY + 6, 5, 5);
+  ellipse(carriage.x + 12, railY + 6, 5, 5);
+
+  // Carriage detail
+  stroke(mr, mg, mb, 120);
+  strokeWeight(0.8);
+  line(carriage.x-10, railY-2, carriage.x+10, railY-2);
+
+  // ── Articulated arm ──
+  stroke(mr, mg, mb, 170);
+  strokeWeight(2.5);
+  line(carriage.x, railY + 5, head.x, head.y - 4);
+
+  // Joint at carriage
+  noStroke();
+  fill(mr, mg, mb, 200);
+  ellipse(carriage.x, railY + 5, 7, 7);
+
+  // ── Head (tool tip) ──
+  const styleActive = (currentIdx < charSeq.length)
+    ? charSeq[currentIdx].style : 'body';
+  const isCode = styleActive === 'code';
+  const glowRGB = isCode ? C.codeGlow : C.glowBody;
+
+  // Outer glow ring
+  noFill();
+  stroke(glowRGB[0], glowRGB[1], glowRGB[2], 100);
+  strokeWeight(3);
+  ellipse(head.x, head.y, 15, 15);
+
+  // Head body
+  noStroke();
+  fill(mr, mg, mb, 235);
+  rect(head.x, head.y, 10, 12, 2);
+
+  // Tool tip dot
+  fill(glowRGB[0], glowRGB[1], glowRGB[2]);
+  noStroke();
+  ellipse(head.x, head.y, 4, 4);
+
+  // ── Laser guide ──
+  if (currentIdx < charSeq.length && mState !== 'poststamp') {
+    const tgt = charSeq[currentIdx];
+    let [lr,lg,lb] = C.laser;
+    stroke(lr, lg, lb, 90);
+    strokeWeight(0.8);
+    drawingContext.setLineDash([5, 7]);
+    line(head.x, head.y, tgt.tx + nudgeX, tgt.ty);
+    drawingContext.setLineDash([]);
+
+    // Target crosshair
+    noFill();
+    stroke(lr, lg, lb, 130);
+    strokeWeight(1);
+    const hx = tgt.tx + nudgeX;
+    const hy = tgt.ty;
+    line(hx-7, hy, hx+7, hy);
+    line(hx, hy-7, hx, hy+7);
+  }
+  pop();
+}
+
+// ═════════════════════════════════════════════════════════
+//  RENDER: STAMPED CHARACTERS
+// ═════════════════════════════════════════════════════════
+
+function drawStamps() {
+  for (let i = 0; i < stamps.length; i++) {
+    stamps[i].age++;
+    const s = stamps[i];
+
+    if (s.phase === 'impact' && s.age > 5)  s.phase = 'settle';
+    if (s.phase === 'settle' && s.age > 30) s.phase = 'stable';
+
+    drawOneStamp(s, i);
+  }
+}
+
+function drawOneStamp(s, idx) {
+  push();
+  translate(s.x, s.y);
+
+  const isCode = s.style === 'code';
+  const glowRGB = isCode ? C.codeGlow : C.glowBody;
+  const finalRGB = isCode ? C.codeFinal : C.finalBody;
+  const t = s.age;
+
+  let sc = 1.0;
+  let rot = 0;
+
+  if (s.phase === 'impact') {
+    // Scale burst 1.25 → 1.0, rotation bounce
+    const p = t / 5;
+    sc = lerp(1.25, 1.0, p);
+    rot = radians(sin(p * PI) * 5);
+
+    // Glow rings
+    noStroke();
+    for (let r = 0; r < 3; r++) {
+      fill(glowRGB[0], glowRGB[1], glowRGB[2], map(r, 0, 2, 160, 20));
+      ellipse(0, 0, (30 + r*14) * sc, (30 + r*14) * sc);
+    }
+
+  } else if (s.phase === 'settle') {
+    const p = (t - 5) / 25;
+    sc = 1.0 + sin(p * PI) * 0.02;
+    rot = radians(sin(p * PI * 2) * 1.5);
+
+    // Fading glow
+    noStroke();
+    fill(glowRGB[0], glowRGB[1], glowRGB[2], map(p, 0, 1, 100, 0));
+    ellipse(0, 0, 27, 27);
+
+  } else {
+    sc = 1.0; rot = 0;
+  }
+
+  // Draw the character glyph
+  push();
+  rotate(rot);
+  scale(sc);
+
+  if (isCode) {
+    textFont('monospace');
+    textSize(18);
+    textStyle(NORMAL);
+  } else {
+    textFont('sans-serif');
+    textSize(22);
+    textStyle(BOLD);
+  }
+
+  if (s.phase === 'stable') {
+    // Subtle shadow for depth
+    fill(0, 0, 0, 35);
+    text(s.char, 0.5, 0.8);
+    fill(finalRGB[0], finalRGB[1], finalRGB[2]);
+    text(s.char, 0, 0);
+
+  } else if (s.phase === 'settle') {
+    const p = (s.age - 5) / 25;
+    const cr = lerp(glowRGB[0], finalRGB[0], p);
+    const cg = lerp(glowRGB[1], finalRGB[1], p);
+    const cb = lerp(glowRGB[2], finalRGB[2], p);
+    fill(cr, cg, cb);
+    text(s.char, 0, 0);
+
+  } else {
+    // Impact — pure glow
+    fill(glowRGB[0], glowRGB[1], glowRGB[2]);
+    text(s.char, 0, 0);
+  }
+
+  pop();
+  pop();
+}
+
+// ═════════════════════════════════════════════════════════
+//  RENDER: CONNECTION EDGES
+// ═════════════════════════════════════════════════════════
+
+function drawEdges() {
+  let [er, eg, eb] = C.edge;
+  stroke(er, eg, eb, 120);
+  strokeWeight(0.5);
+
+  for (let i = 1; i < stamps.length; i++) {
+    if (stamps[i].phase === 'stable' && stamps[i-1].phase === 'stable') {
+      const a = stamps[i-1];
+      const b = stamps[i];
+      const my = (a.y + b.y) / 2;
+      line(a.x, my, b.x, my);
+
+      // Tiny tick marks at each character
+      stroke(er, eg, eb, 60);
+      line(a.x, my-3, a.x, my+3);
+      line(b.x, my-3, b.x, my+3);
+    }
+  }
+}
+
+// ═════════════════════════════════════════════════════════
+//  HUD OVERLAY
+// ═════════════════════════════════════════════════════════
+
+function drawHUD() {
+  push();
+  textAlign(LEFT, TOP);
+  textFont('monospace');
+  textSize(11);
+
+  let [gr, gg, gb] = C.grid;
+  fill(gr, gg, gb, 140);
+  text('PHRASE ' + (pIdx+1) + '/' + PHRASES.length, 20, 20);
+
+  // Render phrase as label
+  const label = PHRASES[pIdx].map(w => w.t).join(' ');
+  let [mr, mg, mb] = C.mech;
+  fill(mr, mg, mb, 80);
+  text(label, 20, 36);
+
+  // Progress bar
+  if (charSeq.length > 0 && !allDone) {
+    const prog = currentIdx / charSeq.length;
+    const px = 20, py = 54, pw = 180;
+    noStroke();
+    fill(gr, gg, gb, 60);
+    rect(px, py, pw, 4, 2);
+    if (mState === 'dwell') {
+      let [ar, ag, ab] = C.codeGlow;
+      fill(ar, ag, ab, 200);
+    } else {
+      let [br, bg, bb] = C.glowBody;
+      fill(br, bg, bb, 200);
+    }
+    rect(px, py, pw * prog, 4, 2);
+  }
+
+  // Status indicator
+  fill(mr, mg, mb, 60);
+  const status = allDone ? 'CYCLE COMPLETE' : mState.toUpperCase();
+  text(status, 20, 68);
+  pop();
+}
+
+// ═════════════════════════════════════════════════════════
+//  INTERACTION
+// ═════════════════════════════════════════════════════════
+
+function mousePressed() {
+  if (allDone) {
+    loadPhrase(pIdx + 1);
+    return;
+  }
+  // Force-stamp current character
+  if (mState === 'travel' || mState === 'dwell') {
+    forceNow = true;
+  }
+}
+
+function keyPressed() {
+  if (key === ' ') {
+    auto = !auto;
+    let el = document.getElementById('mode-indicator');
+    if (el) el.textContent = auto ? 'AUTO' : 'MANUAL';
+    forceNow = false;
+    return false;
+  }
+}
+  </script>
+</body>
+</html>

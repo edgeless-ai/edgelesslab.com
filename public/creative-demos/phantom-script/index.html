@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phantom Script — Drag-Cast Glow Typography</title>
+<!--
+  Phantom Script: Drag-Cast Glow Typography
+  ==========================================
+  Inspired by Field Day Sound's zero-color minimalism + Particle Trails' 5-layer
+  exponential glow shader. A brand-showcase page where text is invisible until
+  the user drags a "light source" cursor across the darkness.
+
+  Technique (the "3% Weirdness"):
+    - Pure black (#000000) background — absolute void
+    - Brand names (NIKE, YETI, ADIDAS, etc.) scattered at different positions
+    - Text is invisible (black-on-black) until a drag cursor passes nearby
+    - Within the glow radius, characters are illuminated by a 5-layer exponential
+      cyan glow composited per-fragment in the shader
+    - Drag velocity controls both glow intensity AND character tracking/spacing:
+      faster drag → brighter glow + wider letter-spacing → harder to read
+    - The viewer must actively search for text; reading becomes a kinetic negotiation
+
+  Architecture:
+    - Three.js r128 via CDN (zero build tools — open file:// directly)
+    - InstancedMesh with ShaderMaterial for GPU-efficient character rendering
+    - Texture atlas (canvas-rendered) for character glyphs
+    - OrthographicCamera in pixel-space coordinates
+    - All glow is in-shader compositing (no post-processing)
+-->
+<style>
+  /* Zero-color minimalism: pure black, no UI chrome */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #000;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  canvas { display: block; }
+  /* Fallback for browsers without WebGL — the darkness IS the experience */
+  #fallback {
+    position: fixed; inset: 0; display: none;
+    align-items: center; justify-content: center;
+    background: #000; z-index: 10;
+    color: #333; font: 18px/1.6 'Helvetica Neue', Arial, sans-serif;
+    letter-spacing: 0.3em; text-transform: uppercase; text-align: center;
+    padding: 2rem;
+  }
+</style>
+</head>
+<body>
+<div id="fallback">Your browser doesn&rsquo;t support WebGL &mdash;<br>the darkness is the experience.</div>
+
+<!-- Three.js loaded from CDN — works with file:// protocol, no build tools needed -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+// =====================================================================
+// PHANTOM SCRIPT — Drag-Cast Glow Typography
+// =====================================================================
+// This demo combines Field Day Sound's zero-color minimalism with the
+// 5-layer exponential glow shader from Particle Trails (OpenProcessing).
+//
+// Key technique: InstancedMesh batches all character quads into a single
+// GPU draw call. Each character is a PlaneGeometry(1,1) instance scaled
+// and positioned via instance matrices. Custom instance attributes carry
+// the character index for texture atlas lookup. The fragment shader
+// composites a cyan 5-layer glow around each character, modulated by
+// distance from the drag-cast light source and drag velocity.
+//
+// The 3% weirdness: text is both revealed AND distorted by the same drag
+// gesture — faster pulling makes characters spread wider and glow brighter,
+// forcing the viewer to slow down to read. Reading becomes kinetic.
+// =====================================================================
+
+(function() {
+  'use strict';
+
+  // ------------------------------------------------------------------
+  // 1. CONFIGURATION
+  // ------------------------------------------------------------------
+
+  // Brand names to scatter across the canvas. Positions are fractions of
+  // viewport dimensions (updated on init + resize).
+  const BRAND_DEFS = [
+    { name: 'NIKE',   nx: -0.30, ny:  0.10 },
+    { name: 'YETI',   nx:  0.28, ny: -0.18 },
+    { name: 'SONY',   nx: -0.10, ny: -0.32 },
+    { name: 'BOSE',   nx:  0.30, ny:  0.26 },
+    { name: 'LEICA',  nx: -0.26, ny:  0.32 },
+    { name: 'ADIDAS', nx:  0.06, ny: -0.06 },
+  ];
+
+  // Character size as fraction of viewport (responsive)
+  const CHAR_SIZE_FRAC = 0.065; // relative to min(width, height)
+  const CHAR_ASPECT = 1.3;      // height / width
+
+  // Tracking (letter-spacing) parameters
+  // Base tracking depends on name length: shorter names = wider tracking
+  // Velocity adds extra tracking: faster drag = wider spread
+  const TRACKING_SHORT   = 0.45; // em for names <= 4 chars
+  const TRACKING_MEDIUM  = 0.30; // em for names == 5 chars
+  const TRACKING_LONG    = 0.22; // em for names >= 6 chars
+  const TRACKING_VELOCITY_MULT = 0.025; // em per px/frame of velocity
+  const TRACKING_MAX     = 2.5;  // max total tracking in em
+
+  // Glow radius and intensity mapping from velocity
+  const BASE_RADIUS      = 180;  // base light radius in pixels
+  const RADIUS_PER_INTENSITY = 100; // extra radius per unit of intensity
+  const INTENSITY_SCALE  = 0.018; // velocity → intensity multiplier
+  const INTENSITY_MAX    = 2.0;  // max light intensity
+
+  // Physics — exponential smoothing factor for velocity
+  const VELOCITY_SMOOTHING = 0.15; // higher = more responsive
+  const VELOCITY_DECAY    = 0.92; // decay per frame when not dragging
+
+  // Atlas rendering — each character glyph rendered as white on transparent
+  const ATLAS_CELL_SIZE   = 128;
+  const ATLAS_FONT_SIZE   = 92; // px, fills the cell
+
+  // Characters needed for our brand names (plus padding for future use)
+  const CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const charIndexMap = {};
+  for (let i = 0; i < CHARSET.length; i++) {
+    charIndexMap[CHARSET[i]] = i;
+  }
+
+  // ------------------------------------------------------------------
+  // 2. STATE
+  // ------------------------------------------------------------------
+
+  let renderer, scene, camera;
+  let mesh = null;          // InstancedMesh holding all characters
+  let material = null;      // ShaderMaterial with glow compositing
+  let charTexture = null;   // Canvas texture atlas
+  let totalChars = 0;       // total character instances
+
+  // Drag physics state
+  let isDragging = false;
+  let lastMouseX = 0, lastMouseY = 0;
+  let smoothedVelocity = 0;
+  let lightPosition = { x: -9999, y: -9999 }; // start off-screen
+
+  // Per-instance data for matrix recomputation
+  // Each entry: { brandIdx, charOffset, brandName }
+  let instanceData = [];
+
+  // Current viewport dimensions and derived values
+  let viewW = 0, viewH = 0;
+  let charW = 60, charH = 78;
+
+  // Clock for animation
+  let clock = new THREE.Clock();
+
+  // Uniforms (reusable reference)
+  const uniforms = {
+    lightPosition:   { value: new THREE.Vector2(-9999, -9999) },
+    lightIntensity:  { value: 0.0 },
+    time:            { value: 0.0 },
+    charTexture:     { value: null },
+    numChars:        { value: CHARSET.length }
+  };
+
+  // Track if matrices need update
+  let matricesDirty = true;
+  let lastTrackingExtra = -1; // force initial update
+
+  // ------------------------------------------------------------------
+  // 3. TEXTURE ATLAS GENERATION
+  // ------------------------------------------------------------------
+  // Renders each uppercase character as white glyph on transparent background.
+  // The atlas is a single-row texture where each cell is ATLAS_CELL_SIZE².
+  // Used in the fragment shader via UV offset based on charIndex.
+
+  function generateTextureAtlas() {
+    const numChars = CHARSET.length;
+    const canvas = document.createElement('canvas');
+    canvas.width  = numChars * ATLAS_CELL_SIZE;
+    canvas.height = ATLAS_CELL_SIZE;
+    const ctx = canvas.getContext('2d');
+
+    // Transparent background (canvas default)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Render each character centered in its cell
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff';
+    // Bold sans-serif for clean, high-contrast glyphs
+    ctx.font = `bold ${ATLAS_FONT_SIZE}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
+
+    for (let i = 0; i < numChars; i++) {
+      const cx = i * ATLAS_CELL_SIZE + ATLAS_CELL_SIZE / 2;
+      const cy = ATLAS_CELL_SIZE / 2;
+      ctx.fillText(CHARSET[i], cx, cy);
+    }
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.generateMipmaps = true;
+
+    return texture;
+  }
+
+  // ------------------------------------------------------------------
+  // 4. CHARACTER LAYOUT
+  // ------------------------------------------------------------------
+  // Computes per-instance data: which brand, which character offset,
+  // and the base tracking for each brand.
+
+  function computeLayout(w, h) {
+    const instances = [];
+    const charSize = Math.min(w, h) * CHAR_SIZE_FRAC;
+    const cw = charSize;
+    const ch = charSize * CHAR_ASPECT;
+
+    BRAND_DEFS.forEach((brand, brandIdx) => {
+      const name = brand.name;
+      const numChars = name.length;
+
+      // Base tracking depends on name length
+      let baseTracking;
+      if (numChars <= 4) baseTracking = TRACKING_SHORT;
+      else if (numChars <= 5) baseTracking = TRACKING_MEDIUM;
+      else baseTracking = TRACKING_LONG;
+
+      // Brand center in pixel coordinates
+      const bx = brand.nx * w;
+      const by = brand.ny * h;
+
+      for (let ci = 0; ci < numChars; ci++) {
+        const chName = name[ci];
+        const idx = charIndexMap[chName] !== undefined ? charIndexMap[chName] : 0;
+        instances.push({
+          brandIdx: brandIdx,
+          charOffset: ci,
+          numChars: numChars,
+          charIndex: idx,
+          baseTracking: baseTracking,
+          brandX: bx,
+          brandY: by
+        });
+      }
+    });
+
+    return { instances, charW: cw, charH: ch };
+  }
+
+  // ------------------------------------------------------------------
+  // 5. SHADER CODE
+  // ------------------------------------------------------------------
+  // Custom GLSL for the 5-layer exponential glow compositing.
+  //
+  // VERTEX SHADER: Transforms each character quad via instanceMatrix,
+  //                passes UV, character index, and world center to fragment.
+  //
+  // FRAGMENT SHADER:
+  //   1. Compute distance from character center to light source
+  //   2. If outside radius → render black (invisible)
+  //   3. Look up character glyph from texture atlas
+  //   4. Compute 5-layer exponential glow centered on the quad:
+  //      - Broad halo:  exp(-d²·2.25) × 0.62  (soft outer glow)
+  //      - Smoke glow:  exp(-d²·5.5)  × 0.42  (mid-range haze)
+  //      - Inner glow:  exp(-d²·21.0) × 0.35  (tight inner aura)
+  //      - Hot needle:  exp(-d²·185)  × 3.15  (HDR white core)
+  //      - Electric rim: pow(envelope, 4.8) × 0.18 (cyan edge)
+  //   5. Modulate by distance falloff from light, velocity intensity, pulse
+  //   6. Composite character (white) + glow (cyan) → final color
+
+  const vertexShader = `
+    // Standard attributes from PlaneGeometry
+    attribute vec3 position;
+    attribute vec2 uv;
+
+    // Instance attribute from InstancedMesh — encodes position + scale of each char
+    attribute mat4 instanceMatrix;
+
+    // Custom instance attribute — which character in the atlas
+    attribute float charIndex;
+
+    // Standard uniforms provided by Three.js
+    uniform mat4 modelMatrix;
+    uniform mat4 viewMatrix;
+    uniform mat4 projectionMatrix;
+
+    // Varyings passed to fragment shader
+    varying vec2  vUv;
+    varying float vCharIndex;
+    varying vec3  vCenter;   // world-space center of this character quad
+
+    void main() {
+      // Compute world position: model (mesh transform) × instance (per-char transform) × vertex
+      vec4 worldPos = modelMatrix * instanceMatrix * vec4(position, 1.0);
+
+      // Compute world-space center of this instance (origin of the quad before vertex offset)
+      vec4 worldCenter = modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+
+      vUv        = uv;
+      vCharIndex = charIndex;
+      vCenter    = worldCenter.xyz / worldCenter.w;
+
+      gl_Position = projectionMatrix * viewMatrix * worldPos;
+    }
+  `;
+
+  const fragmentShader = `
+    precision highp float;
+
+    // Custom uniforms
+    uniform vec2  lightPosition;   // world-space coords of drag cursor
+    uniform float lightIntensity;  // [0, 2.0] derived from drag velocity
+    uniform float time;            // elapsed seconds for pulse animation
+    uniform sampler2D charTexture; // atlas of character glyphs
+    uniform float numChars;        // number of columns in atlas
+
+    // Varyings from vertex shader
+    varying vec2  vUv;
+    varying float vCharIndex;
+    varying vec3  vCenter;
+
+    void main() {
+      // --------------------------------------------------------------
+      // STEP 1: Distance-to-light check
+      // If character center is outside the glow radius, render black.
+      // This creates the "flashlight in a dark room" effect.
+      // --------------------------------------------------------------
+      float dLight = distance(vCenter.xy, lightPosition);
+      float radius = ${BASE_RADIUS.toFixed(1)} + lightIntensity * ${RADIUS_PER_INTENSITY.toFixed(1)};
+
+      if (dLight > radius) {
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        return;
+      }
+
+      // --------------------------------------------------------------
+      // STEP 2: Texture atlas lookup
+      // Each character occupies a column in the single-row atlas.
+      // vCharIndex selects which column, vUv selects within the cell.
+      // --------------------------------------------------------------
+      vec2 atlasUV = vec2(
+        (vCharIndex + vUv.x) / numChars,
+        vUv.y
+      );
+      vec4 charTex = texture2D(charTexture, atlasUV);
+      float charAlpha = charTex.a; // 1.0 where character glyph is, 0.0 elsewhere
+
+      // --------------------------------------------------------------
+      // STEP 3: 5-layer exponential glow compositing
+      // All layers are functions of distance from the quad center.
+      // dCenter = 0 at center, ~1.414 at farthest corner
+      // --------------------------------------------------------------
+      float dCenter = distance(vUv, vec2(0.5, 0.5)) * 2.0;
+
+      // Layer 1 — Broad halo: very soft, wide cyan aura
+      //   exp(-d² · 2.25) falls to 10% at d ≈ 1.0
+      float broadHalo = exp(-dCenter * dCenter * 2.25) * 0.62;
+
+      // Layer 2 — Smoke glow: mid-range atmospheric haze
+      //   exp(-d² · 5.5)  falls to 10% at d ≈ 0.65
+      float smokeGlow = exp(-dCenter * dCenter * 5.5) * 0.42;
+
+      // Layer 3 — Inner glow: tight inner aura around character
+      //   exp(-d² · 21.0) falls to 10% at d ≈ 0.33
+      float innerGlow = exp(-dCenter * dCenter * 21.0) * 0.35;
+
+      // Layer 4 — Hot needle: HDR-style overbright white core
+      //   exp(-d² · 185)  falls to 10% at d ≈ 0.11
+      //   Multiplied by 3.15× for overbright intensity
+      float hotNeedle = exp(-dCenter * dCenter * 185.0) * 3.15;
+
+      // Layer 5 — Electric edge: sharp cyan rim at character boundary
+      //   envelope = 1 at center, 0 at edges; pow() sharpens the falloff
+      float envelope = 1.0 - smoothstep(0.0, 1.0, dCenter);
+      float electricEdge = pow(envelope, 4.8) * 0.18;
+
+      // Combine all layers
+      float glowAmt = broadHalo + smokeGlow + innerGlow + hotNeedle + electricEdge;
+
+      // --------------------------------------------------------------
+      // STEP 4: Modulate glow by distance from light source
+      // Characters near the light center are brightest; edges fade.
+      // --------------------------------------------------------------
+      float falloff = 1.0 - smoothstep(0.0, radius, dLight);
+      glowAmt *= falloff;
+
+      // Modulate by drag velocity intensity
+      glowAmt *= lightIntensity;
+
+      // Subtle sine-wave pulse (~1.43 Hz) — makes the glow feel alive
+      float pulse = 0.85 + 0.15 * sin(time * 9.0);
+      glowAmt *= pulse;
+
+      // --------------------------------------------------------------
+      // STEP 5: Color compositing
+      // - Cyan glow layers (broad, smoke, inner, edge)
+      // - White hot needle core
+      // - White character text overlaid on top
+      // --------------------------------------------------------------
+
+      // Cyan glow (primary): #00D4FF
+      vec3 cyanGlow  = vec3(0.0, 0.831, 1.0);
+      // Electric edge: #00B4E0 — slightly deeper cyan
+      vec3 cyanEdge  = vec3(0.0, 0.706, 0.878);
+      // Core overbright: #FFFFFF — pure white
+      vec3 whiteCore = vec3(1.0);
+
+      // Blend glow colors: outer layers use cyan, hot needle uses white,
+      // electric edge uses deeper cyan
+      float outerAmt   = broadHalo + smokeGlow + innerGlow;
+      float coreAmt    = hotNeedle;
+      float edgeAmt    = electricEdge;
+      float totalAmt   = outerAmt + coreAmt + edgeAmt + 0.0001; // prevent div-by-zero
+
+      vec3 glowColor = (cyanGlow * outerAmt + whiteCore * coreAmt + cyanEdge * edgeAmt) / totalAmt;
+      glowColor *= glowAmt;
+
+      // Character text is pure white — overlays the glow
+      vec3 textWhite = vec3(1.0) * charAlpha;
+
+      // Composite: character text on top of glow
+      // Where character exists (charAlpha > 0), show bright white with glow boosting
+      // Where no character, show only the cyan glow
+      vec3 finalColor = textWhite + glowColor * (1.0 - charAlpha * 0.6);
+
+      // Boost: ensure character areas are at least as bright as the character alone
+      finalColor = max(finalColor, textWhite);
+
+      // Edge fade on the quad to prevent hard clipping at geometry boundaries
+      float edgeFade = 1.0 - smoothstep(0.5, 1.0, dCenter / 1.414);
+      finalColor *= (0.85 + 0.15 * edgeFade);
+
+      // Output — alpha is always 1 (we render black for invisible regions)
+      gl_FragColor = vec4(finalColor, 1.0);
+    }
+  `;
+
+  // ------------------------------------------------------------------
+  // 6. SCENE SETUP
+  // ------------------------------------------------------------------
+
+  function initScene() {
+    // Check for WebGL support
+    const fallback = document.getElementById('fallback');
+    try {
+      const testCanvas = document.createElement('canvas');
+      const gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
+      if (!gl) throw new Error('WebGL not supported');
+    } catch (e) {
+      fallback.style.display = 'flex';
+      return false;
+    }
+
+    // Renderer — antialias for smooth character edges
+    renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: false
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // cap for performance
+    renderer.setClearColor(0x000000, 1); // pure black background
+    document.body.prepend(renderer.domElement);
+
+    // Scene
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+
+    // Camera — orthographic for pixel-space layout
+    // We use left=-w/2, right=w/2 so that world coords match screen coords
+    // with origin at center. Y is flipped so positive Y = up.
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    camera = new THREE.OrthographicCamera(-w/2, w/2, h/2, -h/2, 0.1, 100);
+    camera.position.z = 10;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(w, h);
+
+    return true;
+  }
+
+  // ------------------------------------------------------------------
+  // 7. BUILD INSTANCED MESH
+  // ------------------------------------------------------------------
+  // Creates a single InstancedMesh with one PlaneGeometry per character.
+  // All instances share one ShaderMaterial. Custom instance attribute
+  // 'charIndex' enables per-instance texture atlas lookup.
+
+  function buildInstancedMesh() {
+    if (mesh) {
+      scene.remove(mesh);
+      mesh.geometry.dispose();
+    }
+    if (material) {
+      material.dispose();
+    }
+
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    viewW = w; viewH = h;
+
+    // Compute character layout
+    const layout = computeLayout(w, h);
+    instanceData = layout.instances;
+    charW = layout.charW;
+    charH = layout.charH;
+    totalChars = instanceData.length;
+
+    if (totalChars === 0) return;
+
+    // Generate texture atlas (lazily)
+    if (!charTexture) {
+      charTexture = generateTextureAtlas();
+      uniforms.charTexture.value = charTexture;
+    }
+
+    // ---- Geometry ----
+    // Unit quad; we'll scale to CHAR_W × CHAR_H via instance matrix
+    const geometry = new THREE.PlaneGeometry(1, 1);
+
+    // ---- Material ----
+    material = new THREE.ShaderMaterial({
+      uniforms: uniforms,
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
+      // Tell Three.js this is an instanced material so instanceMatrix is available
+      defines: { USE_INSTANCING: '' }
+    });
+
+    // ---- InstancedMesh ----
+    mesh = new THREE.InstancedMesh(geometry, material, totalChars);
+    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+
+    // ---- Custom instance attribute: character index ----
+    // Each instance stores which character in the atlas it represents.
+    const charIdxArray = new Float32Array(totalChars);
+    for (let i = 0; i < totalChars; i++) {
+      charIdxArray[i] = instanceData[i].charIndex;
+    }
+    const charIdxAttr = new THREE.InstancedBufferAttribute(charIdxArray, 1);
+    mesh.geometry.setAttribute('charIndex', charIdxAttr);
+
+    // ---- Set instance matrices for initial positions ----
+    matricesDirty = true;
+    lastTrackingExtra = -1;
+    updateInstanceMatrices(0);
+
+    scene.add(mesh);
+  }
+
+  // ------------------------------------------------------------------
+  // 8. UPDATE INSTANCE MATRICES
+  // ------------------------------------------------------------------
+  // Recomputes all instance matrices based on brand positions and
+  // current tracking (which increases with drag velocity).
+  //
+  // Each character is positioned relative to its brand center:
+  //   x = brandX + (charOffset - (numChars-1)/2) × (CHAR_W + tracking)
+  //   y = brandY
+  //
+  // tracking = baseTracking × CHAR_W + velocityExtra
+
+  function updateInstanceMatrices(trackingExtra) {
+    if (!mesh || instanceData.length === 0) return;
+
+    const dummy = new THREE.Object3D();
+
+    for (let i = 0; i < instanceData.length; i++) {
+      const d = instanceData[i];
+      const tracking = (d.baseTracking + trackingExtra) * charW;
+      const offset = d.charOffset - (d.numChars - 1) / 2;
+      const x = d.brandX + offset * (charW + tracking);
+      const y = d.brandY;
+
+      dummy.position.set(x, y, 0);
+      dummy.scale.set(charW, charH, 1);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+  }
+
+  // ------------------------------------------------------------------
+  // 9. DRAG PHYSICS
+  // ------------------------------------------------------------------
+  // Tracks mouse position and velocity during drag.
+  // Uses exponential smoothing for natural-feeling response.
+  //
+  // Inspired by Field Day Sound's drag-as-navigation interaction model:
+  // the cursor acts as a physical light source that the user pulls
+  // across the dark canvas.
+
+  function onMouseDown(event) {
+    isDragging = true;
+    lastMouseX = event.clientX;
+    lastMouseY = event.clientY;
+    // Snap light to cursor immediately
+    const pos = clientToWorld(event.clientX, event.clientY);
+    lightPosition.x = pos.x;
+    lightPosition.y = pos.y;
+    uniforms.lightPosition.value.set(pos.x, pos.y);
+  }
+
+  function onMouseMove(event) {
+    if (!isDragging) return;
+
+    const clientX = event.clientX;
+    const clientY = event.clientY;
+
+    // Compute raw velocity (pixels per frame)
+    const dx = clientX - lastMouseX;
+    const dy = clientY - lastMouseY;
+    const rawVelocity = Math.sqrt(dx * dx + dy * dy);
+
+    // Exponential smoothing — dampens jitter while remaining responsive
+    smoothedVelocity += (rawVelocity - smoothedVelocity) * VELOCITY_SMOOTHING;
+
+    // Update position tracking
+    lastMouseX = clientX;
+    lastMouseY = clientY;
+
+    // Map to world coordinates
+    const pos = clientToWorld(clientX, clientY);
+    lightPosition.x = pos.x;
+    lightPosition.y = pos.y;
+    uniforms.lightPosition.value.set(pos.x, pos.y);
+  }
+
+  function onMouseUp() {
+    isDragging = false;
+    // Velocity decays naturally via the animation loop
+  }
+
+  // Map browser client coordinates to Three.js world coordinates
+  // (origin center, Y up)
+  function clientToWorld(cx, cy) {
+    return {
+      x: cx - viewW / 2,
+      y: -(cy - viewH / 2)
+    };
+  }
+
+  // ------------------------------------------------------------------
+  // 10. TOUCH SUPPORT (single-finger drag)
+  // ------------------------------------------------------------------
+  // Minimal mobile support — single finger drag only, as specified.
+
+  function onTouchStart(event) {
+    event.preventDefault();
+    const touch = event.touches[0];
+    if (touch) {
+      isDragging = true;
+      lastMouseX = touch.clientX;
+      lastMouseY = touch.clientY;
+      const pos = clientToWorld(touch.clientX, touch.clientY);
+      lightPosition.x = pos.x;
+      lightPosition.y = pos.y;
+      uniforms.lightPosition.value.set(pos.x, pos.y);
+    }
+  }
+
+  function onTouchMove(event) {
+    event.preventDefault();
+    if (!isDragging) return;
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    const clientX = touch.clientX;
+    const clientY = touch.clientY;
+
+    const dx = clientX - lastMouseX;
+    const dy = clientY - lastMouseY;
+    const rawVelocity = Math.sqrt(dx * dx + dy * dy);
+    smoothedVelocity += (rawVelocity - smoothedVelocity) * VELOCITY_SMOOTHING;
+
+    lastMouseX = clientX;
+    lastMouseY = clientY;
+
+    const pos = clientToWorld(clientX, clientY);
+    lightPosition.x = pos.x;
+    lightPosition.y = pos.y;
+    uniforms.lightPosition.value.set(pos.x, pos.y);
+  }
+
+  function onTouchEnd(event) {
+    event.preventDefault();
+    isDragging = false;
+  }
+
+  // ------------------------------------------------------------------
+  // 11. ANIMATION LOOP
+  // ------------------------------------------------------------------
+  // Each frame:
+  //   1. Decay velocity when not dragging (smooth fade-out)
+  //   2. Compute light intensity from velocity
+  //   3. Compute tracking extra from velocity
+  //   4. Update instance matrices if tracking changed
+  //   5. Update shader uniforms
+  //   6. Render
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // ---- Step 1: Update velocity ----
+    if (!isDragging) {
+      smoothedVelocity *= VELOCITY_DECAY;
+      // Snap to zero when very small
+      if (smoothedVelocity < 0.1) smoothedVelocity = 0;
+    }
+
+    // ---- Step 2: Compute light intensity ----
+    const intensity = Math.min(INTENSITY_MAX, smoothedVelocity * INTENSITY_SCALE);
+    uniforms.lightIntensity.value = intensity;
+
+    // ---- Step 3: Compute tracking extra ----
+    const trackingExtra = Math.min(
+      TRACKING_MAX,
+      smoothedVelocity * TRACKING_VELOCITY_MULT
+    );
+
+    // ---- Step 4: Update instance matrices if needed ----
+    if (Math.abs(trackingExtra - lastTrackingExtra) > 0.001) {
+      updateInstanceMatrices(trackingExtra);
+      lastTrackingExtra = trackingExtra;
+    }
+
+    // ---- Step 5: Update time uniform for pulse ----
+    uniforms.time.value = clock.getElapsedTime();
+
+    // ---- Step 6: Render ----
+    if (renderer && scene && camera) {
+      renderer.render(scene, camera);
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // 12. RESIZE HANDLER
+  // ------------------------------------------------------------------
+  // On window resize, update camera bounds, recalculate character
+  // positions, and rebuild the instanced mesh.
+
+  function onResize() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    if (!camera || !renderer) return;
+
+    // Update camera projection
+    camera.left   = -w / 2;
+    camera.right  =  w / 2;
+    camera.top    =  h / 2;
+    camera.bottom = -h / 2;
+    camera.updateProjectionMatrix();
+
+    // Update renderer
+    renderer.setSize(w, h);
+
+    // Rebuild character layout with new dimensions
+    buildInstancedMesh();
+  }
+
+  // ------------------------------------------------------------------
+  // 13. INITIALIZATION
+  // ------------------------------------------------------------------
+
+  function init() {
+    const webglOk = initScene();
+    if (!webglOk) return;
+
+    charTexture = generateTextureAtlas();
+
+    buildInstancedMesh();
+
+    // Register event listeners
+    window.addEventListener('mousedown',  onMouseDown);
+    window.addEventListener('mousemove',  onMouseMove);
+    window.addEventListener('mouseup',    onMouseUp);
+    window.addEventListener('touchstart', onTouchStart, { passive: false });
+    window.addEventListener('touchmove',  onTouchMove,  { passive: false });
+    window.addEventListener('touchend',   onTouchEnd,   { passive: false });
+    window.addEventListener('resize',     onResize);
+
+    // Press-and-drag hint: subtle cursor change
+    document.body.style.cursor = 'crosshair';
+
+    // Start the animation loop
+    animate();
+
+    console.log(
+      '✨ Phantom Script initialized\n' +
+      '   Drag your cursor across the darkness to reveal brand names.\n' +
+      '   Faster drag → brighter glow + wider letter-spacing.'
+    );
+  }
+
+  // Start when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();
+</script>
+</body>
+</html>

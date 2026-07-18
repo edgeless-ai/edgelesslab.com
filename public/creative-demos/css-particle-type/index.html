@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Single-Div CSS Particle Type</title>
+<style>
+:root {
+  --bg: #0d0d14;
+  --text-color: #e8e0f0;
+  --accent: #6a5acd;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Georgia', serif;
+  overflow: hidden;
+}
+h1 {
+  color: rgba(255,255,255,0.06);
+  font-size: 14px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+  font-weight: 400;
+}
+.demo-container {
+  position: relative;
+  width: 700px;
+  height: 200px;
+  cursor: pointer;
+}
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  will-change: transform;
+  transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+              left 1.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+              top 1.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background 0.8s ease;
+}
+.particle.scattered {
+  transition: transform 1.8s cubic-bezier(0.22, 1, 0.36, 1),
+              left 1.8s cubic-bezier(0.22, 1, 0.36, 1),
+              top 1.8s cubic-bezier(0.22, 1, 0.36, 1),
+              background 0.3s ease;
+}
+.subtitle {
+  color: rgba(255,255,255,0.1);
+  font-size: 11px;
+  margin-top: 50px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-family: 'Georgia', serif;
+}
+.hint {
+  color: rgba(255,255,255,0.08);
+  font-size: 10px;
+  margin-top: 10px;
+  letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+<h1>Particle Type</h1>
+<div class="demo-container" id="container"></div>
+<div class="subtitle">hover to scatter · release to gather</div>
+<div class="hint">single-div particle system · pure css · no canvas</div>
+
+<script>
+const WORD = "CΦDE";
+const PARTICLE_SIZE = 7;
+const DENSITY = 3; // particles per "pixel"
+
+// Letter masks — each letter as a set of (x,y) coordinates on a grid
+// Grid is 40 wide × 20 tall for a lowercase letter
+function getLetterMask(letter) {
+  const masks = {
+    'C': (() => { const p=[]; for(let y=1; y<19; y++) { p.push([0,y]); if(y===1||y===17||y===18) for(let x=1;x<6;x++) p.push([x,y]); } for(let x=1;x<8;x++) { p.push([x,1]); p.push([x,18]); } for(let x=1;x<4;x++) { p.push([x,0]); p.push([x,19]); } return p; })(),
+    'Φ': (() => { const p=[]; for(let y=0; y<20; y++){ p.push([3,y]); p.push([4,y]); } for(let x=6;x<12;x++){ p.push([x,0]); p.push([x,19]); } for(let x=6;x<12;x++) for(let y=6;y<14;y++) p.push([x,y]); for(let y=3;y<17;y++){ p.push([14,y]); p.push([15,y]); } for(let x=12;x<15;x++){ p.push([x,3]); p.push([x,16]); } return p; })(),
+    'D': (() => { const p=[]; for(let y=1;y<19;y++) p.push([0,y]); for(let x=1;x<4;x++){ p.push([x,1]); p.push([x,18]); } for(let x=1;x<10;x++){ p.push([x,0]); p.push([x,19]); } for(let y=2;y<18;y++) for(let x=10;x<14;x++) p.push([x,y]); for(let x=14;x<16;x++){ p.push([x,5]); p.push([x,14]); } return p; })(),
+    'E': (() => { const p=[]; for(let y=1;y<19;y++) p.push([0,y]); for(let x=1;x<12;x++){ p.push([x,1]); p.push([x,10]); p.push([x,18]); } for(let x=1;x<8;x++){ p.push([x,0]); p.push([x,19]); } for(let x=1;x<5;x++) p.push([x,9]); p.push([5,9]); p.push([5,11]); return p; })(),
+  };
+  return masks[letter] || masks['C'];
+}
+
+// Build the word
+const letterSpacing = 18;
+const startX = 20;
+const baseY = 20;
+
+const container = document.getElementById('container');
+const containerRect = container.getBoundingClientRect();
+const W = container.offsetWidth;
+const H = container.offsetHeight;
+
+let particles = [];
+let isScattered = false;
+let hasWeirdImperfection = false;
+
+// Track which particle is "imperfect" (weirdness)
+let imperfectIdx = -1;
+
+WORD.split('').forEach((letter, li) => {
+  const mask = getLetterMask(letter);
+  mask.forEach(([mx, my]) => {
+    // Spread particles around each mask point for density
+    for (let d = 0; d < DENSITY; d++) {
+      const px = startX + li * letterSpacing + mx * PARTICLE_SIZE + (Math.random() - 0.5) * 2;
+      const py = baseY + my * PARTICLE_SIZE + (Math.random() - 0.5) * 2;
+      const hue = (li * 60 + mx * 3 + my * 5) % 360;
+      particles.push({
+        homeX: px / W * 100,
+        homeY: py / H * 100,
+        x: px / W * 100,
+        y: py / H * 100,
+        hue: hue,
+        size: PARTICLE_SIZE * (0.8 + Math.random() * 0.6),
+        el: null,
+        li: li
+      });
+    }
+  });
+});
+
+// Add random extra particles for atmosphere
+for (let i = 0; i < 30; i++) {
+  particles.push({
+    homeX: Math.random() * 100,
+    homeY: Math.random() * 100,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    hue: Math.random() * 360,
+    size: 3 + Math.random() * 4,
+    el: null,
+    isFiller: true
+  });
+}
+
+// Shuffle particles for visual interest
+particles.sort(() => Math.random() - 0.5);
+
+// Set imperfect particle
+imperfectIdx = Math.floor(Math.random() * particles.length);
+hasWeirdImperfection = true;
+
+// Create DOM elements
+particles.forEach((p, i) => {
+  const el = document.createElement('div');
+  el.className = 'particle';
+  el.style.left = p.x + '%';
+  el.style.top = p.y + '%';
+  el.style.width = p.size + 'px';
+  el.style.height = p.size + 'px';
+  el.style.background = `radial-gradient(circle at 30% 30%, hsl(${p.hue}, 80%, 80%), hsl(${p.hue}, 70%, 50%))`;
+  el.style.boxShadow = `0 0 ${p.size * 2}px hsl(${p.hue}, 70%, 50%), 0 0 ${p.size * 4}px hsla(${p.hue}, 70%, 50%, 0.3)`;
+  container.appendChild(el);
+  p.el = el;
+});
+
+function scatter() {
+  if (isScattered) return;
+  isScattered = true;
+  container.style.cursor = 'grabbing';
+  
+  particles.forEach((p, i) => {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 30 + Math.random() * 60;
+    const targetX = 50 + Math.cos(angle) * dist;
+    const targetY = 50 + Math.sin(angle) * dist;
+    
+    p.el.classList.add('scattered');
+    p.el.style.left = targetX + '%';
+    p.el.style.top = targetY + '%';
+    p.el.style.opacity = 0.3 + Math.random() * 0.4;
+    
+    // Random hue shift on scatter
+    const newHue = (p.hue + Math.random() * 360) % 360;
+    p.el.style.background = `radial-gradient(circle at 30% 30%, hsl(${newHue}, 70%, 70%), hsl(${newHue}, 60%, 40%))`;
+  });
+}
+
+function gather() {
+  if (!isScattered) return;
+  isScattered = false;
+  container.style.cursor = 'pointer';
+  
+  particles.forEach((p, i) => {
+    p.el.classList.remove('scattered');
+    
+    // Weirdness: imperfect particle lands slightly off position
+    if (hasWeirdImperfection && i === imperfectIdx) {
+      const jitterX = (Math.random() - 0.5) * 4;
+      const jitterY = (Math.random() - 0.5) * 4;
+      p.el.style.left = (p.homeX + jitterX) + '%';
+      p.el.style.top = (p.homeY + jitterY) + '%';
+    } else {
+      p.el.style.left = p.homeX + '%';
+      p.el.style.top = p.homeY + '%';
+    }
+    
+    p.el.style.opacity = 0.85 + Math.random() * 0.15;
+    p.el.style.background = `radial-gradient(circle at 30% 30%, hsl(${p.hue}, 80%, 80%), hsl(${p.hue}, 70%, 50%))`;
+  });
+  
+  // Move imperfect particle to a new random one each cycle
+  let newIdx;
+  do {
+    newIdx = Math.floor(Math.random() * particles.length);
+  } while (newIdx === imperfectIdx && particles.length > 1);
+  imperfectIdx = newIdx;
+}
+
+container.addEventListener('mouseenter', scatter);
+container.addEventListener('mouseleave', gather);
+container.addEventListener('click', () => {
+  if (isScattered) gather(); else scatter();
+});
+
+// Initial gather to place particles at home positions
+setTimeout(gather, 100);
+</script>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Garden of Letters</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #F0F0F0;
+    cursor: none;
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  #canvas-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
+  /* Label that appears near the cursor */
+  #cursor-label {
+    position: absolute;
+    pointer-events: none;
+    color: #FF0000;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    user-select: none;
+    z-index: 10;
+  }
+  #canvas-container:hover #cursor-label {
+    opacity: 1;
+  }
+  #instruction {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #111111;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.4;
+    pointer-events: none;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+<div id="canvas-container">
+  <div id="cursor-label">PLANT.</div>
+  <div id="instruction">Click anywhere to reset the garden</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script>
+// ============================================
+// THE GARDEN OF LETTERS
+// A hybrid of Monumental Typography and Autonomous Walker Tile Claiming
+// Palette: white (#FFFFFF), black (#111111), red (#FF0000)
+// ============================================
+
+// --- CONFIGURATION ---
+const GRID_COLS = 60;
+const GRID_ROWS = 40;
+const HEADLINE = "GROW";
+const NUM_WALKERS = 6;
+const MAX_FRAMES = 1200; // safety cap
+
+// --- PALETTE ---
+const C_BG = "#F0F0F0";
+const C_TEXT = "#111111";
+const C_RED = "#FF0000";
+const C_SOIL = "#E8E8E0";
+
+// --- GLOBAL STATE ---
+let cells = [];      // 2D array of Cell objects
+let walkers = [];    // array of Walker objects
+let maskGraphics;    // off-screen buffer for letter mask
+let cellW, cellH;    // pixel dimensions per cell
+let cols, rows;      // grid dimensions
+let targetCells = []; // cells that are inside the letter mask
+let claimedCount = 0;
+let frameCountDraw = 0;
+let isFinished = false;
+
+// Custom cursor
+let cursorX = 0, cursorY = 0;
+let cursorTargetX = 0, cursorTargetY = 0;
+
+// ============================================
+// CELL CLASS
+// Each cell knows its grid position, pixel center, and claim state.
+// ============================================
+class Cell {
+  constructor(c, r, x, y) {
+    this.c = c;          // grid column
+    this.r = r;          // grid row
+    this.x = x;          // pixel center x
+    this.y = y;          // pixel center y
+    this.claimed = false;
+    this.isTarget = false; // falls inside the letter mask
+    this.flipFrame = 0;  // frames since claim trigger
+    this.scale = 1.0;
+    this.fillColor = color(C_SOIL);
+    // Slightly jittered polygon for "soft" cell look
+    this.jitter = [];
+    const n = 6;
+    for (let i = 0; i < n; i++) {
+      const angle = (TWO_PI / n) * i;
+      this.jitter.push({
+        dx: cos(angle) * (random(0.85, 1.0) * cellW * 0.45),
+        dy: sin(angle) * (random(0.85, 1.0) * cellH * 0.45)
+      });
+    }
+  }
+
+  claim() {
+    if (this.claimed) return false;
+    this.claimed = true;
+    this.flipFrame = 1;
+    return true;
+  }
+
+  update() {
+    if (this.flipFrame > 0) {
+      // Scale pulse: 1.0 -> 1.08 -> 1.0 over ~20 frames
+      const t = this.flipFrame / 20;
+      if (t < 0.5) {
+        this.scale = map(t, 0, 0.5, 1.0, 1.08);
+      } else {
+        this.scale = map(t, 0.5, 1.0, 1.08, 1.0);
+      }
+      this.fillColor = lerpColor(color(C_SOIL), color(C_TEXT), min(t * 1.5, 1.0));
+      this.flipFrame++;
+      if (this.flipFrame > 20) {
+        this.flipFrame = 0;
+        this.scale = 1.0;
+        this.fillColor = color(C_TEXT);
+      }
+    }
+  }
+
+  draw() {
+    push();
+    translate(this.x, this.y);
+    scale(this.scale);
+    noStroke();
+    fill(this.fillColor);
+    beginShape();
+    for (let j of this.jitter) {
+      vertex(j.dx, j.dy);
+    }
+    endShape(CLOSE);
+    pop();
+  }
+}
+
+// ============================================
+// WALKER CLASS
+// Seeded autonomous agent that moves to adjacent unclaimed cells.
+// ============================================
+class Walker {
+  constructor(seed) {
+    this.seed = seed;
+    this.rng = new SeededRandom(seed);
+    // Start at bottom of canvas, random column
+    this.c = floor(this.rng.random() * cols);
+    this.r = rows - 1;
+    this.trail = []; // recent positions for red trail
+    this.alive = true;
+  }
+
+  step() {
+    if (!this.alive) return;
+
+    // Find valid neighbors (unclaimed or already-claimed target cells)
+    const neighbors = [];
+    const dirs = [
+      [0, -1], [0, 1], [-1, 0], [1, 0],
+      [-1, -1], [1, -1], [-1, 1], [1, 1]
+    ];
+    for (let d of dirs) {
+      const nc = this.c + d[0];
+      const nr = this.r + d[1];
+      if (nc >= 0 && nc < cols && nr >= 0 && nr < rows) {
+        const cell = cells[nr][nc];
+        // Prefer unclaimed cells; allow stepping onto already-claimed target cells
+        if (!cell.claimed || cell.isTarget) {
+          neighbors.push([nc, nr]);
+        }
+      }
+    }
+
+    if (neighbors.length === 0) {
+      this.alive = false;
+      return;
+    }
+
+    // Pick a random neighbor
+    const pick = neighbors[floor(this.rng.random() * neighbors.length)];
+    this.c = pick[0];
+    this.r = pick[1];
+
+    const cell = cells[this.r][this.c];
+
+    // If this cell is a target and unclaimed, claim it
+    if (cell.isTarget && cell.claim()) {
+      claimedCount++;
+      // Push a trail point for 3 frames
+      this.trail.push({ x: cell.x, y: cell.y, life: 3 });
+    }
+
+    // Also occasionally leave a faint trail on non-target cells
+    if (!cell.isTarget && this.rng.random() < 0.05) {
+      this.trail.push({ x: cell.x, y: cell.y, life: 2 });
+    }
+  }
+
+  updateTrail() {
+    for (let i = this.trail.length - 1; i >= 0; i--) {
+      this.trail[i].life--;
+      if (this.trail[i].life <= 0) {
+        this.trail.splice(i, 1);
+      }
+    }
+  }
+
+  draw() {
+    // Draw faint red trail
+    for (let t of this.trail) {
+      noStroke();
+      fill(red(C_RED), green(C_RED), blue(C_RED), 20);
+      ellipse(t.x, t.y, cellW * 0.35, cellH * 0.35);
+    }
+  }
+}
+
+// ============================================
+// SEEDED RANDOM (simple LCG)
+// Decouples walker behavior from grid seed.
+// ============================================
+class SeededRandom {
+  constructor(seed) {
+    this.s = seed || 12345;
+  }
+  random() {
+    this.s = (this.s * 16807 + 0) % 2147483647;
+    return (this.s - 1) / 2147483646;
+  }
+}
+
+// ============================================
+// P5.JS LIFECYCLE
+// ============================================
+function setup() {
+  const canvas = createCanvas(windowWidth, windowHeight);
+  canvas.parent("canvas-container");
+  pixelDensity(1);
+
+  // Initialize grid
+  initGrid();
+
+  // Build letter mask
+  buildMask();
+
+  // Spawn walkers
+  spawnWalkers();
+
+  // Cursor init
+  cursorX = width / 2;
+  cursorY = height / 2;
+  cursorTargetX = width / 2;
+  cursorTargetY = height / 2;
+
+  noLoop();
+  redraw();
+}
+
+function initGrid() {
+  cols = GRID_COLS;
+  rows = GRID_ROWS;
+  cellW = width / cols;
+  cellH = height / rows;
+  cells = [];
+  for (let r = 0; r < rows; r++) {
+    cells[r] = [];
+    for (let c = 0; c < cols; c++) {
+      const x = c * cellW + cellW / 2;
+      const y = r * cellH + cellH / 2;
+      cells[r][c] = new Cell(c, r, x, y);
+    }
+  }
+}
+
+function buildMask() {
+  // Create off-screen buffer sized to canvas, draw headline in black
+  maskGraphics = createGraphics(width, height);
+  maskGraphics.pixelDensity(1);
+  maskGraphics.background(0);
+  maskGraphics.fill(255);
+  maskGraphics.noStroke();
+
+  // Compute responsive font size
+  const fontSize = Math.min(width * 0.15, height * 0.45);
+  maskGraphics.textFont("sans-serif");
+  maskGraphics.textSize(fontSize);
+  maskGraphics.textAlign(CENTER, CENTER);
+  maskGraphics.textStyle(BOLD);
+  maskGraphics.text(HEADLINE, width / 2, height / 2);
+
+  // Read pixels and mark target cells
+  maskGraphics.loadPixels();
+  const d = maskGraphics.pixelDensity();
+  const imgW = width * d;
+  const imgH = height * d;
+
+  targetCells = [];
+  claimedCount = 0;
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const px = floor(c * cellW + cellW / 2);
+      const py = floor(r * cellH + cellH / 2);
+      const idx = 4 * (py * d * imgW + px * d);
+      // If pixel is bright (white text on black), mark as target
+      if (maskGraphics.pixels[idx] > 128) {
+        cells[r][c].isTarget = true;
+        targetCells.push(cells[r][c]);
+      }
+    }
+  }
+}
+
+function spawnWalkers() {
+  walkers = [];
+  for (let i = 0; i < NUM_WALKERS; i++) {
+    const seed = 1000 + i * 137 + floor(random(1000));
+    walkers.push(new Walker(seed));
+  }
+}
+
+function draw() {
+  background(C_BG);
+
+  // --- Update cells ---
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      cells[r][c].update();
+    }
+  }
+
+  // --- Walkers step and leave trails ---
+  for (let w of walkers) {
+    w.step();
+    w.updateTrail();
+  }
+
+  // --- Draw all cells ---
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      cells[r][c].draw();
+    }
+  }
+
+  // --- Draw walker trails on top ---
+  for (let w of walkers) {
+    w.draw();
+  }
+
+  // --- Draw active walker dots (red accent) ---
+  for (let w of walkers) {
+    if (w.alive) {
+      const cell = cells[w.r][w.c];
+      noStroke();
+      fill(C_RED);
+      ellipse(cell.x, cell.y, cellW * 0.25, cellH * 0.25);
+    }
+  }
+
+  // --- Custom cursor (lerp-smoothed red circle) ---
+  cursorTargetX = mouseX;
+  cursorTargetY = mouseY;
+  cursorX = lerp(cursorX, cursorTargetX, 0.15);
+  cursorY = lerp(cursorY, cursorTargetY, 0.15);
+  noCursor();
+  noFill();
+  stroke(C_RED);
+  strokeWeight(2);
+  ellipse(cursorX, cursorY, 18, 18);
+
+  // --- Position cursor label ---
+  const label = document.getElementById("cursor-label");
+  if (label) {
+    label.style.left = (cursorX + 14) + "px";
+    label.style.top = (cursorY - 8) + "px";
+  }
+
+  // --- Check finish condition ---
+  frameCountDraw++;
+  const allClaimed = targetCells.every(cell => cell.claimed);
+  if (allClaimed || frameCountDraw >= MAX_FRAMES) {
+    isFinished = true;
+    noLoop();
+  }
+}
+
+// ============================================
+// INTERACTION
+// ============================================
+function mousePressed() {
+  // Reset everything
+  frameCountDraw = 0;
+  isFinished = false;
+  initGrid();
+  buildMask();
+  spawnWalkers();
+  loop();
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  frameCountDraw = 0;
+  isFinished = false;
+  initGrid();
+  buildMask();
+  spawnWalkers();
+  loop();
+}
+
+// Force redraw every frame until finished
+function mouseMoved() {
+  if (!isFinished) {
+    redraw();
+  }
+}
+
+// Also redraw periodically if no mouse movement
+setInterval(() => {
+  if (!isFinished) {
+    redraw();
+  }
+}, 100);
+</script>
+</body>
+</html>

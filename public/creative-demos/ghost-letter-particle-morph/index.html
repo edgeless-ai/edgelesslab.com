@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghost Letter Particle Morph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Recursive:wght,CASL,CRSV,MONO,slnt,wght@300..1000&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d0d10;
+    color: #fff;
+    font-family: 'Recursive', monospace;
+    overflow-x: hidden;
+  }
+  .scroll-section {
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .scroll-marker {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.12);
+    pointer-events: none;
+  }
+  #particle-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 10;
+    pointer-events: none;
+  }
+  #progress {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    font-family: 'Recursive', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.2);
+    text-align: center;
+    pointer-events: none;
+    line-height: 1.6;
+  }
+  #progress-bar {
+    width: 200px;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+    margin: 8px auto 0;
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  #progress-fill {
+    height: 100%;
+    width: 0%;
+    background: rgba(255,255,255,0.3);
+    transition: width 0.1s;
+  }
+</style>
+</head>
+<body>
+
+<div class="scroll-section" id="sec-0"><div class="scroll-marker">begin</div></div>
+<div class="scroll-section" id="sec-1"><div class="scroll-marker">EMERGE</div></div>
+<div class="scroll-section" id="sec-2"><div class="scroll-marker">COALESCE</div></div>
+<div class="scroll-section" id="sec-3"><div class="scroll-marker">DISPERSE</div></div>
+<div class="scroll-section" id="sec-4"><div class="scroll-marker">RESOLVE</div></div>
+<div class="scroll-section" id="sec-5"><div class="scroll-marker">—</div></div>
+
+<canvas id="particle-canvas"></canvas>
+
+<div id="progress">
+  <span id="word-label">EMERGE</span>
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+</div>
+
+<script>
+// ─── Setup ───
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+const wordLabel = document.getElementById('word-label');
+const progressFill = document.getElementById('progress-fill');
+
+const WORDS = ['EMERGE', 'COALESCE', 'DISPERSE', 'RESOLVE'];
+const COLORS = [
+  [100, 160, 255],   // EMERGE: cool blue
+  [255, 200, 100],   // COALESCE: warm amber
+  [80, 220, 190],    // DISPERSE: cyan-green
+  [240, 240, 250]    // RESOLVE: pure white
+];
+const MODES = ['rise', 'spiral', 'orbit', 'snap'];
+const GLYPH_SIZE = 280;
+
+let W, H;
+function resize() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = W;
+  canvas.height = H;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ─── Particle System ───
+class Particle {
+  constructor(x, y) {
+    this.targetX = x;
+    this.targetY = y;
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = 0;
+    this.vy = 0;
+    this.size = 1.5 + Math.random() * 1.5;
+    this.alpha = 1;
+    this.targetAlpha = 1;
+    this.mode = 0;
+  }
+  update(targetX, targetY, mode, transition, dt) {
+    this.targetX = targetX;
+    this.targetY = targetY;
+    this.mode = mode;
+
+    // Determine behavior based on mode and transition progress
+    let tx = targetX, ty = targetY;
+    const cx = W / 2, cy = H / 2;
+
+    if (mode === 0) { // EMERGE - rise from bottom
+      const rise = 1 - transition;
+      ty = targetY + (H - targetY) * rise * 0.8;
+    } else if (mode === 1) { // COALESCE - spiral inward
+      const angle = Math.atan2(targetY - cy, targetX - cx);
+      const radius = Math.sqrt((targetX - cx)**2 + (targetY - cy)**2);
+      const spiralR = radius * (0.3 + 0.7 * transition);
+      tx = cx + spiralR * Math.cos(angle);
+      ty = cy + spiralR * Math.sin(angle);
+    } else if (mode === 2) { // DISPERSE - orbit then fling
+      const angle = Math.atan2(targetY - cy, targetX - cx) + transition * Math.PI * 4;
+      const radius = Math.sqrt((targetX - cx)**2 + (targetY - cy)**2);
+      const orbitR = radius * (0.5 + 2 * (1 - transition));
+      tx = cx + orbitR * Math.cos(angle);
+      ty = cy + orbitR * Math.sin(angle);
+    } else if (mode === 3) { // RESOLVE - snap
+      // Spring toward target
+      const springForce = 0.08 * transition;
+      this.vx += (targetX - this.x) * springForce;
+      this.vy += (targetY - this.y) * springForce;
+      this.vx *= 0.85;
+      this.vy *= 0.85;
+      this.x += this.vx;
+      this.y += this.vy;
+      return;
+    }
+
+    // Lerp toward behavior position
+    const lerpSpeed = 0.04 + 0.04 * transition;
+    this.x += (tx - this.x) * lerpSpeed;
+    this.y += (ty - this.y) * lerpSpeed;
+    this.x += (Math.random() - 0.5) * 0.5;
+    this.y += (Math.random() - 0.5) * 0.5;
+  }
+}
+
+// ─── Text Sampling ───
+function sampleText(word, fontSize) {
+  const offscreen = document.createElement('canvas');
+  offscreen.width = fontSize * word.length * 1.2;
+  offscreen.height = fontSize * 1.6;
+  const offCtx = offscreen.getContext('2d');
+  offCtx.fillStyle = '#fff';
+  offCtx.textAlign = 'center';
+  offCtx.textBaseline = 'middle';
+  offCtx.font = `${fontSize}px 'Recursive', monospace`;
+
+  // Set axis values per word for character
+  let wght = 500, wdth = 100, slnt = 0;
+  if (word === 'EMERGE') { wght = 300; wdth = 75; slnt = 0; }
+  else if (word === 'COALESCE') { wght = 700; wdth = 100; slnt = -10; }
+  else if (word === 'DISPERSE') { wght = 400; wdth = 125; slnt = 12; }
+  else if (word === 'RESOLVE') { wght = 900; wdth = 100; slnt = 0; }
+  offCtx.font = `${fontSize}px 'Recursive', monospace`;
+  offCtx.fontVariationSettings = `'wght' ${wght}, 'wdth' ${wdth}, 'slnt' ${slnt}`;
+
+  const cx = offscreen.width / 2;
+  const cy = offscreen.height / 2;
+  offCtx.fillText(word, cx, cy);
+
+  const imageData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height);
+  const step = 4;
+  const particles = [];
+
+  for (let y = 0; y < offscreen.height; y += step) {
+    for (let x = 0; x < offscreen.width; x += step) {
+      const idx = (y * offscreen.width + x) * 4;
+      const r = imageData.data[idx];
+      if (r > 128) {
+        // Scale to viewport
+        const scaleX = W / offscreen.width;
+        const scaleY = H / offscreen.height;
+        const minScale = Math.min(scaleX, scaleY) * 0.6;
+        const ox = (W - offscreen.width * minScale) / 2;
+        const oy = (H - offscreen.height * minScale) / 2;
+        particles.push({
+          px: x * minScale + ox,
+          py: y * minScale + oy
+        });
+      }
+    }
+  }
+  return particles;
+}
+
+// ─── Ghost punctuation particles ───
+const GHOST_CHARS = [',', '—', '…', '.', '·'];
+function spawnGhosts(count, cx, cy, radius) {
+  const ghosts = [];
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const r = radius * (0.3 + Math.random() * 0.7);
+    ghosts.push({
+      x: cx + r * Math.cos(angle),
+      y: cy + r * Math.sin(angle),
+      char: GHOST_CHARS[Math.floor(Math.random() * GHOST_CHARS.length)],
+      alpha: 0,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+  return ghosts;
+}
+
+// ─── Initialization ───
+let currentWord = 0;
+let transition = 0;
+let particles = [];
+let ghostParticles = [];
+let sampledPositions = [];
+
+async function initWords() {
+  for (let i = 0; i < WORDS.length; i++) {
+    const samples = sampleText(WORDS[i], GLYPH_SIZE);
+    sampledPositions[i] = samples;
+    if (i === 0) {
+      particles = samples.map(s => new Particle(s.px, s.py));
+    }
+  }
+}
+initWords();
+
+// ─── Scroll Tracking ───
+const sections = [];
+for (let i = 1; i <= 4; i++) {
+  sections.push(document.getElementById(`sec-${i}`));
+}
+
+function updateScroll() {
+  const scrollY = window.scrollY;
+  const windowH = window.innerHeight;
+  const totalScroll = windowH * 5; // 5 sections (sec-0 through sec-5)
+  const progress = Math.min(scrollY / totalScroll, 1);
+  progressFill.style.width = `${progress * 100}%`;
+
+  // Determine which word we're in
+  const sectionHeight = windowH;
+  for (let i = 0; i < WORDS.length; i++) {
+    const sectionStart = (i + 1) * sectionHeight;
+    const sectionEnd = (i + 2) * sectionHeight;
+    if (scrollY >= sectionStart - sectionHeight * 0.5 && scrollY < sectionEnd - sectionHeight * 0.5) {
+      if (currentWord !== i) {
+        currentWord = i;
+        wordLabel.textContent = WORDS[i];
+        // Spawn ghost particles during transition
+        ghostParticles = spawnGhosts(30, W/2, H/2, Math.min(W, H) * 0.3);
+      }
+      // Transition within word (0 = entering, 1 = fully visible)
+      const raw = (scrollY - (sectionStart - sectionHeight * 0.5)) / sectionHeight;
+      transition = Math.max(0, Math.min(1, raw));
+      break;
+    }
+  }
+}
+
+window.addEventListener('scroll', updateScroll);
+
+// ─── Update particle targets based on current word and transition ───
+function getInterpolatedPosition(wordIdx, particleIdx) {
+  const current = sampledPositions[wordIdx];
+  if (!current) return { x: W/2, y: H/2 };
+  if (particleIdx < current.length) return current[particleIdx];
+  return { x: W/2 + (Math.random() - 0.5) * 100, y: H/2 + (Math.random() - 0.5) * 100 };
+}
+
+// ─── Ghost Punctuation Drawing ───
+let ghostTimer = 0;
+
+function drawGhosts(time) {
+  ghostTimer++;
+  // Only show ghosts during transitions (0 < transition < 0.6)
+  if (transition > 0.6 || transition < 0.05) {
+    ghostParticles = [];
+    return;
+  }
+
+  if (ghostParticles.length === 0 && transition > 0.05 && transition < 0.6) {
+    ghostParticles = spawnGhosts(30, W/2, H/2, Math.min(W, H) * 0.3);
+  }
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '18px "Recursive", monospace';
+
+  for (const g of ghostParticles) {
+    g.alpha = 0.3 + 0.3 * Math.sin(g.phase + ghostTimer * 0.04);
+    g.y += Math.sin(g.phase + ghostTimer * 0.03) * 0.3;
+    ctx.globalAlpha = g.alpha * (1 - transition * 1.5) * 0.5;
+    ctx.fillStyle = `rgba(200, 200, 255, ${g.alpha * 0.3})`;
+    ctx.fillText(g.char, g.x, g.y);
+  }
+  ctx.globalAlpha = 1;
+}
+
+// ─── Render Loop ───
+function loop(time) {
+  ctx.clearRect(0, 0, W, H);
+
+  if (sampledPositions.length >= 4 && particles.length > 0) {
+    for (let i = 0; i < particles.length; i++) {
+      const target = getInterpolatedPosition(currentWord, i);
+      if (i < sampledPositions[currentWord]?.length) {
+        const t = sampledPositions[currentWord][i];
+        particles[i].update(t.px, t.py, currentWord, transition, 1/60);
+      } else {
+        particles[i].update(W/2 + (Math.random() - 0.5) * 100, H/2 + (Math.random() - 0.5) * 100, currentWord, transition, 1/60);
+      }
+
+      const p = particles[i];
+      const color = COLORS[currentWord];
+      const alpha = 0.5 + 0.5 * (transition < 0.2 ? transition * 5 : 1);
+
+      ctx.globalAlpha = alpha * 0.7;
+      ctx.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // Draw ghosts
+  drawGhosts(time);
+
+  // Draw cursor highlight
+  ctx.globalAlpha = 0.15;
+  const cx = W / 2, cy = H / 2;
+  const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W, H) * 0.4);
+  gradient.addColorStop(0, `rgba(${COLORS[currentWord].join(',')}, 0.1)`);
+  gradient.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, W, H);
+  ctx.globalAlpha = 1;
+
+  requestAnimationFrame(loop);
+}
+
+// Initial call
+updateScroll();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

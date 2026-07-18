@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typographic Coral Reef</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0D0D0D;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      cursor: crosshair;
+    }
+    canvas { display: block; }
+    #hud {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      color: #666666;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      pointer-events: none;
+      z-index: 10;
+      line-height: 1.6;
+      opacity: 0.8;
+      letter-spacing: 0.1em;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+</head>
+<body>
+  <div id="hud">
+    CLICK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;— PLANT SEED<br>
+    CLICK&nbsp;LETTER&nbsp;— PRUNE<br>
+    SCROLL&nbsp;&nbsp;&nbsp;&nbsp;— ZOOM
+  </div>
+  <script>
+    // ═══════════════════════════════════════════════════════════
+    //  TYPOGRAPHIC CORAL REEF
+    //  Letters as calcifying organisms in a differential growth network
+    //  FORN brutalist typography × Anders Hoff differential growth
+    // ═══════════════════════════════════════════════════════════
+
+    // ─── PALETTE ─── (Technique: Dark Void Rule)
+    const VOID  = [ 13,  13,  13]; // #0D0D0D
+    const BONE  = [242, 239, 233]; // #F2EFE9
+    const AMBER = [212, 160,  23]; // #D4A017
+    const SLATE = [ 28,  28,  28]; // #1C1C1C
+    const CORAL = [232, 115,  74]; // #E8734A
+    const INK   = [102, 102, 102]; // #666666
+
+    // ─── PHYSICS CONSTANTS ───
+    const SPRING_K       = 0.08;    // spring stiffness
+    const DAMPING        = 0.92;    // velocity damping per frame
+    const REPULSE_K      = 800;     // repulsion strength
+    const REPULSE_RADIUS = 60;      // repulsion cutoff distance
+    const SPLIT_THRESHOLD = 95;     // edge length that triggers splitting
+    const MIN_EDGE       = 15;      // minimum edge length (don't split below this)
+    const BASE_SPACING   = 70;      // FORN wide tracking — base rest length
+    const WIND_STRENGTH  = 0.12;    // random perturbation per frame
+
+    // ─── AGING / GLOW ─── (Technique: Exponential Glow #2)
+    const GLOW_TAU       = 55;      // exponential decay constant for tip glow
+    const CALCIFY_AGE    = 400;     // frames before calcification begins
+    const CALCIFY_RAMP   = 500;     // frames for full calcification transition
+    const BUD_AGE        = 350;     // age threshold for budding
+    const BUD_CHANCE     = 0.003;   // per-frame budding probability
+    const BUD_COUNT_MIN  = 2;
+    const BUD_COUNT_MAX  = 4;
+    const BUD_SPACING    = 55;
+    const PRUNE_FRAMES   = 45;      // frames for prune shrink/fade
+
+    // ─── RENDERING ───
+    const BASE_FONT_SIZE = 26;
+    const GLOW_LAYERS    = 4;
+    const GLOW_SPREAD    = 7;
+
+    // ─── SEED WORDS ───
+    const SEED_WORDS = [
+      "SUB MER GING",
+      "DEEP REEF",
+      "COR AL",
+      "TI DAL",
+      "GROW TH",
+      "CAL CI FY",
+      "A BYSS",
+      "BONE WHITE",
+      "REEF",
+      "TIDE"
+    ];
+
+    // ─── GLOBAL STATE ───
+    let colonies = [];
+    let cameraX = 0, cameraY = 0, cameraZoom = 1, targetZoom = 1;
+    let nextId = 0;
+    let voidCol, boneCol, amberCol, coralCol, inkCol, slateCol;
+
+    // ─── LETTER NODE ───
+    class LetterNode {
+      constructor(ch, x, y) {
+        this.id   = nextId++;
+        this.char = ch;
+        this.pos  = createVector(x, y);
+        this.vel  = createVector(0, 0);
+        this.force = createVector(0, 0);
+        this.age  = 0;
+        this.neighbors = [];
+        this.pruned = false;
+        this.pruneTimer = 0;
+      }
+
+      addNeighbor(node) {
+        // Null Guard (#12): don't add null/self/duplicate neighbors
+        if (!node || node === this) return;
+        if (!this.neighbors.includes(node)) {
+          this.neighbors.push(node);
+        }
+        if (!node.neighbors.includes(this)) {
+          node.neighbors.push(this);
+        }
+      }
+
+      removeNeighbor(node) {
+        if (!node) return;
+        let i = this.neighbors.indexOf(node);
+        if (i !== -1) this.neighbors.splice(i, 1);
+        let j = node.neighbors.indexOf(this);
+        if (j !== -1) node.neighbors.splice(j, 1);
+      }
+    }
+
+    // ─── COLONY ───
+    class Colony {
+      constructor(word, x, y) {
+        this.id = nextId++;
+        this.seedWord = word;
+        this.nodes = [];
+
+        // Strip spaces for node creation; track positions with gap offsets
+        let chars = [];
+        let gapFlags = [];
+        for (let ch of word) {
+          if (ch === ' ') {
+            gapFlags.push(true);
+          } else {
+            chars.push(ch);
+            gapFlags.push(false);
+          }
+        }
+
+        // Create chain with FORN extreme spacing
+        let cx = x;
+        let gapMultiplier = 2.5; // extra gap for spaces
+        let spaceSeen = 0;
+        for (let i = 0; i < word.length; i++) {
+          let ch = word[i];
+          if (ch === ' ') {
+            cx += BASE_SPACING * gapMultiplier;
+            spaceSeen++;
+            continue;
+          }
+          // Slight vertical jitter for organic initial placement
+          let jy = y + random(-8, 8);
+          let node = new LetterNode(ch, cx, jy);
+          this.nodes.push(node);
+          cx += BASE_SPACING + random(-5, 5);
+        }
+
+        // Connect chain: each node to next
+        for (let i = 0; i < this.nodes.length - 1; i++) {
+          this.nodes[i].addNeighbor(this.nodes[i + 1]);
+        }
+      }
+
+      // ─── FULL UPDATE CYCLE ───
+      grow() {
+        this.computeForces();
+        this.updatePositions();
+        this.splitEdges();
+        this.budBranches();
+        this.updateAges();
+        this.removePrunedNodes();
+      }
+
+      // ─── FORCE COMPUTATION ───
+      computeForces() {
+        let nodes = this.nodes;
+
+        // Reset forces
+        for (let n of nodes) {
+          n.force.set(0, 0);
+        }
+
+        // Edge spring forces (attraction)
+        let processed = new Set();
+        for (let n of nodes) {
+          for (let nb of n.neighbors) {
+            let edgeKey = Math.min(n.id, nb.id) + '_' + Math.max(n.id, nb.id);
+            if (processed.has(edgeKey)) continue;
+            processed.add(edgeKey);
+
+            // Null Guard (#12)
+            if (!nb || !nb.pos) continue;
+
+            let dir = p5.Vector.sub(nb.pos, n.pos);
+            let d = dir.mag();
+            if (d < 0.001) continue; // degenerate edge
+
+            let restLen = this.edgeRestLength(n, nb);
+            let displacement = d - restLen;
+            dir.normalize();
+            dir.mult(SPRING_K * displacement);
+
+            n.force.add(dir);
+            nb.force.sub(dir);
+          }
+        }
+
+        // Node repulsion (overlap prevention)
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            let a = nodes[i];
+            let b = nodes[j];
+            if (a.pruned || b.pruned) continue;
+            let dx = a.pos.x - b.pos.x;
+            let dy = a.pos.y - b.pos.y;
+            let dSq = dx * dx + dy * dy;
+            let d = Math.sqrt(dSq);
+            if (d < 0.001) {
+              // Jitter apart
+              a.pos.x += random(-1, 1);
+              a.pos.y += random(-1, 1);
+              continue;
+            }
+            if (d < REPULSE_RADIUS) {
+              let force = REPULSE_K / (dSq + 1);
+              let fx = (dx / d) * force;
+              let fy = (dy / d) * force;
+              a.force.x += fx;
+              a.force.y += fy;
+              b.force.x -= fx;
+              b.force.y -= fy;
+            }
+          }
+        }
+
+        // Wind / random perturbation
+        for (let n of nodes) {
+          if (n.pruned) continue;
+          n.force.x += random(-WIND_STRENGTH, WIND_STRENGTH);
+          n.force.y += random(-WIND_STRENGTH, WIND_STRENGTH);
+        }
+      }
+
+      edgeRestLength(a, b) {
+        // Kerning-aware: vary based on character pair hash
+        if (!a || !b) return BASE_SPACING;
+        let hash = (a.char.charCodeAt(0) * 31 + b.char.charCodeAt(0)) % 73;
+        return BASE_SPACING * (0.75 + hash / 146);
+      }
+
+      // ─── UPDATE POSITIONS ───
+      updatePositions() {
+        for (let n of this.nodes) {
+          if (n.pruned) continue;
+          n.vel.add(n.force);
+          n.vel.mult(DAMPING);
+          n.pos.add(n.vel);
+        }
+      }
+
+      // ─── EDGE SPLITTING ───
+      splitEdges() {
+        // Collect splits, then execute (avoid mutation during iteration)
+        let splits = [];
+        let processed = new Set();
+        for (let n of this.nodes) {
+          if (n.pruned) continue;
+          for (let nb of n.neighbors) {
+            if (!nb || nb.pruned) continue;
+            let edgeKey = Math.min(n.id, nb.id) + '_' + Math.max(n.id, nb.id);
+            if (processed.has(edgeKey)) continue;
+            processed.add(edgeKey);
+
+            let d = p5.Vector.dist(n.pos, nb.pos);
+            // Null Guard (#12): don't split if too close
+            if (d > SPLIT_THRESHOLD && d > MIN_EDGE) {
+              splits.push({ a: n, b: nb });
+            }
+          }
+        }
+
+        // Execute splits (limit per frame to avoid explosion)
+        let maxSplits = Math.min(splits.length, 3);
+        for (let i = 0; i < maxSplits; i++) {
+          this.executeSplit(splits[i].a, splits[i].b);
+        }
+      }
+
+      executeSplit(a, b) {
+        // Create new node at midpoint with slight offset
+        let mx = (a.pos.x + b.pos.x) / 2 + random(-8, 8);
+        let my = (a.pos.y + b.pos.y) / 2 + random(-8, 8);
+        let newChar = randomChar();
+        let newNode = new LetterNode(newChar, mx, my);
+
+        // Remove old edge
+        a.removeNeighbor(b);
+
+        // Wire new node
+        a.addNeighbor(newNode);
+        newNode.addNeighbor(b);
+
+        // Inherit some velocity for smooth insertion
+        newNode.vel.set(
+          (a.vel.x + b.vel.x) / 2,
+          (a.vel.y + b.vel.y) / 2
+        );
+
+        this.nodes.push(newNode);
+      }
+
+      // ─── BUDDING ───
+      budBranches() {
+        let totalNodes = 0;
+        for (let c of colonies) totalNodes += c.nodes.length;
+        if (totalNodes > 300) return; // global cap
+
+        for (let n of this.nodes) {
+          if (n.pruned) continue;
+          if (n.age < BUD_AGE) continue;
+          // Probability scales with age
+          let prob = BUD_CHANCE * (1 + (n.age - BUD_AGE) / 300);
+          if (random() > prob) continue;
+
+          let budDir = this.getBudDirection(n);
+          if (!budDir) continue;
+
+          let count = Math.floor(random(BUD_COUNT_MIN, BUD_COUNT_MAX + 1));
+          let prev = n;
+          for (let i = 0; i < count; i++) {
+            let bx = prev.pos.x + budDir.x * BUD_SPACING;
+            let by = prev.pos.y + budDir.y * BUD_SPACING;
+            let ch = randomChar();
+            let bud = new LetterNode(ch, bx, by);
+            prev.addNeighbor(bud);
+            this.nodes.push(bud);
+            prev = bud;
+            // Slight direction drift
+            budDir.rotate(random(-0.4, 0.4));
+          }
+        }
+      }
+
+      getBudDirection(node) {
+        // Average direction away from neighbors, with randomness
+        if (node.neighbors.length === 0) {
+          return p5.Vector.random2D();
+        }
+        let avg = createVector(0, 0);
+        for (let nb of node.neighbors) {
+          if (!nb) continue;
+          let d = p5.Vector.sub(node.pos, nb.pos); // away from neighbor
+          avg.add(d);
+        }
+        let mag = avg.mag();
+        if (mag < 0.001) return p5.Vector.random2D();
+        avg.div(mag); // normalize
+        avg.rotate(random(-0.7, 0.7));
+        return avg;
+      }
+
+      // ─── AGING ───
+      updateAges() {
+        for (let n of this.nodes) {
+          if (!n.pruned) {
+            n.age++;
+          } else {
+            n.pruneTimer++;
+          }
+        }
+      }
+
+      // ─── PRUNE NODE ─── (Technique: Pruning #6)
+      pruneNode(node) {
+        if (!node || node.pruned) return;
+        node.pruned = true;
+        node.pruneTimer = 0;
+      }
+
+      removePrunedNodes() {
+        for (let i = this.nodes.length - 1; i >= 0; i--) {
+          let node = this.nodes[i];
+          if (node.pruned && node.pruneTimer >= PRUNE_FRAMES) {
+            // Reconnect neighbors before removal
+            let nbrs = [...node.neighbors];
+            for (let j = 0; j < nbrs.length; j++) {
+              for (let k = j + 1; k < nbrs.length; k++) {
+                nbrs[j].addNeighbor(nbrs[k]);
+              }
+              nbrs[j].removeNeighbor(node);
+            }
+            this.nodes.splice(i, 1);
+          }
+        }
+      }
+
+      // ─── DRAW ───
+      draw() {
+        // Drawing State Reset (#9): each draw is self-contained
+        push();
+        textAlign(CENTER, CENTER);
+        textFont('Space Mono');
+
+        // Draw edges
+        stroke(slateCol);
+        strokeWeight(1.5);
+        let drawnEdges = new Set();
+        for (let n of this.nodes) {
+          for (let nb of n.neighbors) {
+            let key = Math.min(n.id, nb.id) + '_' + Math.max(n.id, nb.id);
+            if (drawnEdges.has(key)) continue;
+            drawnEdges.add(key);
+            line(n.pos.x, n.pos.y, nb.pos.x, nb.pos.y);
+          }
+        }
+
+        // Draw nodes (back to front by age so new glow nodes pop)
+        noStroke();
+        for (let n of this.nodes) {
+          this.drawNode(n);
+        }
+        pop();
+      }
+
+      drawNode(node) {
+        push();
+        textAlign(CENTER, CENTER);
+
+        // Determine color
+        let col = this.getNodeColor(node);
+
+        // Exponential Glow (#2) for young growth-tip nodes
+        let glowIntensity = 0;
+        if (!node.pruned) {
+          glowIntensity = Math.exp(-node.age / GLOW_TAU);
+        }
+
+        if (glowIntensity > 0.005) {
+          // Draw glow layers behind the letter
+          noStroke();
+          for (let i = GLOW_LAYERS; i >= 1; i--) {
+            let t = i / GLOW_LAYERS;
+            let alpha = glowIntensity * (1 - t) * 0.55;
+            fill(AMBER[0], AMBER[1], AMBER[2], alpha * 255);
+            textSize(BASE_FONT_SIZE + i * GLOW_SPREAD * glowIntensity);
+            text(node.char, node.pos.x, node.pos.y);
+          }
+        }
+
+        // Main letter
+        if (node.pruned) {
+          let t = node.pruneTimer / PRUNE_FRAMES;
+          let eased = t * t;
+          let shrink = Math.max(1 - eased, 0.05);
+          textSize(BASE_FONT_SIZE * shrink);
+          let fadeCol = lerpColor(coralCol, voidCol, eased);
+          fill(fadeCol);
+        } else {
+          textSize(BASE_FONT_SIZE);
+          fill(col);
+        }
+
+        text(node.char, node.pos.x, node.pos.y);
+        pop();
+      }
+
+      getNodeColor(node) {
+        if (node.pruned) {
+          let t = Math.min(node.pruneTimer / PRUNE_FRAMES, 1);
+          return lerpColor(coralCol, voidCol, t * t);
+        }
+
+        let age = node.age;
+        let glowDecay = Math.exp(-age / GLOW_TAU);
+
+        if (glowDecay > 0.01) {
+          // Growth tip: blend amber → coral
+          let t = 1 - glowDecay;
+          return lerpColor(amberCol, coralCol, t);
+        }
+
+        // Middle age: coral
+        if (age < CALCIFY_AGE) {
+          return coralCol;
+        }
+
+        // Calcification: coral → bone white
+        let t = Math.min((age - CALCIFY_AGE) / CALCIFY_RAMP, 1);
+        // Ease with slight curve
+        let eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        return lerpColor(coralCol, boneCol, eased);
+      }
+    }
+
+    // ─── UTILITY ───
+    function randomChar() {
+      let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      // Weight toward common letters for organic word-like feel
+      let weighted = 'AAAAABBCCCDDDEEEEEEFFGGHHHIIIIIJKLLLMMMNNNOOOPPQRRRSSSSTTTTUUUVWWXYYZ';
+      return weighted[Math.floor(random(weighted.length))];
+    }
+
+    function getRandomSeedWord() {
+      return SEED_WORDS[Math.floor(random(SEED_WORDS.length))];
+    }
+
+    function screenToWorld(sx, sy) {
+      return {
+        x: (sx - width / 2) / cameraZoom + cameraX,
+        y: (sy - height / 2) / cameraZoom + cameraY
+      };
+    }
+
+    // ─── P5 LIFECYCLE ───
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      textFont('Space Mono');
+
+      // Initialize colors (must be in setup since color() is p5)
+      voidCol  = color(VOID[0],  VOID[1],  VOID[2]);
+      boneCol  = color(BONE[0],  BONE[1],  BONE[2]);
+      amberCol = color(AMBER[0], AMBER[1], AMBER[2]);
+      coralCol = color(CORAL[0], CORAL[1], CORAL[2]);
+      inkCol   = color(INK[0],   INK[1],   INK[2]);
+      slateCol = color(SLATE[0], SLATE[1], SLATE[2]);
+
+      // Plant initial seed colony
+      let seed = new Colony("SUB MER GING", width / 2, height / 2);
+      colonies.push(seed);
+
+      // Center camera on the seed
+      cameraX = width / 2;
+      cameraY = height / 2;
+      cameraZoom = 1;
+      targetZoom = 1;
+    }
+
+    function draw() {
+      // Dark Void Rule: background must be #0D0D0D
+      background(VOID[0], VOID[1], VOID[2]);
+
+      // Smooth camera zoom
+      cameraZoom = lerp(cameraZoom, targetZoom, 0.15);
+
+      // Apply camera transform
+      push();
+      translate(width / 2, height / 2);
+      scale(cameraZoom);
+      translate(-cameraX, -cameraY);
+
+      // Update and draw all colonies
+      for (let i = colonies.length - 1; i >= 0; i--) {
+        let col = colonies[i];
+        col.grow();
+        col.draw();
+
+        // Remove empty colonies
+        if (col.nodes.length === 0) {
+          colonies.splice(i, 1);
+        }
+      }
+
+      pop();
+
+      // ─── HUD Overlay ─── (Drawing State Reset #9: pop above resets)
+      push();
+      textAlign(LEFT, TOP);
+      textFont('Space Mono');
+      textSize(11);
+      fill(INK[0], INK[1], INK[2], 180);
+      noStroke();
+
+      let totalNodes = 0;
+      for (let c of colonies) totalNodes += c.nodes.length;
+      let txt = 'COLONIES ' + colonies.length + '  ·  NODES ' + totalNodes + '  ·  ZOOM ' + nf(cameraZoom, 0, 2);
+      text(txt, 20, height - 36);
+      pop();
+    }
+
+    function mousePressed() {
+      let world = screenToWorld(mouseX, mouseY);
+
+      // Check for pruning: click on existing letter
+      for (let col of colonies) {
+        for (let n of col.nodes) {
+          if (n.pruned) continue;
+          let d = dist(world.x, world.y, n.pos.x, n.pos.y);
+          if (d < BASE_FONT_SIZE * 0.8) {
+            col.pruneNode(n);
+            return false;
+          }
+        }
+      }
+
+      // Plant new seed colony at click location
+      let word = getRandomSeedWord();
+      let seed = new Colony(word, world.x, world.y);
+      colonies.push(seed);
+      return false;
+    }
+
+    function mouseWheel(event) {
+      let world = screenToWorld(mouseX, mouseY);
+
+      let zoomDelta = event.delta > 0 ? -0.12 : 0.12;
+      let newZoom = constrain(cameraZoom * (1 + zoomDelta), 0.15, 4.5);
+
+      // Adjust camera so world point under mouse stays fixed
+      cameraX = world.x - (mouseX - width / 2) / newZoom;
+      cameraY = world.y - (mouseY - height / 2) / newZoom;
+      targetZoom = newZoom;
+
+      return false;
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+    }
+  </script>
+</body>
+</html>

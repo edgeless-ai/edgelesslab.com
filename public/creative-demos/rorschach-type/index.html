@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rorschach Type — Pose-Reactive Split Variable Font</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght,wdth,slnt@8..144,100..900,25..151,-10..0&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.21.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.3/dist/pose-detection.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #8B5E3C;
+      color: #F5F1E8;
+      font-family: 'Roboto Flex', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .word-container {
+      display: flex;
+      position: relative;
+      font-size: clamp(48px, 15vw, 220px);
+      line-height: 1;
+      letter-spacing: 0;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: nowrap;
+      z-index: 2;
+    }
+
+    .letter-container {
+      display: inline-block;
+      position: relative;
+      font-variation-settings: 'opsz' 72;
+    }
+
+    .letter-base {
+      visibility: hidden;
+      font-variation-settings: 'opsz' 72, 'wght' 400, 'wdth' 100;
+    }
+
+    .letter-half {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      font-variation-settings: 'opsz' 72, 'wght' 400, 'wdth' 100;
+    }
+
+    .left-half {
+      clip-path: inset(0 50% 0 0);
+      color: #F5F1E8;
+      text-shadow: -4px 0 24px rgba(212, 160, 74, 0.55);
+    }
+
+    .right-half {
+      clip-path: inset(0 0 0 50%);
+      color: #F5F1E8;
+      text-shadow: 4px 0 24px rgba(57, 255, 20, 0.55);
+    }
+
+    .mirror-line {
+      position: absolute;
+      left: 50%;
+      top: -15%;
+      bottom: -15%;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(201, 169, 97, 0.4), transparent);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .instruction {
+      position: fixed;
+      bottom: 44px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      font-weight: 400;
+      color: #C9A961;
+      text-align: center;
+      opacity: 0.85;
+      pointer-events: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      z-index: 10;
+      white-space: nowrap;
+    }
+
+    .status {
+      position: fixed;
+      top: 22px;
+      right: 24px;
+      font-size: 11px;
+      color: #C9A961;
+      opacity: 0.6;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      z-index: 10;
+    }
+
+    .loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #C9A961;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .video-hidden {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading" id="loading">Loading fonts...</div>
+
+  <div class="word-container" id="word">
+    <div class="mirror-line"></div>
+  </div>
+
+  <div class="instruction" id="instruction">
+    Allow camera access to interact. Move arms to split the type.
+  </div>
+
+  <div class="status" id="status">Initializing</div>
+
+  <video class="video-hidden" id="video" playsinline autoplay muted></video>
+
+  <script>
+    (async function() {
+      const WORD = 'MIRROR';
+      const wordContainer = document.getElementById('word');
+      const statusEl = document.getElementById('status');
+      const instructionEl = document.getElementById('instruction');
+      const loadingEl = document.getElementById('loading');
+
+      // Build letter elements
+      for (const char of WORD) {
+        const container = document.createElement('div');
+        container.className = 'letter-container';
+        container.innerHTML = `
+          <span class="letter-base">${char}</span>
+          <span class="letter-half left-half">${char}</span>
+          <span class="letter-half right-half">${char}</span>
+        `;
+        wordContainer.appendChild(container);
+      }
+
+      const leftHalves = document.querySelectorAll('.left-half');
+      const rightHalves = document.querySelectorAll('.right-half');
+      const letterBases = document.querySelectorAll('.letter-base');
+
+      let useMouse = false;
+      let mouseX = 0.5;
+      let mouseY = 0.5;
+      let isDetecting = false;
+      let mouseLoopId = null;
+
+      document.addEventListener('mousemove', (e) => {
+        if (useMouse) {
+          mouseX = e.clientX / window.innerWidth;
+          mouseY = e.clientY / window.innerHeight;
+        }
+      });
+
+      document.addEventListener('touchmove', (e) => {
+        if (useMouse && e.touches.length > 0) {
+          mouseX = e.touches[0].clientX / window.innerWidth;
+          mouseY = e.touches[0].clientY / window.innerHeight;
+        }
+      }, { passive: true });
+
+      function lerp(a, b, t) {
+        return a + (b - a) * t;
+      }
+
+      function clamp(val, min, max) {
+        return Math.max(min, Math.min(max, val));
+      }
+
+      function mapRange(val, inMin, inMax, outMin, outMax) {
+        return outMin + (clamp(val, inMin, inMax) - inMin) * (outMax - outMin) / (inMax - inMin);
+      }
+
+      function deviationFromUp(angle) {
+        let diff = Math.abs(angle + Math.PI / 2);
+        if (diff > Math.PI) diff = 2 * Math.PI - diff;
+        return Math.min(diff, Math.PI / 2);
+      }
+
+      let leftWght = 400;
+      let leftWdth = 100;
+      let rightWght = 400;
+      let rightWdth = 100;
+
+      function updateFromMouse() {
+        const tLWght = mapRange(mouseX, 0, 1, 100, 900);
+        const tLWdth = mapRange(mouseX, 0, 1, 25, 151);
+        const tRWght = mapRange(mouseY, 0, 1, 100, 900);
+        const tRWdth = mapRange(mouseY, 0, 1, 25, 151);
+
+        leftWght = lerp(leftWght, tLWght, 0.15);
+        leftWdth = lerp(leftWdth, tLWdth, 0.15);
+        rightWght = lerp(rightWght, tRWght, 0.15);
+        rightWdth = lerp(rightWdth, tRWdth, 0.15);
+
+        applyFontSettings();
+      }
+
+      function applyFontSettings() {
+        const lW = Math.round(leftWght);
+        const lD = Math.round(leftWdth);
+        const rW = Math.round(rightWght);
+        const rD = Math.round(rightWdth);
+        const bW = Math.round(Math.max(lW, rW));
+        const bD = Math.round(Math.max(lD, rD));
+
+        const leftSettings = `'opsz' 72, 'wght' ${lW}, 'wdth' ${lD}`;
+        const rightSettings = `'opsz' 72, 'wght' ${rW}, 'wdth' ${rD}`;
+        const baseSettings = `'opsz' 72, 'wght' ${bW}, 'wdth' ${bD}`;
+
+        for (const el of leftHalves) el.style.fontVariationSettings = leftSettings;
+        for (const el of rightHalves) el.style.fontVariationSettings = rightSettings;
+        for (const el of letterBases) el.style.fontVariationSettings = baseSettings;
+      }
+
+      function runMouseLoop() {
+        function loop() {
+          updateFromMouse();
+          mouseLoopId = requestAnimationFrame(loop);
+        }
+        loop();
+      }
+
+      let detector = null;
+      let video = null;
+
+      async function initPoseDetection() {
+        if (typeof tf === 'undefined' || typeof poseDetection === 'undefined') {
+          statusEl.textContent = 'Mouse fallback';
+          useMouse = true;
+          instructionEl.textContent = 'Move mouse to split the type.';
+          runMouseLoop();
+          return;
+        }
+
+        try {
+          video = document.getElementById('video');
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: 640, height: 480, facingMode: 'user' }
+          });
+          video.srcObject = stream;
+
+          await new Promise((resolve, reject) => {
+            video.onloadedmetadata = () => {
+              video.play().then(resolve).catch(reject);
+            };
+            video.onerror = reject;
+            setTimeout(() => reject(new Error('Video timeout')), 10000);
+          });
+
+          detector = await poseDetection.createDetector(
+            poseDetection.SupportedModels.MoveNet,
+            {
+              modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+              minPoseScore: 0.3
+            }
+          );
+
+          statusEl.textContent = 'Camera active';
+          useMouse = false;
+
+          async function loop() {
+            if (!isDetecting && detector && video) {
+              isDetecting = true;
+              try {
+                const poses = await detector.estimatePoses(video);
+                if (poses && poses.length > 0) {
+                  processPose(poses[0].keypoints);
+                }
+              } catch (e) {
+                // frame errors are fine
+              }
+              isDetecting = false;
+            }
+            requestAnimationFrame(loop);
+          }
+          loop();
+        } catch (err) {
+          console.warn('Camera init failed:', err);
+          statusEl.textContent = 'Mouse fallback';
+          useMouse = true;
+          instructionEl.textContent = 'Move mouse to split the type.';
+          runMouseLoop();
+        }
+      }
+
+      function processPose(keypoints) {
+        const kp = {};
+        for (const k of keypoints) {
+          if (k.score > 0.3) kp[k.name] = k;
+        }
+
+        const vw = video.videoWidth || 640;
+        const vh = video.videoHeight || 480;
+
+        // Left arm controls left half
+        if (kp.left_wrist && kp.left_shoulder && kp.left_elbow) {
+          const wristY = kp.left_wrist.y / vh;
+          const targetLWght = mapRange(1 - wristY, 0, 1, 100, 900);
+
+          const dx = kp.left_elbow.x - kp.left_shoulder.x;
+          const dy = kp.left_elbow.y - kp.left_shoulder.y;
+          const angle = Math.atan2(dy, dx);
+          const dev = deviationFromUp(angle);
+          const targetLWdth = mapRange(dev, 0, Math.PI / 2, 25, 151);
+
+          leftWght = lerp(leftWght, targetLWght, 0.2);
+          leftWdth = lerp(leftWdth, targetLWdth, 0.2);
+        }
+
+        // Right arm controls right half
+        if (kp.right_wrist && kp.right_shoulder && kp.right_elbow) {
+          const wristY = kp.right_wrist.y / vh;
+          const targetRWght = mapRange(1 - wristY, 0, 1, 100, 900);
+
+          const dx = kp.right_elbow.x - kp.right_shoulder.x;
+          const dy = kp.right_elbow.y - kp.right_shoulder.y;
+          const angle = Math.atan2(dy, dx);
+          const dev = deviationFromUp(angle);
+          const targetRWdth = mapRange(dev, 0, Math.PI / 2, 25, 151);
+
+          rightWght = lerp(rightWght, targetRWght, 0.2);
+          rightWdth = lerp(rightWdth, targetRWdth, 0.2);
+        }
+
+        applyFontSettings();
+      }
+
+      // Start after fonts are ready
+      try {
+        await document.fonts.ready;
+      } catch (e) {
+        // continue even if fonts fail
+      }
+      loadingEl.style.display = 'none';
+      initPoseDetection();
+    })();
+  </script>
+</body>
+</html>

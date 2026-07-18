@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glyph Skeleton Cursor — Glass Glyph Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0A0A0A;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    cursor: crosshair;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  canvas { display: block; }
+  #overlay {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 30px; align-items: center;
+    color: rgba(255,255,255,0.7); font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+    pointer-events: none; z-index: 10;
+  }
+  .stat { display: flex; align-items: center; gap: 8px; }
+  .stat-label { opacity: 0.5; }
+  .stat-value { font-weight: bold; font-size: 13px; }
+  #color-swatch {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.25);
+    transition: background-color 0.15s ease;
+  }
+  #title {
+    position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
+    color: rgba(255,255,255,0.45); font-size: 10px;
+    letter-spacing: 3px; text-transform: uppercase;
+    pointer-events: none; z-index: 10;
+  }
+  #error {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    color: #FF0B00; font-size: 14px; text-align: center;
+    display: none; z-index: 100;
+  }
+</style>
+</head>
+<body>
+<div id="title">Skeletal Proximity Glass Glyph</div>
+<div id="overlay">
+  <div class="stat"><span class="stat-label">Weight</span><span class="stat-value" id="wv">400</span></div>
+  <div id="color-swatch" style="background:#5C92FF"></div>
+  <div class="stat"><span class="stat-label">IOR</span><span class="stat-value" id="iv">1.250</span></div>
+  <div class="stat"><span class="stat-label">Fresnel</span><span class="stat-value" id="fv">4.0</span></div>
+</div>
+<div id="error"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+(function() {
+'use strict';
+
+// =============================================================================
+// CONSTANTS — Exat thermal palette
+// =============================================================================
+const PALETTE = {
+  bg:      '#0A0A0A',
+  w200hex: '#0000cb', w200: [0.000, 0.000, 0.796],
+  w300hex: '#2546FF', w300: [0.145, 0.275, 1.000],
+  w400hex: '#5C92FF', w400: [0.361, 0.573, 1.000],
+  w500hex: '#FFCE2E', w500: [1.000, 0.808, 0.180],
+  w700hex: '#FFAE00', w700: [1.000, 0.682, 0.000],
+  w800hex: '#FF6200', w800: [1.000, 0.384, 0.000],
+  w900hex: '#FF0B00', w900: [1.000, 0.043, 0.000],
+};
+
+const RING_RADIUS = 3.5;
+const SKELETON_WEIGHT = 0.4;
+const EUCLIDEAN_WEIGHT = 0.6;
+const MORPH_DISPLACEMENT = 0.08;
+const SKELETON_SAMPLES = 200;
+
+// =============================================================================
+// DOM REFS
+// =============================================================================
+const elWeight = document.getElementById('wv');
+const elIOR    = document.getElementById('iv');
+const elFresnel= document.getElementById('fv');
+const elSwatch = document.getElementById('color-swatch');
+const elError  = document.getElementById('error');
+
+// =============================================================================
+// UTILITY
+// =============================================================================
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function lerp(a, b, t) { return a + (b - a) * t; }
+function mapRange(v, ilo, ihi, olo, ohi) {
+  return lerp(olo, ohi, clamp((v - ilo) / (ihi - ilo), 0, 1));
+}
+
+// Weight (200-900) → hex color string
+function weightToHex(w) {
+  if (w >= 850) return PALETTE.w900hex;
+  if (w >= 750) return PALETTE.w800hex;
+  if (w >= 600) return PALETTE.w700hex;
+  if (w >= 450) return PALETTE.w500hex;
+  if (w >= 350) return PALETTE.w400hex;
+  if (w >= 250) return PALETTE.w300hex;
+  return PALETTE.w200hex;
+}
+
+// =============================================================================
+// GLOW TEXTURE for starfield
+// =============================================================================
+function createGlowTexture() {
+  const size = 128;
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  const half = size / 2;
+  const g = ctx.createRadialGradient(half, half, 0, half, half, half);
+  g.addColorStop(0,    'rgba(255,255,255,1)');
+  g.addColorStop(0.04, 'rgba(255,255,255,0.9)');
+  g.addColorStop(0.15, 'rgba(200,215,255,0.5)');
+  g.addColorStop(0.4,  'rgba(120,150,220,0.12)');
+  g.addColorStop(0.7,  'rgba(40,60,120,0.02)');
+  g.addColorStop(1,    'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, size, size);
+  const tex = new THREE.CanvasTexture(c);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+// =============================================================================
+// GLYPH SHAPE — Letter 'A' via THREE.Shape
+// =============================================================================
+function createGlyphShape() {
+  const s = new THREE.Shape();
+  // Outer contour: clockwise (positive area)
+  s.moveTo(-1.05, -1.35);
+  s.lineTo(0, 1.85);
+  s.lineTo(1.05, -1.35);
+  // Crossbar bottom edge, right to left
+  s.lineTo(0.48, -0.28);
+  s.lineTo(-0.48, -0.28);
+  s.closePath();
+
+  // Counter hole: counter-clockwise (negative area = hole)
+  const hole = new THREE.Path();
+  hole.moveTo(0, 0.65);
+  hole.lineTo(-0.44, -0.28);
+  hole.lineTo(0.44, -0.28);
+  hole.closePath();
+  s.holes.push(hole);
+  return s;
+}
+
+// =============================================================================
+// GLYPH SKELETON — Medial axis approximation
+// =============================================================================
+class GlyphSkeleton {
+  constructor() {
+    this.nodes = [];
+    this.edges = [];
+    this.pathDistMatrix = null;
+
+    // Three strokes forming the 'A' medial axis
+    const leftLeg   = this._sampleLine(-0.85, -1.2, 0, 1.7, 75);
+    const rightLeg  = this._sampleLine(0, 1.7, 0.85, -1.2, 75);
+    const crossbar  = this._sampleLine(-0.38, -0.2, 0.38, -0.2, 50);
+
+    const L0 = 0,                      L1 = leftLeg.length - 1;       // 0..74
+    const R0 = leftLeg.length,         R1 = R0 + rightLeg.length - 1; // 75..149
+    const C0 = R0 + rightLeg.length,   C1 = C0 + crossbar.length - 1; // 150..199
+
+    this.nodes = [...leftLeg, ...rightLeg, ...crossbar];
+
+    // Chain edges within each stroke
+    for (let i = L0; i < L1; i++) this.edges.push([i, i + 1]);
+    for (let i = R0; i < R1; i++) this.edges.push([i, i + 1]);
+    for (let i = C0; i < C1; i++) this.edges.push([i, i + 1]);
+
+    // Connect crossbar to nearest points on legs
+    const cxL = C0, cxR = C1;
+    this.edges.push([cxL, this._nearestInRange(cxL, L0, L1)]);
+    this.edges.push([cxR, this._nearestInRange(cxR, R0, R1)]);
+
+    // All-pairs shortest paths (Floyd-Warshall)
+    this._computePathMatrix();
+  }
+
+  _sampleLine(x1, y1, x2, y2, n) {
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1);
+      pts.push({ x: x1 + (x2 - x1) * t, y: y1 + (y2 - y1) * t, z: 0 });
+    }
+    return pts;
+  }
+
+  _dist(a, b) {
+    const dx = a.x - b.x, dy = a.y - b.y, dz = (a.z||0) - (b.z||0);
+    return Math.sqrt(dx*dx + dy*dy + dz*dz);
+  }
+
+  _nearestInRange(srcIdx, lo, hi) {
+    let best = lo, minD = Infinity;
+    for (let i = lo; i <= hi; i++) {
+      const d = this._dist(this.nodes[srcIdx], this.nodes[i]);
+      if (d < minD) { minD = d; best = i; }
+    }
+    return best;
+  }
+
+  _computePathMatrix() {
+    const n = this.nodes.length;
+    const INF = 1e10;
+    const d = new Float32Array(n * n);
+    for (let i = 0; i < n * n; i++) d[i] = INF;
+    for (let i = 0; i < n; i++) d[i * n + i] = 0;
+
+    for (const [a, b] of this.edges) {
+      const w = this._dist(this.nodes[a], this.nodes[b]);
+      d[a * n + b] = w;
+      d[b * n + a] = w;
+    }
+
+    // Floyd-Warshall: 200³ = 8M ops, < 50ms
+    for (let k = 0; k < n; k++) {
+      const kr = k * n;
+      for (let i = 0; i < n; i++) {
+        const ir = i * n;
+        const dik = d[ir + k];
+        if (dik >= INF) continue;
+        for (let j = 0; j < n; j++) {
+          const thru = dik + d[kr + j];
+          if (thru < d[ir + j]) d[ir + j] = thru;
+        }
+      }
+    }
+    this.pathDistMatrix = d;
+    this._nodeCount = n;
+  }
+
+  /** Find nearest skeleton node index for a 3D point */
+  nearestNode(pt) {
+    let best = 0, minD = Infinity;
+    for (let i = 0; i < this._nodeCount; i++) {
+      const d = this._dist(pt, this.nodes[i]);
+      if (d < minD) { minD = d; best = i; }
+    }
+    return best;
+  }
+
+  /** Path distance along skeleton between two node indices */
+  pathDist(a, b) {
+    return this.pathDistMatrix[a * this._nodeCount + b];
+  }
+
+  /** Precompute nearest skeleton node for each vertex */
+  precomputeVertexNodes(positions, vertexCount) {
+    const ids = new Uint16Array(vertexCount);
+    for (let i = 0; i < vertexCount; i++) {
+      ids[i] = this.nearestNode({
+        x: positions[i*3], y: positions[i*3+1], z: positions[i*3+2]
+      });
+    }
+    return ids;
+  }
+
+  get nodeCount() { return this._nodeCount; }
+}
+
+// =============================================================================
+// SHADERS
+// =============================================================================
+const vertexShader = /* glsl */ `
+attribute float skeletalDistance;
+attribute vec3  morphDelta;
+uniform   float u_morphInfluence;
+uniform   vec3  u_cameraWorldPos;
+varying   float v_weightValue;
+varying   vec3  v_worldPos;
+varying   vec3  v_worldNormal;
+varying   vec3  v_viewDirWorld;
+varying   float v_skeletalDist;
+
+void main() {
+  vec3 morphed = position + morphDelta * u_morphInfluence;
+  vec4 worldPos = modelMatrix * vec4(morphed, 1.0);
+  v_worldPos      = worldPos.xyz;
+  v_worldNormal   = normalize(mat3(modelMatrix) * normal);
+  v_viewDirWorld  = normalize(u_cameraWorldPos - v_worldPos);
+
+  float nd = clamp(skeletalDistance / 3.5, 0.0, 1.0);
+  v_weightValue  = mix(900.0, 200.0, nd);
+  v_skeletalDist = skeletalDistance;
+
+  gl_Position = projectionMatrix * viewMatrix * worldPos;
+}
+`;
+
+const fragmentShader = /* glsl */ `
+uniform samplerCube u_envMap;
+uniform float       u_ior;
+uniform float       u_fresnelPower;
+uniform vec3        u_cursorWorldPos;
+varying float v_weightValue;
+varying vec3  v_worldPos;
+varying vec3  v_worldNormal;
+varying vec3  v_viewDirWorld;
+
+// 7-stop thermal gradient matching Exat ring system
+vec3 weightToColor(float w) {
+  if (w >= 850.0) return vec3(1.0, 0.043, 0.0);      // #FF0B00
+  if (w >= 750.0) return vec3(1.0, 0.384, 0.0);      // #FF6200
+  if (w >= 600.0) return vec3(1.0, 0.682, 0.0);      // #FFAE00
+  if (w >= 450.0) return vec3(1.0, 0.808, 0.180);    // #FFCE2E
+  if (w >= 350.0) return vec3(0.361, 0.573, 1.0);    // #5C92FF
+  if (w >= 250.0) return vec3(0.145, 0.275, 1.0);    // #2546FF
+  return vec3(0.0, 0.0, 0.796);                       // #0000cb
+}
+
+vec3 refractSafe(vec3 I, vec3 N, float eta) {
+  vec3 r = refract(I, N, eta);
+  return (length(r) < 0.001) ? reflect(I, N) : r;
+}
+
+void main() {
+  vec3 N = normalize(v_worldNormal);
+  vec3 V = normalize(v_viewDirWorld);
+
+  // Chromatic dispersion — per-channel IOR shift
+  float ior_r = u_ior;
+  float ior_g = u_ior + 0.005;
+  float ior_b = u_ior + 0.010;
+
+  vec3 Rr = refractSafe(-V, N, 1.0 / ior_r);
+  vec3 Rg = refractSafe(-V, N, 1.0 / ior_g);
+  vec3 Rb = refractSafe(-V, N, 1.0 / ior_b);
+
+  float r = textureCube(u_envMap, Rr).r;
+  float g = textureCube(u_envMap, Rg).g;
+  float b = textureCube(u_envMap, Rb).b;
+  vec3 refractedColor = vec3(r, g, b);
+
+  // Fresnel — edges glow, interior transparent
+  float fresnel = 1.0 - abs(dot(N, V));
+  fresnel = pow(fresnel, u_fresnelPower);
+
+  vec3 edgeColor = weightToColor(v_weightValue);
+
+  // Cursor-driven caustic distortion (Noomo-style)
+  float cursorDist = length(v_worldPos.xy - u_cursorWorldPos.xy);
+  float caustic = sin(cursorDist * 22.0) * 0.5 + 0.5;
+  caustic *= exp(-cursorDist * 0.28);
+
+  vec3 color = mix(refractedColor, edgeColor, fresnel * 0.82);
+  color += edgeColor * caustic * 0.13;
+
+  float alpha = mix(0.25, 0.92, fresnel);
+  gl_FragColor = vec4(color, alpha);
+}
+`;
+
+// =============================================================================
+// SCENE SETUP
+// =============================================================================
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(PALETTE.bg, 1);
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(PALETTE.bg);
+
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.5, 50);
+camera.position.set(0.6, 0.35, 5.5);
+camera.lookAt(0, 0.15, 0);
+
+// ---- Starfield ----
+const starGeom = new THREE.BufferGeometry();
+const starCount = 800;
+const spos = new Float32Array(starCount * 3);
+const scol = new Float32Array(starCount * 3);
+for (let i = 0; i < starCount; i++) {
+  const theta = Math.random() * Math.PI * 2;
+  const phi   = Math.acos(2 * Math.random() - 1);
+  const rad   = 3.5 + Math.random() * 11;
+  spos[i*3]   = Math.sin(phi) * Math.cos(theta) * rad;
+  spos[i*3+1] = Math.sin(phi) * Math.sin(theta) * rad;
+  spos[i*3+2] = Math.cos(phi) * rad;
+  const bright = 0.35 + Math.random() * 0.65;
+  scol[i*3]   = 0.45 * bright;
+  scol[i*3+1] = 0.55 * bright;
+  scol[i*3+2] = bright;
+}
+starGeom.setAttribute('position', new THREE.BufferAttribute(spos, 3));
+starGeom.setAttribute('color',    new THREE.BufferAttribute(scol, 3));
+const starMat = new THREE.PointsMaterial({
+  size: 0.13,
+  map: createGlowTexture(),
+  vertexColors: true,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+  transparent: true,
+  opacity: 0.85,
+});
+const starfield = new THREE.Points(starGeom, starMat);
+scene.add(starfield);
+
+// ---- Colored nebula orbs (background interest for refraction) ----
+function addNebula(x, y, z, colorHex, radius, opacity) {
+  const geo = new THREE.SphereGeometry(radius, 16, 16);
+  const mat = new THREE.MeshBasicMaterial({
+    color: colorHex, transparent: true, opacity,
+    depthWrite: false, blending: THREE.AdditiveBlending,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(x, y, z);
+  scene.add(mesh);
+  return mesh;
+}
+const nebulas = [
+  addNebula( 2.5,  1.8, -3.0, '#1a3a8a', 0.9, 0.22),
+  addNebula(-2.8, -1.2, -2.5, '#3a1a6a', 0.7, 0.18),
+  addNebula( 0.5, -2.5, -4.0, '#1a4a5a', 1.1, 0.16),
+  addNebula(-3.0,  0.5, -3.5, '#2a2a6a', 0.8, 0.20),
+  addNebula( 3.2, -0.8, -2.8, '#4a1a3a', 0.6, 0.15),
+];
+
+// ---- Subtle background gradient plane ----
+const bgGeo = new THREE.PlaneGeometry(20, 20);
+const bgMat = new THREE.ShaderMaterial({
+  vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    varying vec2 vUv;
+    void main() {
+      float d = length(vUv - 0.5) * 2.0;
+      vec3 col = mix(vec3(0.04, 0.04, 0.06), vec3(0.02, 0.02, 0.03), smoothstep(0.3, 1.4, d));
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `,
+  transparent: true,
+  depthWrite: false,
+  depthTest: false,
+});
+const bgPlane = new THREE.Mesh(bgGeo, bgMat);
+bgPlane.position.z = -8;
+bgPlane.renderOrder = -1;
+scene.add(bgPlane);
+
+// ---- Glyph geometry ----
+const shape = createGlyphShape();
+const extrudeSettings = {
+  depth: 0.3,
+  bevelEnabled: true,
+  bevelThickness: 0.05,
+  bevelSize: 0.03,
+  bevelSegments: 3,
+};
+const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+geometry.computeVertexNormals();
+
+// Morph deltas: outward displacement along normals (hairline → black)
+const basePositions = geometry.attributes.position.array;
+const normals = geometry.attributes.normal.array;
+const vertexCount = basePositions.length / 3;
+const morphDelta = new Float32Array(basePositions.length);
+for (let i = 0; i < basePositions.length; i += 3) {
+  morphDelta[i]     = normals[i]     * MORPH_DISPLACEMENT;
+  morphDelta[i + 1] = normals[i + 1] * MORPH_DISPLACEMENT;
+  morphDelta[i + 2] = normals[i + 2] * MORPH_DISPLACEMENT;
+}
+geometry.setAttribute('morphDelta', new THREE.BufferAttribute(morphDelta, 3));
+
+// Placeholder for skeletal distances (updated each frame)
+const skeletalDistInit = new Float32Array(vertexCount);
+skeletalDistInit.fill(0.5);
+geometry.setAttribute('skeletalDistance', new THREE.BufferAttribute(skeletalDistInit, 1));
+
+// ---- Skeleton ----
+const skeleton = new GlyphSkeleton();
+const vertexSkeletonNodes = skeleton.precomputeVertexNodes(basePositions, vertexCount);
+
+// ---- CubeCamera for environment mapping ----
+const cubeRT = new THREE.WebGLCubeRenderTarget(256, {
+  format: THREE.RGBAFormat,
+  generateMipmaps: true,
+  minFilter: THREE.LinearMipmapLinearFilter,
+  magFilter: THREE.LinearFilter,
+});
+const cubeCamera = new THREE.CubeCamera(0.1, 100, cubeRT);
+scene.add(cubeCamera);
+
+// ---- Shader material ----
+const shaderUniforms = {
+  u_envMap:          { value: null },
+  u_ior:             { value: 1.25 },
+  u_fresnelPower:    { value: 4.0 },
+  u_cameraWorldPos:  { value: camera.position.clone() },
+  u_cursorWorldPos:  { value: new THREE.Vector3(0, 0, 0) },
+  u_morphInfluence:  { value: 0.0 },
+};
+
+const shaderMat = new THREE.ShaderMaterial({
+  vertexShader,
+  fragmentShader,
+  uniforms: shaderUniforms,
+  transparent: true,
+  depthWrite: false,
+  depthTest: true,
+  side: THREE.DoubleSide,
+});
+
+const glyphMesh = new THREE.Mesh(geometry, shaderMat);
+glyphMesh.position.set(0, 0, 0);
+scene.add(glyphMesh);
+
+// A subtle wireframe outline for spatial reference
+const wireGeo = new THREE.EdgesGeometry(geometry, 15);
+const wireMat = new THREE.LineBasicMaterial({
+  color: 0x1a2a4a,
+  transparent: true,
+  opacity: 0.15,
+  depthTest: true,
+});
+const wireframe = new THREE.LineSegments(wireGeo, wireMat);
+glyphMesh.add(wireframe);
+
+// ---- Lights (minimal — just for potential future use) ----
+scene.add(new THREE.AmbientLight(0x111122, 0.3));
+
+// =============================================================================
+// INPUT STATE
+// =============================================================================
+const mouseNDC = new THREE.Vector2(999, 999); // off-screen initially
+let isTouchDevice = false;
+let cursorWorldPos = new THREE.Vector3(0, 0, 0);
+let globalWeight = 400;
+let globalIOR = 1.25;
+
+// =============================================================================
+// RAYCASTER for cursor → world position
+// =============================================================================
+const raycaster = new THREE.Raycaster();
+const glyphPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+
+function unprojectCursor(ndc) {
+  raycaster.setFromCamera(ndc, camera);
+  const target = new THREE.Vector3();
+  raycaster.ray.intersectPlane(glyphPlane, target);
+  return target || new THREE.Vector3(0, 0, 0);
+}
+
+// =============================================================================
+// PER-FRAME UPDATE: skeletal distances
+// =============================================================================
+function updateSkeletalDistances(cursorWP) {
+  const positions = geometry.attributes.position.array;
+  const skeletalDists = geometry.attributes.skeletalDistance.array;
+  const cNode = skeleton.nearestNode(cursorWP);
+  const n = skeleton.nodeCount;
+
+  for (let i = 0; i < vertexCount; i++) {
+    const vx = positions[i * 3];
+    const vy = positions[i * 3 + 1];
+    const vz = positions[i * 3 + 2];
+
+    const euclidean = Math.sqrt(
+      (vx - cursorWP.x) ** 2 + (vy - cursorWP.y) ** 2 + (vz - cursorWP.z) ** 2
+    );
+
+    const vNode = vertexSkeletonNodes[i];
+    const skelDist = skeleton.pathDist(cNode, vNode);
+
+    skeletalDists[i] = euclidean * EUCLIDEAN_WEIGHT + skelDist * SKELETON_WEIGHT;
+  }
+  geometry.attributes.skeletalDistance.needsUpdate = true;
+}
+
+// =============================================================================
+// ANIMATION LOOP
+// =============================================================================
+function animate() {
+  requestAnimationFrame(animate);
+
+  // Determine cursor state
+  if (mouseNDC.x > 10 || isTouchDevice) {
+    // Off-screen or touch fallback → default centered weights
+    cursorWorldPos.set(0, 0, 0);
+    globalWeight = 400;
+    globalIOR = 1.25;
+  } else {
+    cursorWorldPos.copy(unprojectCursor(mouseNDC));
+
+    // Global morph influence based on cursor distance to glyph center
+    const distToCenter = cursorWorldPos.length();
+    const influence = clamp(1.0 - distToCenter / (RING_RADIUS * 2.5), 0.0, 1.0);
+    globalWeight = Math.round(lerp(200, 900, influence));
+    globalIOR = lerp(1.05, 1.45, influence);
+  }
+
+  // Compute per-vertex skeletal distances
+  updateSkeletalDistances(cursorWorldPos);
+
+  // Update shader uniforms
+  shaderUniforms.u_morphInfluence.value = clamp((globalWeight - 200) / 700, 0, 1);
+  shaderUniforms.u_ior.value = globalIOR;
+  shaderUniforms.u_cursorWorldPos.value.copy(cursorWorldPos);
+  shaderUniforms.u_cameraWorldPos.value.copy(camera.position);
+
+  // Update CubeCamera (render scene without glyph)
+  glyphMesh.visible = false;
+  cubeCamera.position.copy(glyphMesh.position);
+  cubeCamera.update(renderer, scene);
+  glyphMesh.visible = true;
+
+  shaderUniforms.u_envMap.value = cubeCamera.renderTarget.texture;
+
+  // Subtle starfield rotation
+  starfield.rotation.y += 0.0003;
+  starfield.rotation.x += 0.0001;
+
+  // Render
+  renderer.render(scene, camera);
+
+  // Update HUD
+  elWeight.textContent = Math.round(globalWeight);
+  elIOR.textContent = globalIOR.toFixed(3);
+  elFresnel.textContent = shaderUniforms.u_fresnelPower.value.toFixed(1);
+  elSwatch.style.background = weightToHex(globalWeight);
+}
+
+// =============================================================================
+// EVENT HANDLERS
+// =============================================================================
+window.addEventListener('mousemove', (e) => {
+  if (isTouchDevice) return;
+  mouseNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouseNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+});
+
+window.addEventListener('mouseleave', () => {
+  mouseNDC.set(999, 999);
+});
+
+window.addEventListener('touchstart', () => {
+  isTouchDevice = true;
+  mouseNDC.set(999, 999);
+}, { once: true });
+
+window.addEventListener('touchmove', (e) => {
+  isTouchDevice = true;
+  const t = e.touches[0];
+  mouseNDC.x = (t.clientX / window.innerWidth) * 2 - 1;
+  mouseNDC.y = -(t.clientY / window.innerHeight) * 2 + 1;
+});
+
+window.addEventListener('touchend', () => {
+  mouseNDC.set(999, 999);
+});
+
+window.addEventListener('wheel', (e) => {
+  // Scroll adjusts fresnel power (edge sharpness)
+  const current = shaderUniforms.u_fresnelPower.value;
+  const delta = e.deltaY > 0 ? 0.4 : -0.4;
+  shaderUniforms.u_fresnelPower.value = clamp(current + delta, 2.0, 7.0);
+});
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// =============================================================================
+// BOOTSTRAP
+// =============================================================================
+if (!renderer.capabilities.isWebGL2 && !renderer.capabilities.isWebGL1) {
+  elError.style.display = 'block';
+  elError.textContent = 'WebGL not available. Please use a modern browser.';
+  throw new Error('WebGL unavailable');
+}
+
+// First cubemap render
+glyphMesh.visible = false;
+cubeCamera.position.copy(glyphMesh.position);
+cubeCamera.update(renderer, scene);
+glyphMesh.visible = true;
+shaderUniforms.u_envMap.value = cubeCamera.renderTarget.texture;
+
+// Kick off
+console.log(
+  '%c⚡ Glyph Skeleton Cursor %cready\n%cMove cursor across the glass letterform ' +
+  '%c— warmth follows typographic anatomy.',
+  'color:#FFAE00;font-weight:bold', '', 'color:#aaa', ''
+);
+console.log('%c  Scroll to adjust edge sharpness (fresnel power)', 'color:#888');
+animate();
+
+})();
+</script>
+</body>
+</html>

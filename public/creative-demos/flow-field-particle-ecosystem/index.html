@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow-Field Particle Ecosystem</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #121212;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    canvas { display: block; }
+    #ui {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 10;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    button {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.8);
+      padding: 8px 16px;
+      font-size: 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    #info {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 11px;
+      z-index: 10;
+      pointer-events: none;
+      line-height: 1.6;
+    }
+    #seed-display {
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 11px;
+      margin-left: 8px;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+</head>
+<body>
+  <div id="ui">
+    <button id="reseed">Re-seed</button>
+    <span id="seed-display">Seed: 2025</span>
+  </div>
+  <div id="info">
+    Scroll to modulate flow scale • Click to plant seed<br>
+    Circles respire every 5 seconds
+  </div>
+  <script>
+    // ============================================
+    // FLOW-FIELD PARTICLE ECOSYSTEM
+    // ============================================
+    // Hybrid: Circle-packing collision + Perlin noise flow fields
+    // + GPU-style additive particle trails.
+    // Domain A (Generative Squiggles) meets Domain B (Steven.com)
+    // via the 3% weirdness rule: rigid collision geometry becomes
+    // a bioluminescent swarm.
+    // ============================================
+
+    // --- Palette ---
+    const COL_BG = [18, 18, 18];              // #121212 — near-black void
+    const COL_PARTICLE_HEAD = [255, 167, 88]; // #FFA758 — warm gold
+    const COL_PARTICLE_TAIL = [218, 53, 88];  // #DA3558 — magenta-pink
+    const COL_CIRCLE_FILL = [37, 202, 6];     // #25CA06 — green ghost
+    const COL_FLOW_STROKE = [0, 167, 249];    // #00A7F9 — cyan
+    const COL_ACCENT = [231, 167, 53];        // #E7A735 — gold flash
+
+    // --- State ---
+    let particles = [];
+    let circles = [];
+    let flashEvents = [];
+    let pg; // additive graphics buffer
+    let z = 0; // noise time offset
+    let noiseScale = 0.01;
+    let targetNoiseScale = 0.01;
+    let seed = 2025;
+    let respirationTimer = 0;
+    let respirationPhase = 0; // 0=idle, 1=shrink, 2=expand
+    let respirationCycleTimer = 0;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+
+    // ============================================
+    // SETUP
+    // ============================================
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      // Create additive blending buffer for particle trails.
+      // This replicates the Three.js GPU additive blending in p5.js
+      // using createGraphics() with blendMode(ADD).
+      pg = createGraphics(width, height);
+
+      // Initialize deterministic ecosystem
+      seedEverything();
+
+      // UI binding: Re-seed button regenerates with a new random seed
+      document.getElementById('reseed').addEventListener('click', (e) => {
+        e.stopPropagation();
+        seed = floor(random(1000000));
+        seedEverything();
+      });
+
+      // Initialize last mouse position to avoid initial jump
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+    }
+
+    // ============================================
+    // SEED & RESET
+    // ============================================
+    // Seeded reproducibility: randomSeed() + noiseSeed() ensure the
+    // same ecosystem regenerates on every reload.
+    // ============================================
+    function seedEverything() {
+      randomSeed(seed);
+      noiseSeed(seed);
+
+      // Reset all simulation state
+      particles = [];
+      circles = [];
+      flashEvents = [];
+      z = 0;
+      noiseScale = 0.01;
+      targetNoiseScale = 0.01;
+      respirationTimer = 0;
+      respirationPhase = 0;
+      respirationCycleTimer = 0;
+
+      // Generate initial circle packing.
+      // Each circle becomes a "coral reef" seed node that emits particles.
+      let maxCircles = 40;
+      let attempts = 0;
+      while (circles.length < maxCircles && attempts < 2000) {
+        let r = random(15, 60);
+        let x = random(r, width - r);
+        let y = random(r, height - r);
+        if (!circleOverlaps(x, y, r)) {
+          circles.push(new CircleNode(x, y, r));
+        }
+        attempts++;
+      }
+
+      // Update UI
+      document.getElementById('seed-display').textContent = 'Seed: ' + seed;
+    }
+
+    // ============================================
+    // DRAW LOOP
+    // ============================================
+    function draw() {
+      // Black void background — theatrical staging from Steven.com
+      background(COL_BG);
+
+      // Smooth scroll-modulated noise scale.
+      // Scroll down = broader gestures; scroll up = tight texture.
+      // Lerp factor 0.05 gives inertia to the parameter.
+      noiseScale = lerp(noiseScale, targetNoiseScale, 0.05);
+
+      // Time-based animation: Perlin noise field slowly drifts
+      // like a changing wind.
+      z += 0.0003;
+
+      // Respiration cycle check
+      updateRespiration();
+
+      // Subtle background flow-field visualization.
+      // Cyan strokes at 15% opacity — the "aquarium" current.
+      drawFlowField();
+
+      // Update all circles (structural coral reef)
+      for (let c of circles) {
+        c.update();
+      }
+
+      // Update all particles (bioluminescent swarm)
+      // Process in reverse for safe removal of dead particles.
+      for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        p.update();
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+
+      // Cap total particle count for performance.
+      if (particles.length > 800) {
+        particles.splice(0, particles.length - 800);
+      }
+
+      // Draw circles on main canvas
+      for (let c of circles) {
+        c.display();
+      }
+
+      // Draw particles on additive buffer.
+      // The buffer is cleared each frame so trails are life-driven,
+      // not persistence-driven. Overlapping particles add their colors.
+      pg.clear();
+      pg.blendMode(ADD);
+      for (let p of particles) {
+        p.display(pg);
+      }
+      pg.blendMode(BLEND);
+      image(pg, 0, 0);
+
+      // Draw rejection flashes on main canvas
+      updateAndDrawFlashes();
+    }
+
+    // ============================================
+    // RESPIRATION
+    // ============================================
+    // Every 300 frames (~5s at 60fps), circles perform a "respiration":
+    // shrink to 60% radius over 60 frames, then expand back over 60 frames,
+    // squeezing particles outward in a wave.
+    // ============================================
+    function updateRespiration() {
+      if (respirationPhase === 0) {
+        respirationTimer++;
+        if (respirationTimer >= 300) {
+          respirationPhase = 1;
+          respirationCycleTimer = 0;
+          respirationTimer = 0;
+        }
+      } else if (respirationPhase === 1) {
+        // Shrink phase: 60 frames
+        respirationCycleTimer++;
+        if (respirationCycleTimer >= 60) {
+          respirationPhase = 2;
+          respirationCycleTimer = 0;
+        }
+      } else if (respirationPhase === 2) {
+        // Expand phase: 60 frames
+        respirationCycleTimer++;
+        if (respirationCycleTimer >= 60) {
+          respirationPhase = 0;
+          respirationCycleTimer = 0;
+        }
+      }
+    }
+
+    // ============================================
+    // FLOW FIELD VISUALIZATION
+    // ============================================
+    // Draws a sparse grid of short lines whose angle is determined by
+    // the same 2D Perlin noise field that steers the particles.
+    // ============================================
+    function drawFlowField() {
+      stroke(COL_FLOW_STROKE[0], COL_FLOW_STROKE[1], COL_FLOW_STROKE[2], 38);
+      strokeWeight(0.5);
+      let step = 50;
+      for (let x = 0; x < width; x += step) {
+        for (let y = 0; y < height; y += step) {
+          let angle = noise(x / noiseScale, y / noiseScale, z) * TWO_PI;
+          let len = step * 0.35;
+          line(x, y, x + cos(angle) * len, y + sin(angle) * len);
+        }
+      }
+    }
+
+    // ============================================
+    // MOUSE INTERACTION — TRAIL
+    // ============================================
+    // Cursor movement leaves a real-time additive particle trail.
+    // Color shifts from gold (#FFA758) at the head to magenta (#DA3558)
+    // at the tail. Brightness is proportional to mouse velocity.
+    // ============================================
+    function mouseMoved() {
+      let dx = mouseX - lastMouseX;
+      let dy = mouseY - lastMouseY;
+      let dist = sqrt(dx * dx + dy * dy);
+      if (dist > 2) {
+        // Spawn particles along the movement path for continuity.
+        let count = floor(map(dist, 2, 60, 1, 6));
+        count = constrain(count, 1, 8);
+        for (let i = 0; i < count; i++) {
+          let t = i / count;
+          let px = lerp(lastMouseX, mouseX, t);
+          let py = lerp(lastMouseY, mouseY, t);
+          let p = new Particle(px, py, 'mouse');
+          // Inherit some mouse momentum + random jitter
+          p.vel = createVector(dx * 0.15, dy * 0.15);
+          p.vel.add(random(-1, 1), random(-1, 1));
+          // Larger, longer-lived, brighter trail for faster movement
+          p.size = map(dist, 2, 60, 4, 14);
+          p.maxLife = map(dist, 2, 60, 20, 50);
+          p.life = p.maxLife;
+          particles.push(p);
+        }
+      }
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+    }
+
+    // ============================================
+    // CLICK INTERACTION — SEED INJECTION
+    // ============================================
+    // Clicking injects a new seed circle into the packing algorithm.
+    // The circle attempts 500 collision-test placements before settling.
+    // If it succeeds, it immediately begins emitting particles.
+    // If it fails, a gold flash (#E7A735) occurs at the click point.
+    // ============================================
+    function mousePressed() {
+      // Ignore clicks on the UI button area
+      let ui = document.getElementById('ui');
+      let rect = ui.getBoundingClientRect();
+      if (mouseX >= rect.left && mouseX <= rect.right && mouseY >= rect.top && mouseY <= rect.bottom) {
+        return;
+      }
+
+      let r = random(15, 50);
+      let placed = false;
+      for (let i = 0; i < 500; i++) {
+        let x = random(r, width - r);
+        let y = random(r, height - r);
+        if (!circleOverlaps(x, y, r)) {
+          circles.push(new CircleNode(x, y, r));
+          placed = true;
+          break;
+        }
+      }
+
+      if (!placed) {
+        // Rejection flash: expanding gold ring that fades
+        flashEvents.push({ x: mouseX, y: mouseY, life: 30, maxLife: 30 });
+      }
+    }
+
+    // ============================================
+    // SCROLL INTERACTION — NOISE SCALE MODULATION
+    // ============================================
+    // Scrolling the page vertically modulates the noiseScale parameter.
+    // Scroll down = lower scale = broader, sweeping flow gestures.
+    // Scroll up = higher scale = tight, turbulent texture.
+    // ============================================
+    function mouseWheel(event) {
+      targetNoiseScale -= event.deltaY * 0.0001;
+      targetNoiseScale = constrain(targetNoiseScale, 0.002, 0.05);
+      return false;
+    }
+
+    // ============================================
+    // HELPERS
+    // ============================================
+    function circleOverlaps(x, y, r) {
+      for (let c of circles) {
+        let d = dist(x, y, c.x, c.y);
+        if (d < r + c.r) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function updateAndDrawFlashes() {
+      noFill();
+      strokeWeight(2);
+      for (let i = flashEvents.length - 1; i >= 0; i--) {
+        let f = flashEvents[i];
+        f.life--;
+        let t = f.life / f.maxLife;
+        let alpha = t * 200;
+        let size = (1 - t) * 80 + 10;
+        stroke(COL_ACCENT[0], COL_ACCENT[1], COL_ACCENT[2], alpha);
+        ellipse(f.x, f.y, size);
+        if (f.life <= 0) {
+          flashEvents.splice(i, 1);
+        }
+      }
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      pg.resizeCanvas(windowWidth, windowHeight);
+    }
+
+    // ============================================
+    // CIRCLE NODE CLASS
+    // ============================================
+    // Each successfully placed circle becomes a "seed node" that emits
+    // particles. The circle's radius determines its emission rate and
+    // the birth size of its offspring.
+    // ============================================
+    class CircleNode {
+      constructor(x, y, r) {
+        this.x = x;
+        this.y = y;
+        this.r = r; // target radius
+        this.currentR = r;
+        this.emitTimer = 0;
+        // Larger circles emit more frequently
+        this.emitRate = floor(map(r, 10, 80, 2, 6));
+        this.emitRate = max(this.emitRate, 1);
+      }
+
+      update() {
+        // Respiration animation: smooth radius transitions
+        let targetR = this.r;
+        if (respirationPhase === 1) {
+          targetR = this.r * 0.6;
+        } else if (respirationPhase === 2) {
+          targetR = this.r;
+        }
+        this.currentR = lerp(this.currentR, targetR, 0.08);
+
+        // Emit particles from the circle's perimeter
+        this.emitTimer++;
+        if (this.emitTimer >= this.emitRate) {
+          this.emitTimer = 0;
+          this.emit();
+        }
+      }
+
+      emit() {
+        let angle = random(TWO_PI);
+        let px = this.x + cos(angle) * this.currentR;
+        let py = this.y + sin(angle) * this.currentR;
+        let p = new Particle(px, py, 'seed');
+        // Seed particles start with slight outward momentum
+        let out = p5.Vector.fromAngle(angle);
+        out.mult(random(0.5, 1.5));
+        p.vel = out;
+        particles.push(p);
+      }
+
+      display() {
+        // Cyan stroke at 15% opacity — flow-field geometry
+        noFill();
+        stroke(COL_FLOW_STROKE[0], COL_FLOW_STROKE[1], COL_FLOW_STROKE[2], 38);
+        strokeWeight(1);
+        ellipse(this.x, this.y, this.currentR * 2);
+
+        // Green fill at 8% opacity — ghost of the coral reef
+        fill(COL_CIRCLE_FILL[0], COL_CIRCLE_FILL[1], COL_CIRCLE_FILL[2], 20);
+        noStroke();
+        ellipse(this.x, this.y, this.currentR * 2);
+      }
+    }
+
+    // ============================================
+    // PARTICLE CLASS
+    // ============================================
+    // Particles follow the Perlin noise flow field and leave additive
+    // glowing trails. Velocity controls opacity: faster movement =
+    // brighter, longer trail (ported from Steven.com GPU system).
+    // ============================================
+    class Particle {
+      constructor(x, y, type) {
+        this.pos = createVector(x, y);
+        this.vel = createVector(0, 0);
+        this.acc = createVector(0, 0);
+        this.type = type; // 'seed' or 'mouse'
+        this.maxLife = type === 'mouse' ? 30 : 60 + random(40);
+        this.life = this.maxLife;
+        this.size = type === 'mouse' ? random(4, 10) : random(6, 16);
+        this.color = [...COL_PARTICLE_HEAD];
+      }
+
+      update() {
+        // --- Flow-field steering ---
+        // 2D Perlin noise drives the angle: noise(x/scale, y/scale) * TWO_PI.
+        // The z-offset slowly drifts, creating a changing wind.
+        let angle = noise(this.pos.x / noiseScale, this.pos.y / noiseScale, z) * TWO_PI;
+        let flow = p5.Vector.fromAngle(angle);
+        flow.mult(0.6);
+
+        // --- Collision-aware boundary ---
+        // When a particle approaches a circle boundary, the flow-field
+        // angle is inverted with a bounce multiplier. Particles inside
+        // a circle are squeezed outward during respiration.
+        for (let c of circles) {
+          let d = dist(this.pos.x, this.pos.y, c.x, c.y);
+          if (d < c.currentR) {
+            // Inside circle — strong outward push
+            let push = createVector(this.pos.x - c.x, this.pos.y - c.y);
+            push.normalize();
+            push.mult(3.0);
+            this.acc.add(push);
+            this.vel.mult(0.85);
+            // Invert flow field when trapped inside
+            flow.mult(-0.5);
+          } else if (d < c.currentR + this.size * 2) {
+            // Near boundary — gentle repulsion
+            let repulse = createVector(this.pos.x - c.x, this.pos.y - c.y);
+            repulse.normalize();
+            repulse.mult(1.2);
+            this.acc.add(repulse);
+            // Invert flow angle to create bounce illusion
+            flow.mult(-0.3);
+          }
+        }
+
+        this.acc.add(flow);
+        this.vel.add(this.acc);
+        this.vel.limit(4);
+        this.pos.add(this.vel);
+        this.acc.mult(0);
+
+        // Kill off-screen particles for performance
+        if (this.pos.x < -100 || this.pos.x > width + 100 || this.pos.y < -100 || this.pos.y > height + 100) {
+          this.life = 0;
+        }
+
+        this.life--;
+      }
+
+      display(pg) {
+        let t = this.life / this.maxLife;
+        let speed = this.vel.mag();
+
+        // Color interpolation: magenta (old/tail) → gold (young/head)
+        // Maps directly to the palette: #DA3558 → #FFA758
+        let r = lerp(COL_PARTICLE_TAIL[0], COL_PARTICLE_HEAD[0], t);
+        let g = lerp(COL_PARTICLE_TAIL[1], COL_PARTICLE_HEAD[1], t);
+        let b = lerp(COL_PARTICLE_TAIL[2], COL_PARTICLE_HEAD[2], t);
+
+        // Brightness proportional to velocity — faster = brighter trail
+        let velAlpha = map(speed, 0, 4, 0.3, 1.0);
+        velAlpha = constrain(velAlpha, 0.3, 1.0);
+        let alpha = t * velAlpha;
+
+        // Draw soft radial gradient on the additive buffer.
+        // White center → particle color edge → transparent.
+        // This replicates the GPU sprite look via Canvas 2D radialGradient.
+        let ctx = pg.drawingContext;
+        ctx.save();
+        let grad = ctx.createRadialGradient(
+          this.pos.x, this.pos.y, 0,
+          this.pos.x, this.pos.y, this.size
+        );
+        grad.addColorStop(0, `rgba(255, 255, 255, ${alpha})`);
+        grad.addColorStop(0.3, `rgba(${floor(r)}, ${floor(g)}, ${floor(b)}, ${alpha})`);
+        grad.addColorStop(1, `rgba(${floor(r)}, ${floor(g)}, ${floor(b)}, 0)`);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(this.pos.x, this.pos.y, this.size, 0, TWO_PI);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+  </script>
+</body>
+</html>

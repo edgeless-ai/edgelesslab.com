@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Difference Flows — The Reading Particles</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; overflow: hidden; font-family: 'Helvetica Neue', Arial, sans-serif; }
+  #container { position: relative; width: 100vw; height: 100vh; }
+  canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+  #text-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+    font-size: 42px; font-weight: 700; color: #FFFFFF; mix-blend-mode: difference; 
+    z-index: 10; pointer-events: none; text-align: center; max-width: 80vw;
+    line-height: 1.2; letter-spacing: -0.5px; }
+  #info-panel { position: absolute; top: 12px; left: 12px; z-index: 20; color: #C9C5C0; 
+    font-size: 11px; background: rgba(26,26,46,0.8); padding: 6px 10px; border-radius: 4px; }
+  #field-says { position: absolute; top: 12px; right: 12px; z-index: 20; color: #B48A67; 
+    font-size: 10px; font-style: italic; max-width: 300px; text-align: right; }
+  #controls { position: absolute; bottom: 12px; left: 12px; z-index: 20; color: #323232; 
+    font-size: 10px; background: rgba(245,240,232,0.9); padding: 6px 10px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="info-panel">Particles: 300 | Stutter: 9 | Mode: Perlin | mouse to bend flows</div>
+  <div id="field-says"></div>
+  <div id="text-overlay">flows differ</div>
+  <div id="controls">1-5: field mode | T: text | R: reset | scroll: grain | click: burst</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script>
+// === DIFFERENCE FLOWS — Cycle 8 Demo ===
+// Perlin flow field particles + mix-blend-mode difference text overlay
+// Sources: Shiffman (Nature of Code), Du Puy (mix-blend-mode), Codrops (MotionPath)
+
+const textLines = [
+  "differential growth", "curvature bias", "node insertion", "attraction force",
+  "repulsion field", "organic form", "parameter space", "emergence",
+  "morphogenesis", "self-optimizing", "plotter aesthetic", "computational fold",
+  "neighbor attraction", "edge splitting", "biological form", "algorithmic life",
+  "growth epoch", "ghost trail", "becoming form", "dynamic equilibrium",
+  "tendril escape", "prime milestone", "spatial hash", "Reynolds steering",
+  "Perlin noise field", "curl topology", "vector flow", "particle swarm"
+];
+
+let flowField = [];
+let fieldCols, fieldRows;
+let noiseScale = 0.008;
+let zOffset = 0;
+let fieldMode = 0; // 0=Perlin, 1=animated, 2=math, 3=curl, 4=hybrid
+let particles = [];
+let stutterPaths = [];
+let freezeTimer = 0;
+let freezeActive = false;
+let blendModeExclusion = false;
+let textVisible = true;
+const PARTICLE_COUNT = 300;
+const STUTTER_COUNT = 9;
+const BREATH_CYCLE = 47 * 1000; // 47 seconds ms
+let textIndex = 0;
+let lastTextRotate = 0;
+
+let sketch = function(p) {
+  p.setup = function() {
+    let cnv = p.createCanvas(p.windowWidth, p.windowHeight);
+    cnv.parent('container');
+    cnv.style('position', 'absolute');
+    cnv.style('top', '0');
+    cnv.style('left', '0');
+    cnv.style('z-index', '1');
+    p.colorMode(p.RGB, 255);
+    p.noiseSeed(Math.floor(Math.random() * 10000));
+    initFlowField();
+    initParticles();
+    lastTextRotate = p.millis();
+    updateOverlay();
+  };
+
+  p.draw = function() {
+    // Fade background for trails
+    p.background(26, 26, 46, 6);
+
+    // Update flow field (animated mode)
+    if (fieldMode === 1 && p.frameCount % 3 === 0) {
+      zOffset += 0.003;
+      initFlowField();
+    }
+
+    // Breathing cycle check
+    let elapsed = p.millis();
+    if (elapsed % BREATH_CYCLE < 200 && p.frameCount % 60 === 0) {
+      freezeTimer = 12;
+      freezeActive = true;
+      blendModeExclusion = true;
+      let overlay = document.getElementById('text-overlay');
+      if (overlay) overlay.style.mixBlendMode = 'exclusion';
+      setTimeout(() => {
+        blendModeExclusion = false;
+        if (overlay) overlay.style.mixBlendMode = 'difference';
+      }, 100);
+    }
+
+    // Text rotation every 8 seconds
+    if (elapsed - lastTextRotate > 8000) {
+      textIndex = (textIndex + 1) % textLines.length;
+      lastTextRotate = elapsed;
+      updateOverlay();
+    }
+
+    // Update and draw particles
+    for (let particle of particles) {
+      // Freeze check
+      if (freezeActive && freezeTimer > 0) {
+        let distToCenter = p.dist(particle.pos.x, particle.pos.y, p.width/2, p.height/2);
+        if (distToCenter < 150) continue; // freeze near-text particles
+      }
+
+      if (particle.isStutter) {
+        updateStutter(particle);
+      } else {
+        updateFlowParticle(particle);
+      }
+
+      // Draw
+      let trailAlpha = particle.trailAlpha || 15;
+      p.stroke(particle.color[0], particle.color[1], particle.color[2], trailAlpha);
+      p.strokeWeight(1);
+      p.line(particle.prevPos.x, particle.prevPos.y, particle.pos.x, particle.pos.y);
+    }
+
+    // Mouse influence
+    if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
+      for (let particle of particles) {
+        if (particle.isStutter) continue;
+        let d = p.dist(particle.pos.x, particle.pos.y, p.mouseX, p.mouseY);
+        if (d < 120) {
+          let force = p.map(d, 0, 120, 0.8, 0);
+          let dirX = p.mouseX - particle.pos.x;
+          let dirY = p.mouseY - particle.pos.y;
+          let len = Math.sqrt(dirX*dirX + dirY*dirY);
+          if (len > 0) {
+            particle.pos.x += (dirX / len) * force;
+            particle.pos.y += (dirY / len) * force;
+          }
+        }
+      }
+    }
+
+    // Countdown freeze timer
+    if (freezeTimer > 0) {
+      freezeTimer--;
+      if (freezeTimer === 0) freezeActive = false;
+    }
+
+    // Update info panel
+    updateInfoPanel();
+  };
+
+  function initFlowField() {
+    fieldCols = Math.floor(p.width / 15);
+    fieldRows = Math.floor(p.height / 15);
+    flowField = new Array(fieldCols * fieldRows);
+
+    for (let row = 0; row < fieldRows; row++) {
+      for (let col = 0; col < fieldCols; col++) {
+        let angle;
+        switch (fieldMode) {
+          case 2: // mathematical
+            angle = Math.sin(col * 0.3) * Math.cos(row * 0.2) * Math.PI * 2;
+            break;
+          case 3: // curl-like
+            angle = Math.atan2(Math.sin(row * 0.15) * 20 - Math.cos(col * 0.15) * 20,
+                              Math.sin(col * 0.15) * 20 + Math.cos(row * 0.15) * 20);
+            break;
+          case 4: // hybrid
+            let n = p.noise(col * noiseScale, row * noiseScale);
+            let m = Math.sin(col * 0.2) * Math.cos(row * 0.15);
+            angle = (n * 0.6 + m * 0.4) * Math.PI * 4;
+            break;
+          default: // Perlin (0, 1)
+            angle = p.noise(col * noiseScale, row * noiseScale, zOffset) * Math.PI * 4;
+        }
+        flowField[col + row * fieldCols] = angle;
+      }
+    }
+  }
+
+  function initParticles() {
+    particles = [];
+    stutterPaths = [];
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      let isStutter = i < STUTTER_COUNT;
+      let px = p.random(p.width);
+      let py = p.random(p.height);
+      let angle = p.random(Math.PI * 2);
+
+      let color;
+      if (isStutter) {
+        color = [255, 223, 0]; // #FFDF00
+      } else if (p.random() < 0.15) {
+        color = [180, 138, 103]; // #B48A67
+      } else if (p.random() < 0.4) {
+        color = [201, 197, 192]; // #C9C5C0
+      } else {
+        color = [233, 69, 96]; // #e94560
+      }
+
+      let path = null;
+      if (isStutter) {
+        path = generateMotionPath(px, py);
+      }
+
+      particles.push({
+        pos: p.createVector(px, py),
+        prevPos: p.createVector(px, py),
+        vel: p.createVector(Math.cos(angle), Math.sin(angle)),
+        maxSpeed: p.random(1.5, 3.5),
+        maxForce: p.random(0.05, 0.2),
+        color: color,
+        trailAlpha: p.random(8, 25),
+        isStutter: isStutter,
+        motionPath: path,
+        pathProgress: 0,
+        stutterDone: false
+      });
+    }
+  }
+
+  function generateMotionPath(sx, sy) {
+    let ex = p.random(p.width);
+    let ey = p.random(p.height);
+    let mx = (sx + ex) / 2 + p.random(-150, 150);
+    let my = (sy + ey) / 2 + p.random(-150, 150);
+
+    return {
+      start: {x: sx, y: sy},
+      mid: {x: mx, y: my},
+      end: {x: ex, y: ey},
+      curviness: 1.2
+    };
+  }
+
+  function updateStutter(particle) {
+    if (particle.stutterDone) {
+      updateFlowParticle(particle);
+      return;
+    }
+
+    particle.pathProgress += 0.004;
+    if (particle.pathProgress >= 1.0) {
+      particle.stutterDone = true;
+      particle.color = [233, 69, 96]; // shift to pink
+      particle.isStutter = false;
+    }
+
+    let t = particle.pathProgress;
+    let path = particle.motionPath;
+    // Cubic bezier with curviness
+    let p0x = path.start.x, p0y = path.start.y;
+    let p3x = path.end.x, p3y = path.end.y;
+    let p1x = p0x + (path.mid.x - p0x) * path.curviness;
+    let p1y = p0y + (path.mid.y - p0y) * path.curviness;
+    let p2x = p3x + (path.mid.x - p3x) * path.curviness;
+    let p2y = p3y + (path.mid.y - p3y) * path.curviness;
+
+    let u = 1 - t;
+    let x = u*u*u * p0x + 3*u*u*t * p1x + 3*u*t*t * p2x + t*t*t * p3x;
+    let y = u*u*u * p0y + 3*u*u*t * p1y + 3*u*t*t * p2y + t*t*t * p3y;
+
+    particle.prevPos = particle.pos.copy();
+    particle.pos.x = x;
+    particle.pos.y = y;
+  }
+
+  function updateFlowParticle(particle) {
+    let col = Math.floor(particle.pos.x / 15);
+    let row = Math.floor(particle.pos.y / 15);
+    col = p.constrain(col, 0, fieldCols - 1);
+    row = p.constrain(row, 0, fieldRows - 1);
+
+    let angle = flowField[col + row * fieldCols];
+    let desired = p.createVector(Math.cos(angle), Math.sin(angle));
+    desired.setMag(particle.maxSpeed);
+
+    let steer = p5.Vector.sub(desired, particle.vel);
+    steer.limit(particle.maxForce);
+
+    // Text attractor influence — simplified: pull toward center
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let dToCenter = p.dist(particle.pos.x, particle.pos.y, cx, cy);
+    if (dToCenter < 200 && dToCenter > 30) {
+      let infl = p.map(dToCenter, 30, 200, 0.15, 0);
+      let dirX = cx - particle.pos.x;
+      let dirY = cy - particle.pos.y;
+      let len = Math.sqrt(dirX*dirX + dirY*dirY);
+      if (len > 0) {
+        steer.x += (dirX / len) * infl;
+        steer.y += (dirY / len) * infl;
+      }
+    }
+
+    particle.vel.add(steer);
+    particle.vel.limit(particle.maxSpeed);
+    particle.prevPos = particle.pos.copy();
+    particle.pos.add(particle.vel);
+
+    // Edge wrapping
+    if (particle.pos.x < -10) particle.pos.x = p.width + p.random(-5, 5);
+    if (particle.pos.x > p.width + 10) particle.pos.x = p.random(-5, 5);
+    if (particle.pos.y < -10) particle.pos.y = p.height + p.random(-5, 5);
+    if (particle.pos.y > p.height + 10) particle.pos.y = p.random(-5, 5);
+  }
+
+  function updateOverlay() {
+    let overlay = document.getElementById('text-overlay');
+    if (overlay) {
+      overlay.textContent = textLines[textIndex];
+    }
+    // Update field says
+    let fs = document.getElementById('field-says');
+    if (fs) {
+      fs.textContent = '"' + textLines[textIndex] + '"';
+    }
+  }
+
+  function updateInfoPanel() {
+    let info = document.getElementById('info-panel');
+    if (info) {
+      let modeNames = ['Perlin', 'Animated', 'Math', 'Curl', 'Hybrid'];
+      info.textContent = `Particles: ${PARTICLE_COUNT} | Stutter: ${STUTTER_COUNT} | Mode: ${modeNames[fieldMode]} | mouse to bend flows`;
+    }
+  }
+
+  // --- Interactions ---
+  p.mousePressed = function() {
+    // Perturbation bomb
+    for (let i = 0; i < 30; i++) {
+      let angle = p.random(Math.PI * 2);
+      let speed = p.random(2, 6);
+      let particle = {
+        pos: p.createVector(p.mouseX, p.mouseY),
+        prevPos: p.createVector(p.mouseX, p.mouseY),
+        vel: p.createVector(Math.cos(angle) * speed, Math.sin(angle) * speed),
+        maxSpeed: p.random(1.5, 4),
+        maxForce: p.random(0.05, 0.2),
+        color: p.random() < 0.5 ? [233, 69, 96] : [180, 138, 103],
+        trailAlpha: p.random(15, 35),
+        isStutter: false,
+        motionPath: null,
+        pathProgress: 0,
+        stutterDone: false
+      };
+      particles.push(particle);
+    }
+    // Cull excess particles after burst
+    if (particles.length > 400) {
+      particles = particles.slice(particles.length - 350);
+    }
+  };
+
+  p.keyPressed = function() {
+    if (p.key === 't' || p.key === 'T') {
+      textVisible = !textVisible;
+      document.getElementById('text-overlay').style.display = textVisible ? 'block' : 'none';
+      document.getElementById('field-says').style.display = textVisible ? 'block' : 'none';
+    } else if (p.key === 'r' || p.key === 'R') {
+      initParticles();
+      textIndex = 0;
+      updateOverlay();
+    } else if (p.key >= '1' && p.key <= '5') {
+      fieldMode = parseInt(p.key) - 1;
+      initFlowField();
+    }
+  };
+
+  p.mouseWheel = function(e) {
+    noiseScale = p.constrain(noiseScale + (e.delta > 0 ? 0.002 : -0.002), 0.003, 0.03);
+    if (fieldMode !== 1) initFlowField();
+  };
+
+  p.windowResized = function() {
+    p.resizeCanvas(p.windowWidth, p.windowHeight);
+    initFlowField();
+  };
+};
+
+let p5Instance = new p5(sketch);
+</script>
+</body>
+</html>

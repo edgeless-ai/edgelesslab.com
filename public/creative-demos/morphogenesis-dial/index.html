@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morphogenesis Dial — The Growth Time Machine</title>
+<style>
+  body { margin: 0; padding: 0; overflow: hidden; background: #1a1a1a; font-family: Georgia, serif; }
+  #container { display: flex; width: 100vw; height: 100vh; }
+  #canvas-panel { flex: 7; position: relative; background: #F5F0E8; }
+  #dial-panel { flex: 3; background: #4B1431; display: flex; flex-direction: column; align-items: center; justify-content: center; user-select: none; }
+  #dial-label { color: #A09C2E; font-size: 14px; margin-bottom: 8px; letter-spacing: 2px; text-transform: uppercase; }
+  canvas { display: block; }
+  #info { position: absolute; bottom: 10px; left: 10px; color: #323232; font-size: 11px; background: rgba(245,240,232,0.9); padding: 6px 10px; border-radius: 4px; }
+  #horse-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+  .horse-glyph { position: absolute; font-size: 48px; color: #FFDF00; text-shadow: 0 0 20px rgba(255,223,0,0.6); transition: none; }
+  #dial-svg { cursor: grab; }
+  #dial-svg:active { cursor: grabbing; }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="canvas-panel">
+    <div id="horse-container"></div>
+    <div id="info">Epoch: 0 | Nodes: 12 | Drag dial to explore growth</div>
+  </div>
+  <div id="dial-panel">
+    <div id="dial-label">Growth Dial</div>
+    <svg id="dial-svg" viewBox="0 0 300 300" width="280" height="280"></svg>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script>
+// === MORPHOGENESIS DIAL — Cycle 8 Demo ===
+// Differential line growth + rotary dial scrubbing
+// Sources: Anders Hoff (inconvergent), Any Given Moment, Axis-Praxis
+
+const TOTAL_EPOCHS = 180;
+const MAX_NODES = 300;
+
+// Global state
+let growthSnapshots = [];
+let dialIndex = 0;
+let mirrorEpoch = -1;
+let mirrorColor = '#323232';
+let isEscaping = false;
+let escapeStartEpoch = 0;
+let escapePhase = 0; // 0=normal, 1=growingOut, 2=retracting
+let escapeFrameCount = 0;
+let playback = false;
+let bookmarks = [];
+let primes = [];
+let seed = 42;
+let organismWrapped = false;
+let horseEvents = []; // {x, y, frame, path[]}
+
+// --- p5.js sketch ---
+let sketch = function(p) {
+  let dialAngle = 0;
+  let draggingDial = false;
+  let lastDialAngle = 0;
+
+  p.setup = function() {
+    let canvasW = p.windowWidth * 0.7;
+    let canvasH = p.windowHeight;
+    let cnv = p.createCanvas(canvasW, canvasH);
+    cnv.parent('canvas-panel');
+    p.textFont('Georgia');
+    p.frameRate(60);
+    // Precompute primes up to MAX_NODES
+    primes = computePrimes(MAX_NODES);
+    // Hash mirror epoch
+    mirrorEpoch = Math.abs(hashString(seed.toString())) % TOTAL_EPOCHS;
+    // Pre-compute growth snapshots
+    precomputeGrowth();
+    // Initial draw
+    updateInfo();
+  };
+
+  p.draw = function() {
+    p.background('#F5F0E8');
+
+    // Mirror epoch check (3-frame flip)
+    if (dialIndex === mirrorEpoch && p.frameCount % 180 < 3) {
+      p.push();
+      p.translate(p.width / 2, p.height / 2);
+      p.scale(-1, 1);
+      p.translate(-p.width / 2, -p.height / 2);
+      drawOrganism();
+      p.pop();
+    } else {
+      drawOrganism();
+    }
+
+    // Auto-advance in playback mode
+    if (playback && p.frameCount % 3 === 0) {
+      dialIndex = (dialIndex + 1) % (TOTAL_EPOCHS - 1);
+      checkPrimeMilestone();
+      updateInfo();
+    }
+
+    // Horse events animation
+    updateHorseEvents();
+  };
+
+  function drawOrganism() {
+    if (growthSnapshots.length === 0) return;
+    let snap = growthSnapshots[dialIndex];
+    if (!snap) return;
+
+    // Ghost trails
+    p.noFill();
+    for (let i = Math.max(0, dialIndex - 20); i < dialIndex; i++) {
+      let ghost = growthSnapshots[i];
+      if (!ghost) continue;
+      let alpha = p.map(dialIndex - i, 0, 20, 200, 3);
+      p.stroke(204, 204, 204, alpha);
+      p.strokeWeight(1);
+      drawEdges(ghost);
+    }
+
+    // Draw escape tendrils
+    if (isEscaping) {
+      drawEscapeTendrils(snap);
+    }
+
+    // Current snapshot
+    p.stroke('#111111');
+    p.strokeWeight(2);
+    drawEdges(snap);
+
+    // Hot spots (newest nodes)
+    if (snap.nodes.length > 0) {
+      p.fill('#B48A67');
+      p.noStroke();
+      let newestStart = Math.max(0, snap.nodes.length - 5);
+      for (let i = newestStart; i < snap.nodes.length; i++) {
+        let n = snap.nodes[i];
+        p.ellipse(n.x, n.y, 5, 5);
+      }
+    }
+  }
+
+  function drawEscapeTendrils(snap) {
+    if (!snap || snap.nodes.length < 3) return;
+    p.stroke('#111111');
+    p.strokeWeight(2.5);
+    p.noFill();
+
+    let dialCX = p.width + 140; // right side dial center estimate
+    let dialCY = p.height / 2;
+    let dialR = 100;
+
+    // Draw tentacles from organism edge toward dial
+    let stepNodes = [];
+    for (let i = 0; i < Math.min(5, snap.nodes.length); i += Math.max(1, Math.floor(snap.nodes.length/5))) {
+      stepNodes.push(snap.nodes[i]);
+    }
+
+    for (let node of stepNodes) {
+      let dx = dialCX - node.x;
+      let dy = dialCY - node.y;
+      let dist = Math.sqrt(dx*dx + dy*dy);
+      let t = Math.min(1, escapeFrameCount / 15);
+      let cx = node.x + dx * 0.3 * t;
+      let cy = node.y + dy * 0.3 * t;
+
+      p.beginShape();
+      p.curveVertex(node.x, node.y);
+      p.curveVertex(node.x + dx * 0.15, node.y + dy * 0.15 - 20);
+      p.curveVertex(cx, cy);
+      p.curveVertex(dialCX, dialCY);
+      p.endShape();
+
+      // Node at tendril tip
+      p.fill('#E82B27');
+      p.ellipse(cx, cy, 6, 6);
+      p.noFill();
+    }
+  }
+
+  function drawEdges(snap) {
+    if (!snap.edges) return;
+    for (let e of snap.edges) {
+      let a = snap.nodes[e[0]];
+      let b = snap.nodes[e[1]];
+      if (a && b) {
+        p.line(a.x, a.y, b.x, b.y);
+      }
+    }
+  }
+
+  function checkPrimeMilestone() {
+    let nodeCount = growthSnapshots[dialIndex] ? growthSnapshots[dialIndex].nodes.length : 0;
+    if (primes.includes(nodeCount)) {
+      spawnHorseGlyph();
+    }
+  }
+
+  function spawnHorseGlyph() {
+    let x = p.random(50, p.width - 50);
+    let y = p.random(50, p.height - 50);
+    let endX = x + p.random(-100, 100);
+    let endY = y + p.random(-80, 80);
+
+    // Spawn horse HTML element
+    let horse = document.createElement('div');
+    horse.className = 'horse-glyph';
+    horse.textContent = '🐎';
+    horse.style.left = x + 'px';
+    horse.style.top = y + 'px';
+    horse.style.transition = 'all 2s cubic-bezier(0.25, 0.1, 0.25, 1)';
+    document.getElementById('horse-container').appendChild(horse);
+
+    horseEvents.push({el: horse, startX: x, startY: y, endX: endX, endY: endY, spawned: p.frameCount});
+
+    // Animate after a tick
+    requestAnimationFrame(() => {
+      horse.style.left = endX + 'px';
+      horse.style.top = endY + 'px';
+      horse.style.opacity = '0';
+    });
+
+    // Cleanup
+    setTimeout(() => {
+      if (horse.parentNode) horse.parentNode.removeChild(horse);
+    }, 2500);
+  }
+
+  function updateHorseEvents() {
+    // Cleanup old horse events
+    horseEvents = horseEvents.filter(h => p.frameCount - h.spawned < 150);
+  }
+
+  function updateInfo() {
+    let snap = growthSnapshots[dialIndex];
+    let nodeCount = snap ? snap.nodes.length : 0;
+    document.getElementById('info').textContent =
+      `Epoch: ${dialIndex} | Nodes: ${nodeCount} | ` +
+      `${isEscaping ? '🦑 ORGANISM ESCAPING!' : (playback ? '▶ Playing' : 'Drag dial to explore')}` +
+      (dialIndex === mirrorEpoch ? ' | ✦ Mirror' : '');
+  }
+
+  function precomputeGrowth() {
+    // Initialize organism as a circle
+    let cx = p.width / 2;
+    let cy = p.height / 2;
+    let radius = 60;
+    let startNodes = 12;
+    let nodes = [];
+    let edges = [];
+
+    for (let i = 0; i < startNodes; i++) {
+      let angle = (i / startNodes) * Math.PI * 2;
+      nodes.push({x: cx + Math.cos(angle) * radius, y: cy + Math.sin(angle) * radius});
+      if (i > 0) edges.push([i-1, i]);
+    }
+    edges.push([startNodes-1, 0]); // close circle
+
+    // Store initial state
+    growthSnapshots.push(snapshot(nodes, edges));
+
+    // Pre-compute growth for all epochs
+    let rng = createRNG(seed);
+    for (let epoch = 1; epoch < TOTAL_EPOCHS; epoch++) {
+      // Attraction-repulsion
+      for (let i = 0; i < nodes.length; i++) {
+        let n = nodes[i];
+        // Attraction to neighbors
+        for (let e of edges) {
+          if (e[0] === i || e[1] === i) {
+            let other = nodes[e[0] === i ? e[1] : e[0]];
+            let dx = other.x - n.x;
+            let dy = other.y - n.y;
+            let dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist > 5) {
+              n.x += dx * 0.01;
+              n.y += dy * 0.01;
+            }
+          }
+        }
+        // Repulsion from all nodes
+        for (let j = 0; j < nodes.length; j++) {
+          if (i === j) continue;
+          let o = nodes[j];
+          let dx = n.x - o.x;
+          let dy = n.y - o.y;
+          let dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 30 && dist > 0) {
+            n.x += (dx / dist) * 0.3;
+            n.y += (dy / dist) * 0.3;
+          }
+        }
+        // Confine to canvas
+        n.x = p.constrain(n.x, 20, p.width - 20);
+        n.y = p.constrain(n.y, 20, p.height - 20);
+      }
+
+      // Curvature-biased insertion
+      if (nodes.length < MAX_NODES) {
+        for (let ei = edges.length - 1; ei >= 0; ei--) {
+          if (nodes.length >= MAX_NODES) break;
+          let e = edges[ei];
+          if (ei === 0 || ei >= edges.length - 1) continue;
+          let prev = edges[ei - 1];
+          let a = nodes[e[0]];
+          let b = nodes[e[1]];
+          let angleA = Math.atan2(a.y - nodes[prev[0]].y, a.x - nodes[prev[0]].x);
+          let angleB = Math.atan2(b.y - a.y, b.x - a.x);
+          let curvature = Math.PI - Math.abs(angleB - angleA);
+          curvature = p.constrain(curvature / Math.PI, 0, 1);
+
+          if (rng() < curvature * 0.25) {
+            let midX = (a.x + b.x) / 2 + (rng() - 0.5) * 4;
+            let midY = (a.y + b.y) / 2 + (rng() - 0.5) * 4;
+            let newIdx = nodes.length;
+            nodes.push({x: midX, y: midY});
+            edges[ei] = [e[0], newIdx];
+            edges.splice(ei + 1, 0, [newIdx, e[1]]);
+            ei++; // skip the edge we just added
+          }
+        }
+      }
+
+      // Escape check
+      if (!isEscaping && rng() < 0.02) {
+        isEscaping = true;
+        escapeStartEpoch = epoch;
+        escapeFrameCount = 0;
+        escapePhase = 1;
+      }
+      if (isEscaping && epoch - escapeStartEpoch > 30) {
+        isEscaping = false;
+        escapePhase = 0;
+      }
+      if (isEscaping) {
+        escapeFrameCount++;
+        if (escapeFrameCount > 15) escapePhase = 2;
+      }
+
+      growthSnapshots.push(snapshot(nodes, edges));
+    }
+  }
+
+  function snapshot(nodes, edges) {
+    return {
+      nodes: nodes.map(n => ({x: n.x, y: n.y})),
+      edges: edges.map(e => [e[0], e[1]])
+    };
+  }
+
+  function createRNG(s) {
+    let state = s;
+    return function() {
+      state = (state * 16807 + 0) % 2147483647;
+      return (state - 1) / 2147483646;
+    };
+  }
+
+  function computePrimes(max) {
+    let primes = [];
+    for (let i = 2; i <= max; i++) {
+      let isP = true;
+      for (let j = 2; j * j <= i; j++) {
+        if (i % j === 0) { isP = false; break; }
+      }
+      if (isP) primes.push(i);
+    }
+    return primes;
+  }
+
+  function hashString(s) {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) {
+      h = ((h << 5) - h) + s.charCodeAt(i);
+      h |= 0;
+    }
+    return Math.abs(h);
+  }
+
+  // --- Mouse interaction on p5 canvas ---
+  p.mousePressed = function() {
+    // Check if click is near organism for perturbation
+    let snap = growthSnapshots[dialIndex];
+    if (snap && snap.nodes.length < MAX_NODES - 5) {
+      for (let i = 0; i < 5; i++) {
+        snap.nodes.push({
+          x: p.mouseX + (Math.random() - 0.5) * 10,
+          y: p.mouseY + (Math.random() - 0.5) * 10
+        });
+      }
+      // Add edges from last nodes
+      for (let i = snap.nodes.length - 6; i < snap.nodes.length - 1; i++) {
+        snap.edges.push([i, i + 1]);
+      }
+      updateInfo();
+    }
+  };
+
+  p.keyPressed = function() {
+    if (p.key === ' ') {
+      playback = !playback;
+      updateInfo();
+    } else if (p.key === 'ArrowRight') {
+      dialIndex = p.constrain(dialIndex + 10, 0, TOTAL_EPOCHS - 1);
+      updateInfo();
+    } else if (p.key === 'ArrowLeft') {
+      dialIndex = p.constrain(dialIndex - 10, 0, TOTAL_EPOCHS - 1);
+      updateInfo();
+    } else if (p.key === 'r') {
+      dialIndex = 0;
+      isEscaping = false;
+      playback = false;
+      updateInfo();
+    } else if (p.key === 'b') {
+      bookmarks.push(dialIndex);
+    } else if (p.key >= '1' && p.key <= '9') {
+      let bIdx = parseInt(p.key) - 1;
+      if (bIdx < bookmarks.length) {
+        dialIndex = bookmarks[bIdx];
+        updateInfo();
+      }
+    }
+  };
+
+  p.windowResized = function() {
+    let canvasW = p.windowWidth * 0.7;
+    let canvasH = p.windowHeight;
+    p.resizeCanvas(canvasW, canvasH);
+  };
+};
+
+// --- Dial SVG (variable-font-style weight mapping) ---
+function buildDialSVG() {
+  let svg = document.getElementById('dial-svg');
+  let cx = 150, cy = 150, r = 110;
+  let html = '';
+
+  // Dial background
+  html += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#4B1431" stroke="#A09C2E" stroke-width="2"/>`;
+
+  // Tick marks and numbers
+  for (let i = 0; i < TOTAL_EPOCHS; i++) {
+    let angle = p5Draw.map(i, 0, TOTAL_EPOCHS - 1, -Math.PI/3, Math.PI + Math.PI/3);
+    let weightOffset = Math.abs(i - dialIndex);
+    let wght = p5Draw.map(Math.min(weightOffset, 15), 0, 15, 900, 100);
+
+    let tx = cx + Math.cos(angle) * (r - 15);
+    let ty = cy + Math.sin(angle) * (r - 15);
+
+    // Tick mark
+    let isMajor = i % 20 === 0;
+    let isActive = i === dialIndex;
+    let innerR = isMajor ? r - 25 : r - 18;
+    let x1 = cx + Math.cos(angle) * innerR;
+    let y1 = cy + Math.sin(angle) * innerR;
+    let x2 = cx + Math.cos(angle) * (r - 8);
+    let y2 = cy + Math.sin(angle) * (r - 8);
+    let tickColor = isActive ? '#E82B27' : '#A09C2E';
+    html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${tickColor}" stroke-width="${isActive ? 3 : 1}"/>`;
+
+    // Numbers (every 10th)
+    if (i % 10 === 0 || i === dialIndex) {
+      let numX = cx + Math.cos(angle) * (r - 32);
+      let numY = cy + Math.sin(angle) * (r - 32);
+      let numColor = isActive ? '#E82B27' : '#A09C2E';
+      let numSize = isActive ? 14 : 10;
+      let numWeight = isActive ? 700 : Math.max(100, Math.round(p5Draw.map(wght, 100, 900, 100, 700)));
+      html += `<text x="${numX}" y="${numY}" text-anchor="middle" dominant-baseline="central" 
+        fill="${numColor}" font-size="${numSize}" font-weight="${numWeight}" font-family="Georgia, serif"
+        style="cursor:pointer">${i}</text>`;
+    }
+  }
+
+  // Center knob
+  html += `<circle cx="${cx}" cy="${cy}" r="12" fill="#4B1431" stroke="#A09C2E" stroke-width="2" style="cursor:pointer"/>`;
+  html += `<circle cx="${cx}" cy="${cy}" r="4" fill="#E82B27" style="cursor:pointer"/>`;
+
+  // Bookmark dots
+  for (let i = 0; i < bookmarks.length; i++) {
+    let angle = p5Draw.map(bookmarks[i], 0, TOTAL_EPOCHS - 1, -Math.PI/3, Math.PI + Math.PI/3);
+    let bx = cx + Math.cos(angle) * (r - 6);
+    let by = cy + Math.sin(angle) * (r - 6);
+    html += `<circle cx="${bx}" cy="${by}" r="4" fill="#FFDF00" class="bookmark" data-epoch="${bookmarks[i]}" style="cursor:pointer"/>`;
+  }
+
+  svg.innerHTML = html;
+
+  // Dial drag interaction
+  let isDragging = false;
+  svg.onmousedown = function(e) {
+    isDragging = true;
+    updateDialFromEvent(e);
+  };
+  svg.onmousemove = function(e) {
+    if (isDragging) updateDialFromEvent(e);
+  };
+  svg.onmouseup = function() { isDragging = false; };
+  svg.onmouseleave = function() { isDragging = false; };
+  svg.onwheel = function(e) {
+    e.preventDefault();
+    dialIndex = Math.max(0, Math.min(TOTAL_EPOCHS - 1, dialIndex + (e.deltaY > 0 ? 1 : -1)));
+    checkPrimeMilestone();
+    buildDialSVG();
+    updateInfo();
+  };
+
+  // Click on bookmarks
+  let bms = svg.querySelectorAll('.bookmark');
+  bms.forEach(bm => {
+    bm.onclick = function(e) {
+      e.stopPropagation();
+      dialIndex = parseInt(bm.dataset.epoch);
+      buildDialSVG();
+      updateInfo();
+    };
+  });
+}
+
+function updateDialFromEvent(e) {
+  let svg = document.getElementById('dial-svg');
+  let rect = svg.getBoundingClientRect();
+  let cx = rect.width / 2;
+  let cy = rect.height / 2;
+  let x = e.clientX - rect.left - cx;
+  let y = e.clientY - rect.top - cy;
+  let angle = Math.atan2(y, x);
+  dialIndex = Math.round(p5Draw.map(angle, -Math.PI/3, Math.PI + Math.PI/3, 0, TOTAL_EPOCHS - 1, true));
+  dialIndex = Math.max(0, Math.min(TOTAL_EPOCHS - 1, dialIndex));
+  checkPrimeMilestone();
+  buildDialSVG();
+  updateInfo();
+}
+
+function updateInfo() {
+  let snap = growthSnapshots.length > 0 ? growthSnapshots[dialIndex] : null;
+  let nodeCount = snap ? snap.nodes.length : 0;
+  let info = document.getElementById('info');
+  if (info) {
+    let status = playback ? '▶ Playing' : 'Drag dial to explore';
+    if (isEscaping) status = '🦑 ORGANISM ESCAPING!';
+    info.textContent = `Epoch: ${dialIndex} | Nodes: ${nodeCount} | ${status}` +
+      (dialIndex === mirrorEpoch ? ' | ✦ Mirror' : '') +
+      (bookmarks.length > 0 ? ` | Marks: ${bookmarks.length}` : '');
+  }
+}
+
+let p5Draw;
+
+// Bootstrap: instantiate p5 after DOM
+document.addEventListener('DOMContentLoaded', () => {
+  p5Draw = new p5(sketch);
+  // Wait for p5 setup to finish precomputing, then build dial
+  setTimeout(() => {
+    buildDialSVG();
+    updateInfo();
+    document.getElementById('info').textContent = 'Epoch: 0 | Nodes: 12 | Drag dial to explore';
+  }, 500);
+});
+</script>
+</body>
+</html>

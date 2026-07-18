@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Typographic Particle Dissolve</title>
+<style>
+  /* === Typographic Particle Dissolve — Styles ===
+   * Deep void background (#000000) per palette.
+   * Entry overlay: sound-gated dual-choice.
+   * Debug HUD: particle count, FPS, state.
+   */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    background: #000000;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    cursor: default;
+  }
+  canvas { display: block; }
+
+  /* Sound-Gated Entry Overlay — Layer 5 from prompt */
+  #entry-overlay {
+    position: fixed; inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #000000;
+    z-index: 100;
+    transition: opacity 0.8s ease;
+    font-family: 'Courier New', monospace;
+  }
+  #entry-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  #entry-overlay h1 {
+    color: #00D4FF;
+    font-size: 1.4rem;
+    font-weight: normal;
+    letter-spacing: 0.3em;
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px rgba(0,212,255,0.3);
+  }
+  #entry-overlay .buttons {
+    display: flex;
+    gap: 2rem;
+  }
+  #entry-overlay button {
+    background: transparent;
+    border: 1px solid rgba(0,212,255,0.4);
+    color: #00D4FF;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  #entry-overlay button:hover {
+    background: rgba(0,212,255,0.1);
+    border-color: #00D4FF;
+    box-shadow: 0 0 30px rgba(0,212,255,0.2);
+  }
+  #entry-overlay .sub {
+    color: rgba(255,255,255,0.3);
+    font-size: 0.7rem;
+    margin-top: 0.5rem;
+    letter-spacing: 0.15em;
+  }
+
+  /* Debug HUD (toggle with 'g' key) */
+  #debug-hud {
+    position: fixed; top: 1rem; left: 1rem;
+    color: rgba(0,212,255,0.5);
+    font-size: 0.7rem;
+    font-family: 'Courier New', monospace;
+    line-height: 1.6;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  #debug-hud.visible { opacity: 1; }
+
+  /* Visual metronome dot — for sound-less mode */
+  #visual-metronome {
+    position: fixed; bottom: 2rem; right: 2rem;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #FF6B6B;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 50;
+    pointer-events: none;
+  }
+  #visual-metronome.beat {
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(255,107,107,0.8);
+  }
+
+  /* Instructions hint */
+  #instructions {
+    position: fixed; bottom: 2rem; left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.15);
+    font-size: 0.65rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.15em;
+    pointer-events: none;
+    z-index: 50;
+    text-align: center;
+    line-height: 1.8;
+    transition: opacity 0.5s ease;
+  }
+</style>
+</head>
+<body>
+
+<!-- Debug HUD -->
+<div id="debug-hud">
+  <div id="debug-state">state: —</div>
+  <div id="debug-word">word: —</div>
+  <div id="debug-particles">particles: —</div>
+  <div id="debug-fps">fps: —</div>
+  <div id="debug-bpm">bpm: 60</div>
+</div>
+
+<!-- Entry Overlay: Sound-Gated Dual Choice -->
+<div id="entry-overlay">
+  <h1>✦ Typographic Particle Dissolve ✦</h1>
+  <div class="buttons">
+    <div>
+      <button id="btn-sound">▶ Enter With Sound</button>
+      <div class="sub">Web Audio — generative ambient drone</div>
+    </div>
+    <div>
+      <button id="btn-nosound">▶ Enter Without Sound</button>
+      <div class="sub">Visual metronome replaces audio pulse</div>
+    </div>
+  </div>
+</div>
+
+<!-- Visual metronome dot -->
+<div id="visual-metronome"></div>
+
+<!-- Instructions -->
+<div id="instructions">CLICK — dissolve/reform all · SPACE — next word · G — debug · SCROLL — BPM</div>
+
+<!-- Three.js from CDN (r152 as specified in prompt) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.152.0/three.min.js"></script>
+
+<script>
+// ========================================================================
+// TYPOGRAPHIC PARTICLE DISSOLVE — Glowing Instanced Letterforms
+// ========================================================================
+//
+// Technique: Each letter is constructed from hundreds of Three.js
+// Points-based glow particles. Letters form and hold as stable glow fields
+// but dissolve into constituent particles on interaction. Typography is
+// rendered purely as emergent glow geometry — no text nodes, no SVG paths.
+//
+// Architecture (6 layers as specified in the prompt):
+//   Layer 1: Letterform → Particle Map (canvas getImageData sampling)
+//   Layer 2: Three.js Points with custom ShaderMaterial
+//   Layer 3: 5-Layer Exponential Glow Shader (custom GLSL)
+//   Layer 4: State Machine — Stable ↔ Dissolve ↔ Reform
+//   Layer 5: Audio-Reactive Pulse (Web Audio API / visual metronome)
+//   Layer 6: Perpetual Word Cycle (marquee pattern)
+//
+// NOTE: Uses THREE.Points (GL_POINTS) rather than InstancedMesh because
+// gl_PointCoord is only available for GL_POINTS rendering. This is the
+// standard approach for particle glow in WebGL — each point gets position,
+// tint, size, and params via BufferGeometry attributes. The 5-layer
+// exponential glow is computed per-point in the fragment shader.
+// ========================================================================
+
+// ---- Color Palette (from prompt) ----
+const PALETTE = {
+  bg:     '#000000', // Background — deep void
+  cyan:   '#00D4FF', // Primary glow — letter core
+  white:  '#FFFFFF', // Hot needle — letter centers, HDR overbright
+  coral:  '#FF6B6B', // Coral accent — transition state / highlight
+  teal:   '#4ECDC4', // Teal accent — secondary letterforms
+  yellow: '#FFE66D', // Yellow accent — particle trails on dissolve
+  rim:    '#00B4E0', // Rim light — electric edge on particle quads
+  trail:  '#0088FF'  // Trail segments — depth-dimmed particles
+};
+
+// Convert hex to {r,g,b} in [0,1] range
+function hexToVec3(hex) {
+  const r = parseInt(hex.slice(1,3), 16) / 255;
+  const g = parseInt(hex.slice(3,5), 16) / 255;
+  const b = parseInt(hex.slice(5,7), 16) / 255;
+  return { r, g, b };
+}
+
+// ---- Words to cycle through (from prompt Layer 6) ----
+const WORDS = ['HELLO', 'CREATIVE', 'CODE', 'SOUND', 'MOTION', 'GLOW'];
+const WORD_INTERVAL = 5000; // ms per word in stable state
+const DISSOLVE_DURATION = 2000; // ms for dissolve transition
+const REFORM_DURATION = 2000;   // ms for reform transition
+
+// ---- Constants ----
+const MAX_PARTICLES = 12000;
+const PARTICLES_PER_LETTER = 600;
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+const FONT_SIZE = 160;
+const CANVAS_SIZE = 256;
+const RESOLUTION = 3; // grid sampling step (px)
+const BPM_DEFAULT = 60;
+
+// ---- Precomputed color vec3s ----
+const COL_CYAN  = hexToVec3(PALETTE.cyan);
+const COL_WHITE = hexToVec3(PALETTE.white);
+const COL_CORAL = hexToVec3(PALETTE.coral);
+const COL_TEAL  = hexToVec3(PALETTE.teal);
+const COL_YELLOW = hexToVec3(PALETTE.yellow);
+
+// ========================================================================
+// Layer 1: Letterform → Particle Map
+// Pre-compute a particle-map for each character by scanning an off-screen
+// canvas. Where alpha > 128, that's a spawn point.
+// Edge-weighting via simple adjacency check: particles near letter edges
+// get higher priority for better legibility at low particle counts.
+//
+// Technique: This is the well-known canvas-based letterform sampling
+// approach used in creative coding (e.g., by Tyler Hobbs, Zach Lieberman,
+// and others). An off-screen 2D canvas renders the character, then
+// getImageData scans the pixel buffer to find non-empty regions.
+// ========================================================================
+
+function edgeWeight(x, y, w, h, data) {
+  // Simple gradient check: if any adjacent pixel differs in alpha>128 status, it's an edge
+  if (x < 1 || x >= w - 1 || y < 1 || y >= h - 1) return 0.5;
+  const idx = (y * w + x) * 4;
+  const a = data[idx + 3] > 128;
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      if (dx === 0 && dy === 0) continue;
+      const ni = ((y + dy) * w + (x + dx)) * 4;
+      if ((data[ni + 3] > 128) !== a) return 1.0;
+    }
+  }
+  return 0.3; // interior
+}
+
+function computeLetterPoints(char, size, resolution) {
+  // 1. Create off-screen canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = CANVAS_SIZE;
+  canvas.height = CANVAS_SIZE;
+  const ctx = canvas.getContext('2d');
+
+  // 2. Draw character in bold sans-serif at fontSize
+  ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `bold ${size}px Arial, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(char, CANVAS_SIZE / 2, CANVAS_SIZE / 2);
+
+  // 3. Scan pixel rows/columns — where alpha > 128, that's a spawn point
+  const imageData = ctx.getImageData(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  const data = imageData.data;
+  const w = CANVAS_SIZE, h = CANVAS_SIZE;
+
+  // Collect candidate points with edge weights
+  const candidates = [];
+  for (let y = 0; y < h; y += resolution) {
+    for (let x = 0; x < w; x += resolution) {
+      const idx = (y * w + x) * 4;
+      const a = data[idx + 3];
+      if (a > 128) {
+        // Add jitter (±1px) for organic feel
+        const jx = x + (Math.random() - 0.5) * 2;
+        const jy = y + (Math.random() - 0.5) * 2;
+        const ew = edgeWeight(x, y, w, h, data);
+        // Edge-weighting: prefer points near letter boundaries (more particles on edges = better legibility)
+        const priority = ew * (0.5 + 0.5 * (a / 255));
+        candidates.push({ x: jx, y: jy, weight: ew, alpha: a / 255, priority });
+      }
+    }
+  }
+
+  // Sort by priority (edges first for better legibility)
+  candidates.sort((a, b) => b.priority - a.priority);
+
+  // Select: 70% top-priority (mostly edges), 30% random fill
+  const numDesired = PARTICLES_PER_LETTER;
+  const topCount = Math.min(Math.floor(numDesired * 0.7), candidates.length);
+  const selected = [];
+
+  for (let i = 0; i < topCount; i++) {
+    selected.push(candidates[i]);
+  }
+
+  // Fill remaining 30% with random samples from remaining candidates
+  const remaining = candidates.slice(topCount);
+  for (let i = 0; i < numDesired - topCount && remaining.length > 0; i++) {
+    const idx = Math.floor(Math.random() * remaining.length);
+    selected.push(remaining.splice(idx, 1)[0]);
+  }
+
+  // If still not enough, duplicate with jitter
+  while (selected.length < numDesired && selected.length > 0) {
+    const src = selected[Math.floor(Math.random() * selected.length)];
+    selected.push({
+      x: src.x + (Math.random() - 0.5) * 3,
+      y: src.y + (Math.random() - 0.5) * 3,
+      weight: src.weight * 0.8,
+      alpha: src.alpha,
+      priority: src.priority * 0.8
+    });
+  }
+
+  // 5. Return array of {x, y} normalized to [-0.5, 0.5] space
+  return selected.map(p => ({
+    x: (p.x / CANVAS_SIZE) - 0.5,
+    y: (p.y / CANVAS_SIZE) - 0.5,
+    weight: p.weight,
+    alpha: p.alpha
+  }));
+}
+
+// ---- Pre-compute maps for all needed characters ----
+const letterMapCache = new Map();
+function getLetterPoints(char) {
+  const upper = char.toUpperCase();
+  if (!letterMapCache.has(upper)) {
+    const points = computeLetterPoints(upper, FONT_SIZE, RESOLUTION);
+    letterMapCache.set(upper, points);
+  }
+  return letterMapCache.get(upper);
+}
+
+// ========================================================================
+// Layer 2 & 3: Points-Based Particle System with 5-Layer Glow Shader
+//
+// We use THREE.Points (GL_POINTS) rather than InstancedMesh because
+// gl_PointCoord is only available for point primitives. Each particle
+// is stored as a vertex in a single BufferGeometry with per-vertex
+// attributes for position, tint (color), size, and params (intensity, core).
+//
+// The 5-layer exponential glow shader (Layer 3):
+//   glow += exp(-d2 * 2.25)  * 0.62  — Broad halo
+//   glow += exp(-d2 * 5.5)   * 0.42  — Smoke glow
+//   glow += exp(-d2 * 21.0)  * 0.35  — Inner glow
+//   glow += exp(-d2 * 185.0) * vCore * 3.15 — Hot needle (HDR overbright)
+//   glow += pow(1.0 - d * 1.414, 4.8) * 0.18 — Electric edge
+// ========================================================================
+
+// Vertex shader: passes per-vertex attributes as varyings, controls point size
+const vertexShader = `
+  attribute vec3 customColor;
+  attribute float customSize;
+  attribute vec2 customParams;
+
+  varying float vIntensity;
+  varying float vCore;
+  varying vec3 vTint;
+
+  uniform float uTime;
+  uniform float uPulseIntensity;
+
+  void main() {
+    vIntensity = customParams.x;
+    vCore = customParams.y;
+    vTint = customColor;
+
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+
+    // Point size: base size * scale, with distance attenuation
+    float size = customSize * (300.0 / -mvPosition.z);
+    gl_PointSize = size;
+
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`;
+
+// Fragment shader: 5-layer exponential glow compositing
+const fragmentShader = `
+  varying float vIntensity;
+  varying float vCore;
+  varying vec3 vTint;
+
+  void main() {
+    // Distance from point center [0..~0.707] using gl_PointCoord [0..1]
+    float d = distance(gl_PointCoord, vec2(0.5));
+    float d2 = d * d;
+
+    // 5-layer exponential glow compositing (exact coefficients from Particle Trail analysis)
+    vec3 glow = vec3(0.0);
+    glow += exp(-d2 * 2.25)  * 0.62  * vIntensity;  // Broad halo
+    glow += exp(-d2 * 5.5)   * 0.42  * vIntensity;  // Smoke glow
+    glow += exp(-d2 * 21.0)  * 0.35  * vIntensity;  // Inner glow
+    glow += exp(-d2 * 185.0) * vCore * 3.15;         // Hot needle (HDR overbright)
+    glow += pow(1.0 - d * 1.414, 4.8) * 0.18 * vIntensity; // Electric edge
+
+    // Apply tint and output with alpha for additive blending
+    vec3 finalColor = glow * vTint;
+    float alpha = max(finalColor.r, max(finalColor.g, finalColor.b));
+
+    gl_FragColor = vec4(finalColor, alpha);
+  }
+`;
+
+// ========================================================================
+// Main Application Class
+// ========================================================================
+
+class TypographicParticleDissolve {
+  constructor(hasAudio) {
+    this.hasAudio = hasAudio;
+    this.bpm = BPM_DEFAULT;
+    this.beatInterval = 60000 / this.bpm;
+    this.lastBeatTime = 0;
+    this.pulseIntensity = 0;
+    this.pulseDecay = 0.93;
+
+    // State machine (Layer 4)
+    this.state = 'STABLE';
+    this.wordIndex = 0;
+    this.currentWord = WORDS[0];
+    this.wordTimer = 0;
+    this.transitionStartTime = 0;
+    this.dissolveEnteredTime = 0;
+
+    // Mouse interaction — init to far-away values so proximity doesn't trigger
+    this.mouse = new THREE.Vector2(99999, 99999);
+    this.mouseNorm = new THREE.Vector2(99999, 99999);
+    this.prevMouse = new THREE.Vector2(99999, 99999);
+    this.mouseInitialized = false; // becomes true after first mousemove
+
+    // Pre-compute all letter maps
+    this.precomputeAllChars();
+
+    // Scene setup
+    this.setupScene();
+    this.setupParticleSystem();
+    this.setupWord(0, false);
+    this.setupAudio();
+    this.setupInteraction();
+    this.startLoop();
+    this.startWordCycle();
+
+    // Debug
+    this.debugFrameCount = 0;
+    this.debugFpsTimer = 0;
+  }
+
+  // ---- Pre-compute letter points for all needed chars ----
+  precomputeAllChars() {
+    const allChars = new Set();
+    for (const word of WORDS) {
+      for (const ch of word) allChars.add(ch);
+    }
+    for (const ch of allChars) {
+      getLetterPoints(ch);
+    }
+  }
+
+  // ========================================================================
+  // Scene Setup
+  // ========================================================================
+
+  setupScene() {
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(PALETTE.bg);
+
+    // Orthographic camera — letterforms are 2D
+    const aspect = window.innerWidth / window.innerHeight;
+    const viewSize = 8;
+    this.camera = new THREE.OrthographicCamera(
+      -viewSize * aspect, viewSize * aspect,
+      viewSize, -viewSize,
+      0.1, 100
+    );
+    this.camera.position.z = 10;
+
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: false,
+      powerPreference: 'high-performance'
+    });
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    document.body.prepend(this.renderer.domElement);
+
+    // Resize
+    window.addEventListener('resize', () => {
+      const a = window.innerWidth / window.innerHeight;
+      const vs = 8;
+      this.camera.left = -vs * a;
+      this.camera.right = vs * a;
+      this.camera.top = vs;
+      this.camera.bottom = -vs;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  }
+
+  // ========================================================================
+  // Particle System Setup
+  // ========================================================================
+
+  setupParticleSystem() {
+    // ---- Pre-allocate typed arrays for all particle data ----
+    // We use a single BufferGeometry with per-vertex attributes.
+    // The particle system uses THREE.Points rendering to get GL_POINTS
+    // primitive support (needed for gl_PointCoord in fragment shader).
+
+    this.positions    = new Float32Array(MAX_PARTICLES * 3); // current xyz
+    this.targets      = new Float32Array(MAX_PARTICLES * 3); // letterform home positions
+    this.dissolveTargets = new Float32Array(MAX_PARTICLES * 3); // spiral destinations
+    this.colors       = new Float32Array(MAX_PARTICLES * 3); // current RGB tint
+    this.targetColors = new Float32Array(MAX_PARTICLES * 3); // transition targets
+    this.sizes        = new Float32Array(MAX_PARTICLES);     // point size
+    this.params       = new Float32Array(MAX_PARTICLES * 2); // intensity, core
+    this.phases       = new Float32Array(MAX_PARTICLES);     // sine phase for micro-oscillation
+    this.weights      = new Float32Array(MAX_PARTICLES);     // edge weight
+    this.active       = new Uint8Array(MAX_PARTICLES);       // 0=inactive, 1=active
+
+    // Init random phases
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+      this.phases[i] = Math.random() * Math.PI * 2;
+    }
+
+    // ---- Build BufferGeometry with attributes ----
+    const geo = new THREE.BufferGeometry();
+
+    // Position attribute (vec3) — required for THREE.Points
+    const posAttr = new THREE.BufferAttribute(this.positions, 3);
+    posAttr.setUsage(THREE.DynamicDrawUsage);
+    geo.setAttribute('position', posAttr);
+
+    // Custom color (vec3) — per-particle tint
+    const colAttr = new THREE.BufferAttribute(this.colors, 3);
+    colAttr.setUsage(THREE.DynamicDrawUsage);
+    geo.setAttribute('customColor', colAttr);
+
+    // Custom size (float) — per-particle point size
+    const sizeAttr = new THREE.BufferAttribute(this.sizes, 1);
+    sizeAttr.setUsage(THREE.DynamicDrawUsage);
+    geo.setAttribute('customSize', sizeAttr);
+
+    // Custom params (vec2) — per-particle intensity + core
+    const paramsAttr = new THREE.BufferAttribute(this.params, 2);
+    paramsAttr.setUsage(THREE.DynamicDrawUsage);
+    geo.setAttribute('customParams', paramsAttr);
+
+    // ---- ShaderMaterial with 5-layer glow ----
+    this.material = new THREE.ShaderMaterial({
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      uniforms: {
+        uTime: { value: 0 },
+        uPulseIntensity: { value: 0 }
+      }
+    });
+
+    // ---- Points ----
+    this.points = new THREE.Points(geo, this.material);
+    this.points.frustumCulled = false;
+    this.scene.add(this.points);
+
+    this.activeCount = 0;
+  }
+
+  // ========================================================================
+  // Word → Particle Layout
+  // ========================================================================
+
+  setupWord(wordIndex, animateFromCurrent) {
+    const word = WORDS[wordIndex];
+    const totalLetters = word.length;
+    const spacing = 1.5;
+    const totalWidth = (totalLetters - 1) * spacing;
+    const startX = -totalWidth / 2;
+
+    // Save old positions if animating from current
+    let oldPos = null;
+    if (animateFromCurrent) {
+      oldPos = new Float32Array(this.positions);
+    }
+
+    let idx = 0;
+
+    for (let li = 0; li < totalLetters; li++) {
+      const ch = word[li];
+      const points = getLetterPoints(ch);
+      if (!points) continue;
+
+      const letterX = startX + li * spacing;
+
+      for (let pi = 0; pi < points.length && idx < MAX_PARTICLES; pi++) {
+        const p = points[pi];
+        const scale = 1.2;
+        const px = letterX + p.x * scale;
+        const py = p.y * scale;
+        const pz = (Math.random() - 0.5) * 0.05;
+
+        // Set target (letterform home position)
+        const i3 = idx * 3;
+        this.targets[i3]     = px;
+        this.targets[i3 + 1] = py;
+        this.targets[i3 + 2] = pz;
+
+        // Set current position: from old position if animating, otherwise at target
+        if (animateFromCurrent && oldPos && idx < oldPos.length / 3) {
+          this.positions[i3]     = oldPos[i3];
+          this.positions[i3 + 1] = oldPos[i3 + 1];
+          this.positions[i3 + 2] = oldPos[i3 + 2];
+        } else {
+          this.positions[i3]     = px;
+          this.positions[i3 + 1] = py;
+          this.positions[i3 + 2] = pz;
+        }
+
+        // Dissolve target — computed on trigger
+        this.dissolveTargets[i3]     = 0;
+        this.dissolveTargets[i3 + 1] = 0;
+        this.dissolveTargets[i3 + 2] = 0;
+
+        // Weight and params
+        const w = p.weight || 0.5;
+        this.weights[idx] = w;
+
+        // Params: intensity, core (edge = brighter core)
+        this.params[idx * 2]     = 0.6 + w * 0.4;     // intensity
+        this.params[idx * 2 + 1] = 0.3 + w * 0.7;     // core — edge particles are hotter
+
+        // Tint: cyan with edge-based white mixing
+        const mix = 0.7 + w * 0.3;
+        this.colors[i3]     = COL_CYAN.r * (1 - w * 0.3) + COL_WHITE.r * w * 0.3;
+        this.colors[i3 + 1] = COL_CYAN.g * (1 - w * 0.2) + COL_WHITE.g * w * 0.2;
+        this.colors[i3 + 2] = COL_CYAN.b + w * 0.1;
+
+        // Target colors (for transitions)
+        this.targetColors[i3]     = this.colors[i3];
+        this.targetColors[i3 + 1] = this.colors[i3 + 1];
+        this.targetColors[i3 + 2] = this.colors[i3 + 2];
+
+        // Size
+        this.sizes[idx] = 1.0 + w * 0.5;
+
+        this.active[idx] = 1;
+        idx++;
+      }
+    }
+
+    // Deactivate remaining
+    for (let i = idx; i < MAX_PARTICLES; i++) {
+      this.active[i] = 0;
+    }
+
+    this.activeCount = idx;
+  }
+
+  // ---- Dissolve targets: golden angle spiral ----
+  computeDissolveTargets() {
+    const count = this.activeCount;
+    for (let i = 0; i < count; i++) {
+      if (!this.active[i]) continue;
+      const angle = i * GOLDEN_ANGLE;
+      const radius = 0.02 + (i / Math.max(count, 1)) * 5;
+      const cx = this.targets[i * 3];
+      const cy = this.targets[i * 3 + 1];
+      this.dissolveTargets[i * 3]     = cx + Math.cos(angle) * radius;
+      this.dissolveTargets[i * 3 + 1] = cy + Math.sin(angle) * radius;
+      this.dissolveTargets[i * 3 + 2] = (Math.random() - 0.5) * 1.5;
+    }
+  }
+
+  // ---- Dissolve tints: cyan → coral/teal/yellow ramp ----
+  computeDissolveTints() {
+    const count = this.activeCount;
+    const dissolveColors = [COL_CORAL, COL_TEAL, COL_YELLOW];
+    for (let i = 0; i < count; i++) {
+      if (!this.active[i]) continue;
+      const c = dissolveColors[i % 3];
+      const i3 = i * 3;
+      this.targetColors[i3]     = this.colors[i3] * 0.2     + c.r * 0.8;
+      this.targetColors[i3 + 1] = this.colors[i3 + 1] * 0.2 + c.g * 0.8;
+      this.targetColors[i3 + 2] = this.colors[i3 + 2] * 0.2 + c.b * 0.8;
+    }
+  }
+
+  // ---- Reform tints: back to cyan ----
+  computeReformTints() {
+    const count = this.activeCount;
+    for (let i = 0; i < count; i++) {
+      if (!this.active[i]) continue;
+      const w = this.weights[i];
+      const i3 = i * 3;
+      this.targetColors[i3]     = COL_CYAN.r * (1 - w * 0.3) + COL_WHITE.r * w * 0.3;
+      this.targetColors[i3 + 1] = COL_CYAN.g * (1 - w * 0.2) + COL_WHITE.g * w * 0.2;
+      this.targetColors[i3 + 2] = COL_CYAN.b + w * 0.1;
+    }
+  }
+
+  // ========================================================================
+  // Layer 4: State Machine — Stable ↔ Dissolve ↔ Reform
+  // ========================================================================
+
+  triggerDissolve() {
+    if (this.state !== 'STABLE') return;
+    this.state = 'DISSOLVE';
+    this.transitionStartTime = performance.now();
+    this.computeDissolveTargets();
+    this.computeDissolveTints();
+    // Increase size for dissolve
+    for (let i = 0; i < this.activeCount; i++) {
+      if (this.active[i]) {
+        this.sizes[i] = 1.5 + this.weights[i] * 1.5;
+      }
+    }
+    this.updateDebugHUD();
+  }
+
+  triggerReform() {
+    if (this.state !== 'DISSOLVE' && this.state !== 'WORD_TRANSITION_DISSOLVE') return;
+    this.state = 'REFORM';
+    this.transitionStartTime = performance.now();
+    this.computeReformTints();
+    for (let i = 0; i < this.activeCount; i++) {
+      if (this.active[i]) {
+        this.sizes[i] = 1.0 + this.weights[i] * 0.5;
+      }
+    }
+    this.updateDebugHUD();
+  }
+
+  triggerNextWord() {
+    if (this.state === 'STABLE') {
+      const nextIdx = (this.wordIndex + 1) % WORDS.length;
+      // Phase 1: dissolve current word
+      this.state = 'WORD_TRANSITION_DISSOLVE';
+      this.nextWordIndex = nextIdx;
+      this.transitionStartTime = performance.now();
+      this.computeDissolveTargets();
+      this.computeDissolveTints();
+      for (let i = 0; i < this.activeCount; i++) {
+        if (this.active[i]) {
+          this.sizes[i] = 1.5 + this.weights[i] * 1.5;
+        }
+      }
+      this.updateDebugHUD();
+    }
+  }
+
+  // ========================================================================
+  // Layer 5: Audio-Reactive Pulse (Web Audio API)
+  // ========================================================================
+
+  setupAudio() {
+    if (!this.hasAudio) return;
+
+    try {
+      this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      // Ambient generative drone: sine wave at 60Hz + gentle LFO
+      this.oscillator = this.audioCtx.createOscillator();
+      this.oscillator.type = 'sine';
+      this.oscillator.frequency.value = 60;
+
+      // LFO for slow modulation
+      this.lfo = this.audioCtx.createOscillator();
+      this.lfo.type = 'sine';
+      this.lfo.frequency.value = 0.3;
+      this.lfoGain = this.audioCtx.createGain();
+      this.lfoGain.gain.value = 8;
+      this.lfo.connect(this.lfoGain);
+      this.lfoGain.connect(this.oscillator.frequency);
+
+      // Gain envelope
+      this.gainNode = this.audioCtx.createGain();
+      this.gainNode.gain.value = 0.06;
+
+      // Simple reverb via synthetic impulse response
+      this.convolver = this.audioCtx.createConvolver();
+      const impulseLen = this.audioCtx.sampleRate * 1.5;
+      const impulse = this.audioCtx.createBuffer(2, impulseLen, this.audioCtx.sampleRate);
+      for (let ch = 0; ch < 2; ch++) {
+        const data = impulse.getChannelData(ch);
+        for (let i = 0; i < impulseLen; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (impulseLen * 0.3));
+        }
+      }
+      this.convolver.buffer = impulse;
+
+      this.oscillator.connect(this.gainNode);
+      this.gainNode.connect(this.convolver);
+      this.convolver.connect(this.audioCtx.destination);
+
+      this.oscillator.start();
+      this.lfo.start();
+      this.audioReady = true;
+    } catch (e) {
+      console.warn('Audio setup failed:', e);
+      this.audioReady = false;
+    }
+  }
+
+  // ---- Beat pulse ----
+  onBeat() {
+    this.lastBeatTime = performance.now();
+    this.pulseIntensity = 1.0;
+
+    // Audio pulse
+    if (this.audioReady && this.audioCtx) {
+      try {
+        const t = this.audioCtx.currentTime;
+        this.gainNode.gain.setValueAtTime(0.12, t);
+        this.gainNode.gain.exponentialRampToValueAtTime(0.04, t + 0.1);
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    // Visual metronome dot
+    const dot = document.getElementById('visual-metronome');
+    if (dot) {
+      dot.classList.add('beat');
+      setTimeout(() => dot.classList.remove('beat'), 100);
+    }
+  }
+
+  // ========================================================================
+  // Interaction
+  // ========================================================================
+
+  setupInteraction() {
+    // Mouse move
+    window.addEventListener('mousemove', (e) => {
+      this.prevMouse.copy(this.mouse);
+      this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+      const aspect = window.innerWidth / window.innerHeight;
+      const viewSize = 8;
+      this.mouseNorm.x = this.mouse.x * viewSize * aspect;
+      this.mouseNorm.y = this.mouse.y * viewSize;
+      this.mouseInitialized = true;
+    });
+
+    // Click — toggle dissolve/reform
+    window.addEventListener('click', () => {
+      if (this.state === 'STABLE') {
+        this.triggerDissolve();
+      } else if (this.state === 'DISSOLVE') {
+        this.triggerReform();
+      }
+    });
+
+    // Keys
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        this.triggerNextWord();
+      }
+      if (e.key === 'g' || e.key === 'G') {
+        document.getElementById('debug-hud').classList.toggle('visible');
+      }
+    });
+
+    // Scroll — adjust BPM
+    window.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      this.bpm = Math.max(20, Math.min(200, this.bpm + (e.deltaY > 0 ? -2 : 2)));
+      this.beatInterval = 60000 / this.bpm;
+      document.getElementById('debug-bpm').textContent = `bpm: ${this.bpm}`;
+    }, { passive: false });
+
+    window.addEventListener('mouseleave', () => {
+      this.mouseNorm.set(99999, 99999);
+    });
+  }
+
+  // ========================================================================
+  // Update Loop
+  // ========================================================================
+
+  update(time, delta) {
+    // Beat timer
+    if (!this.lastBeatTime) this.lastBeatTime = time;
+    if (time - this.lastBeatTime > this.beatInterval) {
+      this.onBeat();
+    }
+
+    // Decay pulse intensity
+    this.pulseIntensity *= this.pulseDecay;
+    if (this.pulseIntensity < 0.001) this.pulseIntensity = 0;
+
+    // Update uniforms
+    this.material.uniforms.uTime.value = time * 0.001;
+    this.material.uniforms.uPulseIntensity.value = this.pulseIntensity;
+
+    // State machine
+    this.updateStateMachine(time);
+
+    // Particle positions, colors, sizes
+    this.updateParticles(time, delta);
+
+    // Sync geometry attributes
+    this.points.geometry.attributes.position.needsUpdate = true;
+    this.points.geometry.attributes.customColor.needsUpdate = true;
+    this.points.geometry.attributes.customSize.needsUpdate = true;
+    this.points.geometry.attributes.customParams.needsUpdate = true;
+
+    // Update draw range
+    this.points.geometry.setDrawRange(0, this.activeCount);
+
+    // Debug FPS
+    this.debugFrameCount++;
+    this.debugFpsTimer += delta;
+    if (this.debugFpsTimer >= 1) {
+      document.getElementById('debug-fps').textContent = `fps: ${this.debugFrameCount}`;
+      this.debugFrameCount = 0;
+      this.debugFpsTimer = 0;
+      document.getElementById('debug-particles').textContent = `particles: ${this.activeCount}`;
+    }
+  }
+
+  updateStateMachine(time) {
+    const elapsed = time - this.transitionStartTime;
+
+    switch (this.state) {
+      case 'STABLE': {
+        // Check mouse proximity — dissolve if close (world distance < ~0.8 units)
+        const prox = this.mouseNorm.length();
+        if (prox < 0.8 && elapsed > 1500) {
+          this.triggerDissolve();
+        }
+        break;
+      }
+
+      case 'DISSOLVE': {
+        if (elapsed > DISSOLVE_DURATION + 2000) {
+          this.triggerReform();
+        }
+        break;
+      }
+
+      case 'WORD_TRANSITION_DISSOLVE': {
+        if (elapsed > DISSOLVE_DURATION) {
+          // Switch to next word
+          this.wordIndex = this.nextWordIndex;
+          this.currentWord = WORDS[this.wordIndex];
+          this.setupWord(this.wordIndex, true);
+          this.state = 'REFORM';
+          this.transitionStartTime = time;
+          this.computeReformTints();
+          for (let i = 0; i < this.activeCount; i++) {
+            if (this.active[i]) {
+              this.sizes[i] = 1.0 + this.weights[i] * 0.5;
+            }
+          }
+          this.updateDebugHUD();
+        }
+        break;
+      }
+
+      case 'REFORM': {
+        if (elapsed > REFORM_DURATION) {
+          this.state = 'STABLE';
+          this.updateDebugHUD();
+        }
+        break;
+      }
+    }
+  }
+
+  updateParticles(time, delta) {
+    const t = time * 0.001;
+    const count = this.activeCount;
+    const isDissolving = this.state === 'DISSOLVE' || this.state === 'WORD_TRANSITION_DISSOLVE';
+    const isReforming = this.state === 'REFORM';
+    const mouseDist = this.mouseNorm.length();
+    const mouseAttract = mouseDist > 0.5 && mouseDist < 8;
+
+    for (let i = 0; i < count; i++) {
+      if (!this.active[i]) continue;
+
+      const i3 = i * 3;
+      let px = this.positions[i3];
+      let py = this.positions[i3 + 1];
+      let pz = this.positions[i3 + 2];
+
+      if (isDissolving) {
+        // Lerp toward spiral destinations
+        const dx = this.dissolveTargets[i3];
+        const dy = this.dissolveTargets[i3 + 1];
+        const dz = this.dissolveTargets[i3 + 2];
+        const speed = 0.025 + 0.01 * this.weights[i];
+        px += (dx - px) * speed;
+        py += (dy - py) * speed;
+        pz += (dz - pz) * speed;
+
+        // Tint transition
+        this.colors[i3]     += (this.targetColors[i3]     - this.colors[i3]) * 0.03;
+        this.colors[i3 + 1] += (this.targetColors[i3 + 1] - this.colors[i3 + 1]) * 0.03;
+        this.colors[i3 + 2] += (this.targetColors[i3 + 2] - this.colors[i3 + 2]) * 0.03;
+
+      } else if (isReforming) {
+        // Lerp back to letterform positions
+        const tx = this.targets[i3];
+        const ty = this.targets[i3 + 1];
+        const tz = this.targets[i3 + 2];
+        const speed = 0.03 + 0.02 * this.weights[i];
+        px += (tx - px) * speed;
+        py += (ty - py) * speed;
+        pz += (tz - pz) * speed;
+
+        // Tint transition back to cyan
+        this.colors[i3]     += (this.targetColors[i3]     - this.colors[i3]) * 0.04;
+        this.colors[i3 + 1] += (this.targetColors[i3 + 1] - this.colors[i3 + 1]) * 0.04;
+        this.colors[i3 + 2] += (this.targetColors[i3 + 2] - this.colors[i3 + 2]) * 0.04;
+
+      } else {
+        // STABLE: micro-oscillation — sine wave per particle, random phase
+        const phase = this.phases[i];
+        const oscX = Math.sin(t * 1.5 + phase) * 0.006;
+        const oscY = Math.cos(t * 2.3 + phase * 1.7) * 0.004;
+        const oscZ = Math.sin(t * 0.7 + phase) * 0.008;
+        px = this.targets[i3]     + oscX;
+        py = this.targets[i3 + 1] + oscY;
+        pz = this.targets[i3 + 2] + oscZ;
+
+        // Gentle mouse attractor (parallax effect at 10% strength)
+        if (mouseAttract) {
+          const dx = (this.mouseNorm.x - px) * 0.001;
+          const dy = (this.mouseNorm.y - py) * 0.001;
+          px += dx;
+          py += dy;
+        }
+      }
+
+      // Beat pulse: brief core spike + scale perturbation
+      if (this.pulseIntensity > 0.01) {
+        // Core value spikes on beat
+        this.params[i * 2 + 1] += this.pulseIntensity * 0.3;
+
+        // Intensity boost
+        this.params[i * 2] = Math.min(1.2, this.params[i * 2] + this.pulseIntensity * 0.2);
+      }
+
+      // Relax params toward rest values
+      const restIntensity = 0.6 + this.weights[i] * 0.4;
+      const restCore = 0.3 + this.weights[i] * 0.7;
+      this.params[i * 2]     += (restIntensity - this.params[i * 2])     * 0.02;
+      this.params[i * 2 + 1] += (restCore - this.params[i * 2 + 1]) * 0.02;
+
+      // Apply pulse to size
+      if (this.pulseIntensity > 0.05) {
+        const sizeBoost = 1 + this.pulseIntensity * 0.08;
+        this.sizes[i] *= (1 + (sizeBoost - 1) * 0.1);
+      }
+
+      this.positions[i3]     = px;
+      this.positions[i3 + 1] = py;
+      this.positions[i3 + 2] = pz;
+    }
+  }
+
+  // ========================================================================
+  // Layer 6: Perpetual Word Cycle
+  // ========================================================================
+
+  startWordCycle() {
+    setInterval(() => {
+      if (this.state === 'STABLE') {
+        this.triggerNextWord();
+      }
+    }, WORD_INTERVAL);
+  }
+
+  // ========================================================================
+  // Render Loop
+  // ========================================================================
+
+  startLoop() {
+    this.lastFrameTime = performance.now();
+
+    const loop = (now) => {
+      requestAnimationFrame(loop);
+      const delta = Math.min((now - this.lastFrameTime) / 1000, 0.05); // cap delta
+      this.lastFrameTime = now;
+      this.update(now, delta);
+      this.renderer.render(this.scene, this.camera);
+    };
+    loop(performance.now());
+  }
+
+  updateDebugHUD() {
+    const stateEl  = document.getElementById('debug-state');
+    const wordEl   = document.getElementById('debug-word');
+    if (stateEl) stateEl.textContent = `state: ${this.state}`;
+    if (wordEl)  wordEl.textContent  = `word: ${this.currentWord}`;
+  }
+}
+
+// ========================================================================
+// Entry Point: Sound-Gated Overlay (Layer 5)
+// ========================================================================
+let app = null;
+
+document.getElementById('btn-sound').addEventListener('click', () => {
+  document.getElementById('entry-overlay').classList.add('hidden');
+  app = new TypographicParticleDissolve(true);
+  app.updateDebugHUD();
+  // Show instructions briefly
+  setTimeout(() => {
+    document.getElementById('instructions').style.opacity = '0';
+  }, 8000);
+});
+
+document.getElementById('btn-nosound').addEventListener('click', () => {
+  document.getElementById('entry-overlay').classList.add('hidden');
+  app = new TypographicParticleDissolve(false);
+  app.updateDebugHUD();
+  setTimeout(() => {
+    document.getElementById('instructions').style.opacity = '0';
+  }, 8000);
+});
+
+console.log(`
+✦ Typographic Particle Dissolve ✦
+  Click      — dissolve/reform particles
+  Space      — next word
+  G          — toggle debug HUD
+  Scroll     — adjust BPM (20–200)
+  Mouse      — proximity dissolve (near letters)
+`);
+</script>
+</body>
+</html>

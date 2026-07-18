@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generative Editorial Topography</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    overflow-x: hidden;
+    background: #0a0a0a;
+  }
+
+  #canvas-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+  }
+
+  #tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    display: none;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 8vw;
+    position: relative;
+    transition: opacity 0.6s ease;
+  }
+
+  .headline {
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    font-weight: 700;
+    line-height: 1.08;
+    margin-bottom: 0.4em;
+    letter-spacing: -0.02em;
+    max-width: 800px;
+  }
+
+  .byline {
+    font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 1.8em;
+    opacity: 0.75;
+  }
+
+  .body {
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    line-height: 1.75;
+    max-width: 640px;
+  }
+
+  /* Culture palette: warm, expressive */
+  .culture {
+    color: #F4E4C1;
+    background: rgba(26, 15, 46, 0.88);
+  }
+  .culture .headline { color: #EDAE49; }
+  .culture .byline { color: #D1495B; }
+
+  /* Nature palette: earthy, grounded */
+  .nature {
+    color: #D4E0D4;
+    background: rgba(13, 26, 13, 0.88);
+  }
+  .nature .headline { color: #8FA68F; }
+  .nature .byline { color: #5D7A5D; }
+
+  /* Design palette: modern, minimal */
+  .design {
+    color: #EAEAEA;
+    background: rgba(10, 10, 10, 0.88);
+  }
+  .design .headline { color: #BFC0C0; }
+  .design .byline { color: #778DA9; }
+
+  .section-indicator {
+    position: fixed;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    pointer-events: auto;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    border: 2px solid rgba(255,255,255,0.35);
+    cursor: pointer;
+    transition: all 0.35s ease;
+  }
+
+  .dot.active {
+    background: rgba(255,255,255,0.95);
+    border-color: rgba(255,255,255,1);
+    transform: scale(1.35);
+  }
+
+  .hint {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    color: rgba(255,255,255,0.45);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div id="canvas-container"></div>
+<div id="tooltip"></div>
+<div class="section-indicator">
+  <div class="dot active" data-index="0"></div>
+  <div class="dot" data-index="1"></div>
+  <div class="dot" data-index="2"></div>
+</div>
+<div class="hint">Scroll &middot; Arrow Keys &middot; Click to Reseed</div>
+
+<main>
+  <section id="section-0" class="culture">
+    <div class="headline">The Culture of Curiosity</div>
+    <div class="byline">Exploring the Creative Mind &mdash; 1240 words</div>
+    <div class="body">
+      In a world driven by rapid technological change, the creative spirit remains our most resilient asset. Culture is not merely the art we consume, but the lens through which we interpret reality. This article examines how curiosity fuels innovation across disciplines, from the ateliers of Paris to the startup hubs of Silicon Valley. When sentiment runs high, the terrain opens up: wide valleys, smooth ridges, and expansive plateaus where ideas flow freely.
+    </div>
+  </section>
+  <section id="section-1" class="nature">
+    <div class="headline">Wilderness and the Wandering Eye</div>
+    <div class="byline">Nature in Focus &mdash; 890 words</div>
+    <div class="body">
+      The natural world offers no guarantees, only patterns. In the alpine meadows and coastal rainforests, we find the raw material of meaning. This piece traces the photographer's journey through the Pacific Northwest, revealing how the landscape reshapes the observer as much as the observer frames the landscape. Negative sentiment compresses the terrain: fractured ridges, tight contours, and steep gradients where every step demands attention.
+    </div>
+  </section>
+  <section id="section-2" class="design">
+    <div class="headline">Form Follows Friction</div>
+    <div class="byline">Design Discipline &mdash; 1560 words</div>
+    <div class="body">
+      Good design is not the absence of complexity, but the mastery of it. Every interface, every object, every space carries the weight of a thousand decisions. This essay unpacks the invisible labor behind the seamless experiences we take for granted, and argues that friction, when placed intentionally, is a design feature&mdash;not a bug. Neutral sentiment yields balanced terrain: measured slopes, regular contours, and an equilibrium between chaos and control.
+    </div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script>
+const articles = [
+  { category: 'culture', wordCount: 1240, sentiment: 0.7 },
+  { category: 'nature', wordCount: 890, sentiment: -0.3 },
+  { category: 'design', wordCount: 1560, sentiment: 0.2 }
+];
+
+const palettes = {
+  culture: ['#D1495B', '#EDAE49', '#F4E4C1', '#692A5C', '#2C0E37'],
+  nature: ['#5D7A5D', '#8FA68F', '#D4E0D4', '#3A4F3A', '#1B2A1B'],
+  design: ['#5C5C5C', '#8C8C8C', '#EAEAEA', '#2D2D2D', '#0A0A0A']
+};
+
+let currentIndex = 0;
+let particles = [];
+const NUM_PARTICLES = 500;
+let rez = 20;
+let cols, rows;
+let seed, noiseScale, tectonic;
+let terrainGraphics;
+
+function setup() {
+  let canvas = createCanvas(windowWidth, windowHeight);
+  canvas.parent('canvas-container');
+  canvas.style('display', 'block');
+
+  cols = floor(width / rez) + 1;
+  rows = floor(height / rez) + 1;
+  terrainGraphics = createGraphics(width, height);
+
+  setArticleParams(0);
+
+  for (let i = 0; i < NUM_PARTICLES; i++) {
+    particles.push(new Particle());
+  }
+
+  // p5 mouse events fire on the canvas
+  canvas.mousePressed(() => {
+    seed = floor(random(1000000));
+    regenerateTerrain();
+  });
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  cols = floor(width / rez) + 1;
+  rows = floor(height / rez) + 1;
+  terrainGraphics = createGraphics(width, height);
+  regenerateTerrain();
+  for (let p of particles) {
+    p.pos.x = constrain(p.pos.x, 0, width);
+    p.pos.y = constrain(p.pos.y, 0, height);
+    p.prevPos = p.pos.copy();
+  }
+}
+
+function setArticleParams(index) {
+  currentIndex = index;
+  let article = articles[index];
+  seed = article.wordCount;
+  noiseScale = map(article.sentiment, -1, 1, 0.018, 0.003);
+  tectonic = map(abs(article.sentiment), 0, 1, 1.0, 1.6);
+  regenerateTerrain();
+  for (let p of particles) {
+    p.color = random(palettes[article.category]);
+    p.reset();
+  }
+  updateDots();
+}
+
+function regenerateTerrain() {
+  let pal = palettes[articles[currentIndex].category];
+  terrainGraphics.clear();
+  noiseSeed(seed);
+
+  // Terrain fill with Perlin noise
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      let nx = x * rez * noiseScale;
+      let ny = y * rez * noiseScale * tectonic;
+      let n = noise(nx, ny);
+      let c;
+      if (n < 0.28) c = pal[4];
+      else if (n < 0.45) c = pal[3];
+      else if (n < 0.62) c = pal[2];
+      else if (n < 0.78) c = pal[1];
+      else c = pal[0];
+      terrainGraphics.fill(c);
+      terrainGraphics.noStroke();
+      terrainGraphics.rect(x * rez, y * rez, rez + 1, rez + 1);
+    }
+  }
+
+  // Marching-squares contour lines
+  terrainGraphics.stroke(pal[2]);
+  terrainGraphics.strokeWeight(1.2);
+  for (let y = 0; y < rows - 1; y++) {
+    for (let x = 0; x < cols - 1; x++) {
+      let xPos = x * rez;
+      let yPos = y * rez;
+
+      let tl = noise(xPos * noiseScale, yPos * noiseScale * tectonic);
+      let tr = noise((xPos + rez) * noiseScale, yPos * noiseScale * tectonic);
+      let br = noise((xPos + rez) * noiseScale, (yPos + rez) * noiseScale * tectonic);
+      let bl = noise(xPos * noiseScale, (yPos + rez) * noiseScale * tectonic);
+
+      let threshold = 0.5;
+      let config = 0;
+      if (tl > threshold) config += 8;
+      if (tr > threshold) config += 4;
+      if (br > threshold) config += 2;
+      if (bl > threshold) config += 1;
+
+      let xMid = xPos + rez * 0.5;
+      let yMid = yPos + rez * 0.5;
+      let xRight = xPos + rez;
+      let yBottom = yPos + rez;
+
+      // Linear interpolation for more precise contour lines
+      let lerpTop = threshold === tl ? 0.5 : (threshold - tl) / (tr - tl);
+      let lerpRight = threshold === tr ? 0.5 : (threshold - tr) / (br - tr);
+      let lerpBottom = threshold === bl ? 0.5 : (threshold - bl) / (br - bl);
+      let lerpLeft = threshold === tl ? 0.5 : (threshold - tl) / (bl - tl);
+
+      let xTop = xPos + rez * constrain(lerpTop, 0, 1);
+      let yRight = yPos + rez * constrain(lerpRight, 0, 1);
+      let xBottom = xPos + rez * constrain(lerpBottom, 0, 1);
+      let yLeft = yPos + rez * constrain(lerpLeft, 0, 1);
+
+      switch (config) {
+        case 1:
+          terrainGraphics.line(xPos, yLeft, xBottom, yBottom);
+          break;
+        case 2:
+          terrainGraphics.line(xBottom, yBottom, xRight, yRight);
+          break;
+        case 3:
+          terrainGraphics.line(xPos, yLeft, xRight, yRight);
+          break;
+        case 4:
+          terrainGraphics.line(xTop, yPos, xRight, yRight);
+          break;
+        case 5:
+          terrainGraphics.line(xPos, yLeft, xTop, yPos);
+          terrainGraphics.line(xBottom, yBottom, xRight, yRight);
+          break;
+        case 6:
+          terrainGraphics.line(xTop, yPos, xBottom, yBottom);
+          break;
+        case 7:
+          terrainGraphics.line(xPos, yLeft, xTop, yPos);
+          break;
+        case 8:
+          terrainGraphics.line(xPos, yLeft, xTop, yPos);
+          break;
+        case 9:
+          terrainGraphics.line(xTop, yPos, xBottom, yBottom);
+          break;
+        case 10:
+          terrainGraphics.line(xPos, yLeft, xBottom, yBottom);
+          terrainGraphics.line(xTop, yPos, xRight, yRight);
+          break;
+        case 11:
+          terrainGraphics.line(xTop, yPos, xRight, yRight);
+          break;
+        case 12:
+          terrainGraphics.line(xPos, yLeft, xRight, yRight);
+          break;
+        case 13:
+          terrainGraphics.line(xBottom, yBottom, xRight, yRight);
+          break;
+        case 14:
+          terrainGraphics.line(xPos, yLeft, xBottom, yBottom);
+          break;
+        case 15:
+          break;
+      }
+    }
+  }
+}
+
+function draw() {
+  image(terrainGraphics, 0, 0);
+
+  for (let p of particles) {
+    p.follow();
+    p.update();
+    p.show();
+    p.edges();
+  }
+}
+
+function mouseMoved() {
+  let tooltip = document.getElementById('tooltip');
+  if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+    noiseSeed(seed);
+    let n = noise(mouseX * noiseScale, mouseY * noiseScale * tectonic);
+    tooltip.style.display = 'block';
+    tooltip.style.left = (mouseX + 16) + 'px';
+    tooltip.style.top = (mouseY + 16) + 'px';
+    tooltip.innerText = 'Elevation: ' + n.toFixed(3);
+  } else {
+    tooltip.style.display = 'none';
+  }
+}
+
+function mouseOut() {
+  document.getElementById('tooltip').style.display = 'none';
+}
+
+class Particle {
+  constructor() {
+    this.pos = createVector(random(width), random(height));
+    this.vel = createVector(0, 0);
+    this.acc = createVector(0, 0);
+    this.maxSpeed = 2;
+    this.prevPos = this.pos.copy();
+    this.color = random(palettes[articles[currentIndex].category]);
+  }
+
+  reset() {
+    this.pos = createVector(random(width), random(height));
+    this.vel = createVector(0, 0);
+    this.acc = createVector(0, 0);
+    this.prevPos = this.pos.copy();
+  }
+
+  follow() {
+    let angle = noise(this.pos.x * noiseScale, this.pos.y * noiseScale * tectonic, frameCount * 0.001) * TWO_PI * 2;
+    let force = p5.Vector.fromAngle(angle);
+    force.mult(0.5);
+    this.applyForce(force);
+  }
+
+  applyForce(force) {
+    this.acc.add(force);
+  }
+
+  update() {
+    this.vel.add(this.acc);
+    this.vel.limit(this.maxSpeed);
+    this.prevPos = this.pos.copy();
+    this.pos.add(this.vel);
+    this.acc.mult(0);
+  }
+
+  show() {
+    stroke(this.color);
+    strokeWeight(1);
+    line(this.prevPos.x, this.prevPos.y, this.pos.x, this.pos.y);
+  }
+
+  edges() {
+    if (this.pos.x > width) { this.pos.x = 0; this.prevPos.x = 0; }
+    if (this.pos.x < 0) { this.pos.x = width; this.prevPos.x = width; }
+    if (this.pos.y > height) { this.pos.y = 0; this.prevPos.y = 0; }
+    if (this.pos.y < 0) { this.pos.y = height; this.prevPos.y = height; }
+  }
+}
+
+// Scroll listener
+window.addEventListener('scroll', () => {
+  let index = Math.floor((window.scrollY + window.innerHeight / 2) / window.innerHeight);
+  index = Math.max(0, Math.min(index, articles.length - 1));
+  if (index !== currentIndex) {
+    setArticleParams(index);
+  }
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown') {
+    let next = Math.min(currentIndex + 1, articles.length - 1);
+    if (next !== currentIndex) {
+      document.getElementById('section-' + next).scrollIntoView({ behavior: 'smooth' });
+    }
+  } else if (e.key === 'ArrowUp') {
+    let prev = Math.max(currentIndex - 1, 0);
+    if (prev !== currentIndex) {
+      document.getElementById('section-' + prev).scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+});
+
+// Dot navigation
+document.querySelectorAll('.dot').forEach(dot => {
+  dot.addEventListener('click', () => {
+    let index = parseInt(dot.dataset.index);
+    document.getElementById('section-' + index).scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+function updateDots() {
+  document.querySelectorAll('.dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === currentIndex);
+  });
+}
+</script>
+</body>
+</html>

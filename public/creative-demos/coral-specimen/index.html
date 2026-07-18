@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coral Specimen: A Noise-Driven Variable Font Reef</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,wdth@9..144,100..900,0..100&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #F5F1E8;
+      overflow: hidden;
+      font-family: 'Fraunces', serif;
+      cursor: none;
+    }
+    canvas {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    .letter {
+      position: absolute;
+      font-family: 'Fraunces', serif;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      line-height: 1;
+      z-index: 10;
+      user-select: none;
+      will-change: transform, font-size;
+    }
+    .cursor-overlay {
+      position: absolute;
+      pointer-events: none;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: #39FF14;
+      background: rgba(245, 241, 232, 0.95);
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 100;
+      border: 1px solid rgba(57, 255, 20, 0.4);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .instructions {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: #4A7C8C;
+      z-index: 100;
+      background: rgba(245, 241, 232, 0.85);
+      padding: 8px 10px;
+      border-radius: 4px;
+      pointer-events: none;
+      line-height: 1.5;
+      border: 1px solid rgba(74, 124, 140, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <script>
+    let particles = [];
+    let grid = [];
+    const gridCellSize = 28;
+    let cols, rows;
+    const sentence = "The coral remembers the tide.";
+    let sentenceIndex = 0;
+    let zOffset = 0;
+    let cursorOverlay;
+    let colonies = [];
+    let reseedFlag = false;
+    let instructionDiv;
+    let fontReady = false;
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      background(245, 241, 232);
+
+      cols = ceil(width / gridCellSize);
+      rows = ceil(height / gridCellSize);
+      initGrid();
+
+      cursorOverlay = createDiv('');
+      cursorOverlay.class('cursor-overlay');
+      cursorOverlay.hide();
+
+      instructionDiv = createDiv('Click: spawn colony &nbsp;|&nbsp; R: reseed noise &nbsp;|&nbsp; Particles: 0');
+      instructionDiv.class('instructions');
+
+      // Wait for font to be ready before starting
+      document.fonts.ready.then(() => {
+        fontReady = true;
+        // Initial colony at center
+        colonies.push({ x: width / 2, y: height / 2, rate: 7 });
+        // Seed initial burst
+        for (let i = 0; i < 90; i++) {
+          let x = width / 2 + random(-70, 70);
+          let y = height / 2 + random(-70, 70);
+          spawnParticle(x, y);
+        }
+      });
+    }
+
+    function draw() {
+      // Subtle fade keeps the canvas from becoming infinitely dense
+      noStroke();
+      fill(245, 241, 232, 6);
+      rect(0, 0, width, height);
+
+      zOffset += 0.003;
+
+      if (reseedFlag) {
+        background(245, 241, 232);
+        for (let p of particles) {
+          p.remove();
+        }
+        particles = [];
+        colonies = [];
+        colonies.push({ x: width / 2, y: height / 2, rate: 7 });
+        sentenceIndex = 0;
+        noiseSeed(random(10000));
+        zOffset = 0;
+        reseedFlag = false;
+        initGrid();
+        for (let i = 0; i < 90; i++) {
+          let x = width / 2 + random(-70, 70);
+          let y = height / 2 + random(-70, 70);
+          spawnParticle(x, y);
+        }
+        return;
+      }
+
+      if (!fontReady) {
+        background(245, 241, 232);
+        textAlign(CENTER, CENTER);
+        textFont('Fraunces');
+        textSize(18);
+        fill(74, 124, 140);
+        text("The coral remembers the tide.", width / 2, height / 2);
+        return;
+      }
+
+      // Rebuild grid from current particle positions
+      rebuildGrid();
+
+      // Spawn from colonies
+      for (let c of colonies) {
+        if (frameCount % c.rate === 0 && particles.length < 350) {
+          spawnParticle(c.x + random(-45, 45), c.y + random(-45, 45));
+        }
+      }
+
+      // Update and draw particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        p.update();
+        p.draw();
+        if (p.isDead()) {
+          p.remove();
+          particles.splice(i, 1);
+        }
+      }
+
+      updateCursorOverlay();
+      updateInstruction();
+
+      // Draw cursor
+      noCursor();
+      stroke(57, 255, 20);
+      strokeWeight(2);
+      noFill();
+      ellipse(mouseX, mouseY, 16, 16);
+      line(mouseX - 9, mouseY, mouseX + 9, mouseY);
+      line(mouseX, mouseY - 9, mouseX, mouseY + 9);
+    }
+
+    function initGrid() {
+      grid = [];
+      for (let i = 0; i < cols; i++) {
+        grid[i] = [];
+        for (let j = 0; j < rows; j++) {
+          grid[i][j] = null;
+        }
+      }
+    }
+
+    function rebuildGrid() {
+      initGrid();
+      for (let p of particles) {
+        let cx = floor(p.x / gridCellSize);
+        let cy = floor(p.y / gridCellSize);
+        cx = constrain(cx, 0, cols - 1);
+        cy = constrain(cy, 0, rows - 1);
+        grid[cx][cy] = p;
+      }
+    }
+
+    function spawnParticle(x, y) {
+      if (particles.length >= 350) return null;
+
+      let cx = floor(x / gridCellSize);
+      let cy = floor(y / gridCellSize);
+      cx = constrain(cx, 0, cols - 1);
+      cy = constrain(cy, 0, rows - 1);
+
+      // Occupancy grid collision check
+      if (grid[cx][cy] !== null) {
+        let found = false;
+        let attempts = 0;
+        while (!found && attempts < 10) {
+          let ox = floor(random(-3, 4));
+          let oy = floor(random(-3, 4));
+          let nx = constrain(cx + ox, 0, cols - 1);
+          let ny = constrain(cy + oy, 0, rows - 1);
+          if (grid[nx][ny] === null) {
+            x = nx * gridCellSize + gridCellSize / 2;
+            y = ny * gridCellSize + gridCellSize / 2;
+            cx = nx;
+            cy = ny;
+            found = true;
+          }
+          attempts++;
+        }
+        if (!found) return null;
+      }
+
+      let letter = sentence[sentenceIndex % sentence.length];
+      sentenceIndex++;
+
+      let p = new Particle(x, y, letter);
+      particles.push(p);
+      grid[cx][cy] = p;
+      return p;
+    }
+
+    class Particle {
+      constructor(x, y, letter) {
+        this.x = x;
+        this.y = y;
+        this.prevX = x;
+        this.prevY = y;
+        this.letter = letter;
+        this.vx = random(-0.3, 0.3);
+        this.vy = random(-0.3, 0.3);
+        this.age = 0;
+        this.maxAge = floor(random(350, 750));
+        this.baseSize = random(16, 32);
+        this.color = random() > 0.72 ? '#D96C48' : '#4A7C8C';
+        this.opacity = 1;
+
+        this.element = createDiv(letter);
+        this.element.class('letter');
+        this.element.style('color', this.color);
+        this.element.style('opacity', '1');
+        this.element.position(x, y);
+      }
+
+      update() {
+        this.prevX = this.x;
+        this.prevY = this.y;
+
+        // 3D Perlin noise flow field
+        let n = noise(this.x * 0.004, this.y * 0.004, zOffset);
+        let angle = n * TWO_PI * 4;
+        let force = 0.45;
+
+        this.vx += cos(angle) * force;
+        this.vy += sin(angle) * force;
+
+        // Damping
+        this.vx *= 0.93;
+        this.vy *= 0.93;
+
+        // Micro jitter
+        this.vx += random(-0.08, 0.08);
+        this.vy += random(-0.08, 0.08);
+
+        let newX = this.x + this.vx;
+        let newY = this.y + this.vy;
+
+        // Soft bounce at edges
+        if (newX < 0) { newX = 0; this.vx *= -0.6; }
+        if (newX > width) { newX = width; this.vx *= -0.6; }
+        if (newY < 0) { newY = 0; this.vy *= -0.6; }
+        if (newY > height) { newY = height; this.vy *= -0.6; }
+
+        this.x = newX;
+        this.y = newY;
+        this.age++;
+
+        // Variable font settings driven by noise and velocity
+        let n2 = noise(this.x * 0.008, this.y * 0.008, zOffset * 1.5);
+        let weight = floor(map(n2, 0, 1, 100, 900));
+        let speed = abs(this.vx) + abs(this.vy);
+        let wdth = floor(map(speed, 0, 5, 0, 100));
+        wdth = constrain(wdth, 0, 100);
+        let opsz = floor(map(this.age, 0, this.maxAge, 9, 144));
+        opsz = constrain(opsz, 9, 144);
+
+        let fvs = `'wght' ${weight}, 'wdth' ${wdth}, 'opsz' ${opsz}`;
+        this.element.style('font-variation-settings', fvs);
+
+        // Size pulses slightly with age
+        let size = this.baseSize * map(sin(this.age * 0.02), -1, 1, 0.85, 1.15);
+        this.element.style('font-size', size + 'px');
+        this.element.position(this.x, this.y);
+
+        // Fade out near death
+        if (this.age > this.maxAge - 120) {
+          this.opacity = map(this.age, this.maxAge - 120, this.maxAge, 1, 0);
+          this.element.style('opacity', this.opacity);
+        }
+      }
+
+      draw() {
+        stroke(this.color);
+        strokeWeight(1.3);
+        line(this.prevX, this.prevY, this.x, this.y);
+      }
+
+      isDead() {
+        return this.age > this.maxAge;
+      }
+
+      remove() {
+        this.element.remove();
+      }
+    }
+
+    function mousePressed() {
+      colonies.push({ x: mouseX, y: mouseY, rate: 6 });
+      // Burst of new particles at click location
+      for (let i = 0; i < 18; i++) {
+        spawnParticle(mouseX + random(-55, 55), mouseY + random(-55, 55));
+      }
+    }
+
+    function keyPressed() {
+      if (key === 'r' || key === 'R') {
+        reseedFlag = true;
+      }
+    }
+
+    function updateCursorOverlay() {
+      let nearest = null;
+      let nearestDist = Infinity;
+      let nearestFvs = '';
+
+      for (let p of particles) {
+        let d = dist(mouseX, mouseY, p.x, p.y);
+        if (d < nearestDist && d < 150) {
+          nearestDist = d;
+          nearest = p;
+          nearestFvs = p.element.style('font-variation-settings');
+        }
+      }
+
+      if (nearest) {
+        cursorOverlay.html(nearestFvs || 'font-variation-settings');
+        cursorOverlay.position(mouseX + 16, mouseY + 16);
+        cursorOverlay.show();
+      } else {
+        // Show noise-derived settings at cursor position
+        let n = noise(mouseX * 0.004, mouseY * 0.004, zOffset);
+        let weight = floor(map(n, 0, 1, 100, 900));
+        let wdth = floor(map(noise(mouseX * 0.008 + 100, mouseY * 0.008 + 100, zOffset), 0, 1, 0, 100));
+        let opsz = 72;
+        cursorOverlay.html(`'wght' ${weight}, 'wdth' ${wdth}, 'opsz' ${opsz}`);
+        cursorOverlay.position(mouseX + 16, mouseY + 16);
+        cursorOverlay.show();
+      }
+    }
+
+    function updateInstruction() {
+      instructionDiv.html(
+        'Click: spawn colony &nbsp;|&nbsp; R: reseed noise &nbsp;|&nbsp; Particles: ' + particles.length
+      );
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      cols = ceil(width / gridCellSize);
+      rows = ceil(height / gridCellSize);
+      initGrid();
+    }
+  </script>
+</body>
+</html>

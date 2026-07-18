@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shader-to-CSS Pipeline · CC9 Prompt 05</title>
+<style>
+  /* =========================================================
+     CASCADE LAYERS: theme tokens + state curves + component
+     ========================================================= */
+  @layer theme.base, theme.light, theme.dark, theme.high-contrast, states;
+
+  /* Custom property definitions (shader curves exposed via @property) */
+  @property --hover-progress {
+    syntax: "<number>";
+    initial-value: 0;
+    inherits: true;
+  }
+  @property --focus-progress {
+    syntax: "<number>";
+    initial-value: 0;
+    inherits: true;
+  }
+  @property --active-progress {
+    syntax: "<number>";
+    initial-value: 0;
+    inherits: true;
+  }
+  @property --disable-progress {
+    syntax: "<number>";
+    initial-value: 0;
+    inherits: true;
+  }
+  @property --pixel-peep {
+    syntax: "<number>";
+    initial-value: 0;
+    inherits: true;
+  }
+
+  /* Theme tokens */
+  @layer theme.base {
+    :root {
+      --card-width: 340px;
+      --card-height: 440px;
+      --radius: 24px;
+      --texture-scale: 100px; /* aligns with runtime build size */
+      --noise-opacity: 0.18;
+      --color-bg-start: #0b1220;
+      --color-bg-end: #111827;
+      --color-accent: #22d3ee;
+      --color-accent-2: #818cf8;
+      --color-text: #f8fafc;
+      --color-text-dim: #94a3b8;
+    }
+    /* Base surface */
+    html { background: var(--color-bg-start); color: var(--color-text); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--color-bg-start);
+      color: var(--color-text);
+    }
+  }
+
+  @layer theme.light {
+    :root {
+      --color-bg-start: #eef2f6;
+      --color-bg-end: #f8fafc;
+      --color-text: #0b1220;
+      --color-text-dim: #475569;
+    }
+  }
+
+  @layer theme.dark {
+    :root {
+      --color-bg-start: #0b1220;
+      --color-bg-end: #111827;
+      --color-text: #f8fafc;
+      --color-text-dim: #94a3b8;
+    }
+  }
+
+  @layer theme.high-contrast {
+    :root {
+      --color-bg-start: #000000;
+      --color-bg-end: #000000;
+      --color-accent: #ffff00;
+      --color-accent-2: #00ffff;
+      --color-text: #ffffff;
+      --color-text-dim: #e5e5e5;
+      --noise-opacity: 0;
+      --radius: 16px;
+    }
+  }
+
+  /* State keyframes / curve definitions */
+  @keyframes hover-drive {
+    0%   { --hover-progress: 0; }
+    100% { --hover-progress: 1; }
+  }
+  @keyframes focus-drive {
+    0%   { --focus-progress: 0; }
+    100% { --focus-progress: 1; }
+  }
+  @keyframes active-drive {
+    0%   { --active-progress: 0; }
+    100% { --active-progress: 1; }
+  }
+  @keyframes disable-drive {
+    0%   { --disable-progress: 0; }
+    100% { --disable-progress: 1; }
+  }
+  @keyframes peep-drive {
+    0%   { --pixel-peep: 0; }
+    100% { --pixel-peep: 1; }
+  }
+
+  /* States layer: interaction-authored on .card */
+  @layer states {
+    .card {
+      /* Bind generated textures */
+      --shader-texture: image-set(url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>') 1x);
+      --sdf-overlay: image-set(url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>') 1x);
+      --ascii-texture: none;
+
+      /* State property defaults */
+      --hover-progress: 0;
+      --focus-progress: 0;
+      --active-progress: 0;
+      --disable-progress: 0;
+      --pixel-peep: 0;
+
+      width: var(--card-width);
+      height: var(--card-height);
+      border-radius: var(--radius);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      isolation: isolate;
+      user-select: none;
+
+      /* Compose background pipeline */
+      background-color: var(--color-bg-start);
+      background-image:
+        var(--shader-texture),
+        var(--sdf-overlay);
+      background-size:
+        var(--texture-scale) var(--texture-scale),
+        cover;
+      background-position: center, center;
+      background-repeat: repeat, no-repeat;
+
+      transform: scale(calc(1 - var(--active-progress) * 0.04));
+      box-shadow:
+        0 20px 40px -15px color-mix(in srgb, var(--color-accent), transparent 70%),
+        0 0 0 calc(2px + var(--focus-progress) * 3px) color-mix(in srgb, var(--color-accent), transparent 30%);
+      border: 1px solid color-mix(in srgb, var(--color-accent-2), transparent 70%);
+
+      transition:
+        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.3s ease,
+        border-color 0.3s ease,
+        filter 0.35s ease,
+        opacity 0.35s ease;
+    }
+
+    /* Hover state: distinct shader curve + pixel-peeping trigger */
+    .card:hover {
+      animation: hover-drive 0.9s ease-out forwards;
+      background-position: calc(var(--hover-progress) * 12px) calc(var(--hover-progress) * -12px), center;
+      box-shadow:
+        0 28px 55px -20px color-mix(in srgb, var(--color-accent), transparent 50%),
+        0 0 0 2px color-mix(in srgb, var(--color-accent), transparent 60%);
+      /* Forwards: --hover-progress remains at 1 while hovered */
+    }
+
+    /* Focus-visible state */
+    .card:focus-visible {
+      animation: focus-drive 0.5s ease-out forwards;
+    }
+
+    /* Active/press state */
+    .card:active {
+      animation: active-drrive 0.12s ease-out forwards;
+      cursor: grabbing;
+    }
+
+    /* Disabled state */
+    .card.disabled {
+      cursor: not-allowed;
+      pointer-events: none;
+      animation: disable-drive 0.4s ease-out forwards;
+      filter: grayscale(var(--disable-progress)) brightness(calc(1 - var(--disable-progress) * 0.25));
+      opacity: calc(1 - var(--disable-progress) * 0.4);
+    }
+
+    /* Pixel peeping overlay (1-bit dithered ASCII canvas) */
+    .card .peep-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: var(--pixel-peep);
+      background-image: var(--ascii-texture);
+      background-size: cover;
+      background-position: center;
+      mix-blend-mode: normal;
+      transition: opacity 0.4s ease;
+    }
+
+    /* Content layer */
+    .card-body {
+      position: absolute;
+      inset: 0;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 2;
+      pointer-events: none;
+      color: var(--color-text);
+    }
+
+    .card-title {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-text-dim);
+    }
+    .card-headline {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1.05;
+      margin-top: 10px;
+      color: var(--color-text);
+      text-wrap: balance;
+    }
+    .card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--color-accent), transparent 88%);
+      color: var(--color-accent);
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1px solid color-mix(in srgb, var(--color-accent), transparent 55%);
+      backdrop-filter: blur(4px) saturate(120%);
+    }
+    .peep-indicator {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--color-accent);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .peep-indicator.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Demo chrome */
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 28px;
+    padding: 24px;
+    background:
+      radial-gradient(1200px 800px at 20% 10%, color-mix(in srgb, var(--color-accent), transparent 92%), transparent),
+      radial-gradient(900px 600px at 80% 90%, color-mix(in srgb, var(--color-accent-2), transparent 90%), transparent),
+      var(--color-bg-start);
+  }
+  .stage h1 {
+    margin: 0;
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-dim);
+  }
+  .controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .controls button {
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--color-text-dim), transparent 50%);
+    background: color-mix(in srgb, var(--color-bg-end), transparent 70%);
+    color: var(--color-text);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    backdrop-filter: blur(6px);
+  }
+  .controls button:hover { background: color-mix(in srgb, var(--color-accent), transparent 80%); }
+</style>
+</head>
+<body>
+  <main class="stage">
+    <h1>Shader-to-CSS Pipeline Media Card</h1>
+
+    <div class="card" id="mediaCard" tabindex="0" role="button" aria-label="Shader media card">
+      <div class="peep-overlay" id="peepOverlay"></div>
+      <div class="card-body">
+        <div>
+          <div class="card-title">Cascade-layer tokens &amp; offscreen shader pipeline</div>
+          <div class="card-headline">Hover 8 seconds to enter pixel peeping mode</div>
+        </div>
+        <div class="card-foot">
+          <span class="badge">fBM · SDF · image-set()</span>
+          <span class="peep-indicator" id="peepIndicator">Pixel peeping enabled.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button data-layer="light-layer">Light theme</button>
+      <button data-layer="dark-layer">Dark theme</button>
+      <button data-layer="hc-layer">High contrast</button>
+      <button id="toggleDisabled">Toggle disabled</button>
+    </div>
+  </main>
+
+<script>
+/* =========================================================
+   SHADER-TO-CSS PIPELINE (init-time build step)
+   - fBM noise texture (≤100×100)
+   - SDF overlay
+   - ASCII / 1-bit dithered peep texture
+   - Piped into CSS custom properties as image-set() data URIs
+   ========================================================= */
+(function buildPipeline() {
+  const SIZE = 100; // meets ≤100×100 requirement
+  const ASCII_COLS = 60;
+  const ASCII_ROWS = 20;
+
+  // Token colors mirrored from CSS layers
+  const BASE = [11, 18, 32];     /* --color-bg-start */
+  const END  = [17, 24, 39];     /* --color-bg-end   */
+  const A1   = [34, 211, 238];   /* --color-accent   */
+  const A2   = [129, 140, 248];  /* --color-accent-2 */
+
+  // Hash PRNG for deterministic noise
+  const hash = (n) => {
+    let s = Math.sin(n) * 43758.5453123;
+    return s - Math.floor(s);
+  };
+
+  // 2D value noise with Hermite smoothing
+  const noise = (x, y) => {
+    const i = Math.floor(x), j = Math.floor(y);
+    const f = x - i, g = y - j;
+    const u = f * f * (3 - 2 * f), v = g * g * (3 - 2 * g);
+    const n00 = hash(i + j * 57.0);
+    const n10 = hash(i + 1 + j * 57.0);
+    const n01 = hash(i + (j + 1) * 57.0);
+    const n11 = hash(i + 1 + (j + 1) * 57.0);
+    return n00 + (n10 - n00) * u + (n01 - n00) * v + (n00 - n10 - n01 + n11) * u * v;
+  };
+
+  // Fractal Brownian motion
+  const fbm = (x, y, oct = 6) => {
+    let v = 0, amp = 0.5, freq = 1;
+    for (let i = 0; i < oct; i++) {
+      v += amp * noise(x * freq, y * freq);
+      freq *= 2.0; amp *= 0.5;
+    }
+    return v;
+  };
+
+  // SDF rounded-box
+  const sdfRoundBox = (px, py, cx, cy, hw, hh, r) => {
+    const dx = Math.abs(px - cx) - hw + r;
+    const dy = Math.abs(py - cy) - hh + r;
+    return Math.min(Math.max(dx, dy), 0) + Math.hypot(Math.max(dx, 0), Math.max(dy, 0)) - r;
+  };
+
+  function toHex(n) { return Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0"); }
+  function rgb(a, b, c) { return "#" + toHex(a) + toHex(b) + toHex(c); }
+
+  function generateBase() {
+    const c = document.createElement("canvas");
+    c.width = SIZE; c.height = SIZE;
+    const ctx = c.getContext("2d");
+    const img = ctx.createImageData(SIZE, SIZE);
+    const d = img.data;
+
+    for (let y = 0; y < SIZE; y++) {
+      for (let x = 0; x < SIZE; x++) {
+        const u = x / SIZE, v = y / SIZE;
+        const qx = fbm(u, v);
+        const qy = fbm(u + 5.2, v + 1.3);
+        const r = fbm(u + 4 * qx + 1.7, v + 4 * qy + 9.2);
+        const s = fbm(u + 4 * qx + 7.3, v + 4 * qy + 3.8);
+        const t = fbm(u + 8 * r + 2.8, v + 8 * s + 6.1);
+
+        const k = t;
+        const blend1 = Math.pow(Math.max(0, k - 0.5) * 2, 2);
+        let tr = BASE[0] + (END[0] - BASE[0]) * k + (A1[0] - BASE[0]) * blend1 * 0.35;
+        let tg = BASE[1] + (END[1] - BASE[1]) * k + (A1[1] - BASE[1]) * blend1 * 0.35;
+        let tb = BASE[2] + (END[2] - BASE[2]) * k + (A1[2] - BASE[2]) * blend1 * 0.35;
+
+        const dist = sdfRoundBox(u, v, 0.5, 0.5, 0.34, 0.44, 0.16);
+        const sdf = Math.max(0, 1 - dist / 0.18);
+        const glow = 1 - Math.exp(-sdf * 5);
+
+        const m = 0.88;
+        let fr = tr * m + A2[0] * glow * (1 - m);
+        let fg = tg * m + A2[1] * glow * (1 - m);
+        let fb = tb * m + A2[2] * glow * (1 - m);
+
+        const idx = (y * SIZE + x) * 4;
+        d[idx] = fr; d[idx + 1] = fg; d[idx + 2] = fb; d[idx + 3] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    return c.toDataURL("image/png");
+  }
+
+  function generateSDF() {
+    const c = document.createElement("canvas");
+    c.width = SIZE; c.height = SIZE;
+    const ctx = c.getContext("2d");
+    const g = ctx.createRadialGradient(SIZE/2, SIZE/2, SIZE * 0.18, SIZE/2, SIZE/2, SIZE * 0.72);
+    g.addColorStop(0, "rgba(34,211,238,0.32)");
+    g.addColorStop(0.55, "rgba(129,140,248,0.10)");
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, SIZE, SIZE);
+    return c.toDataURL("image/png");
+  }
+
+  function grayscaleLum(px, py) {
+    const u = px / ASCII_COLS, v = py / ASCII_ROWS;
+    const qx = fbm(u, v);
+    const qy = fbm(u + 5.2, v + 1.3);
+    const r = fbm(u + 4 * qx + 1.7, v + 4 * qy + 9.2);
+    const s = fbm(u + 4 * qx + 7.3, v + 4 * qy + 3.8);
+    const t = fbm(u + 8 * r + 2.8, v + 8 * s + 6.1);
+    let lum = BASE[0] * 0.114 + BASE[1] * 0.587 + BASE[2] * 0.114;
+    lum += t * (END[0] * 0.114 + END[1] * 0.587 + END[2] * 0.114);
+    lum += Math.pow(Math.max(0, t - 0.5) * 2, 2) * (A1[0] * 0.114 + A1[1] * 0.587 + A1[2] * 0.114) * 0.35;
+    const dist = sdfRoundBox(u, v, 0.5, 0.5, 0.34, 0.44, 0.16);
+    const sdf = Math.max(0, 1 - dist / 0.18);
+    lum += sdf * 45;
+    return lum;
+  }
+
+  function generateASCII() {
+    const c = document.createElement("canvas");
+    c.width = ASCII_COLS * 2; c.height = ASCII_ROWS * 2;
+    const ctx = c.getContext("2d");
+
+    // Sample luminance, then 1-bit dither + draw ASCII glyphs
+    const lum = new Float32Array(ASCII_COLS * ASCII_ROWS);
+    for (let y = 0; y < ASCII_ROWS; y++) {
+      for (let x = 0; x < ASCII_COLS; x++) {
+        lum[y * ASCII_COLS + x] = grayscaleLum(x, y);
+      }
+    }
+
+    // Floyd-Steinberg
+    for (let y = 0; y < ASCII_ROWS; y++) {
+      for (let x = 0; x < ASCII_COLS; x++) {
+        const idx = y * ASCII_COLS + x;
+        const old = lum[idx];
+        const nv = old > 128 ? 255 : 0;
+        const err = old - nv;
+        lum[idx] = nv;
+        if (x + 1 < ASCII_COLS) lum[idx + 1] += err * 7 / 16;
+        if (y + 1 < ASCII_ROWS) {
+          if (x > 0) lum[(y + 1) * ASCII_COLS + (x - 1)] += err * 3 / 16;
+          lum[(y + 1) * ASCII_COLS + x] += err * 5 / 16;
+          if (x + 1 < ASCII_COLS) lum[(y + 1) * ASCII_COLS + (x + 1)] += err * 1 / 16;
+        }
+      }
+    }
+
+    // Map to ASCII ramp
+    const ramp = ["  ", "░░", "▒▒", "▓▓", "██"];
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = 'bold 9px ui-monospace, SFMono-Regular, Menlo, monospace';
+    ctx.textBaseline = 'top';
+    for (let y = 0; y < ASCII_ROWS; y++) {
+      for (let x = 0; x < ASCII_COLS; x++) {
+        const val = lum[y * ASCII_COLS + x];
+        const ci = Math.min(ramp.length - 1, Math.max(0, Math.floor((val / 255) * (ramp.length - 1) + 0.5)));
+        ctx.fillText(ramp[ci], x * 2, y * 2);
+      }
+    }
+    return c.toDataURL("image/png");
+  }
+
+  const baseURI = generateBase();
+  const asciiURI = generateASCII();
+  const sdfURI = generateSDF();
+
+  const root = document.documentElement;
+  root.style.setProperty("--shader-texture", `image-set(url('${baseURI}') 1x)`);
+  root.style.setProperty("--sdf-overlay", `image-set(url('${sdfURI}') 1x)`);
+  root.style.setProperty("--ascii-texture", `image-set(url('${asciiURI}') 1x)`);
+})();
+
+/* =========================================================
+   INTERACTION CHOREOGRAPHY
+   - Hover timing for pixel peeping (only JS listener added)
+   - Focus/active/disabled remain CSS-only states
+   ========================================================= */
+(() => {
+  const card = document.getElementById("mediaCard");
+  const overlay = document.getElementById("peepOverlay");
+  const indicator = document.getElementById("peepIndicator");
+
+  let timer = null;
+  let peeping = false;
+  const PEEP_MS = 8000; // 8s deterministically within 7.5–9s window
+
+  const enterPeep = () => {
+    peeping = true;
+    card.style.setProperty("--pixel-peep", "1");
+    overlay.style.opacity = "1";
+    indicator.classList.add("visible");
+  };
+  const leavePeep = () => {
+    clearTimeout(timer);
+    if (peeping) {
+      peeping = false;
+      card.style.setProperty("--pixel-peep", "0");
+      overlay.style.opacity = "0";
+      indicator.classList.remove("visible");
+    }
+  };
+
+  card.addEventListener("mouseenter", () => {
+    if (card.classList.contains("disabled")) return;
+    timer = setTimeout(enterPeep, PEEP_MS);
+  });
+  card.addEventListener("mouseleave", leavePeep);
+  card.addEventListener("focus", () => {
+    if (card.classList.contains("disabled")) return;
+    timer = setTimeout(enterPeep, PEEP_MS);
+  });
+  card.addEventListener("blur", leavePeep);
+
+  // Demo controls
+  document.querySelectorAll("[data-layer]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.body.className = btn.getAttribute("data-layer");
+    });
+  });
+  document.getElementById("toggleDisabled").addEventListener("click", () => {
+    card.classList.toggle("disabled");
+  });
+})();
+</script>
+</body>
+</html>

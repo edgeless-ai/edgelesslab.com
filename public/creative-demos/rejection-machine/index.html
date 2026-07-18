@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Rejection Machine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,MONO,CASL,CRSV@0..-15,300..1000,0..1,0..1,0..1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+/* =============================================
+   RESET & BASE
+   ============================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  /* Default axis values for the root */
+  --mono: 1;
+  --casl: 0;
+  --crsv: 0;
+  --slnt: 0;
+  --wght: 400;
+}
+
+body {
+  font-family: 'Recursive', monospace;
+  font-variation-settings:
+    'MONO' var(--mono, 1),
+    'CASL' var(--casl, 0),
+    'CRSV' var(--crsv, 0),
+    'slnt' var(--slnt, 0);
+  font-weight: var(--wght, 400);
+  line-height: 1.8;
+  background: #0a0a0a;
+  color: #e0e0e0;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* =============================================
+   SECTIONS
+   ============================================= */
+.section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6rem 0;
+  view-transition-name: section;
+  position: relative;
+}
+
+.section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #333, transparent);
+}
+
+.section:last-child::after { display: none; }
+
+.section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variation-settings:
+    'MONO' var(--mono, 1),
+    'CASL' var(--casl, 0),
+    'CRSV' 0,
+    'slnt' 0;
+  background: linear-gradient(135deg, #e0e0e0, #888);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section p {
+  font-size: 1.2rem;
+  margin-bottom: 1.8rem;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  position: relative;
+  font-variation-settings:
+    'MONO' var(--mono, 1),
+    'CASL' var(--casl, 0),
+    'CRSV' var(--crsv, 0),
+    'slnt' var(--slnt, 0);
+  font-weight: var(--wght, 400);
+  /* smooth transitions for rejection/animation */
+  transition: color 0.8s ease, background 0.8s ease, opacity 0.8s ease, filter 0.8s ease;
+  will-change: font-variation-settings;
+}
+
+/* =============================================
+   REJECTED STATE — dissolves into cursive
+   ============================================= */
+.section p.rejected {
+  --rej-mono: 0;
+  --rej-casl: 1;
+  --rej-crsv: 1;
+  --rej-slnt: -12;
+  font-variation-settings:
+    'MONO' var(--rej-mono, 0),
+    'CASL' var(--rej-casl, 1),
+    'CRSV' var(--rej-crsv, 1),
+    'slnt' var(--rej-slnt, -12);
+  color: #555;
+  opacity: 0.4;
+  filter: blur(0.5px);
+  background: rgba(255, 30, 30, 0.04);
+  border-left: 2px solid rgba(255, 50, 50, 0.2);
+  transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: dissolve 1s ease forwards;
+}
+
+@keyframes dissolve {
+  0%   { letter-spacing: 0em; filter: blur(0px);   opacity: 1; }
+  50%  { letter-spacing: 0.03em; filter: blur(0.3px); opacity: 0.6; }
+  100% { letter-spacing: 0.02em; filter: blur(0.5px); opacity: 0.4; }
+}
+
+/* =============================================
+   APPEALED STATE
+   ============================================= */
+.section p.appealed {
+  --app-mono: 0.4;
+  --app-casl: 0.5;
+  --app-crsv: 0;
+  --app-slnt: 0;
+  font-variation-settings:
+    'MONO' var(--app-mono, 0.4),
+    'CASL' var(--app-casl, 0.5),
+    'CRSV' var(--app-crsv, 0),
+    'slnt' var(--app-slnt, 0);
+  color: #8f8;
+  opacity: 1;
+  filter: blur(0px);
+  background: rgba(0, 255, 100, 0.04);
+  border-left: 3px solid rgba(0, 255, 100, 0.4);
+  transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: accept-glow 0.8s ease;
+}
+
+@keyframes accept-glow {
+  0%   { background: rgba(0, 255, 100, 0.15); }
+  100% { background: rgba(0, 255, 100, 0.04); }
+}
+
+/* =============================================
+   APPEALING STATE (in-progress hover)
+   ============================================= */
+.section p.appealing {
+  border-left: 3px solid #ffd700;
+  background: rgba(255, 215, 0, 0.04);
+}
+
+/* =============================================
+   APPEAL PROGRESS BAR
+   ============================================= */
+.appeal-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ffd700, #ff8c00);
+  border-radius: 0 0 4px 4px;
+  transition: none;
+}
+
+/* =============================================
+   SCOREBOARD
+   ============================================= */
+.scoreboard {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(8, 8, 8, 0.92);
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  font-family: 'Recursive', monospace;
+  font-size: 0.72rem;
+  font-variation-settings: 'MONO' 1, 'CASL' 0, 'CRSV' 0, 'slnt' 0;
+  min-width: 210px;
+  z-index: 1000;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  user-select: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.scoreboard h3 {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #666;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid #222;
+}
+
+.scoreboard .metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.15rem 0;
+}
+
+.scoreboard .metric .label {
+  color: #666;
+}
+
+.scoreboard .metric .value {
+  color: #ccc;
+  font-weight: 600;
+  font-size: 0.75rem;
+  font-variation-settings: 'MONO' 1, 'CASL' 0, 'CRSV' 0;
+}
+
+.scoreboard .value.good { color: #4d4; }
+.scoreboard .value.warn { color: #da0; }
+.scoreboard .value.bad  { color: #e33; }
+
+.scoreboard .threshold-section {
+  margin: 0.6rem 0;
+  padding: 0.5rem 0;
+  border-top: 1px solid #222;
+  border-bottom: 1px solid #222;
+}
+
+.scoreboard .threshold-bar {
+  margin-top: 0.3rem;
+  height: 3px;
+  background: #222;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.scoreboard .threshold-bar .fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.scoreboard .stats {
+  margin-top: 0.5rem;
+  font-size: 0.62rem;
+  color: #555;
+  font-variation-settings: 'MONO' 1, 'CASL' 0, 'CRSV' 0;
+}
+
+.scoreboard .status-tag {
+  display: inline-block;
+  margin-top: 0.4rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.scoreboard .status-tag.active { background: rgba(255,50,50,0.15); color: #e33; border: 1px solid rgba(255,50,50,0.2); }
+.scoreboard .status-tag.idle   { background: rgba(255,215,0,0.1);  color: #da0; border: 1px solid rgba(255,215,0,0.15); }
+
+/* =============================================
+   VIEW TRANSITIONS
+   ============================================= */
+::view-transition-old(section) {
+  animation: 450ms cubic-bezier(0.22, 1, 0.36, 1) both fade-out;
+}
+::view-transition-new(section) {
+  animation: 450ms cubic-bezier(0.22, 1, 0.36, 1) both fade-in;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(15px) scale(0.97); filter: blur(2px); }
+  to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes fade-out {
+  from { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  to   { opacity: 0; transform: translateY(-15px) scale(0.97); filter: blur(2px); }
+}
+
+/* section header view transitions */
+#section-1 h2 { view-transition-name: s1-title; }
+#section-2 h2 { view-transition-name: s2-title; }
+#section-3 h2 { view-transition-name: s3-title; }
+#section-4 h2 { view-transition-name: s4-title; }
+
+/* =============================================
+   SEPARATOR / PULL-QUOTE
+   ============================================= */
+.section-num {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #444;
+  margin-bottom: 0.5rem;
+  font-variation-settings: 'MONO' 1, 'CASL' 0, 'CRSV' 0;
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 700px) {
+  .container { padding: 1.2rem; }
+  .section { padding: 4rem 0; min-height: 90vh; }
+  .section h2 { font-size: 1.8rem; margin-bottom: 1.8rem; }
+  .section p { font-size: 1rem; padding: 0.5rem 0.75rem; margin-bottom: 1.2rem; }
+  .scoreboard { top: 0.5rem; right: 0.5rem; min-width: 160px; padding: 0.7rem 0.9rem; font-size: 0.65rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- =============================================
+     FLOATING SCOREBOARD
+     ============================================= -->
+<div class="scoreboard" id="scoreboard">
+  <h3>⏤ Rejection Monitor ⏤</h3>
+  <div class="threshold-section">
+    <div class="metric">
+      <span class="label">Threshold</span>
+      <span class="value" id="threshold-val">0.500</span>
+    </div>
+    <div class="metric">
+      <span class="label">Scroll Vel.</span>
+      <span class="value" id="velocity-val">0 px/s</span>
+    </div>
+    <div class="threshold-bar">
+      <div class="fill" id="threshold-fill" style="width:50%; background:linear-gradient(90deg,#e33,#da0,#4d4)"></div>
+    </div>
+  </div>
+  <div class="metric">
+    <span class="label">Density</span>
+    <span class="value" id="density-val">—</span>
+  </div>
+  <div class="metric">
+    <span class="label">Whitespace</span>
+    <span class="value" id="whitespace-val">—</span>
+  </div>
+  <div class="metric">
+    <span class="label">Coherence</span>
+    <span class="value" id="coherence-val">—</span>
+  </div>
+  <div class="metric">
+    <span class="label">Overall</span>
+    <span class="value" id="overall-val">—</span>
+  </div>
+  <div class="stats" id="stats">Rejected: 0 / 0 paragraphs</div>
+  <div class="status-tag active" id="status-tag">● REJECTING</div>
+</div>
+
+<!-- =============================================
+     ESSAY CONTENT
+     ============================================= -->
+<div class="container">
+
+  <!-- SECTION I -->
+  <section class="section" id="section-1"
+    data-start-mono="1" data-start-casl="0" data-start-crsv="0" data-start-slnt="0" data-start-wght="400"
+    data-end-mono="0.7" data-end-casl="0.3" data-end-crsv="0.15" data-end-slnt="-4" data-end-wght="550">
+    <div class="section-num">I</div>
+    <h2>The Taxonomy of Rejection</h2>
+
+    <p class="essay-text">Rejection operates along multiple axes. There is the rejection of the marketplace, where an idea fails to find purchase; the rejection of the peer, where personal affinity is withheld; and the rejection of the self, where internal critique forecloses possibility before it can bloom. Each form carries its own texture, its own weight, its own particular flavor of negation. The philosopher examines rejection as a structuring principle of consciousness. To be rejected is to be defined by absence, to exist in the negative space of another's preference. It is, in some sense, the most honest form of feedback the world can offer.</p>
+
+    <p class="essay-text">But what of algorithmic rejection? When a machine judges the worth of a sentence, a paragraph, a life's work, we have entered a new territory. The algorithm does not deliberate. It does not weigh context or intention. It simply measures, compares, and decides. We have built systems that mirror our own capacity for judgment, but stripped of empathy, stripped of second thoughts, stripped of the capacity to be wrong in interesting ways.</p>
+
+    <p class="essay-text">Consider the architecture of a typical rejection pipeline. Input is received, features are extracted, scores are computed, a threshold is applied. Below the line: rejection. Above the line: acceptance. The binary is brutal in its simplicity. There is no maybe, no "come back later," no "I see what you were trying to do." There is only pass or fail, and the line moves with the velocity of your scrolling.</p>
+  </section>
+
+  <!-- SECTION II -->
+  <section class="section" id="section-2"
+    data-start-mono="0.7" data-start-casl="0.3" data-start-crsv="0.15" data-start-slnt="-4" data-start-wght="550"
+    data-end-mono="0.35" data-end-casl="0.65" data-end-crsv="0.45" data-end-slnt="-8" data-end-wght="700">
+    <div class="section-num">II</div>
+    <h2>The Algorithm's Judgment</h2>
+
+    <p class="essay-text">The Rejection Sampler considers each paragraph as a collection of measurable properties. Density: the ratio of characters to words, a proxy for conceptual concentration. Whitespace: the breathing room between ideas, between letters, the silence that makes speech legible. Coherence: the statistical likelihood that one word follows another in a way that produces meaning rather than noise.</p>
+
+    <p class="essay-text">These metrics are not arbitrary. They encode a theory of good writing, a normative standard that privileges certain forms of expression over others. Prose that is too dense feels academic, exclusionary. Prose that is too sparse feels thin, undercooked. The algorithm hunts for a Goldilocks zone, a narrow band of acceptability that shifts with every scroll, every glance, every moment of user impatience encoded as velocity.</p>
+
+    <p class="essay-text">When a paragraph falls below the threshold, it dissolves. The letters loosen their bonds, pulling apart like mourners leaving a grave. The careful architecture of the sentence collapses into something more fluid, more gestural. Cursive, the algorithm seems to say, is what happens when form fails. The text bleeds into its own margins, and the machine waits, indifferent, for an appeal it does not expect to receive.</p>
+  </section>
+
+  <!-- SECTION III -->
+  <section class="section" id="section-3"
+    data-start-mono="0.35" data-start-casl="0.65" data-start-crsv="0.45" data-start-slnt="-8" data-start-wght="700"
+    data-end-mono="0" data-end-casl="1" data-end-crsv="0.85" data-end-slnt="-12" data-end-wght="850">
+    <div class="section-num">III</div>
+    <h2>On Being Found Wanting</h2>
+
+    <p class="essay-text">There is a particular anguish in being judged by a system that cannot understand you. The algorithm does not know the sleepless night that produced the sentence, the thesaurus consulted, the thesaurus rejected, the word found at last in the quiet hour before dawn when the mind is both sharpest and most vulnerable. It only knows that the density ratio is suboptimal for the current threshold. It does not care why.</p>
+
+    <p class="essay-text">And yet. There is also a strange freedom in being rejected by something so magnificently indifferent. The algorithm's judgment carries no malice, no envy, no hidden agenda, no childhood trauma expressing itself as professional criticism. It is pure, statistical, dispassionate. In being rejected by the machine, we are released — briefly, fictionally — from the burden of human judgment. The rejection is clean. It leaves no emotional residue.</p>
+
+    <p class="essay-text">Or so we tell ourselves. The truth is more unsettling. The algorithm was trained on human judgments. Its metrics encode our preferences, our biases, our unexamined assumptions about what constitutes good prose. The training data was curated by someone with a theory of quality. When the machine rejects us, we are really rejecting ourselves through a mechanism we built to make that rejection feel objective. The mirror has been polished to a chrome finish, but it is still a mirror.</p>
+  </section>
+
+  <!-- SECTION IV -->
+  <section class="section" id="section-4"
+    data-start-mono="0" data-start-casl="1" data-start-crsv="0.85" data-start-slnt="-12" data-start-wght="850"
+    data-end-mono="0" data-end-casl="1" data-end-crsv="1" data-end-slnt="-15" data-end-wght="1000">
+    <div class="section-num">IV</div>
+    <h2>The Acceptance of Rejection</h2>
+
+    <p class="essay-text">Perhaps the final lesson of the Rejection Machine is this: that rejection is not the opposite of acceptance but its complement. To be rejected is to be seen, to be evaluated, to be found not wanting in some absolute sense but simply not fitting the current shape of the threshold. The machine's cold calculus reveals something profound about the nature of judgment itself — that it is always situational, always contextual, always a function of parameters that could be different.</p>
+
+    <p class="essay-text">We can appeal. Hover — hold your attention on the rejected text for one second, one full second of sustained regard — and the machine relents. The dissolved letters reconstitute themselves, the cursive straightens back into legible form, the color returns from grey to green. This too is a lesson: that attention is the antidote to algorithmic dismissal. To be seen, truly seen, is to be accepted. The mechanism is simple, but its implications are not.</p>
+
+    <p class="essay-text">The Rejection Machine continues to run. It has rejected some of its own sentences in the writing of this essay. It rejects these words even now, even as you read them. Somewhere beneath the fluctuating threshold, a paragraph dissolves into cursive, and the machine does not feel regret or satisfaction. It only waits. It always waits. Scroll, and the judgment begins again.</p>
+  </section>
+
+</div>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ==============================================================
+//  RejectionSampler Class
+// ==============================================================
+class RejectionSampler {
+  constructor() {
+    this.threshold = 0.50;
+    this.baseThreshold = 0.50;
+    this.velocity = 0;
+    this.paragraphs = [];
+    this.rejectedCount = 0;
+    this.totalCount = 0;
+    this.lastIndex = -1;
+  }
+
+  /** Register a <p> element for scoring */
+  addParagraph(el) {
+    this.paragraphs.push({
+      el,
+      text: el.textContent.trim(),
+      scores: null,
+      rejected: false,
+      appealed: false,
+    });
+    this.totalCount = this.paragraphs.length;
+  }
+
+  /**
+   * Set scroll velocity and modulate the rejection threshold.
+   * Higher velocity = higher threshold = more rejection.
+   * velocity is in px/s, smoothed.
+   */
+  setVelocity(v) {
+    this.velocity = v;
+    const modulation = Math.min(0.40, (v / 1800) * 0.40);
+    this.threshold = Math.min(0.92, this.baseThreshold + modulation);
+  }
+
+  /**
+   * Score a single paragraph on three axes:
+   *   density    – chars per word (ideal ~5)
+   *   whitespace – ratio of whitespace to total chars (ideal ~0.18)
+   *   coherence  – std-dev of word lengths (ideal ~2.5)
+   * Returns { total, density, whitespace, coherence, rejected }
+   */
+  scoreParagraph(text) {
+    const words = text.split(/\s+/);
+    const wordCount = words.length;
+    const charCount = text.length;
+    const spaceCount = (text.match(/\s/g) || []).length;
+    if (wordCount === 0) return { total: 0, density: 0, whitespace: 0, coherence: 0, rejected: false };
+
+    // ── Density ──
+    const avgCharPerWord = charCount / wordCount;
+    const densityScore = Math.max(0, 1 - Math.abs(avgCharPerWord - 5) / 12);
+
+    // ── Whitespace ──
+    const whitespaceRatio = spaceCount / charCount;
+    const whitespaceScore = Math.max(0, 1 - Math.abs(whitespaceRatio - 0.18) / 0.25);
+
+    // ── Coherence (lower variance in word length → more regular → feels more "coherent") ──
+    const wordLengths = words.map(w => w.length);
+    const avgLen = wordLengths.reduce((a, b) => a + b, 0) / wordCount;
+    const variance = wordLengths.reduce((a, b) => a + (b - avgLen) ** 2, 0) / wordCount;
+    const stdDev = Math.sqrt(variance);
+    const coherenceScore = Math.max(0, 1 - Math.abs(stdDev - 2.5) / 8);
+
+    // ── Small noise for organic feel ──
+    const noise = (Math.random() - 0.5) * 0.12;
+
+    const raw = densityScore * 0.35 + whitespaceScore * 0.30 + coherenceScore * 0.35;
+    const total = Math.max(0, Math.min(1, raw + noise));
+
+    return {
+      total,
+      density: densityScore,
+      whitespace: whitespaceScore,
+      coherence: coherenceScore,
+      rejected: total < this.threshold,
+    };
+  }
+
+  /** Evaluate every paragraph, updating DOM classes. */
+  evaluateAll() {
+    this.rejectedCount = 0;
+    let lastScores = null;
+    let lastIdx = -1;
+
+    this.paragraphs.forEach((p, i) => {
+      if (p.appealed) {
+        if (p.rejected) {
+          p.rejected = false;
+          p.el.classList.remove('rejected');
+        }
+        return;
+      }
+
+      const scores = this.scoreParagraph(p.text);
+      p.scores = scores;
+      const wasRejected = p.rejected;
+      p.rejected = scores.rejected;
+
+      if (scores.rejected) {
+        p.el.classList.add('rejected');
+        p.el.classList.remove('appealed');
+        p.appealed = false;
+        this.rejectedCount++;
+      } else {
+        p.el.classList.remove('rejected');
+      }
+
+      lastScores = scores;
+      lastIdx = i;
+    });
+
+    if (lastScores) {
+      this.lastIndex = lastIdx;
+      this._pushScores(lastScores);
+    }
+    this._updateStats();
+  }
+
+  /** Re-score a specific paragraph by index. */
+  evaluateParagraph(index) {
+    const p = this.paragraphs[index];
+    if (!p || p.appealed) return;
+
+    const scores = this.scoreParagraph(p.text);
+    p.scores = scores;
+    p.rejected = scores.rejected;
+
+    if (scores.rejected) {
+      p.el.classList.add('rejected');
+      p.el.classList.remove('appealed');
+      p.appealed = false;
+    } else {
+      p.el.classList.remove('rejected');
+    }
+
+    this.lastIndex = index;
+    this._pushScores(scores);
+
+    this.rejectedCount = this.paragraphs.filter(x => x.rejected && !x.appealed).length;
+    this._updateStats();
+  }
+
+  /** Appeal (accept) a rejected paragraph. */
+  appeal(index) {
+    const p = this.paragraphs[index];
+    if (!p || !p.rejected) return false;
+
+    p.appealed = true;
+    p.rejected = false;
+    p.el.classList.remove('rejected');
+    p.el.classList.add('appealed');
+
+    this.rejectedCount = this.paragraphs.filter(x => x.rejected && !x.appealed).length;
+    this._updateStats();
+
+    // flash ACCEPTED on scoreboard
+    const ov = document.getElementById('overall-val');
+    ov.textContent = 'ACCEPTED';
+    ov.className = 'value good';
+    document.getElementById('status-tag').textContent = '● ACCEPTED';
+    document.getElementById('status-tag').className = 'status-tag idle';
+    setTimeout(() => {
+      const cur = this.paragraphs[index];
+      if (cur && cur.scores) {
+        this._pushScores(cur.scores);
+      }
+      document.getElementById('status-tag').textContent = '● REJECTING';
+      document.getElementById('status-tag').className = 'status-tag active';
+    }, 1200);
+
+    return true;
+  }
+
+  /** Push scores to the scoreboard DOM. */
+  _pushScores(s) {
+    if (!s) return;
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (typeof val === 'number') {
+        el.textContent = val.toFixed(3);
+        el.className = 'value ' + (val > 0.6 ? 'good' : val > 0.35 ? 'warn' : 'bad');
+      } else {
+        el.textContent = val;
+        el.className = 'value';
+      }
+    };
+    setVal('density-val', s.density);
+    setVal('whitespace-val', s.whitespace);
+    setVal('coherence-val', s.coherence);
+    setVal('overall-val', s.total);
+    document.getElementById('threshold-val').textContent = this.threshold.toFixed(3);
+    document.getElementById('threshold-fill').style.width = (this.threshold * 100) + '%';
+    document.getElementById('velocity-val').textContent = Math.round(this.velocity) + ' px/s';
+  }
+
+  _updateStats() {
+    document.getElementById('stats').textContent =
+      `Rejected: ${this.rejectedCount} / ${this.totalCount} paragraphs`;
+  }
+}
+
+// ==============================================================
+//  SETUP: RejectionSampler + register paragraphs
+// ==============================================================
+const sampler = new RejectionSampler();
+document.querySelectorAll('.essay-text').forEach(el => sampler.addParagraph(el));
+console.log(`🧠 Rejection Machine: tracking ${sampler.paragraphs.length} paragraphs`);
+
+// ==============================================================
+//  GSAP SCROLLTRIGGER — animate Recursive axis states per section
+// ==============================================================
+const sections = document.querySelectorAll('.section');
+
+sections.forEach((section, idx) => {
+  const pars = section.querySelectorAll('.essay-text');
+  if (!pars.length) return;
+
+  // Read axis states from data attributes
+  const start = {
+    mono: parseFloat(section.dataset.startMono),
+    casl: parseFloat(section.dataset.startCasl),
+    crsv: parseFloat(section.dataset.startCrsv),
+    slnt: parseFloat(section.dataset.startSlnt),
+    wght: parseFloat(section.dataset.startWght),
+  };
+  const end = {
+    mono: parseFloat(section.dataset.endMono),
+    casl: parseFloat(section.dataset.endCasl),
+    crsv: parseFloat(section.dataset.endCrsv),
+    slnt: parseFloat(section.dataset.endSlnt),
+    wght: parseFloat(section.dataset.endWght),
+  };
+
+  // GSAP can't natively interpolate `fontVariationSettings` as a string,
+  // so we use a proxy object and apply via onUpdate.
+  pars.forEach(p => {
+    const proxy = { ...start };
+    gsap.to(proxy, {
+      mono: end.mono,
+      casl: end.casl,
+      crsv: end.crsv,
+      slnt: end.slnt,
+      wght: end.wght,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: section,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 1.8,
+        invalidateOnRefresh: true,
+      },
+      onUpdate() {
+        // Only update if paragraph isn't in a rejected/appealed override state
+        if (p.classList.contains('rejected') || p.classList.contains('appealed')) return;
+        p.style.fontVariationSettings =
+          `'MONO' ${proxy.mono}, 'CASL' ${proxy.casl}, 'CRSV' ${proxy.crsv}, 'slnt' ${proxy.slnt}`;
+        p.style.fontWeight = proxy.wght;
+      },
+    });
+  });
+});
+
+// ==============================================================
+//  SCROLL VELOCITY TRACKING
+// ==============================================================
+let lastScrollY = window.scrollY;
+let lastScrollTime = performance.now();
+let smoothVelocity = 0;
+let lastThreshold = 0.50;
+
+function velocityLoop(now) {
+  const dt = Math.max(2, now - lastScrollTime);
+  const dy = Math.abs(window.scrollY - lastScrollY);
+  const instant = (dy / dt) * 1000; // px/s
+
+  smoothVelocity = smoothVelocity * 0.72 + instant * 0.28;
+  lastScrollY = window.scrollY;
+  lastScrollTime = now;
+
+  sampler.setVelocity(smoothVelocity);
+
+  // Re-evaluate if threshold crossed a significant delta
+  if (Math.abs(sampler.threshold - lastThreshold) > 0.015) {
+    sampler.evaluateAll();
+    lastThreshold = sampler.threshold;
+  }
+
+  requestAnimationFrame(velocityLoop);
+}
+
+requestAnimationFrame(velocityLoop);
+
+// Also batch-evaluate on scroll (throttled)
+let scrollBatch = null;
+window.addEventListener('scroll', () => {
+  if (!scrollBatch) {
+    scrollBatch = setTimeout(() => {
+      sampler.evaluateAll();
+      scrollBatch = null;
+    }, 350);
+  }
+}, { passive: true });
+
+// ==============================================================
+//  MOUSEENTER APPEAL MECHANISM (hold 1 s to accept)
+// ==============================================================
+document.querySelectorAll('.essay-text').forEach((el, index) => {
+  let timer = null;
+  let progress = null;
+
+  el.addEventListener('mouseenter', () => {
+    if (!el.classList.contains('rejected')) return;
+
+    // Build progress bar
+    progress = document.createElement('div');
+    progress.className = 'appeal-progress';
+    progress.style.width = '0%';
+    el.appendChild(progress);
+    el.classList.add('appealing');
+
+    // Force reflow then start transition
+    void progress.offsetWidth;
+    progress.style.transition = 'width 1s linear';
+    progress.style.width = '100%';
+
+    timer = setTimeout(() => {
+      sampler.appeal(index);
+      el.classList.remove('appealing');
+      if (progress) {
+        progress.style.transition = 'none';
+        progress.remove();
+        progress = null;
+      }
+    }, 1000);
+  });
+
+  el.addEventListener('mouseleave', () => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    el.classList.remove('appealing');
+    if (progress) {
+      progress.style.transition = 'none';
+      progress.remove();
+      progress = null;
+    }
+  });
+});
+
+// ==============================================================
+//  VIEW TRANSITIONS API — morph between sections
+// ==============================================================
+if (document.startViewTransition) {
+  const vtObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        document.startViewTransition(() => {
+          /* DOM change is a no-op; the morph comes from CSS */
+        });
+        break;
+      }
+    }
+  }, { threshold: 0.4 });
+
+  sections.forEach(s => vtObserver.observe(s));
+}
+
+// ==============================================================
+//  INITIAL EVALUATION
+// ==============================================================
+sampler.evaluateAll();
+
+// Continuous periodic re-evaluation
+setInterval(() => {
+  sampler.evaluateAll();
+}, 1800);
+
+console.log('📊 Rejection Machine active. Hover rejected paragraphs for 1s to appeal.');
+</script>
+</body>
+</html>

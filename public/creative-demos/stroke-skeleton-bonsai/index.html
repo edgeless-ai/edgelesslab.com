@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stroke-Skeleton Bonsai</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000000;
+    color: #ffffff;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+  }
+  #ui {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: rgba(0,0,0,0.6);
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid #333333;
+    backdrop-filter: blur(4px);
+  }
+  #ui.zen {
+    background: rgba(255,251,237,0.85);
+    border: 1px solid #9dbeb7;
+  }
+  #ui.zen label, #ui.zen button {
+    color: #2a574d;
+  }
+  #ui.zen input {
+    color: #2a574d;
+    border-color: #9dbeb7;
+    background: #fffbed;
+  }
+  label {
+    font-size: 12px;
+    color: #999999;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  input[type="text"] {
+    font-size: 14px;
+    padding: 6px 10px;
+    border: 1px solid #333333;
+    border-radius: 4px;
+    background: #111111;
+    color: #ffffff;
+    width: 120px;
+    outline: none;
+  }
+  button {
+    font-size: 12px;
+    padding: 6px 12px;
+    border: 1px solid #333333;
+    border-radius: 4px;
+    background: transparent;
+    color: #999999;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: all 0.2s;
+  }
+  button:hover {
+    border-color: #00e5ff;
+    color: #00e5ff;
+  }
+  #ui.zen button:hover {
+    border-color: #e66e4a;
+    color: #e66e4a;
+  }
+  #canvas-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <label for="wordInput">Word</label>
+  <input type="text" id="wordInput" value="BONSAI" maxlength="8">
+  <button id="regenerate">Regenerate</button>
+  <button id="toggleMode">Toggle Mode</button>
+</div>
+<div id="canvas-container"></div>
+
+<script>
+  // ─── Palette ───
+  const PALETTE = {
+    bgVoid: '#000000',
+    bgZen: '#fffbed',
+    branch: '#ffffff',
+    accentVoid: '#00e5ff',
+    accentZen: '#e66e4a',
+    innerZen: '#2a574d',
+    outerZen: '#9dbeb7',
+    leaf: '#00ff88',
+    grid: '#333333',
+    uiText: '#999999'
+  };
+
+  // ─── State ───
+  let mode = 'void'; // 'void' | 'zen'
+  let growthProgress = 0;
+  let maxDepth = 11;
+  let bloomProgress = 0;
+  let seedOffset = 0;
+  let animating = true;
+  let word = 'BONSAI';
+  let dashArray = [10, 5];
+  let dashSolid = false;
+  let canvasSize;
+
+  // ─── DOM hooks ───
+  const uiEl = document.getElementById('ui');
+  const wordInput = document.getElementById('wordInput');
+  const regenBtn = document.getElementById('regenerate');
+  const toggleBtn = document.getElementById('toggleMode');
+
+  wordInput.addEventListener('input', (e) => {
+    word = (e.target.value || 'BONSAI').toUpperCase().slice(0, 8);
+    triggerRegen();
+  });
+  regenBtn.addEventListener('click', triggerRegen);
+  toggleBtn.addEventListener('click', () => {
+    mode = mode === 'void' ? 'zen' : 'void';
+    uiEl.classList.toggle('zen', mode === 'zen');
+  });
+
+  function triggerRegen() {
+    seedOffset = Math.random() * 10000;
+    growthProgress = 0;
+    bloomProgress = 0;
+    animating = true;
+  }
+
+  // ─── p5.js ───
+  function setup() {
+    const container = document.getElementById('canvas-container');
+    canvasSize = { w: container.clientWidth, h: container.clientHeight };
+    const c = createCanvas(canvasSize.w, canvasSize.h);
+    c.parent('canvas-container');
+    frameRate(60);
+    noiseSeed(Math.floor(seedOffset));
+  }
+
+  function windowResized() {
+    const container = document.getElementById('canvas-container');
+    canvasSize = { w: container.clientWidth, h: container.clientHeight };
+    resizeCanvas(canvasSize.w, canvasSize.h);
+  }
+
+  function draw() {
+    // Background
+    if (mode === 'void') {
+      background(PALETTE.bgVoid);
+      drawGrid();
+    } else {
+      background(PALETTE.bgZen);
+      drawZenCircles();
+    }
+
+    // Growth animation
+    if (animating) {
+      growthProgress += 0.008;
+      if (growthProgress >= 1) {
+        growthProgress = 1;
+        bloomProgress += 0.02;
+        if (bloomProgress >= 1) {
+          bloomProgress = 1;
+          animating = false;
+        }
+      }
+    }
+
+    // Tree root
+    const startX = width / 2;
+    const startY = height * 0.88;
+    const trunkLen = Math.min(width, height) * 0.18;
+    const trunkAngle = -PI / 2;
+
+    push();
+    drawBranch(startX, startY, trunkLen, trunkAngle, maxDepth, 0);
+    pop();
+  }
+
+  // ─── Helpers ───
+  function getAngleDeviation(level) {
+    const idx = level % word.length;
+    const code = word.charCodeAt(idx);
+    // Map ASCII 65-90 to deviation range 0.20–0.55 rad (~11–31°)
+    const norm = (code - 65) / 25;
+    return 0.20 + norm * 0.35;
+  }
+
+  function getGlowColor() {
+    return mode === 'void' ? PALETTE.accentVoid : PALETTE.accentZen;
+  }
+
+  function getBgColor() {
+    return mode === 'void' ? PALETTE.bgVoid : PALETTE.bgZen;
+  }
+
+  // ─── Grid (void mode) ───
+  function drawGrid() {
+    stroke(PALETTE.grid);
+    strokeWeight(1);
+    const spacing = 60;
+    for (let x = 0; x < width; x += spacing) {
+      line(x, 0, x, height);
+    }
+    for (let y = 0; y < height; y += spacing) {
+      line(0, y, width, y);
+    }
+  }
+
+  // ─── Zen circles (zen mode) ───
+  function drawZenCircles() {
+    noFill();
+    const cx = width / 2;
+    const cy = height / 2;
+    const maxR = Math.min(width, height) * 0.42;
+    stroke(PALETTE.outerZen);
+    strokeWeight(2);
+    ellipse(cx, cy, maxR * 2, maxR * 2);
+    stroke(PALETTE.innerZen);
+    strokeWeight(3);
+    ellipse(cx, cy, maxR * 1.2, maxR * 1.2);
+  }
+
+  // ─── Stroke-Skeleton Segment ───
+  function drawStrokeSegment(x1, y1, x2, y2, depth) {
+    const freq = 0.003;
+    const amp = 8 * (depth / maxDepth);
+    const n1 = noise(x1 * freq + seedOffset, y1 * freq + frameCount * 0.01);
+    const n2 = noise(x2 * freq + seedOffset, y2 * freq + frameCount * 0.01);
+    const dx1 = (n1 - 0.5) * amp;
+    const dy1 = (n1 - 0.5) * amp;
+    const dx2 = (n2 - 0.5) * amp;
+    const dy2 = (n2 - 0.5) * amp;
+
+    const sx1 = x1 + dx1;
+    const sy1 = y1 + dy1;
+    const sx2 = x2 + dx2;
+    const sy2 = y2 + dy2;
+
+    const weight = map(depth, 0, maxDepth, 0.5, 8);
+    const glowColor = getGlowColor();
+
+    // Glow
+    stroke(glowColor);
+    strokeWeight(weight * 2.5);
+    drawingContext.globalAlpha = 0.25;
+    line(sx1, sy1, sx2, sy2);
+    drawingContext.globalAlpha = 1.0;
+
+    // Core stroke
+    stroke(PALETTE.branch);
+    strokeWeight(weight);
+    if (dashSolid) {
+      drawingContext.setLineDash([]);
+    } else {
+      drawingContext.setLineDash(dashArray);
+    }
+    line(sx1, sy1, sx2, sy2);
+    drawingContext.setLineDash([]);
+  }
+
+  // ─── Leaf-Glyph (tiny radial stroke-skeleton letterform) ───
+  function drawLeafGlyph(cx, cy, depth) {
+    const bloomW = bloomProgress * 1.5;
+    const w = max(0.2, bloomW);
+    const r = 6 + (depth / maxDepth) * 4;
+    const segs = 5;
+    const glowColor = getGlowColor();
+
+    // Glow behind leaf
+    stroke(PALETTE.leaf);
+    strokeWeight(w * 3);
+    drawingContext.globalAlpha = 0.35;
+    for (let i = 0; i < segs; i++) {
+      const a1 = (TWO_PI / segs) * i;
+      const a2 = (TWO_PI / segs) * ((i + 1) % segs);
+      const x1 = cx + cos(a1) * r;
+      const y1 = cy + sin(a1) * r;
+      const x2 = cx + cos(a2) * r;
+      const y2 = cy + sin(a2) * r;
+      line(x1, y1, x2, y2);
+    }
+    drawingContext.globalAlpha = 1.0;
+
+    // Core leaf glyph
+    stroke(PALETTE.leaf);
+    strokeWeight(w);
+    for (let i = 0; i < segs; i++) {
+      const a1 = (TWO_PI / segs) * i;
+      const a2 = (TWO_PI / segs) * ((i + 1) % segs);
+      const n = noise(cx * 0.01 + seedOffset, cy * 0.01 + frameCount * 0.01);
+      const drift = (n - 0.5) * 4;
+      const x1 = cx + cos(a1) * r + drift;
+      const y1 = cy + sin(a1) * r + drift;
+      const x2 = cx + cos(a2) * r + drift;
+      const y2 = cy + sin(a2) * r + drift;
+      line(x1, y1, x2, y2);
+    }
+
+    // Center dot
+    stroke(PALETTE.leaf);
+    strokeWeight(w * 1.5);
+    point(cx, cy);
+  }
+
+  // ─── Recursive Branch ───
+  function drawBranch(x, y, len, angle, depth, level) {
+    if (depth <= 0 || len < 2) return;
+
+    // Growth culling: only draw branches up to current growth level
+    const currentLevel = maxDepth - depth;
+    const visibleLevel = floor(growthProgress * maxDepth);
+    if (currentLevel > visibleLevel) return;
+
+    const x2 = x + cos(angle) * len;
+    const y2 = y + sin(angle) * len;
+
+    drawStrokeSegment(x, y, x2, y2, depth);
+
+    // Leaf-glyph at terminal branches
+    if (depth <= 2 && bloomProgress > 0) {
+      drawLeafGlyph(x2, y2, depth);
+    }
+
+    // Recursion
+    const deviation = getAngleDeviation(level);
+    const lenDecay = random(0.65, 0.75);
+    const leftAngle = angle - deviation;
+    const rightAngle = angle + deviation;
+    const leftLen = len * lenDecay * random(0.9, 1.1);
+    const rightLen = len * lenDecay * random(0.9, 1.1);
+
+    drawBranch(x2, y2, leftLen, leftAngle, depth - 1, level + 1);
+    drawBranch(x2, y2, rightLen, rightAngle, depth - 1, level + 1);
+  }
+
+  // ─── Key toggles ───
+  function keyPressed() {
+    if (key === ' ') {
+      dashSolid = !dashSolid;
+    }
+    if (key === 'r' || key === 'R') {
+      triggerRegen();
+    }
+  }
+</script>
+</body>
+</html>

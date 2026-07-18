@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Current Atlas — Dialing the Wind</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0f0c29; overflow: hidden; font-family: 'Georgia', 'Times New Roman', serif; }
+  #container { position: relative; width: 100vw; height: 100vh; }
+  canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+  #text-overlay { position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
+    font-family: 'Georgia', 'Times New Roman', serif; font-size: 44px; color: #FFFFFF; 
+    z-index: 10; pointer-events: none; text-align: center; letter-spacing: 2px;
+    display: flex; justify-content: center; flex-wrap: wrap; max-width: 85vw; }
+  .char-span { display: inline-block; transition: font-weight 0.3s ease; }
+  #dial-panel { position: absolute; bottom: 30px; right: 30px; z-index: 20; cursor: grab; }
+  #dial-panel:active { cursor: grabbing; }
+  #info-panel { position: absolute; top: 12px; left: 12px; z-index: 20; color: #91BFBE; 
+    font-size: 11px; background: rgba(15,12,41,0.85); padding: 6px 10px; border-radius: 4px; }
+  #wind-says { position: absolute; bottom: 30px; left: 30px; z-index: 20; color: #DA942C;
+    font-size: 11px; font-style: italic; }
+  #controls { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 20;
+    color: #91BFBE; font-size: 10px; background: rgba(15,12,41,0.8); padding: 4px 12px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="info-panel">Heading: N (0°) | Particles: 300 | Turn dial to steer the wind</div>
+  <div id="text-overlay"></div>
+  <div id="dial-panel">
+    <svg id="dial-svg" viewBox="0 0 180 180" width="160" height="160"></svg>
+  </div>
+  <div id="wind-says"></div>
+  <div id="controls">drag dial to steer wind | click canvas for burst | scroll: grain | R: reset</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script>
+// === THE CURRENT ATLAS — Cycle 8 Demo ===
+// Flow field particle system governed by rotary wind dial
+// Sources: Shiffman (Nature of Code), Any Given Moment (dial), Axis-Praxis
+
+const windPhrases = [
+  "the wind remembers", "currents unseen", "drift and return", "weather of being",
+  "flow without form", "steer the invisible", "where the wind goes", "current atlas",
+  "a compass of currents", "north of knowing", "trade wind whispers", "doldrums dreaming",
+  "gulf stream song", "jet stream scar", "zephyr turning", "sirocco sighing",
+  "mistral memories", "monsoon mapping", "breeze becoming", "cyclone stillness"
+];
+
+let dialAngle = 0; // radians, 0 = east (right), PI/2 = south
+let flowField = [];
+let fieldCols, fieldRows;
+let noiseScale = 0.01;
+let particles = [];
+const PARTICLE_COUNT = 300;
+let phraseIndex = 0;
+let lastPhraseChange = 0;
+let dialSlip = false;
+let dialSlipTimer = 0;
+let dialSlipTarget = 0;
+
+// Variable weight tracking
+let characterWeights = [];
+
+let sketch = function(p) {
+  p.setup = function() {
+    let cnv = p.createCanvas(p.windowWidth, p.windowHeight);
+    cnv.parent('container');
+    cnv.style('position', 'absolute');
+    cnv.style('top', '0');
+    cnv.style('left', '0');
+    cnv.style('z-index', '1');
+    p.colorMode(p.RGB, 255);
+    p.noiseSeed(Math.floor(Math.random() * 10000));
+    initFlowField();
+    initParticles();
+    lastPhraseChange = p.millis();
+    updatePhrase();
+    buildDialSVG();
+    updateInfoPanel();
+  };
+
+  p.draw = function() {
+    // Fade background for trails
+    p.background(15, 12, 41, 5);
+
+    // Dial slip check
+    let now = p.millis();
+    if (!dialSlip && now % 50000 < 200 && now > 10000) {
+      dialSlip = true;
+      dialSlipTimer = 8;
+      dialSlipTarget = dialAngle + p.random(-Math.PI/2, Math.PI/2);
+    }
+
+    if (dialSlip && dialSlipTimer > 0) {
+      dialAngle += (dialSlipTarget - dialAngle) * 0.3;
+      dialSlipTimer--;
+      if (dialSlipTimer <= 0) dialSlip = false;
+      initFlowField();
+      buildDialSVG();
+    }
+
+    // Phrase rotation every 12 seconds
+    if (now - lastPhraseChange > 12000) {
+      phraseIndex = (phraseIndex + 1) % windPhrases.length;
+      lastPhraseChange = now;
+      updatePhrase();
+    }
+
+    // Update and draw particles
+    updateParticles();
+
+    // Update text weights based on flow density
+    if (p.frameCount % 10 === 0) {
+      updateCharacterWeights();
+    }
+
+    updateInfoPanel();
+  };
+
+  function initFlowField() {
+    fieldCols = Math.floor(p.width / 12);
+    fieldRows = Math.floor(p.height / 12);
+    flowField = new Array(fieldCols * fieldRows);
+
+    for (let row = 0; row < fieldRows; row++) {
+      for (let col = 0; col < fieldCols; col++) {
+        let n = p.noise(col * noiseScale, row * noiseScale, dialAngle * 10);
+        let angle = n * Math.PI * 4 + dialAngle;
+        flowField[col + row * fieldCols] = angle;
+      }
+    }
+  }
+
+  function initParticles() {
+    particles = [];
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      let px = p.random(p.width);
+      let py = p.random(p.height);
+      let color;
+
+      let r = p.random();
+      if (r < 0.1) {
+        color = [218, 148, 44]; // #DA942C convergence
+      } else if (r < 0.35) {
+        color = [0, 122, 255]; // #007AFF secondary
+      } else {
+        color = [233, 69, 96]; // #e94560 primary
+      }
+
+      particles.push({
+        pos: p.createVector(px, py),
+        prevPos: p.createVector(px, py),
+        vel: p.createVector(p.random(-1, 1), p.random(-1, 1)),
+        maxSpeed: p.random(1.5, 4),
+        maxForce: p.random(0.05, 0.18),
+        color: color,
+        trailAlpha: p.random(10, 30)
+      });
+    }
+  }
+
+  function updateParticles() {
+    for (let particle of particles) {
+      let col = Math.floor(particle.pos.x / 12);
+      let row = Math.floor(particle.pos.y / 12);
+      col = p.constrain(col, 0, fieldCols - 1);
+      row = p.constrain(row, 0, fieldRows - 1);
+
+      let angle = flowField[col + row * fieldCols];
+      let desired = p.createVector(Math.cos(angle), Math.sin(angle));
+      desired.setMag(particle.maxSpeed);
+
+      let steer = p5.Vector.sub(desired, particle.vel);
+      steer.limit(particle.maxForce);
+
+      // Mouse influence
+      if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
+        let d = p.dist(particle.pos.x, particle.pos.y, p.mouseX, p.mouseY);
+        if (d < 100) {
+          let force = p.map(d, 0, 100, 1.2, 0);
+          let dx = p.mouseX - particle.pos.x;
+          let dy = p.mouseY - particle.pos.y;
+          let len = Math.sqrt(dx*dx + dy*dy);
+          if (len > 0) {
+            steer.x += (dx / len) * force * 0.3;
+            steer.y += (dy / len) * force * 0.3;
+          }
+        }
+      }
+
+      particle.vel.add(steer);
+      particle.vel.limit(particle.maxSpeed);
+      particle.prevPos = particle.pos.copy();
+      particle.pos.add(particle.vel);
+
+      // Edge wrapping
+      if (particle.pos.x < 0) particle.pos.x = p.width;
+      if (particle.pos.x > p.width) particle.pos.x = 0;
+      if (particle.pos.y < 0) particle.pos.y = p.height;
+      if (particle.pos.y > p.height) particle.pos.y = 0;
+
+      // Draw
+      p.stroke(particle.color[0], particle.color[1], particle.color[2], particle.trailAlpha);
+      p.strokeWeight(1.2);
+      p.line(particle.prevPos.x, particle.prevPos.y, particle.pos.x, particle.pos.y);
+    }
+  }
+
+  function updateCharacterWeights() {
+    let phrase = windPhrases[phraseIndex];
+    let chars = phrase.replace(/\s/g, '').split('');
+    characterWeights = [];
+
+    for (let ch of chars) {
+      // Approximate position: characters in text overlay area
+      let idx = phrase.indexOf(ch);
+      let charX = 100 + idx * 28;
+      let charY = p.height * 0.15;
+
+      // Sample flow density at character position
+      let density = 0;
+      let samples = 0;
+      for (let dx = -5; dx <= 5; dx += 5) {
+        for (let dy = -5; dy <= 5; dy += 5) {
+          let sx = p.constrain(charX + dx, 0, p.width - 1);
+          let sy = p.constrain(charY + dy, 0, p.height - 1);
+          let px = p.get(Math.floor(sx), Math.floor(sy));
+          let brightness = (px[0] + px[1] + px[2]) / 3;
+          density += brightness;
+          samples++;
+        }
+      }
+      density = density / samples;
+      // Map brightness to weight: dark (empty) = 100, bright (dense) = 900
+      let weight = Math.round(p.map(density, 0, 180, 100, 900, true));
+      characterWeights.push(weight);
+    }
+
+    // Update the overlay spans
+    let overlay = document.getElementById('text-overlay');
+    if (overlay) {
+      let spans = overlay.querySelectorAll('.char-span');
+      for (let i = 0; i < Math.min(spans.length, characterWeights.length); i++) {
+        spans[i].style.fontWeight = characterWeights[i];
+      }
+    }
+  }
+
+  function updatePhrase() {
+    let phrase = windPhrases[phraseIndex];
+    let overlay = document.getElementById('text-overlay');
+    if (overlay) {
+      let html = '';
+      for (let ch of phrase) {
+        if (ch === ' ') {
+          html += '<span class="char-span" style="display:inline-block;width:0.6em"> </span>';
+        } else {
+          html += `<span class="char-span">${ch}</span>`;
+        }
+      }
+      overlay.innerHTML = html;
+    }
+
+    let ws = document.getElementById('wind-says');
+    if (ws) {
+      ws.textContent = `"${phrase}"`;
+    }
+  }
+
+  function updateInfoPanel() {
+    let deg = Math.round(dialAngle * 180 / Math.PI);
+    let heading = getHeading(dialAngle);
+    let info = document.getElementById('info-panel');
+    if (info) {
+      info.textContent = `Heading: ${heading} (${deg}°) | Particles: ${PARTICLE_COUNT} | ${dialSlip ? '⚠ SLIP' : 'Turn dial to steer the wind'}`;
+    }
+  }
+
+  function getHeading(angle) {
+    // Normalize to 0-2PI
+    let a = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+    let headings = ['E', 'SE', 'S', 'SW', 'W', 'NW', 'N', 'NE'];
+    let idx = Math.round(a / (Math.PI / 4)) % 8;
+    return headings[idx];
+  }
+
+  function buildDialSVG() {
+    let svg = document.getElementById('dial-svg');
+    if (!svg) return;
+    let cx = 90, cy = 90, r = 70;
+    let html = '';
+
+    // Dial background
+    html += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#302b63" stroke="#A09C2E" stroke-width="2"/>`;
+
+    // Cardinal direction markers
+    let cardinals = [
+      {label: 'E', angle: 0},
+      {label: 'SE', angle: Math.PI/4},
+      {label: 'S', angle: Math.PI/2},
+      {label: 'SW', angle: 3*Math.PI/4},
+      {label: 'W', angle: Math.PI},
+      {label: 'NW', angle: 5*Math.PI/4},
+      {label: 'N', angle: 3*Math.PI/2},
+      {label: 'NE', angle: 7*Math.PI/4}
+    ];
+
+    for (let c of cardinals) {
+      let angle = c.angle;
+      let tx = cx + Math.cos(angle) * (r - 16);
+      let ty = cy + Math.sin(angle) * (r - 16);
+      let diff = Math.abs(angle - dialAngle);
+      if (diff > Math.PI) diff = Math.PI*2 - diff;
+      let isActive = diff < 0.25;
+      let weight = isActive ? 900 : 200;
+      let color = isActive ? '#FFDF00' : '#A09C2E';
+      let size = c.label.length > 1 ? 9 : 11;
+
+      html += `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="central"
+        fill="${color}" font-size="${size}" font-weight="${weight}" 
+        font-family="Georgia, serif">${c.label}</text>`;
+    }
+
+    // Tick marks
+    for (let i = 0; i < 36; i++) {
+      let angle = (i / 36) * Math.PI * 2;
+      let isMajor = i % 9 === 0;
+      let innerR = isMajor ? r - 16 : r - 10;
+      let x1 = cx + Math.cos(angle) * innerR;
+      let y1 = cy + Math.sin(angle) * innerR;
+      let x2 = cx + Math.cos(angle) * (r - 5);
+      let y2 = cy + Math.sin(angle) * (r - 5);
+      html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" 
+        stroke="#A09C2E" stroke-width="${isMajor ? 2 : 0.5}"/>`;
+    }
+
+    // Heading indicator
+    let hx = cx + Math.cos(dialAngle) * (r - 20);
+    let hy = cy + Math.sin(dialAngle) * (r - 20);
+    html += `<line x1="${cx}" y1="${cy}" x2="${hx}" y2="${hy}" 
+      stroke="#FFDF00" stroke-width="3" stroke-linecap="round"/>`;
+    html += `<circle cx="${hx}" cy="${hy}" r="5" fill="#FFDF00"/>`;
+
+    // Center
+    html += `<circle cx="${cx}" cy="${cy}" r="8" fill="#302b63" stroke="#A09C2E" stroke-width="1.5"/>`;
+    html += `<circle cx="${cx}" cy="${cy}" r="3" fill="#DA942C"/>`;
+
+    svg.innerHTML = html;
+
+    // Dial interaction
+    let isDragging = false;
+    svg.onmousedown = function(e) {
+      isDragging = true;
+      updateDialFromEvent(e);
+    };
+    svg.onmousemove = function(e) {
+      if (isDragging) updateDialFromEvent(e);
+    };
+    svg.onmouseup = function() { isDragging = false; };
+    svg.onmouseleave = function() { isDragging = false; };
+  }
+
+  function updateDialFromEvent(e) {
+    let svg = document.getElementById('dial-svg');
+    if (!svg) return;
+    let rect = svg.getBoundingClientRect();
+    let cx = rect.width / 2;
+    let cy = rect.height / 2;
+    let x = e.clientX - rect.left - cx;
+    let y = e.clientY - rect.top - cy;
+    dialAngle = Math.atan2(y, x);
+    initFlowField();
+    buildDialSVG();
+    updateInfoPanel();
+  }
+
+  // --- p5 Interactions ---
+  p.mousePressed = function() {
+    // Click on canvas for particle burst
+    if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
+      for (let i = 0; i < 20; i++) {
+        let angle = p.random(Math.PI * 2);
+        let speed = p.random(2, 5);
+        particles.push({
+          pos: p.createVector(p.mouseX, p.mouseY),
+          prevPos: p.createVector(p.mouseX, p.mouseY),
+          vel: p.createVector(Math.cos(angle) * speed, Math.sin(angle) * speed),
+          maxSpeed: p.random(2, 4),
+          maxForce: p.random(0.05, 0.2),
+          color: [233, 69, 96],
+          trailAlpha: p.random(15, 35)
+        });
+      }
+      if (particles.length > 400) particles = particles.slice(-350);
+    }
+  };
+
+  p.mouseWheel = function(e) {
+    noiseScale = p.constrain(noiseScale + (e.delta > 0 ? 0.002 : -0.002), 0.003, 0.03);
+    initFlowField();
+  };
+
+  p.keyPressed = function() {
+    if (p.key === 'r' || p.key === 'R') {
+      dialAngle = 0;
+      initFlowField();
+      initParticles();
+      phraseIndex = 0;
+      updatePhrase();
+      buildDialSVG();
+      updateInfoPanel();
+    } else if (p.key === 'ArrowRight') {
+      dialAngle += Math.PI / 16;
+      initFlowField();
+      buildDialSVG();
+      updateInfoPanel();
+    } else if (p.key === 'ArrowLeft') {
+      dialAngle -= Math.PI / 16;
+      initFlowField();
+      buildDialSVG();
+      updateInfoPanel();
+    }
+  };
+
+  p.windowResized = function() {
+    p.resizeCanvas(p.windowWidth, p.windowHeight);
+    initFlowField();
+  };
+};
+
+let p5Instance = new p5(sketch);
+</script>
+</body>
+</html>

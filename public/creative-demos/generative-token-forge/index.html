@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Generative Token Forge</title>
+<style>
+  :root{
+    --ink:#08080f;
+    --paper:#f7f7fa;
+    --muted:#8a8a9a;
+    --accent:#ff5c8a;
+    --accent-2:#00e5ff;
+    --accent-3:#c7ff00;
+    --glass:rgba(8,8,15,.45);
+    --glass-border:rgba(247,247,250,.08);
+    --grad:linear-gradient(135deg,#ff5c8a33,#00e5ff22,#c7ff0018);
+    --radius:14px;
+    --ratio:1.25;
+    --font-body:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;
+    --font-display:ui-serif,Georgia,Cambria,Times New Roman,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--ink);color:var(--paper);font-family:var(--font-body);overflow-x:hidden}
+  canvas[data-layer=shader]{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+  canvas[data-layer=particles]{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;mix-blend-mode:screen}
+
+  .scene{position:relative;z-index:2;min-height:100dvh;display:grid;place-items:center;padding:max(24px,3dvh) max(20px,3dvw)}
+
+  .gate{container-type:inline-size;container-name:layout;width:100%;max-width:1400px;display:grid;grid-template-columns:minmax(240px,1.2fr) minmax(220px,.9fr);gap:clamp(24px,3cqi,64px);align-items:center}
+
+  .brand{font-family:var(--font-display);font-weight:400;letter-spacing:-.02em;line-height:1.05;font-size:clamp(1.6rem,3.5cqi,3.8rem);margin:0 0 .35em}
+  .brand b{font-weight:600;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{font-size:clamp(.95rem,1.2cqi,1.2rem);line-height:1.55;color:var(--muted);max-width:50ch;margin:0 0 1.6em}
+  .actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+
+  .btn{padding:.65em 1.1em;border-radius:999px;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--glass-border);color:var(--paper);font-weight:600;letter-spacing:.02em;font-size:clamp(.85rem,1cqi,1.05rem);cursor:pointer;position:relative;transition:transform .2s ease,background .2s}
+  .btn:hover{background:rgba(247,247,250,.09);transform:translateY(-1px)}
+  .btn.is-primary{background:var(--accent);border-color:transparent}
+  .btn.is-primary:hover{background:color-mix(in srgb,var(--accent) 75%,#000 25%)}
+
+  .meta{display:grid;gap:14px;align-content:start}
+  .chip{padding:12px 14px;border-radius:var(--radius);background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(10px);font-size:clamp(.75rem,.9cqi,.95rem);color:var(--paper)}
+  .chip b{display:block;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-weight:600}
+  .chip time{font-variant-numeric:tabular-nums}
+
+  /* Container queries */
+  @container layout (max-width: 520px){
+    .gate{grid-template-columns:1fr;gap:28px}
+    .meta{order:2;display:grid;grid-template-columns:1fr 1fr 1fr}
+    .actions{order:1}
+  }
+  @container layout (min-width: 521px) and (max-width: 1040px){
+    .gate{grid-template-columns:1fr 1fr;gap:36px}
+  }
+  @container layout (min-width: 1041px){
+    .gate{grid-template-columns:1.2fr .8fr}
+  }
+
+  /* :has() contrast overlay */
+  .ui-layer:has(.is-primary:hover){backdrop-filter:brightness(.72)}
+  .ui-layer:has(.is-secondary:hover){backdrop-filter:brightness(.82)}
+  .ui-layer{transition:backdrop-filter .4s ease;backdrop-filter:brightness(1)}
+
+  /* Fine typography utility */
+  .display-xl{font-size:max(2.4rem,calc(1.2rem * var(--ratio) * var(--ratio) * var(--ratio) * var(--ratio)));line-height:1.05}
+  .display-lg{font-size:max(1.6rem,calc(1.2rem * var(--ratio) * var(--ratio) * var(--ratio)));line-height:1.1}
+  .display-md{font-size:max(1.25rem,calc(1.2rem * var(--ratio) * var(--ratio)));line-height:1.2}
+  .text-sm{font-size:max(.8rem,calc(1.2rem / var(--ratio)));line-height:1.4}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<canvas data-layer="shader" aria-hidden="true"></canvas>
+<canvas data-layer="particles" aria-hidden="true"></canvas>
+
+<section class="scene ui-layer">
+  <div class="gate">
+    <div class="hero">
+      <h1 class="brand display-xl">Generative <b>Token</b> Forge</h1>
+      <p class="lead">GPU-driven glyph minting for on-chain artifacts. Each token is born from a live shader — no two are equal.</p>
+      <div class="actions">
+        <button class="btn is-primary" aria-label="Create token">Create Token</button>
+        <button class="btn is-secondary" aria-label="Explore gallery">Explore</button>
+      </div>
+    </div>
+    <aside class="meta">
+      <div class="chip"><b>Status</b><time>Minting live</time></div>
+      <div class="chip"><b>Chain</b>Ethereum Mainnet</div>
+      <div class="chip"><b>Edition</b>Genesis <time>1 / 500</time></div>
+    </aside>
+  </div>
+</section>
+
+<script>
+(() => {
+  /* ---------------- WebGL ---------------- */
+  const canvas = document.querySelector('canvas[data-layer=shader]');
+  const gl = canvas.getContext('webgl', {antialias:false, preserveDrawingBuffer:false});
+  if (!gl) document.body.insertAdjacentHTML('afterbegin','<p style="z-index:3;position:relative;padding:20px">WebGL required.</p>');
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const resize = () => {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+  };
+  new ResizeObserver(resize).observe(canvas);
+  resize();
+
+  const src = `precision highp float;
+  uniform float u_time;
+  uniform vec2 u_resolution;
+  uniform vec2 u_mouse;
+  uniform vec2 u_pollution; // x = accumulated 0..inf, y = local intensity
+  uniform float u_seed;
+
+  // compact hash & gradient noise
+  vec2 hash(vec2 p){p=vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3)));return -1.+2.*fract(sin(p)*43758.5453);}
+  float gnoise(vec2 p){
+    vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);
+    float a=dot(hash(i+vec2(0,0)),f-vec2(0,0));
+    float b=dot(hash(i+vec2(1,0)),f-vec2(1,0));
+    float c=dot(hash(i+vec2(0,1)),f-vec2(0,1));
+    float d=dot(hash(i+vec2(1,1)),f-vec2(1,1));
+    return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);
+  }
+  // domain-warped fBM (3 octaves compact)
+  float fbm(vec2 p){
+    float v=0.,a=.5;
+    mat2 r=mat2(.8,-.6,.6,.8);
+    for(int i=0;i<3;i++){v+=a*gnoise(p);p=r*p*2.+vec2(1.7,9.2);a*=.5;}
+    return v;
+  }
+  // SDF circle (smooth)
+  float sdCircle(vec2 p,float r){return length(p)-r;}
+  // palette via mix
+  vec3 palette(float t){
+    vec3 a=vec3(.08,.07,.12), b=vec3(.95,.35,.55), c=vec3(.0,.9,1.), d=vec3(.78,1.,0.);
+    // re-mix pollution into hues after threshold
+    vec3 pal = a + b*cos(6.28318*(c*t+d));
+    return clamp(pal,0.,1.);
+  }
+
+  void main(){
+    vec2 uv = (gl_FragCoord.xy - .5*u_resolution.xy) / min(u_resolution.x,u_resolution.y);
+    vec2 mouse = (u_mouse - .5*u_resolution.xy) / min(u_resolution.x,u_resolution.y);
+    float t = u_time*.15 + u_seed;
+    // pollution warp — contaminates coordinates
+    float pwr = min(u_pollution.x, 4.0);
+    vec2 puv = uv + pwr * vec2(
+      gnoise(uv*3.+t),
+      gnoise(uv*3.+t+31.4)
+    );
+    // domain warping
+    vec2 q = vec2(fbm(puv+t), fbm(puv+vec2(5.2,1.3)+t));
+    vec2 r = vec2(fbm(puv+4.*q+vec2(1.7,9.2)+.15*t),
+                 fbm(puv+4.*q+vec2(8.3,2.8)+.12*t));
+    float f = fbm(puv + 4.*r);
+    // base layer
+    vec3 col = palette(length(q)+length(r)+f);
+    // SDF circles (token shapes)
+    float d1 = sdCircle(uv - vec2(sin(t)*.2, cos(t*1.3)*.15), .18);
+    float d2 = sdCircle(uv + vec2(cos(t*1.1)*.25, sin(t*.9)*.2), .14);
+    float d = min(d1,d2);
+    col = mix(col, col*.35 + vec3(.0,.9,1.)*smoothstep(.04,.0,d), smoothstep(.06,.0,d));
+    // pollution glitch: shift colors outside palette
+    float g = dot(hash(floor(uv*120.)),vec2(.35));
+    float pollShift = smoothstep(.4, 1.8, pwr);
+    vec3 glitch = palette(g*.5 + u_pollution.y*.25);
+    col = mix(col, glitch, pollShift * smoothstep(.55,.9, fract(sin(dot(uv*u_pollution.x,vec2(12.98,78.23)))*43758.5453)));
+    // vignette
+    col *= 1. - .6*dot(uv,uv);
+    gl_FragColor = vec4(col,1.);
+  }`;
+
+  const compile = (type, src) => {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(s)); gl.deleteShader(s); return null; }
+    return s;
+  };
+  const prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, `attribute vec2 a;p;void main(){gl_Position=vec4(a,0,1);}`));
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, src));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+  const aLoc = gl.getAttribLocation(prog, 'a');
+  gl.enableVertexAttribArray(aLoc);
+  gl.vertexAttribPointer(aLoc, 2, gl.FLOAT, false, 0, 0);
+
+  const uTime = gl.getUniformLocation(prog,'u_time');
+  const uRes = gl.getUniformLocation(prog,'u_resolution');
+  const uMouse = gl.getUniformLocation(prog,'u_mouse');
+  const uPoll = gl.getUniformLocation(prog,'u_pollution');
+  const uSeed = gl.getUniformLocation(prog,'u_seed');
+
+  /* ---------------- Particles (2D overlay) ---------------- */
+  const pCanvas = document.querySelector('canvas[data-layer=particles]');
+  const ctx = pCanvas.getContext('2d');
+  const presetSize = () => ({w:pCanvas.clientWidth*dpr, h:pCanvas.clientHeight*dpr});
+  const setPSize = () => { const {w,h} = presetSize(); if (pCanvas.width!==w||pCanvas.height!==h){pCanvas.width=w;pCanvas.height=h;} };
+  new ResizeObserver(setPSize).observe(pCanvas);
+  setPSize();
+
+  const rand = (n=1) => Math.random()*n;
+  class P { constructor(x,y){ this.x=x; this.y=y; this.vx=(Math.random()-.5)*2.2; this.vy=(Math.random()-.5)*2.2; this.life=1; this.decay=.006+Math.random()*.02; this.r=1.4+Math.random()*2.2; this.hue= Math.random()<.5?330:190; } update(){ this.x+=this.vx*dpr; this.y+=this.vy*dpr; this.vx*=0.995; this.vy*=0.995; this.life-=this.decay; } }
+  let particles=[];
+  const emit=(x,y,n=6)=>{for(let i=0;i<n;i++) particles.push(new P(x,y))};
+
+  /* ---------------- Interactions / Pollution ---------------- */
+  const seed = Math.random()*1000;
+  let pollution = 0.0;      // accumulated
+  let intent = 0.0;         // local intensity during hover
+  let mouseX = canvas.width*.5, mouseY = canvas.height*.5;
+
+  window.addEventListener('pointermove', e=>{
+    mouseX = e.clientX*dpr; mouseY = (window.innerHeight - e.clientY)*dpr;
+  });
+
+  const ctas = document.querySelectorAll('.is-primary, .is-secondary');
+  let hoverTimer=null, hoverStart=0;
+  const onEnter=()=>{ hoverStart=performance.now(); hoverTimer=requestAnimationFrame(hoverTick); };
+  const onLeave=()=>{ hoverTimer && cancelAnimationFrame(hoverTimer); hoverTimer=null; intent=0; };
+  ctas.forEach(b=>{ b.addEventListener('pointerenter', onEnter); b.addEventListener('pointerleave', onLeave); });
+
+  const hoverTick = (ts)=>{
+    const b = document.querySelector('.btn:hover, .is-primary:hover, .is-secondary:hover');
+    if (!b) { onLeave(); return; }
+    const r = b.getBoundingClientRect();
+    const cx = (r.left+r.width*.5)*dpr;
+    const cy = (window.innerHeight - (r.top+r.height*.5))*dpr;
+    if (Math.random()<.6) emit(cx, cy, Math.floor(2+Math.random()*4));
+    const elapsed = performance.now() - hoverStart;
+    intent = Math.min(elapsed/2000, 1.0);
+    pollution += .0004;
+    hoverTimer = requestAnimationFrame(hoverTick);
+  };
+
+  /* ---------------- Loop ---------------- */
+
+
+  const frame = (t)=>{
+    resize(); setPSize();
+    const sec = t*.001;
+    // decay pollution slowly so the canvas recovers when idle
+    pollution = Math.max(pollution - .00015, 0);
+    // map hover intent 0..1 -> local pollution intensity
+    const blend = intent;
+    // still input-related pollution from mouse proximity to CTA center if hovering
+    const local = blend * (.5 + .5*Math.sin(sec*6.));
+
+    ctx.clearRect(0,0,pCanvas.width,pCanvas.height);
+    ctx.globalCompositeOperation='lighter';
+    for (let i=particles.length-1;i>=0;i--){
+      const p=particles[i];
+      p.update();
+      if (p.life<=0){ particles.splice(i,1); continue; }
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r*dpr*p.life,0,Math.PI*2);
+      ctx.fillStyle=`hsla(${p.hue},95%,60%,${p.life*.9})`;
+      ctx.shadowBlur=12*dpr; ctx.shadowColor=`hsla(${p.hue},95%,60%,.9)`;
+      ctx.fill();
+    }
+    ctx.shadowBlur=0;
+
+    gl.uniform1f(uTime, sec);
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+    gl.uniform2f(uMouse, mouseX, mouseY);
+    gl.uniform2f(uPoll, pollution, local);
+    gl.uniform1f(uSeed, seed);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

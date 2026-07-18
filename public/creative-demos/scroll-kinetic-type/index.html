@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CC9 — Scroll-Driven Kinetic Type</title>
+<style>
+  :root {
+    --ink: #0b0b10;
+    --paper: #f4f2ec;
+    --accent-1: #2f3e46;
+    --accent-2: #52796f;
+    --accent-3: #84a98c;
+    --accent-4: #cad2c5;
+    font-family: "Georgia", "Times New Roman", serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  body {
+    line-height: 1.6;
+    counter-reset: section;
+  }
+
+  /* ---------- content layout ---------- */
+  article {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 10vh 1.5rem 60vh;
+  }
+
+  header {
+    text-align: center;
+    padding: 30vh 0 20vh;
+  }
+
+  header h1 {
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    margin: 0;
+  }
+
+  blockquote {
+    font-style: italic;
+    color: color-mix(in oklab, var(--accent-1) 70%, transparent);
+    border-left: 3px solid var(--accent-2);
+    padding-left: 1.2rem;
+    margin: 3rem 0;
+  }
+
+  section {
+    margin: 55vh 0;
+    position: relative;
+  }
+
+  p {
+    font-size: 1.15rem;
+    margin: 1.2rem 0;
+  }
+
+  /* ---------- kinetic headline choreography ---------- */
+  .kinetic {
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    font-weight: 700;
+    line-height: 1.05;
+    margin: 0 0 1rem;
+    position: relative;
+    display: inline-block;
+    offset-path: path("M0,80 C120,0 280,0 400,80 S680,160 800,80");
+    animation: wind 1s linear both;
+    animation-timeline: view(block);
+    animation-range: entry 20% cover 60%;
+  }
+
+  .kinetic::before {
+    content: attr(data-indexed);
+    position: absolute;
+    left: -1.6rem;
+    top: 0;
+    font-size: 0.9rem;
+    color: var(--accent-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  section:nth-of-type(1) .kinetic {
+    color: color-mix(in oklab, var(--ink) 60%, var(--accent-1));
+  }
+  section:nth-of-type(2) .kinetic {
+    color: color-mix(in oklab, var(--accent-2) 85%, var(--accent-1));
+  }
+  section:nth-of-type(3) .kinetic {
+    color: color-mix(in oklab, var(--accent-3) 60%, var(--accent-2));
+  }
+  section:nth-of-type(4) .kinetic {
+    color: color-mix(in oklab, var(--accent-4) 80%, var(--accent-3));
+  }
+
+  @keyframes wind {
+    0% {
+      offset-distance: 0%;
+      transform: scale(0.85) rotate(-3deg);
+      opacity: 0.4;
+    }
+    45% {
+      offset-distance: 55%;
+      transform: scale(1.06) rotate(0.6deg);
+      opacity: 1;
+    }
+    75% {
+      offset-distance: 85%;
+      transform: scale(0.96) rotate(-0.4deg);
+      opacity: 0.9;
+    }
+    100% {
+      offset-distance: 100%;
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+  }
+
+  /* ---------- GSAP particle layer ---------- */
+  .particle-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+  }
+
+  .particle-word {
+    position: absolute;
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: color-mix(in oklab, var(--accent-3) 75%, transparent);
+    text-transform: uppercase;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  /* ---------- "Unread" tumble state ---------- */
+  .is-unread {
+    animation: stamp-tumble 0.9s cubic-bezier(.17,.67,.19,1.18) forwards !important;
+    color: #e63946 !important;
+  }
+
+  @keyframes stamp-tumble {
+    0%   { transform: translate(0,0) rotate(0deg) scale(1);      opacity: 1; filter: blur(0px); }
+    18%  { transform: translate(-30%,-18%) rotate(-22deg) scale(1.35); opacity: 1; filter: blur(1px); }
+    45%  { transform: translate(14%,8%) rotate(11deg) scale(0.9); opacity: 0.9; filter: blur(0px); }
+    72%  { transform: translate(-4%,-2%) rotate(-4deg) scale(1.1); opacity: 1; }
+    100% { transform: translate(0,0) rotate(0deg) scale(1);      opacity: 1; filter: blur(0px); }
+  }
+
+  /* ---------- safety ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    .kinetic { animation: none; }
+    .particle-word { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<article>
+  <header>
+    <h1>Kinetic Type<br>in Motion</h1>
+    <p>A demonstration of CSS scroll-driven choreography and GSAP micro-particles.</p>
+  </header>
+
+  <blockquote>
+    "Typography is the craft of endowing human language with a durable visual form."
+  </blockquote>
+
+  <section data-speed="0.7">
+    <h2 class="kinetic" data-indexed="01 /">Typography in Space</h2>
+    <p>As you scroll, notice how the headline moves along a path defined purely in CSS. No JavaScript timeline drives this motion. The scroll position becomes the clock.</p>
+  </section>
+
+  <section data-speed="1.2">
+    <h2 class="kinetic" data-indexed="02 /">Offset Paths</h2>
+    <p>The <code>offset-path</code> property ties the headline to an SVG path. Combined with <code>animation-timeline: view()</code>, the page creates a dual-layer rhythm.</p>
+  </section>
+
+  <section data-speed="0.9">
+    <h2 class="kinetic" data-indexed="03 /">Color as Signal</h2>
+    <p>Each section derives its palette from semantic tags via <code>color-mix()</code>. The values shift as the reader moves through the article.</p>
+  </section>
+
+  <section data-speed="1.1">
+    <h2 class="kinetic" data-indexed="04 /">Particle Memory</h2>
+    <p>Beneath this headline, GSAP emits fleeting letter fragments. They are tied to character and word maps but live in a separate layer.</p>
+  </section>
+</article>
+
+<!-- particle layer -->
+<div class="particle-layer" aria-hidden="true"></div>
+
+<!-- GSAP from CDN (inline fallback if offline) -->
+<script>
+  // ------- scroll-speed tracker (minimal, non-throttled) -------
+  const SCROLL_THRESHOLD = 1200; // px/s
+  const RESET_MS         = 3000;
+
+  let lastY = window.scrollY;
+  let lastT = performance.now();
+  let speed = 0;
+  let fastTimer = null;
+
+  window.addEventListener("scroll", () => {
+    const now = performance.now();
+    const dy  = Math.abs(window.scrollY - lastY);
+    const dt  = now - lastT;
+    if (dt > 0) speed = dy / (dt / 1000);
+    lastY = window.scrollY;
+    lastT = now;
+    checkUnread();
+  }, { passive: true });
+
+  function checkUnread() {
+    if (speed >= SCROLL_THRESHOLD) {
+      triggerUnread();
+      window.clearTimeout(fastTimer);
+      fastTimer = window.setTimeout(clearUnread, RESET_MS);
+    }
+  }
+
+  // ------- "Unread" tumble -------
+  function triggerUnread() {
+    document.querySelectorAll(".kinetic").forEach(el => {
+      if (!el.classList.contains("is-unread")) {
+        el.classList.add("is-unread");
+      }
+    });
+  }
+  function clearUnread() {
+    document.querySelectorAll(".kinetic.is-unread")
+      .forEach(el => el.classList.remove("is-unread"));
+  }
+
+  // ------- word-pool for particles -------
+  const words = [
+    "a","about","after","again","air","all","also","am","an","and","any","are","as","ask",
+    "at","away","back","be","because","been","before","big","but","by","came","can","come",
+    "could","day","did","do","down","each","even","eye","find","first","for","from","get",
+    "give","go","good","got","had","has","have","he","her","here","him","his","how","i",
+    "if","in","into","is","it","its","just","keep","kind","know","last","later","letter",
+    "like","long","look","made","make","man","many","me","men","might","more","most",
+    "move","much","must","my","name","need","new","no","not","now","of","off","old","on",
+    "once","one","only","or","other","our","out","over","own","part","people","place",
+    "put","read","right","run","said","same","saw","say","see","seem","she","should",
+    "show","small","so","some","sound","still","such","take","tell","than","that","the",
+    "them","then","there","these","they","thing","think","this","those","though","thought",
+    "through","time","to","together","too","two","under","up","us","use","very","want",
+    "was","water","we","well","went","were","what","when","where","which","while","who",
+    "why","will","with","word","work","would","year","yes","yet","you","your",
+    "track","tumble","snap","scroll","depth","form","light","space","speed","type","view"
+  ];
+  function pickWord() {
+    return words[Math.floor(Math.random() * words.length)];
+  }
+
+  // ------- GSAP particle service (split-text metaphor) -------
+  // If GSAP CDN didn't load, we polyfill minimally.
+  (function () {
+    const layer = document.querySelector(".particle-layer");
+
+    // Lazy-load GSAP
+    const gsapPromise = new Promise((resolve, reject) => {
+      if (window.gsap) return resolve(window.gsap);
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js";
+      s.onload = () => resolve(window.gsap);
+      s.onerror = () => reject(new Error("GSAP CDN unavailable"));
+      document.head.appendChild(s);
+    });
+
+    gsapPromise.catch(() => {
+      console.warn("[kinetic] gsap unavailable — particle layer skipped");
+    });
+
+    // Build a character/word node map from the visible headline
+    function buildHeadlineMap(el) {
+      const text  = el.textContent.trim();
+      const chars = text.split("");
+      const words = [];
+      let current = "";
+      chars.forEach((ch, i) => {
+        if (ch === " ") {
+          words.push({ word: current, start: i - current.length, end: i });
+          current = "";
+        } else {
+          current += ch;
+        }
+      });
+      if (current) words.push({ word: current, start: text.length - current.length, end: text.length });
+      return { chars, words, length: chars.length };
+    }
+
+    // Emit 1-3 particles for a headline, staggered across timeline
+    function emitParticles(el) {
+      const map = buildHeadlineMap(el);
+      const count = 1 + Math.floor(Math.random() * 3);
+      const rect  = el.getBoundingClientRect();
+      const originX = rect.left + rect.width / 2;
+      const originY = rect.top  + rect.height / 2;
+
+      for (let i = 0; i < count; i++) {
+        const fragment = pickWord();
+
+        // pick emission point from the map's character positions
+        const idx  = Math.floor(Math.random() * map.length);
+        const glyphHalf = 6;
+        const x = originX + (Math.random() - 0.5) * rect.width * 0.8 + idx * glyphHalf;
+        const y = originY + (Math.random() - 0.5) * 40;
+
+        const span = document.createElement("span");
+        span.className = "particle-word";
+        span.textContent = fragment;
+        span.style.left = x + "px";
+        span.style.top  = y + "px";
+        layer.appendChild(span);
+
+        // stagger math: roughly 0.05 * i offset
+        const delay = i * 0.05;
+
+        if (window.gsap) {
+          window.gsap.to(span, {
+            x: `+=${(Math.random() - 0.5) * 160}`,
+            y: `+=${-(30 + Math.random() * 110)}`,
+            opacity: 0,
+            duration: 0.7 + Math.random() * 0.6,
+            delay,
+            ease: "power2.out",
+            onComplete: () => span.remove(),
+          });
+        } else {
+          // fallback CSS animation if no gsap
+          span.style.transition = `all ${0.7 + Math.random()*0.6}s ${delay}s ease-out`;
+          requestAnimationFrame(() => {
+            span.style.opacity = 0;
+            span.style.transform = `translate(${(Math.random()-0.5)*160}px, ${-(30+Math.random()*110)}px)`;
+          });
+          setTimeout(() => span.remove(), 1600);
+        }
+      }
+    }
+
+    // Emit when a kinetic headline enters the viewport
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          emitParticles(entry.target);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.35 });
+
+    document.querySelectorAll(".kinetic").forEach(el => observer.observe(el));
+
+    // Also emit periodically on '"Unread"' tumble
+    const unreadObserver = new MutationObserver(() => {
+      document.querySelectorAll(".kinetic.is-unread").forEach(el => {
+        if (!el.dataset.stampEmitted) {
+          el.dataset.stampEmitted = "1";
+          emitParticles(el);
+        }
+      });
+      document.querySelectorAll(".kinetic:not(.is-unread)").forEach(el => {
+        delete el.dataset.stampEmitted;
+      });
+    });
+    document.querySelectorAll(".kinetic").forEach(el => {
+      unreadObserver.observe(el, { attributes: true, attributeFilter: ["class"] });
+    });
+  })();
+
+  /* debug overlay removed for production */
+</script>
+</body>
+</html>

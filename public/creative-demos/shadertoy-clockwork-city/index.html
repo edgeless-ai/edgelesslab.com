@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadertoy Clockwork City</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a1020;
+    overflow: hidden;
+    font-family: 'Oswald', sans-serif;
+    color: #f6a623;
+    user-select: none;
+  }
+
+  #canvas-container {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+  }
+
+  canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  #overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+    padding: clamp(1rem, 3vw, 3rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .coords {
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    font-weight: 200;
+    letter-spacing: 0.08em;
+    line-height: 1.05;
+    text-transform: uppercase;
+    color: #f6a623;
+    text-shadow: 0 0 24px rgba(246, 166, 35, 0.35), 0 2px 4px rgba(0,0,0,0.6);
+    font-variation-settings: "wdth" 100;
+    transition: font-variation-settings 0.15s ease-out;
+  }
+
+  .meta {
+    text-align: right;
+    font-size: clamp(0.7rem, 1.2vw, 1rem);
+    font-weight: 300;
+    color: #1f6f9c;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+
+  .meta span { color: #f6a623; }
+  .meta .label {
+    display: block;
+    color: rgba(246, 166, 35, 0.5);
+    font-size: 0.75em;
+    letter-spacing: 0.3em;
+    margin-bottom: 0.25em;
+  }
+</style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<div id="overlay">
+  <div class="coords" id="coords">
+    <div id="lat">LAT 00.0000</div>
+    <div id="lon">LON 00.0000</div>
+  </div>
+  <div class="meta">
+    <span class="label">CLOCKWORK CITY</span>
+    TIME SPEED <span id="speed">1.00</span>x
+    &nbsp;&bull;&nbsp;
+    ORBIT <span id="orbit">0.0</span>°
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.157.0/build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+const container = document.getElementById('canvas-container');
+const latEl = document.getElementById('lat');
+const lonEl = document.getElementById('lon');
+const speedEl = document.getElementById('speed');
+const orbitEl = document.getElementById('orbit');
+const coordsEl = document.getElementById('coords');
+
+const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+container.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+const vertexShader = `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = vec4(position, 1.0);
+}
+`;
+
+const fragmentShader = `
+precision highp float;
+
+uniform float uTime;
+uniform vec2 uResolution;
+uniform vec2 uMouse;
+uniform float uOrbit;
+uniform float uSpeed;
+uniform vec2 uRipple;
+uniform float uRippleAge;
+
+varying vec2 vUv;
+
+#define PI 3.14159265359
+#define MAX_STEPS 100
+#define MAX_DIST 80.0
+#define SURF_DIST 0.001
+#define GRID_SIZE 10.0
+#define CITY_SIZE 6.0
+
+float hash(vec2 p) {
+  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}
+
+float hash1(float p) {
+  return fract(sin(p) * 43758.5453123);
+}
+
+// Smooth min
+float smin(float a, float b, float k) {
+  float h = clamp(0.5 + 0.5*(b-a)/k, 0.0, 1.0);
+  return mix(b, a, h) - k*h*(1.0-h);
+}
+
+float sdBox(vec3 p, vec3 b) {
+  vec3 q = abs(p) - b;
+  return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+}
+
+// Ground + city map
+vec2 map(vec3 p, float t) {
+  float d = 1e9;
+  float mat = 0.0;
+  
+  // Ground plate
+  float ground = sdBox(p - vec3(0.0, -0.05, 0.0), vec3(40.0, 0.05, 40.0));
+  if (ground < d) { d = ground; mat = 0.0; }
+  
+  // City grid
+  vec2 id = floor(p.xz / GRID_SIZE + 0.5);
+  vec2 center = (id + 0.5) * GRID_SIZE;
+  vec2 local = p.xz - center;
+  
+  // Wheel2-style luminance → height (mapped to time, not webcam)
+  float hBase = hash(id);
+  float hWave = sin(hBase * 6.2831 + t * 0.25) * 0.5 + 0.5;
+  float h = mix(0.4, 3.2, hBase) + hWave * 1.6;
+  
+  // Central core
+  float centDist = length(id);
+  h += exp(-centDist * 0.4) * 3.0;
+  
+  // Ripple from click
+  float rip = 0.0;
+  if (uRippleAge > 0.0 && uRippleAge < 4.0) {
+    float age = uRippleAge;
+    float radius = age * 10.0;
+    float width = radius * 0.35;
+    float dist = length(p.xz - uRipple);
+    float wave = exp(-pow((dist - radius) / width, 2.0)) * exp(-age * 0.35);
+    rip = wave * 1.2 * sin(dist * 4.0 - age * 10.0);
+  }
+  
+  float bx = GRID_SIZE * 0.42;
+  float bz = GRID_SIZE * 0.42;
+  float building = sdBox(p - vec3(0.0, h * 0.5, 0.0), vec3(bx, h, bz)) + rip * exp(-centDist*0.25);
+  
+  if (building < d) { d = building; mat = 1.0; }
+  
+  // Wireframe edges on the ground
+  float ew = 0.08;
+  if (abs(local.x) < bx + ew) {
+    float ex = sdBox(p - vec3(center.x + sign(local.x)*(bx+ew*0.5), 0.0, center.y), vec3(ew*0.5, 0.015, bz+ew));
+    if (ex < d) { d = ex; mat = 2.0; }
+  }
+  if (abs(local.z) < bz + ew) {
+    float ez = sdBox(p - vec3(center.x, 0.0, center.y + sign(local.z)*(bz+ew*0.5)), vec3(bx+ew, 0.015, ew*0.5));
+    if (ez < d) { d = ez; mat = 2.0; }
+  }
+  
+  return vec2(d, mat);
+}
+
+vec2 raymarch(vec3 ro, vec3 rd, float t) {
+  float dO = 0.0;
+  float m = 0.0;
+  for (int i = 0; i < MAX_STEPS; i++) {
+    vec3 p = ro + rd * dO;
+    vec2 h = map(p, t);
+    if (h.x < SURF_DIST || dO > MAX_DIST) break;
+    dO += h.x * 0.75;
+    m = h.y;
+  }
+  return vec2(dO, m);
+}
+
+vec3 calcNormal(vec3 p, float t) {
+  vec2 e = vec2(0.002, 0.0);
+  return normalize(vec3(
+    map(p+e.xyy, t).x - map(p-e.xyy, t).x,
+    map(p+e.yxy, t).x - map(p-e.yxy, t).x,
+    map(p+e.yyx, t).x - map(p-e.yyx, t).x
+  ));
+}
+
+float softShadow(vec3 ro, vec3 rd, float mint, float maxt, float k, float t) {
+  float res = 1.0;
+  float d = mint;
+  for (int i = 0; i < 24; i++) {
+    float h = map(ro + rd*d, t).x;
+    res = min(res, k*h/d);
+    d += clamp(h, 0.02, 0.5);
+    if (h < 0.001 || d > maxt) break;
+  }
+  return clamp(res, 0.0, 1.0);
+}
+
+void main() {
+  vec2 uv = (gl_FragCoord.xy - 0.5*uResolution.xy) / uResolution.y;
+  float t = uTime * uSpeed;
+  
+  float angle = uOrbit;
+  float radius = 14.0;
+  vec3 ro = vec3(cos(angle)*radius, 6.0 + sin(angle*0.5)*2.5, sin(angle)*radius);
+  vec3 ta = vec3(0.0, 0.5, 0.0);
+  vec3 fwd = normalize(ta - ro);
+  vec3 rgt = normalize(cross(vec3(0.0,1.0,0.0), fwd));
+  vec3 up = cross(fwd, rgt);
+  vec3 rd = normalize(fwd*1.6 + rgt*uv.x + up*uv.y);
+  
+  vec2 hit = raymarch(ro, rd, t);
+  float d = hit.x;
+  float mat = hit.y;
+  
+  // Background sky gradient
+  vec3 col = mix(vec3(0.02, 0.04, 0.09), vec3(0.04, 0.06, 0.12), uv.y + 0.5);
+  
+  if (d < MAX_DIST) {
+    vec3 p = ro + rd * d;
+    vec3 n = calcNormal(p, t);
+    vec3 light = normalize(vec3(2.0, 6.0, 3.0));
+    float diff = max(dot(n, light), 0.0);
+    float amb = 0.35 + 0.25*n.y;
+    float sha = softShadow(p+n*0.01, light, 0.01, 12.0, 10.0, t);
+    
+    vec3 baseCol;
+    if (mat < 0.5) {
+      // Ground plane
+      baseCol = vec3(0.04, 0.06, 0.12);
+      // Grid
+      vec2 gp = abs(fract(p.xz - 0.5) - 0.5);
+      float line = min(gp.x, gp.y);
+      float grid = 1.0 - smoothstep(0.0, 0.035, line);
+      baseCol += vec3(0.12, 0.44, 0.61) * grid * 0.5;
+    } else if (mat < 1.5) {
+      // Building
+      vec2 bid = floor(p.xz / GRID_SIZE + 0.5);
+      float hrand = hash(bid);
+      baseCol = mix(vec3(0.06, 0.11, 0.19), vec3(0.965, 0.65, 0.137), step(0.78, hrand) * 0.7);
+      // Top emissive strip
+      float top = 1.0 - smoothstep(0.0, 0.08, abs(p.y - (hash(bid)*3.2 + 0.4 + hrand)));
+      baseCol += vec3(0.12, 0.44, 0.61) * top * 0.6;
+    } else {
+      // Wireframe
+      baseCol = vec3(0.12, 0.44, 0.61);
+    }
+    
+    vec3 spec = vec3(pow(max(dot(reflect(-light, n), -rd), 0.0), 32.0));
+    col = baseCol * (amb + diff * sha) + spec * sha * vec3(0.965, 0.651, 0.137) * 0.4;
+    
+    // Distance fog
+    col = mix(col, vec3(0.04, 0.06, 0.12), 1.0 - exp(-0.0125 * d * d));
+  }
+  
+  // Subtle scanlines
+  col *= 0.96 + 0.04 * sin(gl_FragCoord.y * 0.7);
+  
+  // Vignette
+  vec2 q = vUv;
+  col *= 0.5 + 0.5 * pow(16.0 * q.x * q.y * (1.0 - q.x) * (1.0 - q.y), 0.3);
+  
+  // ACES-ish tonemap
+  col = (col*(2.51*col+0.03))/(col*(2.43*col+0.59)+0.14);
+  
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+
+const uniforms = {
+  uTime: { value: 0 },
+  uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+  uMouse: { value: new THREE.Vector2(0, 0) },
+  uOrbit: { value: 0 },
+  uSpeed: { value: 1.0 },
+  uRipple: { value: new THREE.Vector2(0, 0) },
+  uRippleAge: { value: -1.0 }
+};
+
+const geometry = new THREE.PlaneGeometry(2, 2);
+const material = new THREE.ShaderMaterial({
+  vertexShader,
+  fragmentShader,
+  uniforms,
+  depthWrite: false,
+  depthTest: false
+});
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
+
+// Interaction
+const target = { angle: 0, tilt: 0.5 };
+let currentAngle = 0;
+
+window.addEventListener('mousemove', (e) => {
+  const nx = (e.clientX / window.innerWidth) * 2 - 1;
+  const ny = -(e.clientY / window.innerHeight) * 2 + 1;
+  target.angle = nx * Math.PI;
+  target.tilt = ny * 0.5 + 0.5;
+  uniforms.uMouse.value.set(nx, ny);
+});
+
+window.addEventListener('mousedown', (e) => {
+  const sx = ((e.clientX / window.innerWidth) * 2 - 1) * (window.innerWidth / window.innerHeight);
+  const sy = -((e.clientY / window.innerHeight) * 2 - 1);
+  uniforms.uRipple.value.set(sx * 6.0, sy * 6.0);
+  uniforms.uRippleAge.value = 0.0;
+});
+
+let scrollVelocity = 0;
+let lastScrollT = performance.now();
+
+window.addEventListener('wheel', (e) => {
+  const now = performance.now();
+  const dt = (now - lastScrollT) / 1000.0;
+  lastScrollT = now;
+  if (dt < 0.1) {
+    scrollVelocity = Math.min(Math.abs(e.deltaY) / dt / 250.0, 5.0);
+  }
+}, { passive: true });
+
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+});
+
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.1);
+  const elapsed = performance.now() / 1000.0;
+  
+  uniforms.uTime.value = elapsed;
+  
+  // Orbit easing
+  currentAngle += (target.angle - currentAngle) * 3.5 * dt;
+  uniforms.uOrbit.value = currentAngle;
+  orbitEl.textContent = ((currentAngle * 180 / Math.PI) % 360).toFixed(1);
+  
+  // Scroll speed decay
+  scrollVelocity *= Math.exp(-3.5 * dt);
+  const speed = 0.05 + scrollVelocity * 2.5;
+  uniforms.uSpeed.value = speed;
+  speedEl.textContent = speed.toFixed(2);
+  
+  // Ripple aging
+  if (uniforms.uRippleAge.value >= 0.0) {
+    uniforms.uRippleAge.value += dt;
+    if (uniforms.uRippleAge.value > 4.5) uniforms.uRippleAge.value = -1.0;
+  }
+  
+  // Typography update
+  const tiltFactor = target.tilt;
+  const widthVal = 100 + scrollVelocity * 40;
+  coordsEl.style.fontVariationSettings = `"wdth" ${widthVal}`;
+  
+  const camX = Math.cos(currentAngle) * 14.0;
+  const camZ = Math.sin(currentAngle) * 14.0;
+  const lat = ((camZ / 28.0) * 90).toFixed(4);
+  const lon = ((camX / 28.0) * 180).toFixed(4);
+  latEl.textContent = `LAT ${lat.padStart(7, '0')}`;
+  lonEl.textContent = `LON ${lon.padStart(7, '0')}`;
+  
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+
+</body>
+</html>

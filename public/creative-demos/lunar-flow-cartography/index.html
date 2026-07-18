@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lunar Flow Cartography</title>
+  <!-- p5.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    /* ============================================================
+       Lunar Flow Cartography — Inline Styles
+       Technique: HUD overlay rendered as DOM above canvas,
+       keeping canvas purely for generative mark-making.
+       Palette: black void, bronze/off-white strokes, red alert.
+       ============================================================ */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000000;
+      font-family: 'Courier New', Courier, monospace;
+      color: #FFF3EA;
+    }
+
+    /* Canvas sits at the bottom of the visual stack */
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* HUD overlay: higher z-index, pointer-events none so mouse passes through */
+    #hud-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      padding: 24px;
+    }
+
+    /* HUD corner panels */
+    .hud-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+      line-height: 1.4;
+      text-shadow: 0 0 4px rgba(228, 181, 146, 0.4);
+    }
+
+    .hud-top-left    { align-items: flex-start; justify-content: flex-start; }
+    .hud-top-right   { align-items: flex-end;   justify-content: flex-start; }
+    .hud-bottom-left { align-items: flex-start; justify-content: flex-end; }
+    .hud-bottom-right{ align-items: flex-end;   justify-content: flex-end; }
+
+    .hud-label {
+      color: #E4B592;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+
+    .hud-value {
+      color: #FFF3EA;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+
+    /* Compass rose container */
+    .compass-container {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin-top: 4px;
+    }
+
+    .compass-n {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #EE1212;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    .compass-s {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #DAD0C8;
+      font-size: 10px;
+    }
+
+    .compass-e {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      color: #DAD0C8;
+      font-size: 10px;
+    }
+
+    .compass-w {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      color: #DAD0C8;
+      font-size: 10px;
+    }
+
+    .compass-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 4px;
+      height: 4px;
+      background: #E4B592;
+      border-radius: 50%;
+    }
+
+    .compass-diamond {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      transform: translate(-50%, -50%);
+    }
+
+    .compass-diamond svg {
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: #E4B592;
+      stroke-width: 1;
+      opacity: 0.6;
+    }
+
+    .hud-alert {
+      color: #EE1212;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .hud-alert.active {
+      opacity: 1;
+    }
+
+    /* Scanline aesthetic overlay */
+    .scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 2px,
+        rgba(228, 181, 146, 0.03) 2px,
+        rgba(228, 181, 146, 0.03) 4px
+      );
+    }
+
+    /* Vignette for depth */
+    .vignette {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      pointer-events: none;
+      box-shadow: inset 0 0 150px 40px rgba(0, 0, 0, 0.8);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Canvas container for p5.js -->
+  <div id="canvas-container"></div>
+
+  <!-- HUD overlay: mission control readouts -->
+  <div id="hud-overlay">
+    <div class="hud-panel hud-top-left">
+      <div class="hud-label">Mission Clock</div>
+      <div class="hud-value" id="mission-clock">MET: 00:00:00</div>
+      <div class="hud-label">Signal Status</div>
+      <div class="hud-alert" id="signal-status">SIGNAL INJECTED</div>
+    </div>
+    <div class="hud-panel hud-top-right">
+      <div class="hud-label">Compass</div>
+      <div class="compass-container">
+        <div class="compass-n">N</div>
+        <div class="compass-s">S</div>
+        <div class="compass-e">E</div>
+        <div class="compass-w">W</div>
+        <div class="compass-center"></div>
+        <div class="compass-diamond" id="compass-diamond">
+          <svg viewBox="0 0 100 100">
+            <polygon points="50,10 90,50 50,90 10,50" />
+          </svg>
+        </div>
+      </div>
+      <div class="hud-value" id="compass-heading">HDG: 000°</div>
+    </div>
+    <div class="hud-panel hud-bottom-left">
+      <div class="hud-label">Rover Coordinates</div>
+      <div class="hud-value" id="rover-x">X: +00000.00</div>
+      <div class="hud-value" id="rover-y">Y: +00000.00</div>
+      <div class="hud-label">Velocity</div>
+      <div class="hud-value" id="rover-vel">VEL: 0.00 m/s</div>
+    </div>
+    <div class="hud-panel hud-bottom-right">
+      <div class="hud-label">Terrain Seed</div>
+      <div class="hud-value" id="terrain-seed">SEED: 0</div>
+      <div class="hud-label">Craters</div>
+      <div class="hud-value" id="crater-count">CRATERS: 0</div>
+      <div class="hud-label">Instructions</div>
+      <div class="hud-value" style="font-size: 10px; opacity: 0.6;">
+        SCROLL: time-travel · CLICK: pulse · R: reset
+      </div>
+    </div>
+  </div>
+
+  <!-- Subtle CRT-style scanlines -->
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+  <script>
+    /* ============================================================
+       LUNAR FLOW CARTOGRAPHY
+       ============================================================
+       A hybrid demo combining lunar HUD aesthetics with a Perlin
+       noise flow field. The terrain is an ever-shifting, hand-drawn
+       lunar surface that a mission-control HUD tries to pin down.
+
+       TECHNIQUES:
+       - Flow-field terrain: Perlin noise drives organic strokes.
+       - Circle-packing seed wells: Craters bend nearby flow angles.
+       - GPU-style particle trail: Ring buffer + ADD blend mode.
+       - DOM HUD overlay: Monospace telemetry outside the canvas.
+       - Signal injection: Click triggers a radial pulse that
+         temporarily disrupts the noise field.
+       - Scroll time-travel: Wheel drives the timeSeed parameter.
+       - Progressive rendering: attemptsPerFrame controls saturation.
+       ============================================================ */
+
+    // --- Configuration ---
+    const NOISE_SCALE = 120;        // Spatial frequency of noise field
+    const FLOW_STROKE_WEIGHT = 1.2; // Base thickness of terrain strokes
+    const ATTEMPTS_PER_FRAME = 60;  // Progressive render budget per frame
+    const SATURATION_THRESHOLD = 35000; // Stop rendering when this many strokes exist
+    const CRATER_MIN_RADIUS = 60;
+    const CRATER_MAX_RADIUS = 140;
+    const CRATER_COUNT = 10;
+    const TRAIL_MAX_POINTS = 120;   // Ring buffer size for mouse trail
+    const TRAIL_BASE_LENGTH = 20;   // Minimum trail segments
+    const SIGNAL_DURATION = 120;    // 2 seconds at 60fps
+    const SIGNAL_RADIUS = 100;
+
+    // --- Globals ---
+    let craters = [];
+    let timeSeed = 0;
+    let noiseOffset = 0;
+    let totalStrokes = 0;
+    let trailPoints = []; // ring buffer of {x, y, vx, vy, age}
+    let trailIndex = 0;
+    let signalActive = false;
+    let signalTimer = 0;
+    let signalX = 0;
+    let signalY = 0;
+    let mouseVel = 0;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    let frameCounter = 0;
+    let compassAngle = 0;
+    let startTime;
+    let hudJitter = false;
+    let canvasLayer;
+    let hudLayer;
+
+    // ============================================================
+    // p5.js setup
+    // ============================================================
+    function setup() {
+      const canvas = createCanvas(windowWidth, windowHeight);
+      canvas.parent('canvas-container');
+      // Background is the lunar void
+      background(0);
+
+      // Initialize noise seed
+      noiseOffset = floor(random(100000));
+      startTime = millis();
+
+      // Pre-fill trail buffer so it doesn't glitch at startup
+      for (let i = 0; i < TRAIL_MAX_POINTS; i++) {
+        trailPoints.push({ x: -100, y: -100, vx: 0, vy: 0, age: 0 });
+      }
+
+      // Generate craters in the top half of the canvas
+      generateCraters();
+
+      // Prevent default scroll behavior on the canvas
+      const canvasEl = canvas.elt;
+      canvasEl.addEventListener('wheel', (e) => {
+        e.preventDefault();
+      }, { passive: false });
+
+      noCursor();
+    }
+
+    // ============================================================
+    // Circle-packing: brute-force collision detection
+    // ============================================================
+    function generateCraters() {
+      craters = [];
+      let attempts = 0;
+      while (craters.length < CRATER_COUNT && attempts < 2000) {
+        let r = random(CRATER_MIN_RADIUS, CRATER_MAX_RADIUS);
+        // Restrict to top half of canvas
+        let x = random(r + 20, width - r - 20);
+        let y = random(r + 20, height / 2 - r - 20);
+        let valid = true;
+        for (let c of craters) {
+          let d = dist(x, y, c.x, c.y);
+          if (d < r + c.r + 10) {
+            valid = false;
+            break;
+          }
+        }
+        if (valid) {
+          craters.push({ x, y, r });
+        }
+        attempts++;
+      }
+    }
+
+    // ============================================================
+    // Main draw loop
+    // ============================================================
+    function draw() {
+      // Increment mission clock
+      frameCounter++;
+      compassAngle += TWO_PI / 3600; // 1 RPM = 360 deg / 60 sec = 6 deg/sec = 0.1 deg/frame at 60fps
+      // Actually: 1 RPM = 360° per 60s = 6° per second = 0.1° per frame at 60fps
+      // In radians: TWO_PI / 60 / 60 = TWO_PI / 3600 per frame
+      // Let's do: compassAngle += TWO_PI / 60 / frameRate() for smoother, but simpler is fine
+      compassAngle += TWO_PI / 60 / 60; // 1 RPM at 60fps
+
+      // Update HUD elements
+      updateHUD();
+
+      // Compute mouse velocity
+      let dx = mouseX - lastMouseX;
+      let dy = mouseY - lastMouseY;
+      mouseVel = sqrt(dx * dx + dy * dy);
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+
+      // --- Progressive flow-field rendering ---
+      if (totalStrokes < SATURATION_THRESHOLD) {
+        // Draw terrain strokes with additive blending for luminous effect
+        blendMode(ADD);
+        for (let i = 0; i < ATTEMPTS_PER_FRAME; i++) {
+          drawTerrainStroke();
+        }
+        blendMode(BLEND);
+      }
+
+      // --- Draw mouse particle trail ---
+      // Write current point to ring buffer
+      let trailBrightness = map(mouseVel, 0, 40, 80, 255, true);
+      let trailThickness = map(mouseVel, 0, 40, 1, 4, true);
+      trailPoints[trailIndex] = {
+        x: mouseX,
+        y: mouseY,
+        vx: dx,
+        vy: dy,
+        age: 255,
+        brightness: trailBrightness,
+        thickness: trailThickness
+      };
+      trailIndex = (trailIndex + 1) % TRAIL_MAX_POINTS;
+
+      drawTrail();
+
+      // --- Signal pulse ---
+      if (signalActive) {
+        signalTimer--;
+        drawSignalPulse();
+        if (signalTimer <= 0) {
+          signalActive = false;
+        }
+      }
+
+      // --- Draw craters as subtle seed wells ---
+      // Only draw faint outlines so they don't dominate; they affect the flow field
+      noFill();
+      strokeWeight(0.5);
+      for (let c of craters) {
+        stroke(228, 181, 146, 30); // #E4B592 at low opacity
+        ellipse(c.x, c.y, c.r * 2);
+      }
+
+      // --- Draw a small cursor marker (the rover) ---
+      noCursor();
+      stroke(255, 243, 234, 200);
+      strokeWeight(1);
+      noFill();
+      ellipse(mouseX, mouseY, 8, 8);
+      stroke(218, 208, 200, 100);
+      ellipse(mouseX, mouseY, 16, 16);
+    }
+
+    // ============================================================
+    // Terrain stroke: one organic segment following the flow field
+    // ============================================================
+    function drawTerrainStroke() {
+      let x = random(width);
+      let y = random(height);
+      let len = random(10, 60);
+      let stepSize = 2;
+      let life = len / stepSize;
+
+      // Stroke color: mostly bronze (#E4B592), occasionally off-white (#FFF3EA)
+      let useWhite = random() < 0.15;
+      let r = useWhite ? 255 : 228;
+      let g = useWhite ? 243 : 181;
+      let b = useWhite ? 234 : 146;
+      let alpha = random(30, 80);
+
+      stroke(r, g, b, alpha);
+      strokeWeight(FLOW_STROKE_WEIGHT * random(0.5, 1.2));
+      noFill();
+
+      beginShape();
+      vertex(x, y);
+
+      for (let i = 0; i < life; i++) {
+        // Get base flow angle from Perlin noise
+        let angle = noise(x / NOISE_SCALE, y / NOISE_SCALE, timeSeed) * TWO_PI;
+
+        // Bend angle toward nearby craters (gravitational wells)
+        for (let c of craters) {
+          let d = dist(x, y, c.x, c.y);
+          if (d < c.r * 2.5) {
+            let toCrater = atan2(c.y - y, c.x - x);
+            let influence = map(d, 0, c.r * 2.5, 0.6, 0, true);
+            angle = lerp(angle, toCrater, influence);
+          }
+        }
+
+        // Signal pulse temporarily inverts noise field direction
+        if (signalActive) {
+          let d = dist(x, y, signalX, signalY);
+          let pulseRadius = map(signalTimer, SIGNAL_DURATION, 0, 0, SIGNAL_RADIUS * 4);
+          if (d < pulseRadius + 20) {
+            let pulseStrength = map(d, 0, pulseRadius + 20, 1, 0, true);
+            angle += PI * pulseStrength;
+          }
+        }
+
+        let vx = cos(angle) * stepSize;
+        let vy = sin(angle) * stepSize;
+        x += vx;
+        y += vy;
+
+        // Fade stroke as it goes off-screen
+        if (x < -10 || x > width + 10 || y < -10 || y > height + 10) {
+          break;
+        }
+        vertex(x, y);
+      }
+      endShape();
+      totalStrokes++;
+    }
+
+    // ============================================================
+    // GPU-style particle trail: render from ring buffer
+    // ============================================================
+    function drawTrail() {
+      blendMode(ADD);
+      noFill();
+
+      // Count how many valid points we have
+      let count = 0;
+      let pointsToDraw = [];
+      let idx = trailIndex;
+      for (let i = 0; i < TRAIL_MAX_POINTS; i++) {
+        let pt = trailPoints[idx];
+        if (pt && pt.x >= 0 && pt.x <= width && pt.y >= 0 && pt.y <= height) {
+          pointsToDraw.push(pt);
+        }
+        idx = (idx - 1 + TRAIL_MAX_POINTS) % TRAIL_MAX_POINTS;
+        if (pointsToDraw.length >= TRAIL_BASE_LENGTH + map(mouseVel, 0, 40, 0, TRAIL_MAX_POINTS - TRAIL_BASE_LENGTH, true)) {
+          break;
+        }
+      }
+
+      // Render as small luminous segments
+      for (let i = 0; i < pointsToDraw.length - 1; i++) {
+        let pt = pointsToDraw[i];
+        let nextPt = pointsToDraw[i + 1];
+        let fade = map(i, 0, pointsToDraw.length - 1, 0, 1);
+        let a = pt.brightness * (1 - fade);
+
+        // Trail color: #DAD0C8 (warm grey) with velocity tinting
+        stroke(218, 208, 200, a);
+        strokeWeight(pt.thickness * (1 - fade * 0.5));
+        line(pt.x, pt.y, nextPt.x, nextPt.y);
+
+        // Occasional bright sprite at the head
+        if (i < 3 && mouseVel > 5) {
+          noStroke();
+          fill(255, 255, 255, a * 0.5);
+          ellipse(pt.x, pt.y, 3 + mouseVel * 0.1, 3 + mouseVel * 0.1);
+        }
+      }
+
+      blendMode(BLEND);
+    }
+
+    // ============================================================
+    // Signal pulse: red radiating ring from click position
+    // ============================================================
+    function drawSignalPulse() {
+      blendMode(ADD);
+      noFill();
+      let progress = 1 - signalTimer / SIGNAL_DURATION;
+      let maxR = SIGNAL_RADIUS * 4;
+      let currentR = progress * maxR;
+
+      // Draw expanding concentric rings
+      strokeWeight(2);
+      for (let i = 0; i < 3; i++) {
+        let r = currentR - i * 15;
+        if (r > 0) {
+          let alpha = map(r, 0, maxR, 200, 0, true);
+          stroke(238, 18, 18, alpha);
+          ellipse(signalX, signalY, r * 2, r * 2);
+        }
+      }
+
+      // Central flare
+      noStroke();
+      fill(238, 18, 18, map(signalTimer, SIGNAL_DURATION, 0, 80, 0, true));
+      ellipse(signalX, signalY, 12, 12);
+
+      blendMode(BLEND);
+    }
+
+    // ============================================================
+    // HUD update: DOM elements refreshed every frame
+    // ============================================================
+    function updateHUD() {
+      // Mission clock
+      let elapsed = (millis() - startTime) / 1000;
+      let h = floor(elapsed / 3600);
+      let m = floor((elapsed % 3600) / 60);
+      let s = floor(elapsed % 60);
+      document.getElementById('mission-clock').textContent =
+        `MET: ${nf(h,2)}:${nf(m,2)}:${nf(s,2)}`;
+
+      // Compass rotation
+      let diamond = document.getElementById('compass-diamond');
+      if (diamond) {
+        let deg = (degrees(compassAngle) % 360);
+        diamond.style.transform = `translate(-50%, -50%) rotate(${deg}deg)`;
+      }
+      document.getElementById('compass-heading').textContent =
+        `HDG: ${nf(degrees(compassAngle) % 360, 3, 0)}°`;
+
+      // Rover coordinates with jitter every 60 frames
+      let jitter = (frameCounter % 60 === 0) ? random(-2, 2) : 0;
+      hudJitter = (frameCounter % 60 < 5); // brief jitter window
+      let jx = hudJitter ? random(-1, 1) : 0;
+      let jy = hudJitter ? random(-1, 1) : 0;
+      document.getElementById('rover-x').textContent =
+        `X: ${nf(mouseX + jx + jitter, 0, 2)}`;
+      document.getElementById('rover-y').textContent =
+        `Y: ${nf(mouseY + jy + jitter, 0, 2)}`;
+      document.getElementById('rover-vel').textContent =
+        `VEL: ${nf(mouseVel, 0, 2)} m/s`;
+
+      // Terrain info
+      document.getElementById('terrain-seed').textContent =
+        `SEED: ${noiseOffset}`;
+      document.getElementById('crater-count').textContent =
+        `CRATERS: ${craters.length}`;
+
+      // Signal status
+      let alertEl = document.getElementById('signal-status');
+      if (signalActive) {
+        alertEl.classList.add('active');
+      } else {
+        alertEl.classList.remove('active');
+      }
+    }
+
+    // ============================================================
+    // Interactions
+    // ============================================================
+
+    // Click: inject signal pulse
+    function mousePressed() {
+      signalActive = true;
+      signalTimer = SIGNAL_DURATION;
+      signalX = mouseX;
+      signalY = mouseY;
+      return false;
+    }
+
+    // Scroll: time-travel (advance timeSeed)
+    function mouseWheel(event) {
+      timeSeed += event.delta * 0.0005;
+      return false;
+    }
+
+    // Keyboard: R to reset
+    function keyPressed() {
+      if (key === 'r' || key === 'R') {
+        resetTerrain();
+      }
+    }
+
+    function resetTerrain() {
+      background(0);
+      totalStrokes = 0;
+      timeSeed = 0;
+      noiseOffset = floor(random(100000));
+      noiseSeed(noiseOffset);
+      generateCraters();
+      startTime = millis();
+      frameCounter = 0;
+      compassAngle = 0;
+    }
+
+    // ============================================================
+    // Window resize
+    // ============================================================
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+      background(0);
+      totalStrokes = 0;
+    }
+  </script>
+</body>
+</html>

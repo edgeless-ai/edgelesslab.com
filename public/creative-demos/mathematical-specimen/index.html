@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mathematical Specimen — Formula-Driven Typography</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Serif:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF9F6;
+    --text-primary: #1A1A1A;
+    --text-secondary: #6B6B6B;
+    --serif: #4A6FA5;
+    --sans: #B85C4B;
+    --display: #6B8E6B;
+    --mono: #5A5A7A;
+    --panel-width: 320px;
+    --gap: 24px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+  #app {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+  /* Left sticky metadata panel */
+  #panel {
+    width: var(--panel-width);
+    min-width: var(--panel-width);
+    background: var(--bg);
+    border-right: 1px solid rgba(0,0,0,0.06);
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    position: relative;
+    z-index: 10;
+  }
+  .panel-header {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .panel-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  .meta-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .meta-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  .meta-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--text-primary);
+    background: rgba(0,0,0,0.03);
+    padding: 8px 10px;
+    border-radius: 6px;
+    word-break: break-all;
+  }
+  .rating-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .rating-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .rating-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .rating-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: rgba(0,0,0,0.06);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .rating-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--serif), var(--sans));
+    transition: width 0.4s ease;
+  }
+  .divider {
+    height: 1px;
+    background: rgba(0,0,0,0.08);
+    margin: 8px 0;
+  }
+  .hint {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-top: auto;
+  }
+  .hint kbd {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    background: rgba(0,0,0,0.06);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  /* Right area: formula bar + canvas */
+  #main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-width: 0;
+  }
+  #topbar {
+    display: flex;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    background: var(--bg);
+    align-items: center;
+    z-index: 10;
+  }
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+  }
+  .input-group label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  .input-group input {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 8px 10px;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--text-primary);
+    outline: none;
+    width: 100%;
+  }
+  .input-group input:focus {
+    border-color: var(--serif);
+  }
+  .input-group input.error {
+    border-color: var(--sans);
+    background: rgba(184,92,75,0.08);
+  }
+  #canvas-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  #canvas-wrap canvas {
+    display: block;
+  }
+  /* Tooltip */
+  #tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(26,26,26,0.92);
+    color: #fff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  #tooltip.visible {
+    opacity: 1;
+  }
+  /* Export overlay */
+  #export-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  #export-overlay.active {
+    display: flex;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <aside id="panel">
+    <div class="panel-header">Mathematical Specimen</div>
+    <div class="panel-sub">Formula-driven typography. Each letter is a variable in a living cipher.</div>
+    <div class="divider"></div>
+    <div class="meta-group">
+      <div class="meta-label">Font Name</div>
+      <div class="meta-value" id="meta-name">ABCDEFGHIJKLMNOPQRSTUVWXYZ</div>
+    </div>
+    <div class="meta-group">
+      <div class="meta-label">Designer (Formula)</div>
+      <div class="meta-value" id="meta-formula">sin(t + x*0.1) * cos(y*0.1)</div>
+    </div>
+    <div class="divider"></div>
+    <div class="rating-group">
+      <div class="rating-row">
+        <div class="rating-label"><span>Character</span><span id="score-char">0.00</span></div>
+        <div class="rating-bar-bg"><div class="rating-bar-fill" id="bar-char" style="width:0%"></div></div>
+      </div>
+      <div class="rating-row">
+        <div class="rating-label"><span>Versatility</span><span id="score-vers">0.00</span></div>
+        <div class="rating-bar-bg"><div class="rating-bar-fill" id="bar-vers" style="width:0%"></div></div>
+      </div>
+      <div class="rating-row">
+        <div class="rating-label"><span>Range</span><span id="score-range">0.00</span></div>
+        <div class="rating-bar-bg"><div class="rating-bar-fill" id="bar-range" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="hint">
+      <kbd>Hover</kbd> a cell to see its output.<br>
+      <kbd>Click</kbd> a cell to lock it for 3s.<br>
+      <kbd>Scroll</kbd> to shift time.<br>
+      <kbd>Double-click</kbd> canvas to export PNG.
+    </div>
+  </aside>
+
+  <main id="main">
+    <div id="topbar">
+      <div class="input-group" style="flex: 0 0 220px;">
+        <label>Word</label>
+        <input type="text" id="word-input" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ" maxlength="256" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="input-group">
+        <label>Formula f(t, x, y, i, charCode, isVowel)</label>
+        <input type="text" id="formula-input" value="sin(t + x*0.1) * cos(y*0.1) + charCode * 0.002" autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+    <div id="canvas-wrap">
+      <div id="tooltip"></div>
+    </div>
+  </main>
+</div>
+<div id="export-overlay">Exporting high-resolution PNG…</div>
+
+<script>
+  // ==========================
+  // State
+  // ==========================
+  const COLS = 16;
+  const ROWS = 16;
+  const TOTAL = COLS * ROWS;
+  let word = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let formula = "sin(t + x*0.1) * cos(y*0.1) + charCode * 0.002";
+  let compiledFn = null;
+  let errorFlash = 0;
+  let t = 0;
+  let outputs = []; // recent outputs for ratings
+  let maxOutputs = 120; // 2 seconds at 60fps
+  let grid = []; // array of cell objects
+  let tooltipEl = document.getElementById('tooltip');
+  let p5inst = null;
+  let exportOverlay = document.getElementById('export-overlay');
+  let wordInput = document.getElementById('word-input');
+  let formulaInput = document.getElementById('formula-input');
+  let metaName = document.getElementById('meta-name');
+  let metaFormula = document.getElementById('meta-formula');
+  let barChar = document.getElementById('bar-char');
+  let barVers = document.getElementById('bar-vers');
+  let barRange = document.getElementById('bar-range');
+  let scoreChar = document.getElementById('score-char');
+  let scoreVers = document.getElementById('score-vers');
+  let scoreRange = document.getElementById('score-range');
+
+  // ==========================
+  // Grid setup
+  // ==========================
+  function setupGrid() {
+    grid = [];
+    let idx = 0;
+    for (let y = 0; y < ROWS; y++) {
+      for (let x = 0; x < COLS; x++) {
+        let char = word[idx % word.length] || ' ';
+        if (char === ' ') { idx++; char = word[idx % word.length] || ' '; }
+        let cc = char.charCodeAt(0);
+        grid.push({
+          x, y, i: idx,
+          char,
+          charCode: cc,
+          isVowel: isVowel(char) ? 1 : 0,
+          locked: false,
+          lockValue: 0,
+          lockUntil: 0,
+          lastValue: 0
+        });
+        idx++;
+      }
+    }
+  }
+
+  function isVowel(c) {
+    return /^[aeiouAEIOU]$/.test(c);
+  }
+
+  // ==========================
+  // Formula compilation
+  // ==========================
+  function compileFormula(src) {
+    try {
+      let fn = new Function('t', 'x', 'y', 'i', 'charCode', 'isVowel', 'return (' + src + ');');
+      // Test-run once
+      fn(0, 0, 0, 0, 65, 0);
+      return fn;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function evaluateFormula(t, x, y, i, charCode, isVowel) {
+    if (!compiledFn) return 0;
+    try {
+      return compiledFn(t, x, y, i, charCode, isVowel);
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  // ==========================
+  // Rating axes
+  // ==========================
+  function updateRatings() {
+    if (outputs.length === 0) return;
+    let avg = outputs.reduce((a, b) => a + b, 0) / outputs.length;
+    let variance = outputs.reduce((sum, v) => sum + (v - avg) * (v - avg), 0) / outputs.length;
+    let std = Math.sqrt(variance);
+    let min = Math.min(...outputs);
+    let max = Math.max(...outputs);
+    let range = max - min;
+    // Normalize to 0..1 for display (clip)
+    let normChar = Math.min(1, Math.max(0, (avg + 2) / 4));
+    let normVers = Math.min(1, Math.max(0, std / 2));
+    let normRange = Math.min(1, Math.max(0, range / 4));
+    barChar.style.width = (normChar * 100) + '%';
+    barVers.style.width = (normVers * 100) + '%';
+    barRange.style.width = (normRange * 100) + '%';
+    scoreChar.textContent = avg.toFixed(2);
+    scoreVers.textContent = std.toFixed(2);
+    scoreRange.textContent = range.toFixed(2);
+  }
+
+  // ==========================
+  // p5.js Sketch
+  // ==========================
+  let sketch = function(p) {
+    let baseFontSize = 16;
+    let cellW, cellH;
+    let canvasWrap = document.getElementById('canvas-wrap');
+    let mouseOverCell = null;
+
+    p.setup = function() {
+      let w = canvasWrap.clientWidth;
+      let h = canvasWrap.clientHeight;
+      let c = p.createCanvas(w, h);
+      c.parent('canvas-wrap');
+      p.textAlign(p.CENTER, p.CENTER);
+      p.textFont('IBM Plex Serif');
+      p.frameRate(60);
+      p5inst = p;
+      setupGrid();
+      compiledFn = compileFormula(formula);
+      resizeCells();
+    };
+
+    p.draw = function() {
+      p.background(250, 249, 246);
+      t += 0.016;
+      let frameOutputs = [];
+      let now = performance.now();
+
+      // Error flash
+      if (errorFlash > 0) {
+        p.fill(184, 92, 75, 51); // 20% opacity
+        p.noStroke();
+        p.rect(0, 0, p.width, p.height);
+        errorFlash -= 1 / 60;
+      }
+
+      // Grid
+      for (let cell of grid) {
+        let val;
+        if (cell.locked && now < cell.lockUntil) {
+          val = cell.lockValue;
+        } else {
+          cell.locked = false;
+          val = evaluateFormula(t, cell.x, cell.y, cell.i, cell.charCode, cell.isVowel);
+          if (isNaN(val) || !isFinite(val)) val = 0;
+          cell.lastValue = val;
+        }
+        frameOutputs.push(val);
+
+        let fs = p.map(val, -2, 2, baseFontSize * 0.3, baseFontSize * 2.2, true);
+        let hue = p.map(val, -2, 2, 210, 10, true);
+        let sat = 40;
+        let bri = p.map(Math.abs(val), 0, 2, 70, 35, true);
+        let alpha = p.map(Math.abs(val), 0, 2, 255, 80, true);
+
+        let cx = cell.x * cellW + cellW / 2;
+        let cy = cell.y * cellH + cellH / 2;
+
+        p.push();
+        p.noStroke();
+        // Subtle hover highlight
+        if (mouseOverCell && mouseOverCell.x === cell.x && mouseOverCell.y === cell.y) {
+          p.fill(74, 111, 165, 30);
+          p.rect(cell.x * cellW, cell.y * cellH, cellW, cellH, 4);
+        }
+        p.colorMode(p.HSB, 360, 100, 100, 255);
+        p.fill(hue, sat, bri, alpha);
+        p.textSize(fs);
+        p.text(cell.char, cx, cy);
+        p.pop();
+      }
+
+      // Store outputs for ratings
+      outputs.push(...frameOutputs);
+      if (outputs.length > maxOutputs * TOTAL) {
+        outputs = outputs.slice(outputs.length - maxOutputs * TOTAL);
+      }
+      if (p.frameCount % 6 === 0) updateRatings();
+
+      // Tooltip position
+      if (mouseOverCell) {
+        let cell = mouseOverCell;
+        let tooltipX = cell.x * cellW + cellW / 2 + 12;
+        let tooltipY = cell.y * cellH + cellH / 2 - 10;
+        // Keep within bounds
+        tooltipX = Math.min(tooltipX, p.width - 140);
+        tooltipY = Math.min(Math.max(tooltipY, 0), p.height - 40);
+        tooltipEl.style.left = tooltipX + 'px';
+        tooltipEl.style.top = tooltipY + 'px';
+        tooltipEl.innerHTML =
+          `char: <b>${cell.char}</b> &nbsp; code: <b>${cell.charCode}</b><br>` +
+          `val: <b>${cell.lastValue.toFixed(3)}</b> &nbsp; vowel: <b>${cell.isVowel}</b>`;
+      }
+    };
+
+    p.windowResized = function() {
+      let w = canvasWrap.clientWidth;
+      let h = canvasWrap.clientHeight;
+      p.resizeCanvas(w, h);
+      resizeCells();
+    };
+
+    function resizeCells() {
+      cellW = p.width / COLS;
+      cellH = p.height / ROWS;
+      baseFontSize = Math.min(cellW, cellH) * 0.55;
+    }
+
+    // Mouse interactions
+    p.mouseMoved = function() {
+      let cx = Math.floor(p.mouseX / cellW);
+      let cy = Math.floor(p.mouseY / cellH);
+      if (cx >= 0 && cx < COLS && cy >= 0 && cy < ROWS) {
+        let idx = cy * COLS + cx;
+        mouseOverCell = grid[idx];
+        tooltipEl.classList.add('visible');
+      } else {
+        mouseOverCell = null;
+        tooltipEl.classList.remove('visible');
+      }
+    };
+
+    p.mousePressed = function() {
+      if (p.mouseX < 0 || p.mouseX > p.width || p.mouseY < 0 || p.mouseY > p.height) return;
+      let cx = Math.floor(p.mouseX / cellW);
+      let cy = Math.floor(p.mouseY / cellH);
+      if (cx >= 0 && cx < COLS && cy >= 0 && cy < ROWS) {
+        let idx = cy * COLS + cx;
+        let cell = grid[idx];
+        cell.locked = true;
+        cell.lockValue = cell.lastValue;
+        cell.lockUntil = performance.now() + 3000;
+      }
+    };
+
+    p.doubleClicked = function() {
+      if (p.mouseX < 0 || p.mouseX > p.width || p.mouseY < 0 || p.mouseY > p.height) return;
+      exportHighRes();
+    };
+  };
+
+  new p5(sketch);
+
+  // ==========================
+  // DOM Events
+  // ==========================
+  wordInput.addEventListener('input', (e) => {
+    word = e.target.value || ' ';
+    metaName.textContent = word || ' ';
+    setupGrid();
+  });
+
+  formulaInput.addEventListener('input', (e) => {
+    let src = e.target.value;
+    formula = src;
+    metaFormula.textContent = src;
+    let fn = compileFormula(src);
+    if (fn) {
+      compiledFn = fn;
+      formulaInput.classList.remove('error');
+    } else {
+      formulaInput.classList.add('error');
+      errorFlash = 0.3;
+    }
+  });
+
+  // Scroll shifts time
+  document.getElementById('canvas-wrap').addEventListener('wheel', (e) => {
+    e.preventDefault();
+    t += e.deltaY * 0.002;
+  }, { passive: false });
+
+  // ==========================
+  // High-res export
+  // ==========================
+  function exportHighRes() {
+    if (!p5inst) return;
+    exportOverlay.classList.add('active');
+    setTimeout(() => {
+      let size = 3000;
+      let g = p5inst.createGraphics(size, size);
+      g.textAlign(g.CENTER, g.CENTER);
+      g.textFont('IBM Plex Serif');
+      g.background(250, 249, 246);
+      let cw = size / COLS;
+      let ch = size / ROWS;
+      let bfs = Math.min(cw, ch) * 0.55;
+      let now = performance.now();
+      for (let cell of grid) {
+        let val;
+        if (cell.locked && now < cell.lockUntil) {
+          val = cell.lockValue;
+        } else {
+          val = evaluateFormula(t, cell.x, cell.y, cell.i, cell.charCode, cell.isVowel);
+          if (isNaN(val) || !isFinite(val)) val = 0;
+        }
+        let fs = g.map(val, -2, 2, bfs * 0.3, bfs * 2.2, true);
+        let hue = g.map(val, -2, 2, 210, 10, true);
+        let sat = 40;
+        let bri = g.map(Math.abs(val), 0, 2, 70, 35, true);
+        let alpha = g.map(Math.abs(val), 0, 2, 255, 80, true);
+        let cx = cell.x * cw + cw / 2;
+        let cy = cell.y * ch + ch / 2;
+        g.push();
+        g.colorMode(g.HSB, 360, 100, 100, 255);
+        g.fill(hue, sat, bri, alpha);
+        g.noStroke();
+        g.textSize(fs);
+        g.text(cell.char, cx, cy);
+        g.pop();
+      }
+      p5inst.save(g, 'mathematical-specimen.png');
+      g.remove();
+      exportOverlay.classList.remove('active');
+    }, 100);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ditto · UI Clone Gallery · Edgeless</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#0c0c0e; color:#e0e0e0; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height:100vh; display:flex; flex-direction:column;
+  }
+  header { padding:3rem 2rem 1rem; max-width:1100px; margin:0 auto; width:100%; }
+  h1 { font-size:2.5rem; font-weight:300; letter-spacing:-0.02em; margin-bottom:0.5rem; }
+  p { color:#888; margin-bottom:2rem; }
+  .gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:1.5rem; padding:0 2rem 4rem; max-width:1100px; margin:0 auto; width:100%; }
+  .card {
+    background:#1a1a1e; border-radius:12px; overflow:hidden; transition:transform .2s, box-shadow .2s;
+    text-decoration:none; color:inherit; border:1px solid #2a2a2e;
+  }
+  .card:hover { transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,0.4); }
+  .card img { width:100%; aspect-ratio:16/10; object-fit:cover; display:block; }
+  .card-body { padding:1rem 1.25rem; }
+  .card-body h3 { font-size:1rem; font-weight:500; margin-bottom:0.25rem; }
+  .card-body span { font-size:0.85rem; color:#666; }
+  footer { margin-top:auto; padding:2rem; text-align:center; color:#444; font-size:0.85rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ditto</h1>
+  <p>UI clone captures — pixel-perfect reproductions of iconic interfaces</p>
+</header>
+<div class="gallery">
+  <a class="card" href="cosmos.html">
+    <img src="cosmos.png" alt="Cosmos">
+    <div class="card-body"><h3>Cosmos</h3><span>Database browser interface</span></div>
+  </a>
+  <a class="card" href="excalidraw.html">
+    <img src="excalidraw.png" alt="Excalidraw">
+    <div class="card-body"><h3>Excalidraw</h3><span>Whiteboard clone</span></div>
+  </a>
+  <a class="card" href="linear.html">
+    <img src="linear.png" alt="Linear">
+    <div class="card-body"><h3>Linear</h3><span>Issue tracker UI</span></div>
+  </a>
+  <a class="card" href="pudding-cool.html">
+    <img src="pudding-cool.png" alt="Pudding Cool">
+    <div class="card-body"><h3>Pudding Cool</h3><span>Data journalism aesthetic</span></div>
+  </a>
+  <a class="card" href="replicate.html">
+    <img src="replicate.png" alt="Replicate">
+    <div class="card-body"><h3>Replicate</h3><span>ML inference dashboard</span></div>
+  </a>
+</div>
+<footer>Edgeless Lab · creative demos</footer>
+</body>
+</html>

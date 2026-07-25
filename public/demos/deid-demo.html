@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>De-identification demo</title>
+<style>
+  /* Palette mirrors the parent site (Dark Lab / Light Lab). Dark is the site
+     default; init() flips to light when the parent document says so. */
+  :root {
+    color-scheme: dark;
+    --bg: #09090B;
+    --fg: #E7E7EA;
+    --fg-dim: #8A8A93;
+    --line: #26262B;
+    --accent: #C6F24E;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #FAFAFA;
+    --fg: #1a1a1a;
+    --fg-dim: #666;
+    --line: #e5e5e5;
+    --accent: #5a7d0a;
+  }
+  body {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: var(--bg);
+    color: var(--fg);
+  }
+  .deid-demo { border: 1px solid var(--line); padding: 1.5em; margin: 4px; font-size: 14px; line-height: 1.9; }
+  .deid-head { font-size: 0.78em; color: var(--fg-dim); margin-bottom: 1.2em; display: flex; justify-content: space-between; gap: 1em; flex-wrap: wrap; }
+  .deid-head b { color: var(--accent); font-weight: 600; }
+  .tok-phi { white-space: nowrap; transition: color .2s; }
+  .tok-phi.done { color: var(--fg-dim); }
+  .tok-phi .lbl { font-size: 0.68em; letter-spacing: .08em; vertical-align: .18em; margin-left: .25em; opacity: 0; transition: opacity .3s; }
+  .tok-phi.done .lbl { opacity: .7; }
+  .tok-keep { white-space: nowrap; transition: box-shadow .4s, color .4s; }
+  .tok-keep.done { color: var(--accent); box-shadow: 0 1px 0 var(--accent); }
+  .tok-keep .lbl { font-size: 0.68em; letter-spacing: .08em; vertical-align: .18em; margin-left: .25em; opacity: 0; transition: opacity .3s; color: var(--accent); }
+  .tok-keep.done .lbl { opacity: .85; }
+  .deid-foot { margin-top: 1.2em; display: flex; justify-content: space-between; align-items: baseline; gap: 1em; flex-wrap: wrap; }
+  .deid-note { font-size: 0.72em; color: var(--fg-dim); letter-spacing: .06em; opacity: 0; transition: opacity .5s; }
+  .deid-note.show { opacity: 1; }
+  .deid-replay { font-size: 0.72em; letter-spacing: .06em; background: none; border: 1px solid var(--line); color: var(--fg-dim); padding: .35em .8em; cursor: pointer; font-family: inherit; }
+  .deid-replay:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="deid-demo" id="deid-demo" aria-label="Animated demo: a fake patient message redacts its PHI while keeping the declared provider name"></div>
+<script>
+// De-identification demo: a fake patient message redacts itself, keeping only
+// the provider name the request declared. All data below is invented.
+const TOKENS = [
+  { t: 'keep', text: 'Dr. Alvarez' },
+  { text: ' saw my son ' },
+  { t: 'phi', text: 'Milo', label: 'PATIENT' },
+  { text: ' on ' },
+  { t: 'phi', text: 'March 3rd', label: 'DATE' },
+  { text: '. We drove in from ' },
+  { t: 'phi', text: '14 Cedar Lane', label: 'ADDRESS' },
+  { text: ' after calling ' },
+  { t: 'phi', text: '(555) 013-2276', label: 'PHONE' },
+  { text: '. He was endlessly patient with ' },
+  { t: 'phi', text: "Milo's asthma", label: 'CONDITION' },
+  { text: ' and even remembered his birthday, ' },
+  { t: 'phi', text: '04/12/2019', label: 'DOB' },
+  { text: '.' },
+];
+const SCRAMBLE = '█▓▒░#%@*';
+
+function build(root) {
+  root.innerHTML = '';
+  const head = document.createElement('div');
+  head.className = 'deid-head';
+  head.innerHTML = '<span>request.providers = ["<b>Dr. Alvarez</b>"]</span><span>de-id: step 0</span>';
+  const body = document.createElement('div');
+  body.className = 'deid-body';
+  const spans = [];
+  for (const tok of TOKENS) {
+    const s = document.createElement('span');
+    if (tok.t === 'phi' || tok.t === 'keep') {
+      s.className = tok.t === 'phi' ? 'tok-phi' : 'tok-keep';
+      s.innerHTML = '<span class="txt"></span><span class="lbl"></span>';
+      s.querySelector('.txt').textContent = tok.text;
+      spans.push({ el: s, tok });
+    } else {
+      s.textContent = tok.text;
+    }
+    body.appendChild(s);
+  }
+  const foot = document.createElement('div');
+  foot.className = 'deid-foot';
+  const note = document.createElement('span');
+  note.className = 'deid-note';
+  note.textContent = 'PHI masked · declared provider kept · nothing above reached a model';
+  const replay = document.createElement('button');
+  replay.className = 'deid-replay';
+  replay.type = 'button';
+  replay.textContent = 'replay';
+  foot.append(note, replay);
+  root.append(head, body, foot);
+  return { spans, note, replay };
+}
+
+const redactText = (text) => text.replace(/[^\s]/g, '█');
+const scrambleFrame = (text) => text.replace(/[^\s]/g, () => SCRAMBLE[(Math.random() * SCRAMBLE.length) | 0]);
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function finish(el, tok) {
+  const txt = el.querySelector('.txt');
+  const lbl = el.querySelector('.lbl');
+  if (tok.t === 'phi') {
+    txt.textContent = redactText(tok.text);
+    lbl.textContent = '[' + tok.label + ']';
+  } else {
+    lbl.textContent = '[KEPT: DECLARED PROVIDER]';
+  }
+  el.classList.add('done');
+}
+
+async function animate(spans, note, reduced, alive) {
+  if (reduced) {
+    for (const { el, tok } of spans) finish(el, tok);
+    note.classList.add('show');
+    return;
+  }
+  await wait(600);
+  for (const { el, tok } of spans) {
+    if (!alive()) return;
+    if (tok.t === 'keep') continue; // scanner passes over it first
+    const txt = el.querySelector('.txt');
+    for (let i = 0; i < 6; i++) {
+      txt.textContent = scrambleFrame(tok.text);
+      await wait(40);
+    }
+    finish(el, tok);
+    await wait(140);
+  }
+  if (!alive()) return;
+  await wait(250);
+  for (const { el, tok } of spans) if (tok.t === 'keep') finish(el, tok);
+  await wait(300);
+  note.classList.add('show');
+}
+
+function init() {
+  // Same-origin embed: mirror the parent site's theme (dark is its default).
+  try {
+    const t = window.parent.document.documentElement.getAttribute('data-theme');
+    if (t) document.documentElement.setAttribute('data-theme', t);
+  } catch (e) { /* cross-origin or standalone: keep dark default */ }
+
+  const root = document.getElementById('deid-demo');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let gen = 0;
+  const run = async () => {
+    const my = ++gen;
+    const alive = () => my === gen;
+    const { spans, note, replay } = build(root);
+    replay.addEventListener('click', run);
+    await animate(spans, note, reduced, alive);
+  };
+  if (reduced) { run(); return; }
+  // Show the raw text immediately; redact when scrolled into view.
+  const { replay } = build(root);
+  replay.addEventListener('click', run);
+  const io = new IntersectionObserver((entries) => {
+    if (entries.some((e) => e.isIntersecting)) {
+      io.disconnect();
+      run();
+    }
+  }, { threshold: 0.4 });
+  io.observe(root);
+}
+init();
+</script>
+</body>
+</html>

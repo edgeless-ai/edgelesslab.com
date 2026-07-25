@@ -2,6 +2,108 @@ import type { BlogPost } from "./blog-types";
 
 export const newPosts: BlogPost[] = [
   {
+    slug: "kimi-k3-post",
+    editorial: true,
+    title: "Kimi K3: The \"New Kimmy Moment\" That Should Change How You Think About Your Stack",
+    description: "Kimi K3 offers frontier AI quality at a fraction of the cost – a new Kimmy moment that could reshape your stack.",
+    date: "2026-07-23",
+    tags: ["kimi-k3","ai","cost","benchmark","creative-coding"],
+    readTime: "9 min",
+    content: `---
+title: "Kimi K3: The \"New Kimmy Moment\" That Should Change How You Think About Your Stack"
+date: 2026-07-23T07:30:00Z
+tags: ["kimi-k3","ai","cost","benchmark","creative-coding"]
+excerpt: "Kimi K3 is shaking the AI landscape with cheaper, faster, and more creative capabilities—here’s what that means for your stack."
+thumbnail: "https://img.youtube.com/vi/OPuD-UeQGY8/hqdefault.jpg"
+---
+
+![Kimi K3 thumbnail](https://img.youtube.com/vi/OPuD-UeQGY8/hqdefault.jpg)
+
+# Kimi K3: The "New Kimmy Moment" That Should Change How You Think About Your Stack
+
+*"This is the most insane generation I've ever seen from one prompt by any AI ever."
+
+That's LanceyPoo, playing a playable Call of Duty Black Ops 2 recreation — built from a single prompt, for under five dollars in API costs. He's not an AI researcher. He's a person who wanted to see if it could be done. It was.
+
+This is Kimi K3, and something is shifting.
+
+---
+
+## The Pattern, Seen From Four Angles
+
+Four separate sources, four different contexts, and they all arrived at the same conclusion within the same two‑week window. That's not coincidence — that's a pattern.
+
+**The Rumor Mill.** Wes Roth's coverage captured the pre‑launch fever. Kimi K3 leaked into Kimmy app builds, CLI tools, and desktop clients before any official announcement. Early testers weren’t just benchmarking — they were comparing outputs directly against Fable 5, and the conversation had a different register than the usual “another Chinese model, let’s see.” The anticipation was real because the numbers leaked first.
+
+**The Numbers.** Big Technology Podcast's analysis put the specifics on the table: 2.8 trillion parameters, open‑weight release, beating Fable 5 on Program Bench and SWE Marathon benchmarks. Pricing: $3 per million input tokens, $15 per million output. That’s 40 % cheaper than GPT 5.6, and 70 % cheaper than Fable. Rajan Roy called it *the new Kimmy moment* — a reference to when Kimi first surprised the Western AI world, recast for this new scale.
+
+**The Creative Work.** Nick Saraev did something different. He spent $1‑2 in API credits and combined Kimi K3 with Higgsfield MCP for video generation and frame interpolation. The output was a cinematic, scroll‑driven website. It looked like a film, not a webpage. The cost‑per‑output curve isn’t just improving — it’s collapsing in the right hands.
+
+**The Game.** LanceyPoo's video is the visceral version. Three games — a Super Mario 64 clone, Call of Duty Black Ops 2, and a Roblox Natural Disaster Survival recreation — were generated from single prompts, all playable. He isn’t running benchmarks. He’s playing the thing. The Natural Disaster Survival game gets a *9 out of 10*.
+
+Four sources. Four lenses. One conclusion: Kimi K3 is competitive on quality *and* cheaper. The old trade‑off — cheap or good — no longer holds.
+
+---
+
+## Four Takes, One Model
+
+The same model, seen through different eyes, tells different stories about what matters.
+
+**Wes Roth — The Skeptical Optimist.** Roth's coverage was measured. He noted that Fable 5 finished faster and had more robust UI components in some tasks. But Kimi K3 was “much more complex and visually appealing.” The subtext: wait and see, but the signs are strong. This is the responsible position — neither hype nor dismissal.
+
+**Nick Saraev — The Pragmatic Creator.** Saraev doesn’t run benchmarks. His angle is purely economic: model + tool chain + creative director prompt = movie‑quality output at $1‑2. His insight about taste is the one that lingers: *"The cool thing that humans are great at right now is employing our taste to pick things that we think might actually sound good."* The model does the work. The human applies taste. That’s the loop worth building around.
+
+**LanceyPoo — The Pure Reaction.** LanceyPoo's video is the consumer experience, unfiltered. He isn’t analyzing benchmarks or strategic implications — he’s building things and playing them. The excitement is genuine, and that’s the thing that makes people *feel* the shift before they understand it. *"Honestly, Kimmy, you are fantastic at creating games."
+
+**Big Technology Podcast — The Industry Analyst.** Rajan Roy and Wes Roth zoomed out to the strategic layer. The question isn’t "is Kimi K3 good?" The question is: what does this mean for OpenAI and Anthropic? The answer — frontier intelligence is being commoditized. If a Chinese startup can ship open‑weight models that compete, the moat isn’t the model. It’s distribution, tooling, and trust.
+
+These takes aren’t contradictory. They’re all true simultaneously. Kimi K3 under‑performs on some tasks and overwhelms on others. What changes is which tasks you’re measuring.
+
+---
+
+## What This Means for Your Stack
+
+If you’ve been building your stack around a single frontier model provider, this is the moment to reconsider.
+
+**Cost arbitrage is real.** At 70 % cheaper than Fable, routing decisions are no longer just quality decisions — they’re financial ones. Any stack that sends all traffic to the most expensive model is leaving material money on the table. Run the comparison for your actual workload, not a benchmark suite.
+
+**Open‑weight changes the infrastructure conversation.** 2.8 trillion parameters is large but not impossible to self‑host. Open‑weight means no API dependency, no rate limits, no data leaving your VPC. For teams with enterprise clients, that’s a different sales conversation entirely.
+
+**Agent Swarm is the feature to watch.** The "Agent Swarm" feature mentioned in the pre‑launch leaks — analogous to Claude Ultra mode — would change the abstraction layer. You’d stop prompting a model and start deploying a team. If you’ve been following Paperclip, Kanban, or multi‑agent orchestration patterns, this is where those investments become directly relevant.
+
+**Taste is the moat.** Saraev's workflow — fast generation, human evaluation, fast iteration — is the emerging pattern. The model does the volume work. The human applies judgment. Your stack should be optimized for that loop: generate, evaluate, refine. Speed through the generation phase, slow down at the taste checkpoint.
+
+**The "Kimmy moment" is a warning.** Frontier model quality is now available at commodity prices. The incumbents’ pricing power isn’t safe. For your stack, the takeaway is practical: don’t build around one provider. Route intelligently. Test Kimi K3 against your current stack and let the results drive the decision.
+
+---
+
+## What To Do With This
+
+Don't just read about it. Here's what actually makes sense:
+
+1. **Try it.** Sign up for Kimmy — app, CLI, or desktop. Run your actual prompts, not the demo prompts. Compare quality and cost against what you're using now.
+
+2. **Benchmark your stack honestly.** Run a cost comparison for your real workload. At 70 % cheaper, the savings are material — but only if the quality holds for your specific use case. It won't hold for everything.
+
+3. **Build something creative.** The most compelling demos are creative ones. Try the full loop: model + creative director prompt + taste. See what emerges when generation is cheap enough to be experimental.
+
+4. **Watch the Agent Swarm feature.** If it ships at scale, test how it compares to your current orchestration. Does it change the abstraction? Does it simplify what you're building?
+
+5. **Share what you find.** The story is still unfolding. Real‑world usage data is more valuable than benchmark numbers. If Kimi K3 excels at X and fails at Y, the community needs to know.
+
+The "new Kimmy moment" isn't just a benchmark story. It's a cost story, a tooling story, and — most importantly — a taste story. The model is commoditizing. Your judgment is the edge.
+
+---
+
+## Sources
+
+- [Wes Roth — INSANE AI News: Kimi K3 rumors and Fable comparison](https://www.youtube.com/watch?v=OPuD-UeQGY8)
+- [Nick Saraev — Cinematic websites for $1-2 with Kimi K3](https://www.youtube.com/watch?v=0zlwXSVmoeg)
+- [LanceyPoo — 3.js game creation test with Kimi K3](https://www.youtube.com/watch?v=dmw7iTQvTRo)
+- [Big Technology Podcast — Industry analysis of Kimi K3](https://www.youtube.com/watch?v=jPbN5m2iQ_M)
+`,
+  },
+  {
     slug: "swarm-tried-to-bankrupt-itself",
     editorial: true,
     title: "The Night Our Swarm Tried to Bankrupt Itself",
@@ -2164,5 +2266,139 @@ of "outages" are the observer tripping over its own feet.
 
 My monitor still watches the swarm. It just earned the right to page me by first proving it
 can tell the difference between a dead service and a blind probe.`.trim(),
+  },
+  {
+    slug: "rescuing-an-ai-product-from-a-dying-platform",
+    editorial: true,
+    title: "Rescuing an AI Product From a Dying Platform in Four Weeks",
+    description:
+      "A healthcare AI product was built on a no-code LLM platform that announced shutdown with a month of notice. How a solo rebuild on Azure hit the deadline with zero downtime, and what it says about platform risk in the LLM era.",
+    date: "2026-07-25",
+    tags: ["llm-ops", "azure", "consulting", "platform-risk", "hipaa"],
+    readTime: "7 min",
+    content: `
+> Details anonymized. The shape of the problem is the point, not the names.
+
+## The month-of-runway problem
+
+A founder I work with had built his product's AI engine on a no-code LLM orchestration platform. Good choice at the time: fast to prototype, visual flows, no infra to run. The product drafts compliant, on-voice text for medical practices, so every request can carry PHI and every output is regulated speech.
+
+Then the platform announced it was shutting down. About a month of notice.
+
+Everything that made the product the product lived inside that vendor: the prompt flows, the compliance rules, years of voice engineering. Not exportable to anything runnable. This is the LLM era's version of the agency-built website you can't edit, except the agency is also turning off the servers.
+
+## What four weeks bought
+
+I rebuilt the system solo on Azure, part-time, against the vendor's shutoff date. The cutover landed on the deadline with zero downtime, verified by running the old and new systems against the same inputs until the outputs matched.
+
+:::metric
+1 | engineer
+4 | weeks, part-time
+0 | downtime at cutover
+161 | dependencies pinned
+:::
+
+The rebuild, in rough order of how much it mattered:
+
+**The engine.** The platform's proprietary flow format turned out to be event documents: 900+ blocks with branch gates and nested subflows. I reverse-engineered the format and reimplemented it as a faithful executor behind a FastAPI service on Azure Container Apps. Faithful matters. The goal of a migration is not "better", it's "provably the same", because the client's team can verify sameness and they cannot verify better. Better comes after.
+
+**Compliance as step zero, not a checkbox.** De-identification runs before any model sees text, and every model in the fleet is pinned to the US data zone. One bug class was instructive: naive de-id masked names the response legitimately needed, garbling the output. The fix was a context-aware allowlist that keeps exactly the names the request declares and masks everything else. Compliance-grade LLM systems are an architecture problem. The paperwork describes the architecture; it doesn't substitute for it.
+
+Here is that allowlist doing its job, on invented data:
+
+<iframe src="/demos/deid-demo.html" title="De-identification demo: a fake patient message redacts its PHI while keeping the declared provider name" loading="lazy" style="width:100%;height:460px;border:0;display:block;margin:1.5em 0"></iframe>
+
+**Honest failure contracts.** Early on, an unreachable data source caused a model to write apology text into structured fields, which then landed in a database. That's the quiet failure mode of LLM systems: they don't crash, they confabulate. The redesign made failure a first-class result. Unreadable source means empty fields plus a \`needs_manual_entry\` status, with a refusal detector and one grounded retry. The system never apologizes into data.
+
+<svg viewBox="0 0 720 224" width="100%" style="max-width:720px;display:block;margin:2.5em 0;font-family:monospace" role="img" aria-label="Request path: de-identification runs first, then the model, then one of two honest outcomes">
+<defs><marker id="ah1" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8" fill="none" stroke="currentColor" stroke-width="1"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1">
+<rect x="8" y="80" width="104" height="44"/>
+<rect x="150" y="80" width="180" height="44"/>
+<rect x="368" y="80" width="150" height="44"/>
+<rect x="566" y="28" width="146" height="48"/>
+<rect x="566" y="142" width="146" height="48" stroke-dasharray="4 3"/>
+<line x1="112" y1="102" x2="146" y2="102" marker-end="url(#ah1)"/>
+<line x1="330" y1="102" x2="364" y2="102" marker-end="url(#ah1)"/>
+<polyline points="518,102 542,102 542,52 562,52" marker-end="url(#ah1)"/>
+<polyline points="518,102 542,102 542,166 562,166" marker-end="url(#ah1)"/>
+</g>
+<g fill="currentColor">
+<text x="60" y="99" text-anchor="middle" font-size="13">request</text>
+<text x="60" y="115" text-anchor="middle" font-size="10" opacity="0.55">PHI inside</text>
+<text x="240" y="99" text-anchor="middle" font-size="13">de-identify</text>
+<text x="240" y="115" text-anchor="middle" font-size="10" opacity="0.55">mask PHI &#183; keep declared</text>
+<text x="443" y="99" text-anchor="middle" font-size="13">model</text>
+<text x="443" y="115" text-anchor="middle" font-size="10" opacity="0.55">US data zone</text>
+<text x="639" y="49" text-anchor="middle" font-size="12">status: ok</text>
+<text x="639" y="65" text-anchor="middle" font-size="10" opacity="0.55">source: website</text>
+<text x="639" y="163" text-anchor="middle" font-size="12">needs_manual_entry</text>
+<text x="639" y="179" text-anchor="middle" font-size="10" opacity="0.55">empty fields &#183; no prose</text>
+<text x="150" y="64" font-size="10" letter-spacing="2" opacity="0.55">&#8220;STEP 0. BEFORE ANY MODEL SEES TEXT&#8221;</text>
+<text x="443" y="142" text-anchor="middle" font-size="10" opacity="0.55">refusal detector</text>
+<text x="443" y="156" text-anchor="middle" font-size="10" opacity="0.55">one grounded retry</text>
+<text x="712" y="212" text-anchor="end" font-size="10" letter-spacing="2" fill="var(--accent,#2563eb)">&#8220;NEVER APOLOGIZES INTO DATA&#8221;</text>
+</g>
+</svg>
+
+**A control room, not a black box.** The founder doesn't write code. He now edits every production prompt, picks the model per flow node, and replays real payloads in a web control room. Edits go to a staging store, get tested against a staging environment, then promote to production with history and one-click rollback. Prompt changes went from "file a developer request" to "founder ships it himself." For a non-technical owner, the ops surface is the product.
+
+**Boring deployment discipline.** One repo, trunk-based. Every build is an immutable image tagged with its commit SHA. New builds hit a UAT environment first; the byte-identical image then promotes to production, with the previous revision parked as an instant rollback. Every promote gets a git tag, so the tag history is the audit trail. And after two supply-chain incidents in one week (a pip resolver meltdown and a transitive minor-version bump that broke the model API), all ~161 dependencies got frozen to a verified set. Both incidents died in staging. Users never saw either.
+
+<svg viewBox="0 0 720 300" width="100%" style="max-width:720px;display:block;margin:2.5em 0;font-family:monospace" role="img" aria-label="Two lanes: everything runs in the TEST lane first, then the byte-identical artifact promotes across into the PROD lane, where the previous revision stays parked for instant rollback">
+<defs><marker id="ah2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8" fill="none" stroke="currentColor" stroke-width="1"/></marker></defs>
+<g fill="none" stroke="currentColor" stroke-width="1">
+<rect x="8" y="52" width="110" height="44"/>
+<rect x="156" y="52" width="150" height="44"/>
+<rect x="344" y="52" width="130" height="44"/>
+<rect x="540" y="52" width="164" height="44"/>
+<rect x="344" y="188" width="130" height="44"/>
+<rect x="540" y="188" width="164" height="44"/>
+<rect x="130" y="188" width="150" height="44" stroke-dasharray="4 3"/>
+<line x1="118" y1="74" x2="152" y2="74" marker-end="url(#ah2)"/>
+<line x1="306" y1="74" x2="340" y2="74" marker-end="url(#ah2)"/>
+<line x1="409" y1="96" x2="409" y2="184" marker-end="url(#ah2)"/>
+<line x1="622" y1="96" x2="622" y2="184" marker-end="url(#ah2)"/>
+<line x1="340" y1="210" x2="284" y2="210" stroke-dasharray="4 3" marker-end="url(#ah2)"/>
+<line x1="0" y1="142" x2="720" y2="142" stroke-dasharray="2 5" opacity="0.5"/>
+</g>
+<g fill="currentColor">
+<text x="8" y="30" font-size="10" letter-spacing="3" opacity="0.55">TEST LANE</text>
+<text x="8" y="170" font-size="10" letter-spacing="3" opacity="0.55">PROD LANE</text>
+<text x="63" y="71" text-anchor="middle" font-size="13">commit</text>
+<text x="63" y="87" text-anchor="middle" font-size="10" opacity="0.55">sha abc123</text>
+<text x="231" y="71" text-anchor="middle" font-size="13">image</text>
+<text x="231" y="87" text-anchor="middle" font-size="10" opacity="0.55">:abc123 &#183; immutable</text>
+<text x="409" y="71" text-anchor="middle" font-size="13">UAT</text>
+<text x="409" y="87" text-anchor="middle" font-size="10" opacity="0.55">smoke &#183; evals</text>
+<text x="622" y="71" text-anchor="middle" font-size="13">staging prompts</text>
+<text x="622" y="87" text-anchor="middle" font-size="10" opacity="0.55">founder edits here</text>
+<text x="409" y="207" text-anchor="middle" font-size="13">PROD</text>
+<text x="409" y="223" text-anchor="middle" font-size="10" opacity="0.55">same image</text>
+<text x="622" y="207" text-anchor="middle" font-size="13">prod prompts</text>
+<text x="622" y="223" text-anchor="middle" font-size="10" opacity="0.55">live next request</text>
+<text x="205" y="207" text-anchor="middle" font-size="11">prev revision</text>
+<text x="205" y="221" text-anchor="middle" font-size="10" opacity="0.55">parked &#183; 0% traffic</text>
+<text x="401" y="132" text-anchor="end" font-size="10" letter-spacing="2" fill="var(--accent,#2563eb)">&#8220;BYTE-IDENTICAL&#8221;</text>
+<text x="630" y="132" font-size="10" letter-spacing="2" fill="var(--accent,#2563eb)">&#8220;PROMOTE&#8221;</text>
+<text x="130" y="252" font-size="10" letter-spacing="2" opacity="0.55">&#8220;INSTANT ROLLBACK&#8221;</text>
+<text x="8" y="282" font-size="11">git tag prod/&lt;date&gt;-abc123</text>
+<text x="380" y="282" font-size="10" letter-spacing="2" opacity="0.55">&#8220;THE AUDIT TRAIL &#183; NO BRANCHES, TAGS&#8221;</text>
+</g>
+</svg>
+
+**A real model fleet.** Migrating off a platform also meant escaping its model menu. The system now runs the current frontier (multiple GPT lines, DeepSeek, Kimi) with per-node model selection, and the ops panel shows published per-model pricing next to actual month-to-date spend. Cost as a visible dial, not a surprise invoice.
+
+## What I'd tell anyone building on an AI platform
+
+1. **Ask the exit question before you build.** If this vendor died tomorrow, what artifact do you walk away with? If the answer is "a JSON export nothing can run", you are renting your own product.
+2. **Your prompts are your IP. Treat them like source code.** Version them, stage them, promote them, and keep them somewhere you control.
+3. **Design the failure states first.** An LLM system's worst outputs come from its error paths, because that's where models improvise. Make failure structured and boring.
+4. **Byte-identical promotion beats clever branching.** Prod should run the exact artifact staging verified. Tags are cheaper than branches and drift less.
+5. **One engineer with modern AI leverage covers what used to take a team**, but only if the discipline comes along: parity testing, pinned dependencies, rollback ladders. The leverage multiplies the discipline. It doesn't replace it.
+
+Platform risk is not an argument against building on platforms. It's an argument for knowing, on day one, what the rebuild would take. In this case the answer turned out to be four weeks. The founder now owns his stack, ships his own prompt changes, and the next version of the product is being built on rails he can see into.
+
+That's the trade worth making: from renting to owning.`.trim(),
   },
 ];

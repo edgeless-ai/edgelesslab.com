@@ -18,3 +18,6 @@ _script.py
 public/renders/_*.py
 public/renders/_*.glb
 public/marimo/
+__pycache__/
+*.pyc
+lh-report.json

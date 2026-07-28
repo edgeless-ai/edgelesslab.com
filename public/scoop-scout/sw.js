@@ -1,5 +1,5 @@
 /* Scoop Scout service worker — offline app shell + runtime cache for CDN assets */
-var VERSION = 'scoopscout-v4';
+var VERSION = 'scoopscout-v5';
 var SHELL = VERSION + '-shell';
 var RUNTIME = VERSION + '-runtime';
 

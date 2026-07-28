@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marimo × NBA Sports Demos — Edgeless Lab</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --card: #12121a;
+    --border: #1e1e2e;
+    --text: #e0e0e0;
+    --muted: #8888aa;
+    --cyan: #00d4ff;
+    --orange: #ff6b35;
+    --green: #00ff88;
+    --pink: #ff6b9d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem;
+  }
+  header {
+    text-align: center;
+    padding: 3rem 1rem 1rem;
+  }
+  header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--cyan), var(--orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  header p {
+    color: var(--muted);
+    margin-top: 0.5rem;
+    font-size: 1.05rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.25rem;
+    max-width: 1100px;
+    margin: 2rem auto;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: border-color 0.2s, transform 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .card:hover {
+    border-color: var(--cyan);
+    transform: translateY(-2px);
+  }
+  .card .emoji { font-size: 1.8rem; }
+  .card h2 { font-size: 1.15rem; font-weight: 600; }
+  .card p { color: var(--muted); font-size: 0.88rem; line-height: 1.45; flex: 1; }
+  .card .tags {
+    display: flex; gap: 0.4rem; flex-wrap: wrap;
+  }
+  .card .tags span {
+    font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 10px;
+    background: rgba(0, 212, 255, 0.1); color: var(--cyan);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+  }
+  .card .links { display: flex; gap: 0.8rem; margin-top: 0.3rem; }
+  .card .links a {
+    color: var(--cyan); text-decoration: none; font-weight: 600; font-size: 0.85rem;
+  }
+  .card .links a:hover { text-decoration: underline; }
+  .card .links a.local { color: var(--muted); font-size: 0.78rem; }
+  footer {
+    text-align: center; color: var(--muted); font-size: 0.8rem;
+    margin-top: 3rem; padding: 1rem;
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .notice {
+    background: rgba(255, 107, 53, 0.08);
+    border: 1px solid rgba(255, 107, 53, 0.2);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    max-width: 700px;
+    margin: 1.5rem auto;
+    font-size: 0.85rem;
+    color: var(--orange);
+    text-align: center;
+  }
+  .notice a { color: var(--orange); }
+  .stats-line {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin: 0.5rem auto;
+    max-width: 700px;
+  }
+  .stats-line span { color: var(--cyan); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Marimo × NBA Sports Demos</h1>
+  <p>Reactive Python notebooks with live NBA data — built with <a href="https://github.com/koaning/wigglystuff" style="color:var(--cyan)">wigglystuff</a> + <a href="https://marimo.io" style="color:var(--cyan)">marimo</a> + <a href="https://github.com/swar/nba_api" style="color:var(--cyan)">nba_api</a></p>
+</header>
+
+<div class="stats-line">
+  <span>10</span> star players · <span>555</span> game logs · <span>452</span> player season profiles · 2025‑26 regular season
+</div>
+
+<div class="notice">
+  ⚡ These demos use <strong>wigglystuff</strong> (anywidget) and require a live Python kernel.<br>
+  Click <strong>Run on molab</strong> for interactive versions, or <strong>Source</strong> to run locally with <code>uv pip install wigglystuff && marimo edit &lt;file&gt;.py</code>
+</div>
+
+<div class="grid">
+
+  <div class="card">
+    <div class="emoji">📊</div>
+    <h2>Scoring Distribution Explorer</h2>
+    <p>Drag μ and σ in the normal distribution formula and watch the fit overlay real NBA scoring data. The exact TangleLatex trick from the marimo_io reel, but with real game stats.</p>
+    <div class="tags"><span>TangleLatex</span><span>statistics</span><span>reactive</span></div>
+    <div class="links">
+      <a href="https://molab.marimo.io/github/edgeless-ai/edgelesslab.com/blob/main/public/marimo-sports-demos/scoring-distribution-explorer.py">Run on molab →</a>
+      <a class="local" href="scoring-distribution-explorer.py">Source</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="emoji">📈</div>
+    <h2>Efficiency Frontier</h2>
+    <p>Drag control points on a curve editor to draw an efficiency frontier, then watch it overlay real NBA player data. Switch stat axes to find surprising patterns — players above your curve are outperforming.</p>
+    <div class="tags"><span>CurveEditor</span><span>efficiency</span><span>exploration</span></div>
+    <div class="links">
+      <a href="https://molab.marimo.io/github/edgeless-ai/edgelesslab.com/blob/main/public/marimo-sports-demos/efficiency-frontier.py">Run on molab →</a>
+      <a class="local" href="efficiency-frontier.py">Source</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="emoji">🏀</div>
+    <h2>Game Log Timeline</h2>
+    <p>Auto-playing slider walks through the entire season game by game. Bar charts show each game's score with rolling averages, and a detailed stat card updates for every game. Watch the arc of a season unfold.</p>
+    <div class="tags"><span>PlaySlider</span><span>timeline</span><span>animation</span></div>
+    <div class="links">
+      <a href="https://molab.marimo.io/github/edgeless-ai/edgelesslab.com/blob/main/public/marimo-sports-demos/game-log-timeline.py">Run on molab →</a>
+      <a class="local" href="game-log-timeline.py">Source</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Built by <a href="https://edgelesslab.com">Edgeless Lab</a> · <a href="https://github.com/koaning/wigglystuff">wigglystuff</a> · <a href="https://marimo.io">marimo</a> · <a href="https://github.com/swar/nba_api">nba_api</a> · Data from NBA API</p>
+</footer>
+
+</body>
+</html>

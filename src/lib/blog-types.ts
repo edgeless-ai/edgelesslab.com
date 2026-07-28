@@ -22,6 +22,8 @@ export interface BlogPost {
   ctaHook?: string;
   /** Blog post cover image / og:image path */
   image?: string;
+  /** One-line statement of how this piece was produced, matching Substack's "how I made this" disclosure pattern. E.g., "AI-generated, human-reviewed" or "Human-written, AI-assisted editing." */
+  processNote?: string;
 }
 
 /**

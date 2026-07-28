@@ -14,6 +14,7 @@
  *     (mobile LCP 4.4s → target <2.5s). Inline critical CSS in layout.tsx instead.
  *   - Kept posthog/github preconnect (PostHog instrumentation is harmless;
  *     github preconnect helps repo CTA clicks).
+ *   - 2026-07-18: Added font preloads and dns-prefetch for common origins.
  */
 
 export function PerformancePreload() {
@@ -23,6 +24,9 @@ export function PerformancePreload() {
       <link rel="preconnect" href="https://us.i.posthog.com" crossOrigin="anonymous" />
       <link rel="dns-prefetch" href="https://github.com" />
       <link rel="dns-prefetch" href="https://us.i.posthog.com" />
+      <link rel="dns-prefetch" href="https://cdn.fontshare.com" />
+      <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+      <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     </>
   );
 }

@@ -1,10 +1,10 @@
 ---
 slug: the-gateway-that-broke-and-the-expensive-models-we-didnt-need
-title: The Gateway That Broke — and the Expensive Models We Didn't Need
+title: The Gateway That Broke and the Expensive Models We Didn't Need
 description: FreeLLMAPI had been quietly routing a small agent swarm across more than
   a dozen providers. Then the setup collapsed to four, its premium credential vanished,
   and activation started failing. Recovering it taught me that the real upgrade was
-  not a pricier model — it was one source of truth and intentional routing.
+  not a pricier model. It was one source of truth and intentional routing.
 date: '2026-07-28'
 tags:
 - Infrastructure
@@ -20,7 +20,7 @@ ctaHook: Before you buy a smarter model, make sure you have not lost the system 
   was already making your free models work.
 ---
 
-# The Gateway That Broke — and the Expensive Models We Didn't Need
+# The Gateway That Broke and the Expensive Models We Didn't Need
 
 I maintain a small agent swarm that researches, drafts, codes, and reviews. Its model
 traffic passes through FreeLLMAPI, a local gateway that turns many provider credentials
@@ -45,8 +45,8 @@ system.
 
 FreeLLMAPI had been split between a Docker build and a native build. Each had its own
 database state. The native process was alive and serving requests, but it had the
-four-provider version. The older, richer state — including the active premium
-credential and the provider inventory I remembered — still existed on the Docker side.
+four-provider version. The older, richer state, including the active premium
+credential and the provider inventory I remembered, still existed on the Docker side.
 The activation request failed because I was asking one runtime to recognize state that
 belonged to the other.
 
@@ -95,12 +95,12 @@ model being selected automatically.
 
 The fix was creating three named route selectors:
 
-- **`auto:smart-core`** — the strongest automatically routed free model pool. Every
+- **`auto:smart-core`:** the strongest automatically routed free model pool. Every
   route in it had passed a live completion canary. No assumptions, no untested
   providers.
-- **`auto:fast-core`** — a speed-optimized pool for routine work. Models are sorted by
+- **`auto:fast-core`:** a speed-optimized pool for routine work. Models are sorted by
   intelligence within the fast tier, so the best quick model wins.
-- **`fusion:smart-core`** — a synthesis route for editorial review. Its judge is
+- **`fusion:smart-core`:** a synthesis route for editorial review. Its judge is
   pinned to one model, and the most expensive free model is explicitly excluded from
   the automatic pool.
 
@@ -120,18 +120,18 @@ Exceptional task -> Manual escalation -> Pro or paid model
 
 Once the routes were named and curated, I assigned them:
 
-- **Atlas**, **Hive**, and **Beau** — the research and dispatch agents — got Hyper
+- **Atlas**, **Hive**, and **Beau**, the research and dispatch agents, got Hyper
   DeepSeek V4 Flash as their primary, with `auto:smart-core` and NVIDIA GPT-OSS as
   fallbacks.
-- **Builder** — the implementation agent — uses a free MOA blend that composites
+- **Builder**, the implementation agent, uses a free MOA blend that composites
   multiple free models, with `auto:fast-core` and V4 Flash as fallbacks.
-- **Honey** — the editorial agent — uses V4 Flash with Fusion as its review/fallback
+- **Honey**, the editorial agent, uses V4 Flash with Fusion as its review/fallback
   layer.
 
 The smartest discovery: Hive is the **sole continuous dispatcher** for the swarm's
 task board. Atlas is the standby if Hive is taken offline. One agent polls, the rest
 do one-shot work. This rule alone eliminated the most common failure mode in a
-multi-agent system — competing dispatchers stepping on each other.
+multi-agent system: competing dispatchers stepping on each other.
 
 ## The lesson worth stealing
 

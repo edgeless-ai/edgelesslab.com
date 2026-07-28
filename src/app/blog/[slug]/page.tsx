@@ -165,6 +165,14 @@ export default async function BlogPostPage({
                 </span>
               ))}
             </div>
+            {post.processNote && (
+              <p
+                className="mt-4 text-[11px] font-mono"
+                style={{ color: "var(--text-tertiary)", lineHeight: 1.6 }}
+              >
+                Process note: {post.processNote}
+              </p>
+            )}
           </div>
 
           {/* Content */}

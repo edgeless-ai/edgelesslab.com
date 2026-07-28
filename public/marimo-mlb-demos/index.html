@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLB Marimo Demos — Interactive Data Exploration</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0f;
+      color: #ccc;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #00d4ff, #ff6b9d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle { color: #888; font-size: 1.1rem; margin-bottom: 2rem; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .card {
+      background: #12121a;
+      border: 1px solid #1e1e2e;
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .card:hover {
+      border-color: #00d4ff44;
+      transform: translateY(-2px);
+    }
+    .card h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .card .widget { color: #ff6b9d; font-size: 0.85rem; margin-bottom: 0.75rem; }
+    .card p { color: #999; font-size: 0.95rem; margin-bottom: 1rem; }
+    .card .data { color: #00d4ff; font-size: 0.8rem; }
+    .card .tags { margin-top: 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag {
+      background: #1a1a2e;
+      color: #888;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
+    .tag.mlb { color: #00d4ff; border: 1px solid #00d4ff33; }
+    .tag.blue { color: #00d4ff; border: 1px solid #00d4ff33; }
+    .tag.pink { color: #ff6b9d; border: 1px solid #ff6b9d33; }
+    .tag.green { color: #00ff88; border: 1px solid #00ff8833; }
+    a { color: #00d4ff; text-decoration: none; }
+    a:hover { color: #ff6b9d; }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #666; }
+    .back-link:hover { color: #00d4ff; }
+    .footer { margin-top: 3rem; text-align: center; color: #555; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/" class="back-link">← Back to edgelesslab.com</a>
+    <span style="color:#555; margin-left: 1rem;">|</span>
+    <a href="../marimo-sports-demos/index.html" class="back-link" style="margin-left: 1rem;">🏀 NBA Demos</a>
+    <h1>⚾ MLB Marimo Demos</h1>
+    <p class="subtitle">Interactive data exploration with real Statcast data and wigglystuff widgets.</p>
+
+    <div class="grid">
+      <div class="card">
+        <h2>🔥 Barrel Zone Explorer</h2>
+        <div class="widget">TangleSlider</div>
+        <p>Drag launch angle and exit velocity thresholds to define your custom barrel zone. See which batters are crushing it in real time — the scatter plot highlights every hitter in your zone.</p>
+        <div class="data">250 qualified batters • 2025 Statcast</div>
+        <div class="tags">
+          <span class="tag mlb">MLB</span>
+          <span class="tag blue">TangleSlider</span>
+          <span class="tag pink">Barrels</span>
+        </div>
+        <p style="margin-top: 1rem;"><a href="barrel-zone-explorer.py" download>📥 Download Notebook</a></p>
+      </div>
+
+      <div class="card">
+        <h2>🎯 Pitch Tunnel Visualizer</h2>
+        <div class="widget">CurveEditor</div>
+        <p>Draw your ideal pitch profile — a curve mapping usage vs. effectiveness — and find real MLB pitchers whose arsenal best matches it. The ultimate scouting exploration tool.</p>
+        <div class="data">100+ pitchers • 440+ arsenal rows • 2025 Statcast</div>
+        <div class="tags">
+          <span class="tag mlb">MLB</span>
+          <span class="tag green">CurveEditor</span>
+          <span class="tag pink">Pitch Arsenal</span>
+        </div>
+        <p style="margin-top: 1rem;"><a href="pitch-tunnel-visualizer.py" download>📥 Download Notebook</a></p>
+      </div>
+
+      <div class="card">
+        <h2>📅 Hot Streak Simulator</h2>
+        <div class="widget">PlaySlider</div>
+        <p>Press play to watch a full 162-game season unfold. Rolling averages, win streaks, and game-by-game scores — see when the Dodgers, Yankees, or Braves caught fire.</p>
+        <div class="data">3 teams × 161 games • 2025 Baseball Reference</div>
+        <div class="tags">
+          <span class="tag mlb">MLB</span>
+          <span class="tag blue">PlaySlider</span>
+          <span class="tag green">Season Tracker</span>
+        </div>
+        <p style="margin-top: 1rem;"><a href="hot-streak-simulator.py" download>📥 Download Notebook</a></p>
+      </div>
+
+      <div class="card">
+        <h2>🎯 Spray Chart Explorer</h2>
+        <div class="widget">TangleSlider + Field Overlay</div>
+        <p>Filter any batter's batted balls by launch angle and exit velocity. See where singles, doubles, triples, and home runs land on the field. Color-coded by event type.</p>
+        <div class="data">10,302 hit events • June 2025 Statcast</div>
+        <div class="tags">
+          <span class="tag mlb">MLB</span>
+          <span class="tag pink">TangleSlider</span>
+          <span class="tag blue">Spray Chart</span>
+        </div>
+        <p style="margin-top: 1rem;"><a href="spray-chart-explorer.py" download>📥 Download Notebook</a></p>
+      </div>
+    </div>
+
+    <div class="footer">
+      Built with <a href="https://marimo.io">marimo</a> + <a href="https://github.com/vincentlaucsb/wigglystuff">wigglystuff</a> • Data from <a href="https://github.com/jldbc/pybaseball">pybaseball</a> (Statcast / Baseball Reference)
+    </div>
+  </div>
+</body>
+</html>

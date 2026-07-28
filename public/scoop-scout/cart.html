@@ -1,0 +1,147 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta name="robots" content="noindex"><script src="js/auth.js"></script><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1D3557"><link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png"><link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg"><script src="js/app.js"></script><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><script src="assets/js/tailwind.js"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-background": "#1a1c1e", "tertiary-fixed": "#ffdeae", "on-primary-container": "#879ec6", "error-container": "#ffdad6", "on-error-container": "#93000a", "primary-fixed-dim": "#b0c7f1", "secondary-fixed": "#ffdcc4", "surface": "#f9f9fc", "surface-container-highest": "#e2e2e5", "surface-container-lowest": "#ffffff", "surface-dim": "#dadadc", "on-surface": "#1a1c1e", "on-tertiary-fixed-variant": "#5d4210", "on-tertiary": "#ffffff", "inverse-surface": "#2f3133", "surface-container": "#eeeef0", "on-primary-fixed": "#001b3c", "primary-container": "#1d3557", "surface-variant": "#e2e2e5", "surface-container-low": "#f3f3f6", "on-primary": "#ffffff", "tertiary-container": "#493000", "primary": "#031f41", "on-secondary-container": "#783d01", "error": "#ba1a1a", "surface-bright": "#f9f9fc", "outline": "#74777f", "on-error": "#ffffff", "tertiary-fixed-dim": "#e9c083", "primary-fixed": "#d5e3ff", "tertiary": "#2d1c00", "on-primary-fixed-variant": "#30476a", "surface-container-high": "#e8e8ea", "secondary-fixed-dim": "#ffb780", "inverse-on-surface": "#f0f0f3", "on-tertiary-fixed": "#281900", "on-surface-variant": "#44474e", "on-secondary-fixed": "#2f1400", "background": "#f9f9fc", "secondary": "#8e4e14", "outline-variant": "#c4c6cf", "inverse-primary": "#b0c7f1", "surface-tint": "#485f84", "on-secondary-fixed-variant": "#6f3800", "on-tertiary-container": "#bd985e", "secondary-container": "#ffab69", "on-secondary": "#ffffff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "sm": "12px", "xs": "4px", "xl": "80px", "base": "8px", "lg": "48px", "container-max": "1280px", "gutter": "24px", "md": "24px" }, "fontFamily": { "body-md": ["Be Vietnam Pro"], "display-lg": ["Be Vietnam Pro"], "body-lg": ["Be Vietnam Pro"], "headline-lg-mobile": ["Be Vietnam Pro"], "label-lg": ["Be Vietnam Pro"], "headline-md": ["Be Vietnam Pro"], "headline-lg": ["Be Vietnam Pro"] } } } }</script><style>@layer base { body { -webkit-tap-highlight-color: transparent; } .pt-safe { padding-top: env(safe-area-inset-top); } }</style></head><body class="bg-background font-body-md text-on-background"><header class="fixed top-0 w-full z-50 bg-primary shadow-[0_1px_8px_rgba(0,0,0,0.08)] pt-safe"><div class="h-16 flex items-center px-md gap-md"><a class="p-2 -ml-2 text-on-primary hover:opacity-80 active:scale-95 transition-all" href="menu.html"><span class="material-symbols-outlined">arrow_back</span></a><h1 class="font-headline-md text-headline-md text-on-primary">Your Cart</h1></div></header><main class="pt-16 min-h-screen bg-surface"><div class="flex flex-col w-full">
+<!-- Dynamic Cart Illustration Section -->
+<div class="px-md flex flex-col items-center justify-center text-center space-y-sm overflow-hidden relative py-md">
+<div class="absolute inset-0 -z-10 bg-gradient-to-b from-primary/5 to-transparent"></div>
+<div class="relative w-32 h-32 flex items-center justify-center"><img src="assets/img/cart-scoop.jpg" alt="Ice cream scoop icon" class="w-full h-full object-cover rounded-full shadow-sm"></div>
+
+</div>
+<!-- Cart Items List -->
+<div class="px-md space-y-md mb-lg">
+<div class="flex items-center justify-between">
+<span class="font-label-lg text-label-lg text-outline uppercase tracking-widest" id="items-count">Items (0)</span>
+<button class="font-label-lg text-label-lg text-secondary flex items-center gap-xs active:opacity-60 transition-opacity" onclick="clearCart()">
+<span class="material-symbols-outlined text-[18px]">delete_sweep</span>
+            Clear All
+        </button>
+</div>
+<div class="space-y-md" id="cart-items"></div>
+</div>
+<!-- Summary Card -->
+<div class="px-md pb-xl">
+<div class="bg-surface-container-low rounded-2xl p-lg space-y-md">
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md text-on-surface-variant">Subtotal</span>
+<span class="font-body-md text-body-md text-on-surface" id="cart-subtotal">$20.75</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md text-on-surface-variant">Sales Tax (none in Portland, OR)</span>
+<span class="font-body-md text-body-md text-on-surface">$0.00</span>
+</div>
+<div class="pt-md border-t border-outline-variant flex justify-between items-center">
+<span class="font-headline-md text-headline-md text-primary">Total</span>
+<span class="font-headline-md text-headline-md text-primary" id="cart-total">$20.75</span>
+</div>
+<div class="pt-md">
+<button class="w-full bg-primary text-on-primary py-md px-lg rounded-xl font-headline-md text-headline-md shadow-xl active:scale-[0.97] transition-all flex items-center justify-center gap-md" id="checkout-btn" onclick="handleCheckout()">
+<span class="">Proceed to Payment</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<p class="text-center font-label-lg text-label-lg text-outline mt-md flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+                Demo checkout &mdash; no payment processed
+            </p>
+</div>
+</div>
+<!-- Upsell Section -->
+<div class="mt-lg p-md bg-tertiary-fixed rounded-xl flex items-center gap-md">
+<div class="p-2 bg-on-tertiary rounded-full">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant">celebration</span>
+</div>
+<div class="flex-1">
+<p class="font-label-lg text-label-lg text-on-tertiary-fixed-variant">Add a personalized note for $2.00?</p>
+</div>
+<button class="font-label-lg text-label-lg text-on-tertiary-fixed-variant underline" onclick="addToCart('Personalized Note', 2.00); render()">Add</button>
+</div>
+</div>
+<script>
+    const ITEM_IMGS = {
+        'Cookie Monster Pint': 'assets/img/cookie-monster.jpg',
+        'Marionberry Cobbler Scoop': 'assets/img/marionberry.jpg'
+    };
+
+    // Demo preview: seed the shared cart so first-time visitors see the flow.
+    if (ScoopCart.count() === 0) {
+        ScoopCart.add('Cookie Monster Pint', 14.50);
+        ScoopCart.add('Marionberry Cobbler Scoop', 6.25);
+    }
+
+    function itemRow(item) {
+        const img = ITEM_IMGS[item.name] || 'assets/img/cart-scoop.jpg';
+        return `<div class="bg-surface-container-lowest rounded-xl p-md flex gap-md items-center shadow-sm relative overflow-hidden">
+            <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+            <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container">
+                <img class="w-full h-full object-cover" alt="${item.name}" src="${img}">
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex justify-between items-start">
+                    <h3 class="font-headline-md text-body-lg text-primary truncate">${item.name}</h3>
+                    <button class="text-outline hover:text-error transition-colors p-1" onclick="removeItem('${item.name}')">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                </div>
+                <p class="font-body-md text-body-md text-on-surface-variant mb-sm">${item.qty} x ${money(item.price)}</p>
+                <div class="flex items-center gap-md">
+                    <div class="flex items-center bg-surface-container rounded-full px-base py-xs gap-md">
+                        <button class="w-6 h-6 flex items-center justify-center text-primary active:scale-125 transition-transform" onclick="changeQty('${item.name}', -1)"><span class="material-symbols-outlined text-[18px]">remove</span></button>
+                        <span class="font-label-lg text-label-lg text-primary">${item.qty}</span>
+                        <button class="w-6 h-6 flex items-center justify-center text-primary active:scale-125 transition-transform" onclick="changeQty('${item.name}', 1)"><span class="material-symbols-outlined text-[18px]">add</span></button>
+                    </div>
+                    <span class="ml-auto font-headline-md text-body-lg text-primary">${money(item.price * item.qty)}</span>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function render() {
+        const items = ScoopCart.items();
+        document.getElementById('items-count').textContent = `Items (${ScoopCart.count()})`;
+        document.getElementById('cart-items').innerHTML = items.length
+            ? items.map(itemRow).join('')
+            : '<p class="text-center font-body-md text-body-md text-on-surface-variant py-lg">Your cart is empty &mdash; add something tasty from the menu!</p>';
+        // Portland, OR: no sales tax, total === subtotal
+        document.getElementById('cart-subtotal').textContent = money(ScoopCart.subtotal());
+        document.getElementById('cart-total').textContent = money(ScoopCart.total());
+    }
+
+    function removeItem(name) {
+        ScoopCart.remove(name);
+        render();
+    }
+
+    function changeQty(name, delta) {
+        const row = ScoopCart.items().find((i) => i.name === name);
+        if (row) ScoopCart.setQty(name, row.qty + delta);
+        render();
+    }
+
+    function clearCart() {
+        ScoopCart.clear();
+        render();
+    }
+
+    document.addEventListener('DOMContentLoaded', render);
+
+    function handleCheckout() {
+        const btn = document.getElementById('checkout-btn');
+        const originalContent = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `
+            <svg class="animate-spin h-6 w-6 text-on-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>Processing...</span>
+        `;
+        
+        // Mock delay for feeling "alive", then continue to checkout
+        setTimeout(() => {
+            btn.innerHTML = `<span class="material-symbols-outlined">check_circle</span> <span>Ready!</span>`;
+            btn.classList.replace('bg-primary', 'bg-secondary');
+            location.href = 'checkout.html';
+        }, 1500);
+    }
+  </script>
+</div></main>
+
+</body></html>

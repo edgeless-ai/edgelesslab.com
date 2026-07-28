@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1D3557">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+<script src="js/app.js" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&amp;family=Be+Vietnam+Pro:wght@400;600&amp;display=swap" rel="stylesheet">
+<title>Scoop Scout — Preview Access</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1D3557;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    color: #f9f9fc;
+    padding: 20px;
+  }
+  .card {
+    width: 100%;
+    max-width: 360px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 1.5rem;
+    padding: 40px 28px;
+    text-align: center;
+  }
+  .scoop { font-size: 48px; line-height: 1; margin-bottom: 16px; }
+  h1 {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  p { font-size: 14px; opacity: 0.75; margin-bottom: 24px; }
+  input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 16px;
+    font-family: inherit;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  input:focus { border-color: #ffb1c0; }
+  input::placeholder { color: rgba(255, 255, 255, 0.45); }
+  button {
+    width: 100%;
+    padding: 14px 16px;
+    border: none;
+    border-radius: 0.75rem;
+    background: #f9f9fc;
+    color: #1D3557;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button:active { transform: translateY(1px); }
+  #err { color: #ffb1c0; font-size: 13px; margin-top: 12px; min-height: 18px; }
+  #ios-hint {
+    display: none;
+    margin-top: 20px;
+    padding: 12px 14px;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<form class="card" id="gate-form">
+  <div class="scoop">&#127846;</div>
+  <h1>Scoop Scout</h1>
+  <p>Kate's Ice Cream Truck &mdash; private preview.<br>Enter the password to continue.</p>
+  <input type="password" id="pw" placeholder="Password" autocomplete="off" autofocus>
+  <button type="submit">Let me in</button>
+  <div id="err"></div>
+  <div id="ios-hint">Install Scoop Scout: tap the <strong>Share</strong> button, then <strong>Add to Home Screen</strong>.</div>
+</form>
+<script>
+(function () {
+  'use strict';
+  var HASH = 'a8d60cfe02a79ea93e57df66843c0a8208f7d37a8c111e21f88845c879d8bbf9';
+
+  function hex(buf) {
+    return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+      return b.toString(16).padStart(2, '0');
+    }).join('');
+  }
+
+  document.getElementById('gate-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var pw = document.getElementById('pw').value;
+    crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw)).then(function (buf) {
+      if (hex(buf) === HASH) {
+        try { localStorage.setItem('ss_auth', HASH); } catch (err) {}
+        location.replace('./index.html');
+      } else {
+        document.getElementById('err').textContent = 'Wrong password — try again.';
+        document.getElementById('pw').value = '';
+      }
+    });
+  });
+
+  // iOS Safari never fires beforeinstallprompt — show a manual A2HS hint.
+  var isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  var standalone = window.navigator.standalone === true ||
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  if (isIOS && !standalone) {
+    document.getElementById('ios-hint').style.display = 'block';
+  }
+})();
+</script>
+</body>
+</html>

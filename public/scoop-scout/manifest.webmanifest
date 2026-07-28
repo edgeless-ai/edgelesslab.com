@@ -1,0 +1,17 @@
+{
+  "name": "Scoop Scout",
+  "short_name": "Scoop Scout",
+  "description": "Kate's plant-based, gluten-free ice cream — menu, demo ordering, and truck finder preview.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1D3557",
+  "background_color": "#fff9f0",
+  "categories": ["food", "lifestyle"],
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

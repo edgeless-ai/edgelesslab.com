@@ -2,7 +2,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
 <meta name="robots" content="noindex"/>
-<script src="js/auth.js"></script>
+<script src="js/auth.js"></script><script src="js/phone-frame.js"></script>
 <link rel="manifest" href="manifest.webmanifest"/>
 <meta name="theme-color" content="#1D3557"/>
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png"/>
@@ -11,6 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css"/>
+<script src="assets/vendor/leaflet/leaflet.js"></script>
 <script src="assets/js/tailwind-forms.js"></script>
 <script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-background": "#1a1c1e", "tertiary-fixed": "#ffdeae", "on-primary-container": "#879ec6", "error-container": "#ffdad6", "on-error-container": "#93000a", "primary-fixed-dim": "#b0c7f1", "secondary-fixed": "#ffdcc4", "surface": "#f9f9fc", "surface-container-highest": "#e2e2e5", "surface-container-lowest": "#ffffff", "surface-dim": "#dadadc", "on-surface": "#1a1c1e", "on-tertiary-fixed-variant": "#5d4210", "on-tertiary": "#ffffff", "inverse-surface": "#2f3133", "surface-container": "#eeeef0", "on-primary-fixed": "#001b3c", "primary-container": "#1d3557", "surface-variant": "#e2e2e5", "surface-container-low": "#f3f3f6", "on-primary": "#ffffff", "tertiary-container": "#493000", "primary": "#031f41", "on-secondary-container": "#783d01", "error": "#ba1a1a", "surface-bright": "#f9f9fc", "outline": "#74777f", "on-error": "#ffffff", "tertiary-fixed-dim": "#e9c083", "primary-fixed": "#d5e3ff", "tertiary": "#2d1c00", "on-primary-fixed-variant": "#30476a", "surface-container-high": "#e8e8ea", "secondary-fixed-dim": "#ffb780", "inverse-on-surface": "#f0f0f3", "on-tertiary-fixed": "#281900", "on-surface-variant": "#44474e", "on-secondary-fixed": "#2f1400", "background": "#f9f9fc", "secondary": "#8e4e14", "outline-variant": "#c4c6cf", "inverse-primary": "#b0c7f1", "surface-tint": "#485f84", "on-secondary-fixed-variant": "#6f3800", "on-tertiary-container": "#bd985e", "secondary-container": "#ffab69", "on-secondary": "#ffffff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "sm": "12px", "xs": "4px", "xl": "80px", "base": "8px", "lg": "48px", "container-max": "1280px", "gutter": "24px", "md": "24px" }, "fontFamily": { "body-md": ["Be Vietnam Pro"], "display-lg": ["Be Vietnam Pro"], "body-lg": ["Be Vietnam Pro"], "headline-lg-mobile": ["Be Vietnam Pro"], "label-lg": ["Be Vietnam Pro"], "headline-md": ["Be Vietnam Pro"], "headline-lg": ["Be Vietnam Pro"] } } } }</script>
 <style>
@@ -24,70 +26,74 @@
   0% { transform: scale(0.33); opacity: 1; }
   80%, 100% { opacity: 0; }
 }
-.pulse::before {
+#map { position: absolute; inset: 0; }
+.truck-marker {
+  position: relative;
+  width: 46px; height: 46px;
+  border-radius: 9999px;
+  background: #ffab69;
+  color: #783d01;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+}
+.truck-marker::before {
   content: '';
   position: absolute;
-  inset: -6px;
+  inset: -8px;
   border-radius: 9999px;
-  background-color: currentColor;
+  background-color: #ffab69;
   opacity: 0;
   animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
   z-index: -1;
 }
+.shop-marker {
+  width: 36px; height: 36px;
+  border-radius: 9999px;
+  background: #031f41;
+  color: #fff;
+  border: 2px solid #fff;
+  box-shadow: 0 3px 10px rgba(0,0,0,.3);
+  display: flex; align-items: center; justify-content: center;
+}
+.shop-marker .material-symbols-outlined { font-size: 20px; }
+.leaflet-popup-content { font-family: 'Be Vietnam Pro', sans-serif; margin: 12px 14px; }
+.leaflet-popup-content b { color: #031f41; }
 </style>
-<title>Scoop Scout — Map</title>
+<title>Scoop Scout — Truck Tracker</title>
 </head>
 <body class="bg-background font-body-md text-on-background">
 <header class="fixed top-0 w-full z-50 bg-primary shadow-[0_1px_8px_rgba(0,0,0,0.08)] pt-safe">
 <div class="h-16 flex items-center justify-between px-md">
-<div class="flex items-center gap-sm"><span class="material-symbols-outlined text-on-primary">map</span><h1 class="font-headline-md text-headline-md text-on-primary">Map</h1></div>
+<div class="flex items-center gap-sm"><span class="material-symbols-outlined text-on-primary">local_shipping</span><h1 class="font-headline-md text-headline-md text-on-primary">Truck Tracker</h1></div>
 <img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="assets/img/avatar.jpg"/>
 </div>
 </header>
-<main class="relative w-full h-screen overflow-hidden">
-<div class="absolute inset-0 bg-[#e8ecf3]"><img alt="Stylized map of Portland, Oregon" class="w-full h-full object-cover opacity-60" src="assets/img/city-map.jpg"/></div>
-<!-- Demo badge -->
-<div class="relative z-30 px-md pt-20">
-<div class="max-w-md mx-auto bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full px-4 py-2 shadow-lg text-center font-label-lg text-label-lg flex items-center justify-center gap-xs">
-<span class="material-symbols-outlined text-[16px]">info</span>
-      Demo preview &mdash; pins are illustrative, live truck GPS coming soon
+<main class="fixed inset-x-0 top-16 bottom-20">
+<div id="map" aria-label="Map of Portland showing the Scoop Scout truck"></div>
+<!-- Truck status card -->
+<div class="absolute bottom-3 left-0 w-full px-sm z-[500] pointer-events-none">
+<div class="max-w-md mx-auto bg-surface rounded-xl shadow-2xl border border-outline-variant overflow-hidden pointer-events-auto">
+<button class="w-full text-left p-4 pb-3 flex flex-col gap-1.5" id="status-toggle" aria-expanded="false" aria-controls="schedule-panel">
+<div class="flex items-center justify-between gap-2 w-full">
+<h3 class="font-headline-md text-[17px] font-bold text-on-surface leading-snug" id="truck-status"></h3>
+<span class="material-symbols-outlined text-on-surface-variant" id="chevron">expand_more</span>
 </div>
-</div>
-<!-- Map pins (illustrative positions) -->
-<button aria-label="Kate's — 3713 N Mississippi Ave" class="absolute z-20 left-[30%] top-[38%] w-11 h-11 rounded-full bg-primary text-on-primary shadow-xl flex items-center justify-center border-2 border-white active:scale-90 transition-transform" onclick="selectLocation(0)">
-<span class="material-symbols-outlined">storefront</span>
+<p class="font-body-md text-[13px] text-on-surface-variant" id="truck-sub"></p>
+<p class="font-label-lg text-[13px] text-primary font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span><span id="truck-next"></span>
+</p>
 </button>
-<button aria-label="Kate's — 1430 NW 23rd Ave" class="absolute z-20 left-[62%] top-[52%] w-11 h-11 rounded-full bg-primary text-on-primary shadow-xl flex items-center justify-center border-2 border-white active:scale-90 transition-transform" onclick="selectLocation(1)">
-<span class="material-symbols-outlined">storefront</span>
-</button>
-<button aria-label="Scoop Scout truck (demo)" class="absolute z-20 left-[45%] top-[66%] w-11 h-11 rounded-full bg-secondary-container text-on-secondary-container shadow-xl flex items-center justify-center border-2 border-white active:scale-90 transition-transform pulse" onclick="selectLocation(2)">
-<span class="material-symbols-outlined">local_shipping</span>
-</button>
-<!-- Info Card -->
-<div class="fixed bottom-[96px] left-0 w-full px-md z-40" id="info-card">
-<div class="max-w-md mx-auto bg-surface rounded-xl shadow-2xl p-4 flex flex-col gap-sm border border-outline-variant">
-<div class="flex items-center justify-between">
-<h3 class="font-headline-md text-headline-md text-on-surface truncate pr-2" id="loc-name"></h3>
-<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest whitespace-nowrap" id="loc-badge"></span>
-</div>
-<div class="flex items-center gap-1 text-on-surface-variant">
-<span class="material-symbols-outlined text-[16px]">location_on</span>
-<span class="font-label-lg text-label-lg" id="loc-address"></span>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant" id="loc-detail"></p>
-<div class="bg-surface-container-low rounded-lg p-3 flex items-center justify-between">
-<div class="min-w-0">
-<p class="text-[9px] uppercase tracking-wider text-on-surface-variant font-bold">Featured Scoop</p>
-<p class="font-bold text-[15px] text-primary truncate" id="loc-flavor"></p>
-</div>
-<button class="bg-primary text-on-primary px-4 py-2 rounded-full font-label-lg text-label-lg shadow-lg active:scale-95 transition-all whitespace-nowrap ml-2" onclick="location.href='menu.html'">
-            View Menu
-</button>
+<div class="hidden border-t border-outline-variant" id="schedule-panel">
+<p class="px-4 pt-3 pb-1 text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Today's schedule</p>
+<ul class="px-2 pb-2" id="schedule-list"></ul>
+<p class="px-4 pb-3 text-[10px] text-on-surface-variant/70">Simulated demo data</p>
 </div>
 </div>
 </div>
 </main>
-<nav class="fixed bottom-0 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl pb-safe shadow-[0_-1px_8px_rgba(0,0,0,0.04)]">
+<nav class="fixed bottom-0 w-full z-[600] bg-surface-container-lowest/80 backdrop-blur-xl pb-safe shadow-[0_-1px_8px_rgba(0,0,0,0.04)]">
 <div class="flex items-center justify-around h-20 px-sm">
 <a class="flex flex-col items-center gap-xs text-on-surface-variant transition-colors" href="index.html"><span class="material-symbols-outlined">home</span><span class="font-label-lg text-label-lg">Home</span></a>
 <a aria-current="page" class="flex flex-col items-center gap-xs text-on-surface-variant transition-colors active-nav-item" href="map.html"><span class="material-symbols-outlined">map</span><span class="font-label-lg text-label-lg">Map</span></a>
@@ -96,45 +102,176 @@
 </div>
 </nav>
 <script>
-// Real locations from katesicecream.com/hours-and-location (scraped 2026-07-28);
-// the truck entry is sample data for this preview — no live truck exists yet.
-const LOCATIONS = [
-  {
-    name: "Kate's #1 — Scoop Shop",
-    badge: 'Open 12–10 daily',
-    badgeClass: 'bg-primary-fixed text-on-primary-fixed',
-    address: '3713 N Mississippi Ave, Portland, OR 97227',
-    detail: 'Brick-and-mortar shop · (503) 249-9640 · 100% plant-based & gluten-free.',
-    flavor: 'Marionberry Cobbler'
-  },
-  {
-    name: "Kate's #2 — Scoop Shop",
-    badge: 'Open 12–10 daily',
-    badgeClass: 'bg-primary-fixed text-on-primary-fixed',
-    address: '1430 NW 23rd Ave, Portland, OR 97210',
-    detail: 'Brick-and-mortar shop · (971) 339-2138 · 100% plant-based & gluten-free.',
-    flavor: 'Ube'
-  },
-  {
-    name: 'Scoop Scout Truck',
-    badge: 'Demo preview',
-    badgeClass: 'bg-tertiary-fixed text-on-tertiary-fixed-variant',
-    address: 'Sample location — SE Portland',
-    detail: 'Live truck tracking is coming soon; this pin shows how it will look.',
-    flavor: 'Cookie Monster'
-  }
+(function () {
+'use strict';
+
+/* ---------- Demo day schedule (repeats daily so the tracker is always live).
+   The truck parks at events like a food truck; it is not continuously driving.
+   Real N/NE Portland venues with real coordinates. ---------- */
+var SCHEDULE = [
+  { name: 'Overlook Park Farmers Market',  lat: 45.5482, lng: -122.6846, start: 9 * 60,       end: 11 * 60 + 30, note: 'Morning-market crowd favorite' },
+  { name: 'Dawson Park Pop-Up',            lat: 45.5444, lng: -122.6672, start: 12 * 60,      end: 13 * 60 + 45, note: 'Lunch scoops by the gazebo' },
+  { name: 'Alberta Arts Street Fair',      lat: 45.5590, lng: -122.6449, start: 14 * 60 + 15, end: 17 * 60 + 30, note: 'NE Alberta St & 20th Ave' },
+  { name: 'Peninsula Park Summer Concert', lat: 45.5672, lng: -122.6721, start: 18 * 60,      end: 19 * 60 + 30, note: 'Concerts-in-the-park series' },
+  { name: 'Mississippi Ave Home Base',     lat: 45.5508, lng: -122.6757, start: 20 * 60,      end: 22 * 60,      note: 'Evening scoops outside the shop' }
+];
+var HOME = SCHEDULE.length - 1; // the truck sleeps at home base
+
+var SHOPS = [
+  { name: "Kate's #1 — Scoop Shop", lat: 45.5504, lng: -122.6755, address: '3713 N Mississippi Ave, Portland, OR 97227', phone: '(503) 249-9640' },
+  { name: "Kate's #2 — Scoop Shop", lat: 45.5338, lng: -122.6986, address: '1430 NW 23rd Ave, Portland, OR 97210', phone: '(971) 339-2138' }
 ];
 
-function selectLocation(i) {
-  const loc = LOCATIONS[i];
-  document.getElementById('loc-name').textContent = loc.name;
-  document.getElementById('loc-address').textContent = loc.address;
-  document.getElementById('loc-detail').textContent = loc.detail;
-  document.getElementById('loc-flavor').textContent = loc.flavor;
-  const badge = document.getElementById('loc-badge');
-  badge.textContent = loc.badge;
-  badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest whitespace-nowrap ' + loc.badgeClass;
+/* ---------- Deterministic truck state from the clock ----------
+   Same minute-of-day => same state for every viewer. Returns either
+   { parked, next, overnight } or { transit: {from, to, progress}, next }. */
+function truckState(m) {
+  for (var i = 0; i < SCHEDULE.length; i++) {
+    if (m >= SCHEDULE[i].start && m < SCHEDULE[i].end) {
+      return { parked: SCHEDULE[i], next: SCHEDULE[(i + 1) % SCHEDULE.length], overnight: false };
+    }
+  }
+  // Between windows: a short hop to the next stop…
+  for (var j = 0; j < SCHEDULE.length - 1; j++) {
+    if (m >= SCHEDULE[j].end && m < SCHEDULE[j + 1].start) {
+      var p = (m - SCHEDULE[j].end) / (SCHEDULE[j + 1].start - SCHEDULE[j].end);
+      return { transit: { from: SCHEDULE[j], to: SCHEDULE[j + 1], progress: p }, next: SCHEDULE[j + 1] };
+    }
+  }
+  // …otherwise it's overnight: parked at home base until tomorrow's first stop.
+  return { parked: SCHEDULE[HOME], next: SCHEDULE[0], overnight: true };
 }
-selectLocation(0);
+
+function truckLatLng(state) {
+  if (state.parked) return [state.parked.lat, state.parked.lng];
+  var t = state.transit;
+  return [t.from.lat + (t.to.lat - t.from.lat) * t.progress,
+          t.from.lng + (t.to.lng - t.from.lng) * t.progress];
+}
+
+function nowMinutes() {
+  var d = new Date();
+  return d.getHours() * 60 + d.getMinutes();
+}
+
+function fmt(min) {
+  min = ((min % 1440) + 1440) % 1440;
+  var h = Math.floor(min / 60), mm = min % 60;
+  var ap = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return h + ':' + String(mm).padStart(2, '0') + ' ' + ap;
+}
+
+function countdown(nowMin, targetMin) {
+  var d = (targetMin - nowMin + 1440) % 1440;
+  if (d === 0) return 'now';
+  var h = Math.floor(d / 60), m = d % 60;
+  return 'in ' + (h ? h + 'h ' : '') + m + 'm';
+}
+
+/* ---------- Map ---------- */
+var map = L.map('map', { zoomControl: false }).setView([45.553, -122.665], 13);
+L.control.zoom({ position: 'topright' }).addTo(map);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+SHOPS.forEach(function (s) {
+  L.marker([s.lat, s.lng], {
+    icon: L.divIcon({
+      className: '',
+      html: '<div class="shop-marker"><span class="material-symbols-outlined">storefront</span></div>',
+      iconSize: [36, 36], iconAnchor: [18, 18], popupAnchor: [0, -20]
+    })
+  }).addTo(map).bindPopup(
+    '<b>' + s.name + '</b><br>' + s.address + '<br>' + s.phone +
+    '<br>Open every day, 12&ndash;10PM<br><a href="menu.html">View menu &rarr;</a>'
+  );
+});
+
+var truckMarker = L.marker([45.5508, -122.6757], {
+  icon: L.divIcon({
+    className: '',
+    html: '<div class="truck-marker">🍦</div>',
+    iconSize: [46, 46], iconAnchor: [23, 23], popupAnchor: [0, -26]
+  }),
+  zIndexOffset: 1000
+}).addTo(map);
+
+var routeLine = L.polyline([], {
+  color: '#031f41', weight: 3, opacity: 0.5, dashArray: '6 8'
+}).addTo(map);
+
+/* ---------- Render (every 30s; pure function of the clock) ---------- */
+function render() {
+  var m = nowMinutes();
+  var state = truckState(m);
+  var pos = truckLatLng(state);
+  var next = state.next;
+  var nextAt = fmt(next.start);
+
+  truckMarker.setLatLng(pos);
+  routeLine.setLatLngs([pos, [next.lat, next.lng]]);
+
+  var statusEl = document.getElementById('truck-status');
+  var subEl = document.getElementById('truck-sub');
+  var nextEl = document.getElementById('truck-next');
+
+  if (state.parked && state.overnight) {
+    statusEl.textContent = 'Overnight at ' + state.parked.name;
+    subEl.textContent = 'The truck is parked for the night — first scoops tomorrow.';
+    nextEl.textContent = 'Next: ' + next.name + ' at ' + nextAt;
+    truckMarker.bindPopup('<b>Scoop Scout Truck</b><br>Overnight at ' + state.parked.name +
+      '<br>First stop: ' + next.name + ' at ' + nextAt);
+  } else if (state.parked) {
+    statusEl.textContent = 'Parked at ' + state.parked.name;
+    subEl.textContent = state.parked.note + ' — here until ' + fmt(state.parked.end) + '.';
+    nextEl.textContent = 'Next: ' + next.name + ' at ' + nextAt + ' (' + countdown(m, next.start) + ')';
+    truckMarker.bindPopup('<b>Scoop Scout Truck</b><br>Parked at ' + state.parked.name +
+      ' until ' + fmt(state.parked.end) + '<br>Next: ' + next.name + ' at ' + nextAt);
+  } else {
+    statusEl.textContent = 'On the move to ' + state.transit.to.name;
+    subEl.textContent = 'Just wrapped ' + state.transit.from.name + ' — rolling to the next stop.';
+    nextEl.textContent = 'Arrives ' + nextAt + ' (' + countdown(m, next.start) + ')';
+    truckMarker.bindPopup('<b>Scoop Scout Truck</b><br>On the move to ' + state.transit.to.name +
+      '<br>Arrives ' + nextAt);
+  }
+
+  // Today's schedule: past greyed out, current highlighted, upcoming with windows.
+  var list = document.getElementById('schedule-list');
+  list.innerHTML = '';
+  SCHEDULE.forEach(function (s) {
+    var isCurrent = state.parked === s && !state.overnight;
+    var isPast = !isCurrent && m >= s.end;
+    var li = document.createElement('li');
+    li.className = 'flex items-center justify-between gap-2 px-2 py-2 rounded-lg ' +
+      (isCurrent ? 'bg-primary-fixed text-on-primary-fixed' : isPast ? 'opacity-45' : '');
+    li.innerHTML =
+      '<div class="min-w-0"><p class="font-label-lg text-[13px] font-bold truncate">' + s.name + '</p>' +
+      '<p class="text-[11px]' + (isCurrent ? '' : ' text-on-surface-variant') + '">' +
+      fmt(s.start) + ' &ndash; ' + fmt(s.end) + '</p></div>' +
+      (isCurrent ? '<span class="text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Here now</span>' :
+       isPast ? '<span class="material-symbols-outlined text-[16px]">check</span>' : '');
+    list.appendChild(li);
+  });
+}
+
+render();
+setInterval(render, 30000);
+
+// Frame the action: truck, all stops, and both shops.
+var bounds = L.latLngBounds([truckLatLng(truckState(nowMinutes()))]);
+SCHEDULE.forEach(function (s) { bounds.extend([s.lat, s.lng]); });
+SHOPS.forEach(function (s) { bounds.extend([s.lat, s.lng]); });
+map.fitBounds(bounds, { padding: [40, 40] });
+
+document.getElementById('status-toggle').addEventListener('click', function () {
+  var panel = document.getElementById('schedule-panel');
+  var nowHidden = panel.classList.toggle('hidden');
+  this.setAttribute('aria-expanded', String(!nowHidden));
+  document.getElementById('chevron').textContent = nowHidden ? 'expand_less' : 'expand_more';
+});
+})();
 </script>
 </body></html>

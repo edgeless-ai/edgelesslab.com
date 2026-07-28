@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1D3557">
+<link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+<title>Scoop Scout</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    overflow: hidden; /* the phone screen is the only scroll container */
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    background:
+      radial-gradient(1200px 700px at 20% -10%, #2e4a75 0%, transparent 60%),
+      radial-gradient(1000px 600px at 90% 110%, #12294a 0%, transparent 55%),
+      #1D3557;
+    font-family: -apple-system, BlinkMacSystemFont, 'Be Vietnam Pro', 'Segoe UI', sans-serif;
+  }
+  .stage { transform-origin: center center; }
+  .phone {
+    position: relative;
+    width: 412px;   /* 390 screen + 11px bezel each side */
+    height: 866px;
+    background: #0b0d12;
+    border-radius: 58px;
+    padding: 11px;
+    box-shadow:
+      0 0 0 2px #3a3f4a,            /* titanium rim */
+      0 30px 80px rgba(0, 0, 0, .55),
+      0 8px 24px rgba(0, 0, 0, .35);
+  }
+  /* side buttons */
+  .phone::before, .phone::after {
+    content: '';
+    position: absolute;
+    background: #2b303a;
+    border-radius: 2px;
+  }
+  .phone::before { left: -4px; top: 180px; width: 4px; height: 110px; } /* volume */
+  .phone::after  { right: -4px; top: 210px; width: 4px; height: 70px; } /* power */
+  .screen {
+    position: relative;
+    width: 390px;
+    height: 844px;
+    border-radius: 47px;
+    overflow: hidden;
+    background: #1D3557;
+  }
+  .screen iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+  /* status bar chrome, drawn over the app's navy header */
+  .statusbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 34px;
+    z-index: 10;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .02em;
+  }
+  .statusbar svg { display: block; }
+  .island {
+    position: absolute;
+    top: 11px; left: 50%;
+    transform: translateX(-50%);
+    width: 122px; height: 34px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 11;
+    pointer-events: none;
+  }
+  .home-indicator {
+    position: absolute;
+    bottom: 8px; left: 50%;
+    transform: translateX(-50%);
+    width: 134px; height: 5px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, .9);
+    z-index: 10;
+    pointer-events: none;
+  }
+  .caption {
+    color: rgba(255, 255, 255, .45);
+    font-size: 13px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="phone">
+    <div class="screen">
+      <div class="island"></div>
+      <div class="statusbar">
+        <span>9:41</span>
+        <span style="display:flex;align-items:center;gap:6px;">
+          <!-- signal -->
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="#fff"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+          <!-- wifi -->
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="#fff"><path d="M8.5 12 5.6 8.9a4.4 4.4 0 0 1 5.8 0L8.5 12ZM3.5 6.6a7.6 7.6 0 0 1 10 0l-1.7 1.8a5.2 5.2 0 0 0-6.6 0L3.5 6.6ZM.9 3.8a11.3 11.3 0 0 1 15.2 0l-1.7 1.8a8.9 8.9 0 0 0-11.8 0L.9 3.8Z"/></svg>
+          <!-- battery -->
+          <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0.5" y="0.5" width="22" height="11" rx="3.5" fill="none" stroke="#fff" stroke-opacity=".5"/><rect x="2" y="2" width="17" height="8" rx="2" fill="#fff"/><path d="M24 4v4a2.2 2.2 0 0 0 0-4Z" fill="#fff" fill-opacity=".5"/></svg>
+        </span>
+      </div>
+      <iframe id="app-frame" title="Scoop Scout app"></iframe>
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+</div>
+<div class="caption">Scoop Scout &middot; Kate's Ice Cream</div>
+<script>
+(function () {
+  'use strict';
+  var PAGES = ['gate.html', 'index.html', 'map.html', 'menu.html', 'cart.html',
+               'checkout.html', 'order-success.html'];
+
+  function innerPage() {
+    var h = location.hash.replace(/^#/, '');
+    return PAGES.indexOf(h) !== -1 ? h : 'index.html';
+  }
+
+  // On a real phone-sized viewport, skip the frame entirely.
+  if (window.matchMedia && window.matchMedia('(max-width: 767px)').matches) {
+    location.replace(innerPage());
+    return;
+  }
+
+  var frame = document.getElementById('app-frame');
+  frame.src = innerPage();
+
+  // Keep the outer URL hash in sync so the current screen is deep-linkable.
+  frame.addEventListener('load', function () {
+    try {
+      var page = frame.contentWindow.location.pathname.split('/').pop();
+      if (PAGES.indexOf(page) !== -1 && location.hash !== '#' + page) {
+        history.replaceState(null, '', '#' + page);
+      }
+    } catch (e) { /* cross-origin — ignore */ }
+  });
+
+  // Pasting a new deep link into the address bar swaps the inner screen.
+  window.addEventListener('hashchange', function () {
+    var page = innerPage();
+    try {
+      var current = frame.contentWindow.location.pathname.split('/').pop();
+      if (current !== page) frame.src = page;
+    } catch (e) { frame.src = page; }
+  });
+
+  // Scale the phone down when the window is shorter than the full mockup.
+  var stage = document.getElementById('stage');
+  function fit() {
+    var scale = Math.min(1, (window.innerHeight - 90) / 866, (window.innerWidth - 40) / 412);
+    stage.style.transform = 'scale(' + Math.max(scale, 0.4) + ')';
+    // Collapse the layout height the scaled phone actually needs, so the
+    // caption hugs the phone instead of sitting a full unscaled height away.
+    stage.style.marginTop = stage.style.marginBottom = ((scale - 1) * 866 / 2) + 'px';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+})();
+</script>
+</body>
+</html>

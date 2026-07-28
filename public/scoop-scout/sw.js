@@ -1,5 +1,5 @@
 /* Scoop Scout service worker — offline app shell + runtime cache for CDN assets */
-var VERSION = 'scoopscout-v3';
+var VERSION = 'scoopscout-v4';
 var SHELL = VERSION + '-shell';
 var RUNTIME = VERSION + '-runtime';
 
@@ -11,9 +11,18 @@ var PRECACHE = [
   'cart.html',
   'checkout.html',
   'order-success.html',
+  'phone.html',
   'manifest.webmanifest',
   'js/app.js',
   'js/auth.js',
+  'js/phone-frame.js',
+  'assets/vendor/leaflet/leaflet.js',
+  'assets/vendor/leaflet/leaflet.css',
+  'assets/vendor/leaflet/images/marker-icon.png',
+  'assets/vendor/leaflet/images/marker-icon-2x.png',
+  'assets/vendor/leaflet/images/marker-shadow.png',
+  'assets/vendor/leaflet/images/layers.png',
+  'assets/vendor/leaflet/images/layers-2x.png',
   'assets/js/tailwind.js',
   'assets/js/tailwind-forms.js',
   'assets/img/logo-wordmark.jpg',
@@ -55,6 +64,13 @@ self.addEventListener('fetch', function (e) {
   var req = e.request;
   if (req.method !== 'GET') return;
   var url = new URL(req.url);
+
+  // OSM map tiles: always network-only — never precached, never cache-first
+  // (tile usage policy + they'd bloat the cache).
+  if (url.hostname === 'tile.openstreetmap.org' ||
+      url.hostname.endsWith('.tile.openstreetmap.org')) {
+    return; // let the browser fetch normally, no SW caching
+  }
 
   if (url.origin === self.location.origin) {
     // HTML navigations: network-first so deployed updates are picked up,

@@ -7,5 +7,6 @@
   if (!window.matchMedia || !window.matchMedia('(min-width: 768px)').matches) return;
   var page = location.pathname.split('/').pop() || 'index.html';
   if (page === 'phone.html') return; // never frame the frame
-  location.replace('phone.html#' + page);
+  // Carry the query string (e.g. checkout.html?at=…) into the frame's hash.
+  location.replace('phone.html#' + page + location.search);
 })();

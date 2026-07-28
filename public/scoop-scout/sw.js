@@ -1,5 +1,5 @@
 /* Scoop Scout service worker — offline app shell + runtime cache for CDN assets */
-var VERSION = 'scoopscout-v5';
+var VERSION = 'scoopscout-v6';
 var SHELL = VERSION + '-shell';
 var RUNTIME = VERSION + '-runtime';
 
@@ -12,10 +12,12 @@ var PRECACHE = [
   'checkout.html',
   'order-success.html',
   'phone.html',
+  'truck-qr.html',
   'manifest.webmanifest',
   'js/app.js',
   'js/auth.js',
   'js/phone-frame.js',
+  'js/schedule.js',
   'assets/vendor/leaflet/leaflet.js',
   'assets/vendor/leaflet/leaflet.css',
   'assets/vendor/leaflet/images/marker-icon.png',
@@ -34,6 +36,7 @@ var PRECACHE = [
   'assets/img/marionberry.jpg',
   'assets/img/brand-hero.svg',
   'assets/img/menu-hero.svg',
+  'assets/img/truck-qr.svg',
   'assets/icons/icon.svg',
   'assets/icons/icon-192.png',
   'assets/icons/icon-512.png',

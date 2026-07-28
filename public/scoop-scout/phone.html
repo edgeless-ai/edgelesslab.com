@@ -135,8 +135,10 @@
                'checkout.html', 'order-success.html'];
 
   function innerPage() {
+    // The hash may carry a query for the inner page: #checkout.html?at=…
     var h = location.hash.replace(/^#/, '');
-    return PAGES.indexOf(h) !== -1 ? h : 'index.html';
+    var page = h.split('?')[0];
+    return PAGES.indexOf(page) !== -1 ? h : 'index.html';
   }
 
   // On a real phone-sized viewport, skip the frame entirely.

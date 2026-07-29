@@ -1,0 +1,24 @@
+{
+  "name": "west-mountain",
+  "_comment": "West Coast + Mountain target: Portland OR, Seattle WA, Denver CO — strongest KEYLESS open data in-zone, NO paid/bot-blocked recorder wall (unlike Phoenix/Maricopa + Las Vegas/Clark, gated per the deed survey). Signal readiness (verified live 2026-07-28): SEATTLE fires in-box NOW — adapters/portland_code_violations.py defaults to Seattle SDCI code complaints (Socrata ez4a-iug7, keyless); a bounded --live run surfaced ~818 WA candidates. FEMA disasters fire nationally in-box (wildfire/flood). PORTLAND is a drop-in fixture until the free PortlandMaps API key (a login — David-gated, kanban t_fe8ddebb). DENVER is ArcGIS-not-Socrata and its code-violation endpoint is UNVERIFIED — needs a dedicated probe or swap for a confirmed-Socrata Mountain metro. The assumable/ACRIS + Philly/NYC tax adapters are East-only and do not contribute here (West recorders aren't keyless — deed survey rec #4).",
+  "geo": {
+    "states": ["OR", "WA", "CO"],
+    "cities": ["PORTLAND", "SEATTLE", "DENVER"],
+    "counties": ["MULTNOMAH", "KING", "DENVER"],
+    "zips": []
+  },
+  "price_band": {
+    "min": 100000,
+    "max": 1200000
+  },
+  "min_equity_pct": 0.2,
+  "property_types": [
+    "single_family",
+    "duplex",
+    "triplex",
+    "quadplex",
+    "mobile_home"
+  ],
+  "min_signal_count": 2,
+  "unknown_policy": "lenient"
+}

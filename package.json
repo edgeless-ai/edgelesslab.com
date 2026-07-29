@@ -12,6 +12,8 @@
     "lint:blog-links": "node scripts/lint-blog-links.mjs",
     "lint:experiments": "node scripts/lint-experiments.mjs",
     "lint:voice": "../scripts/lint-voice.sh src/lib/data.ts && ../scripts/lint-voice.sh src/lib/product-content.ts && ../scripts/lint-voice.sh src/lib/blog.ts",
+    "art-only:inject": "node scripts/inject-art-only-mode.mjs",
+    "art-only:check": "node scripts/inject-art-only-mode.mjs --check",
     "worker:ingest:dev": "npx wrangler dev --config workers/ingest/wrangler.toml",
     "worker:ingest:deploy": "npx wrangler deploy --config workers/ingest/wrangler.toml"
   },

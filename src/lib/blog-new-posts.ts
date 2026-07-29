@@ -1491,69 +1491,59 @@ This pattern applies to any audio-driven geometry: detect events, apply localize
   {
     slug: "tartan-weave-synth",
     title: "Tartan Weave Synth",
-    description: "Interactive generative tartan based on Tartanism field notes. Six weave structures, 48 historical dye colors, mouse-warped threads, and click-to-pulse.",
+    description: "A playable textile system based on Tartanism, with formal setts, 48 dye colors, six loom structures, material studies, mutation, and recipe export.",
     date: "2026-06-10",
     tags: ["Creative", "Generative Art", "Tartanism", "Interactive"],
-    readTime: "3 min",
+    readTime: "5 min",
     content: `
 # Tartan Weave Synth
 
-Tartanism is a systematic exploration of generative plaid. The field notes document six weave structures, 48 period-correct dye colors, and a formal grammar for Scottish tartan. This demo takes that system and makes it playable.
+Tartanism is a systematic exploration of generative plaid. The field notes document loom structures, 48 textile colors, traditional reference setts, and a formal grammar for Scottish tartan. This synth exposes the actual system instead of reducing it to a stripe randomizer.
 
 The live artifact: [Open Tartan Weave Synth](/creative-demos/tartan-weave-synth/)
 
-## The Aesthetic
+## The Sett Is the Instrument
 
-The palette is brighter than historical accuracy. The colors are inspired by real woven tartans: deep rust, warm saffron, soft navy, natural cream, beige, muted sage, wheat, and ivory. The background is a warm off-white, not black. The result feels like looking at fabric under daylight, not a CRT monitor in a dark room.
+The synth reads and writes compact threadcount notation such as \`K/4 B4 K4 B4 K20 G24 K6 G24 K20 B22 K/4\`. Each token names a dye color and a thread width. Pivot markers describe a reflective sett. The same representation can be edited directly or manipulated through the stripe editor.
 
-The thread scale is adjustable. At small scales, the weave looks like a dense upholstery textile. At large scales, it looks like a coarse handwoven blanket. The scale control lets you match the tartan to its intended use.
+Eight reference setts provide a serious starting point, including Black Watch, Royal Stewart, Buchanan, Douglas, and Murray of Atholl. Warp and weft can share one sett, as traditional tartan usually does, or split into independent structures for broader textile studies.
 
 ## The Weave Structures
 
-The demo implements all six weave structures from the Tartanism field notes:
+The renderer uses six explicit threading, treadling, and tie-up definitions:
 
-- **Plain**: the simplest weave, alternating warp and weft
-- **Twill**: diagonal lines created by offsetting the weave pattern
-- **Herringbone**: a broken twill that creates a chevron pattern
-- **Hopsack**: paired warp threads create a basket-like texture
-- **Satin**: long floats create a smooth, lustrous surface
-- **Broken**: an irregular weave that produces chaotic patterns
+- **Plain weave** for a balanced over-under structure
+- **2/2 twill** for the familiar tartan diagonal
+- **3/1 twill** for a warp-dominant surface
+- **Herringbone** for a reversing twill
+- **Houndstooth** for a broken check
+- **Basket weave** for grouped warp and weft threads
 
-Each structure is implemented as a pixel-level function that determines which color (warp or weft) is visible at each thread intersection.
+Every visible cell is calculated from the active warp thread, weft thread, shaft, treadle, and tie-up. Changing the weave changes which thread is physically on top rather than placing a decorative texture over a plaid image.
 
-## The Color System
+## Dye and Material
 
-The palette uses 12 natural textile colors inspired by the Tartanism research. The sett (the repeating pattern of colored stripes) is generated randomly, with each stripe having a width of 2-5 threads. The colors are desaturated enough to feel like real dye, but bright enough to feel alive.
+The color vocabulary now includes all 48 codes used by the Tartanism system. The stripe editor exposes every chosen dye and width while keeping the formal notation in sync.
 
-## The Fabric Texture
+Material is separate from pattern. Brushed wool adds a soft, irregular grain. Worsted wool produces cleaner highlights. Linen is drier and more directional. Silk has a sharper raking highlight. Flat study removes the simulated fiber surface so the weave logic can be inspected directly.
 
-Perlin noise simulates the irregularity of real threads. No two threads are exactly the same color. The noise creates subtle variations that make the digital weave feel like actual fabric. The texture is not a post-process effect. It is part of the color calculation.
+Thread scale, weave depth, yarn irregularity, and light direction change the cloth without changing the sett. This makes it possible to compare structure and surface instead of baking both into one effect.
 
-## The Interaction
+## Controlled Mutation
 
-Mouse movement warps the weave. The cursor displaces threads horizontally and vertically, creating a distorted, breathing tartan. The displacement is sinusoidal, so the warp feels organic, not mechanical.
+Mutation is not a single random button. A sett can shift proportions, shift dyes, transpose stripes, insert a stripe, rotate its sequence, or reverse direction. A general mutation chooses among those operations. A seeded generator creates new setts that can be reproduced and refined.
 
-Clicking produces a pulse: a bright ring expands from the click point, temporarily lightening the threads it passes through. The pulse decays over 30 frames, leaving a subtle afterimage.
+The important distinction is between randomness and authorship. A random pattern gives you an answer. A set of constrained mutations gives you a path through a design space.
 
-## The Animation
+## Motion and Art-only Mode
 
-The tartan breathes. The sett pattern drifts slowly, and the fabric texture undulates. The breath speed is controlled by a slider. At maximum speed, the tartan becomes a living, changing pattern. At minimum speed, it is static.
+The cloth can remain still, breathe very subtly, or respond to the pointer with a local ripple. Motion is optional. Press \`H\` or choose **Hide controls** to remove the entire interface and leave only the cloth. \`Escape\` restores the controls.
 
 ## The Export
 
-The demo includes a frame export feature. Click "Export GIF" to capture 90 frames (3 seconds at 30fps) as a PNG sequence. These frames can be assembled into an animated GIF using a tool like ezgif.com, or integrated directly into an NFT minting pipeline.
+PNG export captures the rendered textile. Recipe export saves the seed, threadcounts, symmetry, weave, material, scale, depth, irregularity, and light as JSON. The image is an output. The recipe is the work that produced it.
 
-Each exported sequence is unique because the sett pattern is random and the breath animation is deterministic. The same seed produces the same sequence, but the seed is not exposed. Every export is a one-of-a-kind tartan animation.
-
-## The Design Decision
-
-The pixel-level rendering is deliberate. Most tartan generators use image-based approaches: draw stripes, blend them. This demo renders each thread intersection individually, which allows for the warp, pulse, and texture effects. The tradeoff is performance: the demo runs at 30fps on most devices, not 60fps. The visual complexity is worth the frame rate.
-
-## What It Teaches
-
-The lesson is about making a system playable and exportable. The Tartanism field notes are a rigorous, scholarly document. This demo is a toy and a tool. But the toy is built from the same system. The weave structures, the dye colors, the sett grammar — all from the field notes. The difference is interactivity and exportability. The system is no longer read-only. It is played, recorded, and minted.
-
-This is the bridge between research, creative coding, and digital ownership: take a formal system, implement it faithfully, add interaction, and export the result. The interaction reveals properties of the system that are not visible in the static form. The export makes those properties permanent.
+This is what the first version lacked. Tartanism was broad and rigorous, while the synth had become a shallow animated toy. The rebuilt synth uses the same underlying vocabulary and gives it enough controls to support real exploration.
     `.trim(),
   },
   {

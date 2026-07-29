@@ -2,493 +2,796 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tartan Weave Synth</title>
-  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#171611">
+  <title>Tartan Weave Synth | Edgeless Lab</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #e8e4d9;
-      overflow: hidden;
-      font-family: 'Helvetica Neue', Arial, sans-serif;
+    :root {
+      color-scheme: dark;
+      --ink: #f2efe6;
+      --muted: #aaa69a;
+      --dim: #747168;
+      --panel: rgba(20, 19, 16, 0.94);
+      --line: rgba(255, 255, 255, 0.11);
+      --accent: #d7ff55;
+      --accent-soft: rgba(215, 255, 85, 0.12);
     }
-    canvas { display: block; }
-
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body {
+      background: #171611;
+      color: var(--ink);
+      font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    canvas { display: block; width: 100%; height: 100%; }
+    button, input, select { font: inherit; }
+    button, select, input[type="number"], input[type="text"] {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+    }
+    button { cursor: pointer; }
+    button:hover, select:hover { border-color: rgba(215, 255, 85, 0.55); }
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    [hidden] { display: none !important; }
     #panel {
       position: fixed;
-      top: 16px;
-      left: 16px;
-      width: 260px;
+      z-index: 20;
+      top: max(16px, env(safe-area-inset-top));
+      left: max(16px, env(safe-area-inset-left));
+      width: min(344px, calc(100vw - 32px));
       max-height: calc(100vh - 32px);
-      overflow-y: auto;
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 12px;
-      padding: 16px;
-      color: #2a2a2a;
-      font-size: 12px;
-      z-index: 1000;
-      backdrop-filter: blur(12px);
+      overflow: auto;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+      backdrop-filter: blur(18px);
+      scrollbar-width: thin;
     }
-    #panel h2 {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
+    .panel-head { padding: 16px 16px 13px; border-bottom: 1px solid var(--line); }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+      color: var(--accent);
+      font-size: 10px;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: #555;
-      margin-bottom: 12px;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      padding-bottom: 8px;
     }
-    .control-group {
-      margin-bottom: 14px;
+    .eyebrow::before { content: ""; width: 7px; height: 7px; background: var(--accent); }
+    h1 { margin: 0; font: 600 17px/1.2 system-ui, sans-serif; letter-spacing: -0.02em; }
+    .lede { margin: 7px 0 0; color: var(--muted); font-size: 10px; }
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
     }
-    .control-group label {
+    .actions button { min-height: 34px; padding: 7px; font-size: 10px; }
+    .actions .primary { color: #171811; background: var(--accent); border-color: var(--accent); }
+    details { border-bottom: 1px solid var(--line); }
+    summary {
+      padding: 12px 16px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    summary::marker { color: var(--accent); }
+    .section { display: grid; gap: 11px; padding: 2px 16px 16px; }
+    .control { display: grid; gap: 5px; }
+    .control label, .row-label {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 4px;
-      color: #666;
-      font-size: 11px;
-      letter-spacing: 0.3px;
-    }
-    .control-group .value {
-      color: #c45c3e;
-      font-weight: 600;
-      font-family: monospace;
-    }
-    input[type="range"] {
-      width: 100%;
-      -webkit-appearance: none;
-      height: 3px;
-      background: rgba(0,0,0,0.08);
-      border-radius: 2px;
-      outline: none;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #c45c3e;
-      cursor: pointer;
-      border: 2px solid #fff;
-    }
-    .btn {
-      width: 100%;
-      padding: 8px 0;
-      border: none;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-bottom: 6px;
-    }
-    .btn-random {
-      background: rgba(196, 92, 62, 0.10);
-      color: #c45c3e;
-      border: 1px solid rgba(196, 92, 62, 0.25);
-    }
-    .btn-reset {
-      background: rgba(60, 60, 80, 0.08);
-      color: #555;
-      border: 1px solid rgba(0, 0, 0, 0.15);
-    }
-    .btn-export {
-      background: rgba(60, 90, 120, 0.10);
-      color: #3a5a78;
-      border: 1px solid rgba(60, 90, 120, 0.25);
-    }
-    .hint {
-      color: #888;
+      gap: 12px;
+      color: var(--muted);
       font-size: 10px;
-      margin-top: 10px;
-      line-height: 1.4;
-      border-top: 1px solid rgba(0,0,0,0.06);
-      padding-top: 8px;
     }
-    .progress-bar {
+    .value { color: var(--accent); }
+    select, input[type="number"], input[type="text"] {
       width: 100%;
-      height: 4px;
-      background: rgba(0,0,0,0.06);
-      border-radius: 2px;
-      margin-top: 6px;
-      overflow: hidden;
-      display: none;
+      min-height: 32px;
+      padding: 6px 8px;
     }
-    .progress-bar.active {
-      display: block;
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    input[type="checkbox"] { accent-color: var(--accent); }
+    .check {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      color: var(--muted);
     }
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      background: #c45c3e;
-      transition: width 0.1s;
+    .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .button-grid button { min-height: 32px; padding: 6px; color: var(--muted); }
+    .stripes { display: grid; gap: 6px; }
+    .stripe {
+      display: grid;
+      grid-template-columns: 30px 1fr 58px 26px;
+      gap: 6px;
+      align-items: center;
+    }
+    .stripe input[type="color"] {
+      width: 30px;
+      height: 29px;
+      padding: 1px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: transparent;
+    }
+    .stripe code { overflow: hidden; color: var(--muted); font-size: 10px; }
+    .stripe input[type="number"] { min-height: 29px; padding: 4px 5px; }
+    .stripe button { width: 26px; height: 29px; color: var(--dim); }
+    .add-stripe { min-height: 31px; color: var(--accent); border-style: dashed; }
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--line);
+      border-top: 1px solid var(--line);
+    }
+    .stat { padding: 10px 16px; background: var(--panel); }
+    .stat span { display: block; color: var(--dim); font-size: 9px; text-transform: uppercase; }
+    .stat strong { display: block; margin-top: 2px; color: var(--ink); font-size: 12px; }
+    #status {
+      position: fixed;
+      z-index: 10;
+      left: 50%;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      padding: 7px 10px;
+      color: var(--muted);
+      background: rgba(15, 15, 13, 0.8);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      opacity: 0;
+      transition: opacity 160ms ease;
+      pointer-events: none;
+    }
+    #status.visible { opacity: 1; }
+    @media (max-width: 620px) {
+      #panel { top: 10px; left: 10px; width: min(330px, calc(100vw - 20px)); max-height: calc(100vh - 20px); }
+      .panel-head { padding: 13px; }
+      .actions, .section { padding-left: 13px; padding-right: 13px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #status { transition: none; }
     }
   </style>
 </head>
 <body>
+  <canvas id="loom" aria-label="Interactive rendered tartan"></canvas>
 
-<div id="panel">
-  <h2>Tartan Weave Synth</h2>
+  <aside id="panel" data-art-only-hide>
+    <div class="panel-head">
+      <div class="eyebrow">Textile system</div>
+      <h1>Tartan Weave Synth</h1>
+      <p class="lede">Build the sett, choose the weave, alter the cloth, then export the result.</p>
+    </div>
 
-  <div class="control-group">
-    <label>Threads <span class="value" id="val-threads">16</span></label>
-    <input type="range" id="threads" min="4" max="64" value="16">
-  </div>
+    <div class="actions">
+      <button class="primary" id="mutate">Mutate</button>
+      <button id="randomize">New sett</button>
+      <button id="export-png">PNG</button>
+    </div>
 
-  <div class="control-group">
-    <label>Sett Size <span class="value" id="val-sett">8</span></label>
-    <input type="range" id="sett" min="2" max="32" value="8">
-  </div>
+    <details open>
+      <summary>Sett and structure</summary>
+      <div class="section">
+        <div class="control">
+          <label for="preset">Reference sett</label>
+          <select id="preset"></select>
+        </div>
+        <div class="control">
+          <label for="threadcount">Threadcount notation</label>
+          <input id="threadcount" type="text" spellcheck="false">
+        </div>
+        <div class="control">
+          <label for="symmetry">Sett symmetry</label>
+          <select id="symmetry">
+            <option value="reflective">Reflective tartan</option>
+            <option value="repeat">Direct repeat</option>
+            <option value="asymmetric">Asymmetric</option>
+          </select>
+        </div>
+        <label class="check">
+          <input id="link-weft" type="checkbox" checked>
+          Use the same sett for warp and weft
+        </label>
+        <div class="control" id="weft-control" hidden>
+          <label for="weft-threadcount">Weft threadcount</label>
+          <input id="weft-threadcount" type="text" spellcheck="false">
+        </div>
+        <div class="control">
+          <label for="weave">Weave structure</label>
+          <select id="weave">
+            <option value="twill-2-2">2/2 twill</option>
+            <option value="plain">Plain weave</option>
+            <option value="twill-3-1">3/1 warp twill</option>
+            <option value="herringbone">Herringbone</option>
+            <option value="houndstooth">Houndstooth</option>
+            <option value="basketweave">Basket weave</option>
+          </select>
+        </div>
+      </div>
+    </details>
 
-  <div class="control-group">
-    <label>Weave Type <span class="value" id="val-weave">Twill</span></label>
-    <select id="weave" style="width:100%; background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.08); border-radius:6px; color:#2a2a2a; padding:6px; font-size:11px;">
-      <option value="plain">Plain</option>
-      <option value="twill" selected>Twill</option>
-      <option value="herringbone">Herringbone</option>
-      <option value="hopsack">Hopsack</option>
-      <option value="satin">Satin</option>
-      <option value="broken">Broken</option>
-    </select>
-  </div>
+    <details open>
+      <summary>Cloth</summary>
+      <div class="section">
+        <div class="control">
+          <label for="scale">Thread scale <span class="value" id="scale-value">5 px</span></label>
+          <input id="scale" type="range" min="2" max="12" value="5">
+        </div>
+        <div class="control">
+          <label for="material">Material</label>
+          <select id="material">
+            <option value="wool">Brushed wool</option>
+            <option value="worsted">Worsted wool</option>
+            <option value="linen">Linen</option>
+            <option value="silk">Silk</option>
+            <option value="flat">Flat study</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="depth">Weave depth <span class="value" id="depth-value">72%</span></label>
+          <input id="depth" type="range" min="0" max="100" value="72">
+        </div>
+        <div class="control">
+          <label for="irregularity">Yarn irregularity <span class="value" id="irregularity-value">18%</span></label>
+          <input id="irregularity" type="range" min="0" max="60" value="18">
+        </div>
+        <div class="control">
+          <label for="light">Raking light <span class="value" id="light-value">-35°</span></label>
+          <input id="light" type="range" min="-180" max="180" value="-35">
+        </div>
+        <div class="control">
+          <label for="motion">Motion</label>
+          <select id="motion">
+            <option value="still">Still cloth</option>
+            <option value="breathe">Breathe</option>
+            <option value="ripple">Pointer ripple</option>
+          </select>
+        </div>
+      </div>
+    </details>
 
-  <div class="control-group">
-    <label>Thread Scale <span class="value" id="val-scale">6</span></label>
-    <input type="range" id="scale" min="2" max="16" value="6">
-  </div>
+    <details>
+      <summary>Pattern operations</summary>
+      <div class="section">
+        <div class="button-grid">
+          <button data-operation="proportion">Shift widths</button>
+          <button data-operation="color">Shift dyes</button>
+          <button data-operation="transpose">Transpose</button>
+          <button data-operation="insert">Insert stripe</button>
+          <button data-operation="rotate">Rotate sett</button>
+          <button data-operation="reverse">Reverse sett</button>
+        </div>
+        <div class="control">
+          <label for="seed">Seed</label>
+          <input id="seed" type="number" min="1" max="999999" value="24017">
+        </div>
+        <button id="export-json">Export recipe JSON</button>
+      </div>
+    </details>
 
-  <div class="control-group">
-    <label>Mouse Warp <span class="value" id="val-warp">0.5</span></label>
-    <input type="range" id="warp" min="0" max="2" value="0.5" step="0.1">
-  </div>
+    <details>
+      <summary>Stripe editor</summary>
+      <div class="section">
+        <div class="stripes" id="stripes"></div>
+        <button class="add-stripe" id="add-stripe">Add stripe</button>
+      </div>
+    </details>
 
-  <div class="control-group">
-    <label>Breath Speed <span class="value" id="val-speed">0.02</span></label>
-    <input type="range" id="speed" min="0" max="0.1" value="0.02" step="0.005">
-  </div>
+    <div class="stats">
+      <div class="stat"><span>Warp repeat</span><strong id="stat-warp">0</strong></div>
+      <div class="stat"><span>Weft repeat</span><strong id="stat-weft">0</strong></div>
+      <div class="stat"><span>Colors</span><strong id="stat-colors">0</strong></div>
+      <div class="stat"><span>Structure</span><strong id="stat-weave">2/2</strong></div>
+    </div>
+  </aside>
 
-  <div class="control-group">
-    <label>Brightness <span class="value" id="val-bright">1.2</span></label>
-    <input type="range" id="bright" min="0.5" max="2.0" value="1.2" step="0.1">
-  </div>
+  <div id="status" role="status" aria-live="polite"></div>
 
-  <button class="btn btn-random" onclick="randomizeTartan()">Randomize Pattern</button>
-  <button class="btn btn-export" onclick="exportGif()">Export GIF (3 sec)</button>
-  <div class="progress-bar" id="progress"><div class="progress-fill" id="progress-fill"></div></div>
-  <button class="btn btn-reset" onclick="resetTartan()">Reset</button>
+  <script>
+    (() => {
+      "use strict";
 
-  <div class="hint">
-    Move mouse to warp. Click to pulse. Export GIF for NFT backgrounds.
-  </div>
-</div>
+      const COLORS = {
+        K: ["Black", "#171715"], W: ["White", "#e8e2d2"], R: ["Red", "#a5232b"],
+        G: ["Green", "#183e2b"], B: ["Blue", "#173b5d"], Y: ["Yellow", "#d3a928"],
+        TN: ["Tan", "#a7875e"], BR: ["Brown", "#5e3828"], DBR: ["Dark brown", "#34231f"],
+        LBR: ["Light brown", "#987052"], O: ["Orange", "#c15e26"], DO: ["Dark orange", "#8e411f"],
+        LO: ["Light orange", "#da8846"], CR: ["Crimson", "#7f1d2d"], RU: ["Russet", "#8a3626"],
+        MR: ["Maroon", "#541e2c"], LR: ["Light red", "#c75a58"], PK: ["Pink", "#d69094"],
+        P: ["Purple", "#55375f"], DP: ["Dark purple", "#35243d"], LP: ["Light purple", "#9679a2"],
+        VI: ["Violet", "#67458a"], LV: ["Lavender", "#a18ab8"], N: ["Navy", "#111f3a"],
+        DB: ["Dark blue", "#142845"], LB: ["Light blue", "#6d91a7"], CB: ["Cornflower", "#4f7295"],
+        AB: ["Azure", "#286d8a"], NB: ["Night blue", "#19273f"], FG: ["Forest", "#193629"],
+        DG: ["Dark green", "#14291f"], LG: ["Light green", "#6d8d67"], GY: ["Green-yellow", "#8f9451"],
+        LGY: ["Lichen", "#9b9d73"], DGY: ["Dark grey", "#3f423e"], HG: ["Heather grey", "#6d686f"],
+        ST: ["Stone", "#8c877c"], SC: ["Slate", "#5d6871"], IW: ["Ivory", "#d9d0ba"],
+        CW: ["Cream", "#c9b995"], CH: ["Charcoal", "#30302f"], GD: ["Gold", "#b88a2e"],
+        OG: ["Old gold", "#8b6c2d"], AM: ["Amber", "#b0642d"], TL: ["Teal", "#216269"],
+        RB: ["Royal blue", "#244f83"], LY: ["Light yellow", "#e0c76d"]
+      };
 
-<script>
-// ============================================================
-// Tartan Weave Synth v2 - Brighter, Fabric-like, GIF Export
-// ============================================================
+      const PRESETS = {
+        "Royal Stewart": "R/72 G4 R2 K24 Y2 K24 W2 K2 Y2 K32 W2 B/24",
+        "Black Watch": "K/4 B4 K4 B4 K20 G24 K6 G24 K20 B22 K/4",
+        "MacLeod of Lewis": "Y/24 K4 Y/24",
+        "Campbell of Argyll": "K/2 B6 K6 G28 K6 B6 K4 W4 Y4 W/4",
+        "Cameron of Erracht": "R/4 G48 R6 G4 R6 G48 Y4 B6 Y4 G48 R6 G4 R6 G48 R/4",
+        "Murray of Atholl": "G/4 K2 G4 K32 B4 K32 G4 K2 G/4",
+        "Buchanan": "Y/4 R8 Y4 R2 K4 R2 W2 G24 R4 G24 W2 R2 K4 R2 Y/4",
+        "Douglas": "G/4 B4 G4 B24 K24 B4 W4 B4 K24 B24 G4 B4 G/4"
+      };
 
-let PARAMS = {
-  threads: 16,
-  settSize: 8,
-  weaveType: 'twill',
-  threadScale: 6,
-  mouseWarp: 0.5,
-  speed: 0.02,
-  brightness: 1.2
-};
+      const WEAVES = {
+        plain: { name: "Plain", threading: [0, 1], treadling: [0, 1], tie: [[1, 0], [0, 1]] },
+        "twill-2-2": { name: "2/2 twill", threading: [0, 1, 2, 3], treadling: [0, 1, 2, 3], tie: [[1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 1, 1], [1, 0, 0, 1]] },
+        "twill-3-1": { name: "3/1 twill", threading: [0, 1, 2, 3], treadling: [0, 1, 2, 3], tie: [[1, 1, 1, 0], [0, 1, 1, 1], [1, 0, 1, 1], [1, 1, 0, 1]] },
+        herringbone: { name: "Herringbone", threading: [0, 1, 2, 3, 2, 1], treadling: [0, 1, 2, 3, 2, 1], tie: [[1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 1, 1], [1, 0, 0, 1]] },
+        houndstooth: { name: "Houndstooth", threading: [0, 1, 2, 3], treadling: [0, 0, 1, 1, 2, 2, 3, 3], tie: [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1]] },
+        basketweave: { name: "Basket weave", threading: [0, 0, 1, 1], treadling: [0, 0, 1, 1], tie: [[1, 0], [0, 1]] }
+      };
 
-// Brighter, more natural textile palette inspired by real tartans
-const PALETTE = [
-  { r: 178, g: 34,  b: 34  },  // deep rust red
-  { r: 220, g: 140, b: 40  },  // warm saffron
-  { r: 60,  g: 80,  b: 120 },  // soft navy
-  { r: 50,  g: 50,  b: 70  },  // charcoal
-  { r: 200, g: 195, b: 180 },  // natural cream
-  { r: 160, g: 140, b: 100 },  // beige
-  { r: 100, g: 120, b: 80  },  // muted sage
-  { r: 140, g: 90,  b: 60  },  // warm brown
-  { r: 210, g: 170, b: 120 },  // wheat
-  { r: 80,  g: 60,  b: 90  },  // plum
-  { r: 190, g: 210, b: 220 },  // pale blue
-  { r: 230, g: 210, b: 170 },  // ivory
-];
+      const canvas = document.getElementById("loom");
+      const ctx = canvas.getContext("2d", { alpha: false });
+      const state = {
+        warp: [],
+        weft: [],
+        symmetry: "reflective",
+        linked: true,
+        weave: "twill-2-2",
+        scale: 5,
+        material: "wool",
+        depth: 0.72,
+        irregularity: 0.18,
+        light: -35,
+        motion: "still",
+        seed: 24017,
+        pointer: { x: -1000, y: -1000, active: false },
+        time: 0,
+        dirty: true
+      };
+      let renderWidth = 0;
+      let renderHeight = 0;
+      let statusTimer = 0;
 
-let settPattern = [];
-let time = 0;
-let pulseOrigin = null;
-let pulseTime = 0;
-let noiseOffset = 0;
+      function hash(value) {
+        let x = Math.sin(value * 127.1 + state.seed * 0.013) * 43758.5453;
+        return x - Math.floor(x);
+      }
 
-// GIF export
-let isRecording = false;
-let gifFrames = [];
-let gifMaxFrames = 90; // 3 seconds at 30fps
+      function colorToRgb(hex) {
+        const clean = hex.replace("#", "");
+        return [
+          parseInt(clean.slice(0, 2), 16),
+          parseInt(clean.slice(2, 4), 16),
+          parseInt(clean.slice(4, 6), 16)
+        ];
+      }
 
-function setup() {
-  createCanvas(windowWidth, windowHeight);
-  pixelDensity(1);
-  noCursor();
-  generateSett();
-  bindControls();
-  noiseOffset = random(1000);
-}
+      function shade(hex, amount) {
+        const [r, g, b] = colorToRgb(hex);
+        const apply = (value) => Math.max(0, Math.min(255, Math.round(value + amount * 255)));
+        return `rgb(${apply(r)}, ${apply(g)}, ${apply(b)})`;
+      }
 
-function generateSett() {
-  settPattern = [];
-  let used = new Set();
-  for (let i = 0; i < PARAMS.settSize; i++) {
-    let color;
-    do {
-      color = random(PALETTE);
-    } while (used.has(color) && used.size < PALETTE.length);
-    used.add(color);
-    settPattern.push({
-      color: color,
-      width: floor(random(2, 6))
-    });
-  }
-}
+      function parseThreadcount(value) {
+        const stripes = [];
+        const regex = /([A-Z]+)(\/)?\s*(\d+)/g;
+        let match;
+        while ((match = regex.exec(value.toUpperCase()))) {
+          const code = COLORS[match[1]] ? match[1] : "K";
+          stripes.push({
+            code,
+            color: COLORS[code][1],
+            width: Math.max(1, Math.min(96, Number(match[3]))),
+            pivot: Boolean(match[2])
+          });
+        }
+        return stripes.length ? stripes : [{ code: "K", color: COLORS.K[1], width: 8, pivot: true }];
+      }
 
-function getWeavePattern(x, y) {
-  let wx = x % PARAMS.threads;
-  let wy = y % PARAMS.threads;
-  let idx = 0;
+      function serializeThreadcount(stripes) {
+        return stripes.map((stripe) => `${stripe.code}${stripe.pivot ? "/" : ""}${stripe.width}`).join(" ");
+      }
 
-  switch (PARAMS.weaveType) {
-    case 'plain':
-      idx = (wx + wy) % 2;
-      break;
-    case 'twill':
-      idx = (wx + wy) % PARAMS.threads < PARAMS.threads / 2 ? 0 : 1;
-      break;
-    case 'herringbone':
-      let diag = (wx + wy) % (PARAMS.threads * 2);
-      idx = diag < PARAMS.threads ? 0 : 1;
-      break;
-    case 'hopsack':
-      idx = (floor(wx / 2) + floor(wy / 2)) % 2;
-      break;
-    case 'satin':
-      idx = ((wx * 2 + wy * 3) % PARAMS.threads) < 2 ? 0 : 1;
-      break;
-    case 'broken':
-      let bx = (wx + floor(y / 4)) % PARAMS.threads;
-      idx = (bx + wy) % 2;
-      break;
-  }
-  return idx;
-}
+      function expandedStripes(stripes) {
+        if (state.symmetry !== "reflective" || stripes.length < 2) return stripes.slice();
+        return stripes.concat(stripes.slice(1, -1).reverse().map((stripe) => ({ ...stripe, pivot: false })));
+      }
 
-function getSettColor(pos) {
-  let totalWidth = settPattern.reduce((sum, s) => sum + s.width, 0);
-  let p = pos % totalWidth;
-  let accumulated = 0;
-  for (let i = 0; i < settPattern.length; i++) {
-    accumulated += settPattern[i].width;
-    if (p < accumulated) {
-      return settPattern[i].color;
-    }
-  }
-  return settPattern[settPattern.length - 1].color;
-}
+      function expandThreads(stripes) {
+        const threads = [];
+        for (const stripe of expandedStripes(stripes)) {
+          for (let i = 0; i < stripe.width; i += 1) threads.push(stripe.color);
+        }
+        return threads.length ? threads : [COLORS.K[1]];
+      }
 
-function getFabricNoise(x, y) {
-  // Simulate thread texture with Perlin noise
-  return noise(x * 0.1 + noiseOffset, y * 0.1 + noiseOffset, time * 0.5);
-}
+      function isWarpOnTop(warpIndex, weftIndex) {
+        const weave = WEAVES[state.weave];
+        const shaft = weave.threading[warpIndex % weave.threading.length];
+        const treadle = weave.treadling[weftIndex % weave.treadling.length];
+        return Boolean(weave.tie[treadle % weave.tie.length][shaft]);
+      }
 
-function draw() {
-  time += PARAMS.speed;
+      function resize() {
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        renderWidth = window.innerWidth;
+        renderHeight = window.innerHeight;
+        canvas.width = Math.round(renderWidth * ratio);
+        canvas.height = Math.round(renderHeight * ratio);
+        canvas.style.width = `${renderWidth}px`;
+        canvas.style.height = `${renderHeight}px`;
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        state.dirty = true;
+      }
 
-  // Mouse warp
-  let mx = mouseX / width;
-  let my = mouseY / height;
-  let warpX = (mouseX - width / 2) / width * PARAMS.mouseWarp * 50;
-  let warpY = (mouseY - height / 2) / height * PARAMS.mouseWarp * 50;
+      function drawCloth() {
+        const warp = expandThreads(state.warp);
+        const weft = expandThreads(state.linked ? state.warp : state.weft);
+        const baseScale = state.scale;
+        const motionAmount = state.motion === "still" ? 0 : state.motion === "breathe" ? 0.45 : 1.1;
+        const lightRadians = (state.light * Math.PI) / 180;
+        const lightX = Math.cos(lightRadians);
+        const lightY = Math.sin(lightRadians);
 
-  // Pulse decay
-  if (pulseOrigin && pulseTime > 0) {
-    pulseTime -= 0.02;
-  }
+        ctx.fillStyle = "#171611";
+        ctx.fillRect(0, 0, renderWidth, renderHeight);
 
-  let scale = PARAMS.threadScale;
+        for (let row = -2; row < Math.ceil(renderHeight / baseScale) + 2; row += 1) {
+          for (let column = -2; column < Math.ceil(renderWidth / baseScale) + 2; column += 1) {
+            let x = column * baseScale;
+            let y = row * baseScale;
+            const distance = Math.hypot(x - state.pointer.x, y - state.pointer.y);
+            let displacement = Math.sin(state.time * 2.2 + distance * 0.025) * motionAmount;
+            if (state.motion === "ripple" && state.pointer.active) {
+              displacement *= Math.max(0, 1 - distance / 420) * 3.2;
+            }
+            x += displacement;
+            y += displacement * 0.62;
 
-  loadPixels();
+            const variation = (hash(column * 911 + row * 353) - 0.5) * state.irregularity;
+            const cellScale = Math.max(1.5, baseScale * (1 + variation));
+            const warpTop = isWarpOnTop(column + 4096, row + 4096);
+            const color = warpTop
+              ? warp[(column + 4096) % warp.length]
+              : weft[(row + 4096) % weft.length];
+            const light = (warpTop ? lightX : lightY) * state.depth * 0.09;
 
-  for (let y = 0; y < height; y += 2) {
-    for (let x = 0; x < width; x += 2) {
-      // Warped coordinates
-      let wx = x + warpX * sin(y * 0.01 + time);
-      let wy = y + warpY * sin(x * 0.01 + time);
+            ctx.fillStyle = shade(color, -0.08 * state.depth);
+            ctx.fillRect(x, y, cellScale + 0.8, cellScale + 0.8);
 
-      // Thread positions
-      let tx = floor(wx / scale);
-      let ty = floor(wy / scale);
+            if (state.material !== "flat") {
+              ctx.beginPath();
+              if (warpTop) {
+                ctx.roundRect(x + cellScale * 0.2, y - 0.3, cellScale * 0.62, cellScale + 0.6, cellScale * 0.32);
+              } else {
+                ctx.roundRect(x - 0.3, y + cellScale * 0.2, cellScale + 0.6, cellScale * 0.62, cellScale * 0.32);
+              }
+              ctx.fillStyle = shade(color, light + 0.035 * state.depth);
+              ctx.fill();
 
-      // Color from sett
-      let c1 = getSettColor(tx);
-      let c2 = getSettColor(ty);
+              if (state.material === "silk" || state.material === "worsted") {
+                ctx.strokeStyle = shade(color, state.material === "silk" ? 0.17 : 0.09);
+                ctx.lineWidth = Math.max(0.35, cellScale * 0.08);
+                ctx.beginPath();
+                if (warpTop) {
+                  ctx.moveTo(x + cellScale * 0.38, y);
+                  ctx.lineTo(x + cellScale * 0.38, y + cellScale);
+                } else {
+                  ctx.moveTo(x, y + cellScale * 0.38);
+                  ctx.lineTo(x + cellScale, y + cellScale * 0.38);
+                }
+                ctx.stroke();
+              }
+            }
+          }
+        }
 
-      // Weave pattern
-      let weave = getWeavePattern(tx, ty);
-
-      // Blend based on weave with fabric texture
-      let n = getFabricNoise(x, y);
-      let blend = weave === 0 ? 0.6 + n * 0.4 : 0.4 + n * 0.4;
-      let r = lerp(c1.r, c2.r, blend);
-      let g = lerp(c1.g, c2.g, blend);
-      let b = lerp(c1.b, c2.b, blend);
-
-      // Brightness
-      let bright = PARAMS.brightness;
-      r = constrain(r * bright, 0, 255);
-      g = constrain(g * bright, 0, 255);
-      b = constrain(b * bright, 0, 255);
-
-      // Pulse effect
-      if (pulseTime > 0 && pulseOrigin) {
-        let d = dist(x, y, pulseOrigin.x, pulseOrigin.y);
-        let pulseRadius = (1 - pulseTime) * 300;
-        if (abs(d - pulseRadius) < 30) {
-          r = min(255, r + 80);
-          g = min(255, g + 80);
-          b = min(255, b + 80);
+        if (state.material === "wool" || state.material === "linen") {
+          const grainCount = Math.round((renderWidth * renderHeight) / (state.material === "wool" ? 820 : 1350));
+          ctx.globalAlpha = state.material === "wool" ? 0.085 : 0.055;
+          ctx.fillStyle = "#f4ead7";
+          for (let i = 0; i < grainCount; i += 1) {
+            const x = hash(i * 19) * renderWidth;
+            const y = hash(i * 31 + 7) * renderHeight;
+            ctx.fillRect(x, y, state.material === "wool" ? 1.2 : 3.8, 0.55);
+          }
+          ctx.globalAlpha = 1;
         }
       }
 
-      // Write to 2x2 block
-      let idx = (x + y * width) * 4;
-      if (idx < pixels.length) {
-        pixels[idx] = r;
-        pixels[idx + 1] = g;
-        pixels[idx + 2] = b;
-        pixels[idx + 3] = 255;
+      function frame() {
+        if (state.motion !== "still") {
+          state.time += 0.016;
+          state.dirty = true;
+        }
+        if (state.dirty) {
+          drawCloth();
+          state.dirty = false;
+        }
+        requestAnimationFrame(frame);
       }
-    }
-  }
 
-  updatePixels();
+      function showStatus(message) {
+        const status = document.getElementById("status");
+        status.textContent = message;
+        status.classList.add("visible");
+        window.clearTimeout(statusTimer);
+        statusTimer = window.setTimeout(() => status.classList.remove("visible"), 1700);
+      }
 
-  // GIF recording
-  if (isRecording && gifFrames.length < gifMaxFrames) {
-    gifFrames.push(canvas.toDataURL('image/png'));
-    let progress = (gifFrames.length / gifMaxFrames) * 100;
-    document.getElementById('progress-fill').style.width = progress + '%';
-    if (gifFrames.length >= gifMaxFrames) {
-      finishGifExport();
-    }
-  }
-}
+      function updateStats() {
+        const warp = expandThreads(state.warp);
+        const weft = expandThreads(state.linked ? state.warp : state.weft);
+        const colors = new Set([...warp, ...weft]);
+        document.getElementById("stat-warp").textContent = `${warp.length} threads`;
+        document.getElementById("stat-weft").textContent = `${weft.length} threads`;
+        document.getElementById("stat-colors").textContent = String(colors.size);
+        document.getElementById("stat-weave").textContent = WEAVES[state.weave].name;
+      }
 
-function mousePressed() {
-  pulseOrigin = { x: mouseX, y: mouseY };
-  pulseTime = 1;
-}
+      function updateStripeEditor() {
+        const container = document.getElementById("stripes");
+        container.replaceChildren();
+        state.warp.forEach((stripe, index) => {
+          const row = document.createElement("div");
+          row.className = "stripe";
+          row.innerHTML = `
+            <input type="color" aria-label="Stripe ${index + 1} color" value="${stripe.color}">
+            <code title="${COLORS[stripe.code]?.[0] || stripe.code}">${stripe.code}</code>
+            <input type="number" aria-label="Stripe ${index + 1} width" min="1" max="96" value="${stripe.width}">
+            <button type="button" aria-label="Remove stripe ${index + 1}">×</button>
+          `;
+          const colorInput = row.querySelector('input[type="color"]');
+          const widthInput = row.querySelector('input[type="number"]');
+          colorInput.addEventListener("input", () => {
+            stripe.color = colorInput.value;
+            stripe.code = nearestColorCode(stripe.color);
+            row.querySelector("code").textContent = stripe.code;
+            syncThreadcount();
+          });
+          widthInput.addEventListener("input", () => {
+            stripe.width = Math.max(1, Math.min(96, Number(widthInput.value)));
+            syncThreadcount();
+          });
+          row.querySelector("button").addEventListener("click", () => {
+            if (state.warp.length <= 1) return;
+            state.warp.splice(index, 1);
+            syncThreadcount();
+            updateStripeEditor();
+          });
+          container.appendChild(row);
+        });
+      }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-}
+      function nearestColorCode(hex) {
+        const [r, g, b] = colorToRgb(hex);
+        let nearest = "K";
+        let distance = Infinity;
+        for (const [code, entry] of Object.entries(COLORS)) {
+          const [cr, cg, cb] = colorToRgb(entry[1]);
+          const next = (r - cr) ** 2 + (g - cg) ** 2 + (b - cb) ** 2;
+          if (next < distance) {
+            distance = next;
+            nearest = code;
+          }
+        }
+        return nearest;
+      }
 
-function randomizeTartan() {
-  generateSett();
-  PARAMS.weaveType = random(['plain', 'twill', 'herringbone', 'hopsack', 'satin', 'broken']);
-  document.getElementById('weave').value = PARAMS.weaveType;
-  document.getElementById('val-weave').textContent = PARAMS.weaveType.charAt(0).toUpperCase() + PARAMS.weaveType.slice(1);
-  noiseOffset = random(1000);
-}
+      function syncThreadcount() {
+        document.getElementById("threadcount").value = serializeThreadcount(state.warp);
+        state.dirty = true;
+        updateStats();
+      }
 
-function resetTartan() {
-  PARAMS.threads = 16;
-  PARAMS.settSize = 8;
-  PARAMS.weaveType = 'twill';
-  PARAMS.threadScale = 6;
-  PARAMS.mouseWarp = 0.5;
-  PARAMS.speed = 0.02;
-  PARAMS.brightness = 1.2;
+      function seededRandom() {
+        state.seed = (state.seed * 1664525 + 1013904223) % 999983;
+        document.getElementById("seed").value = state.seed;
+        return state.seed / 999983;
+      }
 
-  document.getElementById('threads').value = 16;
-  document.getElementById('sett').value = 8;
-  document.getElementById('weave').value = 'twill';
-  document.getElementById('scale').value = 6;
-  document.getElementById('warp').value = 0.5;
-  document.getElementById('speed').value = 0.02;
-  document.getElementById('bright').value = 1.2;
+      function randomColor() {
+        const codes = Object.keys(COLORS);
+        const code = codes[Math.floor(seededRandom() * codes.length)];
+        return { code, color: COLORS[code][1] };
+      }
 
-  document.getElementById('val-threads').textContent = '16';
-  document.getElementById('val-sett').textContent = '8';
-  document.getElementById('val-weave').textContent = 'Twill';
-  document.getElementById('val-scale').textContent = '6';
-  document.getElementById('val-warp').textContent = '0.5';
-  document.getElementById('val-speed').textContent = '0.02';
-  document.getElementById('val-bright').textContent = '1.2';
+      function mutate(operation = "mixed") {
+        if (!state.warp.length) return;
+        const choice = operation === "mixed"
+          ? ["proportion", "color", "transpose", "insert", "rotate"][Math.floor(seededRandom() * 5)]
+          : operation;
+        const index = Math.floor(seededRandom() * state.warp.length);
 
-  generateSett();
-  noiseOffset = random(1000);
-}
+        if (choice === "proportion") {
+          state.warp[index].width = Math.max(1, Math.min(96, state.warp[index].width + Math.round(seededRandom() * 16 - 8)));
+        } else if (choice === "color") {
+          Object.assign(state.warp[index], randomColor());
+        } else if (choice === "transpose" && state.warp.length > 1) {
+          const other = (index + 1 + Math.floor(seededRandom() * (state.warp.length - 1))) % state.warp.length;
+          [state.warp[index], state.warp[other]] = [state.warp[other], state.warp[index]];
+        } else if (choice === "insert") {
+          const next = randomColor();
+          state.warp.splice(index, 0, { ...next, width: 2 + Math.floor(seededRandom() * 8), pivot: false });
+        } else if (choice === "rotate") {
+          state.warp.push(state.warp.shift());
+        } else if (choice === "reverse") {
+          state.warp.reverse();
+        }
+        document.getElementById("preset").value = "Custom";
+        syncThreadcount();
+        updateStripeEditor();
+        showStatus(`${choice} mutation`);
+      }
 
-function exportGif() {
-  if (isRecording) return;
-  isRecording = true;
-  gifFrames = [];
-  document.getElementById('progress').classList.add('active');
-  document.getElementById('progress-fill').style.width = '0%';
-}
+      function newSett() {
+        state.warp = [];
+        const count = 3 + Math.floor(seededRandom() * 7);
+        for (let i = 0; i < count; i += 1) {
+          const next = randomColor();
+          state.warp.push({ ...next, width: 2 + Math.floor(seededRandom() * 31), pivot: i === 0 || i === count - 1 });
+        }
+        state.symmetry = seededRandom() > 0.2 ? "reflective" : "asymmetric";
+        document.getElementById("symmetry").value = state.symmetry;
+        document.getElementById("preset").value = "Custom";
+        syncThreadcount();
+        updateStripeEditor();
+        showStatus("New sett generated");
+      }
 
-function finishGifExport() {
-  isRecording = false;
-  document.getElementById('progress').classList.remove('active');
+      function download(name, type, content) {
+        const link = document.createElement("a");
+        link.download = name;
+        link.href = URL.createObjectURL(new Blob([content], { type }));
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      }
 
-  // Create a zip-like download of PNG frames
-  // In a real app, you'd use a GIF encoder library like gif.js
-  // For now, we download the last frame as a PNG
-  let link = document.createElement('a');
-  link.download = 'tartan-weave-' + Date.now() + '.png';
-  link.href = gifFrames[gifFrames.length - 1];
-  link.click();
+      function exportPng() {
+        const link = document.createElement("a");
+        link.download = `tartan-${state.seed}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        showStatus("PNG exported");
+      }
 
-  // Also offer to download all frames
-  if (gifFrames.length > 1) {
-    gifFrames.forEach((frame, i) => {
-      setTimeout(() => {
-        let l = document.createElement('a');
-        l.download = `tartan-frame-${String(i).padStart(3, '0')}.png`;
-        l.href = frame;
-        l.click();
-      }, i * 100);
-    });
-  }
+      function exportRecipe() {
+        const recipe = {
+          version: 3,
+          seed: state.seed,
+          warp: serializeThreadcount(state.warp),
+          weft: state.linked ? "same as warp" : serializeThreadcount(state.weft),
+          symmetry: state.symmetry,
+          weave: state.weave,
+          material: state.material,
+          scale: state.scale,
+          depth: state.depth,
+          irregularity: state.irregularity,
+          light: state.light
+        };
+        download(`tartan-${state.seed}.json`, "application/json", JSON.stringify(recipe, null, 2));
+        showStatus("Recipe exported");
+      }
 
-  alert('Exported ' + gifFrames.length + ' frames. Use a tool like ezgif.com to convert PNG sequence to GIF, or integrate gif.js for direct GIF export.');
-}
+      function bind() {
+        const preset = document.getElementById("preset");
+        preset.innerHTML = '<option value="Custom">Custom</option>' +
+          Object.keys(PRESETS).map((name) => `<option value="${name}">${name}</option>`).join("");
+        preset.value = "Black Watch";
 
-function bindControls() {
-  const binds = [
-    ['threads', 'threads', v => parseInt(v), 'val-threads', v => v],
-    ['sett', 'settSize', v => parseInt(v), 'val-sett', v => v],
-    ['scale', 'threadScale', v => parseInt(v), 'val-scale', v => v],
-    ['warp', 'mouseWarp', v => parseFloat(v), 'val-warp', v => v.toFixed(1)],
-    ['speed', 'speed', v => parseFloat(v), 'val-speed', v => v.toFixed(3)],
-    ['bright', 'brightness', v => parseFloat(v), 'val-bright', v => v.toFixed(1)],
-  ];
+        preset.addEventListener("change", () => {
+          if (preset.value === "Custom") return;
+          state.warp = parseThreadcount(PRESETS[preset.value]);
+          syncThreadcount();
+          updateStripeEditor();
+        });
 
-  binds.forEach(([id, param, parser, labelId, formatter]) => {
-    const el = document.getElementById(id);
-    const label = document.getElementById(labelId);
-    el.addEventListener('input', () => {
-      PARAMS[param] = parser(el.value);
-      label.textContent = formatter(PARAMS[param]);
-    });
-  });
+        document.getElementById("threadcount").addEventListener("change", (event) => {
+          state.warp = parseThreadcount(event.target.value);
+          preset.value = "Custom";
+          syncThreadcount();
+          updateStripeEditor();
+        });
+        document.getElementById("weft-threadcount").addEventListener("change", (event) => {
+          state.weft = parseThreadcount(event.target.value);
+          state.dirty = true;
+          updateStats();
+        });
+        document.getElementById("symmetry").addEventListener("change", (event) => {
+          state.symmetry = event.target.value;
+          state.dirty = true;
+          updateStats();
+        });
+        document.getElementById("link-weft").addEventListener("change", (event) => {
+          state.linked = event.target.checked;
+          document.getElementById("weft-control").hidden = state.linked;
+          state.dirty = true;
+          updateStats();
+        });
+        document.getElementById("weave").addEventListener("change", (event) => {
+          state.weave = event.target.value;
+          state.dirty = true;
+          updateStats();
+        });
 
-  document.getElementById('weave').addEventListener('change', (e) => {
-    PARAMS.weaveType = e.target.value;
-    document.getElementById('val-weave').textContent = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1);
-  });
-}
-</script>
+        const ranges = [
+          ["scale", (value) => { state.scale = Number(value); }, (value) => `${value} px`],
+          ["depth", (value) => { state.depth = Number(value) / 100; }, (value) => `${value}%`],
+          ["irregularity", (value) => { state.irregularity = Number(value) / 100; }, (value) => `${value}%`],
+          ["light", (value) => { state.light = Number(value); }, (value) => `${value}°`]
+        ];
+        ranges.forEach(([id, apply, format]) => {
+          document.getElementById(id).addEventListener("input", (event) => {
+            apply(event.target.value);
+            document.getElementById(`${id}-value`).textContent = format(event.target.value);
+            state.dirty = true;
+          });
+        });
+
+        document.getElementById("material").addEventListener("change", (event) => {
+          state.material = event.target.value;
+          state.dirty = true;
+        });
+        document.getElementById("motion").addEventListener("change", (event) => {
+          state.motion = event.target.value;
+          state.dirty = true;
+        });
+        document.getElementById("seed").addEventListener("change", (event) => {
+          state.seed = Math.max(1, Number(event.target.value) || 1);
+          state.dirty = true;
+        });
+        document.getElementById("mutate").addEventListener("click", () => mutate());
+        document.getElementById("randomize").addEventListener("click", newSett);
+        document.getElementById("export-png").addEventListener("click", exportPng);
+        document.getElementById("export-json").addEventListener("click", exportRecipe);
+        document.querySelectorAll("[data-operation]").forEach((button) => {
+          button.addEventListener("click", () => mutate(button.dataset.operation));
+        });
+        document.getElementById("add-stripe").addEventListener("click", () => {
+          const next = randomColor();
+          state.warp.push({ ...next, width: 6, pivot: false });
+          preset.value = "Custom";
+          syncThreadcount();
+          updateStripeEditor();
+        });
+        window.addEventListener("resize", resize);
+        window.addEventListener("artonlychange", resize);
+        window.addEventListener("pointermove", (event) => {
+          state.pointer = { x: event.clientX, y: event.clientY, active: true };
+          if (state.motion === "ripple") state.dirty = true;
+        });
+        window.addEventListener("pointerleave", () => {
+          state.pointer.active = false;
+          state.dirty = true;
+        });
+      }
+
+      state.warp = parseThreadcount(PRESETS["Black Watch"]);
+      state.weft = parseThreadcount(PRESETS["Royal Stewart"]);
+      bind();
+      syncThreadcount();
+      document.getElementById("weft-threadcount").value = serializeThreadcount(state.weft);
+      updateStripeEditor();
+      resize();
+      frame();
+    })();
+  </script>
+  <script src="/art-only-mode.js" defer></script>
 </body>
 </html>

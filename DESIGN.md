@@ -259,6 +259,22 @@ For the pen plotter (historical): lives at `/pen-plotter/index.html` directly (n
 | Spread | 800x1000 | PNG |
 | OG card | 1200x630 | PNG |
 
+## Art-only mode
+
+Every standalone canvas page must let the artwork occupy the full viewport
+without a permanent control panel, toolbar, header, or footer.
+
+- Include `<script src="/art-only-mode.js" defer></script>` before `</body>`.
+- The visible control says `Hide controls`; the compact restore control says
+  `Show controls`.
+- `H` toggles the interface. `Escape` restores it.
+- Art-only preference persists across standalone studies.
+- Use `data-art-only-hide` for unusual interface containers.
+- Use `data-art-only-keep` for an element that must remain visible.
+- Use `data-art-only-artwork` when the artwork is not a `<canvas>`.
+- Run `npm run art-only:inject` after adding canvas studies and
+  `npm run art-only:check` before publishing.
+
 ## Conventions
 
 - All CSS/JS inline in the HTML file. No external stylesheets, no build.

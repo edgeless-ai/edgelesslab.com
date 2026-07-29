@@ -39,7 +39,8 @@ classification logic does NOT reclassify already-ledgered signals** — same
 `recordnum` → same id → dedupe skips the re-write. To apply a logic change you
 must rebuild the ledger (`mv data/signals.jsonl{,.bak}` then `cli.py run`).
 Candidate count drops after a rebuild (single run vs accumulated) — expected.
-**Next:** a `cli.py reset`/`--rebuild` so this isn't a manual mv. (roadmap #1 done)
+**Follow-through:** added `cli.py reset` — backs up + clears ledger/pending so
+`run` rebuilds and reclassifies in one command (no manual mv). (roadmap #1 done)
 
 ---
 

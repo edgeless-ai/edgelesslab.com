@@ -7,6 +7,7 @@ dealflow-spine CLI.
   python cli.py ingest     # ingest only (adapters -> data/signals.jsonl)
   python cli.py enrich     # resolve quarantined signals (signals_pending.jsonl -> resolvers -> ledger)
   python cli.py review     # list ambiguous enrichments; --pick <key> <i> resolves one to a parcel
+  python cli.py reset      # back up + clear ledger/pending so `run` rebuilds (apply a classifier change)
   python cli.py score      # merge + score the ledger, print the ranked table (no writes)
   python cli.py underwrite # re-run the strategy picker on data/candidates.jsonl + refresh digest
   python cli.py digest     # re-render the digest from data/candidates.jsonl
@@ -146,6 +147,31 @@ def cmd_enrich(args) -> int:
     if result.resolved:
         print(f"  {result.resolved} enriched signal(s) -> {paths.ledger}")
         print("  (run `python cli.py run` to score + route them)")
+    return 0
+
+
+def cmd_reset(args) -> int:
+    """Back up + clear the append-only stores so the next `run` rebuilds the
+    ledger from scratch — the way to apply a classification/scoring logic
+    change (idempotent source:id dedupe won't reclassify existing signals).
+    Non-destructive: each store is moved to a .bak sibling, not deleted.
+    Candidates/digests are overwritten by `run` anyway, so only the ledger and
+    pending file are reset."""
+    import shutil
+    paths = _paths(args)
+    moved = []
+    for store in (paths.ledger, paths.pending):
+        p = Path(store)
+        if p.exists():
+            bak = p.with_suffix(p.suffix + ".bak")
+            shutil.move(str(p), str(bak))
+            moved.append((p.name, bak.name))
+    print("── reset ──")
+    if not moved:
+        print("  nothing to reset (ledger + pending already empty)")
+    for name, bak in moved:
+        print(f"  {name} → {bak}")
+    print("  next `python cli.py run` rebuilds the ledger (reclassifies all signals)")
     return 0
 
 
@@ -293,6 +319,11 @@ def main(argv: list[str] | None = None) -> int:
                        help="enable live resolvers (default: offline, fixture "
                             "resolver only)")
     p_enr.set_defaults(func=cmd_enrich)
+
+    p_reset = sub.add_parser("reset",
+                             help="back up + clear the ledger/pending so `run` "
+                                  "rebuilds (apply a scoring/classifier change)")
+    p_reset.set_defaults(func=cmd_reset)
 
     p_rev = sub.add_parser("review",
                            help="human disambiguation of ambiguous "

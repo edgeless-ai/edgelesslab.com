@@ -19,6 +19,30 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-07-29 — distress scoring: owner-distress vs tenant disputes
+**Commit:** (this session) `adapters/portland_code_violations.py` + `tests/test_code_violations.py`
+**Why:** the 🚩 was meaningless — a naive keyword match flagged "Emergency,
+LandLord/Tenant — 3 day notice" (a tenant gripe) as owner distress, because the
+Seattle record-type vocab ("Emergency"/"Housing") over-fires.
+**What:** `_classify(desc)` → 3 tiers: **owner_distress** (vacant/fire/flood/
+condemned/derelict/structural/boarded → conf 0.8, 🚩), **tenant_dispute**
+(landlord/tenant/lease/rent/eviction/notice → conf 0.4, no flag), **other**
+(→ 0.5). Owner-distress checked first so "vacant building with a tenant" is
+distress. Since score = weight × confidence × decay, owner-distress now ranks
+~2× a tenant dispute. `evidence.distress_tier` added for transparency.
+**Verified:** 216 tests (+11 classifier). Fresh live run: owner_distress 36 /
+tenant_dispute 61 / other 103; warm list now leads with vacant buildings,
+severe structural faults, flooding — not "3 day notice."
+**⚠ Operational gotcha (learned here):** the signal ledger
+(`data/signals.jsonl`) is append-only + idempotent by `source:id`, so **changing
+classification logic does NOT reclassify already-ledgered signals** — same
+`recordnum` → same id → dedupe skips the re-write. To apply a logic change you
+must rebuild the ledger (`mv data/signals.jsonl{,.bak}` then `cli.py run`).
+Candidate count drops after a rebuild (single run vs accumulated) — expected.
+**Next:** a `cli.py reset`/`--rebuild` so this isn't a manual mv. (roadmap #1 done)
+
+---
+
 ## 2026-07-28 — actionable digest (readable output)
 **Commit:** (this session) `spine/route.py` render_digest rewrite
 **Why:** the digest was 617 near-identical "code_violation | as-is cash offer"

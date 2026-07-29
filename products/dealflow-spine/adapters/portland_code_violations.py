@@ -47,12 +47,38 @@ SEATTLE_URL = "https://data.seattle.gov/resource/ez4a-iug7.json"
 FIXTURE_SEATTLE = "portland_code_violations_sample.json"   # real Seattle sample
 FIXTURE_PORTLAND = "portland_code_violations_portland_fixture.json"  # synthetic
 
-# Complaint categories that indicate property distress (vs. e.g. weeds on
-# a sidewalk). Used to scale confidence.
-_DISTRESS_HINTS = (
-    "vacant", "unfit", "derelict", "unsafe", "emergency", "housing",
-    "substandard", "demolition", "hazard",
+# Signal-quality classifier for a code complaint. Seattle's record-type vocab
+# ("Emergency", "Housing", "LandLord/Tenant") over-fires on distress under a
+# naive keyword match — a tenant's "Emergency, LandLord/Tenant — 3 day notice"
+# is NOT an owner-sell signal. So separate REAL owner-side distress (the
+# structure is failing or empty — a genuine "the owner may unload this") from
+# tenant/landlord disputes (a tenant complaining about a landlord).
+_OWNER_DISTRESS = (
+    "vacant", "abandon", "derelict", "condemn", "unfit", "uninhabit",
+    "demolition", "demolish", "collapse", "fire", "burned", "flood",
+    "water damage", "structural", "boarded", "unsafe building",
+    "unsafe structure", "hoard",
 )
+_TENANT_DISPUTE = (
+    "landlord", "tenant", "lease", "rent increase", "rent ", "eviction",
+    "deposit", "just cause", "notice to vacate", "3 day notice",
+)
+
+
+def _classify(desc: str) -> tuple[str, float, bool]:
+    """(tier, confidence, distress_flag) for a complaint description.
+
+    Owner-distress ranks ~2x a tenant dispute in the score
+    (weight * confidence * decay), and ONLY owner-distress raises the digest's
+    🚩 flag — so vacant/fire/damage rise above tenant gripes. Owner-distress is
+    checked first so 'vacant building with a tenant' classifies as distress.
+    """
+    d = desc.lower()
+    if any(t in d for t in _OWNER_DISTRESS):
+        return "owner_distress", 0.8, True
+    if any(t in d for t in _TENANT_DISPUTE):
+        return "tenant_dispute", 0.4, False
+    return "other", 0.5, False
 
 
 def _fetch_seattle_raw(days: int, limit: int) -> list[dict]:
@@ -71,8 +97,7 @@ def _fetch_seattle_raw(days: int, limit: int) -> list[dict]:
 def _seattle_to_signal(rec: dict) -> dict:
     desc = " ".join(str(rec.get(k) or "") for k in
                     ("recordtypedesc", "description")).lower()
-    distress = any(h in desc for h in _DISTRESS_HINTS)
-    confidence = 0.75 if distress else 0.55  # real address, unverified claim
+    tier, confidence, distress = _classify(desc)
     link = (rec.get("link") or {}).get("url") if isinstance(
         rec.get("link"), dict) else rec.get("link")
     return _common.build_signal(
@@ -94,6 +119,7 @@ def _seattle_to_signal(rec: dict) -> dict:
             "status": rec.get("statuscurrent"),
             "last_inspection_date": rec.get("lastinspdate"),
             "last_inspection_result": rec.get("lastinspresult"),
+            "distress_tier": tier,
             "distress_hint": distress,
             "county": "KING",  # KNOWN_FACT_KEYS
         },

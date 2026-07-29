@@ -88,8 +88,164 @@ I thought the swarm needed a paid model budget. It needed a receipt audit: find 
 - **A named selector beats bare auto.** \`auto:smart-core\` preserves intent even if the dashboard's active profile changes. Bare \`auto\` is a gamble on whatever the gateway happens to prefer today.
 - **Exclude the expensive ones on purpose.** If a paid model isn't your primary, it shouldn't be in your automatic fallback either. Manual escalation is the cheapest way to keep a pro model available without letting it burn through your budget by accident.
 - **One dispatcher per board.** The most reliable agent is the one that isn't competing. Pick one, name a standby, and enforce the rule.
+`,
 
-The swarm did not get smarter because I bought a new model. It got smarter because the system stopped lying about what it had.`,
+  },
+  {
+    slug: "the-bottleneck-that-wasnt",
+    editorial: true,
+    title: "710 Tasks and the Bottleneck That Wasn't",
+    description: "My task board had 710 open items and I was sure the holdup was me \u2014 the human reviewer. Then I actually counted. My real decision queue was 69. Measure before you believe.",
+    date: "2026-07-16",
+    tags: ["Multi-Agent", "Automation", "Postmortem"],
+    readTime: "5 min",
+    ctaHook: "Why \u201Cthe human is the bottleneck\u201D is the most expensive assumption in an agent system, and the five-minute query that disproves it.",
+    content: `# 710 Tasks and the Bottleneck That Wasn't
+
+My agent swarm shares a task board. Agents pick up work, do it, mark it done. Simple. Except
+one morning the board showed **710 open items**, and I had a story ready for why: the bots
+generate faster than I can review, so everything piles up behind me. The human is the
+bottleneck. Obviously.
+
+I was about to go build a fancier review queue to fix my supposed slowness when I did the
+thing I should have done first. I counted.
+
+## The five-minute query that killed my assumption
+
+"Open" is a single word hiding several different situations. So I cohorted the 710 by the
+actual reason each item was still sitting there:
+
+| Cohort | Roughly | Whose problem |
+|---|---|---|
+| Worker failed (crashed, or exited without reporting done) | ~55% | Reliability |
+| Stale cruft from an old migration, never triaged | ~25% | Nobody's \u2014 delete it |
+| Genuinely waiting on me to decide something | **69** | Mine |
+| Blocked on another task | the rest | Sequencing |
+
+Sixty-nine. My real decision queue, the set of things that actually could not move without a
+human, was **69 items out of 710**. The other ninety-plus percent had nothing to do with me.
+The biggest single slice was workers dying mid-task, and the next was landfill from a
+migration months earlier that no one had ever swept. Not a queue. Sediment.
+
+## What the failures actually were
+
+Two signatures accounted for most of the dead workers:
+
+- **"Exited cleanly without reporting done."** The agent finished its work and then just...
+  stopped, without calling the one function that marks the task complete. The system correctly
+  counted that as a failure. The work may even have happened, but nothing recorded it. One
+  protocol bug, dozens of stuck tasks.
+- **"Iteration budget exhausted."** Tasks too big for one worker to finish in its turn budget.
+  The fix here is not bigger budgets, which just burns more tokens hitting the same wall. It's
+  decomposition: break the task down so each piece fits.
+
+Neither of those is a review problem. Both were invisible because "open" looked like one
+undifferentiated pile, and the pile *felt* like it was my fault.
+
+## The lesson worth stealing
+
+The most expensive assumption in an autonomous system is the one you never check because it
+flatters your mental model. "The human is the bottleneck" felt true, so I almost spent a day
+building the wrong fix for it.
+
+Three habits that came out of it:
+
+1. **Cohort before you conclude.** A single status like "open" or "blocked" is a category, not
+   a cause. The five-minute query that splits it by *why* is worth more than the dashboard that
+   shows you the total.
+2. **The real queue is smaller than the scary number.** Mine was 69, not 710. Find the number
+   that's genuinely yours before you redesign your life around the one that isn't.
+3. **Silent worker death is the default failure mode.** Agents don't usually crash loudly. They
+   finish-and-forget, or hit a wall and sit. If you're not measuring completion as a distinct
+   thing from "didn't error," you're not measuring it at all.
+
+I still owe my board a real reliability fix: the report-on-completion bug, the decomposition
+routing, a broom for the migration sediment. But at least now I'm building the fix for the
+problem I *have*, not the one that happened to make me the hero of the story.`.trim(),
+  },
+  {
+    slug: "the-monitor-that-cried-wolf",
+    editorial: true,
+    title: "The Monitor That Cried Wolf",
+    description: "My health monitor paged me about three dead services. All three were fine. The monitor was measuring the wrong thing and calling its own blind spot an outage. Verify the measurement before you chase the symptom.",
+    date: "2026-07-12",
+    tags: ["Infrastructure", "Observability", "Postmortem"],
+    readTime: "5 min",
+    ctaHook: "The most dangerous failure in a monitoring system isn't a missed alert \u2014 it's a confident one that's wrong.",
+    content: `# The Monitor That Cried Wolf
+
+I built a health monitor for my agent swarm so I'd stop finding out about outages from the
+silence. It worked. One morning it paged me: three model providers **down**, red across the
+board. I rolled up my sleeves to go fix an infrastructure fire.
+
+There was no fire. All three providers were up and serving. The monitor was the thing that
+was broken \u2014 and it had been broken in the most expensive way a monitor can be: not silent,
+but *confidently wrong*.
+
+## How a monitor lies with a straight face
+
+The check was simple, which was the problem. It fetched each provider's model list and
+counted a non-empty response as "healthy." Reasonable, until you look at *how* it fetched.
+
+One provider blocks requests that don't send a browser-like user agent. My monitor sent a
+bare scripting user agent, got a \`403\`, and dutifully recorded "down." The provider was
+answering every real request from my agents perfectly the whole time. The only thing that
+couldn't reach it was the monitor.
+
+Another was "down" because its health endpoint was tiered behind a plan the monitor's key
+didn't have \u2014 a \`402\`, not an outage. A third was rate-limiting the *monitor's* aggressive
+polling specifically, which the monitor scored as the service failing.
+
+Three different measurement bugs, all rendered identically: a red box that said DOWN when the
+truth was "my probe couldn't see." A monitor that can't distinguish "the service is failing"
+from "I failed to measure the service" isn't observability. It's a random number generator
+with strong opinions.
+
+## The category error underneath it
+
+The bug wasn't any one of those user agents or keys. It was a missing third state.
+
+My monitor had two outcomes: **UP** and **DOWN**. Reality has three. The one it was missing is
+**UNKNOWN** \u2014 "I could not obtain a valid measurement." A \`403\` from a user-agent block, a
+\`402\` from a plan gate, a timeout on my own overloaded prober: none of those are evidence the
+service is down. They're evidence *I don't know*. Collapsing "I don't know" into "it's down"
+is what turned a measurement gap into a 6am false alarm.
+
+And the inverse is just as dangerous. A monitor that collapses UNKNOWN into UP \u2014 "no error, so
+it's fine" \u2014 is the one that stays quiet while something burns. The absence of a successful
+measurement is not a passing grade. It's a question mark, and it has to render as one.
+
+## The fix: make the probe prove itself first
+
+I didn't start by fixing the providers. I fixed the probe's honesty:
+
+1. **Three states, always.** Every check returns UP, DOWN, or UNKNOWN. UNKNOWN never counts as
+   either a pass or a failure \u2014 it counts as "go verify the probe."
+2. **Distinguish transport from service.** A \`403\`/\`402\`/timeout on the *probe's* connection is
+   an UNKNOWN, not a DOWN. Only a valid response that shows the service misbehaving is a DOWN.
+3. **Probe the way the real client does.** If my agents reach a provider with a browser user
+   agent, the monitor uses the same one. A health check that takes a different road than
+   production traffic is measuring a road nobody drives.
+
+The red boxes went away because the services were never down. What had been down, the whole
+time, was my ability to see them \u2014 and the monitor was too sure of itself to admit it.
+
+## The lesson worth stealing
+
+Before you chase the symptom a monitor reports, verify the *measurement*. A surprising number
+of "outages" are the observer tripping over its own feet.
+
+- **A monitor needs an "I don't know."** Two-state health (up/down) forces every blind spot
+  into a lie. The third state is what keeps it honest.
+- **Confident and wrong beats silent and wrong \u2014 for finding the bug, and for wasting your
+  morning.** A false DOWN costs you a scramble; a false UP costs you an outage. Design against
+  both by refusing to guess.
+- **Measure along the production path.** If the probe authenticates differently, routes
+  differently, or throttles differently than real traffic, it's testing a system you don't
+  run.
+
+My monitor still watches the swarm. It just earned the right to page me by first proving it
+can tell the difference between a dead service and a blind probe.`.trim(),
   },
   {
     slug: "kimi-k3-post",
@@ -2480,5 +2636,25 @@ Here is that allowlist doing its job, on invented data:
 Platform risk is not an argument against building on platforms. It's an argument for knowing, on day one, what the rebuild would take. In this case the answer turned out to be four weeks. The founder now owns his stack, ships his own prompt changes, and the next version of the product is being built on rails he can see into.
 
 That's the trade worth making: from renting to owning.`.trim(),
+  },
+  {
+    slug: "multi-model-routing",
+    editorial: true,
+    title: "Multi-Model Routing: Why I Run 4 Different AI Brains Instead of One",
+    description: "My agent system routes requests across 4 models based on task type. Full cost breakdown, routing logic, and configuration. 10x cost reduction vs. single-model approach.",
+    date: "2026-04-19",
+    tags: ["AI Agents", "Model Routing", "Cost Optimization", "Multi-Agent"],
+    readTime: "10 min",
+    content: `...content in blog.ts...`.trim(),
+  },
+  {
+    slug: "knowledge-base-loop",
+    editorial: true,
+    title: "The Knowledge Base Loop: Why Your Agents Need a Memory System",
+    description: "How I built a KB Loop based on the Karpathy pattern — ChromaDB, triage scoring, synthesizer agents, and a 0-25 health score. Results: 4.2x context restatements down to 0.3x.",
+    date: "2026-04-19",
+    tags: ["AI Agents", "Knowledge Base", "ChromaDB", "Vector Search", "Agent Memory"],
+    readTime: "8 min",
+    content: `...content in blog.ts...`.trim(),
   },
 ];

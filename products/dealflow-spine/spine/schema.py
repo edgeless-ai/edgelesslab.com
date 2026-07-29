@@ -37,6 +37,7 @@ SIGNAL_TYPES: frozenset[str] = frozenset(
         "obituary",
         "pre_foreclosure",
         "assumable_loan",
+        "absentee_owner",
         "other",
     }
 )

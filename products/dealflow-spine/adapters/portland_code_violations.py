@@ -155,7 +155,7 @@ def _portland_to_signal(rec: dict) -> dict:
     )
 
 
-def fetch(city: str = "seattle", days: int = 30, limit: int = 200,
+def fetch(city: str = "seattle", days: int = 90, limit: int = 600,
           offline: bool | None = None) -> list[dict]:
     """Fetch code-violation signals.
 

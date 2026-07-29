@@ -100,7 +100,7 @@
       },
       "owner": null,
       "evidence": {
-        "violation": "unsafe structure — unrepaired hurricane roof damage",
+        "violation": "unsafe structure \u2014 unrepaired hurricane roof damage",
         "case": "CE26-04471",
         "status": "open",
         "absentee_owner": true
@@ -347,6 +347,36 @@
       },
       "source_url": null,
       "confidence": 0.5
+    },
+    {
+      "id": "kca-1250049112",
+      "source": "kingcounty_parcel_absentee",
+      "signal_type": "absentee_owner",
+      "observed_at": "2026-07-01T00:00:00+00:00",
+      "property": {
+        "apn": null,
+        "address": "8213 35th Ave SW",
+        "city": "Seattle",
+        "state": "WA",
+        "zip": "98126",
+        "lat": 47.53,
+        "lon": -122.37
+      },
+      "owner": {
+        "name": "",
+        "mailing_address": "30 N Gould St Suite R, Sheridan WY, 82801"
+      },
+      "evidence": {
+        "parcel_pin": "1250049112",
+        "absentee_type": "out_of_state",
+        "owner_mailing_city_state": "SHERIDAN WY",
+        "owner_state": "WY",
+        "county": "KING",
+        "assessed_value": 708000,
+        "property_type": "single_family"
+      },
+      "source_url": "https://blue.kingcounty.com/Assessor/eRealProperty/Dashboard.aspx?ParcelNbr=1250049112",
+      "confidence": 0.65
     }
   ]
 }

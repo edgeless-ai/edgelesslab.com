@@ -161,11 +161,11 @@ def test_owner_merged_from_most_recent_that_knows():
 
 
 def test_fixture_merge_shape(fixture_signals):
-    """13 fixture signals -> 8 properties, with the stacks we designed."""
+    """14 fixture signals -> 9 properties, with the stacks we designed."""
     records = merge_signals(fixture_signals)
-    assert len(records) == 8
+    assert len(records) == 9
     by_count = sorted((r.signal_count for r in records), reverse=True)
-    assert by_count == [4, 2, 2, 1, 1, 1, 1, 1]
+    assert by_count == [4, 2, 2, 1, 1, 1, 1, 1, 1]  # +1 standalone absentee
     # keyed by APN (parcel identity beats address string); APNs are
     # county-scoped, so the county from evidence is part of the key (H4)
     cape = next(r for r in records if r.key == "apn:FL:LEE:134424C3005420010")

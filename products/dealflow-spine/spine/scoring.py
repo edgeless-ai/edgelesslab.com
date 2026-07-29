@@ -34,6 +34,7 @@ DEFAULT_WEIGHTS: dict[str, float] = {
     "fema_disaster": 2.0,     # damage + insurance-gap thesis
     "code_violation": 2.0,    # deferred maintenance + fine pressure
     "assumable_loan": 1.5,    # deal-structure sweetener more than distress
+    "absentee_owner": 1.3,    # the EBRE "spine" — out-of-area owner, sells more
     "other": 1.0,
 }
 

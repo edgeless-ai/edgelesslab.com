@@ -19,6 +19,39 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-07-29 — absentee-owner signal → FIRST HOT STACKS
+**Commits:** (this session) new `adapters/kingcounty_absentee.py` + registration
+across `_common.py` / `schema.py` / `scoring.py` + fixture + tests
+**Why:** roadmap #2 — the engine only produced single-signal *warm* leads. The
+EBRE thesis needs STACKING: 2+ reasons one owner sells. Absentee ownership is
+the classic "spine."
+**Data hunt:** King County publishes on ArcGIS (not Socrata). Verified keyless
+layer `PARCEL_ADDRESS_PUB_AREA_3069` — situs address (ADDR_*) + taxpayer mailing
+(KCTP_*). No owner NAME (privacy), so it's a location signal, not a name
+resolver — which is *better* (no probate detour). Tax-delinquency (the other
+path) is NOT keyless (behind the eReal Property search app).
+**What:** new `absentee_owner` signal — Seattle residential parcels whose
+taxpayer mails out of state (KCTP_STATE≠WA, conf 0.65). Fixture = 12 real
+records. Weight 1.3. Stacks with `code_violation` on the same parcel → hot.
+**Two integration bugs found + fixed (this is why you verify end-to-end):**
+1. `absentee_owner` coerced to "other" — `schema.py` has its OWN `SIGNAL_TYPES`
+   set separate from the adapter's `VALID_SIGNAL_TYPES`; registered in BOTH now
+   (+ scoring weights = 3 places a new type must be added).
+2. Feeds never merged: absentee keyed on `apn:` (PIN), code-violations on
+   `addr:` — "APN wins" split the same property into 2 keys. Fixed: absentee
+   anchors on ADDRESS (PIN → evidence), matching the address-only code feed.
+   Also widened code-violation defaults (30d/200 → 90d/600) so a single run has
+   enough addresses to overlap.
+**Verified:** 221 tests (+5 absentee, +count updates). Cross-reference proved 5
+Seattle properties are BOTH code-violation AND absentee-owned (owners in
+Portland/Sunnyvale/Boynton Beach/Honolulu/Newark). Live pipeline surfaced the
+**first 🔥 HOT stack: 6555 25TH AVE NE, Seattle** (code violation + owner in
+Boynton Beach FL, score 3.80). More accrue as the weekly ledger accumulates.
+**Note:** absentee is a STANDING list (LIVE_LIMIT 1000, ArcGIS single-call max);
+full coverage = paginate resultOffset (future). (roadmap #2 done)
+
+---
+
 ## 2026-07-29 — distress scoring: owner-distress vs tenant disputes
 **Commit:** (this session) `adapters/portland_code_violations.py` + `tests/test_code_violations.py`
 **Why:** the 🚩 was meaningless — a naive keyword match flagged "Emergency,

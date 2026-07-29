@@ -77,6 +77,7 @@ VALID_SIGNAL_TYPES = {
     "obituary",
     "pre_foreclosure",
     "assumable_loan",
+    "absentee_owner",
     "other",
 }
 

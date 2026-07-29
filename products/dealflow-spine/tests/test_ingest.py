@@ -14,14 +14,14 @@ def test_run_twice_writes_nothing_new(tmp_adapters_dir, tmp_path):
     """THE dedupe invariant: same adapters, same upstream -> 0 new rows."""
     ledger = tmp_path / "data" / "signals.jsonl"
     first = run_ingest(tmp_adapters_dir, ledger)
-    assert first.total_written == 13
+    assert first.total_written == 14
     assert first.total_duplicates == 0
     n_lines = len(ledger.read_text().strip().splitlines())
-    assert n_lines == 13
+    assert n_lines == 14
 
     second = run_ingest(tmp_adapters_dir, ledger)
     assert second.total_written == 0
-    assert second.total_duplicates == 13
+    assert second.total_duplicates == 14
     assert len(ledger.read_text().strip().splitlines()) == n_lines
 
 
@@ -29,8 +29,8 @@ def test_ledger_roundtrip(tmp_adapters_dir, tmp_path):
     ledger = tmp_path / "signals.jsonl"
     run_ingest(tmp_adapters_dir, ledger)
     signals = load_ledger_signals(ledger)
-    assert len(signals) == 13
-    assert len({s.dedupe_key for s in signals}) == 13
+    assert len(signals) == 14
+    assert len({s.dedupe_key for s in signals}) == 14
 
 
 def test_invalid_and_unanchored_signals_kept_out_of_ledger(tmp_path):

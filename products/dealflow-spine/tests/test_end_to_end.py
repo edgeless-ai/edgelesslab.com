@@ -23,8 +23,8 @@ def test_pipeline_end_to_end_and_idempotent(tmp_adapters_dir, tmp_path):
 
     result = run_pipeline(paths=paths, buybox=BOX, now=FIXED_NOW)
 
-    # ingest: 13 fixture signals, all accepted
-    assert result.ingest.total_written == 13
+    # ingest: 14 fixture signals, all accepted
+    assert result.ingest.total_written == 14
     assert result.ingest.total_invalid == 0
     assert result.ingest.failed_adapters == []
 
@@ -32,7 +32,7 @@ def test_pipeline_end_to_end_and_idempotent(tmp_adapters_dir, tmp_path):
     # NOTE (adversarial review 2026-07-04, H2): Riverside (other+obituary)
     # was hot under the old distinct-count rule; the "other" bucket no longer
     # counts toward the hot stack, so it is now WARM — hot 3->2, warm 1->2.
-    assert result.route_counts == {"hot": 2, "warm": 2, "watch": 3, "discard": 1}
+    assert result.route_counts == {"hot": 2, "warm": 2, "watch": 3, "discard": 2}
 
     # outputs on disk
     assert paths.ledger.exists()
@@ -68,8 +68,8 @@ def test_pipeline_end_to_end_and_idempotent(tmp_adapters_dir, tmp_path):
     # run 2: ledger idempotent, candidates snapshot identical size
     result2 = run_pipeline(paths=paths, buybox=BOX, now=FIXED_NOW)
     assert result2.ingest.total_written == 0
-    assert result2.ingest.total_duplicates == 13
-    assert len(load_candidates(paths.candidates)) == 8
+    assert result2.ingest.total_duplicates == 14
+    assert len(load_candidates(paths.candidates)) == 9
     assert result2.route_counts == result.route_counts
 
 
@@ -85,7 +85,7 @@ def test_candidates_jsonl_is_valid_contract(tmp_adapters_dir, tmp_path):
 
     with paths.candidates.open() as f:
         rows = [json.loads(line) for line in f if line.strip()]
-    assert len(rows) == 8
+    assert len(rows) == 9
     for row in rows:
         cand = DealCandidate.from_dict(row)         # contract holds
         assert cand.property_key == row["property_key"]

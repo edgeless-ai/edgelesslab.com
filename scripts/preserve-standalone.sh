@@ -1,29 +1,26 @@
 #!/bin/bash
 #
-# Preserve standalone content directories across Next.js builds.
+# Verify standalone content directories across Next.js builds.
 #
-# These directories contain non-Next.js content (editorial pages, apps,
-# static experiments) that live alongside the Next.js output. The Next.js
-# build does not know about them, so any "git add -A" after a build will
-# mark them as deleted if they were removed from the working tree.
+# These directories contain non-Next.js source material. They live outside
+# the generated out/ directory, so Next.js does not modify them during a build.
 #
 # This script:
-# 1. As "save": copies standalone dirs to a temp location before build
-# 2. As "restore": copies them back after build
+# 1. Verifies the source directories exist before the build
+# 2. Verifies they still exist after the build
 #
 # Usage in package.json:
 #   "prebuild": "./scripts/preserve-standalone.sh save",
 #   "postbuild": "./scripts/preserve-standalone.sh restore"
 #
-# Created: 2026-04-15 (after tartanism/ was deleted twice by rebuild commits)
+# The earlier implementation copied hundreds of megabytes into a temporary
+# stash, deleted the tracked source, and rebuilt it from that stash. A partial
+# copy could therefore destroy clean source files. Verification is sufficient.
 
-set -uo pipefail
-# NOTE: not using -e because cp on large dirs (pen-plotter 25K+ files)
-# can fail on individual files without meaning the whole operation failed.
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-STASH_DIR="$PROJECT_DIR/.standalone-stash"
 
 # Standalone directories to preserve (add new ones here)
 # NOTE: flow-viz is served from public/flow-viz/ (copied into out/ by the Next
@@ -36,41 +33,20 @@ STANDALONE_DIRS=(
 
 case "${1:-}" in
   save)
-    echo "[preserve] Saving standalone directories..."
-    rm -rf "$STASH_DIR"
-    mkdir -p "$STASH_DIR"
+    echo "[preserve] Verifying standalone source before build..."
     for dir in "${STANDALONE_DIRS[@]}"; do
-      if [ -d "$PROJECT_DIR/$dir" ]; then
-        if rsync -a "$PROJECT_DIR/$dir/" "$STASH_DIR/$dir/" 2>/dev/null; then
-          echo "  saved $dir"
-        else
-          # Fallback: tar preserves everything even with many files
-          tar cf - -C "$PROJECT_DIR" "$dir" | tar xf - -C "$STASH_DIR" 2>/dev/null
-          echo "  saved $dir (via tar fallback)"
-        fi
-      fi
+      test -d "$PROJECT_DIR/$dir"
+      echo "  verified $dir"
     done
     echo "[preserve] Done."
     ;;
 
   restore)
-    echo "[preserve] Restoring standalone directories..."
-    if [ ! -d "$STASH_DIR" ]; then
-      echo "[preserve] No stash found. Nothing to restore."
-      exit 0
-    fi
+    echo "[preserve] Verifying standalone source after build..."
     for dir in "${STANDALONE_DIRS[@]}"; do
-      if [ -d "$STASH_DIR/$dir" ]; then
-        rm -rf "$PROJECT_DIR/$dir"
-        if rsync -a "$STASH_DIR/$dir/" "$PROJECT_DIR/$dir/" 2>/dev/null; then
-          echo "  restored $dir"
-        else
-          tar cf - -C "$STASH_DIR" "$dir" | tar xf - -C "$PROJECT_DIR" 2>/dev/null
-          echo "  restored $dir (via tar fallback)"
-        fi
-      fi
+      test -d "$PROJECT_DIR/$dir"
+      echo "  verified $dir"
     done
-    rm -rf "$STASH_DIR"
     echo "[preserve] Done."
     ;;
 
@@ -88,7 +64,6 @@ case "${1:-}" in
     if [ "$missing" -gt 0 ]; then
       echo ""
       echo "ERROR: $missing standalone directory(s) missing!"
-      echo "Run: ./scripts/preserve-standalone.sh restore"
       exit 1
     fi
     ;;

@@ -47,7 +47,6 @@ export function CommandPalette() {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [totalIndexed, setTotalIndexed] = useState<number | null>(null);
   const [pagefindReady, setPagefindReady] = useState(false);
   const [pagefindFailed, setPagefindFailed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -62,15 +61,10 @@ export function CommandPalette() {
 
     async function init() {
       try {
-        const pf = await loadPagefind();
+        await loadPagefind();
         if (cancelled) return;
         setPagefindReady(true);
         setPagefindFailed(false);
-        // Get total indexed count
-        try {
-          const search = await pf.search("");
-          setTotalIndexed(search?.results?.length ?? null);
-        } catch {}
       } catch (error) {
         console.warn("Failed to initialize Pagefind search", error);
         if (!cancelled) setPagefindFailed(true);
@@ -178,8 +172,15 @@ export function CommandPalette() {
   const navigate = useCallback(
     (item: SearchResult) => {
       setIsOpen(false);
+      const standalone =
+        item.href.includes(".html") ||
+        item.href.startsWith("/creative-demos/") ||
+        item.href.startsWith("/total-serialism/") ||
+        item.href.startsWith("/tartanism/");
       if (item.href.startsWith("http")) {
         window.open(item.href, "_blank", "noopener noreferrer");
+      } else if (standalone) {
+        window.location.assign(item.href);
       } else {
         router.push(item.href);
       }
@@ -392,7 +393,7 @@ export function CommandPalette() {
             style={{ borderColor: "var(--border-subtle)", color: "var(--text-tertiary)" }}
           >
             <span>
-              {totalIndexed ?? "?"} pages indexed &middot; {results.length} results
+              {results.length} result{results.length === 1 ? "" : "s"}
             </span>
             <span>
               <kbd className="px-1">&uarr;</kbd> <kbd className="px-1">&darr;</kbd> navigate

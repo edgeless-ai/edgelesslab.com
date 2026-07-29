@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { useState, FormEvent } from "react";
+import { SubscribeForm } from "@/components/subscribe-form";
 
 const toolLinks = [
-  { label: "Projects", href: "/projects" },
-  { label: "Products", href: "/products" },
-  { label: "Services", href: "/services/private-ai-systems" },
+  { label: "Systems", href: "/projects" },
+  { label: "Resources", href: "/products" },
+  { label: "Work with David", href: "/services/private-ai-systems" },
   { label: "Shop", href: "https://shop.edgelesslab.com", external: true },
 ];
 
@@ -18,27 +18,7 @@ const labLinks = [
   { label: "Marimo", href: "/lab/marimo", external: false },
 ];
 
-const ASCII_BANNER = `    ______    __           __
-   / ____/___/ /___ ____  / /__  __________
-  / __/ / __  / __ \`/ _ \\/ / _ \\/ ___/ ___/
- / /___/ /_/ / /_/ /  __/ /  __(__  |__  )
-/_____/\\__,_/\\__, /\\___/_/\\___/____/____/
-            /____/                         `;
-
 export function Footer() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    const subject = encodeURIComponent("Subscribe to Edgeless Lab updates");
-    const body = encodeURIComponent(`Please add me to the newsletter: ${email}`);
-    window.location.href = `mailto:david@edgelesslab.com?subject=${subject}&body=${body}`;
-    setSubmitted(true);
-    setEmail("");
-  };
-
   return (
     <footer className="px-6 pt-16 pb-8 mt-auto border-t" style={{ borderColor: "var(--border-subtle)" }}>
       <div className="max-w-[1280px] mx-auto">
@@ -48,31 +28,16 @@ export function Footer() {
             className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
             style={{ color: "var(--text-tertiary)" }}
           >
-            Get updates
+            Follow the lab
           </h3>
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md">
-            <input
-              type="email"
-              required
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 h-10 px-4 rounded-lg bg-transparent border text-sm outline-none focus:border-white/30 transition-colors"
-              style={{ borderColor: "var(--border-subtle)", color: "var(--text-primary)" }}
-            />
-            <button
-              type="submit"
-              className="h-10 px-5 text-sm font-medium rounded-lg transition-all hover:brightness-110 shrink-0"
-              style={{ background: "var(--accent)", color: "#fff" }}
-            >
-              Subscribe
-            </button>
-          </form>
-          {submitted && (
-            <p className="mt-3 text-xs font-mono" style={{ color: "var(--green)" }}>
-              Thanks, your email client will open to confirm.
-            </p>
-          )}
+          <SubscribeForm source="footer" />
+          <Link
+            href="/feed.xml"
+            className="mt-3 inline-flex items-center gap-1 font-mono text-xs"
+            style={{ color: "var(--text-tertiary)" }}
+          >
+            Prefer RSS <ArrowUpRight size={11} />
+          </Link>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
@@ -208,19 +173,6 @@ export function Footer() {
         </div>
 
         {/* ASCII logo banner */}
-        <div className="mb-8 flex justify-center">
-          <pre
-            className="text-[9px] sm:text-xs leading-[1.3] font-mono select-none hidden sm:block"
-            style={{
-              color: "var(--text-tertiary)",
-              textShadow: "0 0 8px rgba(198, 242, 78,0.15)",
-            }}
-            aria-hidden="true"
-          >
-            {ASCII_BANNER}
-          </pre>
-        </div>
-
         <div
           className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-6 border-t"
           style={{ borderColor: "var(--border-subtle)" }}
@@ -240,7 +192,7 @@ export function Footer() {
               className="text-xs font-mono"
               style={{ color: "var(--text-tertiary)" }}
             >
-              Systems online
+              Public research studio
             </span>
           </div>
         </div>

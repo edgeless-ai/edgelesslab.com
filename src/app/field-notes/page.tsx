@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
@@ -96,7 +95,7 @@ export default function FieldNotesPage() {
 
         <div className="mx-auto max-w-[1280px] pb-20">
           <section className="border-y" style={{ borderColor: "var(--ink)" }}>
-            <Link
+            <a
               href="/total-serialism/field-notes/index.html"
               className="group grid lg:grid-cols-[1.15fr_0.85fr]"
             >
@@ -167,7 +166,7 @@ export default function FieldNotesPage() {
                   </div>
                 </div>
               </div>
-            </Link>
+            </a>
           </section>
 
           <FieldNotesGallery notes={notes} />

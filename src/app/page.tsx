@@ -3,7 +3,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { DemoPreview } from "@/components/demo-preview";
-import { LabRouteField } from "@/components/lab-route-field";
+import { FeaturedArtifact } from "@/components/featured-artifact";
 import { posts } from "@/lib/blog";
 import { projects } from "@/lib/data";
 import { getFieldNotes } from "@/lib/field-notes.server";
@@ -15,6 +15,12 @@ const FIELD_NOTE_SLUGS = [
 ];
 
 const PROJECT_SLUGS = ["safety-hooks", "mcp-servers", "pen-plotter-art"];
+
+const PROJECT_OUTCOMES: Record<string, string> = {
+  "safety-hooks": "Destructive operations stopped before execution",
+  "mcp-servers": "One protocol layer across knowledge, tools, and agents",
+  "pen-plotter-art": "98 plotter-ready generators from screen to SVG",
+};
 
 export default function Home() {
   const fieldNotes = getFieldNotes();
@@ -28,30 +34,28 @@ export default function Home() {
   const featuredProjects = PROJECT_SLUGS.map((slug) =>
     projects.find((project) => project.slug === slug)
   ).filter((project): project is NonNullable<typeof project> => Boolean(project));
-  const liveProjects = projects.filter((project) => project.status === "Live").length;
-
   return (
     <div className="flex min-h-full flex-col" style={{ background: "var(--bg-base)" }}>
       <Nav />
 
       <main id="main-content">
         <section className="relative overflow-hidden px-6 pb-16 pt-32 sm:pb-24 sm:pt-40">
-          <div className="mx-auto grid max-w-[1280px] gap-14 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
+          <div className="mx-auto grid max-w-[1280px] gap-14 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
             <div>
               <div className="lab-metadata mb-7 flex items-center gap-3" style={{ color: "var(--accent)" }}>
                 <span className="h-2 w-2" style={{ background: "var(--accent)" }} />
-                One-person research lab / live
+                Public research studio / live
               </div>
 
-              <h1 className="max-w-3xl text-[clamp(3.9rem,7.6vw,7.8rem)] font-semibold leading-[0.84] tracking-[-0.055em]">
-                Build the
+              <h1 className="max-w-3xl text-[clamp(3.65rem,7vw,7.2rem)] font-semibold leading-[0.86] tracking-[-0.055em]">
+                Systems that
                 <br />
-                system.
+                work.
                 <br />
                 <span className="font-editorial font-normal italic" style={{ color: "var(--accent)" }}>
-                  Study what
+                  Studies that
                   <br />
-                  emerges.
+                  show why.
                 </span>
               </h1>
 
@@ -59,9 +63,10 @@ export default function Home() {
                 className="mt-8 max-w-xl text-base leading-7 sm:text-lg"
                 style={{ color: "var(--text-secondary)" }}
               >
-                Edgeless Lab builds autonomous systems, generative tools, and
-                visual experiments, then publishes the methods, failures, and
-                artifacts in the open.
+                Edgeless Lab is a public research studio for autonomous
+                software, generative systems, and physical artifacts. I build
+                under real constraints, publish how the work changes, and turn
+                the strongest results into useful tools and editions.
               </p>
 
               <div className="mt-9 flex flex-wrap gap-3">
@@ -70,7 +75,7 @@ export default function Home() {
                   className="inline-flex min-h-11 items-center gap-2 rounded-sm px-5 text-sm font-medium transition-transform hover:-translate-y-0.5"
                   style={{ background: "var(--accent)", color: "var(--accent-contrast)" }}
                 >
-                  Enter Field Notes <ArrowRight size={15} />
+                  Explore Field Notes <ArrowRight size={15} />
                 </Link>
                 <Link
                   href="/blog"
@@ -80,49 +85,19 @@ export default function Home() {
                     color: "var(--text-secondary)",
                   }}
                 >
-                  Read the dispatches <ArrowRight size={15} />
+                  Read the Blog <ArrowRight size={15} />
                 </Link>
-              </div>
-
-              <div
-                className="mt-10 grid grid-cols-3 gap-px border font-mono text-[10px] uppercase tracking-[0.1em]"
-                style={{ borderColor: "var(--border-subtle)", background: "var(--border-subtle)" }}
-              >
-                {["Open methods", "Live systems", "Physical artifacts"].map((item) => (
-                  <div key={item} className="px-3 py-3" style={{ background: "var(--bg-base)", color: "var(--text-tertiary)" }}>
-                    {item}
-                  </div>
-                ))}
+                <Link
+                  href="/services/private-ai-systems"
+                  className="inline-flex min-h-11 items-center gap-2 px-2 text-sm transition-colors hover:text-white"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Work with David <ArrowRight size={15} />
+                </Link>
               </div>
             </div>
 
-            <LabRouteField />
-          </div>
-        </section>
-
-        <section className="border-y px-6" style={{ borderColor: "var(--border-subtle)" }}>
-          <div className="mx-auto grid max-w-[1280px] divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0" style={{ borderColor: "var(--border-subtle)" }}>
-            <Link href="/field-notes" className="group px-0 py-5 sm:px-5">
-              <div className="lab-metadata" style={{ color: "var(--text-tertiary)" }}>Research archive</div>
-              <div className="mt-2 flex items-end justify-between gap-4">
-                <span className="font-editorial text-3xl">{fieldNotes.length} studies</span>
-                <ArrowRight size={14} className="mb-1 transition-transform group-hover:translate-x-1" />
-              </div>
-            </Link>
-            <Link href="/blog" className="group px-0 py-5 sm:px-5">
-              <div className="lab-metadata" style={{ color: "var(--text-tertiary)" }}>Latest dispatch</div>
-              <div className="mt-2 flex items-end justify-between gap-4">
-                <span className="line-clamp-1 text-sm">{recentPosts[0]?.title}</span>
-                <ArrowRight size={14} className="mb-1 shrink-0 transition-transform group-hover:translate-x-1" />
-              </div>
-            </Link>
-            <Link href="/projects" className="group px-0 py-5 sm:px-5">
-              <div className="lab-metadata" style={{ color: "var(--text-tertiary)" }}>Operational systems</div>
-              <div className="mt-2 flex items-end justify-between gap-4">
-                <span className="font-editorial text-3xl">{liveProjects} live</span>
-                <ArrowRight size={14} className="mb-1 transition-transform group-hover:translate-x-1" />
-              </div>
-            </Link>
+            <FeaturedArtifact />
           </div>
         </section>
 
@@ -134,15 +109,16 @@ export default function Home() {
                   Field Notes / selected studies
                 </div>
                 <h2 className="font-editorial text-5xl leading-[0.95] sm:text-7xl">
-                  The artifact is
+                  Start with
                   <br />
-                  part of the argument.
+                  the evidence.
                 </h2>
               </div>
               <div>
                 <p className="max-w-xl text-sm leading-6" style={{ color: "var(--text-secondary)" }}>
-                  These are not portfolio thumbnails. Each study runs in the
-                  browser and exposes the behavior behind the image.
+                  Three working studies, selected because each exposes the
+                  behavior behind the image. Open one, hide the controls, and
+                  inspect the system directly.
                 </p>
                 <Link href="/field-notes" className="mt-5 inline-flex items-center gap-2 text-sm" style={{ color: "var(--accent)" }}>
                   Browse the full archive <ArrowRight size={14} />
@@ -152,7 +128,7 @@ export default function Home() {
 
             <div className="grid gap-px border md:grid-cols-3" style={{ borderColor: "var(--border-subtle)", background: "var(--border-subtle)" }}>
               {featuredNotes.map((note) => (
-                <Link
+                <a
                   key={note.slug}
                   href={`/creative-demos/${note.slug}/`}
                   className="group p-4 sm:p-5"
@@ -166,7 +142,7 @@ export default function Home() {
                     <h3 className="font-editorial text-2xl leading-tight">{note.title}</h3>
                     <ArrowUpRight size={16} className="shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                   </div>
-                </Link>
+                </a>
               ))}
             </div>
           </div>
@@ -177,7 +153,7 @@ export default function Home() {
             <div className="grid gap-12 lg:grid-cols-[0.72fr_1.28fr]">
               <div>
                 <div className="lab-metadata mb-5" style={{ color: "var(--malachite)" }}>
-                  Writing / field dispatches
+                  Blog / recent reports
                 </div>
                 <h2 className="font-editorial text-5xl leading-[0.95] sm:text-7xl">
                   Publish the
@@ -187,9 +163,9 @@ export default function Home() {
                   just the result.
                 </h2>
                 <p className="mt-6 max-w-md text-sm leading-6" style={{ color: "var(--ink-soft)" }}>
-                  Build reports about agent systems, knowledge infrastructure,
-                  recovery work, and what changes after the first version meets
-                  reality.
+                  Reports, tutorials, and postmortems about agent systems,
+                  knowledge infrastructure, recovery work, and what changes
+                  after a system meets reality.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link href="/blog" className="inline-flex items-center gap-2 font-mono text-xs uppercase" style={{ color: "var(--malachite)" }}>
@@ -236,14 +212,14 @@ export default function Home() {
             <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
               <div>
                 <div className="lab-metadata mb-4" style={{ color: "var(--relay)" }}>
-                  Selected systems / production
+                  Systems / selected case studies
                 </div>
                 <h2 className="text-4xl font-semibold tracking-[-0.035em] sm:text-6xl">
-                  Built where failure is real.
+                  Evidence from difficult builds.
                 </h2>
               </div>
               <Link href="/projects" className="inline-flex items-center gap-2 text-sm" style={{ color: "var(--text-secondary)" }}>
-                All projects <ArrowRight size={14} />
+                All systems <ArrowRight size={14} />
               </Link>
             </div>
 
@@ -266,6 +242,15 @@ export default function Home() {
                   <h3 className="mt-10 text-2xl font-semibold">{project.title}</h3>
                   <p className="mt-4 text-sm leading-6" style={{ color: "var(--text-secondary)" }}>
                     {project.description}
+                  </p>
+                  <p
+                    className="mt-5 border-l pl-3 text-sm font-medium leading-6"
+                    style={{
+                      borderColor: "var(--relay)",
+                      color: "var(--text-primary)",
+                    }}
+                  >
+                    {PROJECT_OUTCOMES[project.slug]}
                   </p>
                   <div className="mt-auto flex items-end justify-between pt-8">
                     <span className="font-mono text-[10px] uppercase tracking-[0.08em]" style={{ color: "var(--text-tertiary)" }}>
@@ -304,7 +289,7 @@ export default function Home() {
               <div className="lab-metadata mb-3" style={{ color: "var(--text-tertiary)" }}>
                 Shop / editions from the lab
               </div>
-              <h2 className="font-editorial text-3xl sm:text-5xl">
+              <h2 className="font-editorial text-3xl sm:text-5xl" style={{ color: "var(--oxide)" }}>
                 Art first. The object comes second.
               </h2>
               <p className="mt-4 max-w-2xl text-sm leading-6" style={{ color: "var(--text-secondary)" }}>

@@ -1,7 +1,7 @@
 import { posts } from "@/lib/blog";
 import { products, projects, experiments } from "@/lib/data";
 
-// /llms.txt — Markdown index for LLM crawlers (https://llmstxt.org spec).
+// /llms.txt: Markdown index for LLM crawlers (https://llmstxt.org spec).
 // Re-rendered at build time, served as text/plain with 1h cache.
 
 export const dynamic = "force-static";
@@ -46,7 +46,7 @@ export async function GET(): Promise<Response> {
 
   const body = `# Edgeless Lab
 
-> One developer shipping autonomous agents, MCP servers, and generative art. ${freeCount} free lead magnets, ${paidCount} premium toolkits. Everything open source. Built in production, released in the open.
+> A public research studio for autonomous software, generative systems, and physical artifacts. Working systems, Field Notes, and methods published in the open. ${freeCount} resources are free and ${paidCount} deeper toolkits are paid.
 
 ## Docs
 

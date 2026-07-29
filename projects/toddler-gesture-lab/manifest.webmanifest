@@ -1,0 +1,19 @@
+{
+  "name": "Color Garden",
+  "short_name": "Color Garden",
+  "description": "A full-screen touch-responsive color garden for open-ended play.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#090b18",
+  "theme_color": "#090b18",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

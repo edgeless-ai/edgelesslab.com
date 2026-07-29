@@ -4,7 +4,7 @@ import type { BlogPost } from "./blog-types";
 // Re-exported so existing `@/lib/blog` consumers keep importing the type from here.
 export type { BlogPost };
 
-export const posts: BlogPost[] = [
+const allPosts: BlogPost[] = [
   {
     slug: "kb-audit-circulation",
     editorial: true,
@@ -3601,3 +3601,11 @@ The source repo has the full set of skills we use to build these demos automatic
   },
   ...newPosts.sort((a: BlogPost, b: BlogPost) => new Date(b.date).getTime() - new Date(a.date).getTime()),
 ];
+
+const seenSlugs = new Set<string>();
+
+export const posts: BlogPost[] = allPosts.filter((post) => {
+  if (seenSlugs.has(post.slug)) return false;
+  seenSlugs.add(post.slug);
+  return true;
+});

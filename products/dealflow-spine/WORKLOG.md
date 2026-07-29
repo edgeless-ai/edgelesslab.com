@@ -44,9 +44,22 @@ WA candidates (real Seattle SDCI code violations + FEMA), routed warm/watch.
 - ✅ **FEMA** — national, in-box (wildfire/flood).
 - ⏳ **Portland** — needs the free PortlandMaps API key (a login → David's
   signup; kanban `t_fe8ddebb`). Drop-in fixture until then.
-- ❌ **Denver** — ArcGIS not Socrata; keyless code-violation endpoint
-  unconfirmed after 3 probes. Needs a dedicated probe or a swap for a
-  confirmed-Socrata Mountain metro. **← next product step.**
+- ❌ **Mountain distress signal** — decided after a time-boxed Socrata sweep:
+  NO Mountain metro exposes a clean keyless per-property distress feed. Denver,
+  Boulder, Albuquerque are ArcGIS (no Socrata catalog); Utah's catalog only
+  leaked federated Seattle datasets. So the Mountain leg's *second* signal
+  requires building an **ArcGIS code-violation adapter** (a real build, not a
+  probe). Meanwhile FEMA already fires in Mountain states nationally (wildfire
+  is heavy in CO/UT/AZ/NM), so the geography isn't dark — it just lacks a
+  stacking partner. Open decision below.
+
+**Decision / next increment (2026-07-28):** the West buy-box produces ~818
+single-signal *warm* Seattle leads but few *hot* (2+ stacked) ones, because West
+Coast has ~1.x usable signals. Highest product value = a **second signal in the
+target geo** so properties stack to high-conviction: options are (1) a King
+County / WA tax-delinquency or foreclosure feed for Seattle, (2) an ArcGIS
+code-violation adapter for Denver (Mountain unlock), (3) making the current warm
+output into a readable digest David can act on. Awaiting direction.
 
 **Kanban:** `t_4814d24b` DONE. Parked/David-gated: `t_fe8ddebb` (Portland key),
 `t_c824060b` (metro choice → answered: West/Mountain).

@@ -27,9 +27,8 @@ test.describe("static site smoke", () => {
   });
 
   test("/field-notes/ renders the featured studies", async ({ page }) => {
-    // The plain Python test server sees Next's RSC folder before the clean
-    // route HTML. GitHub Pages resolves /field-notes to this exported file.
-    const response = await page.goto("/field-notes.html");
+    // Match the canonical trailing-slash route emitted by the static export.
+    const response = await page.goto("/field-notes/");
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { name: "Field Notes" })).toBeVisible();
     const cards = page.locator('a[href^="/creative-demos/"]');

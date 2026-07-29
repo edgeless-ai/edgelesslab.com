@@ -26,12 +26,14 @@ test.describe("static site smoke", () => {
     expect(unique.size).toBeGreaterThanOrEqual(25);
   });
 
-  test("/creative/ renders demo cards", async ({ page }) => {
-    const response = await page.goto("/creative/");
+  test("/field-notes/ renders the featured studies", async ({ page }) => {
+    // The plain Python test server sees Next's RSC folder before the clean
+    // route HTML. GitHub Pages resolves /field-notes to this exported file.
+    const response = await page.goto("/field-notes.html");
     expect(response?.status()).toBe(200);
-    await expect(page.locator("h1").first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Field Notes" })).toBeVisible();
     const cards = page.locator('a[href^="/creative-demos/"]');
-    expect(await cards.count()).toBeGreaterThanOrEqual(10);
+    expect(await cards.count()).toBeGreaterThanOrEqual(6);
   });
 
   test("home page has no severe console errors", async ({ page }) => {

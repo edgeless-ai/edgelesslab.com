@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { projects, experiments, products } from '@/lib/data';
 import { posts } from '@/lib/blog';
 import { productContent } from '@/lib/product-content';
+import { getFieldNotes } from '@/lib/field-notes.server';
 
 export const dynamic = 'force-static';
 
@@ -50,10 +51,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: 'https://edgelesslab.com/creative/',
+      url: 'https://edgelesslab.com/field-notes',
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.75,
+      priority: 0.9,
     },
     {
       url: 'https://edgelesslab.com/series/agentic-os/',
@@ -147,5 +148,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     }));
 
-  return [...staticPages, ...projectPages, ...experimentPages, ...blogPages, ...productPages];
+  const fieldNotePages: MetadataRoute.Sitemap = getFieldNotes().map((note) => ({
+    url: `https://edgelesslab.com/creative-demos/${note.slug}/`,
+    lastModified: note.published ? new Date(note.published) : new Date(),
+    changeFrequency: 'monthly',
+    priority: note.curated ? 0.7 : 0.55,
+  }));
+
+  return [
+    ...staticPages,
+    ...projectPages,
+    ...experimentPages,
+    ...blogPages,
+    ...productPages,
+    ...fieldNotePages,
+  ];
 }

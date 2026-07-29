@@ -13,7 +13,15 @@ type NavItem =
   | { label: string; children: NavChild[] };
 
 const NAV: NavItem[] = [
-  { label: "Shop", href: "https://shop.edgelesslab.com", external: true },
+  {
+    label: "Explore",
+    children: [
+      { label: "Field Notes", href: "/field-notes" },
+      { label: "Experiments", href: "/lab" },
+      { label: "Agents", href: "/agents" },
+      { label: "Marimo", href: "/lab/marimo" },
+    ],
+  },
   {
     label: "Work",
     children: [
@@ -23,23 +31,14 @@ const NAV: NavItem[] = [
     ],
   },
   {
-    label: "Lab",
-    children: [
-      { label: "Lab", href: "/lab" },
-      { label: "Creative", href: "/creative" },
-      { label: "Marimo", href: "/lab/marimo" },
-      { label: "Agents", href: "/agents" },
-    ],
-  },
-  {
     label: "Writing",
     children: [
-      { label: "Blog", href: "/blog" },
-      { label: "Notes", href: "https://notes.edgelesslab.com", external: true },
+      { label: "Essays", href: "/blog" },
       { label: "Now", href: "/now" },
     ],
   },
   { label: "About", href: "/about" },
+  { label: "Shop", href: "https://shop.edgelesslab.com", external: true },
 ];
 
 function hasChildren(item: NavItem): item is { label: string; children: NavChild[] } {
@@ -47,11 +46,11 @@ function hasChildren(item: NavItem): item is { label: string; children: NavChild
 }
 
 /** A single top-level group with a hover/keyboard dropdown. */
-function NavGroup({ label, children, pathname }: { label: string; children: NavChild[]; pathname: string }) {
+function NavGroup({ label, items, pathname }: { label: string; items: NavChild[]; pathname: string }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const active = children.some((c) => c.href === pathname);
+  const active = items.some((c) => c.href === pathname);
 
   // Close on outside click + Escape.
   useEffect(() => {
@@ -93,10 +92,10 @@ function NavGroup({ label, children, pathname }: { label: string; children: NavC
       </button>
       {open && (
         <div
-          className="absolute left-0 top-full mt-3 min-w-[168px] rounded-2xl border p-1.5 backdrop-blur-xl"
+          className="absolute left-0 top-full mt-3 min-w-[176px] rounded-md border p-1.5 backdrop-blur-xl"
           style={{ background: "var(--bg-glass-solid)", borderColor: "var(--border-subtle)" }}
         >
-          {children.map((c) => (
+          {items.map((c) => (
             <Link
               key={c.label}
               href={c.href}
@@ -104,7 +103,7 @@ function NavGroup({ label, children, pathname }: { label: string; children: NavC
               {...(c.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               onClick={() => setOpen(false)}
               aria-current={c.href === pathname ? "page" : undefined}
-              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-[13px] transition-colors hover:text-white"
+              className="flex items-center justify-between gap-2 rounded-sm px-3 py-2 text-[13px] transition-colors hover:text-white"
               style={{
                 background: c.href === pathname ? "var(--accent-muted)" : "transparent",
                 color: c.href === pathname ? "var(--text-primary)" : "var(--text-secondary)",
@@ -137,7 +136,7 @@ export function Nav() {
       <div className="max-w-[1280px] mx-auto px-6 pt-5">
         <div className="relative">
           <div
-            className="flex items-center justify-between h-12 px-5 rounded-full border backdrop-blur-xl"
+            className="flex items-center justify-between h-12 px-5 rounded-md border backdrop-blur-xl"
             style={{ background: "var(--bg-glass)", borderColor: "var(--border-subtle)" }}
           >
             <Link
@@ -146,14 +145,14 @@ export function Nav() {
               className="flex items-center gap-2 text-[15px] font-semibold tracking-tight font-mono hover:opacity-80 transition-opacity"
               style={{ color: "var(--text-primary)" }}
             >
-              <span className="inline-block w-1.5 h-1.5 rounded-full" style={{ background: "var(--accent)" }} />
+              <span className="inline-block h-2 w-2" style={{ background: "var(--accent)" }} />
               edgeless<span style={{ color: "var(--text-tertiary)" }}>/lab</span>
             </Link>
 
             <div className="hidden md:flex items-center gap-5">
               {NAV.map((item) =>
                 hasChildren(item) ? (
-                  <NavGroup key={item.label} label={item.label} children={item.children} pathname={pathname} />
+                  <NavGroup key={item.label} label={item.label} items={item.children} pathname={pathname} />
                 ) : (
                   <Link
                     key={item.label}
@@ -183,16 +182,6 @@ export function Nav() {
                 </kbd>
                 <span className="sr-only">Search</span>
               </button>
-              <a
-                href="https://github.com/edgeless-ai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[13px] hover:text-white transition-colors flex items-center gap-1"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                GitHub <ArrowUpRight size={12} />
-                <span className="sr-only">(opens in new tab)</span>
-              </a>
               <ThemeToggle />
             </div>
 
@@ -210,7 +199,7 @@ export function Nav() {
 
           {isOpen && (
             <div
-              className="mt-3 rounded-[1.5rem] border p-3 backdrop-blur-xl md:hidden"
+              className="mt-3 rounded-md border p-3 backdrop-blur-xl md:hidden"
               style={{ background: "var(--bg-glass-solid)", borderColor: "var(--border-subtle)" }}
             >
               <div className="flex flex-col gap-1">
@@ -229,7 +218,7 @@ export function Nav() {
                           href={c.href}
                           prefetch={false}
                           {...(c.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                          className="rounded-2xl px-4 py-3 text-sm transition-colors flex items-center justify-between"
+                          className="rounded-sm px-4 py-3 text-sm transition-colors flex items-center justify-between"
                           aria-current={c.href === pathname ? "page" : undefined}
                           onClick={() => setIsOpen(false)}
                           style={{
@@ -248,7 +237,7 @@ export function Nav() {
                       href={item.href}
                       prefetch={false}
                       {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                      className="rounded-2xl px-4 py-3 text-sm transition-colors"
+                      className="rounded-sm px-4 py-3 text-sm transition-colors"
                       aria-current={pathname === item.href ? "page" : undefined}
                       onClick={() => setIsOpen(false)}
                       style={{
@@ -266,23 +255,12 @@ export function Nav() {
                     setIsOpen(false);
                     openCommandPalette();
                   }}
-                  className="text-left rounded-2xl px-4 py-3 text-sm transition-colors hover:text-white flex items-center gap-1.5 bg-transparent border-none cursor-pointer mt-2"
+                  className="text-left rounded-sm px-4 py-3 text-sm transition-colors hover:text-white flex items-center gap-1.5 bg-transparent border-none cursor-pointer mt-2"
                   style={{ color: "var(--text-secondary)" }}
                 >
                   <Search size={14} />
                   Search
                 </button>
-                <a
-                  href="https://github.com/edgeless-ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 rounded-2xl px-4 py-3 text-sm transition-colors hover:text-white"
-                  style={{ color: "var(--text-secondary)" }}
-                  onClick={() => setIsOpen(false)}
-                >
-                  GitHub <ArrowUpRight size={12} />
-                  <span className="sr-only">(opens in new tab)</span>
-                </a>
                 <div className="px-4 py-2">
                   <ThemeToggle />
                 </div>

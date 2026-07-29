@@ -396,7 +396,7 @@ export default function GestureSwarmPage() {
         <div className="max-w-[1200px] mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
-              href="/creative"
+              href="/field-notes"
               className="flex items-center gap-2 text-sm hover:text-white transition-colors"
               style={{ color: 'var(--text-secondary, #a1a1aa)' }}
             >

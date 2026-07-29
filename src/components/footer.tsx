@@ -5,18 +5,17 @@ import { ArrowUpRight } from "lucide-react";
 import { useState, FormEvent } from "react";
 
 const toolLinks = [
-  { label: "Safety Hooks", href: "/projects/safety-hooks" },
-  { label: "MCP Servers", href: "/projects/mcp-servers" },
-  { label: "Knowledge API", href: "/projects/knowledge-api" },
-  { label: "LLM Client", href: "/projects/llm-client" },
+  { label: "Projects", href: "/projects" },
+  { label: "Products", href: "/products" },
+  { label: "Services", href: "/services/private-ai-systems" },
+  { label: "Shop", href: "https://shop.edgelesslab.com", external: true },
 ];
 
 const labLinks = [
-  { label: "Pen Plotter Art", href: "/lab/pen-plotter-pipeline", external: false },
-  { label: "Strange Attractors", href: "/lab/strange-attractors", external: false },
-  { label: "Total Serialism", href: "/total-serialism/app/", external: false },
-  { label: "Excalidraw Diagrams", href: "/lab/excalidraw-diagrams", external: false },
-  { label: "Field Notes", href: "https://notes.edgelesslab.com", external: true },
+  { label: "Field Notes", href: "/field-notes", external: false },
+  { label: "Experiments", href: "/lab", external: false },
+  { label: "Agents", href: "/agents", external: false },
+  { label: "Marimo", href: "/lab/marimo", external: false },
 ];
 
 const ASCII_BANNER = `    ______    __           __
@@ -71,7 +70,7 @@ export function Footer() {
           </form>
           {submitted && (
             <p className="mt-3 text-xs font-mono" style={{ color: "var(--green)" }}>
-              Thanks — your email client will open to confirm.
+              Thanks, your email client will open to confirm.
             </p>
           )}
         </div>
@@ -82,18 +81,31 @@ export function Footer() {
               className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
               style={{ color: "var(--text-tertiary)" }}
             >
-              Tools
+              Work
             </h2>
             <ul className="space-y-2.5">
               {toolLinks.map((item) => (
                 <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="text-[13px] hover:text-white transition-colors"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
-                    {item.label}
-                  </Link>
+                  {item.external ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[13px] transition-colors hover:text-white"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {item.label}
+                      <ArrowUpRight size={11} />
+                    </a>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className="text-[13px] hover:text-white transition-colors"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -137,38 +149,13 @@ export function Footer() {
               className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
               style={{ color: "var(--text-tertiary)" }}
             >
-              Social
+              Writing
             </h2>
             <ul className="space-y-2.5">
               {[
-                { label: "GitHub", href: "https://github.com/edgeless-ai" },
-                { label: "Gumroad", href: "https://edgelessai.gumroad.com" },
-                { label: "Email", href: "mailto:david@edgelesslab.com" },
-              ].map((item) => (
-                <li key={item.label}>
-                  <a
-                    href={item.href}
-                    className="text-[13px] hover:text-white transition-colors inline-flex items-center gap-1"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
-                    {item.label}
-                    <ArrowUpRight size={11} />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h2
-              className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
-              style={{ color: "var(--text-tertiary)" }}
-            >
-              About
-            </h2>
-            <ul className="space-y-2.5">
-              {[
-                { label: "Privacy", href: "/privacy" },
-                { label: "Terms", href: "/terms" },
+                { label: "Essays", href: "/blog", external: false },
+                { label: "Now", href: "/now", external: false },
+                { label: "RSS", href: "/feed.xml", external: false },
               ].map((item) => (
                 <li key={item.label}>
                   <Link
@@ -178,6 +165,43 @@ export function Footer() {
                   >
                     {item.label}
                   </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h2
+              className="text-xs font-mono uppercase tracking-[0.12em] mb-4"
+              style={{ color: "var(--text-tertiary)" }}
+            >
+              Connect
+            </h2>
+            <ul className="space-y-2.5">
+              {[
+                { label: "About", href: "/about", external: false },
+                { label: "GitHub", href: "https://github.com/edgeless-ai", external: true },
+                { label: "Email", href: "mailto:david@edgelesslab.com", external: true },
+                { label: "Privacy", href: "/privacy", external: false },
+              ].map((item) => (
+                <li key={item.label}>
+                  {item.external ? (
+                    <a
+                      href={item.href}
+                      className="inline-flex items-center gap-1 text-[13px] transition-colors hover:text-white"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {item.label}
+                      <ArrowUpRight size={11} />
+                    </a>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className="text-[13px] hover:text-white transition-colors"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

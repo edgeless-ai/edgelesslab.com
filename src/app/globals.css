@@ -37,6 +37,19 @@ html[data-theme="light"] {
   --green: #34D399;
   --green-muted: rgba(52, 211, 153, 0.12);
 
+  /* Edgeless visual system: Night Lab + Field Sheet */
+  --paper: #F3EDDD;
+  --paper-deep: #EBE3CF;
+  --ink: #0C0A08;
+  --ink-soft: #2A2520;
+  --ink-faint: #56524A;
+  --paper-rule: #D4CAB4;
+  --malachite: #1A6847;
+  --malachite-deep: #134D35;
+  --relay: #7AA2FF;
+  --relay-muted: rgba(122, 162, 255, 0.14);
+  --font-editorial: Georgia, "Times New Roman", serif;
+
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -166,6 +179,75 @@ h1, h2, h3 {
     linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
   background-size: 64px 64px;
+}
+
+/* Edgeless Lab visual-system primitives */
+.font-editorial {
+  font-family: var(--font-editorial);
+}
+
+.field-sheet {
+  background-color: var(--paper);
+  color: var(--ink);
+  background-image:
+    radial-gradient(circle at 14% 8%, rgba(26, 104, 71, 0.08), transparent 34%),
+    radial-gradient(rgba(12, 10, 8, 0.08) 0.65px, transparent 0.75px);
+  background-size: auto, 11px 13px;
+}
+
+.print-rule {
+  height: 10px;
+  color: currentColor;
+  background:
+    repeating-linear-gradient(90deg, currentColor 0 8px, transparent 8px 13px);
+}
+
+.crop-frame {
+  position: relative;
+}
+
+.crop-frame::before,
+.crop-frame::after {
+  content: "";
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-color: currentColor;
+  border-style: solid;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.crop-frame::before {
+  left: -8px;
+  top: -8px;
+  border-width: 1px 0 0 1px;
+}
+
+.crop-frame::after {
+  right: -8px;
+  bottom: -8px;
+  border-width: 0 1px 1px 0;
+}
+
+.lab-panel {
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: var(--bg-surface);
+}
+
+.lab-metadata {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.route-focus {
+  color: var(--relay);
+  border-color: color-mix(in srgb, var(--relay) 45%, transparent);
+  background: var(--relay-muted);
 }
 
 /* Blog prose styles */

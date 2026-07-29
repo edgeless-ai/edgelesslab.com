@@ -33,7 +33,7 @@ export async function GET(): Promise<Response> {
   };
 
   const productLine = (p: typeof products[number]) => {
-    const priceTag = p.price && p.price !== "Free" ? ` — ${p.price}` : "";
+    const priceTag = p.price && p.price !== "Free" ? `, ${p.price}` : "";
     const target = p.href || `${SITE_URL}/products/${p.slug || ""}`;
     return `- [${oneLine(p.name)}](${target})${priceTag}: ${oneLine(p.description)}`;
   };
@@ -55,7 +55,7 @@ export async function GET(): Promise<Response> {
 - [Projects](${SITE_URL}/projects): shipped and live systems
 - [Agents](${SITE_URL}/agents): multi-agent orchestration stack
 - [Lab](${SITE_URL}/lab): interactive playgrounds and experiments
-- [Creative](${SITE_URL}/creative): generative art, pen-plotter, and visual work
+- [Field Notes](${SITE_URL}/field-notes): interactive studies, cited science plots, generative systems, and visual research
 - [Services / Private AI Systems](${SITE_URL}/services/private-ai-systems): custom private AI agent systems for professionals and small businesses
 - [Agentic OS series](${SITE_URL}/series/agentic-os): long-form series on building autonomous AI infrastructure
 - [Knowledge](${SITE_URL}/knowledge): KB index
@@ -83,8 +83,7 @@ ${liveExperiments.map(itemLine).join("\n")}
 
 ## Related properties
 
-- [Field Notes](https://notes.edgelesslab.com): gallery of field notes and visual experiments (separate subdomain)
-- [Shop](https://shop.edgelesslab.com): merch and physical goods (separate subdomain)
+- [Shop](https://shop.edgelesslab.com): art-led editions and physical objects from the lab
 
 ## Optional
 

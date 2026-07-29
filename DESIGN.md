@@ -1,6 +1,113 @@
-# Edgeless Lab Editorial Design System
+# Edgeless Lab Visual System
 
-Shared conventions for self-contained HTML field notes. Each editorial is a single HTML file with inline CSS/JS, no build step.
+Edgeless Lab is a working research studio for autonomous systems, creative
+code, and the notes produced while building both. The visual system has two
+related environments:
+
+- **Night Lab** is the operational shell used by the main site, navigation,
+  projects, writing, and product surfaces.
+- **Field Sheet** is the editorial and artifact language used by Field Notes,
+  scientific studies, plotter work, and print-led storytelling.
+
+They share typography, metadata, hard rules, and one live signal color. They
+do not share every surface color. This keeps the site recognizable without
+forcing a dark interface onto art that needs paper, ink, and natural pigment.
+
+## Design thesis
+
+The site should feel like evidence from an active lab, not a portfolio
+template. Every visual device must do at least one of these jobs:
+
+1. route a visitor;
+2. expose the state of a real system;
+3. frame an artifact;
+4. identify provenance, date, method, or status.
+
+One orchestrated interaction is stronger than several ambient effects. Motion
+belongs to routing, filtering, comparison, or the behavior of the work itself.
+It is not background decoration.
+
+## Audience and page priorities
+
+The homepage serves curious technical readers first, then potential
+collaborators and employers, then buyers. Its priorities are:
+
+1. showcase the lab;
+2. build readership;
+3. teach;
+4. make David's work and availability legible;
+5. introduce products and shop editions.
+
+## Core palette
+
+| Token | Value | Role |
+|------|------|------|
+| Night | `#09090b` | Main operational background |
+| Carbon | `#111113` | Raised dark surface |
+| Paper | `#f3eddd` | Field Sheet background |
+| Ink | `#0c0a08` | Text and hard print structure |
+| Signal lime | `#c6f24e` | Live state, active route, primary action |
+| Malachite | `#1a6847` | Field Notes research and natural systems |
+| Relay blue | `#7aa2ff` | Directed routing and interactive focus only |
+
+Signal lime is not a general decoration color. Relay blue appears only when a
+route, handoff, or interactive state is visible. Field Sheet projects may use
+one natural pigment in place of malachite.
+
+## Typography roles
+
+- **Display:** a restrained editorial serif for theses, artifact titles, and
+  Field Notes. Boska is preferred where it is already packaged; Georgia is the
+  local fallback.
+- **Interface:** Geist Sans for navigation, explanations, and product UI.
+- **Metadata:** Geist Mono or JetBrains Mono for routes, dates, state,
+  categories, and provenance.
+
+Large sans-serif headlines are reserved for operational declarations. Large
+serif headlines are reserved for ideas and artifacts. Do not use both at the
+same scale in one section.
+
+## Shape and material
+
+- Prefer square corners or radii between 2px and 8px.
+- Use hairline rules, crop marks, metadata strips, and hard print offsets.
+- Reserve pills for filters, status, or compact toggles.
+- Dark cards should not float in glass. They should read as panels, terminals,
+  or captured artifacts.
+- Texture must identify paper, scan, toner, or signal state. Random noise is
+  not a substitute for hierarchy.
+
+## Motion contract
+
+- The homepage signature is a route field. Selecting a destination reorganizes
+  its network and reveals the corresponding content.
+- Field Notes motion comes primarily from live study previews.
+- Hover motion should confirm what opens or what changes.
+- All meaningful controls work with keyboard focus.
+- `prefers-reduced-motion` receives a composed static state.
+- No section may introduce a second ambient animation while the route field is
+  active above the fold.
+
+## Information architecture vocabulary
+
+Use these labels consistently:
+
+- **Field Notes:** interactive studies, scientific plots, generative systems,
+  and visual research.
+- **Writing:** essays, build reports, and longer explanations.
+- **Now:** current work and operating status.
+- **Work:** projects, products, and services.
+- **Shop:** art-led editions and objects. The art is named before the garment
+  or substrate.
+
+`Creative` and `Notes` are retired as public navigation labels. Existing URLs
+may redirect, but they do not define separate content collections.
+
+## Field Sheet conventions
+
+The following conventions apply to self-contained HTML field notes. Each
+editorial is a single HTML file with inline CSS and JavaScript, with no build
+step.
 
 ## Typography
 

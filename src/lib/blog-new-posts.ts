@@ -1269,7 +1269,7 @@ These demos are built on a simple principle: the artifact should be inspectable.
 
 ## The Full Collection
 
-Browse all 37 demos at [edgelesslab.com/creative](/creative).
+Browse the complete collection in [Field Notes](/field-notes).
 
 ## Technical Notes
 

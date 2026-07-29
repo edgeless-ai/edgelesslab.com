@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Harmonograph (Lissajous) — Edgeless Lab Field Notes</title>
+<meta name="description" content="Harmonograph — damped two-pendulum Lissajous figure — a cited plot rendered from real computation. Lissajous 1857">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0C0E;--panel:#141619;--line:rgba(255,255,255,.09);--ink:#ECEEF1;--ink-60:#9AA0A8;--acc:#C9FF4A}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Mono',ui-monospace,monospace;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px}
+header{padding:40px 0 14px;display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+.kicker{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--acc)}
+.back{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-60);text-decoration:none}
+.back:hover{color:var(--ink)}
+.plate{background:#F7F7F2;border:1px solid var(--line);border-radius:14px;padding:clamp(16px,4vw,44px);margin:22px 0 30px;display:flex;justify-content:center}
+.plate img{width:100%;max-width:720px;height:auto;display:block;mix-blend-mode:multiply}
+h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,5vw,46px);letter-spacing:-.02em;line-height:1.06;margin-top:6px}
+.algo{color:var(--acc);font-size:13px;letter-spacing:.04em;margin-top:14px}
+.desc{color:var(--ink);max-width:66ch;margin-top:16px;font-size:15px}
+.cite{margin-top:26px;border-left:2px solid var(--acc);padding:4px 0 4px 16px;color:var(--ink-60);font-size:13px;max-width:70ch}
+.cite a{color:var(--acc);text-decoration:none;word-break:break-all}
+.cite .lbl{display:block;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-60);margin-bottom:8px}
+.cite .ref{color:var(--ink)}
+.note{margin-top:24px;font-size:12.5px;color:var(--ink-60);display:flex;gap:10px;align-items:flex-start;max-width:66ch}
+.note b{color:var(--acc);font-weight:500}
+footer{border-top:1px solid var(--line);margin-top:40px;padding:28px 0 60px;color:var(--ink-60);font-size:13px}
+footer a{color:var(--acc);text-decoration:none}
+</style></head><body>
+<div class="wrap">
+<header><span class="kicker">Edgeless Lab · Field Notes</span><a class="back" href="/field-notes">&larr; all studies</a></header>
+<div class="plate"><img src="plot.svg" alt="Harmonograph (Lissajous) — cited plot"></div>
+<h1>Harmonograph (Lissajous)</h1>
+<div class="algo">Harmonograph — damped two-pendulum Lissajous figure</div>
+<p class="desc">x and y are each a sum of two exponentially-damped sinusoids, traced as a single 60,000-sample continuous pen stroke. The slowly-tightening envelope is the pendulums losing energy.</p>
+<div class="cite"><span class="lbl">Paper / citation</span><span class="ref">J. A. Lissajous, “Mémoire sur l’étude optique des mouvements vibratoires,” Ann. Chim. Phys. 51:147–231 (1857); harmonograph device attr. Hugh Blackburn (~1844).</span><br><a href="https://gallica.bnf.fr/">https://gallica.bnf.fr/</a></div>
+<div class="note"><b>&#9672;</b><span>Made by real computation — every vertex is produced by the algorithm’s own math, integrated or iterated from the paper’s equations. No tracing, no decoration, no image model.</span></div>
+</div>
+<footer><div>Built by <a href="https://edgelesslab.com">Edgeless Lab</a> · Papers-as-Plots · the artifact <em>is</em> the citation.</div></footer>
+</body></html>

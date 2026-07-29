@@ -57,6 +57,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: 'https://edgelesslab.com/total-serialism/field-notes/index.html',
+      lastModified: new Date('2026-05-05'),
+      changeFrequency: 'monthly',
+      priority: 0.85,
+    },
+    {
       url: 'https://edgelesslab.com/series/agentic-os/',
       lastModified: new Date(),
       changeFrequency: 'monthly',

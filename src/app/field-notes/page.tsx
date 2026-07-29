@@ -1,3 +1,6 @@
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
@@ -35,13 +38,21 @@ export default function FieldNotesPage() {
             description:
               "Interactive studies, cited science plots, generative systems, and visual research.",
             url: "https://edgelesslab.com/field-notes",
-            numberOfItems: notes.length,
-            itemListElement: notes.map((note, index) => ({
-              "@type": "ListItem",
-              position: index + 1,
-              name: note.title,
-              url: `https://edgelesslab.com/creative-demos/${note.slug}/`,
-            })),
+            numberOfItems: notes.length + 1,
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Total Serialism: Field Notes on Algorithmic Constraint",
+                url: "https://edgelesslab.com/total-serialism/field-notes/index.html",
+              },
+              ...notes.map((note, index) => ({
+                "@type": "ListItem",
+                position: index + 2,
+                name: note.title,
+                url: `https://edgelesslab.com/creative-demos/${note.slug}/`,
+              })),
+            ],
           }}
         />
 
@@ -84,6 +95,81 @@ export default function FieldNotesPage() {
         </header>
 
         <div className="mx-auto max-w-[1280px] pb-20">
+          <section className="border-y" style={{ borderColor: "var(--ink)" }}>
+            <Link
+              href="/total-serialism/field-notes/index.html"
+              className="group grid lg:grid-cols-[1.15fr_0.85fr]"
+            >
+              <div
+                className="relative min-h-[300px] overflow-hidden border-b lg:min-h-[440px] lg:border-b-0 lg:border-r"
+                style={{ borderColor: "var(--ink)", background: "var(--ink)" }}
+              >
+                <Image
+                  src="/total-serialism/field-notes/assets/og-image.png"
+                  alt="Total Serialism pen plotter specimens arranged as an algorithmic field study"
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 58vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-[1.015]"
+                />
+              </div>
+
+              <div
+                className="flex flex-col justify-between p-6 sm:p-9 lg:p-10"
+                style={{ background: "var(--paper-deep)", color: "var(--ink)" }}
+              >
+                <div>
+                  <div
+                    className="font-mono text-[10px] uppercase tracking-[0.14em]"
+                    style={{ color: "var(--malachite)" }}
+                  >
+                    Long-form field note / May 2026
+                  </div>
+                  <h2 className="mt-7 font-editorial text-5xl leading-[0.92] tracking-[-0.035em] sm:text-6xl">
+                    Total
+                    <br />
+                    <em className="font-normal">Serialism.</em>
+                  </h2>
+                  <p className="mt-7 max-w-lg text-sm leading-6" style={{ color: "var(--ink-soft)" }}>
+                    Ninety-eight algorithmic art generators, sixteen families,
+                    and one physical constraint: a pen on paper. The complete
+                    account of the system, its visual lineage, its failures,
+                    and the specimens that survived.
+                  </p>
+                </div>
+
+                <div className="mt-10">
+                  <div
+                    className="grid grid-cols-3 gap-px border"
+                    style={{ borderColor: "var(--ink)" }}
+                  >
+                    {[
+                      ["98", "Algorithms"],
+                      ["16", "Families"],
+                      ["1", "Constraint"],
+                    ].map(([value, label]) => (
+                      <div key={label} className="p-3 sm:p-4">
+                        <div className="font-editorial text-3xl">{value}</div>
+                        <div className="lab-metadata mt-1">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-6 flex items-center justify-between gap-4">
+                    <span className="font-mono text-xs uppercase tracking-[0.1em]">
+                      Read the original Field Note
+                    </span>
+                    <ArrowUpRight
+                      aria-hidden="true"
+                      size={20}
+                      className="shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                      style={{ color: "var(--malachite)" }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </section>
+
           <FieldNotesGallery notes={notes} />
         </div>
       </main>

@@ -86,6 +86,16 @@ class SynthesisEngine:
         else:
             self.client = get_llm_client()
         self.model = model  # kept for backwards compat, unused by unified client
+        # Backend health counters. A run where every synthesis call fails still
+        # produces a sendable "likes list" edition, so without these the caller
+        # cannot tell a genuinely insight-free batch from a dead backend.
+        self.api_calls = 0
+        self.api_failures = 0
+
+    @property
+    def backend_dead(self) -> bool:
+        """True when synthesis was attempted and *every* call failed."""
+        return self.api_calls > 0 and self.api_failures == self.api_calls
 
     def _call_api_with_retry(
         self,
@@ -98,6 +108,7 @@ class SynthesisEngine:
 
         Returns response text or None if all retries fail.
         """
+        self.api_calls += 1
         for attempt in range(self.MAX_RETRIES):
             try:
                 response = self.client.complete(
@@ -114,8 +125,10 @@ class SynthesisEngine:
                     time.sleep(delay)
                 else:
                     logger.error(f"All retries failed for {context}: {e}")
+                    self.api_failures += 1
                     return None
 
+        self.api_failures += 1
         return None
 
     def synthesize_videos(

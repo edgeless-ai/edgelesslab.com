@@ -6,6 +6,7 @@ Uses the user's existing Claude Code subscription (no API keys needed).
 
 import json
 import os
+import re
 import subprocess
 import tempfile
 from dataclasses import dataclass
@@ -155,17 +156,28 @@ class ClaudeCodeClient:
 
 def _freellmapi_key() -> Optional[str]:
     """Resolve the freellmapi key: env first, then the canonical hermes config."""
-    for var in ("FREELMAPI_API_KEY", "FREELLMAPI_API_KEY"):
+    for var in ("FREELLMAPI_KEY", "FREELMAPI_API_KEY", "FREELLMAPI_API_KEY"):
         if os.environ.get(var):
             return os.environ[var]
     # Fall back to the canonical local store (~/.hermes/config.yaml) so we never
     # duplicate the secret into this repo. Cheap line scan — no yaml dep.
+    # Values are either a literal key or a ${VAR} env reference; hermes normalised
+    # every api_key to the latter in Jul 2026, which silently broke the old
+    # literal-only scan. Handle both.
     cfg = Path.home() / ".hermes" / "config.yaml"
     try:
         for line in cfg.read_text().splitlines():
             s = line.strip()
-            if s.startswith("api_key:") and "freellmapi-" in s:
-                return s.split("api_key:", 1)[1].strip().strip('"\'')
+            if not s.startswith("api_key:"):
+                continue
+            val = s.split("api_key:", 1)[1].strip().strip('"\'')
+            ref = re.fullmatch(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}", val)
+            if ref:
+                name = ref.group(1)
+                if "FREELLMAPI" in name.upper() and os.environ.get(name):
+                    return os.environ[name]
+            elif "freellmapi-" in val:
+                return val
     except Exception:
         pass
     return None
@@ -189,11 +201,24 @@ class FreeLLMAPIClient:
 
     @staticmethod
     def is_available(base_url: Optional[str] = None, timeout: int = 4) -> bool:
+        """Probe an *authenticated* endpoint.
+
+        The old check pinged /api/ping, which returns 200 without a key. That
+        reported the backend healthy while every completion 401'd, and masked a
+        19-run newsletter outage in Jul 2026. /v1/models needs the key, so it
+        fails under exactly the conditions that would break synthesis.
+        """
         import urllib.request
+        key = _freellmapi_key()
+        if not key:
+            return False
         url = (base_url or os.environ.get("FREELMAPI_BASE_URL")
-               or "http://localhost:3001/v1").rstrip("/").rsplit("/v1", 1)[0]
+               or "http://localhost:3001/v1").rstrip("/")
+        req = urllib.request.Request(
+            f"{url}/models", headers={"Authorization": f"Bearer {key}"}
+        )
         try:
-            with urllib.request.urlopen(f"{url}/api/ping", timeout=timeout) as r:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
                 return r.status == 200
         except Exception:
             return False

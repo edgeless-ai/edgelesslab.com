@@ -213,33 +213,13 @@ class NewsletterGenerator:
         merged = {**processed, **liked}
         db_videos = list(merged.values())
 
-        # Enrich with ChromaDB summaries — BEST EFFORT only. The list of videos is built
-        # from db_videos below regardless, so a genuine like is NEVER silently dropped just
-        # because its summary is missing/ChromaDB is down. (That drop was the "0 new likes"
-        # bug: likes existed in the DB but had no summary, so they vanished from the email.)
-        summaries_by_id: dict[str, dict] = {}
-        try:
-            import chromadb
-            client = chromadb.PersistentClient(path=str(self.config.chroma_path))
-            summaries_collection = client.get_collection("youtube_summaries")
-            for row in db_videos:
-                try:
-                    result = summaries_collection.get(
-                        ids=[f"yt_summary_{row['video_id']}"],
-                        include=["documents", "metadatas"],
-                    )
-                    if result['documents'] and result['documents'][0]:
-                        md = result['metadatas'][0] if result['metadatas'] else {}
-                        summaries_by_id[row['video_id']] = {
-                            'summary': result['documents'][0],
-                            'takeaways': self._parse_list_field(md.get('takeaways', ''), delimiter='|'),
-                            'themes': self._parse_list_field(md.get('topics', '') or md.get('themes', ''), delimiter=','),
-                            'tools': self._parse_list_field(md.get('tools_mentioned', ''), delimiter=','),
-                        }
-                except Exception:
-                    continue
-        except Exception as e:
-            print(f"Newsletter: ChromaDB enrichment unavailable ({e}) — listing likes without summaries")
+        # Enrich from the VAULT — BEST EFFORT only. The list of videos is built from
+        # db_videos below regardless, so a genuine like is NEVER silently dropped just
+        # because its summary is missing. (That drop was the "0 new likes" bug: likes
+        # existed in the DB but had no summary, so they vanished from the email.)
+        summaries_by_id = self._load_vault_summaries()
+        if not summaries_by_id:
+            print("Newsletter: no vault summaries found — listing likes without summaries")
 
         videos = []
         for row in db_videos:
@@ -256,6 +236,116 @@ class NewsletterGenerator:
 
         return videos
 
+    def _load_vault_summaries(self) -> dict[str, dict]:
+        """Index enriched YouTube notes from the vault, keyed by video_id.
+
+        This used to read the ChromaDB collection 'youtube_summaries', but
+        claude-deep-enrich.sh only ever writes vault notes — nothing has written
+        that collection since 2026-05-28, so every video rendered "summary
+        pending" while a fully-enriched note sat in the vault. The vault is the
+        single producer, so read it directly. This also removes a
+        chromadb.PersistentClient that violated the single-writer rule.
+
+        Scans the tree once (~180 files) rather than per-video, and memoises for
+        the life of the generator since both the recent-video and historical
+        paths need it. Best effort: any unparseable note is skipped, never fatal.
+        """
+        cached = getattr(self, "_vault_summary_cache", None)
+        if cached is not None:
+            return cached
+
+        root = Path(self.config.vault_dir) / "03-Knowledge" / "YouTube"
+        if not root.is_dir():
+            self._vault_summary_cache = {}
+            return {}
+
+        index: dict[str, dict] = {}
+        for path in root.rglob("*.md"):
+            try:
+                text = path.read_text(encoding="utf-8")
+            except Exception:
+                continue
+
+            fm = self._parse_frontmatter(text)
+            video_id = (fm.get("video_id") or "").strip().strip('"\'')
+            if not video_id:
+                continue
+
+            # Prefer the written Summary section; fall back to the one-liner.
+            summary = self._extract_section(text, "Summary") or fm.get("one_liner", "")
+            if not summary:
+                continue
+
+            index[video_id] = {
+                "summary": summary,
+                "takeaways": self._extract_bullets(text, "Key Takeaways"),
+                "themes": self._parse_yaml_list(fm.get("topics", "")),
+                "tools": self._parse_yaml_list(fm.get("tools", "")),
+                "title": fm.get("title", "").strip('"\'') or path.stem,
+                "channel": fm.get("channel", "").strip('"\'') or "Unknown",
+            }
+        self._vault_summary_cache = index
+        return index
+
+    @staticmethod
+    def _parse_frontmatter(text: str) -> dict:
+        """Minimal YAML frontmatter reader: scalars plus '- item' lists.
+
+        Deliberately dependency-free and read-only. List values come back as a
+        newline-joined string for _parse_yaml_list to split.
+        """
+        if not text.startswith("---"):
+            return {}
+        end = text.find("\n---", 3)
+        if end == -1:
+            return {}
+
+        fm: dict[str, str] = {}
+        key = None
+        for line in text[3:end].splitlines():
+            if not line.strip():
+                continue
+            if line.startswith((" ", "\t")) and line.strip().startswith("-") and key:
+                fm[key] = (fm[key] + "\n" if fm[key] else "") + line.strip()[1:].strip()
+            elif ":" in line and not line.startswith((" ", "\t")):
+                key, _, val = line.partition(":")
+                key = key.strip()
+                fm[key] = val.strip()
+        return fm
+
+    @staticmethod
+    def _parse_yaml_list(raw: str) -> list[str]:
+        """Split a frontmatter list (or comma string) into clean values."""
+        if not raw:
+            return []
+        parts = raw.split("\n") if "\n" in raw else raw.split(",")
+        return [p.strip().strip('"\'[]') for p in parts if p.strip().strip('"\'[]')]
+
+    @staticmethod
+    def _extract_section(text: str, heading: str) -> str:
+        """Return the prose under '## <heading>', up to the next heading."""
+        out: list[str] = []
+        capturing = False
+        for line in text.splitlines():
+            if line.startswith("#"):
+                if capturing:
+                    break
+                capturing = line.lstrip("#").strip().lower() == heading.lower()
+                continue
+            if capturing:
+                out.append(line)
+        return "\n".join(out).strip()
+
+    @classmethod
+    def _extract_bullets(cls, text: str, heading: str) -> list[str]:
+        """Return the bullet items under '## <heading>'."""
+        section = cls._extract_section(text, heading)
+        return [
+            line.strip().lstrip("-*").strip()
+            for line in section.splitlines()
+            if line.strip().startswith(("-", "*"))
+        ]
+
     def _get_historical_context(self, exclude_video_ids: list[str], max_videos: int = 50) -> tuple[list[VideoSummary], dict[str, int]]:
         """
         Fetch historical videos and theme frequency from ChromaDB.
@@ -267,52 +357,17 @@ class NewsletterGenerator:
         historical_videos = []
         theme_counts: dict[str, int] = {}
 
+        # Reads the vault for the same reason _get_recent_videos does: the old
+        # ChromaDB 'youtube_summaries' collection has been unwritten since
+        # 2026-05-28, so historical context silently came back empty — which is
+        # what starves synthesis of the cross-video material it needs.
         try:
-            import chromadb
-            client = chromadb.PersistentClient(path=str(self.config.chroma_path))
-            summaries_collection = client.get_collection("youtube_summaries")
-
-            # Get all summaries from ChromaDB
-            result = summaries_collection.get(
-                include=["documents", "metadatas"],
-                limit=500  # Reasonable upper bound
-            )
-
-            if not result['ids']:
-                return [], {}
-
-            # Process all historical videos
-            for i, doc_id in enumerate(result['ids']):
-                # Extract video_id from ChromaDB ID (format: yt_summary_{video_id})
-                if not doc_id.startswith("yt_summary_"):
-                    continue
-                video_id = doc_id.replace("yt_summary_", "")
-
-                # Skip videos that are in the current batch
-                if video_id in exclude_video_ids:
+            excluded = set(exclude_video_ids)
+            for video_id, entry in self._load_vault_summaries().items():
+                if video_id in excluded:
                     continue
 
-                metadata = result['metadatas'][i] if result['metadatas'] else {}
-                document = result['documents'][i] if result['documents'] else ""
-
-                if not document:
-                    continue
-
-                # Parse fields
-                takeaways = self._parse_list_field(
-                    metadata.get('takeaways', ''),
-                    delimiter='|'
-                )
-                themes = self._parse_list_field(
-                    metadata.get('topics', '') or metadata.get('themes', ''),
-                    delimiter=','
-                )
-                tools = self._parse_list_field(
-                    metadata.get('tools_mentioned', ''),
-                    delimiter=','
-                )
-
-                # Accumulate theme counts
+                themes = entry["themes"]
                 for theme in themes:
                     theme_lower = theme.lower().strip()
                     if theme_lower:
@@ -320,16 +375,14 @@ class NewsletterGenerator:
 
                 historical_videos.append(VideoSummary(
                     video_id=video_id,
-                    title=metadata.get('title', 'Unknown'),
-                    channel=metadata.get('channel', 'Unknown'),
-                    summary=document,
-                    takeaways=takeaways,
+                    title=entry["title"],
+                    channel=entry["channel"],
+                    summary=entry["summary"],
+                    takeaways=entry["takeaways"],
                     themes=themes,
-                    tools_mentioned=tools
+                    tools_mentioned=entry["tools"],
                 ))
 
-            # Sort by most relevant themes (videos with common themes first)
-            # and limit to max_videos
             historical_videos = historical_videos[:max_videos]
 
         except Exception as e:
@@ -371,17 +424,6 @@ class NewsletterGenerator:
         # Sort by overlap score and return top matches
         scored_videos.sort(key=lambda x: x[0], reverse=True)
         return [v for _, v in scored_videos[:max_related]]
-
-    def _parse_list_field(self, value: str, delimiter: str = ',') -> list[str]:
-        """Parse a string field that might be a list."""
-        if not value:
-            return []
-        if isinstance(value, list):
-            return value
-        # Use specified delimiter
-        if delimiter in value:
-            return [item.strip() for item in value.split(delimiter) if item.strip()]
-        return [value] if value else []
 
     def _generate_content(
         self,

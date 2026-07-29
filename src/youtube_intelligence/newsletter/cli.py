@@ -141,12 +141,24 @@ def main():
     print(f"Theme syntheses: {len(edition.content.theme_syntheses)}")
     print(f"Recommendations: {len(edition.content.recommendations)}")
 
+    # A dead synthesis backend still yields a sendable "likes list" edition. Left
+    # unflagged that exits 0, so cron-wrapper.sh stays quiet — which is how a 401
+    # after a key rotation degraded 19 consecutive runs unnoticed (Jul 2026).
+    engine = getattr(generator, 'synthesis_engine', None)
+    backend_dead = bool(engine and engine.backend_dead)
+    if backend_dead:
+        print(
+            f"ERROR: synthesis backend dead - all {engine.api_calls} call(s) failed. "
+            "Edition degraded to a likes list with no insight.",
+            file=sys.stderr,
+        )
+
     if args.preview:
         print("\n" + "=" * 60)
         print("PREVIEW (Plain Text)")
         print("=" * 60)
         print(edition.plain_body)
-        return 0
+        return 1 if backend_dead else 0
 
     # Archive to vault
     archive_to_vault(edition, args.edition)
@@ -164,7 +176,7 @@ def main():
             return 1
 
     print("\nDone!")
-    return 0
+    return 1 if backend_dead else 0
 
 
 if __name__ == '__main__':

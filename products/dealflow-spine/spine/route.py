@@ -257,32 +257,82 @@ def render_digest(
     lines.append("> R&D pipeline — no outreach. Routes feed underwriting review only.")
     lines.append("")
 
-    def _table(items: list[DealCandidate], underwrite_col: bool = False) -> list[str]:
-        head = "| Score | Address | Signals | Strategy |"
-        rule = "|------:|---------|---------|----------|"
+    # per-route caps so a live run's hundreds of rows stay scannable
+    WARM_CAP, WATCH_CAP, DISCARD_CAP = 40, 20, 15
+
+    def _lead(c: DealCandidate) -> dict:
+        """The most actionable detail across a candidate's signals: the 'why'
+        (violation category/description/status), whether any signal flags real
+        distress (vacant/unfit/derelict...), how many complaints stacked, and a
+        link to verify. Defensive — signals may lack evidence."""
+        sigs = list(getattr(c, "signals", []) or [])
+        def ev(s): return getattr(s, "evidence", None) or {}
+        cv = [s for s in sigs if getattr(s, "signal_type", "") == "code_violation"]
+        pool = cv or sigs
+        if not pool:
+            return {"why": "—", "cases": 0, "distress": False, "url": None}
+        primary = max(pool, key=lambda s: (bool(ev(s).get("distress_hint")),
+                                            getattr(s, "confidence", 0) or 0))
+        e = ev(primary)
+        cat = str(e.get("category") or "").strip()
+        desc = str(e.get("description") or "").strip()
+        status = str(e.get("status") or "").strip()
+        why = " — ".join(x for x in (cat, desc) if x) or getattr(
+            primary, "signal_type", "signal")
+        if status:
+            why += f" ({status})"
+        why = why.replace("|", "/").replace("\n", " ").replace("\r", " ")
+        return {
+            "why": why[:80],
+            "cases": len(cv) or len(sigs),
+            "distress": any(ev(s).get("distress_hint") for s in sigs),
+            "url": getattr(primary, "source_url", None),
+        }
+
+    def _addr(c: DealCandidate, url: str | None) -> str:
+        p = c.property
+        a = f"{p.address}, {p.city} {p.state} {p.zip}".strip().strip(",")
+        return f"[{a}]({url})" if url else a
+
+    def _table(items: list[DealCandidate], underwrite_col: bool = False,
+               cap: int | None = None) -> list[str]:
+        shown = items[:cap] if cap else items
+        head = "| Score | ⚑ | Address (→ case) | Why — latest complaint | Cases |"
+        rule = "|------:|:-:|------------------|------------------------|:-----:|"
         if underwrite_col:
-            head += " Underwrite |"
-            rule += "-----------|"
+            head += " Strategy | Underwrite |"
+            rule += "----------|------------|"
         rows = [head, rule]
-        for c in items:
-            p = c.property
-            addr = f"{p.address}, {p.city} {p.state} {p.zip}".strip().strip(",")
-            sigs = ", ".join(sorted(c.distinct_signal_types))
-            row = f"| {c.distress_score:.2f} | {addr} | {sigs} | {c.recommended_strategy} |"
+        for c in shown:
+            d = _lead(c)
+            flag = "🚩" if d["distress"] else ""
+            row = (f"| {c.distress_score:.2f} | {flag} | {_addr(c, d['url'])} "
+                   f"| {d['why']} | {d['cases']} |")
             if underwrite_col:
                 rec = (c.underwriting or {}).get("recommendation") or "—"
-                row += f" **{rec}** |"
+                row += f" {c.recommended_strategy} | **{rec}** |"
             rows.append(row)
+        if cap and len(items) > cap:
+            rows.append(f"\n_+{len(items) - cap} more (see `data/candidates.jsonl`)_")
         return rows
 
-    for route, title in ((Route.HOT, "🔥 Hot — stacked + in the box"),
-                         (Route.WARM, "🌤 Warm — in the box, single signal"),
-                         (Route.WATCH, "👀 Watch")):
+    for route, title, cap in (
+        (Route.HOT, "🔥 Hot — stacked + in the box", None),
+        (Route.WARM, "🌤 Warm — in the box, single signal", WARM_CAP),
+        (Route.WATCH, "👀 Watch", WATCH_CAP),
+    ):
         items = by_route[route.value]
-        lines.append(f"## {title} ({len(items)})")
+        # lead with flagged distress, then score
+        items = sorted(items, key=lambda c: (_lead(c)["distress"], c.distress_score),
+                       reverse=True)
+        flagged = sum(1 for c in items if _lead(c)["distress"])
+        head = f"## {title} ({len(items)})"
+        if flagged:
+            head += f" · 🚩 {flagged} distress-flagged"
+        lines.append(head)
         lines.append("")
         if items:
-            lines.extend(_table(items, underwrite_col=route is Route.HOT))
+            lines.extend(_table(items, underwrite_col=route is Route.HOT, cap=cap))
             lines.append("")
             # top hot candidates get their receipts printed
             if route is Route.HOT:
@@ -309,9 +359,11 @@ def render_digest(
     discards = by_route[Route.DISCARD.value]
     lines.append(f"## Discarded ({len(discards)})")
     lines.append("")
-    for c in discards:
+    for c in discards[:DISCARD_CAP]:
         misses = "; ".join(c.criteria_matches.get("misses") or []) or f"score {c.distress_score:.2f} below floor"
         lines.append(f"- {c.property.address}, {c.property.city} {c.property.state} — {misses}")
+    if len(discards) > DISCARD_CAP:
+        lines.append(f"- _+{len(discards) - DISCARD_CAP} more discarded_")
     if not discards:
         lines.append("_none_")
     lines.append("")

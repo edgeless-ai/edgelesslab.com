@@ -19,6 +19,28 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-07-28 — actionable digest (readable output)
+**Commit:** (this session) `spine/route.py` render_digest rewrite
+**Why:** the digest was 617 near-identical "code_violation | as-is cash offer"
+rows — a wall, not something to act on. It threw away the fields that make a
+lead real: violation category, description, status, stacked-complaint count,
+and the case link.
+**What:** each row now shows the actual complaint (category — description
+(status)), a 🚩 flag when any signal is real distress (vacant/unfit/fire/etc.),
+the stacked-complaint count, and links the address to its Seattle case. Rows
+sort distress-first; warm/watch/discard capped (40/20/15) so a live run stays
+scannable. Header shows the distress-flagged count.
+**Verified:** 205 tests still pass. Live West run: 617 warm, **189
+distress-flagged**, surfacing real leads — vacant buildings, fire/water damage,
+"waiting for sale escrow to new owner", "sold about a year ago". Pipe/newline
+sanitized so complaint text can't break the table.
+**Nuance for later:** many warm rows are landlord/tenant *complaints* (a tenant
+griping), not owner-sell distress. Vacant/condemned/fire/damage are the real
+owner-distress signals; a future scoring pass should weight those above tenant
+disputes. Recorded, not yet done.
+
+---
+
 ## 2026-07-28 — enrichment follow-ons + West/Mountain pivot
 **Commits:** `da0aa52b9` (adapter + review flow), `13214f2cf` (West buy-box)
 **Branch:** `dealflow/enrichment-followons` (local; not merged — trace is by hash, not branch)

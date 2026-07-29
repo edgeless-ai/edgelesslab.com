@@ -1,13 +1,8 @@
 "use client";
 
-import Image from "next/image";
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { EditorialBlock } from "@/components/ui/pretext-pull-quote";
-
-interface Stat {
-  label: string;
-  value: string;
-}
 
 interface TimelineItem {
   period: string;
@@ -27,79 +22,63 @@ const fadeInStyle = (delay = 0): React.CSSProperties => ({
 
 export function AboutHeader() {
   return (
-    <>
-      <div
-        className="inline-flex items-center gap-2.5 mb-6 px-3 py-1.5 rounded-full border"
-        style={{
-          borderColor: "var(--border-subtle)",
-          background: "var(--bg-surface)",
-          ...fadeInStyle(0),
-        }}
-      >
+    <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20 lg:items-start">
+      <div className="flex items-center gap-3 pt-2" style={fadeInStyle(0)}>
         <span
-          className="w-1.5 h-1.5 rounded-full"
+          className="w-2 h-2 shrink-0"
           style={{ background: "var(--accent)" }}
         />
         <span
           className="text-[11px] font-mono uppercase tracking-[0.14em]"
-          style={{ color: "var(--text-secondary)" }}
+          style={{ color: "var(--text-tertiary)" }}
         >
-          The studio
+          About Edgeless Lab
         </span>
       </div>
-      <Image
-        src="/og-image.webp"
-        alt="Edgeless Lab"
-        width={0}
-        height={0}
-        className="sr-only"
-        aria-hidden="true"
-        loading="lazy"
-      />
-      <h1
-        className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[0.92] tracking-[-0.035em] max-w-4xl"
-        style={{ color: "var(--text-primary)", ...fadeInStyle(0.1) }}
-      >
-        One person.
-        <br />
-        <span style={{ color: "var(--accent)" }}>Real tools.</span>
-      </h1>
-      <p
-        className="mt-8 text-lg max-w-2xl font-light"
-        style={{ color: "var(--text-secondary)", lineHeight: 1.55, ...fadeInStyle(0.2) }}
-      >
-        David Murray. Solo creative tech studio, 4 MCP servers in production, 6,300 notes in the vault. No team, no funding, no vaporware.
-      </p>
-    </>
-  );
-}
-
-export function StatsGrid({ stats }: { stats: Stat[] }) {
-  return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
-      {stats.map((stat, i) => (
-        <div
-          key={stat.label}
-          className="border-l-2 pl-5"
-          style={{
-            borderColor: "var(--accent)",
-            ...fadeInStyle(i * 0.08),
-          }}
+      <div>
+        <h1
+          className="text-4xl sm:text-5xl font-semibold leading-[1.02] tracking-[-0.035em] max-w-3xl"
+          style={{ color: "var(--text-primary)", ...fadeInStyle(0.08) }}
         >
-          <span
-            className="text-4xl sm:text-5xl font-bold font-mono block mb-2 tracking-tight"
-            style={{ color: "var(--text-primary)" }}
+          I build systems that work, and studies that make them visible.
+        </h1>
+        <p
+          className="mt-7 text-lg max-w-2xl"
+          style={{ color: "var(--text-secondary)", lineHeight: 1.65, ...fadeInStyle(0.16) }}
+        >
+          I&apos;m David Murray, a creative technologist working across agent
+          infrastructure, generative art, and tools for people who want more
+          control over their technology. Edgeless Lab is where I build in
+          public, document what I learn, and turn the strongest experiments
+          into useful work.
+        </p>
+        <div
+          className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3"
+          style={fadeInStyle(0.24)}
+        >
+          <Link
+            href="/projects"
+            className="inline-flex items-center gap-2 text-sm font-medium transition-colors hover:text-white"
+            style={{ color: "var(--accent)" }}
           >
-            {stat.value}
-          </span>
-          <span
-            className="text-[11px] font-mono uppercase tracking-[0.14em]"
-            style={{ color: "var(--text-tertiary)" }}
+            See the work <ArrowUpRight size={14} />
+          </Link>
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 text-sm transition-colors hover:text-white"
+            style={{ color: "var(--text-secondary)" }}
           >
-            {stat.label}
-          </span>
+            Read the blog <ArrowUpRight size={14} />
+          </Link>
+          <a
+            href="mailto:david@edgelesslab.com?subject=Working%20with%20Edgeless%20Lab"
+            className="inline-flex items-center gap-2 text-sm transition-colors hover:text-white"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            Work with me <ArrowUpRight size={14} />
+          </a>
         </div>
-      ))}
+      </div>
     </div>
   );
 }

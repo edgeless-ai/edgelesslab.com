@@ -5,30 +5,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { onOpenCommandPalette } from "@/lib/command-palette-events";
-
-interface PagefindResultData {
-  url: string;
-  title: string;
-  meta: Record<string, string>;
-  excerpt: string;
-  anchors: string[];
-  raw_content?: string;
-  word_count: number;
-}
-
-interface PagefindResult {
-  id: string;
-  score: number;
-  data: () => Promise<PagefindResultData>;
-}
-
-interface PagefindSearchResponse {
-  results?: PagefindResult[];
-}
-
-interface PagefindApi {
-  search: (query: string) => Promise<PagefindSearchResponse>;
-}
+import { getPagefind, loadPagefind } from "@/lib/pagefind-client";
 
 interface SearchResult {
   id: string;
@@ -65,37 +42,6 @@ function categorizePath(url: string): SearchResult["category"] {
   return "Page";
 }
 
-let pagefindLoading: Promise<PagefindApi | null> | null = null;
-
-function getPagefind(): PagefindApi | undefined {
-  return (window as Window & typeof globalThis & { pagefind?: PagefindApi }).pagefind;
-}
-
-function loadPagefind(): Promise<PagefindApi | null> {
-  const existing = getPagefind();
-  if (existing) return Promise.resolve(existing);
-  if (pagefindLoading) return pagefindLoading;
-
-  pagefindLoading = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = "/pagefind/pagefind.js";
-    script.async = true;
-    script.onload = () => {
-      // Give Pagefind a tick to initialize its internal state
-      requestAnimationFrame(() => {
-        resolve(getPagefind() ?? null);
-      });
-    };
-    script.onerror = () => {
-      console.warn("Failed to load Pagefind search index");
-      reject(new Error("Pagefind load failed"));
-    };
-    document.head.appendChild(script);
-  });
-
-  return pagefindLoading;
-}
-
 export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -103,6 +49,7 @@ export function CommandPalette() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [totalIndexed, setTotalIndexed] = useState<number | null>(null);
   const [pagefindReady, setPagefindReady] = useState(false);
+  const [pagefindFailed, setPagefindFailed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -114,15 +61,19 @@ export function CommandPalette() {
     let cancelled = false;
 
     async function init() {
-      const pf = await loadPagefind();
-      if (cancelled) return;
-      if (pf) {
+      try {
+        const pf = await loadPagefind();
+        if (cancelled) return;
         setPagefindReady(true);
+        setPagefindFailed(false);
         // Get total indexed count
         try {
           const search = await pf.search("");
           setTotalIndexed(search?.results?.length ?? null);
         } catch {}
+      } catch (error) {
+        console.warn("Failed to initialize Pagefind search", error);
+        if (!cancelled) setPagefindFailed(true);
       }
     }
     init();
@@ -337,7 +288,9 @@ export function CommandPalette() {
         {!pagefindReady && query.length < 2 && (
           <div className="px-5 py-3">
             <p className="text-[11px] font-mono" style={{ color: "var(--text-tertiary)" }}>
-              Loading full-text search index&hellip;
+              {pagefindFailed
+                ? "Search is temporarily unavailable. Please try again."
+                : "Loading full-text search index\u2026"}
             </p>
           </div>
         )}
@@ -348,7 +301,9 @@ export function CommandPalette() {
             {!pagefindReady ? (
               <div className="px-5 py-8 text-center">
                 <p className="text-sm font-mono" style={{ color: "var(--text-tertiary)" }}>
-                  Loading search index&hellip;
+                  {pagefindFailed
+                    ? "Search is temporarily unavailable. Please try again."
+                    : "Loading search index\u2026"}
                 </p>
               </div>
             ) : results.length === 0 ? (

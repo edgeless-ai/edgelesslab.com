@@ -30,13 +30,7 @@ const NAV: NavItem[] = [
       { label: "Services", href: "/services/private-ai-systems" },
     ],
   },
-  {
-    label: "Writing",
-    children: [
-      { label: "Essays", href: "/blog" },
-      { label: "Now", href: "/now" },
-    ],
-  },
+  { label: "Blog", href: "/blog" },
   { label: "About", href: "/about" },
   { label: "Shop", href: "https://shop.edgelesslab.com", external: true },
 ];

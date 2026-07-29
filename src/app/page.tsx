@@ -193,7 +193,7 @@ export default function Home() {
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link href="/blog" className="inline-flex items-center gap-2 font-mono text-xs uppercase" style={{ color: "var(--malachite)" }}>
-                    All essays <ArrowRight size={13} />
+                    All posts <ArrowRight size={13} />
                   </Link>
                   <Link href="/feed.xml" className="inline-flex items-center gap-2 font-mono text-xs uppercase" style={{ color: "var(--ink-soft)" }}>
                     RSS feed <ArrowUpRight size={13} />

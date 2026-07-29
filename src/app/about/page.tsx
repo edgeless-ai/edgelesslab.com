@@ -2,7 +2,6 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import {
   AboutHeader,
-  StatsGrid,
   Philosophy,
   Timeline,
   Manifesto,
@@ -11,18 +10,11 @@ import {
 import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
-  title: "About the Studio",
-  description: "One-person creative technology studio building agents, pipelines, and tools that run in production.",
+  title: "About David Murray and Edgeless Lab",
+  description: "David Murray builds agent infrastructure, generative art, and creative technology through Edgeless Lab.",
   path: "/about",
   keywords: ["about Edgeless Lab", "David Murray", "creative technology studio", "AI-native developer tools"],
 });
-
-const stats = [
-  { label: "Products live", value: "18" },
-  { label: "Services monitored", value: "4" },
-  { label: "Vault docs indexed", value: "6,300+" },
-  { label: "MCP servers in prod", value: "4" },
-];
 
 const timeline = [
   {
@@ -56,15 +48,9 @@ export default function About() {
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
       <Nav />
 
-      <section className="px-6 pt-32 pb-20">
-        <div className="max-w-[1280px] mx-auto">
+      <section className="px-6 pt-32 pb-16 sm:pb-20">
+        <div className="max-w-[1080px] mx-auto">
           <AboutHeader />
-        </div>
-      </section>
-
-      <section className="px-6 py-16" style={{ background: "var(--bg-surface)" }}>
-        <div className="max-w-[1280px] mx-auto">
-          <StatsGrid stats={stats} />
         </div>
       </section>
 

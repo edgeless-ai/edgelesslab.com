@@ -153,8 +153,7 @@ export function Footer() {
             </h2>
             <ul className="space-y-2.5">
               {[
-                { label: "Essays", href: "/blog", external: false },
-                { label: "Now", href: "/now", external: false },
+                { label: "Blog", href: "/blog", external: false },
                 { label: "RSS", href: "/feed.xml", external: false },
               ].map((item) => (
                 <li key={item.label}>

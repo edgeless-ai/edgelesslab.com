@@ -51,7 +51,6 @@ export async function GET(): Promise<Response> {
 ## Docs
 
 - [About](${SITE_URL}/about): founder context, mission, and operating principles
-- [Now](${SITE_URL}/now): production state, active projects, live signals
 - [Projects](${SITE_URL}/projects): shipped and live systems
 - [Agents](${SITE_URL}/agents): multi-agent orchestration stack
 - [Lab](${SITE_URL}/lab): interactive playgrounds and experiments

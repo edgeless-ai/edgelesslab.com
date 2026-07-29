@@ -4,30 +4,7 @@ import { Search, FileText, Folder, BookOpen, Package, ArrowRight } from "lucide-
 import { useState, useRef, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
-
-interface PagefindResultData {
-  url: string;
-  title: string;
-  meta: Record<string, string>;
-  excerpt: string;
-  anchors: string[];
-  raw_content?: string;
-  word_count: number;
-}
-
-interface PagefindResult {
-  id: string;
-  score: number;
-  data: () => Promise<PagefindResultData>;
-}
-
-interface PagefindSearchResponse {
-  results?: PagefindResult[];
-}
-
-interface PagefindApi {
-  search: (query: string) => Promise<PagefindSearchResponse>;
-}
+import { getPagefind, loadPagefind } from "@/lib/pagefind-client";
 
 interface SearchResult {
   id: string;
@@ -71,42 +48,13 @@ function categorizePath(url: string): SearchResult["category"] {
   return "Page";
 }
 
-let pagefindLoading: Promise<PagefindApi | null> | null = null;
-
-function getPagefind(): PagefindApi | undefined {
-  return (window as Window & typeof globalThis & { pagefind?: PagefindApi }).pagefind;
-}
-
-function loadPagefind(): Promise<PagefindApi | null> {
-  const existing = getPagefind();
-  if (existing) return Promise.resolve(existing);
-  if (pagefindLoading) return pagefindLoading;
-
-  pagefindLoading = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = "/pagefind/pagefind.js";
-    script.async = true;
-    script.onload = () => {
-      requestAnimationFrame(() => {
-        resolve(getPagefind() ?? null);
-      });
-    };
-    script.onerror = () => {
-      console.warn("Failed to load Pagefind search index");
-      reject(new Error("Pagefind load failed"));
-    };
-    document.head.appendChild(script);
-  });
-
-  return pagefindLoading;
-}
-
 export function SearchPageClient() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [groupedResults, setGroupedResults] = useState<{ category: SearchResult["category"]; results: SearchResult[] }[]>([]);
   const [totalIndexed, setTotalIndexed] = useState<number | null>(null);
   const [pagefindReady, setPagefindReady] = useState(false);
+  const [pagefindFailed, setPagefindFailed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -119,15 +67,17 @@ export function SearchPageClient() {
       try {
         const pf = await loadPagefind();
         if (cancelled) return;
-        if (pf) {
-          setPagefindReady(true);
-          try {
-            const search = await pf.search("");
-            setTotalIndexed(search?.results?.length ?? null);
-          } catch {}
-        }
+        setPagefindReady(true);
+        setPagefindFailed(false);
+        try {
+          const search = await pf.search("");
+          setTotalIndexed(search?.results?.length ?? null);
+        } catch {}
       } catch {
-        if (!cancelled) setPagefindReady(false);
+        if (!cancelled) {
+          setPagefindReady(false);
+          setPagefindFailed(true);
+        }
       }
     }
     init();
@@ -142,17 +92,19 @@ export function SearchPageClient() {
   // Search with Pagefind (debounced)
   useEffect(() => {
     if (!pagefindReady || query.length < 2) {
-      setResults([]);
-      setGroupedResults([]);
-      setIsLoading(false);
-      return;
+      const frame = requestAnimationFrame(() => {
+        setResults([]);
+        setGroupedResults([]);
+        setIsLoading(false);
+      });
+      return () => cancelAnimationFrame(frame);
     }
 
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
 
-    setIsLoading(true);
+    const loadingFrame = requestAnimationFrame(() => setIsLoading(true));
 
     searchTimeoutRef.current = setTimeout(async () => {
       try {
@@ -208,6 +160,7 @@ export function SearchPageClient() {
     }, 200);
 
     return () => {
+      cancelAnimationFrame(loadingFrame);
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
       }
@@ -263,7 +216,7 @@ export function SearchPageClient() {
         />
         {!pagefindReady && (
           <span className="text-[11px] font-mono" style={{ color: "var(--text-tertiary)" }}>
-            Loading index...
+            {pagefindFailed ? "Search unavailable" : "Loading index\u2026"}
           </span>
         )}
       </div>

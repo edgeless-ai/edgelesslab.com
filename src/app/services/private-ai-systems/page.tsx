@@ -156,27 +156,16 @@ export default function PrivateAiSystemsPage() {
         <section className="px-6 pb-20 pt-36">
           <div className="mx-auto grid max-w-[1280px] gap-10 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-start">
             <div>
-              <div
-                className="mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1.5"
-                style={{
-                  borderColor: "rgba(52, 211, 153, 0.28)",
-                  background: "rgba(52, 211, 153, 0.07)",
-                }}
-              >
-                <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--green)" }} />
-                <span
-                  className="font-mono text-[11px] uppercase tracking-[0.14em]"
-                  style={{ color: "var(--green)" }}
-                >
-                  Portland builds - remote available
-                </span>
+              <div className="lab-metadata mb-6 flex items-center gap-3" style={{ color: "var(--relay)" }}>
+                <span className="h-2 w-2" style={{ background: "var(--relay)" }} />
+                Work with David / Portland and remote
               </div>
 
               <h1
                 className="mb-6 max-w-4xl text-[clamp(2.6rem,7vw,6rem)] font-bold leading-[0.9] tracking-tight"
                 style={{ color: "var(--text-primary)" }}
               >
-                Private AI systems for work that generic SaaS keeps missing.
+                Difficult AI systems, built to belong to you.
               </h1>
 
               <p className="mb-8 max-w-3xl text-lg leading-8" style={{ color: "var(--text-secondary)" }}>
@@ -189,7 +178,7 @@ export default function PrivateAiSystemsPage() {
                 <ServiceCtaLink
                   href="mailto:david@edgelesslab.com?subject=Private%20AI%20system"
                   name="private_ai_start_build"
-                  className="inline-flex h-11 items-center gap-2 rounded-full border px-5 font-mono text-xs uppercase tracking-[0.1em] transition-all hover:brightness-110"
+                  className="inline-flex h-11 items-center gap-2 border px-5 font-mono text-xs uppercase tracking-[0.1em] transition-all hover:brightness-110"
                   style={{
                     color: "var(--text-primary)",
                     borderColor: "rgba(255,255,255,0.18)",
@@ -201,7 +190,7 @@ export default function PrivateAiSystemsPage() {
                 </ServiceCtaLink>
                 <a
                   href="#pricing"
-                  className="inline-flex h-11 items-center gap-2 rounded-full px-5 font-mono text-xs uppercase tracking-[0.1em] transition-colors hover:text-white"
+                  className="inline-flex h-11 items-center gap-2 px-5 font-mono text-xs uppercase tracking-[0.1em] transition-colors hover:text-white"
                   style={{ color: "var(--text-secondary)" }}
                 >
                   See pricing
@@ -211,7 +200,7 @@ export default function PrivateAiSystemsPage() {
             </div>
 
             <aside
-              className="rounded-2xl border p-6"
+              className="border p-6"
               style={{
                 background: "linear-gradient(180deg, rgba(17,17,19,0.98), rgba(9,9,11,0.98))",
                 borderColor: "var(--border-subtle)",
@@ -221,7 +210,7 @@ export default function PrivateAiSystemsPage() {
                 <span className="font-mono text-xs uppercase tracking-[0.18em]" style={{ color: "var(--text-tertiary)" }}>
                   System shape
                 </span>
-                <span className="rounded-full px-2 py-1 font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: "var(--green)", background: "var(--green-muted)" }}>
+                <span className="px-2 py-1 font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: "var(--green)", background: "var(--green-muted)" }}>
                   Owned by you
                 </span>
               </div>
@@ -240,7 +229,7 @@ export default function PrivateAiSystemsPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-8 rounded-lg border p-4" style={{ borderColor: "rgba(198, 242, 78,0.24)", background: "rgba(198, 242, 78,0.07)" }}>
+              <div className="mt-8 border p-4" style={{ borderColor: "rgba(198, 242, 78,0.24)", background: "rgba(198, 242, 78,0.07)" }}>
                 <p className="font-mono text-[11px] uppercase tracking-[0.14em]" style={{ color: "var(--accent)" }}>
                   Typical AI usage
                 </p>
@@ -265,7 +254,7 @@ export default function PrivateAiSystemsPage() {
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               {useCases.map((item) => (
-                <div key={item} className="flex gap-3 rounded-lg border p-4" style={{ borderColor: "var(--border-subtle)", background: "rgba(9,9,11,0.45)" }}>
+                <div key={item} className="flex gap-3 border p-4" style={{ borderColor: "var(--border-subtle)", background: "rgba(9,9,11,0.45)" }}>
                   <Check className="mt-0.5 shrink-0" size={16} style={{ color: "var(--green)" }} />
                   <p className="text-sm leading-6" style={{ color: "var(--text-secondary)" }}>{item}</p>
                 </div>
@@ -288,7 +277,7 @@ export default function PrivateAiSystemsPage() {
               {deploymentOptions.map((option) => {
                 const Icon = option.icon;
                 return (
-                  <div key={option.title} className="rounded-xl border p-6" style={{ borderColor: "var(--border-subtle)", background: "var(--bg-surface)" }}>
+                  <div key={option.title} className="border p-6" style={{ borderColor: "var(--border-subtle)", background: "var(--bg-surface)" }}>
                     <Icon className="mb-5" size={22} style={{ color: "var(--accent)" }} />
                     <h3 className="mb-3 text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
                       {option.title}
@@ -319,7 +308,7 @@ export default function PrivateAiSystemsPage() {
 
             <div className="grid gap-4 lg:grid-cols-5">
               {tiers.map((tier) => (
-                <article key={tier.name} className="rounded-xl border p-5" style={{ borderColor: "var(--border-subtle)", background: "rgba(9,9,11,0.55)" }}>
+                <article key={tier.name} className="border p-5" style={{ borderColor: "var(--border-subtle)", background: "rgba(9,9,11,0.55)" }}>
                   <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.14em]" style={{ color: "var(--text-tertiary)" }}>
                     {tier.name}
                   </p>
@@ -355,7 +344,7 @@ export default function PrivateAiSystemsPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border p-6" style={{ borderColor: "var(--border-subtle)", background: "var(--bg-surface)" }}>
+            <div className="border p-6" style={{ borderColor: "var(--border-subtle)", background: "var(--bg-surface)" }}>
               <Wrench className="mb-5" size={22} style={{ color: "var(--accent)" }} />
               <h3 className="mb-3 text-xl font-semibold" style={{ color: "var(--text-primary)" }}>
                 How to start
@@ -368,7 +357,7 @@ export default function PrivateAiSystemsPage() {
               <ServiceCtaLink
                 href="mailto:david@edgelesslab.com?subject=Private%20AI%20system&body=What%20I%20want%20to%20automate%3A%0A%0ATools%20involved%3A%0A%0AAPI%20keys%2C%20local%20LLM%2C%20or%20not%20sure%3A%0A"
                 name="private_ai_email_workflow"
-                className="inline-flex h-11 items-center gap-2 rounded-full border px-5 font-mono text-xs uppercase tracking-[0.1em]"
+                className="inline-flex h-11 items-center gap-2 border px-5 font-mono text-xs uppercase tracking-[0.1em]"
                 style={{
                   color: "var(--green)",
                   borderColor: "rgba(52,211,153,0.35)",

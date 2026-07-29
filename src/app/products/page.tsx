@@ -7,9 +7,9 @@ import { ProductsSubtitle } from "@/components/products-subtitle";
 import { products } from "@/lib/data";
 
 export const metadata = createPageMetadata({
-  title: "Products",
+  title: "Resources",
   description:
-    "Developer tools and templates for AI agent infrastructure. Built from production systems.",
+    "Free references and paid implementation kits extracted from systems used inside Edgeless Lab.",
   path: "/products",
   keywords: ["AI products", "Claude Memory Kit", "prompt engineering", "developer templates", "MCP servers", "agent cookbook"],
 });
@@ -25,8 +25,8 @@ export default function ProductsPage() {
       <JsonLd data={{
         "@context": "https://schema.org",
         "@type": "ItemList",
-        "name": "Edgeless Lab Products",
-        "description": "Developer tools and templates for AI agent infrastructure.",
+        "name": "Edgeless Lab Resources",
+        "description": "Free references and paid implementation kits from working systems.",
         "numberOfItems": products.filter(p => !p.comingSoon).length,
         "itemListElement": products.filter(p => !p.comingSoon).map((p, i) => ({
           "@type": "ListItem",
@@ -36,44 +36,31 @@ export default function ProductsPage() {
         })),
       }} />
 
-      <section className="pt-32 pb-20 px-6">
+      <main id="main-content">
+      <section className="px-6 pb-20 pt-36 sm:pt-44">
         <div className="max-w-[1080px] mx-auto">
-          <div
-            className="inline-flex items-center gap-2.5 mb-6 px-3 py-1.5 rounded-full border"
-            style={{
-              borderColor: "rgba(198, 242, 78, 0.25)",
-              background: "var(--accent-muted)",
-            }}
-          >
-            <span
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ background: "var(--accent)" }}
-            />
-            <span
-              className="text-[11px] font-mono uppercase tracking-[0.14em]"
-              style={{ color: "var(--accent)" }}
-            >
-              On Gumroad &middot; {products.filter(p => !p.comingSoon).length} live
-            </span>
+          <div className="lab-metadata mb-6 flex items-center gap-3" style={{ color: "var(--relay)" }}>
+            <span className="h-2 w-2" style={{ background: "var(--relay)" }} />
+            Resources / from working systems
           </div>
 
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[0.92] mb-6"
+            className="mb-6 text-5xl font-semibold leading-[0.92] tracking-[-0.045em] sm:text-6xl lg:text-7xl"
             style={{ color: "var(--text-primary)" }}
           >
-            Products
+            Resources
           </h1>
 
           <div className="max-w-[640px] mb-8">
             <ProductsSubtitle />
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 mb-12">
+          <div className="mb-12 flex flex-wrap items-center gap-3">
             <a
               href="https://edgelessai.gumroad.com/l/claude-memory-kit"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 h-10 px-5 text-xs font-mono uppercase tracking-[0.1em] rounded-full border transition-all hover:brightness-110 hover:scale-[1.02]"
+              className="inline-flex h-10 items-center gap-2 border px-5 font-mono text-xs uppercase tracking-[0.1em] transition-colors"
               style={{
                 color: "var(--green)",
                 borderColor: "rgba(52, 211, 153, 0.4)",
@@ -83,17 +70,15 @@ export default function ProductsPage() {
               <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--green)" }} />
               Start free with Claude Memory Kit
             </a>
-            <span
-              className="text-[11px] font-mono"
-              style={{ color: "var(--text-tertiary)" }}
-            >
-              5 free lead magnets · instant download
+            <span className="font-mono text-[11px]" style={{ color: "var(--text-tertiary)" }}>
+              Open references first
             </span>
           </div>
 
           <ProductsGrid products={products} />
         </div>
       </section>
+      </main>
 
       <Footer />
     </div>

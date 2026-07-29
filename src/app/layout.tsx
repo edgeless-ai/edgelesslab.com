@@ -18,8 +18,7 @@ const geistSans = localFont({
   weight: "100 900",
   display: "swap",
   fallback: ["system-ui", "sans-serif"],
-  preload: true,
-  crossOrigin: "anonymous",
+  preload: false,
 });
 
 const geistMono = localFont({
@@ -28,37 +27,36 @@ const geistMono = localFont({
   weight: "100 900",
   display: "swap",
   fallback: ["ui-monospace", "monospace"],
-  preload: true,
-  crossorigin: "anonymous",
+  preload: false,
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://edgelesslab.com'),
   title: {
-    default: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
+    default: 'Edgeless Lab | Systems, Field Notes, and Generative Work',
     template: '%s | Edgeless Lab',
   },
-  description: 'One person shipping autonomous agents, generative art, and developer tools. Built in production, released in the open.',
+  description: 'A public research studio for autonomous software, generative systems, and physical artifacts. Working systems, Field Notes, and methods published in the open.',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://edgelesslab.com',
     siteName: 'Edgeless Lab',
-    title: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
-    description: 'One person shipping autonomous agents, generative art, and developer tools. Built in production, released in the open.',
+    title: 'Edgeless Lab | Systems, Field Notes, and Generative Work',
+    description: 'A public research studio for autonomous software, generative systems, and physical artifacts.',
     images: [
       {
         url: '/og-image.webp',
         width: 1200,
         height: 630,
-        alt: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
+        alt: 'Edgeless Lab systems, Field Notes, and generative work',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Edgeless Lab - AI Agents, Generative Art, Developer Tools',
-    description: 'One person shipping autonomous agents, generative art, and developer tools.',
+    title: 'Edgeless Lab | Systems, Field Notes, and Generative Work',
+    description: 'A public research studio for autonomous software, generative systems, and physical artifacts.',
     images: ['/og-image.webp'],
   },
   alternates: {
@@ -89,14 +87,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
         <PerformancePreload />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
-        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' us.i.posthog.com us-assets.i.posthog.com gumroad.com; connect-src 'self' us.i.posthog.com us-assets.i.posthog.com gumroad.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src 'self' gumroad.com;" />
-        <meta httpEquiv="X-Frame-Options" content="SAMEORIGIN" />
-        <meta httpEquiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
+        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' us.i.posthog.com us-assets.i.posthog.com gumroad.com; connect-src 'self' us.i.posthog.com us-assets.i.posthog.com gumroad.com https://edgeless-ingest.djm-claude-assistant.workers.dev; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src 'self' gumroad.com;" />
         {/* Preconnect hints moved to PerformancePreload component for centralized management */}
         <script
           dangerouslySetInnerHTML={{
@@ -120,7 +117,7 @@ export default function RootLayout({
           "@type": "Organization",
           "name": "Edgeless Lab",
           "url": "https://edgelesslab.com",
-          "description": "Creative technology lab building AI agents, MCP servers, generative art pipelines, and developer tools",
+          "description": "Public research studio for autonomous software, generative systems, and physical artifacts",
           "founder": { "@id": "https://edgelesslab.com/#david-murray" },
           "logo": "https://edgelesslab.com/favicon.svg",
           "sameAs": [
@@ -137,7 +134,7 @@ export default function RootLayout({
           "name": "David Murray",
           "url": "https://edgelesslab.com/about",
           "jobTitle": "Founder",
-          "description": "AI builder and creative technologist. Founder of Edgeless Lab — agent systems, generative art, and developer tools.",
+          "description": "AI builder and creative technologist. Founder of Edgeless Lab: agent systems, generative art, and developer tools.",
           "worksFor": {
             "@type": "Organization",
             "name": "Edgeless Lab",
@@ -155,7 +152,7 @@ export default function RootLayout({
           "@type": "WebSite",
           "name": "Edgeless Lab",
           "url": "https://edgelesslab.com",
-          "description": "One person shipping autonomous agents, generative art, and developer tools. Built in production, released in the open.",
+          "description": "A public research studio for autonomous software, generative systems, and physical artifacts.",
           "inLanguage": "en-US",
           "publisher": {
             "@type": "Organization",

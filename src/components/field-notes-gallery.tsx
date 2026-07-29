@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { ArrowUpRight, Search } from "lucide-react";
 import { DemoPreview } from "@/components/demo-preview";
 import type { FieldNote } from "@/lib/field-note-types";
@@ -161,7 +160,7 @@ export function FieldNotesGallery({ notes }: { notes: FieldNote[] }) {
           Showing {filtered.length} artifacts
         </p>
         <p className="hidden font-mono text-[11px] sm:block" style={{ color: "var(--ink-faint)" }}>
-          Live previews mount only when visible
+          Posters first / hover for live previews
         </p>
       </div>
 
@@ -178,9 +177,8 @@ export function FieldNotesGallery({ notes }: { notes: FieldNote[] }) {
                   borderColor: "var(--ink)",
                 }}
               >
-                <Link
+                <a
                   href={`/creative-demos/${note.slug}/`}
-                  prefetch={false}
                   className="group block h-full p-4 sm:p-5"
                   style={{
                     background: lead ? "var(--paper-deep)" : "var(--paper)",
@@ -240,7 +238,7 @@ export function FieldNotesGallery({ notes }: { notes: FieldNote[] }) {
                       </span>
                     )}
                   </div>
-                </Link>
+                </a>
               </article>
             );
           })}

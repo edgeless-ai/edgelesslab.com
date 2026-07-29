@@ -13,7 +13,7 @@ function normalizeTag(tag: string) {
 export const metadata = createPageMetadata({
   title: "Blog",
   description:
-    "Field notes from one developer running 4 services 24/7. New post every product launch.",
+    "Reports, tutorials, and postmortems about autonomous systems, generative tools, recovery work, and production lessons.",
   path: "/blog",
   keywords: [
     "AI engineering blog",

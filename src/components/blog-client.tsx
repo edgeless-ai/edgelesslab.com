@@ -12,7 +12,6 @@ function normalizeTag(tag: string) {
 
 export function BlogSearch({
   allPosts,
-  tagCounts,
 }: {
   allPosts: BlogPost[];
   tagCounts: { tag: string; count: number }[];
@@ -20,6 +19,17 @@ export function BlogSearch({
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const uniquePosts = Array.from(
+    new Map(allPosts.map((post) => [post.slug, post])).values()
+  );
+  const uniqueTagCounts = Array.from(
+    uniquePosts
+      .flatMap((post) => post.tags)
+      .reduce((counts, tag) => {
+        counts.set(tag, (counts.get(tag) ?? 0) + 1);
+        return counts;
+      }, new Map<string, number>())
+  ).map(([tag, count]) => ({ tag, count }));
 
   // Cmd+K / Ctrl+K to focus search
   useEffect(() => {
@@ -42,7 +52,7 @@ export function BlogSearch({
     }
   }, []);
 
-  const filtered = allPosts.filter((post) => {
+  const filtered = uniquePosts.filter((post) => {
     const matchesQuery =
       query.length === 0 ||
       post.title.toLowerCase().includes(query.toLowerCase()) ||
@@ -59,7 +69,7 @@ export function BlogSearch({
   return (
     <>
       <main className="pt-32 pb-20 px-6">
-        <div className="max-w-[800px] mx-auto">
+        <div className="max-w-[920px] mx-auto">
           <div className="flex items-center gap-2.5 mb-6">
             <span
               className="w-1.5 h-1.5 rounded-full"
@@ -69,7 +79,7 @@ export function BlogSearch({
               className="text-[11px] font-mono uppercase tracking-[0.14em]"
               style={{ color: "var(--text-tertiary)" }}
             >
-              Field notes
+              Blog / reports from the lab
             </span>
           </div>
 
@@ -84,7 +94,7 @@ export function BlogSearch({
               className="text-xs font-mono"
               style={{ color: "var(--text-tertiary)" }}
             >
-              {allPosts.length} posts &middot; new on every product launch
+              Reports, tutorials, and postmortems
             </span>
           </div>
 
@@ -92,8 +102,9 @@ export function BlogSearch({
             className="text-base mb-8 max-w-xl"
             style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
           >
-            Shipping logs from a solo AI studio. Claude Code agents, MCP
-            servers, pen plotter runs, and whatever broke last week.
+            What changed after the first version met reality. Agent systems,
+            recovery work, creative tools, pen plotter runs, and the methods
+            worth carrying into the next build.
           </p>
 
           {/* Search bar */}
@@ -175,7 +186,7 @@ export function BlogSearch({
               Topics
             </h2>
             <div className="flex flex-wrap gap-x-5 gap-y-2">
-              {tagCounts
+              {uniqueTagCounts
                 .sort((a, b) => b.count - a.count)
                 .slice(0, 14)
                 .map(({ tag, count }) => {
@@ -249,22 +260,22 @@ function BlogPostCard({ post }: { post: BlogPost }) {
     >
       <Link
         href={`/blog/${post.slug}`}
-        className="group flex items-baseline justify-between gap-4 py-4 px-3 -mx-3 rounded-lg transition-colors hover:bg-[var(--bg-surface)]"
+        className="group grid gap-4 border-b px-3 py-6 -mx-3 transition-colors hover:bg-[var(--bg-surface)] sm:grid-cols-[1fr_auto]"
         style={{ color: "var(--text-primary)" }}
       >
         <div className="min-w-0">
-          <h2 className="text-[15px] font-medium truncate mb-1">
+          <h2 className="text-xl font-medium leading-tight sm:text-2xl">
             {post.title}
           </h2>
           <p
-            className="text-sm truncate"
+            className="mt-3 line-clamp-2 max-w-2xl text-sm leading-6"
             style={{ color: "var(--text-secondary)" }}
           >
             {post.description}
           </p>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="flex gap-1.5">
+        <div className="flex items-center gap-3 sm:flex-col sm:items-end">
+          <div className="hidden gap-1.5 md:flex">
             {post.tags.slice(0, 2).map((tag) => (
               <span
                 key={tag}
@@ -279,7 +290,7 @@ function BlogPostCard({ post }: { post: BlogPost }) {
             ))}
           </div>
           <time
-            className="text-xs font-mono whitespace-nowrap"
+            className="whitespace-nowrap font-mono text-xs"
             style={{ color: "var(--text-tertiary)" }}
           >
             {new Date(post.date + "T00:00:00").toLocaleDateString("en-US", {

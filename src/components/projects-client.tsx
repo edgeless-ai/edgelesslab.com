@@ -1,5 +1,5 @@
-import { ArrowUpRight } from "lucide-react";
-import { GlowingCard } from "@/components/ui/glowing-card";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 interface Project {
   title: string;
@@ -10,152 +10,91 @@ interface Project {
   snippet: string;
 }
 
+const OUTCOMES: Record<string, string> = {
+  "safety-hooks": "Dangerous operations are stopped before execution.",
+  "mcp-servers": "Agents reach knowledge and tools through one protocol layer.",
+  "pen-plotter-art": "Generative studies move from browser canvas to plottable SVG.",
+  "mastra-orchestrator": "Specialist agents receive work through explicit routing rules.",
+  "knowledge-api": "Stored research becomes queryable context instead of a dead archive.",
+  "llm-client": "Model providers can fail without taking the calling system down.",
+};
+
 export function ProjectsHeader() {
   return (
-    <>
-      <div
-        className="inline-flex items-center gap-2.5 mb-6 px-3 py-1.5 rounded-full border"
-        style={{
-          borderColor: "rgba(52, 211, 153, 0.25)",
-          background: "rgba(52, 211, 153, 0.06)",
-          animation: "fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both",
-        }}
-      >
-        <span className="relative flex h-2 w-2">
-          <span
-            className="absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping"
-            style={{ background: "var(--green)" }}
-          />
-          <span
-            className="relative inline-flex h-2 w-2 rounded-full"
-            style={{ background: "var(--green)" }}
-          />
-        </span>
-        <span
-          className="text-[11px] font-mono uppercase tracking-[0.14em]"
-          style={{ color: "var(--green)" }}
-        >
-          Running now
-        </span>
+    <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
+      <div>
+        <div className="lab-metadata mb-5 flex items-center gap-3" style={{ color: "var(--relay)" }}>
+          <span className="h-2 w-2" style={{ background: "var(--relay)" }} />
+          Systems / case studies
+        </div>
+        <h1 className="text-[clamp(3.5rem,8vw,7rem)] font-semibold leading-[0.88] tracking-[-0.055em]">
+          Systems
+        </h1>
       </div>
-
-      <h1
-        className="text-[clamp(3rem,7vw,6rem)] font-bold leading-[0.92] tracking-[-0.035em]"
-        style={{
-          color: "var(--text-primary)",
-          animation: "fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.08s both",
-        }}
-      >
-        Projects
-      </h1>
-
-      <p
-        className="mt-5 text-lg max-w-xl font-light"
-        style={{
-          color: "var(--text-secondary)",
-          lineHeight: 1.55,
-          animation: "fadeInUp 0.55s cubic-bezier(0.16,1,0.3,1) 0.18s both",
-        }}
-      >
-        Four always-on services on one Hetzner box. Hooks guard, Hermes assists, pm2 managed, zero restarts.
-      </p>
-    </>
+      <div className="max-w-2xl lg:pb-2">
+        <p className="text-xl leading-8" style={{ color: "var(--text-primary)" }}>
+          Production tools built to keep working after the first clean demo.
+        </p>
+        <p className="mt-4 max-w-xl text-sm leading-6" style={{ color: "var(--text-secondary)" }}>
+          Each case study starts with the constraint, shows the system that
+          answered it, and records what changed once real failures appeared.
+        </p>
+      </div>
+    </div>
   );
 }
 
 export function ProjectsGrid({ projects }: { projects: Project[] }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {projects.map((project, i) => (
-        <div
+    <div
+      className="grid gap-px border md:grid-cols-2"
+      style={{
+        borderColor: "var(--border-subtle)",
+        background: "var(--border-subtle)",
+      }}
+    >
+      {projects.map((project) => (
+        <Link
           key={project.slug}
-          style={{
-            animation: `fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) ${i * 0.07}s both`,
-          }}
+          href={`/projects/${project.slug}`}
+          className="group flex min-h-[330px] flex-col p-6 sm:p-8"
+          style={{ background: "var(--bg-surface)" }}
         >
-          <GlowingCard href={`/projects/${project.slug}`} className="h-full">
-            <div
-              className="w-full rounded-lg mb-6 overflow-hidden"
-              style={{
-                background: "rgba(0,0,0,0.4)",
-                border: "1px solid var(--border-subtle)",
-              }}
-            >
-              <div
-                className="flex items-center gap-1.5 px-3 py-2.5 border-b"
-                style={{ borderColor: "var(--border-subtle)" }}
-              >
-                <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
-                <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
-                <div className="w-2 h-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
-                <span
-                  className="ml-2 text-xs font-mono"
-                  style={{ color: "var(--text-tertiary)" }}
-                >
-                  {project.slug}
-                </span>
-              </div>
-              <pre
-                className="px-3 py-3 text-xs leading-[1.7] font-mono whitespace-pre overflow-hidden min-h-[80px]"
-                style={{ color: "var(--green)" }}
-              >
-                {project.snippet}
-              </pre>
-            </div>
+          <div className="flex items-center justify-between gap-4">
+            <span className="lab-metadata" style={{ color: "var(--relay)" }}>
+              {project.tags[0] || "System"}
+            </span>
+            <span className="lab-metadata" style={{ color: "var(--accent)" }}>
+              {project.status}
+            </span>
+          </div>
 
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-1.5">
-                  <h2
-                    className="text-lg font-semibold"
-                    style={{ color: "var(--text-primary)" }}
-                  >
-                    {project.title}
-                  </h2>
-                  <span
-                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-mono"
-                    style={{
-                      background: "var(--green-muted)",
-                      color: "var(--green)",
-                    }}
-                  >
-                    <span
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ background: "var(--green)" }}
-                    />
-                    {project.status}
-                  </span>
-                </div>
-                <p
-                  className="text-sm"
-                  style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
-                >
-                  {project.description}
-                </p>
-              </div>
-              <ArrowUpRight
-                size={16}
-                className="shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ color: "var(--text-tertiary)" }}
-              />
-            </div>
+          <h2 className="mt-10 text-3xl font-semibold tracking-[-0.025em]">
+            {project.title}
+          </h2>
+          <p className="mt-4 max-w-xl text-sm leading-6" style={{ color: "var(--text-secondary)" }}>
+            {project.description}
+          </p>
 
-            <div className="flex flex-wrap gap-2">
-              {project.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-2.5 py-1 text-xs font-mono rounded-md"
-                  style={{
-                    background: "var(--accent-muted)",
-                    color: "var(--accent)",
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
+          <div className="mt-7 border-l pl-4" style={{ borderColor: "var(--relay)" }}>
+            <div className="lab-metadata mb-2" style={{ color: "var(--text-tertiary)" }}>
+              Outcome
             </div>
-          </GlowingCard>
-        </div>
+            <p className="text-sm leading-6">
+              {OUTCOMES[project.slug] || "The working implementation and its operating constraints are documented in the case study."}
+            </p>
+          </div>
+
+          <div className="mt-auto flex items-end justify-between gap-4 pt-8">
+            <span className="font-mono text-[10px] uppercase tracking-[0.08em]" style={{ color: "var(--text-tertiary)" }}>
+              {project.tags.slice(0, 3).join(" / ")}
+            </span>
+            <ArrowRight
+              size={16}
+              className="shrink-0 transition-transform group-hover:translate-x-1"
+            />
+          </div>
+        </Link>
       ))}
     </div>
   );

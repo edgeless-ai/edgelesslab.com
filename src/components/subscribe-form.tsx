@@ -1,46 +1,111 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 
-export function SubscribeForm() {
+const INGEST_URL =
+  process.env.NEXT_PUBLIC_INGEST_URL ||
+  "https://edgeless-ingest.djm-claude-assistant.workers.dev";
+
+type Status = "idle" | "submitting" | "success" | "error";
+
+export function SubscribeForm({ source = "site" }: { source?: string }) {
   const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [company, setCompany] = useState("");
+  const [status, setStatus] = useState<Status>("idle");
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    const subject = encodeURIComponent("Subscribe to Edgeless Lab updates");
-    const body = encodeURIComponent(`Please add me to the newsletter: ${email}`);
-    window.location.href = `mailto:david@edgelesslab.com?subject=${subject}&body=${body}`;
-    setSubmitted(true);
-    setEmail("");
-  };
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    if (!email || status === "submitting") return;
+
+    if (company) {
+      setStatus("success");
+      return;
+    }
+
+    setStatus("submitting");
+    try {
+      const response = await fetch(`${INGEST_URL}?e=newsletter_signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          distinct_id: email,
+          source,
+          page_url: window.location.href,
+          consent: "Edgeless Lab email updates",
+        }),
+      });
+
+      if (!response.ok) throw new Error("Signup endpoint rejected the request");
+      setEmail("");
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    }
+  }
 
   return (
-    <>
-      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md">
+    <div className="max-w-xl">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
+        <label className="sr-only" htmlFor={`newsletter-${source}`}>
+          Email address
+        </label>
         <input
+          id={`newsletter-${source}`}
           type="email"
           required
+          autoComplete="email"
           placeholder="you@example.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 h-10 px-4 rounded-lg bg-transparent border text-sm outline-none focus:border-white/30 transition-colors"
-          style={{ borderColor: "var(--border-subtle)", color: "var(--text-primary)" }}
+          onChange={(event) => {
+            setEmail(event.target.value);
+            if (status !== "idle") setStatus("idle");
+          }}
+          className="h-11 flex-1 border bg-transparent px-4 text-sm outline-none transition-colors"
+          style={{
+            borderColor: status === "error" ? "var(--oxide)" : "var(--border-focus)",
+            color: "var(--text-primary)",
+          }}
         />
+        <label className="absolute -left-[10000px]" aria-hidden="true">
+          Company
+          <input
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            value={company}
+            onChange={(event) => setCompany(event.target.value)}
+          />
+        </label>
         <button
           type="submit"
-          className="h-10 px-5 text-sm font-medium rounded-lg transition-all hover:brightness-110 shrink-0"
-          style={{ background: "var(--accent)", color: "#fff" }}
+          disabled={status === "submitting" || status === "success"}
+          className="h-11 shrink-0 px-6 text-sm font-medium transition-[filter,opacity] hover:brightness-110 disabled:cursor-default disabled:opacity-70"
+          style={{ background: "var(--accent)", color: "var(--accent-contrast)" }}
         >
-          Subscribe
+          {status === "submitting"
+            ? "Joining..."
+            : status === "success"
+              ? "You are on the list"
+              : "Get new Field Notes"}
         </button>
       </form>
-      {submitted && (
-        <p className="mt-3 text-xs font-mono" style={{ color: "var(--green)" }}>
-          Thanks — your email client will open to confirm.
-        </p>
-      )}
-    </>
+      <p className="mt-3 text-xs leading-5" style={{ color: "var(--text-tertiary)" }}>
+        New Field Notes and useful build reports. No automated sales sequence.
+        Unsubscribe by replying.
+      </p>
+      <p aria-live="polite" className="mt-2 min-h-5 font-mono text-xs">
+        {status === "success" && (
+          <span style={{ color: "var(--green)" }}>
+            Added. The next update will arrive by email.
+          </span>
+        )}
+        {status === "error" && (
+          <span style={{ color: "var(--oxide)" }}>
+            Signup could not be recorded. Use the RSS feed or email David.
+          </span>
+        )}
+      </p>
+    </div>
   );
 }

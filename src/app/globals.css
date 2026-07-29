@@ -48,6 +48,8 @@ html[data-theme="light"] {
   --malachite-deep: #134D35;
   --relay: #7AA2FF;
   --relay-muted: rgba(122, 162, 255, 0.14);
+  --oxide: #C96846;
+  --oxide-muted: rgba(201, 104, 70, 0.14);
   --font-editorial: Georgia, "Times New Roman", serif;
 
   --radius-sm: 6px;

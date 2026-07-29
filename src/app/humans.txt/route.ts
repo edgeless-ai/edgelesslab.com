@@ -1,4 +1,4 @@
-// /humans.txt — authorship & credits (http://humanstxt.org/).
+// /humans.txt: authorship and credits (http://humanstxt.org/).
 // Companion file to /llms.txt. Tells humans and crawlers who actually builds
 // this site. Re-rendered at build time, served as text/plain with 24h cache.
 
@@ -21,11 +21,11 @@ const body = `/* TEAM */
 	Source:             https://github.com/edgeless-ai
 
 /* THANKS */
-	- Next.js team — for the static export pipeline that makes this site fast at the edge
-	- Model Context Protocol maintainers — for the agent integration primitives powering every product shipped here
-	- Vercel + Cloudflare Pages — for the build pipeline and global CDN
-	- Pen-plotter + generative-art community — for the references in /lab and /pen-plotter
-	- Open-source maintainers everywhere — every dependency below credits its authors
+	- Next.js team, for the static export pipeline that makes this site fast at the edge
+	- Model Context Protocol maintainers, for the agent integration primitives powering every product shipped here
+	- Vercel + Cloudflare Pages, for the build pipeline and global CDN
+	- Pen-plotter + generative-art community, for the references in /lab and /pen-plotter
+	- Open-source maintainers everywhere, every dependency below credits its authors
 
 /* LICENSE */
 	Code:               MIT (this site's source on GitHub)

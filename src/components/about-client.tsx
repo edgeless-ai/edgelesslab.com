@@ -84,20 +84,20 @@ export function AboutHeader() {
 }
 
 const philosophyParagraphs = [
-  "Most AI companies are building demos. This lab builds infrastructure that runs 24/7. The knowledge pipeline indexes thousands of documents. The MCP servers handle real queries from real agents. The hooks catch mistakes before they cost real money.",
-  "The lab exists at the intersection of AI, craft, and systems thinking. Every project ships. Every tool gets used. If it doesn\u2019t work in production, it doesn\u2019t exist.",
-  "The best AI tools are built by people who use them every day. Everything here is dogfooded. The orchestration layer routes my own work. The memory system stores my own knowledge. The hooks guard my own agents.",
+  "I work best where software, research, and craft overlap. The problems are usually ambiguous at the start: an agent system that cannot recover, a knowledge archive nobody can query, or a visual process that has not found its physical form yet.",
+  "On the systems side, I build orchestration, memory, safety, and model-routing infrastructure. The work is judged by what happens during failure: whether state survives, whether an action can be verified, and whether a human can still understand the result.",
+  "On the creative side, I use code as a material. A browser study can become a plotter path, a textile system, a print, or a better question. Field Notes keep the method attached to the artifact.",
 ];
 
 const philosophyPullQuotes = [
   {
-    text: "Infrastructure that runs 24/7.",
+    text: "Failure is part of the brief.",
     side: "right" as const,
     yOffset: 20,
     width: 240,
   },
   {
-    text: "If it doesn\u2019t work in production, it doesn\u2019t exist.",
+    text: "Keep the method attached to the artifact.",
     side: "right" as const,
     yOffset: 200,
     width: 260,
@@ -174,12 +174,11 @@ export function Timeline({ items }: { items: TimelineItem[] }) {
 
 export function Manifesto() {
   const lines = [
-    "Ship weekly.",
-    "Price honestly.",
-    "Open-source the boring parts.",
-    "Run it in production before selling it.",
-    "Answer every email.",
-    "No vaporware. Ever.",
+    "Build under real constraints.",
+    "Publish the method and the failure.",
+    "Let working artifacts carry the argument.",
+    "Use the tools before recommending them.",
+    "Keep humans at irreversible decisions.",
   ];
   return (
     <div className="max-w-3xl">

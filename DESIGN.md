@@ -49,10 +49,12 @@ collaborators and employers, then buyers. Its priorities are:
 | Signal lime | `#c6f24e` | Live state, active route, primary action |
 | Malachite | `#1a6847` | Field Notes research and natural systems |
 | Relay blue | `#7aa2ff` | Directed routing and interactive focus only |
+| Oxide | `#c96846` | Physical editions, material studies, and Shop |
 
 Signal lime is not a general decoration color. Relay blue appears only when a
-route, handoff, or interactive state is visible. Field Sheet projects may use
-one natural pigment in place of malachite.
+route, handoff, or interactive state is visible. Oxide identifies work that
+has crossed from screen to physical material. Field Sheet projects may use one
+natural pigment in place of malachite.
 
 ## Typography roles
 
@@ -79,14 +81,33 @@ same scale in one section.
 
 ## Motion contract
 
-- The homepage signature is a route field. Selecting a destination reorganizes
-  its network and reveals the corresponding content.
+- The homepage signature is one real generative artifact. Pointer movement
+  changes the work itself. The artifact is not a navigation diagram.
 - Field Notes motion comes primarily from live study previews.
 - Hover motion should confirm what opens or what changes.
 - All meaningful controls work with keyboard focus.
 - `prefers-reduced-motion` receives a composed static state.
-- No section may introduce a second ambient animation while the route field is
-  active above the fold.
+- No section may introduce a second ambient animation while the featured
+  artifact is active above the fold.
+- Every live preview has a composed poster before its runtime mounts.
+- A failed preview leaves the poster visible and never produces an empty black
+  frame.
+
+## Homepage content contract
+
+The homepage is curated, not exhaustive. It contains:
+
+1. one thesis and one featured live artifact;
+2. three selected Field Notes;
+3. one featured Blog post and two recent posts;
+4. three Systems case studies with a visible outcome;
+5. one direct path to work with David;
+6. one art-led Shop entry point;
+7. one working readership action.
+
+Inventory totals, uptime counters, activity feeds, and internal status panels
+do not belong on the homepage. Operational facts are useful only when they
+support a case study.
 
 ## Information architecture vocabulary
 
@@ -94,14 +115,15 @@ Use these labels consistently:
 
 - **Field Notes:** interactive studies, scientific plots, generative systems,
   and visual research.
-- **Writing:** essays, build reports, and longer explanations.
-- **Now:** current work and operating status.
-- **Work:** projects, products, and services.
+- **Systems:** production tools, infrastructure, and case studies.
+- **Blog:** build reports, tutorials, postmortems, and longer explanations.
+- **Work with David:** a direct route for collaboration and hiring.
 - **Shop:** art-led editions and objects. The art is named before the garment
   or substrate.
 
-`Creative` and `Notes` are retired as public navigation labels. Existing URLs
-may redirect, but they do not define separate content collections.
+`Creative`, `Notes`, `Writing`, `Projects`, and `Now` are retired as primary
+public navigation labels. Existing URLs may remain for compatibility, but the
+visitor-facing vocabulary above defines the site.
 
 ## Field Sheet conventions
 

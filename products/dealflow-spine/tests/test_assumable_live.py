@@ -90,6 +90,59 @@ def test_live_env_routes_to_live_records(adapter, monkeypatch):
     assert seen["args"] == ("4", 7)
 
 
+# --- multi-borough aim (gov-dense default) ---------------------------------
+
+def _record_boroughs(adapter, monkeypatch):
+    """Patch _live_records to log the boroughs it is asked to pull, tagging
+    one record per borough so record identity is traceable."""
+    seen: list[str] = []
+
+    def fake(borough, limit):
+        seen.append(str(borough))
+        return [{"instrument_id": f"I-{borough}", "recorded_date": "2020-06-01",
+                 "doc_type": "MORTGAGE", "loan_program": "FHA",
+                 "loan_amount": 355000.0, "origination_date": "2020-06-01",
+                 "property": {"address": f"{borough} MAIN ST", "apn": borough}}]
+
+    monkeypatch.setattr(adapter, "_live_records",
+                        lambda borough, limit: fake(borough, limit))
+    monkeypatch.setenv(LIVE, "1")
+    return seen
+
+
+def test_default_aim_is_gov_dense_bronx_and_queens(adapter, monkeypatch):
+    seen = _record_boroughs(adapter, monkeypatch)
+    signals = adapter.fetch()                 # no borough -> default aim
+    assert seen == ["2", "4"]                 # Bronx, then Queens
+    assert adapter.DEFAULT_BOROUGHS == ("2", "4")
+    # every targeted borough's records flow through to signals
+    assert {s["evidence"]["instrument_id"] for s in signals} == {"I-2", "I-4"}
+
+
+def test_default_aim_excludes_low_share_boroughs(adapter):
+    # Brooklyn (3) is below Queens on HMDA gov share; Manhattan (1) negligible
+    assert "3" not in adapter.DEFAULT_BOROUGHS
+    assert "1" not in adapter.DEFAULT_BOROUGHS
+
+
+def test_explicit_boroughs_list_overrides_default(adapter, monkeypatch):
+    seen = _record_boroughs(adapter, monkeypatch)
+    adapter.fetch(boroughs=["2", "3"])
+    assert seen == ["2", "3"]
+
+
+def test_explicit_single_borough_wins_over_default(adapter, monkeypatch):
+    seen = _record_boroughs(adapter, monkeypatch)
+    adapter.fetch(borough="1")
+    assert seen == ["1"]
+
+
+def test_bad_borough_raises_before_network(adapter, monkeypatch):
+    monkeypatch.setenv(LIVE, "1")
+    with pytest.raises(ValueError):
+        adapter.fetch(boroughs=["2", "5"])    # 5 = Staten Island, not in ACRIS
+
+
 # --- HMDA inference --------------------------------------------------------
 
 def test_bin_midpoint_matches_public_lar_convention(adapter):
@@ -179,7 +232,7 @@ def test_live_fetch_caps_inferred_confidence_and_carries_provenance(
                masters=[MASTER], legals={"2020050400526001": LEGAL},
                bins={(2020, 355_000.0): {"VA": 3}})
     monkeypatch.setenv(LIVE, "1")
-    signals = adapter.fetch()
+    signals = adapter.fetch(borough="3")   # pin: default aim is multi-borough
     assert len(signals) == 1
     sig = signals[0]
     assert sig["signal_type"] == "assumable_loan"
@@ -208,7 +261,7 @@ def test_live_fetch_drops_out_of_window_and_unmatched(adapter, monkeypatch):
                        "X2": dict(LEGAL, document_id="X2")},
                bins={(2020, 355_000.0): {"FHA": 1},
                      (2018, 355_000.0): {"FHA": 9}})
-    signals = adapter.fetch(offline=False)
+    signals = adapter.fetch(offline=False, borough="3")
     assert [s["evidence"]["instrument_id"] for s in signals] \
         == ["2020050400526001"]      # 2018 vintage + CONV both filtered
 
@@ -223,15 +276,15 @@ def test_posterior_bounds_cap_and_floor(adapter, monkeypatch):
         bins={(2020, 355_000.0): {"FHA": 5}}, shares=shares)
 
     wire({2020: 0.9})    # posterior 0.9 -> hard cap
-    sig = adapter.fetch(offline=False)[0]
+    sig = adapter.fetch(offline=False, borough="3")[0]
     assert sig["confidence"] == adapter.INFERRED_CONFIDENCE_CAP
 
     wire({2020: 0.03})   # posterior 0.03 -> floor 0.05
-    sig = adapter.fetch(offline=False)[0]
+    sig = adapter.fetch(offline=False, borough="3")[0]
     assert sig["confidence"] == adapter.INFERRED_CONFIDENCE_FLOOR
 
     wire({})             # share unknown -> posterior None -> flat cap
-    sig = adapter.fetch(offline=False)[0]
+    sig = adapter.fetch(offline=False, borough="3")[0]
     assert sig["confidence"] == adapter.INFERRED_CONFIDENCE_CAP
     assert sig["evidence"]["program_inference"][
         "posterior_gov_probability"] is None

@@ -6,6 +6,7 @@ dealflow-spine CLI.
   python cli.py run --live # same, with network adapters enabled (default is offline/fixtures)
   python cli.py ingest     # ingest only (adapters -> data/signals.jsonl)
   python cli.py enrich     # resolve quarantined signals (signals_pending.jsonl -> resolvers -> ledger)
+  python cli.py review     # list ambiguous enrichments; --pick <key> <i> resolves one to a parcel
   python cli.py score      # merge + score the ledger, print the ranked table (no writes)
   python cli.py underwrite # re-run the strategy picker on data/candidates.jsonl + refresh digest
   python cli.py digest     # re-render the digest from data/candidates.jsonl
@@ -28,6 +29,7 @@ from spine.enrich import run_enrich
 from spine.ingest import load_ledger_signals, run_ingest
 from spine.merge import merge_signals
 from spine.pipeline import Paths, run_pipeline
+from spine.review import apply_pick, list_ambiguous
 from spine.route import load_candidates, write_candidates, write_digest
 from spine.scoring import score_record
 from spine.underwrite import top_reason, underwrite_candidates
@@ -147,6 +149,49 @@ def cmd_enrich(args) -> int:
     return 0
 
 
+def cmd_review(args) -> int:
+    """Human disambiguation of ambiguous enrichments: list the rows awaiting
+    a pick, or --pick one to re-ingest its chosen candidate parcel."""
+    paths = _paths(args)
+    if args.pick:
+        key, raw_idx = args.pick
+        try:
+            choice = int(raw_idx)
+        except ValueError:
+            print(f"pick INDEX must be an integer, got {raw_idx!r}",
+                  file=sys.stderr)
+            return 2
+        res = apply_pick(key, choice, pending_path=paths.pending,
+                         ledger_path=paths.ledger)
+        if not res.ok:
+            print(f"✗ {res.message}", file=sys.stderr)
+            return 1
+        addr = res.address or "(no address)"
+        print(f"✓ {res.dedupe_key} -> {addr}  apn={res.apn}  [{res.message}]")
+        print("  (run `python cli.py run` to score + route it)")
+        return 0
+
+    items = list_ambiguous(paths.pending)
+    print("── review ──")
+    if not items:
+        print("  no ambiguous enrichments awaiting review "
+              "(nothing parked in enrichment_candidates)")
+        return 0
+    print(f"  {len(items)} signal(s) awaiting a human pick:\n")
+    for it in items:
+        print(f"  ● {it.name or '(no name)'}  [{it.signal_type}]  "
+              f"{it.status}, {it.attempts} attempt(s)  via {it.resolver}")
+        print(f"    key: {it.dedupe_key}")
+        for i, c in enumerate(it.candidates):
+            addr = c.get("address") or "(no address)"
+            apn = c.get("apn") or "?"
+            owner = c.get("owner") or c.get("owner_1") or ""
+            print(f"      [{i}] {addr}  apn={apn}"
+                  + (f"  owner={owner}" if owner else ""))
+        print(f"    pick: python cli.py review --pick {it.dedupe_key} <index>\n")
+    return 0
+
+
 def cmd_underwrite(args) -> int:
     paths = _paths(args)
     candidates = load_candidates(paths.candidates)
@@ -248,6 +293,13 @@ def main(argv: list[str] | None = None) -> int:
                        help="enable live resolvers (default: offline, fixture "
                             "resolver only)")
     p_enr.set_defaults(func=cmd_enrich)
+
+    p_rev = sub.add_parser("review",
+                           help="human disambiguation of ambiguous "
+                                "enrichments (list candidates; --pick to resolve)")
+    p_rev.add_argument("--pick", nargs=2, metavar=("DEDUPE_KEY", "INDEX"),
+                       help="resolve DEDUPE_KEY to candidate INDEX and re-ingest")
+    p_rev.set_defaults(func=cmd_review)
 
     p_uw = sub.add_parser("underwrite",
                           help="strategy-pick hot/warm candidates, rewrite snapshot + digest")

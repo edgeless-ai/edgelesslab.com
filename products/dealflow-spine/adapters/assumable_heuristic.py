@@ -28,7 +28,10 @@ Live path (DEALFLOW_LIVE=1 / cli.py run --live) — two-layer join
     CONV_OR_UNKNOWN and produce NO signal (a missing lead beats a fake
     one). NYC is a low-FHA/VA market — right for proving the pipe, wrong
     for hunting assumables at scale; the FHA/VA-dense metros' recorders
-    are captcha-gated/paid (survey doc §4/§9).
+    are captcha-gated/paid (survey doc §4/§9). Within ACRIS the live pull
+    aims at the gov-dense boroughs (DEFAULT_BOROUGHS = Bronx + Queens; see
+    the NYC_BOROUGHS note for the HMDA shares that rank them), which lifts
+    the inferred-program posterior above the ~0.10 Queens-only floor.
 
 Fixture format (fixtures/adapters/assumable_heuristic_sample.json)
     [
@@ -110,7 +113,16 @@ NYC_BOROUGHS = {
     "3": ("36047", "KINGS", "BROOKLYN"),
     "4": ("36081", "QUEENS", "QUEENS"),
 }
-DEFAULT_BOROUGH = "4"   # Queens: most FHA/VA-dense borough ACRIS covers
+# Government-loan share of 2019-21 originations by borough (HMDA aggregations,
+# keyless, live-verified 2026-07-25 — the Bayes PRIOR that governs inferred
+# confidence). 2020 gov (FHA+VA+USDA) share:
+#     Bronx 15.4%  >  Queens 8.5%  >  Brooklyn 4.9%  >  Manhattan 0.1%
+# So the assumable heuristic aims at the two genuinely gov-dense boroughs
+# ACRIS covers, Bronx first. NOTE the empirical correction: Brooklyn (4.9%)
+# is BELOW Queens, so it is deliberately NOT a default target — the higher
+# match denominator would deflate labels, not sharpen them.
+DEFAULT_BOROUGH = "4"           # Queens (kept for single-borough callers)
+DEFAULT_BOROUGHS = ("2", "4")   # Bronx + Queens: the gov-dense aim
 LIVE_LIMIT = 250               # bounded Socrata pull per run (politeness)
 HMDA_YEARS = (2019, 2020, 2021)
 HMDA_LOAN_TYPE_LABEL = {"2": "FHA", "3": "VA", "4": "USDA"}
@@ -382,10 +394,29 @@ def _live_records(borough: str = DEFAULT_BOROUGH,
     return records
 
 
+def _resolve_boroughs(borough: str | None,
+                      boroughs) -> list[str]:
+    """Target borough list for a live pull. Explicit `boroughs` wins; else a
+    single explicit `borough`; else the gov-dense default (Bronx + Queens).
+    Validated up front so a bad digit fails before any network work."""
+    if boroughs is not None:
+        targets = [str(b) for b in boroughs]
+    elif borough is not None:
+        targets = [str(borough)]
+    else:
+        targets = list(DEFAULT_BOROUGHS)
+    bad = [b for b in targets if b not in NYC_BOROUGHS]
+    if bad:
+        raise ValueError(f"borough(s) {bad} not in {sorted(NYC_BOROUGHS)} "
+                         "(ACRIS does not cover Staten Island)")
+    return targets
+
+
 def fetch(records: list[dict] | None = None,
           current_rate: float = DEFAULT_CURRENT_RATE,
           offline: bool | None = None,
-          borough: str = DEFAULT_BOROUGH,
+          borough: str | None = None,
+          boroughs=None,
           limit: int = LIVE_LIMIT) -> list[dict]:
     """Flag assumable low-rate FHA/VA/USDA loans from recording records.
 
@@ -396,9 +427,12 @@ def fetch(records: list[dict] | None = None,
         current_rate: today's 30y fixed rate used for the delta hint.
         offline: None consults DEALFLOW_LIVE (via _common.resolve_offline);
                  an explicit True/False always wins.
-        borough: ACRIS borough digit for the live pull, 1-4 (default
-                 Queens; Staten Island is NOT in ACRIS).
-        limit: max ACRIS master rows per live run (politeness bound).
+        borough: a single ACRIS borough digit (1-4) to pull; overrides the
+                 default aim. Staten Island is NOT in ACRIS.
+        boroughs: an explicit list of borough digits; overrides both `borough`
+                  and the default. Default aim = DEFAULT_BOROUGHS (Bronx +
+                  Queens, the gov-dense boroughs — see NYC_BOROUGHS note).
+        limit: max ACRIS master rows per live run, PER borough (politeness).
     """
     fixture_mode = False
     if records is None:
@@ -406,7 +440,9 @@ def fetch(records: list[dict] | None = None,
             records = _common.load_fixture(FIXTURE)
             fixture_mode = True
         else:
-            records = _live_records(borough=borough, limit=limit)
+            records = []
+            for b in _resolve_boroughs(borough, boroughs):
+                records += _live_records(borough=b, limit=limit)
     signals = []
     for rec in records:
         sig = _to_signal(rec, current_rate)

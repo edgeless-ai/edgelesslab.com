@@ -221,6 +221,31 @@ Per-record inference provenance (`matched_bin`, `bin_counts`,
 ships in `evidence.program_inference`; `evidence.loan_program_source` is
 `"inferred"` vs the fixture path's `"stated"`.
 
+### Aimed at gov-dense boroughs (2026-07-25)
+
+The 2026-07-04 note left the live adapter defaulting to Queens (borough 4), the
+"most FHA/VA-dense borough ACRIS covers" — but that was an assumption, not a
+measurement. Live-probed the HMDA aggregations endpoint (keyless,
+`loan_types=1,2,3,4 & actions_taken=1`) for all four ACRIS boroughs, 2020:
+
+| Borough | County FIPS | Total orig. | Gov (FHA+VA+USDA) | **Gov share** |
+|---|---|---|---|---|
+| **Bronx** | 36005 | 7,182 | 1,105 | **15.4%** |
+| Queens | 36081 | 25,817 | 2,196 | 8.5% |
+| Brooklyn | 36047 | 25,066 | 1,219 | 4.9% |
+| Manhattan | 36061 | 16,688 | 12 | 0.1% |
+
+**Bronx is ~2× Queens; Brooklyn is BELOW Queens.** Because the adapter's
+confidence is the Bayes posterior `county_gov_share / batch_match_rate`, aiming
+at Bronx materially lifts label confidence, while adding Brooklyn would *lower*
+the average (bigger match denominator, same-or-thinner prior). So the adapter's
+default aim is now `DEFAULT_BOROUGHS = (Bronx, Queens)` — Brooklyn and Manhattan
+are deliberately excluded, correcting the "Bronx/Brooklyn" hunch with the data.
+`fetch(borough=...)` / `fetch(boroughs=[...])` still target any borough(s)
+explicitly; `limit` is per-borough. The recorder-leg ceiling is unchanged
+(§4/§9): no keyless source pairs program with parcel, so labels stay inferred
+and image-verifiable, never read.
+
 ## Surprises worth remembering
 
 1. **HMDA's data-browser `/view/csv` endpoint is loan-level and keyless** — 10k

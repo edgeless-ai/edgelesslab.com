@@ -372,16 +372,7 @@ export function CommandPalette() {
         {query.length < 2 && pagefindReady && (
           <div className="px-5 py-3">
             <p className="text-[11px] font-mono" style={{ color: "var(--text-tertiary)" }}>
-              {totalIndexed ? (
-                <>
-                  Full-text search across all {totalIndexed} pages &middot; type at least 2
-                  characters
-                </>
-              ) : (
-                <>
-                  Full-text search across the entire site &middot; type at least 2 characters
-                </>
-              )}
+              Full-text search across the entire site &middot; type at least 2 characters
             </p>
           </div>
         )}

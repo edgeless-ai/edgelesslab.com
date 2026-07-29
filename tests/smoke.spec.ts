@@ -35,6 +35,22 @@ test.describe("static site smoke", () => {
     expect(await cards.count()).toBeGreaterThanOrEqual(6);
   });
 
+  test("command palette opens and searches without runtime errors", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+
+    await page.goto("/blog/");
+    await page.getByRole("button", { name: /Search/ }).click();
+
+    const searchInput = page.getByRole("textbox", { name: "Search site content" });
+    await expect(searchInput).toBeVisible();
+    await searchInput.fill("Total Serialism");
+    await expect(
+      page.locator("[data-index]").filter({ hasText: /Total Serialism/i }).first(),
+    ).toBeVisible({ timeout: 10_000 });
+    expect(errors).toEqual([]);
+  });
+
   test("home page has no severe console errors", async ({ page }) => {
     // Known pre-existing issues (2026-07-05), filtered so this test only
     // catches NEW severe errors. Remove entries as the underlying bugs get fixed:

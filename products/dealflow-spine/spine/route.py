@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import html as _html
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
@@ -259,6 +260,9 @@ def _lead_detail(c: DealCandidate) -> dict:
     if status:
         why += f" ({status})"
     why = why.replace("|", "/").replace("\n", " ").replace("\r", " ")
+    # source descriptions sometimes glue two words ('vacantREFERENCE:'); un-glue
+    # a lowercase→UPPERCASE-run boundary without splitting normal CamelCase.
+    why = re.sub(r"([a-z])([A-Z]{2,})", r"\1 \2", why)
     return {
         "why": why[:80],
         "cases": len(cv) or len(sigs),

@@ -73,6 +73,7 @@ def _fetch_live(limit: int = LIVE_LIMIT) -> list[dict]:
     signalling exceededTransferLimit.
     """
     out: list[dict] = []
+    seen: set[str] = set()
     offset = 0
     while len(out) < limit:
         page_size = min(_PAGE, limit - len(out))
@@ -87,9 +88,19 @@ def _fetch_live(limit: int = LIVE_LIMIT) -> list[dict]:
         })
         feats = data.get("features", []) if isinstance(data, dict) else []
         recs = [f.get("attributes", {}) for f in feats if f.get("attributes")]
-        out.extend(recs)
+        # Dedupe by PIN: guards against a service that ignores resultOffset and
+        # re-serves the same window (would otherwise inflate + loop to the cap).
+        new = []
+        for r in recs:
+            pin = str(r.get("PIN") or "")
+            if pin and pin in seen:
+                continue
+            if pin:
+                seen.add(pin)
+            new.append(r)
+        out.extend(new)
         more = isinstance(data, dict) and data.get("exceededTransferLimit")
-        if len(recs) < page_size or not more:
+        if len(recs) < page_size or not more or not new:
             break
         offset += len(recs)
     return out[:limit]

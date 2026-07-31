@@ -113,6 +113,25 @@ def test_fetch_live_paginates_until_short_page(adapter, monkeypatch):
     assert recs[0]["PIN"] == "0" and recs[-1]["PIN"] == "2499"
 
 
+def test_fetch_live_dedupes_when_service_ignores_offset(adapter, monkeypatch):
+    """Hardening: some ArcGIS layers silently ignore resultOffset and return the
+    same window every page. Without a guard that inflates the ledger with
+    duplicate PINs and loops to the cap. _fetch_live must dedupe by PIN and stop
+    once a page adds nothing new."""
+    def fake_get_json(url, params=None, **kw):
+        page_size = int(params["resultRecordCount"])
+        feats = [{"attributes": {"PIN": str(i), "ADDR_FULL": f"{i} X ST",
+                                 "CTYNAME": "SEATTLE", "KCTP_STATE": "CA"}}
+                 for i in range(page_size)]          # SAME rows every call
+        return {"features": feats, "exceededTransferLimit": True}  # "more" forever
+
+    monkeypatch.setattr(adapter._common, "http_get_json", fake_get_json)
+    recs = adapter._fetch_live(limit=5000)
+    pins = [r["PIN"] for r in recs]
+    assert len(pins) == len(set(pins))     # no duplicate PINs
+    assert len(recs) <= 1000               # stopped after the first (all-new) page
+
+
 def test_fetch_live_respects_total_cap(adapter, monkeypatch):
     """Politeness bound: stop at `limit` even if the service says more exist."""
     def fake_get_json(url, params=None, **kw):

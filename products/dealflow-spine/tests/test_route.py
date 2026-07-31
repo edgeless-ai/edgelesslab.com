@@ -195,6 +195,21 @@ def test_digest_render_and_write(tmp_path):
     assert (tmp_path / "digest-latest.html").read_text().startswith("<!doctype html>")
 
 
+def test_lead_detail_unglues_mashed_source_text():
+    """Seattle SDCI descriptions sometimes glue two words with no space
+    ('...vacantREFERENCE:'). The digest should un-glue them for readability."""
+    from spine.route import _lead_detail
+    cands = _candidates([
+        make_signal(id="a", observed_at=RECENT, evidence=GOOD_FACTS),
+        make_signal(id="b", signal_type="code_violation", observed_at=RECENT,
+                    evidence={"category": "Vacant Building",
+                              "description": "house is vacantREFERENCE: 26-001"}),
+    ])
+    why = _lead_detail(cands[0])["why"]
+    assert "vacantREFERENCE" not in why
+    assert "vacant REFERENCE" in why
+
+
 def test_digest_html_renders_and_escapes():
     cands = _candidates([
         make_signal(id="a", observed_at=RECENT, evidence=GOOD_FACTS),

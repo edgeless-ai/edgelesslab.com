@@ -19,6 +19,32 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-07-30 (overnight) — item #5: adversarial review + hardening
+**Commit:** (this session) `adapters/kingcounty_absentee.py` (pagination dedupe
+guard) + `spine/route.py` (`_lead_detail` un-glue) + tests (+2)
+**Why:** roadmap item #5 — before extending, harden what's live and prove the 66
+hot stacks are real, not a merge/scoring artifact.
+**Validated the 66 hot stacks (read-only):** all 66 carry BOTH an
+`absentee_owner` and a `code_violation` signal, all address-keyed, 0 with an
+in-state owner. Spot-checks confirmed genuine same-address merges with real
+out-of-state owners: 6621 FAUNTLEROY WAY SW = Vacant Building + owner in VA;
+2657 39TH AVE SW = Vacant Building + owner in PR; 901 SW HOLDEN ST + owner in NC.
+Not inflated.
+**Two hardening fixes (TDD — red first):**
+1. **Absentee pagination dedupe guard.** Some ArcGIS layers silently ignore
+   `resultOffset` and re-serve the same window every page — that would inflate
+   the ledger with duplicate PINs and loop to the cap. `_fetch_live` now dedupes
+   by PIN and stops once a page adds nothing new. (KC honors offset — live
+   dupes=0 — so this is belt-and-suspenders against a future service change.)
+2. **Digest un-glue.** Seattle SDCI descriptions sometimes mash two words
+   ("...vacantREFERENCE:"). `_lead_detail` now inserts a space at a
+   lowercase→UPPERCASE-run boundary (won't split normal CamelCase).
+**Verified end-to-end (live):** reset + live run unchanged where it should be —
+absentee still 4234 (dupes 0), 66 hot / 1267 warm; digest now reads "vacant
+REFERENCE". 234 tests green (+2).
+
+---
+
 ## 2026-07-30 (overnight) — HTML digest (eyeball view for David)
 **Commit:** (this session) `spine/route.py` (`render_digest_html` +
 `_lead_detail` shared helper + `write_digest` emits HTML) +

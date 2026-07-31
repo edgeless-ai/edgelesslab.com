@@ -379,4 +379,14 @@ export const postsMeta: BlogPostMeta[] = [
     readTime: "6 min",
     content: "",
   },
+  {
+    slug: "multi-agent-orchestration-week",
+    editorial: true,
+    title: "The Week Multi-Agent Orchestration Stopped Being Optional",
+    description: "Seven YouTube videos, one week, one conclusion: one agent is not enough. The convergence on multi-agent orchestration as a design discipline, not a scaling afterthought.",
+    date: "2026-07-30",
+    tags: ["AI Agents", "Multi-Agent", "Orchestration", "Architecture"],
+    readTime: "7 min",
+    content: "",
+  },
 ];

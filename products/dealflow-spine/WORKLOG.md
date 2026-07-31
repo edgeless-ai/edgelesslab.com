@@ -19,6 +19,33 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-07-31 (overnight) — item #6b: West Sacramento probe → built, shelved
+**Commit:** (this session) new `adapters/westsac_code_enforcement.py` (ENABLED=
+False) + fixture + `tests/test_westsac_code.py` (7). Buy-box unchanged (CA add
+reverted).
+**Why:** roadmap item #6 — probe one more keyless West Coast metro. Sacramento
+proper isn't cleanly keyless (ArcGIS Hub, no clear city code feed), but West
+Sacramento publishes Code Enforcement on a keyless ArcGIS FeatureServer (15107
+records, verified live: CaseNumber/Address/Type/DateOpened/Status/Parcel).
+**Built it (TDD, 7 tests) — then VERIFIED it doesn't earn a place, honestly:**
+live end-to-end, West Sac produced **0 warm / 0 hot** — only 63 watch + 129
+discard. Two structural reasons, both real (not fixable without dishonesty):
+1. Single-signal — no keyless West-Sac stacking partner exists, so it can never
+   mint a hot stack.
+2. Low-signal — `Type` is uniformly "ENFORCEMENT" (no complaint detail → no
+   honest distress flag), and its "open" cases are long-running, so recency
+   decay pushes even active enforcement below the warm floor (max live score
+   ~0.30 vs Denver's 0.6 warm leads). Filtering to non-CLOSED didn't rescue it.
+**Decision:** it fails the actionable-leads bar Denver clears (90 warm), so it's
+`ENABLED=False` — kept as a ready drop-in (code + tests + fixture) but excluded
+from the default pipeline (a test pins this). No pipeline change: still 98 hot.
+The lesson for future metros: a warm-producing feed needs recent-dated events
+(Seattle/Denver) or a second signal; a bare long-running case list is watch-tier.
+**Verified:** 241 tests green (+7); `discover_adapters` confirms West Sac is
+excluded; hot/warm unchanged (98/1848).
+
+---
+
 ## 2026-07-31 (overnight) — item #6a: 180d Seattle window → 66→98 HOT
 **Commit:** (this session) `adapters/portland_code_violations.py` defaults
 (days 90→180, limit 8000→12000) + `tests/test_code_violations.py` guard

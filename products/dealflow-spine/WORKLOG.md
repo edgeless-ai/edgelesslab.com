@@ -19,6 +19,36 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-07-30 (overnight) — Denver/Mountain leg: first keyless distress feed
+**Commit:** (this session) new `adapters/denver_health_complaints.py` +
+`fixtures/adapters/denver_health_complaints_sample.json` +
+`tests/test_denver_health.py` (+7)
+**Why:** roadmap item #2 — the Mountain leg had geography (FEMA fires in CO) but
+no per-property distress signal. The 2026-07-28 note concluded Denver needs a
+real ArcGIS build (no Socrata). This is that build.
+**Data hunt (≤3 probes, honest):** Denver AGOL org = `The City and County of
+Denver` (services1.arcgis.com/zdB7qR0BtYrg0Xpl). Found + verified keyless
+**Residential Health Complaints** FeatureServer (DDPHE) — 6956 per-property
+habitability complaints with FULL_ADDRESS, INCIDENT_DATE, COMPLAINT_OUTCOME
+(Founded/Unsubstantiated), status, OWNER_ENTITY_NAME, and an Accela case link.
+**NEGATIVE logged:** Denver `ODC_PROP_PARCELS_A` exposes NO owner/mailing fields
+publicly → no keyless Denver *absentee* signal (privacy), so Denver has no
+stacking partner yet. Denver leads are WARM (single signal), not hot — expected.
+**What (TDD — 7 tests first):** new `code_violation` adapter, anchored on ADDRESS
+(no apn — same lesson as Seattle absentee) so a future 2nd Denver signal can
+stack. Confidence by outcome (Founded 0.6 / Unsubstantiated 0.3 / else 0.45);
+`_classify` flags owner-distress terms (vacant/mold/no heat/structural…) 🚩 vs
+routine health_complaint. Address parser drops UNIT parts (units merge to one
+building) and lifts the zip. Fixture = 14 real Founded records.
+**Verified end-to-end (live):** reset + live run (Seattle code + KC absentee +
+Denver) ingested 600 Denver signals → **90 warm CO leads** (Founded habitability
+distress, real Denver addresses: 8000 E 12TH AVE, 1750 S FEDERAL BLVD…), 377
+watch. Totals: 5223 candidates, 4 hot / 201 warm (was 111). 230 tests green (+7).
+**Next lever for Denver HOT:** find a second distinct-typed Denver signal
+(tax/foreclosure/absentee) — none keyless yet; parked.
+
+---
+
 ## 2026-07-30 (overnight) — absentee pagination → full Seattle coverage, 1→4 hot
 **Commit:** (this session) `adapters/kingcounty_absentee.py` `_fetch_live`
 pagination + `tests/test_kingcounty_absentee.py` (+2)

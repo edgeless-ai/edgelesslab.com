@@ -37,11 +37,12 @@ SOURCE = "kingcounty_parcel_absentee"
 
 ARCGIS_QUERY = ("https://services.arcgis.com/Ej0PsM5Aw677QF1W/arcgis/rest/"
                 "services/PARCEL_ADDRESS_PUB_AREA_3069/FeatureServer/0/query")
-LIVE_LIMIT = 1000   # ArcGIS single-request max; absentee is a STANDING list
-                    # (not a recent-event feed) so pull big — overlap with the
-                    # distress feeds is where hot stacks come from. Full
-                    # coverage (all out-of-state Seattle owners) = paginate via
-                    # resultOffset; 1000 is the practical single-call bound.
+_PAGE = 1000        # ArcGIS single-request max (resultRecordCount ceiling)
+LIVE_LIMIT = 8000   # total-records politeness cap across pages. Absentee is a
+                    # STANDING list (not a recent-event feed), so pull the whole
+                    # out-of-state Seattle set — overlap with the distress feeds
+                    # is where hot stacks come from. _fetch_live paginates via
+                    # resultOffset in _PAGE-size pages up to this cap.
 _OUT_FIELDS = ("PIN,ADDR_FULL,CTYNAME,ZIP5,LAT,LON,KCTP_ATTN,KCTP_ADDR,"
                "KCTP_CTYST,KCTP_STATE,KCTP_ZIP,APPRLNDVAL,APPR_IMPR,PREUSE_DESC")
 
@@ -63,18 +64,35 @@ def _prop_type(desc) -> str | None:
     return None
 
 
-def _fetch_live(limit: int) -> list[dict]:
-    """Seattle residential parcels whose taxpayer mails out of state."""
-    data = _common.http_get_json(ARCGIS_QUERY, params={
-        "where": ("KCTP_STATE<>'WA' AND CTYNAME='SEATTLE' "
-                  "AND ADDR_FULL IS NOT NULL AND PROPTYPE='R'"),
-        "outFields": _OUT_FIELDS,
-        "resultRecordCount": int(limit),
-        "orderByFields": "PIN",
-        "f": "json",
-    })
-    feats = data.get("features", []) if isinstance(data, dict) else []
-    return [f.get("attributes", {}) for f in feats if f.get("attributes")]
+def _fetch_live(limit: int = LIVE_LIMIT) -> list[dict]:
+    """Seattle residential parcels whose taxpayer mails out of state.
+
+    Paginates via resultOffset in _PAGE-size pages up to `limit` total records
+    (politeness cap), so a live run gets FULL out-of-state coverage instead of a
+    single 1000-row window. Stops on a short page or when the service stops
+    signalling exceededTransferLimit.
+    """
+    out: list[dict] = []
+    offset = 0
+    while len(out) < limit:
+        page_size = min(_PAGE, limit - len(out))
+        data = _common.http_get_json(ARCGIS_QUERY, params={
+            "where": ("KCTP_STATE<>'WA' AND CTYNAME='SEATTLE' "
+                      "AND ADDR_FULL IS NOT NULL AND PROPTYPE='R'"),
+            "outFields": _OUT_FIELDS,
+            "resultOffset": offset,
+            "resultRecordCount": int(page_size),
+            "orderByFields": "PIN",
+            "f": "json",
+        })
+        feats = data.get("features", []) if isinstance(data, dict) else []
+        recs = [f.get("attributes", {}) for f in feats if f.get("attributes")]
+        out.extend(recs)
+        more = isinstance(data, dict) and data.get("exceededTransferLimit")
+        if len(recs) < page_size or not more:
+            break
+        offset += len(recs)
+    return out[:limit]
 
 
 def _to_signal(rec: dict) -> dict | None:

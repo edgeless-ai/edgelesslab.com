@@ -19,6 +19,30 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-07-30 (overnight) — absentee pagination → full Seattle coverage, 1→4 hot
+**Commit:** (this session) `adapters/kingcounty_absentee.py` `_fetch_live`
+pagination + `tests/test_kingcounty_absentee.py` (+2)
+**Why:** roadmap item #1. Absentee was a single 1000-row ArcGIS window, so most
+out-of-state Seattle owners never entered the ledger and hot stacks were luck —
+only 1 surfaced per bounded run despite 5 known code∩absentee overlaps.
+**What (TDD — red first):** `_fetch_live` now walks `resultOffset` in 1000-row
+pages up to an 8000-record politeness cap (`LIVE_LIMIT`), stopping on a short
+page or when the service stops signalling `exceededTransferLimit`. Two new tests
+pin the pagination walk (pages [0,1000,2000] → stop on short page) and the total
+cap (stops at `limit` even when the service says more exist).
+**Verified end-to-end (live):** paginated pull = **4234** out-of-state Seattle
+owners (was 1000; top states CA 1601 / OR 252 / TX 235 / NY 156). Reset ledger +
+live run (`--config config/buybox-west-mountain.json --only
+portland_code_violations kingcounty_absentee`): **4 HOT stacks** (was 1), top =
+5956 41ST AVE SW ("suspect house is vacant" + absentee, 4.38, 🚩) and 100 NE 58TH
+ST ("house empty during construction" + absentee). 223 tests green (+2).
+**Note:** overlap is now bounded by the code-violation side (600/run), not
+absentee. Next levers: widen code-violation window, add a second West metro, and
+the Denver/Mountain leg. Minor cosmetic: violation description concatenation can
+mash ("vacantREFERENCE:") — clean in a later digest pass.
+
+---
+
 ## 2026-07-29 — absentee-owner signal → FIRST HOT STACKS
 **Commits:** (this session) new `adapters/kingcounty_absentee.py` + registration
 across `_common.py` / `schema.py` / `scoring.py` + fixture + tests

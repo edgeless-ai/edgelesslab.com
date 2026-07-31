@@ -89,6 +89,45 @@ def test_no_address_drops_record(adapter):
     assert adapter._to_signal({"PIN": "9"}) is None
 
 
+def test_fetch_live_paginates_until_short_page(adapter, monkeypatch):
+    """Full coverage: _fetch_live walks resultOffset in pages of 1000 and stops
+    when the service returns a short page (no more rows)."""
+    calls = []
+
+    def fake_get_json(url, params=None, **kw):
+        offset = int(params.get("resultOffset", 0))
+        page_size = int(params["resultRecordCount"])
+        calls.append((offset, page_size))
+        remaining = 2500 - offset                     # 2500 total available
+        n = max(0, min(page_size, remaining))
+        feats = [{"attributes": {"PIN": str(offset + i),
+                                 "ADDR_FULL": f"{offset + i} MAIN ST",
+                                 "CTYNAME": "SEATTLE", "ZIP5": "98101",
+                                 "KCTP_STATE": "CA"}} for i in range(n)]
+        return {"features": feats, "exceededTransferLimit": (offset + n) < 2500}
+
+    monkeypatch.setattr(adapter._common, "http_get_json", fake_get_json)
+    recs = adapter._fetch_live(limit=5000)
+    assert [c[0] for c in calls] == [0, 1000, 2000]   # 3rd page short -> stop
+    assert len(recs) == 2500
+    assert recs[0]["PIN"] == "0" and recs[-1]["PIN"] == "2499"
+
+
+def test_fetch_live_respects_total_cap(adapter, monkeypatch):
+    """Politeness bound: stop at `limit` even if the service says more exist."""
+    def fake_get_json(url, params=None, **kw):
+        offset = int(params.get("resultOffset", 0))
+        page_size = int(params["resultRecordCount"])
+        feats = [{"attributes": {"PIN": str(offset + i), "ADDR_FULL": f"{offset + i} X",
+                                 "CTYNAME": "SEATTLE", "KCTP_STATE": "CA"}}
+                 for i in range(page_size)]
+        return {"features": feats, "exceededTransferLimit": True}  # always more
+
+    monkeypatch.setattr(adapter._common, "http_get_json", fake_get_json)
+    recs = adapter._fetch_live(limit=2500)
+    assert len(recs) == 2500                          # capped, not runaway
+
+
 def test_live_env_routes_to_arcgis(adapter, monkeypatch):
     seen = {}
 

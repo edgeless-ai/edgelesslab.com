@@ -19,6 +19,31 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-07-30 (overnight) — widen Seattle code window → 4→66 HOT stacks
+**Commit:** (this session) `adapters/portland_code_violations.py` default limit
+600→8000 + `tests/test_code_violations.py` limit-threading guard (+1)
+**Why:** the north star is HOT flow, and hot = stacking. Seattle is the only
+metro with two stacking signals (code_violation + absentee_owner). Absentee was
+already full (4234), but the code side was capped at **600 of ~5991** Seattle
+violations/90d — so we saw only ~10% of the possible overlap. This cap was the
+binding constraint on hot flow.
+**What (TDD — red first):** raised the Seattle `fetch` default limit to 8000
+(covers the full 90-day window; single polite Socrata request, daily poll). New
+guard test pins that the window+limit thread into the `$where`/`$limit` params
+and that the default stays hot-flow-sized (>=6000), so it can't silently
+regress to a tiny cap.
+**Verified end-to-end (live):** reset + live run ingested **5991** Seattle
+violations (was 600) + 4234 absentee. Result: **66 HOT stacks (was 4)** —
+100% `absentee_owner + code_violation`, 0 malformed, top 5.38 (6621 FAUNTLEROY
+WAY SW / 2657 39TH AVE SW / 901 SW HOLDEN ST). Warm 201→1267. 231 tests green.
+**SF NEGATIVE logged (item #3, ≤3 probes):** DataSF catalog lists Building
+Violations (`22u3-xenr`) + DOB Complaints (`eabe-havv`) but both SODA endpoints
+return `{"error":true,"message":"Not found"}` — migrated/retired. Skipped per
+the no-rabbit-hole rail. Sacramento/Oakland not probed (same dead-endpoint risk);
+the higher-value move was maximizing Seattle's existing two-signal stack.
+
+---
+
 ## 2026-07-30 (overnight) — Denver/Mountain leg: first keyless distress feed
 **Commit:** (this session) new `adapters/denver_health_complaints.py` +
 `fixtures/adapters/denver_health_complaints_sample.json` +

@@ -37,6 +37,25 @@ def adapter(monkeypatch):
     return mod
 
 
+def test_seattle_raw_threads_window_and_limit(adapter, monkeypatch):
+    """Contract guard: the live pull passes the configured window + limit into
+    the Socrata query. Widening the limit is the hot-flow lever (Seattle has
+    ~6000 violations/90d vs a much larger absentee set), so this must not
+    silently regress to a tiny cap."""
+    seen = {}
+
+    def fake_get_json(url, params=None, **kw):
+        seen["url"], seen["params"] = url, params
+        return []
+    monkeypatch.setattr(adapter._common, "http_get_json", fake_get_json)
+    adapter._fetch_seattle_raw(days=90, limit=8000)
+    assert seen["params"]["$limit"] == "8000"
+    assert seen["params"]["$where"].startswith("opendate >=")
+    # default fetch() keeps a hot-flow-sized limit (not the old 600 cap)
+    import inspect
+    assert inspect.signature(adapter.fetch).parameters["limit"].default >= 6000
+
+
 @pytest.mark.parametrize("desc", [
     "Emergency , Vacant Building — NA (EO Vacate Close Issued)",
     "Severe fire in her apartment building",

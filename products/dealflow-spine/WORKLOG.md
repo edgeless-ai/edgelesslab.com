@@ -19,6 +19,30 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-07-31 (overnight) — item #6d: Tacoma metro pt.2 → SECOND hot metro (+18 hot)
+**Commit:** (this session) new `adapters/pierce_absentee.py` + fixture +
+`tests/test_pierce_absentee.py` (7).
+**Why:** the payoff for pt.1 — add the absentee spine so Tacoma parcels stack
+into hot leads (Seattle's pattern, replicated).
+**What (TDD, 7 tests):** Pierce County absentee adapter, `absentee_owner`,
+**APN-anchored** on the 10-digit TaxParcelNumber (so it merges EXACTLY with the
+APN-anchored tacoma_code_violations — no address/zip matching). Out-of-state
+residential only (City_State not ending ", WA"; SINGLE FAMILY / OTHER
+RESIDENTIAL). Paginated via resultOffset with the PIN-dedupe guard (same as
+King). confidence 0.65.
+**Verified end-to-end (live) — IT WORKS:** ingested 8298 out-of-state Pierce
+owners; reset + live run → total HOT **98 → 116 (+18 Tacoma stacks)**, all clean
+2-type `code_violation+absentee_owner` on `apn:WA:PIERCE:*`, 0 malformed. Top
+Tacoma hot: 2401 66TH AVE NE (Substandard Building + owner in AZ, 4.81); also
+Derelict Building + owner in TN, Nuisance + CA/AZ. 255 tests green (+7).
+**This is a SECOND hot-producing metro.** Engine now surfaces 116 hot leads
+across Seattle (98) + Tacoma (18), all real distress + out-of-state-owner stacks.
+The APN-merge design (vs Seattle's address-anchoring) is the reusable template
+for any county publishing both a parcel-numbered code feed and taxpayer mailing.
+As the weekly ledger accumulates more Tacoma code cases, Tacoma hot grows.
+
+---
+
 ## 2026-07-31 (overnight) — item #6c: Tacoma metro pt.1 → distress feed (99 warm)
 **Commit:** (this session) new `adapters/tacoma_code_violations.py` + fixture +
 `tests/test_tacoma_code.py` (7) + buy-box adds TACOMA/PIERCE.

@@ -19,6 +19,20 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-07-31 (overnight) — WRAP: 3rd-metro probe (Snohomish) negative, run closed
+**Why:** final bounded shot at a 3rd metro via the APN template, then wrap.
+**Snohomish/Everett NEGATIVE (logged, skipped):** the make-or-break code feed
+does not exist keyless. ArcGIS search for an Everett/Snohomish code-enforcement /
+nuisance / violation / inspection FeatureServer returned nothing across multiple
+queries; the only Snohomish-serving parcel layer (WAGeoservices statewide
+`Current_Parcels`) exposes SITUS only (no taxpayer mailing), so no absentee
+either. Both halves failed in-budget -> no build (West Sac lesson: do not force).
+**Run closed here.** Final state: **116 HOT stacks across 2 metros** (Seattle 98,
+Tacoma 18), 1953 warm, 255 tests green, 10 enabled adapters. Full arc +
+templates + DAVID-GATED items in `reports/dealflow-overnight-2026-07-30.md`.
+
+---
+
 ## 2026-07-31 (overnight) — item #6d: Tacoma metro pt.2 → SECOND hot metro (+18 hot)
 **Commit:** (this session) new `adapters/pierce_absentee.py` + fixture +
 `tests/test_pierce_absentee.py` (7).

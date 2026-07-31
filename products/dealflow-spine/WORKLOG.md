@@ -19,6 +19,30 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-07-30 (overnight) — HTML digest (eyeball view for David)
+**Commit:** (this session) `spine/route.py` (`render_digest_html` +
+`_lead_detail` shared helper + `write_digest` emits HTML) +
+`tests/test_route.py` (+2)
+**Why:** roadmap item #4 — David asked for a way to *eyeball* leads, not read a
+617-row markdown wall. Now that there are 66 real hot stacks, a scannable view
+earns its keep.
+**What (TDD):** `write_digest` now also emits `data/digest-latest.html` — a
+self-contained, theme-aware (light/dark) single-file HTML: count pills, then
+Hot / Warm / Watch tables sorted distress-first, each row = score · 🚩 · address
+(→ live case link) · why · **owner + mailing** (the absentee tell, e.g. "owner
+in Boynton Beach FL") · stacked cases · underwrite verdict (hot). Factored the
+markdown renderer's lead-extraction into a shared `_lead_detail` (DRY, byte-for-
+byte identical markdown output). All output HTML-escaped (a `<script>` in a
+complaint description renders as text, tested).
+**LOCAL ONLY — not published:** these are real property/owner leads (R&D), so
+the HTML is a local file, never an Artifact. `data/` is gitignored (regenerated
+each run); the renderer is the committed artifact.
+**Verified:** 232 tests green (+2, incl. an escaping test). Regenerated from the
+live 66-hot candidate set → 100 KB, 66 hot rows, valid doctype. Open with
+`open products/dealflow-spine/data/digest-latest.html`.
+
+---
+
 ## 2026-07-30 (overnight) — widen Seattle code window → 4→66 HOT stacks
 **Commit:** (this session) `adapters/portland_code_violations.py` default limit
 600→8000 + `tests/test_code_violations.py` limit-threading guard (+1)

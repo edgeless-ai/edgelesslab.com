@@ -10,6 +10,7 @@ from spine.route import (
     load_candidates,
     recommend_strategy,
     render_digest,
+    render_digest_html,
     write_candidates,
     write_digest,
 )
@@ -190,3 +191,21 @@ def test_digest_render_and_write(tmp_path):
     dated = write_digest(cands, digest_dir=tmp_path, buybox_name="test-box", now=FIXED_NOW)
     assert dated.name == "digest-2026-07-04.md"
     assert (tmp_path / "digest-latest.md").read_text() == dated.read_text()
+    # write_digest also emits the local HTML eyeball view
+    assert (tmp_path / "digest-latest.html").read_text().startswith("<!doctype html>")
+
+
+def test_digest_html_renders_and_escapes():
+    cands = _candidates([
+        make_signal(id="a", observed_at=RECENT, evidence=GOOD_FACTS),
+        make_signal(id="b", signal_type="code_violation", observed_at=RECENT,
+                    evidence={"category": "Vacant", "distress_hint": True,
+                              "description": "<script>owned()</script>"}),
+    ])
+    doc = render_digest_html(cands, buybox_name="test-box", now=FIXED_NOW)
+    assert doc.startswith("<!doctype html>") and doc.rstrip().endswith("</html>")
+    assert "123 Main St" in doc                      # hot lead present
+    assert 'class="pill hot"' in doc                 # hot count pill
+    assert "<script>owned()</script>" not in doc     # not injected raw
+    assert "&lt;script&gt;owned()&lt;/script&gt;" in doc   # escaped instead
+    assert "🚩" in doc                                # distress flag rendered

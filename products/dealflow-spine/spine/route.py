@@ -35,6 +35,7 @@ Outputs:
 
 from __future__ import annotations
 
+import html as _html
 import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -235,6 +236,37 @@ def load_candidates(path: str | Path = DEFAULT_CANDIDATES) -> list[DealCandidate
     return out
 
 
+def _lead_detail(c: DealCandidate) -> dict:
+    """The most actionable detail across a candidate's signals: the 'why'
+    (violation category/description/status), whether any signal flags real
+    distress (vacant/unfit/derelict...), how many complaints stacked, and a
+    link to verify. Shared by the markdown and HTML digests. Defensive —
+    signals may lack evidence."""
+    sigs = list(getattr(c, "signals", []) or [])
+    def ev(s): return getattr(s, "evidence", None) or {}
+    cv = [s for s in sigs if getattr(s, "signal_type", "") == "code_violation"]
+    pool = cv or sigs
+    if not pool:
+        return {"why": "—", "cases": 0, "distress": False, "url": None}
+    primary = max(pool, key=lambda s: (bool(ev(s).get("distress_hint")),
+                                        getattr(s, "confidence", 0) or 0))
+    e = ev(primary)
+    cat = str(e.get("category") or "").strip()
+    desc = str(e.get("description") or "").strip()
+    status = str(e.get("status") or "").strip()
+    why = " — ".join(x for x in (cat, desc) if x) or getattr(
+        primary, "signal_type", "signal")
+    if status:
+        why += f" ({status})"
+    why = why.replace("|", "/").replace("\n", " ").replace("\r", " ")
+    return {
+        "why": why[:80],
+        "cases": len(cv) or len(sigs),
+        "distress": any(ev(s).get("distress_hint") for s in sigs),
+        "url": getattr(primary, "source_url", None),
+    }
+
+
 def render_digest(
     candidates: list[DealCandidate],
     buybox_name: str = "default",
@@ -260,34 +292,7 @@ def render_digest(
     # per-route caps so a live run's hundreds of rows stay scannable
     WARM_CAP, WATCH_CAP, DISCARD_CAP = 40, 20, 15
 
-    def _lead(c: DealCandidate) -> dict:
-        """The most actionable detail across a candidate's signals: the 'why'
-        (violation category/description/status), whether any signal flags real
-        distress (vacant/unfit/derelict...), how many complaints stacked, and a
-        link to verify. Defensive — signals may lack evidence."""
-        sigs = list(getattr(c, "signals", []) or [])
-        def ev(s): return getattr(s, "evidence", None) or {}
-        cv = [s for s in sigs if getattr(s, "signal_type", "") == "code_violation"]
-        pool = cv or sigs
-        if not pool:
-            return {"why": "—", "cases": 0, "distress": False, "url": None}
-        primary = max(pool, key=lambda s: (bool(ev(s).get("distress_hint")),
-                                            getattr(s, "confidence", 0) or 0))
-        e = ev(primary)
-        cat = str(e.get("category") or "").strip()
-        desc = str(e.get("description") or "").strip()
-        status = str(e.get("status") or "").strip()
-        why = " — ".join(x for x in (cat, desc) if x) or getattr(
-            primary, "signal_type", "signal")
-        if status:
-            why += f" ({status})"
-        why = why.replace("|", "/").replace("\n", " ").replace("\r", " ")
-        return {
-            "why": why[:80],
-            "cases": len(cv) or len(sigs),
-            "distress": any(ev(s).get("distress_hint") for s in sigs),
-            "url": getattr(primary, "source_url", None),
-        }
+    _lead = _lead_detail   # shared with the HTML renderer
 
     def _addr(c: DealCandidate, url: str | None) -> str:
         p = c.property
@@ -370,13 +375,138 @@ def render_digest(
     return "\n".join(lines)
 
 
+_HTML_CSS = """
+:root{--bg:#f7f6f3;--card:#fff;--ink:#1c1b19;--muted:#6b6862;--line:#e4e1da;
+--hot:#b4471f;--hotbg:#fbeee7;--warm:#1f6f6b;--flag:#c8341a;--link:#8a4a1f}
+@media(prefers-color-scheme:dark){:root{--bg:#161513;--card:#211f1c;--ink:#ece9e3;
+--muted:#a39e94;--line:#332f2a;--hot:#e08a5c;--hotbg:#2b1c13;--warm:#5fb8b2;--flag:#e8785e;--link:#e0a56f}}
+:root[data-theme=dark]{--bg:#161513;--card:#211f1c;--ink:#ece9e3;--muted:#a39e94;
+--line:#332f2a;--hot:#e08a5c;--hotbg:#2b1c13;--warm:#5fb8b2;--flag:#e8785e;--link:#e0a56f}
+:root[data-theme=light]{--bg:#f7f6f3;--card:#fff;--ink:#1c1b19;--muted:#6b6862;
+--line:#e4e1da;--hot:#b4471f;--hotbg:#fbeee7;--warm:#1f6f6b;--flag:#c8341a;--link:#8a4a1f}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
+font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:32px 20px 64px}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+.counts{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px}
+.pill{padding:4px 11px;border-radius:999px;border:1px solid var(--line);
+background:var(--card);font-size:12px;font-variant-numeric:tabular-nums}
+.pill b{font-size:14px}.pill.hot{color:var(--hot);border-color:var(--hot)}
+.note{color:var(--muted);font-size:12px;font-style:italic;margin:-10px 0 26px}
+h2{font-size:17px;margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+h2 .n{color:var(--muted);font-weight:400;font-size:14px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:640px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:none}
+td.s{font-variant-numeric:tabular-nums;font-weight:700;text-align:right;white-space:nowrap}
+.hot td.s{color:var(--hot)}.flag{color:var(--flag)}
+a{color:var(--link);text-decoration:none}a:hover{text-decoration:underline}
+.owner{color:var(--muted);font-size:12px}.why{color:var(--ink)}
+.uw{font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+.more{color:var(--muted);font-size:12px;padding:8px 12px}
+"""
+
+
+def _esc(x) -> str:
+    return _html.escape(str(x if x is not None else ""))
+
+
+def render_digest_html(
+    candidates: list[DealCandidate],
+    buybox_name: str = "default",
+    now: datetime | None = None,
+) -> str:
+    """Self-contained, theme-aware HTML digest for eyeballing leads locally.
+    NOT for publishing — these are real property/owner leads (R&D only)."""
+    now = now or datetime.now(timezone.utc)
+    by_route: dict[str, list[DealCandidate]] = {r.value: [] for r in Route}
+    for c in candidates:
+        by_route.setdefault(c.route or "watch", []).append(c)
+
+    def _addr_cell(c: DealCandidate, url: str | None) -> str:
+        p = c.property
+        a = _esc(f"{p.address}, {p.city} {p.state} {p.zip}".strip().strip(","))
+        return f'<a href="{_esc(url)}" target="_blank" rel="noopener">{a}</a>' if url else a
+
+    def _owner_cell(c: DealCandidate) -> str:
+        o = c.owner
+        if not o or not (o.name or o.mailing_address):
+            return ""
+        bits = [_esc(o.name)] if o.name else []
+        if o.mailing_address:
+            bits.append(f'<span class="owner">{_esc(o.mailing_address)}</span>')
+        return "<br>".join(bits)
+
+    def _rows(items, cap, hot=False):
+        out = []
+        for c in (items[:cap] if cap else items):
+            d = _lead_detail(c)
+            flag = '<span class="flag">🚩</span>' if d["distress"] else ""
+            cells = [f'<td class="s">{c.distress_score:.2f}</td>',
+                     f"<td>{flag}</td>",
+                     f'<td>{_addr_cell(c, d["url"])}</td>',
+                     f'<td class="why">{_esc(d["why"])}</td>',
+                     f'<td>{_owner_cell(c)}</td>',
+                     f'<td class="s">{d["cases"]}</td>']
+            if hot:
+                rec = (c.underwriting or {}).get("recommendation") or "—"
+                cells.append(f'<td class="uw">{_esc(c.recommended_strategy)}<br>'
+                             f'<b>{_esc(rec)}</b></td>')
+            out.append(f'<tr class="{"hot" if hot else ""}">' + "".join(cells) + "</tr>")
+        if cap and len(items) > cap:
+            span = 7 if hot else 6
+            out.append(f'<tr><td class="more" colspan="{span}">+{len(items) - cap} '
+                       f'more (see data/candidates.jsonl)</td></tr>')
+        return "\n".join(out)
+
+    def _section(route, title, cap, hot=False):
+        items = sorted(by_route[route.value],
+                       key=lambda c: (_lead_detail(c)["distress"], c.distress_score),
+                       reverse=True)
+        flagged = sum(1 for c in items if _lead_detail(c)["distress"])
+        head = (f'<h2>{title} <span class="n">· {len(items)}'
+                + (f" · 🚩 {flagged}" if flagged else "") + "</span></h2>")
+        if not items:
+            return head + "<p class='more'>none</p>"
+        cols = ("Score", "", "Address → case", "Why", "Owner (mailing)", "Cases")
+        thead = "".join(f"<th>{c}</th>" for c in cols) + (
+            "<th>Underwrite</th>" if hot else "")
+        return (head + '<div class="scroll"><table><thead><tr>' + thead
+                + "</tr></thead><tbody>" + _rows(items, cap, hot)
+                + "</tbody></table></div>")
+
+    pills = "".join(
+        f'<span class="pill{" hot" if r is Route.HOT else ""}">'
+        f'{r.value} <b>{len(by_route[r.value])}</b></span>' for r in Route)
+    body = (
+        f"<h1>Dealflow digest</h1>"
+        f'<div class="sub">{now.date().isoformat()} · buy-box '
+        f"<b>{_esc(buybox_name)}</b> · {len(candidates)} properties evaluated</div>"
+        f'<div class="counts">{pills}</div>'
+        f'<div class="note">R&amp;D pipeline — no outreach. Routes feed '
+        f"underwriting review only.</div>"
+        + _section(Route.HOT, "🔥 Hot — stacked + in the box", None, hot=True)
+        + _section(Route.WARM, "🌤 Warm — in the box, single signal", 120)
+        + _section(Route.WATCH, "👀 Watch", 40)
+    )
+    return (f'<!doctype html><html lang="en"><head><meta charset="utf-8">'
+            f'<meta name="viewport" content="width=device-width,initial-scale=1">'
+            f"<title>Dealflow digest — {now.date().isoformat()}</title>"
+            f"<style>{_HTML_CSS}</style></head><body><div class='wrap'>{body}"
+            f"</div></body></html>")
+
+
 def write_digest(
     candidates: list[DealCandidate],
     digest_dir: str | Path = DEFAULT_DIGEST_DIR,
     buybox_name: str = "default",
     now: datetime | None = None,
 ) -> Path:
-    """Write data/digests/digest-YYYY-MM-DD.md and mirror to data/digest-latest.md."""
+    """Write data/digests/digest-YYYY-MM-DD.md, mirror to data/digest-latest.md,
+    and emit a local HTML view at data/digest-latest.html (eyeball view)."""
     now = now or datetime.now(timezone.utc)
     digest_dir = Path(digest_dir)
     dated_dir = digest_dir / "digests"
@@ -385,4 +515,6 @@ def write_digest(
     dated = dated_dir / f"digest-{now.date().isoformat()}.md"
     dated.write_text(text)
     (digest_dir / "digest-latest.md").write_text(text)
+    (digest_dir / "digest-latest.html").write_text(
+        render_digest_html(candidates, buybox_name=buybox_name, now=now))
     return dated

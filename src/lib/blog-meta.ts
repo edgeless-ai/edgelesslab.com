@@ -369,4 +369,14 @@ export const postsMeta: BlogPostMeta[] = [
     readTime: "6 min",
     content: "",
   },
+  {
+    slug: "agentic-engineering-week",
+    editorial: true,
+    title: "The Week Agentic Engineering Became a Real Discipline",
+    description: "Nine YouTube videos, one week, zero hype. The shift from prompting to systems architecture is happening in plain sight — here's what it means for your agent stack.",
+    date: "2026-07-30",
+    tags: ["AI Agents", "Agentic Engineering", "Multi-Agent", "Architecture"],
+    readTime: "6 min",
+    content: "",
+  },
 ];

@@ -51,9 +51,12 @@ def test_seattle_raw_threads_window_and_limit(adapter, monkeypatch):
     adapter._fetch_seattle_raw(days=90, limit=8000)
     assert seen["params"]["$limit"] == "8000"
     assert seen["params"]["$where"].startswith("opendate >=")
-    # default fetch() keeps a hot-flow-sized limit (not the old 600 cap)
+    # default fetch() keeps a hot-flow-sized window: 180d (scores under the 180d
+    # half-life / 730d max-age) x a limit that covers the ~10.5k violations in it.
     import inspect
-    assert inspect.signature(adapter.fetch).parameters["limit"].default >= 6000
+    params = inspect.signature(adapter.fetch).parameters
+    assert params["days"].default >= 180
+    assert params["limit"].default >= 10000
 
 
 @pytest.mark.parametrize("desc", [

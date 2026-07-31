@@ -19,6 +19,34 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-07-31 (overnight) — item #6a: 180d Seattle window → 66→98 HOT
+**Commit:** (this session) `adapters/portland_code_violations.py` defaults
+(days 90→180, limit 8000→12000) + `tests/test_code_violations.py` guard
+**Why:** roadmap item #6, highest reliable hot-flow lever. Scoring half-life is
+180d and max-age 730d, so a 180-day violation still scores (decay ~0.5), and the
+absentee set (4234) already covers all out-of-state owners — more violation
+history = more overlap = more hot.
+**Grounded the decision in live data first (not a guess):** measured
+absentee∩violation address overlap at 90d = 99 vs 180d = **142** (+43%), so the
+wider window was worth the permanent volume.
+**What (TDD — red first):** Seattle `fetch` defaults now days=180, limit=12000
+(covers the ~10.5k violations in 180d in one polite Socrata request/day). Guard
+test locks days>=180 and limit>=10000.
+**Verified end-to-end (live):** reset + live run ingested **10551** violations
+(was 5991) + 4234 absentee → **98 HOT stacks (was 66)**, all
+`absentee_owner+code_violation`, 0 malformed. Warm 1267→1848. 234 tests green.
+**TWO extension NEGATIVES logged (KC parcel layer, ≤3 probes each):**
+- *out-of-COUNTY absentee tier* deferred: no clean keyless King County boundary.
+  Live data disproved the naive heuristic ("DUVALL WA"/98019 looks out-of-Seattle
+  but IS King County; Snohomish 982xx zips straddle the range). Deriving the zip
+  set from the parcel layer truncated at 21 (capped scan), not the full ~80.
+  Needs an authoritative KC zip/boundary source before it's trustworthy.
+- *probate via KCTP_ATTN* dead: owner names aren't published (KCTP_ATTN is a 3%-
+  populated care-of line). "%ESTATE%" returns 15 rows, ~14 are "REAL ESTATE"
+  company care-of noise; exactly 1 true "ESTATE OF". Not a signal.
+
+---
+
 ## 2026-07-30 (overnight) — item #5: adversarial review + hardening
 **Commit:** (this session) `adapters/kingcounty_absentee.py` (pagination dedupe
 guard) + `spine/route.py` (`_lead_detail` un-glue) + tests (+2)

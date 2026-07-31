@@ -618,12 +618,12 @@ except Exception as e:
     echo "$TODAY" > "$EMAIL_LOCK"
 fi
 
-# Harvest action items from newly-enriched vault notes into Paperclip issues
-# (Each enriched note's "## Action Items" section becomes one Paperclip issue,
-# routed to the right agent. Idempotent — skips already-harvested notes.)
+# Harvest action items from newly-enriched vault notes into Hermes Kanban tasks
+# (Each enriched note's "## Action Items" section becomes one Kanban task on the
+# edgeless board, routed to the right agent. Idempotent — skips already-harvested notes.)
 HARVESTER="$PROJECT_DIR/scripts/youtube_intelligence/youtube-action-harvester.py"
 if [ -f "$HARVESTER" ]; then
-    log "Running action harvester to create Paperclip issues..."
+    log "Running action harvester to create Hermes Kanban tasks..."
     /opt/homebrew/opt/python@3.11/bin/python3.11 "$HARVESTER" >> "$LOG_FILE" 2>&1 || log "Harvester error (non-fatal)"
 fi
 

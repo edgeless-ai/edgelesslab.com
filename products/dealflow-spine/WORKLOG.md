@@ -19,6 +19,35 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-07-31 (overnight) — item #6c: Tacoma metro pt.1 → distress feed (99 warm)
+**Commit:** (this session) new `adapters/tacoma_code_violations.py` + fixture +
+`tests/test_tacoma_code.py` (7) + buy-box adds TACOMA/PIERCE.
+**Why:** the ONE high-value Option-A shot — a SECOND hot-producing metro. Tacoma
+is the target because it pairs two keyless feeds that stack like Seattle's:
+1. City of Tacoma NCS "Code Violations" (this feed — ArcGIS, 23137 dated cases:
+   Derelict/Substandard Building, Nuisance, Health & Sanitation),
+2. Pierce County Tax Parcels (taxpayer mailing — 16994 out-of-state absentee
+   owners, verified live). Built next cycle.
+**Both verified keyless in-budget, AND both carry the SAME 10-digit Pierce
+parcel number** (code `parcelnumber` 4715012641 ↔ parcel `TaxParcelNumber`
+0019012000), so this metro anchors on **APN** (not address like Seattle) — an
+exact parcel merge with the absentee feed, no zip/city matching.
+**What (TDD, 7 tests):** Tacoma `code_violation` adapter, APN-anchored,
+casetype classifier (Derelict/Substandard/vacant → owner_distress 0.8 🚩; else
+0.5). Recent-first (opendate DESC). county=PIERCE, city=TACOMA. Buy-box gains
+TACOMA/PIERCE.
+**Verified end-to-end (live):** ingested 1000 recent Tacoma cases → **99 WARM
+leads** (Derelict Building distress, real Tacoma addresses, top 2.82) + 808
+watch. Clears the actionable bar West Sac failed (recent-dated + distress
+granularity + weight-2.0). Hot unchanged at 98 (absentee is next cycle). 248
+tests green (+7).
+**Note:** ArcGIS single-request cap = 1000, so live pull is the 1000 most-recent
+(not the 2000 default); paginate later if fuller coverage is wanted.
+**NEXT (pt.2):** Pierce absentee adapter (APN-anchored, out-of-state, paginated)
+→ Tacoma hot stacks (Derelict Building + out-of-state owner).
+
+---
+
 ## 2026-07-31 (overnight) — item #6b: West Sacramento probe → built, shelved
 **Commit:** (this session) new `adapters/westsac_code_enforcement.py` (ENABLED=
 False) + fixture + `tests/test_westsac_code.py` (7). Buy-box unchanged (CA add

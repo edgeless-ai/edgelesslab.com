@@ -19,6 +19,44 @@ python cli.py review         # ambiguous enrichments awaiting a human pick
 
 ---
 
+## 2026-08-04 — Spokane metro: THIRD hot metro via the APN template (+54 hot)
+**Commit:** (this session) new `adapters/spokane_code_violations.py` +
+`adapters/spokane_absentee.py` + fixtures + `tests/test_spokane_code.py` +
+`tests/test_spokane_absentee.py` (+17 tests) + buy-box geo (SPOKANE city/county)
+
+- **Probe (both halves verified live before building):** the city AGOL org has
+  no code service, and `my.spokanecity.org` 403s scripted fetch — but the city
+  runs its OWN ArcGIS server: `services.spokanegis.org`
+  `BDS/Accela_WM_Dynamic/MapServer/47` "Code Complaint" (keyless, dated, 61,844
+  records; 3,566 opened in trailing 180d; RecordId/Parcel/ComplaintType/status).
+  County side: `gismo.spokanecounty.org` `Assessor/SCOUTSimple/MapServer/0`
+  carries FULL taxpayer mailing (name/address/city/state/zip) + PID_NUM — the
+  layer behind their SCOUT viewer. 6,289 out-of-state w/ Spokane situs; 3,699
+  after the residential cut ('Single Unit','Two-to-Four Unit','Other
+  Residential'). Both feeds share the `35082.4002` parcel format → exact
+  APN merge, the Tacoma template.
+- **Vocab judgment calls:** (1) Spokane "Fire Hazard" = weeds/combustible
+  material, NOT a failing structure → classifies "other" (bare "fire" removed
+  from the owner-distress terms, unlike Tacoma). (2) Rows whose
+  ComplaintStatus = "No Violation" (city inspected, found nothing) are dropped
+  in `_to_signal` — a filter Tacoma didn't need. Post-ingest check: dominant
+  bucket is "Initial Inspection / In Violation" (498), i.e. confirmed
+  violations.
+- **Live verified end-to-end:** adapters standalone (1,115 code + 3,699
+  absentee signals), then full `reset` + `run --live`: **hot 116 → 171**
+  (KING 99 / PIERCE 18 / **SPOKANE 54**), warm 1,978, 30,448 signals ingested,
+  digest shows Spokane rows (top: 1678 S COCHRAN ST, distress 3.80,
+  Zoning Violation + owner in Priest Lake ID). 272 tests green (+17).
+- **Notable:** many Spokane absentee owners mail to CdA/Post Falls/Rathdrum ID
+  — out-of-state by the letter, but a 30-min drive; a future "absentee
+  distance" refinement could tier these below true remote owners.
+
+**Next lever:** the WA county template keeps paying (King/Pierce/Spokane all
+publish taxpayer mailing). Remaining candidates: Clark (Vancouver), Kitsap,
+Thurston, Whatcom — probe city-side code feeds first; Snohomish already failed.
+
+---
+
 ## 2026-07-31 (overnight) — WRAP: 3rd-metro probe (Snohomish) negative, run closed
 **Why:** final bounded shot at a 3rd metro via the APN template, then wrap.
 **Snohomish/Everett NEGATIVE (logged, skipped):** the make-or-break code feed

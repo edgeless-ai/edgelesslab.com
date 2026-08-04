@@ -1,0 +1,18 @@
+# Edgeless Options Greek Automation — Cron Schedule
+# Add to crontab with: crontab config/cron.txt
+
+# Pipeline: every 5 minutes during market hours (Mon-Fri)
+# Python-side market-hours gate handles early/close filtering
+*/5 * * * 1-5 cd /Users/djm/Codex-projects/options-greek-automation && source .venv/bin/activate && python jobs/orchestrator.py >> logs/pipeline.log 2>&1
+
+# Monitor: every minute (lightweight check)
+* * * * * cd /Users/djm/Codex-projects/options-greek-automation && source .venv/bin/activate && python execution/monitor.py >> logs/monitor.log 2>&1
+
+# Health check: every hour
+0 * * * * cd /Users/djm/Codex-projects/options-greek-automation && source .venv/bin/activate && python -c "from jobs.orchestrator import run_health_check; import json; print(json.dumps(run_health_check()))" >> logs/health.log 2>&1
+
+# Data purge: every Sunday at 2 AM
+0 2 * * 0 cd /Users/djm/Codex-projects/options-greek-automation && source .venv/bin/activate && python -c "from jobs.orchestrator import purge_old_data; print(purge_old_data(90))" >> logs/purge.log 2>&1
+
+# Metrics server: start on boot (add to launchctl or use nohup)
+# @reboot cd /Users/djm/Codex-projects/options-greek-automation && source .venv/bin/activate && nohup python telemetry/metrics.py >> logs/metrics.log 2>&1 &

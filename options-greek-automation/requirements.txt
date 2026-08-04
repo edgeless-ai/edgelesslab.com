@@ -1,0 +1,29 @@
+# Edgeless Options Greek Automation
+# Run: pip install -r requirements.txt
+
+# Data & API
+requests>=2.31.0
+pyyaml>=6.0.1
+
+# Analytics
+numpy>=1.24.0
+pandas>=2.0.0
+pandas_market_calendars>=4.3.0
+
+# Visualization
+plotly>=5.18.0
+
+# Dashboard
+marimo>=0.6.0
+
+# Telemetry
+prometheus-client>=0.19.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Database (SQLite is built-in, no package needed)
+
+# Optional: Alpaca SDK
+# alpaca-py>=0.21.0

@@ -1,0 +1,19 @@
+# Regenerable data — do NOT commit (250M+ binary, rebuilt by ingest)
+db/data/*.db
+db/data/*.db-wal
+db/data/*.db-shm
+
+# Python cruft
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Runtime logs
+logs/*.log
+logs/*.jsonl
+
+# Any local secrets (belt-and-suspenders; none live here today)
+*.env
+.env
+*token*.json

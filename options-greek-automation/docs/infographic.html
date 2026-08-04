@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edgeless Options Greek Automation - System Overview</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 40px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 30px;
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 16px;
+      border: 1px solid #334155;
+    }
+    .header h1 {
+      font-size: 36px;
+      color: #fbbf24;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    .header p { font-size: 18px; color: #94a3b8; }
+    .section {
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 16px;
+      border: 1px solid #334155;
+      padding: 30px;
+      margin-bottom: 24px;
+    }
+    .section h2 {
+      font-size: 24px;
+      color: #fbbf24;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .flow { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .flow-box {
+      background: #334155;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid #475569;
+    }
+    .flow-arrow { color: #fbbf24; font-size: 20px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .card h3 { font-size: 18px; color: #f8fafc; margin-bottom: 12px; }
+    .card p { font-size: 14px; color: #94a3b8; line-height: 1.6; }
+    .metric { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #334155; }
+    .metric:last-child { border-bottom: none; }
+    .label { color: #94a3b8; font-size: 14px; }
+    .value { font-weight: 600; }
+    .value.green { color: #34d399; }
+    .value.red { color: #f87171; }
+    .value.yellow { color: #fbbf24; }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .badge.green { background: #065f46; color: #34d399; }
+    .badge.red { background: #991b1b; color: #f87171; }
+    .badge.yellow { background: #92400e; color: #fbbf24; }
+    .badge.blue { background: #1e3a5f; color: #60a5fa; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-card .stat-label { font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-card .stat-value { font-size: 28px; font-weight: 700; color: #fbbf24; }
+    .footer {
+      text-align: center;
+      padding: 30px;
+      color: #64748b;
+      font-size: 14px;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th { text-align: left; padding: 12px; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #334155; }
+    td { padding: 12px; font-size: 14px; border-bottom: 1px solid #334155; }
+    tr:hover { background: rgba(51, 65, 85, 0.3); }
+    .highlight { background: rgba(251, 191, 36, 0.1); border: 1px solid #fbbf24; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        Edgeless Options Greek Automation
+      </h1>
+      <p>Real-time options trading system based on Greek exposure analysis</p>
+      <div style="margin-top: 16px; display: flex; justify-content: center; gap: 12px;">
+        <span class="badge green">3 Underlyings</span>
+        <span class="badge yellow">30/50/20 Strategy</span>
+        <span class="badge blue">Paper Trading</span>
+        <span class="badge green">11 Tests Passing</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        System Architecture
+      </h2>
+      <div class="flow">
+        <div class="flow-box" style="background: #1e3a5f; color: #60a5fa;">ConvexValue API</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box" style="background: #1e3a5f; color: #60a5fa;">Ingestion</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box" style="background: #1e3a5f; color: #60a5fa;">SQLite WAL</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box" style="background: #92400e; color: #fbbf24;">Analytics</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box" style="background: #92400e; color: #fbbf24;">Strategy</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box" style="background: #065f46; color: #34d399;">Execution</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box" style="background: #065f46; color: #34d399;">Monitor</div>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Data Layer</h3>
+          <p>ConvexValue API provides real-time options chains with Greeks. Free tier, no rate limits. 36 expirations, 171+ strikes per underlying.</p>
+          <span class="badge blue">36 Expiries</span>
+        </div>
+        <div class="card">
+          <h3>Strategy Layer</h3>
+          <p>Reel Strategy: 30% Delta PCR, 50% Gamma proximity, 20% Vanna. Contrarian to PCR with 14+ DTE rule.</p>
+          <span class="badge yellow">30/50/20</span>
+        </div>
+        <div class="card">
+          <h3>Execution Layer</h3>
+          <p>Alpaca Paper Trading with single-leg OCC orders. Custom monitor loop for 50% profit, 21 DTE exits.</p>
+          <span class="badge green">Paper Only</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v16"></path></svg>
+        Reel Strategy Breakdown
+      </h2>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Delta PCR (30%)</h3>
+          <div class="metric">
+            <span class="label">LONG Threshold</span>
+            <span class="value red">> 1.20</span>
+          </div>
+          <div class="metric">
+            <span class="label">SHORT Threshold</span>
+            <span class="value green">< 0.80</span>
+          </div>
+          <div class="metric">
+            <span class="label">Signal</span>
+            <span class="value yellow">Contrarian</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Gamma Proximity (50%)</h3>
+          <div class="metric">
+            <span class="label">Threshold</span>
+            <span class="value yellow">< 2% of spot</span>
+          </div>
+          <div class="metric">
+            <span class="label">Support</span>
+            <span class="value green">Below spot</span>
+          </div>
+          <div class="metric">
+            <span class="label">Resistance</span>
+            <span class="value red">Above spot</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Vanna (20%)</h3>
+          <div class="metric">
+            <span class="label">Threshold</span>
+            <span class="value yellow">> 0.15</span>
+          </div>
+          <div class="metric">
+            <span class="label">Positive</span>
+            <span class="value green">Buy the dip</span>
+          </div>
+          <div class="metric">
+            <span class="label">Negative</span>
+            <span class="value red">Sell the rip</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        Risk Guards
+      </h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Guard</th>
+            <th>Rule</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Market Hours</td>
+            <td>No trades within 30 min of open</td>
+            <td><span class="badge red">REJECT</span></td>
+          </tr>
+          <tr>
+            <td>Max Positions</td>
+            <td>1 open per underlying</td>
+            <td><span class="badge red">REJECT</span></td>
+          </tr>
+          <tr>
+            <td>Daily Loss</td>
+            <td>< 5% of equity</td>
+            <td><span class="badge red">REJECT</span></td>
+          </tr>
+          <tr>
+            <td>Correlation</td>
+            <td>Beta-weighted delta < 10%</td>
+            <td><span class="badge red">REJECT</span></td>
+          </tr>
+          <tr>
+            <td>Min DTE</td>
+            <td>14 days minimum</td>
+            <td><span class="badge red">REJECT</span></td>
+          </tr>
+          <tr>
+            <td>Expiration</td>
+            <td>Auto-close at 3:30 PM</td>
+            <td><span class="badge yellow">CLOSE</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+        Position Sizing
+      </h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Defined Risk (Spreads)</h3>
+          <p>Size by max loss with Kelly criterion:</p>
+          <div style="background: #0f172a; padding: 16px; border-radius: 8px; margin-top: 12px; font-family: monospace; font-size: 14px;">
+            f* = (bp - q) / b<br>
+            contracts = equity × risk_pct / max_loss
+          </div>
+          <span class="badge green">Half-Kelly</span>
+        </div>
+        <div class="card">
+          <h3>Undefined Risk (Naked)</h3>
+          <p>Size by delta-adjusted notional or margin:</p>
+          <div style="background: #0f172a; padding: 16px; border-radius: 8px; margin-top: 12px; font-family: monospace; font-size: 14px;">
+            contracts = equity × risk_pct / margin<br>
+            or delta × notional
+          </div>
+          <span class="badge yellow">2% Max Risk</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+        Dashboards
+      </h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Next.js Web UI</h3>
+          <p>Real-time web dashboard with:</p>
+          <ul style="margin-top: 12px; padding-left: 20px; color: #94a3b8; line-height: 1.8;">
+            <li>Exposure overview (GEX, delta PCR, vanna)</li>
+            <li>Signal feed with confidence breakdown</li>
+            <li>P&L tracker with trade history</li>
+            <li>Auto-refresh every 30 seconds</li>
+          </ul>
+          <span class="badge blue">React + shadcn/ui</span>
+        </div>
+        <div class="card">
+          <h3>Marimo GPU Lab</h3>
+          <p>Interactive Python notebook with:</p>
+          <ul style="margin-top: 12px; padding-left: 20px; color: #94a3b8; line-height: 1.8;">
+            <li>3D Greeks surfaces (IV, delta, gamma)</li>
+            <li>GEX by strike chart</li>
+            <li>Interactive parameter controls</li>
+            <li>GPU-accelerated rendering</li>
+          </ul>
+          <span class="badge green">Python + Plotly</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        Test Results
+      </h2>
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-label">Total Tests</div>
+          <div class="stat-value">11</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Passing</div>
+          <div class="stat-value" style="color: #34d399;">11</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Failing</div>
+          <div class="stat-value" style="color: #f87171;">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Coverage</div>
+          <div class="stat-value" style="color: #60a5fa;">6</div>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Test Suite</th>
+            <th>Tests</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Vanna Computation</td>
+            <td>3</td>
+            <td><span class="badge green">✅ PASSED</span></td>
+          </tr>
+          <tr>
+            <td>Position Sizing</td>
+            <td>4</td>
+            <td><span class="badge green">✅ PASSED</span></td>
+          </tr>
+          <tr>
+            <td>Risk Guards</td>
+            <td>2</td>
+            <td><span class="badge green">✅ PASSED</span></td>
+          </tr>
+          <tr>
+            <td>Alpaca OCC Symbols</td>
+            <td>2</td>
+            <td><span class="badge green">✅ PASSED</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        Key Metrics
+      </h2>
+      <div class="grid-3">
+        <div class="card">
+          <h3>System Uptime</h3>
+          <div class="stat-value" style="font-size: 36px; color: #34d399;">>95%</div>
+          <p style="margin-top: 8px;">Health check success rate at Day 14</p>
+        </div>
+        <div class="card">
+          <h3>Signal Latency</h3>
+          <div class="stat-value" style="font-size: 36px; color: #fbbf24;"><5 min</div>
+          <p style="margin-top: 8px;">From snapshot to signal generation</p>
+        </div>
+        <div class="card">
+          <h3>Data Freshness</h3>
+          <div class="stat-value" style="font-size: 36px; color: #60a5fa;"><6 min</div>
+          <p style="margin-top: 8px;">Age of last snapshot</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Edgeless Lab — One-person creative technology studio</p>
+      <p style="margin-top: 8px;">Built with Python, SQLite, ConvexValue API, Alpaca Paper, Next.js, Marimo</p>
+      <p style="margin-top: 8px; font-size: 12px;">Not financial advice. All trades are paper-only.</p>
+    </div>
+  </div>
+</body>
+</html>

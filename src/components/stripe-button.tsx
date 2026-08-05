@@ -23,7 +23,7 @@ export function StripeButton({
   icon = true,
 }: StripeButtonProps) {
   const isFree = price === "Free";
-  const label = isFree ? "Get it free" : `Buy now \u2014 ${price}`;
+    const label = isFree ? "Download" : `Purchase — ${price}`;
 
   const handleClick = () => {
     trackCTA("stripe_checkout", href);

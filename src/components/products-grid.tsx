@@ -60,7 +60,7 @@ export function ProductsGrid({ products }: { products: Product[] }) {
           <div className="mt-auto pt-8">
             {product.comingSoon ? (
               <span className="text-sm" style={{ color: "var(--text-tertiary)" }}>
-                In development
+                Shipping Q3 2026
               </span>
             ) : product.slug ? (
               <Link

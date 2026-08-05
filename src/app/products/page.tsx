@@ -68,7 +68,7 @@ export default function ProductsPage() {
               }}
             >
               <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--green)" }} />
-              Start free with Claude Memory Kit
+              Start with Claude Memory Kit
             </a>
             <span className="font-mono text-[11px]" style={{ color: "var(--text-tertiary)" }}>
               Open references first

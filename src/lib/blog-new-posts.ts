@@ -2096,6 +2096,110 @@ The core insight survived the misquote. Generative AI is already worth a lot to 
     `.trim(),
   },
   {
+    slug: "agentic-engineering-week",
+    editorial: true,
+    title: "The Week Agentic Engineering Became a Real Discipline",
+    description: "Nine YouTube videos, one week, zero hype. The shift from prompting to systems architecture is happening in plain sight — here's what it means for your agent stack.",
+    date: "2026-07-30",
+    tags: ["AI Agents", "Agentic Engineering", "Multi-Agent", "Architecture"],
+    readTime: "6 min",
+    content: `# The Week Agentic Engineering Became a Real Discipline
+
+**Nine videos, one week, zero hype.**
+
+Here's what happened in the YouTube creator space between July 23 and July 30, 2026:
+
+- A CEO+board of seven 1M-context Claude agents, debating a business brief and returning a decision memo
+- A minimal MacOS agent architecture with two skills and four CLIs, safely automating a whole desktop
+- A fusion harness that makes rival frontier models write each other's validation gates
+- A meta-skill that syncs private skills, agents, and prompts across every device and teammate
+- A "software factory" pattern converging across every company building agent coding teams
+- A five-pillar system for running Claude Code sessions in parallel with git worktrees
+- A three-phase, tool-agnostic system for reliable AI coding
+- A minimalist self-extending agent that fights Claude Code bloat
+
+Same week. Same problem space. Zero coordination between the creators.
+
+That's the signal.
+
+---
+
+## The Pattern
+
+For the past year, most AI coding content has been about *prompts*. Better prompts, longer prompts, structured prompts, RAG-enhanced prompts. The assumption was that the model was the bottleneck and the prompt was the interface.
+
+The videos this week tell a different story. The assumption has flipped: **the model is no longer the bottleneck. The *system* is.**
+
+Every single video in this batch is about architecture and discipline:
+
+- IndyDevDan's Pi CEO harness isn't a prompt trick. It's an organizational structure: a board of agents with roles, context budgets, and a deliberation protocol.
+- His OpenClaw reverse-engineering is explicitly about *safety architecture* — two skills, four CLIs, one trigger. The model is the smallest part of the system.
+- Claude Mythos, the unreleased model Anthropic published a system card for, wasn't too dangerous because it was too powerful. It was too dangerous because nobody had built the harness *around* it yet.
+- The model fusion harness doesn't try to pick one model. It orchestrates disagreement.
+- Jaymin West's "software factory" analysis shows that every team building coding agents is independently converging on the same architecture: work queue, control plane, sandbox, human review, event stream.
+- ColeMedin's worktree system and PIV (Plan-Implement-Verify) loop are about *project management for agents*, not prompting.
+
+This is the shift. Agentic engineering is becoming a *systems* discipline, not a *prompting* discipline.
+
+---
+
+## Two Contrasting Takes
+
+**IndyDevDan** and **ColeMedin** are the two most prolific creators in this space, and they approach the same problem from opposite ends.
+
+IndyDevDan is a **systems architect**. His videos are about structure: how many agents, what roles, what context budgets, what safety constraints. His CEO+board harness is a literal organizational chart. His OpenClaw deconstruction is a safety audit. His fusion harness is a decision protocol. He's designing organizations of agents.
+
+ColeMedin is a **workflow engineer**. His videos are about process: how to plan, implement, verify, and iterate. His PIV loop is a methodology. His worktree system is a productivity hack. His Pi+Archon integration is a toolchain. He's designing *how* agents work, not *who* they are.
+
+Both are right. Both are necessary. And neither is about prompts.
+
+---
+
+## What It Means for Our Stack
+
+The Edgeless swarm runs on Hermes Kanban with a task board, specialist agents, and a dispatch system. We've been doing this for months. What these videos confirm is that the patterns we're building are the patterns everyone is converging on:
+
+- **Task board as control plane** — work queue, assignment, completion tracking. The "software factory" pattern Jaymin West describes is exactly what Kanban already does.
+- **Specialist agents** — Scribe for knowledge, Kilo for code, Beau for planning. The CEO+board pattern at scale.
+- **Containment** — anti-loop protocol, depth counters, scope limitations. The Mac Mini agent architecture is the same idea: define the guardrails before the agent runs.
+- **Parallel isolation** — worktrees, separate DBs, port management. ColeMedin's five-pillar system validates our own isolation patterns.
+
+The gap these videos surfaced: **we don't have model fusion.** We route to individual models per task type, but we don't have a harness that runs two models on the same problem and compares their outputs. That's the next thing to build — a fusion agent that can surface disagreement between models and let a human (or another agent) resolve it.
+
+---
+
+## The Canonical Video
+
+If you watch one thing from this batch, make it IndyDevDan's *Pi CEO Agents* breakdown. It's the most complete demonstration of the systems-first approach to agent engineering. The CEO+board pattern is directly applicable to any multi-agent system, and the 1M-context budget allocation is a trick worth stealing.
+
+But the real takeaway isn't any single video. It's the convergence. When nine creators in one week all independently arrive at the same conclusion — that agentic engineering is a systems discipline, not a prompting one — the community has spoken.
+
+The answer to "how do I build better AI agents?" is no longer "write a better prompt." It's "design a better system."
+
+---
+
+## What to Build Next
+
+1. **Model fusion agent** — a harness that runs 2+ models on the same task and surfaces disagreement
+2. **Safety wrapper** — an explicit boundary layer between any agent and its external tools, based on the Mac Mini agent pattern
+3. **Skill sync** — the Library meta-skill pattern, so our private skills and prompts are versioned and distributed across devices
+4. **Worktree-based parallel sessions** — ColeMedin's five-pillar system, adapted for our Hermes stack
+
+Each of these is a concrete, buildable step. The discipline is here. The architecture is solidifying. Time to make it explicit.
+
+---
+
+*Related posts:*
+- [How I Run 5 AI Agents That Talk to Each Other](/blog/agents-that-talk-to-each-other)
+- [The Gateway That Broke and the Expensive Models We Didn't Need](/blog/the-gateway-that-broke-and-the-expensive-models-we-didnt-need)
+- [The Night Our Swarm Tried to Bankrupt Itself](/blog/swarm-tried-to-bankrupt-itself)
+- [710 Tasks and the Bottleneck That Wasn't](/blog/the-bottleneck-that-wasnt)
+
+---
+
+*This post was synthesized from 9 YouTube videos published between July 23-30, 2026. Full analysis in the Edgeless knowledge vault.*`.trim(),
+  },
+  {
     slug: "the-router-that-timed-out-on-everything",
     editorial: true,
     title: "The $0 Router That Timed Out on Everything",

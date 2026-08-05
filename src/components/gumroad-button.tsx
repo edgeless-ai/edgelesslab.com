@@ -24,7 +24,7 @@ export function GumroadButton({
   icon = true,
 }: GumroadButtonProps) {
   const isFree = price === "Free";
-  const label = isFree ? "Get it free" : `Buy now · ${price}`;
+  const label = isFree ? "Download" : `Purchase · ${price}`;
 
   const handleClick = () => {
     trackCTA("gumroad_checkout", href);

@@ -25,7 +25,7 @@ function newestFileDate(filename: string): string | null {
     if (!fs.existsSync(file)) continue;
     const date = newestDate(fs.readFileSync(file, "utf8"));
     if (!date) continue;
-    best = !best || date > best ? date : best;
+    if (best === null || date > best) best = date;
   }
   return best;
 }
@@ -110,7 +110,7 @@ function latestMdxDate(dir: string): string | null {
     if (!entry.isFile() || !entry.name.endsWith(".mdx")) continue;
     const date = latestPostDateFromFile(path.join(dir, entry.name));
     if (!date) continue;
-    best = !best || date > best ? date : best;
+    if (best === null || date > best) best = date;
   }
   return best;
 }
@@ -126,7 +126,7 @@ export function lastPostAge(label: string): string {
     if (!fs.existsSync(dir)) continue;
     const date = latestMdxDate(dir);
     if (!date) continue;
-    best = !best || date > best ? date : best;
+    if (best === null || date > best) best = date;
   }
   const today = new Date(new Date().toISOString().slice(0, 10));
   const postDay = new Date(`${best ?? new Date().toISOString().slice(0, 10)}T00:00:00Z`);

@@ -21,3 +21,13 @@ public/marimo/
 __pycache__/
 *.pyc
 lh-report.json
+
+# Untracked clutter — strays, tool logs, generated output
+claude-vault/
+repo/
+sitecustomize.py
+*.bak
+.playwright-cli/
+playwright/
+test-results/
+output/

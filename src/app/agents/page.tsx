@@ -90,6 +90,7 @@ const agents = [
       "Enrichment pipeline",
       "Research synthesis",
       "Source triage",
+      "Problem-solving checklist",
     ],
   },
   {

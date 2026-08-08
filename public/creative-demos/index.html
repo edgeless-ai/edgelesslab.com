@@ -232,6 +232,14 @@ const empty = document.getElementById('empty');
 const searchInput = document.getElementById('search');
 const statShowing = document.getElementById('stat-showing');
 
+// Stats are derived from DATA so they can't drift from the demo list
+const statTotal = document.getElementById('stat-total');
+const statDeployed = document.getElementById('stat-deployed');
+const statUndeployed = document.getElementById('stat-undeployed');
+statTotal.textContent = DATA.demos.length;
+statDeployed.textContent = DATA.demos.filter(d => d.deployed).length;
+statUndeployed.textContent = DATA.demos.filter(d => !d.deployed).length;
+
 let currentFilter = 'all';
 let searchTerm = '';
 

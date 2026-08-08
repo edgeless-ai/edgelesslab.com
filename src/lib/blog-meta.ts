@@ -3,7 +3,7 @@ import type { BlogPostMeta } from "./blog-types";
 // Re-exported so existing `@/lib/blog` consumers keep importing the type from here.
 export type { BlogPostMeta };
 
-export const postsMeta: BlogPostMeta[] = [
+const allPosts: BlogPost[] = [
   {
     slug: "kb-audit-circulation",
     editorial: true,
@@ -135,6 +135,26 @@ export const postsMeta: BlogPostMeta[] = [
     readTime: "6 min",
     productSlug: "hooks-deep-dive",
     ctaHook: "11 production hook implementations, shared libraries, and configuration templates you can drop into any Claude Code project.",
+    content: "",
+  },
+  {
+    slug: "multi-model-routing",
+    editorial: true,
+    title: "Multi-Model Routing: Why I Run 4 Different AI Brains Instead of One",
+    description: "My agent system routes requests across 4 models based on task type. Full cost breakdown, routing logic, and configuration. 10x cost reduction vs. single-model approach.",
+    date: "2026-04-19",
+    tags: ["AI Agents", "Model Routing", "Cost Optimization", "Multi-Agent"],
+    readTime: "10 min",
+    content: "",
+  },
+  {
+    slug: "knowledge-base-loop",
+    editorial: true,
+    title: "The Knowledge Base Loop: Why Your Agents Need a Memory System",
+    description: "How I built a KB Loop based on the Karpathy pattern — ChromaDB, triage scoring, synthesizer agents, and a 0-25 health score. Results: 4.2x context restatements down to 0.3x.",
+    date: "2026-04-19",
+    tags: ["AI Agents", "Knowledge Base", "ChromaDB", "Vector Search", "Agent Memory"],
+    readTime: "8 min",
     content: "",
   },
   {
@@ -369,24 +389,12 @@ export const postsMeta: BlogPostMeta[] = [
     readTime: "6 min",
     content: "",
   },
-  {
-    slug: "agentic-engineering-week",
-    editorial: true,
-    title: "The Week Agentic Engineering Became a Real Discipline",
-    description: "Nine YouTube videos, one week, zero hype. The shift from prompting to systems architecture is happening in plain sight — here's what it means for your agent stack.",
-    date: "2026-07-30",
-    tags: ["AI Agents", "Agentic Engineering", "Multi-Agent", "Architecture"],
-    readTime: "6 min",
-    content: "",
-  },
-  {
-    slug: "multi-agent-orchestration-week",
-    editorial: true,
-    title: "The Week Multi-Agent Orchestration Stopped Being Optional",
-    description: "Seven YouTube videos, one week, one conclusion: one agent is not enough. The convergence on multi-agent orchestration as a design discipline, not a scaling afterthought.",
-    date: "2026-07-30",
-    tags: ["AI Agents", "Multi-Agent", "Orchestration", "Architecture"],
-    readTime: "7 min",
-    content: "",
-  },
 ];
+
+const seenSlugs = new Set<string>();
+
+export const postsMeta: BlogPostMeta[] = allPosts.filter((post) => {
+  if (seenSlugs.has(post.slug)) return false;
+  seenSlugs.add(post.slug);
+  return true;
+});

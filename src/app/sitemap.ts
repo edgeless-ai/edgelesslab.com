@@ -51,7 +51,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: 'https://edgelesslab.com/field-notes',
+      url: 'https://edgelesslab.com/field-notes/',
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,

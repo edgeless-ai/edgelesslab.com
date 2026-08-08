@@ -4,7 +4,7 @@
 import re
 import pathlib
 
-ROOT = pathlib.Path("/Users/djm/claude-projects/edgeless-website/src/lib")
+ROOT = pathlib.Path("/Users/djm/claude-projects/edgelesslab.com/src/lib")
 BLOG = ROOT / "blog.ts"
 META = ROOT / "blog-meta.ts"
 

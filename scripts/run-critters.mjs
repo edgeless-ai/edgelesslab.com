@@ -64,6 +64,13 @@ const failures = [];
 for (const file of htmlFiles) {
   try {
     const html = await readFile(file, "utf8");
+    // Skip files that carry no stylesheet/style references — critters has
+    // nothing to inline there, and its HTML parser can crash on bare
+    // non-HTML stubs (e.g. google-site-verification files).
+    if (!/<style\b|<link[^>]+rel=["']?stylesheet/i.test(html)) {
+      skipped++;
+      continue;
+    }
     const before = html.length;
     const result = await critters.process(html);
     if (result !== html) {

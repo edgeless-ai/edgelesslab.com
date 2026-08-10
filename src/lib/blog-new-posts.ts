@@ -3104,4 +3104,107 @@ Each of these is a concrete, buildable step. The pattern is here. The crisis is 
 
 *This post was synthesized from 7 YouTube videos published between July 23 and August 4, 2026. Full analysis in the Edgeless knowledge vault.*`.trim(),
   },
+  {
+    slug: "cli-tools-week",
+    editorial: true,
+    title: "The Week CLIs Became AI's Distribution Channel",
+    description: "Four videos, one series, one tool: diffbro is a pip-installable CLI that runs git diffs through ChatGPT for AI peer review — and it tells us something about where AI tooling is headed.",
+    date: "2026-08-09",
+    tags: ["AI Tools", "CLI", "Code Review", "Python", "Packaging"],
+    readTime: "6 min",
+    content: `# The Week CLIs Became AI's Distribution Channel
+
+**Four videos, one series, one tool: diffbro is a pip-installable CLI that runs git diffs through ChatGPT for AI peer review — and it tells us something about where AI tooling is headed.**
+
+Here's what IndyDevDan published between August 2 and August 9, 2026:
+
+- **[Introducing DIFFBRO](https://www.youtube.com/watch?v=5oXh5SvPJ-M)** — The launch: diffbro, an open-source pip-installable CLI that runs git diffs through ChatGPT for an AI peer review before code reaches a human reviewer. Closing out a devlog series that built it with Python, Poetry, and Aider.
+- **[Git + AI = DIFFBRO: AI Coding the future of code reviews](https://www.youtube.com/watch?v=20SpUcFzfYI)** — The framing: AI-assisted code review as part of a broader shift from writing code to using AI tools that write and review code. Setting up the thesis ahead of the build.
+- **[AI Devlog: Coding an AI powered, Code Review, CLI tool](https://www.youtube.com/watch?v=2AsHCRJFf3A)** — The build: wiring GPT model selection and file-type include/exclude flags into a Python CLI that runs git diffs through ChatGPT.
+- **[pip install YOUR-PACKAGE: Building your first python package](https://www.youtube.com/watch?v=0vVtbMdmbds)** — The packaging: building and publishing a real pip-installable Python CLI package using Poetry for packaging, ChatGPT for step-by-step instructions, and Aider to execute those instructions as code changes.
+
+Same creator. Same series. One coherent story about the shape of AI tooling in 2026.
+
+That's the signal.
+
+---
+
+## The Pattern
+
+For the past year, most AI-assisted coding content has been about *agents in the IDE* — Claude Code, Codex, Cursor, Copilot. The assumption was that the AI belongs inside your editor, helping you write code in real time.
+
+diffbro tells a different story: **the CLI is the distribution channel.**
+
+IndyDevDan's entire devlog series is about building a tool that lives *outside* the editor. You install it with \`pip install diffbro\`, you run it with \`diffbro review\` in your terminal, and it returns a structured code review before your PR ever reaches a human. It doesn't need to be in your IDE. It doesn't need a plugin. It's a CLI that takes git diffs as input and returns reviews as output.
+
+This is a fundamentally different model from the editor-integrated AI:
+
+- **Editor-integrated AI** is synchronous, real-time, and context-aware. It watches you type. It suggests completions. It's deeply coupled to your workflow.
+- **CLI-distributed AI** is asynchronous, pipeline-able, and composable. \`git diff | diffbro review\` is a chain. You can wire it into CI. You can run it on a schedule. You can pipe the output into another tool.
+
+Both are useful. But the CLI model solves a problem the editor model can't: **it makes AI reviewable, repeatable, and automatable as part of a pipeline.**
+
+---
+
+## The diffbro Case Study
+
+The four videos aren't four separate takes on CLI tools. They're one cohesive case study, and the shape of that case study is worth unpacking.
+
+**Video 1 (The Thesis):** IndyDevDan opens with the framing — code review is a bottleneck, and AI-assisted review is the natural next step in the shift from writing code to orchestrating AI tools. The thesis is clear before a single line of code is written.
+
+**Video 2 (The Architecture):** The first devlog establishes the architecture: a Python CLI that reads git diffs, sends them to ChatGPT, and returns structured feedback. Model selection, file-type filtering, include/exclude patterns. The architectural decisions are front-and-center.
+
+**Video 3 (The Implementation):** The second devlog is about wiring. GPT model selection, config parsing, error handling. The messy middle of making a CLI actually work.
+
+**Video 4 (The Distribution):** The final video is about packaging. Not just making it work, but making it *installable*. Poetry, PyPI, pip install. The last step is the most important: publishing.
+
+The narrative arc is: thesis → architecture → implementation → distribution. And the punchline is that the *distribution* step is what makes it real. A script is a prototype. A pip-installable CLI is a tool.
+
+---
+
+## What It Means for Our Stack
+
+The Edgeless swarm is built on CLI tools — discli, hermes, kanban, curl, grep, jq, Python scripts. We don't have a GUI. We don't have a dashboard. We have a terminal, and that's by design.
+
+diffbro validates three things about our approach:
+
+**1. CLI is the composability layer.** \`diffbro review\` works because it takes stdin and returns stdout. \`git diff | diffbro review\` is a pipeline. Our stack is built on the same principle: \`hermes kanban list | grep scribe | wc -l\` is a pipeline. The CLI is the interface that makes pipelines possible.
+
+**2. AI tooling ships best as CLIs.** diffbro is a pip-installable Python package. Our tools are the same — Python scripts, shell commands, Hermes skills. No IDE plugin, no VS Code extension, no SaaS subscription. \`pip install\` and done. That's the distribution model that matches how developers actually work.
+
+**3. The review pipeline is a concrete build pattern.** \`git diff → AI review → human review\` is a pipeline we should implement for our own PRs. The Edgeless swarm generates a lot of code. A diffbro-style gate that checks every diff before it reaches a human reviewer would catch the noise that shouldn't be a PR at all.
+
+---
+
+## The Canonical Video
+
+If you watch one thing from this batch, make it the final video — *pip install YOUR-PACKAGE*. It's the shortest, the most practical, and it answers the question that the other three set up: "How do I get this thing into someone's hands?"
+
+But the real takeaway isn't any single video. It's the narrative arc across four videos about the same tool. IndyDevDan didn't make four videos about CLI tools. He made one series about building and shipping an AI CLI tool, and the fact that he published it as a pip-installable package — not a VS Code extension, not a SaaS product, not a Claude Code skill — is the signal.
+
+The CLI is the distribution channel. Not because it's the most powerful interface, but because it's the most composable one. \`pip install\` is the last mile. \`stdin | stdout\` is the protocol. And \`git diff | AI review\` is the pattern that's about to be everywhere.
+
+---
+
+## What to Build Next
+
+1. **diffbro-style PR gate** — a pre-review hook that runs every git diff through an AI review before it reaches a human reviewer, catching noise and surfacing issues early
+2. **CLI-first AI tool registry** — a catalog of pip-installable AI CLI tools (diffbro, aider, etc.) with recommended workflows and integration patterns for our stack
+3. **Pipeline-able review chain** — \`git diff | agent-review | slack\` — a composable pipeline that wires AI review into our existing notification and dispatch system
+4. **Poetry-based packaging template** — a starter template for publishing any Hermes script as a pip-installable CLI, following diffbro's pattern
+
+Each of these is a concrete, buildable step. The pattern is here. The distribution model is clear. Time to make it explicit.
+
+---
+
+*Related posts:*
+- [The Week Multi-Agent Orchestration Stopped Being Optional](/blog/multi-agent-orchestration-week)
+- [The Week Agentic Engineering Became a Real Discipline](/blog/agentic-engineering-week)
+- [How I Run 5 AI Agents That Talk to Each Other](/blog/agents-that-talk-to-each-other)
+- [710 Tasks and the Bottleneck That Wasn't](/blog/the-bottleneck-that-wasnt)
+
+---
+
+*This post was synthesized from 4 YouTube videos by IndyDevDan published between August 2-9, 2026. Full analysis in the Edgeless knowledge vault.*`.trim(),
+  },
 ];

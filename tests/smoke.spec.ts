@@ -51,6 +51,19 @@ test.describe("static site smoke", () => {
     expect(errors).toEqual([]);
   });
 
+  test("/lab/prompt-engine/ loads and generates a batch", async ({ page }) => {
+    const response = await page.goto("/lab/prompt-engine/");
+    expect(response?.status()).toBe(200);
+    await expect(page.getByRole("heading", { name: "Prompt Engine" })).toBeVisible();
+
+    // Default batch size is 24; generating may lazy-fetch the museum sref pack.
+    await page.getByRole("button", { name: /^Generate/ }).click();
+    const cards = page.locator("[data-prompt-card]");
+    await expect(cards.first()).toBeVisible({ timeout: 20_000 });
+    expect(await cards.count()).toBeGreaterThanOrEqual(12);
+    await expect(page.locator("[data-copy-prompt]").first()).toBeVisible();
+  });
+
   test("home page has no severe console errors", async ({ page }) => {
     // Known pre-existing issues (2026-07-05), filtered so this test only
     // catches NEW severe errors. Remove entries as the underlying bugs get fixed:

@@ -1,0 +1,1355 @@
+{
+ "_generated": "by generated/nous-mj-overnight/export_dashboard_data.py -- do not hand-edit",
+ "SUBJECTS": [
+  {
+   "text": "a shattered marble bust of Apollo",
+   "tags": [
+    "classical",
+    "singular"
+   ]
+  },
+  {
+   "text": "a winged Nike victory statue",
+   "tags": [
+    "classical",
+    "winged"
+   ]
+  },
+  {
+   "text": "a Doric colonnade dissolving into server racks",
+   "tags": [
+    "classical",
+    "distributed",
+    "machine"
+   ]
+  },
+  {
+   "text": "a brutalist compute-cathedral",
+   "tags": [
+    "machine",
+    "monolithic"
+   ]
+  },
+  {
+   "text": "a brass orrery of nested planetary rings",
+   "tags": [
+    "cosmos",
+    "instrument"
+   ]
+  },
+  {
+   "text": "a medieval astrolabe",
+   "tags": [
+    "cosmos",
+    "instrument"
+   ]
+  },
+  {
+   "text": "a datacenter server hall",
+   "tags": [
+    "distributed",
+    "machine"
+   ]
+  },
+  {
+   "text": "a row of caryatid columns",
+   "tags": [
+    "classical",
+    "distributed"
+   ]
+  },
+  {
+   "text": "a modernist glass pavilion in a birch forest",
+   "tags": [
+    "botanical",
+    "singular"
+   ]
+  },
+  {
+   "text": "an exploded rotary telephone",
+   "tags": [
+    "comms",
+    "machine"
+   ]
+  },
+  {
+   "text": "a Corinthian capital fused with circuit traces",
+   "tags": [
+    "classical",
+    "machine"
+   ]
+  },
+  {
+   "text": "a laurel wreath and acanthus cartouche",
+   "tags": [
+    "classical",
+    "ornament"
+   ]
+  },
+  {
+   "text": "a temple ruin reclaimed by cooling pipes",
+   "tags": [
+    "classical",
+    "machine",
+    "ruin"
+   ]
+  },
+  {
+   "text": "a silicon circuit die",
+   "tags": [
+    "machine",
+    "network"
+   ]
+  },
+  {
+   "text": "a Piranesi prison of endless staircases",
+   "tags": [
+    "architecture",
+    "monolithic"
+   ]
+  },
+  {
+   "text": "a cyanotype fern photogram",
+   "tags": [
+    "botanical"
+   ]
+  },
+  {
+   "text": "a sprawling bazaar of market stalls and awnings",
+   "tags": [
+    "bazaar",
+    "distributed"
+   ]
+  },
+  {
+   "text": "a peer-to-peer mesh of glowing network nodes",
+   "tags": [
+    "distributed",
+    "network"
+   ]
+  },
+  {
+   "text": "an open agora ringed by many columns",
+   "tags": [
+    "bazaar",
+    "classical",
+    "distributed"
+   ]
+  },
+  {
+   "text": "a switchboard of a thousand tangled patch cables",
+   "tags": [
+    "comms",
+    "network"
+   ]
+  },
+  {
+   "text": "a caduceus of intertwined wings and staff",
+   "tags": [
+    "classical",
+    "comms",
+    "winged"
+   ]
+  },
+  {
+   "text": "a loom weaving a vast tapestry of thread",
+   "tags": [
+    "instrument",
+    "weaving"
+   ]
+  },
+  {
+   "text": "an anvil in a forge throwing sparks",
+   "tags": [
+    "forge",
+    "machine"
+   ]
+  },
+  {
+   "text": "a library of endless card-catalog drawers",
+   "tags": [
+    "textual"
+   ]
+  },
+  {
+   "text": "a murmuration rendered as a swarm point-cloud",
+   "tags": [
+    "distributed",
+    "network"
+   ]
+  }
+ ],
+ "SUBJECTS_LARGE": [
+  "a mimic octopus rippling chromatophore patterns across a coral shelf",
+  "a snow leopard padding across a moonlit ridge",
+  "terraced rice paddies catching a mirror sunset",
+  "a supercell thunderstorm towering over open plains",
+  "a single protea flower in extreme detail",
+  "a marbled-paper swirl of ink in water",
+  "a still life of brass scientific instruments on dark velvet",
+  "a brutalist concrete cathedral wrapped in fog",
+  "dripping honeycomb backlit gold",
+  "an haute-couture gown built from folded paper",
+  "a phoenix rising from embers",
+  "a microscopic diatom in radial glass symmetry",
+  "an exploded diagram of a pocket watch, gears afloat",
+  "an umbrella inverted by wind on a rainy street",
+  "a grand piano dissolving into a flock of birds",
+  "a vast datacenter receding into fog, \"NOUS RESEARCH\" on the racks",
+  "a cuttlefish flashing a passing-cloud wave of color over white sand",
+  "a lyrebird mid-display, tail feathers fanned like a veil",
+  "a slot canyon lit by a single amber shaft",
+  "the aurora borealis over a frozen lake",
+  "a carnivorous pitcher plant glistening with dew",
+  "an Islamic geometric tile mosaic",
+  "a cracked pomegranate spilling seeds in chiaroscuro",
+  "an Escherian staircase folding back on itself",
+  "a cross-section of a layered pastry, flaky strata",
+  "a kimono embroidered with crashing waves",
+  "a kitsune with nine glowing tails in a bamboo grove",
+  "a snowflake crystal in hexagonal detail",
+  "a vintage submarine interior of brass dials",
+  "a single chair in a vast empty sunlit room",
+  "a cymatics pattern of sand on a vibrating plate",
+  "a marble bust of Hermes wired with neural filaments, \"NOUS RESEARCH\" on the base",
+  "a deep-sea anglerfish with a glowing lure in the black abyss",
+  "a pangolin curled into an armored spiral",
+  "basalt sea stacks in crashing surf",
+  "a total solar eclipse with the corona blazing",
+  "frost crystals branching across a leaf",
+  "a Voronoi cellular pattern rendered in stained glass",
+  "a stack of weathered books with a glowing manuscript open on top",
+  "a flooded marble palace hall, ankle-deep in still water",
+  "a tower of macarons in pastel gradients",
+  "a beaded ceremonial mask, intricate and bold",
+  "a golem of river clay and moss",
+  "a cross-section of a nautilus shell's chambers",
+  "a steam locomotive emerging from a tunnel of fog",
+  "a typewriter sprouting paper vines",
+  "a brass gramophone horn blooming flowers",
+  "a constellation map whose stars spell \"NOUS RESEARCH\"",
+  "a leafy sea dragon drifting among kelp, camouflaged as fronds",
+  "a fennec fox with oversized ears in desert dusk",
+  "an ancient bristlecone pine on a windswept ridge",
+  "a meteor shower streaking a desert night sky",
+  "a dandelion seed head dispersing in wind",
+  "a topographic contour map as rippling lines",
+  "an alchemist's table of vials and dried herbs",
+  "an organic Gaudi-esque spire dripping with mosaic",
+  "ramen steaming in a dim noodle bar",
+  "a feathered headdress catching the light",
+  "a sea serpent coiling beneath a fishing boat",
+  "a neuron firing in a web of dendrites",
+  "a hot-air balloon regatta at dawn",
+  "a staircase of books spiraling upward",
+  "a monolith inscribed \"NOUS\" on a fog-bound plain",
+  "a bloom of moon jellyfish pulsing in dark water",
+  "a king cobra rearing with hood flared",
+  "a misty fjord between sheer cliffs",
+  "bioluminescent waves breaking on a night beach",
+  "a tangle of luminous fungi on a fallen log",
+  "a kaleidoscopic mandala of beetle wings",
+  "a single glowing jellyfish suspended in a bell jar",
+  "an abandoned greenhouse reclaimed by vines",
+  "a market spread of spices in vivid mounds",
+  "a fair-isle knit pattern of snowflakes",
+  "a thunderbird with storm clouds in its wings",
+  "a soap bubble's iridescent thin-film swirl",
+  "a derelict spacecraft drifting past a ringed planet",
+  "a doorway opening onto a different season",
+  "a quantum core glowing in a white chamber, \"NOUS RESEARCH\" etched on it",
+  "a mantis shrimp in jewel-toned armor at its burrow",
+  "a herd of elephants crossing a dust-gold savanna",
+  "sand dunes rippling to the horizon at golden hour",
+  "a double rainbow over rain-slicked hills",
+  "a lotus opening over still water",
+  "an op-art moire of black and white curves",
+  "a vintage diving helmet wreathed in coral",
+  "a lighthouse on a storm-battered crag",
+  "split crystallized sugar candy like a geode",
+  "a minotaur silhouette in a hedge labyrinth",
+  "a swarm of drones forming \"NOUS\" over a sleeping city",
+  "a nautilus jetting through deep blue, shell spiraling",
+  "a barn owl gliding low over a frosted field",
+  "a volcanic caldera lake glowing turquoise",
+  "lightning forking across a violet dusk",
+  "a fern frond uncurling, backlit",
+  "a woven ikat textile in indigo and rust",
+  "a cabinet of curiosities of shells and fossils",
+  "a stone step-well descending into geometric shadow",
+  "a server cathedral with \"NOUS RESEARCH\" above the altar",
+  "a school of hammerhead sharks circling in a sunlit column",
+  "a praying mantis cleaning its forelegs on a stem",
+  "a redwood grove pierced by god-rays",
+  "a brass orrery thinking-machine, \"NOUS RESEARCH\" engraved"
+ ],
+ "MODIFIERS": [
+  "extreme macro close-up",
+  "wide cinematic establishing shot",
+  "isometric perspective",
+  "flat-lay from directly overhead",
+  "dramatic single-source rim lighting",
+  "soft high-key lighting",
+  "moonlit nocturne",
+  "golden-hour backlight",
+  "stark monochrome palette",
+  "duotone teal and orange",
+  "riotous saturated color",
+  "muted earth tones",
+  "blueprint linework",
+  "cutaway cross-section",
+  "long-exposure light trails",
+  "double-exposure",
+  "negative-space minimalism",
+  "baroque maximalist density",
+  "shallow depth of field with dreamy bokeh",
+  "infrared false-color",
+  "weathered vintage print texture",
+  "holographic iridescence",
+  "silhouette against a bright sky",
+  "worm's-eye upward view",
+  "fisheye distortion",
+  "gold-leaf accents",
+  "chalk-and-charcoal sketch",
+  "cyanotype blueprint"
+ ],
+ "BRAND_TAGS": [
+  "the wordmark \"NOUS RESEARCH\" set in clean type",
+  "the word \"NOUS\" worked subtly into the scene",
+  "a small \"HERMES\" wordmark in the corner",
+  "a winged Hermes caduceus motif integrated",
+  "\"NOUS\" formed from the subject's own elements",
+  "a discreet \"NOUS RESEARCH\" maker's mark",
+  "a Hermes winged-sandal emblem as a recurring motif",
+  "a Greek \"ΝΟΥΣ\" inscription",
+  "stamped \"NOUS\" like a museum accession label",
+  "the ecosystem mark \"NOUS\" embossed",
+  "a tiny \"HERMES\" monogram seal",
+  "\"NOUS RESEARCH\" engraved on a small plaque",
+  "the wordmark \"HERMES\" in restrained serif caps",
+  "\"NOUS\" debossed into the surface",
+  "a caduceus seal stamped \"NOUS\"",
+  "the word \"HERMES\" integrated as signage"
+ ],
+ "LEX_THEME": {
+  "NOUS RESEARCH": {
+   "resonates": [
+    "classical",
+    "cosmos",
+    "instrument",
+    "monolithic"
+   ],
+   "contradicts": []
+  },
+  "HERMES": {
+   "resonates": [
+    "comms",
+    "distributed",
+    "network",
+    "winged"
+   ],
+   "contradicts": [
+    "monolithic"
+   ]
+  },
+  "PSYCHE": {
+   "resonates": [
+    "botanical",
+    "classical",
+    "distributed",
+    "network"
+   ],
+   "contradicts": [
+    "monolithic"
+   ]
+  },
+  "FORGE": {
+   "resonates": [
+    "forge",
+    "machine"
+   ],
+   "contradicts": []
+  },
+  "DisTrO": {
+   "resonates": [
+    "distributed",
+    "machine",
+    "network"
+   ],
+   "contradicts": [
+    "monolithic"
+   ]
+  },
+  "ATROPOS": {
+   "resonates": [
+    "cosmos",
+    "instrument",
+    "weaving"
+   ],
+   "contradicts": []
+  },
+  "DISTRIBUTED INTELLIGENCE": {
+   "resonates": [
+    "bazaar",
+    "distributed",
+    "network"
+   ],
+   "contradicts": [
+    "monolithic"
+   ]
+  },
+  "DISTRIBUTED TRAINING": {
+   "resonates": [
+    "distributed",
+    "machine",
+    "network"
+   ],
+   "contradicts": [
+    "monolithic"
+   ]
+  },
+  "OPEN SOURCE": {
+   "resonates": [
+    "bazaar",
+    "distributed",
+    "network"
+   ],
+   "contradicts": [
+    "monolithic"
+   ]
+  },
+  "OPEN SOURCE AI": {
+   "resonates": [
+    "bazaar",
+    "distributed",
+    "machine"
+   ],
+   "contradicts": [
+    "monolithic"
+   ]
+  },
+  "LANGUAGE MODELS": {
+   "resonates": [
+    "classical",
+    "textual"
+   ],
+   "contradicts": []
+  },
+  "TOKENS TRAINED": {
+   "resonates": [
+    "distributed",
+    "machine",
+    "textual"
+   ],
+   "contradicts": []
+  }
+ },
+ "MODE": [
+  {
+   "phrase": "a FLIR thermal infrared capture",
+   "look": "iron-palette false color, hot whites and cold purples, a temperature scale bar, sensor noise",
+   "ar": "4:5"
+  },
+  {
+   "phrase": "an Aerochrome false-color IR capture",
+   "look": "foliage and warmth rendered crimson and magenta, infrared film grain",
+   "ar": "3:2"
+  },
+  {
+   "phrase": "an ultraviolet fluorescence capture",
+   "look": "electric green and violet fluorescence on near-black",
+   "ar": "4:5"
+  },
+  {
+   "phrase": "a Chandra X-ray false-color capture",
+   "look": "blue and purple plasma shockwaves on black, a coordinate grid",
+   "ar": "1:1"
+  },
+  {
+   "phrase": "a gen-3 night-vision capture",
+   "look": "phosphor-green intensified image, circular vignette, IR bloom",
+   "ar": "4:5"
+  },
+  {
+   "phrase": "a color-schlieren capture",
+   "look": "rainbow refractive-index gradients on black",
+   "ar": "3:2"
+  },
+  {
+   "phrase": "a Kirlian corona-discharge capture",
+   "look": "electric magenta and cyan aura, high-voltage glow on black",
+   "ar": "4:5"
+  },
+  {
+   "phrase": "a thermographic heat-map capture",
+   "look": "rainbow heat map from blue to red, a temperature gradient bar",
+   "ar": "3:4"
+  },
+  {
+   "phrase": "a lidar point-cloud scan",
+   "look": "glowing false-color depth-gradient points in a black void",
+   "ar": "16:9"
+  },
+  {
+   "phrase": "a polarized-light micrograph",
+   "look": "birefringent rainbow interference on black",
+   "ar": "4:5"
+  }
+ ],
+ "PROCESS": [
+  "cyanotype Prussian-blue duotone halftone on cream, risograph misregistration",
+  "bold two-color risograph in cobalt and cream, misregistered ink",
+  "phosphor-green dot-matrix dithering with CRT scanlines on near-black",
+  "black-ink letterpress on foxed cream, ornament rules",
+  "fine 18th-century intaglio line engraving, black on cream, one tiny red mark",
+  "thermal-receipt grain, warm-grey duotone halftone",
+  "xerox-degraded photocopy zine texture, high-contrast black and white"
+ ],
+ "FORMAT": [
+  {
+   "phrase": "a letterpress wood-type broadside",
+   "ar": "4:5"
+  },
+  {
+   "phrase": "a philatelic postage stamp",
+   "ar": "1:1"
+  },
+  {
+   "phrase": "a torn perforated ticket stub",
+   "ar": "3:2"
+  },
+  {
+   "phrase": "a matchbook cover",
+   "ar": "1:1"
+  },
+  {
+   "phrase": "a cyanotype specimen plate",
+   "ar": "4:5"
+  },
+  {
+   "phrase": "a vinyl record center label",
+   "ar": "1:1"
+  },
+  {
+   "phrase": "a stack of vintage book spines",
+   "ar": "3:4"
+  },
+  {
+   "phrase": "an enamel wayfinding sign",
+   "ar": "3:2"
+  },
+  {
+   "phrase": "a Victorian playbill",
+   "ar": "4:5"
+  },
+  {
+   "phrase": "an engraved certificate",
+   "ar": "4:5"
+  }
+ ],
+ "PALETTE": [
+  {
+   "text": "oxblood and gold on cream",
+   "category": "jewel"
+  },
+  {
+   "text": "emerald green and gold, deep and lush",
+   "category": "jewel"
+  },
+  {
+   "text": "aubergine and rose, plum duotone",
+   "category": "jewel"
+  },
+  {
+   "text": "sapphire and amethyst on black",
+   "category": "jewel"
+  },
+  {
+   "text": "burgundy and mustard, rich autumnal",
+   "category": "jewel"
+  },
+  {
+   "text": "terracotta and sand, sun-baked",
+   "category": "earth"
+  },
+  {
+   "text": "sepia and bister, aged photograph",
+   "category": "earth"
+  },
+  {
+   "text": "olive and ochre with black",
+   "category": "earth"
+  },
+  {
+   "text": "rust and forest-green, warm earth",
+   "category": "earth"
+  },
+  {
+   "text": "warm greys and a single vermilion",
+   "category": "earth"
+  },
+  {
+   "text": "soft peach and sage, faded pastel",
+   "category": "pastel"
+  },
+  {
+   "text": "dusty rose and pale teal, muted",
+   "category": "pastel"
+  },
+  {
+   "text": "lilac and butter-yellow, gentle risograph",
+   "category": "pastel"
+  },
+  {
+   "text": "flat pop-art blocks of red yellow and turquoise",
+   "category": "pop"
+  },
+  {
+   "text": "acid green and hot pink, high-key",
+   "category": "pop"
+  },
+  {
+   "text": "full CMYK registration, four-color offset",
+   "category": "pop"
+  },
+  {
+   "text": "primary red blue yellow, Bauhaus",
+   "category": "pop"
+  },
+  {
+   "text": "magenta and lime two-color riso",
+   "category": "pop"
+  },
+  {
+   "text": "coral and cobalt, vivid complementary",
+   "category": "pop"
+  },
+  {
+   "text": "spectrum gradient, saturated rainbow risograph",
+   "category": "pop"
+  },
+  {
+   "text": "stark black-and-white with one tiny red",
+   "category": "standby"
+  },
+  {
+   "text": "cobalt-and-cream two-color riso",
+   "category": "standby"
+  }
+ ],
+ "LEXICON": [
+  "NOUS RESEARCH",
+  "HERMES",
+  "NOUS RESEARCH",
+  "HERMES",
+  "NOUS RESEARCH",
+  "HERMES",
+  "NOUS RESEARCH",
+  "HERMES",
+  "NOUS RESEARCH",
+  "HERMES",
+  "NOUS RESEARCH",
+  "HERMES",
+  "PSYCHE",
+  "FORGE",
+  "DisTrO",
+  "ATROPOS",
+  "PSYCHE",
+  "FORGE",
+  "DisTrO",
+  "ATROPOS",
+  "DISTRIBUTED INTELLIGENCE",
+  "OPEN SOURCE",
+  "LANGUAGE MODELS",
+  "TOKENS TRAINED",
+  "OPEN SOURCE AI",
+  "DISTRIBUTED TRAINING"
+ ],
+ "LAYOUT": [
+  "a strict Swiss modular grid, generous white space",
+  "a Constructivist diagonal composition with dynamic bars",
+  "centered as a specimen with margin metadata and dashed rules",
+  "full-bleed edge-to-edge with corner coordinates"
+ ],
+ "TEXTURE": [
+  "coarse halftone dot screen, visible CMYK rosette",
+  "risograph misregistration, ink texture, off-register color",
+  "CRT scanlines and phosphor bloom, curved-glass vignette",
+  "ordered Bayer dithering, low-bit indexed color",
+  "VHS tracking artifacts, chromatic aberration, analog noise",
+  "xerox photocopy degradation, toner speckle, high-contrast blowout",
+  "dot-matrix printer banding on tractor-feed paper",
+  "moire interference from a rescanned print",
+  "early-90s computer graphics, chunky pixelation, aliased edges",
+  "thermal-receipt paper grain, faded emulsion",
+  "datamatrix micro-scan grid, hairline registration",
+  "screenprint halftone with slight ink bleed and paper tooth",
+  "degraded JPEG blocking and scan-line ghosting, digital-vintage decay",
+  "newsprint halftone on foxed cream stock"
+ ],
+ "INFLUENCE": {
+  "fisk": {
+   "name": "FISK",
+   "domain": "typography",
+   "move": "a FISK-style poster, oversized grotesque type on a strict grid, white space as material"
+  },
+  "vignelli": {
+   "name": "Massimo Vignelli",
+   "domain": "typography",
+   "move": "Vignelli/Unimark rationalism, Helvetica, tight modular grid, red-black"
+  },
+  "brockmann": {
+   "name": "Josef Müller-Brockmann",
+   "domain": "typography",
+   "move": "Swiss objectivity, mathematical grid, diagonal dynamism, halftone"
+  },
+  "weingart": {
+   "name": "Wolfgang Weingart",
+   "domain": "typography",
+   "move": "New Wave typography, wide letterspacing, layered screen tints, torn edges"
+  },
+  "brody": {
+   "name": "Neville Brody",
+   "domain": "typography",
+   "move": "The Face industrial display type, blocky custom letterforms, bold rules"
+  },
+  "carson": {
+   "name": "David Carson",
+   "domain": "typography",
+   "move": "grunge deconstruction, chaotic overlapping type, ransom-note layout"
+  },
+  "licko": {
+   "name": "Zuzana Licko / Emigre",
+   "domain": "typography",
+   "move": "coarse bitmap digital type, low-res pixel letterforms"
+  },
+  "crouwel": {
+   "name": "Wim Crouwel",
+   "domain": "typography",
+   "move": "New Alphabet grid-constructed letterforms, rounded terminals"
+  },
+  "jetset": {
+   "name": "Experimental Jetset",
+   "domain": "typography",
+   "move": "Helvetica-only conceptual system, literal typographic statement"
+  },
+  "martens": {
+   "name": "Karel Martens",
+   "domain": "typography",
+   "move": "letterpress overprint, modular monotype patterns, primary flecks"
+  },
+  "scher": {
+   "name": "Paula Scher",
+   "domain": "typography",
+   "move": "dense typographic environment, wall of words, hand-packed"
+  },
+  "lubalin": {
+   "name": "Herb Lubalin",
+   "domain": "typography",
+   "move": "tight ligatured expressive display type, conceptual logotype"
+  },
+  "abloh": {
+   "name": "Virgil Abloh / Off-White",
+   "domain": "fashion",
+   "move": "industrial \"quotation-mark\" labels, caution stripes, zip-ties, 3% mutation"
+  },
+  "helmutlang": {
+   "name": "Helmut Lang",
+   "domain": "fashion",
+   "move": "minimalist austerity, raw utilitarian, muted bonded surfaces"
+  },
+  "rafsimons": {
+   "name": "Raf Simons",
+   "domain": "fashion",
+   "move": "youth-cult oversized graphic, subcultural print, teenage romanticism"
+  },
+  "margiela": {
+   "name": "Maison Margiela",
+   "domain": "fashion",
+   "move": "deconstruction, blank white label, exposed stitching, numeric tags"
+  },
+  "rickowens": {
+   "name": "Rick Owens",
+   "domain": "fashion",
+   "move": "brutalist monastic drape, charcoal, gothic minimalism"
+  },
+  "yohji": {
+   "name": "Yohji Yamamoto",
+   "domain": "fashion",
+   "move": "ink-black asymmetry, calligraphic void, matte cloth"
+  },
+  "cdg": {
+   "name": "Comme des Garçons / Rei Kawakubo",
+   "domain": "fashion",
+   "move": "anti-fashion conceptual rupture, lumps, red-black"
+  },
+  "hba": {
+   "name": "Hood By Air",
+   "domain": "fashion",
+   "move": "distorted logo-bondage, xerox streetwear, warped wordmark"
+  },
+  "cavempt": {
+   "name": "Cav Empt (C.E)",
+   "domain": "fashion",
+   "move": "glitch-dystopian streetwear, degraded screenprint, surveillance motifs"
+  },
+  "acronym": {
+   "name": "ACRONYM / Errolson Hugh",
+   "domain": "fashion",
+   "move": "techwear, tactical straps, gridded ripstop panels, spec labels"
+  },
+  "stoneisland": {
+   "name": "Stone Island Shadow Project",
+   "domain": "fashion",
+   "move": "utilitarian patch, compass rose, technical hazard labels"
+  },
+  "rammellzee": {
+   "name": "Rammellzee",
+   "domain": "graffiti",
+   "move": "Gothic Futurism armored ironclad letterforms, weaponized type"
+  },
+  "futura2000": {
+   "name": "Futura 2000",
+   "domain": "graffiti",
+   "move": "aerosol atmospheric fades, clean thin arrows, spacey abstraction"
+  },
+  "barrymcgee": {
+   "name": "Barry McGee (Twist)",
+   "domain": "graffiti",
+   "move": "cluster of framed panels, drips, folk-graffiti faces omitted"
+  },
+  "delta": {
+   "name": "Delta (Boris Tellegen)",
+   "domain": "graffiti",
+   "move": "3D hard-edge geometric letter-architecture, isometric"
+  },
+  "phase2": {
+   "name": "Phase 2",
+   "domain": "graffiti",
+   "move": "wildstyle softie bubble letters, interlocking arrows"
+  },
+  "espo": {
+   "name": "ESPO / Steve Powers",
+   "domain": "graffiti",
+   "move": "hand-painted sign-writing slogans, enamel signpainter"
+  },
+  "blackbook": {
+   "name": "blackbook wildstyle",
+   "domain": "graffiti",
+   "move": "interlocking aerosol wildstyle, arrows, sketch marker bleed"
+  },
+  "costrevs": {
+   "name": "Cost & Revs",
+   "domain": "graffiti",
+   "move": "xerox wheatpaste street-poster repetition, cryptic slogans"
+  },
+  "saville": {
+   "name": "Peter Saville / Factory",
+   "domain": "music",
+   "move": "austere appropriation, classical motif meets clinical grid, no cover image"
+  },
+  "vaughanoliver": {
+   "name": "Vaughan Oliver / 4AD",
+   "domain": "music",
+   "move": "ethereal decayed collage, blurred organic type, textured layering"
+  },
+  "hipgnosis": {
+   "name": "Hipgnosis",
+   "domain": "music",
+   "move": "surreal staged photo-conceptual tableau, deadpan"
+  },
+  "reidmiles": {
+   "name": "Reid Miles / Blue Note",
+   "domain": "music",
+   "move": "bold cropped type, two-color, jazz modernism, tight crop"
+  },
+  "tdr": {
+   "name": "The Designers Republic / Warp",
+   "domain": "music",
+   "move": "maximal vector info-graphics, hazard glyphs, hyper-corporate parody"
+  },
+  "barneybubbles": {
+   "name": "Barney Bubbles",
+   "domain": "music",
+   "move": "pop-modernist pastiche, hidden geometric systems, saturated"
+  },
+  "sagmeister": {
+   "name": "Stefan Sagmeister",
+   "domain": "music",
+   "move": "hand-made object-typography, provocation, tactile lettering"
+  },
+  "nonformat": {
+   "name": "Non-Format",
+   "domain": "music",
+   "move": "refined experimental editorial type-image fusion, precise"
+  },
+  "ikeda": {
+   "name": "Ryoji Ikeda",
+   "domain": "music",
+   "move": "datamatrix barcode sublime, black-and-white micro-scan, sine data"
+  },
+  "alvanoto": {
+   "name": "Carsten Nicolai / Alva Noto",
+   "domain": "music",
+   "move": "minimal grid-glitch, sine-wave visualization, hairline"
+  },
+  "hilma": {
+   "name": "Hilma af Klint",
+   "domain": "esoteric",
+   "move": "occult diagram, spirals, esoteric botanical geometry, pastel and black"
+  },
+  "emmakunz": {
+   "name": "Emma Kunz",
+   "domain": "esoteric",
+   "move": "pendulum grid-field drawings on graph paper, radial symmetry"
+  },
+  "steiner": {
+   "name": "Rudolf Steiner",
+   "domain": "esoteric",
+   "move": "colored-chalk blackboard cosmology diagrams on black"
+  },
+  "warburg": {
+   "name": "Aby Warburg / Mnemosyne",
+   "domain": "esoteric",
+   "move": "atlas of clustered images on black panels, associative grid"
+  },
+  "lissitzky": {
+   "name": "El Lissitzky",
+   "domain": "esoteric",
+   "move": "Proun constructivist axonometric abstraction, red-black-grey"
+  },
+  "moholy": {
+   "name": "László Moholy-Nagy",
+   "domain": "esoteric",
+   "move": "Bauhaus photogram, geometric transparency, light abstraction"
+  },
+  "molnar": {
+   "name": "Vera Molnár",
+   "domain": "esoteric",
+   "move": "algorithmic line-permutation, plotter drift, systematic disorder"
+  },
+  "mohr": {
+   "name": "Manfred Mohr",
+   "domain": "esoteric",
+   "move": "cube-projection algorithmic line art, black-white"
+  },
+  "riley": {
+   "name": "Bridget Riley",
+   "domain": "esoteric",
+   "move": "op-art optical wave fields, black-white or restrained hue"
+  },
+  "vasarely": {
+   "name": "Victor Vasarely",
+   "domain": "esoteric",
+   "move": "op-art distorted grid, illusory bulging depth"
+  },
+  "richter": {
+   "name": "Gerhard Richter",
+   "domain": "esoteric",
+   "move": "color-chart grid, or grey squeegee blur"
+  },
+  "agnesmartin": {
+   "name": "Agnes Martin",
+   "domain": "esoteric",
+   "move": "faint hand-ruled pencil grid, near-monochrome, meditative"
+  },
+  "mehretu": {
+   "name": "Julie Mehretu",
+   "domain": "esoteric",
+   "move": "layered architectural mark-storm maps, vectors over plans"
+  },
+  "paglen": {
+   "name": "Trevor Paglen",
+   "domain": "esoteric",
+   "move": "machine-vision limit-photography, adversarial data overlays"
+  },
+  "klein": {
+   "name": "Yves Klein",
+   "domain": "esoteric",
+   "move": "IKB ultramarine monochrome void, gold leaf accent"
+  },
+  "fahlstrom": {
+   "name": "Öyvind Fahlström",
+   "domain": "esoteric",
+   "move": "diagrammatic pop cartography, connected cells and arrows"
+  },
+  "yokoo": {
+   "name": "Tadanori Yokoo",
+   "domain": "esoteric",
+   "move": "ultra-saturated psychedelic Japanese poster, rising-sun rays, dense collage, jewel tones"
+  },
+  "corita": {
+   "name": "Sister Corita Kent",
+   "domain": "typography",
+   "move": "pop serigraphy, joyful hand-torn rainbow color, big slanted handwritten text"
+  },
+  "glaser": {
+   "name": "Milton Glaser",
+   "domain": "esoteric",
+   "move": "psychedelic rainbow silhouette, flowing ribbons of spectral color"
+  },
+  "warhol": {
+   "name": "Andy Warhol",
+   "domain": "esoteric",
+   "move": "pop-art screenprint, flat bright complementary color blocks, repetition grid"
+  },
+  "matisse": {
+   "name": "Henri Matisse cut-outs",
+   "domain": "esoteric",
+   "move": "bold organic paper-cutout shapes, flat jewel and pastel color, white ground"
+  },
+  "murakami": {
+   "name": "Takashi Murakami",
+   "domain": "esoteric",
+   "move": "superflat candy-color, cheerful repeating motifs, glossy saturation"
+  },
+  "kandinsky": {
+   "name": "Wassily Kandinsky",
+   "domain": "esoteric",
+   "move": "abstract musical geometry, primary and jewel color, floating shapes"
+  },
+  "sonia": {
+   "name": "Sonia Delaunay",
+   "domain": "esoteric",
+   "move": "Orphist concentric color-discs, rhythmic prismatic hues"
+  },
+  "hokusai": {
+   "name": "Hokusai (Katsushika Hokusai)",
+   "domain": "fine-art",
+   "move": "ukiyo-e woodblock print, dynamic curling wave-line patterning, flat bold color"
+  },
+  "klimt": {
+   "name": "Gustav Klimt",
+   "domain": "fine-art",
+   "move": "gold-leaf ornamentation, mosaic-like pattern fields, sensuous decorative line"
+  },
+  "lichtenstein": {
+   "name": "Roy Lichtenstein",
+   "domain": "fine-art",
+   "move": "ben-day dot screen, bold comic-panel outline, primary color"
+  },
+  "bruegel": {
+   "name": "Pieter Bruegel the Elder",
+   "domain": "fine-art",
+   "move": "densely populated genre panorama, muted earth palette, folkloric detail"
+  },
+  "rothko": {
+   "name": "Mark Rothko",
+   "domain": "fine-art",
+   "move": "color-field painting, soft-edged luminous rectangles, meditative scale"
+  },
+  "vangogh": {
+   "name": "Vincent van Gogh",
+   "domain": "fine-art",
+   "move": "thick impasto brushwork, swirling expressive strokes, saturated color"
+  },
+  "bosch": {
+   "name": "Hieronymus Bosch",
+   "domain": "fine-art",
+   "move": "fantastical densely populated allegory, surreal hybrid creatures, moralizing detail"
+  },
+  "monet": {
+   "name": "Claude Monet",
+   "domain": "fine-art",
+   "move": "impressionist broken brushwork, soft atmospheric light, plein-air color"
+  },
+  "mondrian": {
+   "name": "Piet Mondrian",
+   "domain": "fine-art",
+   "move": "primary-color grid, black rule lines, strict geometric abstraction"
+  },
+  "mucha": {
+   "name": "Alphonse Mucha",
+   "domain": "fine-art",
+   "move": "art nouveau flowing line, decorative halo motif, pastel elegance"
+  },
+  "munch": {
+   "name": "Edvard Munch",
+   "domain": "fine-art",
+   "move": "expressionist anguished line, emotive distorted form, symbolist color"
+  },
+  "magritte": {
+   "name": "René Magritte",
+   "domain": "fine-art",
+   "move": "surrealist deadpan juxtaposition, crisp illustrative realism, uncanny displacement"
+  },
+  "escher": {
+   "name": "M.C. Escher",
+   "domain": "fine-art",
+   "move": "impossible-geometry tessellation, recursive perspective, precise line engraving"
+  },
+  "hopper": {
+   "name": "Edward Hopper",
+   "domain": "fine-art",
+   "move": "isolated urban realism, stark artificial light, quiet psychological distance"
+  },
+  "dore": {
+   "name": "Gustave Doré",
+   "domain": "fine-art",
+   "move": "dense crosshatch engraving, dramatic chiaroscuro, romantic grandeur"
+  },
+  "moebius": {
+   "name": "Moebius",
+   "domain": "fine-art",
+   "move": "ligne claire clean line, vast otherworldly landscape, luminous desert color"
+  },
+  "schiele": {
+   "name": "Egon Schiele",
+   "domain": "fine-art",
+   "move": "raw angular figure line, expressionist tension, muted acid palette"
+  },
+  "beksinski": {
+   "name": "Zdzisław Beksiński",
+   "domain": "fine-art",
+   "move": "dystopian surreal decay, hazy atmospheric dread, organic-mechanical fusion"
+  },
+  "rousseau": {
+   "name": "Henri Rousseau",
+   "domain": "fine-art",
+   "move": "naive jungle fantasy, flat decorative foliage, dreamlike stillness"
+  },
+  "vermeer": {
+   "name": "Johannes Vermeer",
+   "domain": "fine-art",
+   "move": "soft window light, quiet domestic interior, luminous glazed color"
+  },
+  "caravaggio": {
+   "name": "Caravaggio",
+   "domain": "fine-art",
+   "move": "dramatic chiaroscuro, tenebrist spotlight, raw physical realism"
+  },
+  "turner": {
+   "name": "J.M.W. Turner",
+   "domain": "fine-art",
+   "move": "atmospheric sublime seascape, dissolving light and weather, romantic haze"
+  },
+  "okeeffe": {
+   "name": "Georgia O'Keeffe",
+   "domain": "fine-art",
+   "move": "monumental close-cropped organic form, desert palette, sensuous simplification"
+  },
+  "miro": {
+   "name": "Joan Miró",
+   "domain": "fine-art",
+   "move": "biomorphic surrealist symbol, playful primary color, floating abstract form"
+  },
+  "seurat": {
+   "name": "Georges Seurat",
+   "domain": "fine-art",
+   "move": "pointillist optical color mixing, dappled dot technique, serene composure"
+  },
+  "klee": {
+   "name": "Paul Klee",
+   "domain": "fine-art",
+   "move": "childlike geometric whimsy, textured color field, symbolic line"
+  },
+  "hiroshige": {
+   "name": "Utagawa Hiroshige",
+   "domain": "fine-art",
+   "move": "ukiyo-e landscape print, flat perspective, rain-and-snow atmospheric motif"
+  },
+  "modigliani": {
+   "name": "Amedeo Modigliani",
+   "domain": "fine-art",
+   "move": "elongated stylized portraiture, mask-like simplified face, warm earthen palette"
+  },
+  "toulouselautrec": {
+   "name": "Henri de Toulouse-Lautrec",
+   "domain": "fine-art",
+   "move": "Belle Époque poster line, flat color silhouette, cabaret energy"
+  },
+  "rembrandt": {
+   "name": "Rembrandt",
+   "domain": "fine-art",
+   "move": "warm chiaroscuro portraiture, glowing impasto highlight, psychological depth"
+  },
+  "artdeco": {
+   "name": "Art Deco",
+   "domain": "fine-art",
+   "move": "streamlined geometric glamour, metallic accent color, travel-poster composition"
+  },
+  "constructivism": {
+   "name": "Russian Constructivism",
+   "domain": "fine-art",
+   "move": "diagonal photomontage, red-black-white agitprop geometry, bold sans type"
+  }
+ },
+ "RECIPES": {
+  "influence": {
+   "axes": [
+    "influence",
+    "subject",
+    "palette",
+    "lexicon"
+   ],
+   "tmplBranded": "in the style of {inf_name} — {influence} — depicting {subject}, {palette}, {mark}",
+   "tmplUnbranded": "in the style of {inf_name} — {influence} — depicting {subject}, {palette}",
+   "arSource": "any"
+  },
+  "poster": {
+   "axes": [
+    "influence",
+    "subject",
+    "palette",
+    "lexicon",
+    "layout"
+   ],
+   "tmplBranded": "{influence}, {subject} rendered as a wall poster, {layout}, {palette}, bold \"{lexicon}\"",
+   "tmplUnbranded": "{influence}, {subject} rendered as a wall poster, {layout}, {palette}",
+   "arSource": "any"
+  },
+  "spectral": {
+   "axes": [
+    "mode",
+    "subject",
+    "lexicon"
+   ],
+   "tmplBranded": "{mode} of {subject}, {mode_look}, monospace HUD label \"{lexicon}\"",
+   "tmplUnbranded": "{mode} of {subject}, {mode_look}",
+   "arSource": "mode"
+  },
+  "oldschool": {
+   "axes": [
+    "process",
+    "subject",
+    "lexicon"
+   ],
+   "tmplBranded": "{subject}, {process}, wordmark \"{lexicon}\"",
+   "tmplUnbranded": "{subject}, {process}",
+   "arSource": "any"
+  },
+  "ephemera": {
+   "axes": [
+    "format",
+    "subject",
+    "palette",
+    "lexicon"
+   ],
+   "tmplBranded": "{format} of {subject}, {palette}, engraved \"{lexicon}\"",
+   "tmplUnbranded": "{format} of {subject}, {palette}",
+   "arSource": "format"
+  },
+  "collision": {
+   "axes": [
+    "influence",
+    "mode",
+    "subject",
+    "lexicon"
+   ],
+   "tmplBranded": "{influence} rendering of {mode} of {subject}, {mode_look}, \"{lexicon}\"",
+   "tmplUnbranded": "{influence} rendering of {mode} of {subject}, {mode_look}",
+   "arSource": "mode"
+  },
+  "photo": {
+   "axes": [
+    "subject",
+    "modifier",
+    "influence",
+    "lexicon"
+   ],
+   "tmplBranded": "{subject}, {modifier}, in the style of {inf_name} — {influence}, {mark}",
+   "tmplUnbranded": "{subject}, {modifier}, in the style of {inf_name} — {influence}",
+   "arSource": "any"
+  }
+ },
+ "THEMES": {
+  "nous-branded": {
+   "recipes": [
+    "influence",
+    "poster",
+    "spectral",
+    "oldschool",
+    "ephemera",
+    "collision"
+   ],
+   "lexicon": "LEXICON",
+   "subjects": "SUBJECTS",
+   "influenceDomain": null,
+   "srefMode": null,
+   "coverage": false,
+   "modifiers": false,
+   "markStyle": "wordmark"
+  },
+  "art-history-madlib": {
+   "recipes": [
+    "influence",
+    "photo"
+   ],
+   "lexicon": null,
+   "subjects": "SUBJECTS_LARGE",
+   "influenceDomain": "fine-art",
+   "srefMode": "museum",
+   "coverage": true,
+   "modifiers": true,
+   "markStyle": "none",
+   "srefCountPool": [
+    1,
+    2,
+    2,
+    3
+   ]
+  },
+  "colorist-typography": {
+   "recipes": [
+    "influence",
+    "collision",
+    "poster"
+   ],
+   "lexicon": null,
+   "subjects": "SUBJECTS",
+   "influenceDomain": null,
+   "srefMode": null,
+   "coverage": true,
+   "modifiers": false,
+   "markStyle": "none",
+   "influenceDomainsAny": [
+    "esoteric",
+    "music",
+    "typography"
+   ]
+  },
+  "off-brief-random": {
+   "recipes": [
+    "influence",
+    "spectral",
+    "collision",
+    "photo"
+   ],
+   "lexicon": null,
+   "subjects": "SUBJECTS_LARGE",
+   "influenceDomain": null,
+   "srefMode": "random-stacked",
+   "coverage": false,
+   "modifiers": true,
+   "markStyle": "none",
+   "srefCountPool": [
+    1,
+    2,
+    2,
+    3
+   ]
+  }
+ },
+ "AR_ANY": [
+  "4:5",
+  "4:5",
+  "3:4",
+  "3:4",
+  "1:1",
+  "3:2",
+  "2:3",
+  "16:9",
+  "5:4"
+ ],
+ "FLAGS": "--s 150 --draft",
+ "GIRL": {
+  "ref": "https://raw.githubusercontent.com/thedavidmurray/nous-inspired-design-system/main/public/nous-girl-refs/nous-girl-ref-E-source-mascot.png",
+  "iw": 1.5,
+  "badTags": [
+   "classical",
+   "singular"
+  ],
+  "flags": "--iw 1.5 --s 150 --draft"
+ },
+ "BRAND_WORD_RE": "\\bNOUS\\b|\\bHERMES\\b|ΝΟΥΣ"
+}

@@ -147,6 +147,96 @@ describe("girl slots", () => {
   });
 });
 
+describe("batch-global positioning (roll-wide's indexOffset + coverageSeed)", () => {
+  it("defaults reproduce single-roll behavior exactly", () => {
+    const base = roll({ recipe: "collision", n: 12, seed: 42, theme: "nous-branded", texture: true });
+    const explicit = roll({
+      recipe: "collision",
+      n: 12,
+      seed: 42,
+      theme: "nous-branded",
+      texture: true,
+      indexOffset: 0,
+      coverageSeed: 42,
+    });
+    expect(explicit.map((p) => p.text)).toEqual(base.map((p) => p.text));
+    expect(explicit.map((p) => p.meta)).toEqual(base.map((p) => p.meta));
+  });
+
+  it("slices sharing a coverageSeed walk ONE permutation: full batch-level influence coverage", () => {
+    // Simulates the dashboard's roll-wide over art-history-madlib (recipes
+    // influence + photo, both with the influence axis, 32 fine-art keys):
+    // per-slice RNG seeds differ (seed, seed+1) exactly like the client, but
+    // the shared coverageSeed + contiguous indexOffset keep the coverage
+    // picker on one batch-wide permutation — all 32 influences appear across
+    // the 32-prompt batch with zero repeats. With independent per-slice
+    // restarts (the old behavior) this test fails with cross-slice repeats.
+    const seed = 5001;
+    const a = roll({
+      recipe: "influence",
+      n: 16,
+      seed,
+      theme: "art-history-madlib",
+      indexOffset: 0,
+      coverageSeed: seed,
+    });
+    const b = roll({
+      recipe: "photo",
+      n: 16,
+      seed: seed + 1,
+      theme: "art-history-madlib",
+      indexOffset: a.length,
+      coverageSeed: seed,
+    });
+    const keys = [...a, ...b].map((p) => p.meta.influenceKey);
+    expect(keys).toHaveLength(32);
+    expect(new Set(keys).size).toBe(32);
+    expect(new Set(keys)).toEqual(new Set(fineArtKeys));
+  });
+
+  it("girl slots follow the batch-global index, not the slice-local one", () => {
+    // Slice starting at batch position 2 with rate 4: girl fires at global
+    // index 4 → local meta.index 2 (and NOT at the slice's first prompt).
+    const prompts = roll({
+      recipe: "influence",
+      n: 6,
+      seed: 303,
+      theme: "nous-branded",
+      girlRate: 4,
+      indexOffset: 2,
+    });
+    expect(prompts.filter((p) => p.meta.girl).map((p) => p.meta.index)).toEqual([2]);
+  });
+
+  it("keeps the advertised girl share across a simulated wide batch", () => {
+    // 24 prompts across 6 slices of 4, rate 8 → exactly 3 girls (~13%), not
+    // one per slice (25%) as the per-slice restart produced.
+    const seed = 7207;
+    const recipes = ["influence", "poster", "spectral", "oldschool", "ephemera", "collision"];
+    const batch = recipes.flatMap((recipe, i) =>
+      roll({
+        recipe,
+        n: 4,
+        seed: seed + i,
+        theme: "nous-branded",
+        girlRate: 8,
+        indexOffset: i * 4,
+        coverageSeed: seed,
+      }),
+    );
+    expect(batch).toHaveLength(24);
+    expect(batch.filter((p) => p.meta.girl)).toHaveLength(3);
+  });
+
+  it("rejects fractional or negative indexOffset", () => {
+    for (const bad of [-1, 0.5, 2.25]) {
+      expect(() =>
+        roll({ recipe: "influence", n: 2, seed: 1, theme: "nous-branded", indexOffset: bad }),
+      ).toThrow(/indexOffset must be a non-negative integer/);
+    }
+  });
+});
+
 describe("sref modes", () => {
   it("random-stacked appends --sref random ... with pool-driven counts", () => {
     const prompts = roll({ recipe: "photo", n: 10, seed: 4001, theme: "off-brief-random" });

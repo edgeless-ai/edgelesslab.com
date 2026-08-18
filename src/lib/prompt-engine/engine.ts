@@ -82,6 +82,13 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
     );
   }
   const quiet = opts.quiet ?? false;
+  // Batch-global positioning (roll-wide support; defaults reproduce the
+  // single-roll blender.py behavior exactly).
+  const indexOffset = opts.indexOffset ?? 0;
+  if (!Number.isInteger(indexOffset) || indexOffset < 0) {
+    throw new Error(`indexOffset must be a non-negative integer; got ${indexOffset}`);
+  }
+  const coverageSeed = opts.coverageSeed ?? seed;
 
   const rng = new Rng(seed);
   const recipeDef = banks.RECIPES[recipe];
@@ -141,10 +148,11 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
   let guard = 0;
   while (out.length < n && guard < n * 200) {
     guard++;
-    const idx = out.length; // position within this run, for coverage picking
+    const idx = out.length; // position within this run (meta.index)
+    const gidx = indexOffset + idx; // batch-global position: girl slots + coverage
     const vals: Record<string, string> = {};
     let ar = arSource;
-    const girlSlot = girlRate > 0 && idx % girlRate === 0;
+    const girlSlot = girlRate > 0 && gidx % girlRate === 0;
     if (arSource === "any") ar = lock.ar || rng.choice(banks.AR_ANY);
     if (rollAxes.includes("lexicon")) {
       vals.lexicon = lock.lexicon || rng.choice(lexicon as string[]);
@@ -163,7 +171,7 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
           if (lk) {
             k = lk;
           } else if (coverage && infKeys.length > 0) {
-            k = infKeys[wrapIndex(idx, infKeys.length, seed + 100)];
+            k = infKeys[wrapIndex(gidx, infKeys.length, coverageSeed + 100)];
           } else {
             k = rng.choice(infKeys);
           }
@@ -187,7 +195,7 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
           vals.subject = pickSubject(rng, subjectsBank as TaggedSubject[], vals.lexicon, girlSlot);
         } else if (coverage) {
           vals.subject = (subjectsBank as string[])[
-            wrapIndex(idx, subjectsBank.length, seed + 200)
+            wrapIndex(gidx, subjectsBank.length, coverageSeed + 200)
           ];
         } else {
           vals.subject = rng.choice(subjectsBank as string[]);

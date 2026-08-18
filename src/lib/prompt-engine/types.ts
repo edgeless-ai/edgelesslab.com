@@ -135,6 +135,21 @@ export interface RollOptions {
    * no sref, like blender.py's ImportError fallback.
    */
   srefIndex?: SrefIndex | null;
+  /**
+   * Batch-global index of this roll's FIRST prompt (default 0). Roll-wide
+   * callers pass the running prompt count so girl slots and coverage picking
+   * see one continuous batch instead of restarting at 0 per recipe slice
+   * (which inflated the girl share and broke batch-level coverage).
+   */
+  indexOffset?: number;
+  /**
+   * Salt base for the coverage-guaranteed picker (default: this roll's seed,
+   * i.e. blender.py behavior). Roll-wide callers pass the batch's BASE seed
+   * for every slice so all slices walk ONE shared wrap permutation — restoring
+   * the batch-level "every entry before repeats" guarantee — while per-slice
+   * RNG seeds stay distinct.
+   */
+  coverageSeed?: number;
 }
 
 export interface PromptMeta {

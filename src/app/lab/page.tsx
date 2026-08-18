@@ -4,7 +4,7 @@ import { LabHeader, LabGrid } from "@/components/lab-client";
 import { LazyLabPlayground, LazyAttractorPlayground, LazyASCIIArtGenerator } from "@/components/lazy-playground-wrapper";
 import { experiments } from "@/lib/data";
 import { createPageMetadata } from "@/lib/metadata";
-import { ArrowUpRight, AudioLines } from "lucide-react";
+import { ArrowUpRight, AudioLines, Dices } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = createPageMetadata({
@@ -80,6 +80,46 @@ export default function LabPage() {
               </div>
               <span className="relative inline-flex items-center gap-2 text-sm" style={{ color: "var(--text-primary)" }}>
                 Open visualizer <ArrowUpRight size={14} />
+              </span>
+            </Link>
+            <Link
+              href="/lab/prompt-engine"
+              className="group relative flex h-[320px] flex-col justify-between overflow-hidden rounded-lg border p-6 transition-colors hover:border-white/20"
+              style={{
+                background: "var(--bg-elevated)",
+                borderColor: "var(--border-subtle)",
+              }}
+            >
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-0 bottom-0 h-24 opacity-70"
+                style={{
+                  background:
+                    "repeating-linear-gradient(90deg, rgba(198, 242, 78,0.10) 0 1px, transparent 1px 10px), radial-gradient(circle at 30% 60%, rgba(244,114,182,0.30), transparent 26%), radial-gradient(circle at 70% 40%, rgba(198, 242, 78,0.38), transparent 24%)",
+                }}
+              />
+              <div>
+                <div
+                  className="mb-5 flex h-12 w-12 items-center justify-center rounded-full transition-transform group-hover:scale-105"
+                  style={{ background: "var(--accent-ghost)" }}
+                >
+                  <Dices className="h-5 w-5" style={{ color: "var(--accent)" }} />
+                </div>
+                <span
+                  className="mb-3 block text-xs font-mono uppercase tracking-[0.14em]"
+                  style={{ color: "var(--accent)" }}
+                >
+                  Generative
+                </span>
+                <h3 className="mb-3 text-base font-semibold" style={{ color: "var(--text-primary)" }}>
+                  MJ Prompt Engine
+                </h3>
+                <p className="text-sm leading-6" style={{ color: "var(--text-secondary)" }}>
+                  Roll wide batches of MidJourney prompts from themed recipe banks, with coverage-fair picking, palette restraint, museum style refs, and dedup against the round log.
+                </p>
+              </div>
+              <span className="relative inline-flex items-center gap-2 text-sm" style={{ color: "var(--text-primary)" }}>
+                Open prompt engine <ArrowUpRight size={14} />
               </span>
             </Link>
             <LazyLabPlayground />

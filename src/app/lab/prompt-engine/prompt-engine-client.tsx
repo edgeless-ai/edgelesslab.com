@@ -83,7 +83,7 @@ interface Corpus {
 }
 
 type SrefPoolChoice = "default" | "single" | "varied";
-type GirlChoice = "auto" | "off" | "on";
+type GirlChoice = "off" | "on";
 
 interface Settings {
   theme: string;
@@ -131,7 +131,7 @@ const defaultSettings = (theme: string): Settings => ({
   markStyle: THEMES[theme]?.markStyle ?? "wordmark",
   lockInfluence: null,
   lockPalette: null,
-  girl: "auto",
+  girl: "off",
   girlRate: 4, // every 4th prompt (~25%)
 });
 
@@ -146,10 +146,15 @@ function normalizeGirlRate(v: unknown): number {
   return Math.max(1, Math.round(1 / v));
 }
 
-/** Legacy history entries could hold markStyle "none"/"quiet" as mark styles. */
+/**
+ * Legacy history entries could hold markStyle "none"/"quiet" as mark styles,
+ * and girl "auto" — a retired chip that always behaved exactly like "off"
+ * (the engine's default girlRate is 0), so it maps to "off".
+ */
 function normalizeSettings(s: Settings): Settings {
   return {
     ...s,
+    girl: s.girl === "on" ? "on" : "off",
     girlRate: normalizeGirlRate(s.girlRate),
     markStyle: s.markStyle === "none" ? "wordmark" : s.markStyle,
   };
@@ -163,10 +168,19 @@ function ordinal(n: number): string {
   return `${n}${suffix}`;
 }
 
-function randomSeed(burned: Set<number>): number {
-  for (let i = 0; i < 50; i++) {
+/**
+ * Suggest a seed whose whole derived window is unburned. Roll-wide burns
+ * seed..seed+span-1 (one derived seed per recipe slice), so checking only the
+ * base seed could silently re-burn seed+2 from a past wide round and
+ * reproduce an entire slice.
+ */
+function randomSeed(burned: Set<number>, span = 1): number {
+  outer: for (let i = 0; i < 50; i++) {
     const s = 1 + Math.floor(Math.random() * 999_999);
-    if (!burned.has(s)) return s;
+    for (let j = 0; j < span; j++) {
+      if (burned.has(s + j)) continue outer;
+    }
+    return s;
   }
   return 1 + Math.floor(Math.random() * 999_999);
 }
@@ -208,6 +222,9 @@ export function PromptEngineClient() {
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
   const [srefNotice, setSrefNotice] = useState<string | null>(null);
+  const [dedupeNotice, setDedupeNotice] = useState<string | null>(null);
+  /** How many prompts short of the requested count the last roll came up. */
+  const [shortfall, setShortfall] = useState(0);
   const [includeDupes, setIncludeDupes] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -226,6 +243,10 @@ export function PromptEngineClient() {
   const theme = THEMES[settings.theme];
   const isBranded = theme?.markStyle === "wordmark";
   const needsSrefs = theme?.srefMode != null;
+  // Roll-wide burns one derived seed per recipe slice (seed..seed+span-1);
+  // burned-seed checks must cover the whole window, not just the base seed.
+  const seedSpan =
+    settings.recipe === "wide" ? (theme?.recipes.length ?? 1) : 1;
 
   /* ------------------------- corpus (small, fetched once) ---------- */
 
@@ -247,6 +268,9 @@ export function PromptEngineClient() {
       setCorpus(data);
       return data;
     } catch {
+      // Not cached: the next generate() retries the fetch, and the caller
+      // surfaces the degraded-dedup state to the user (house rule: dupes are
+      // flagged, never silently included — so "unchecked" must be visible).
       return null;
     }
   }, []);
@@ -271,7 +295,13 @@ export function PromptEngineClient() {
       const c = await loadCorpus();
       if (cancelled) return;
       const burned = new Set(c?.burnedSeeds ?? []);
-      setSeed((prev) => prev ?? randomSeed(burned));
+      // Default settings roll wide, so suggest a seed whose whole derived
+      // window (one seed per recipe) is unburned.
+      setSeed(
+        (prev) =>
+          prev ??
+          randomSeed(burned, THEMES[DEFAULT_THEME]?.recipes.length ?? 1),
+      );
     })();
     return () => {
       cancelled = true;
@@ -282,6 +312,16 @@ export function PromptEngineClient() {
     () => new Set(corpus?.burnedSeeds ?? []),
     [corpus],
   );
+
+  /** Burned seeds inside the derived window seed..seed+seedSpan-1. */
+  const burnedInWindow = useMemo(() => {
+    if (seed == null) return [];
+    const hits: number[] = [];
+    for (let i = 0; i < seedSpan; i++) {
+      if (burnedSet.has(seed + i)) hits.push(seed + i);
+    }
+    return hits;
+  }, [seed, seedSpan, burnedSet]);
 
   /* ------------------------- srefs (1.2MB, lazy) ------------------- */
 
@@ -323,6 +363,7 @@ export function PromptEngineClient() {
     setGenerating(true);
     setGenError(null);
     setSrefNotice(null);
+    setDedupeNotice(null);
     try {
       const th = THEMES[settings.theme];
       const recipes =
@@ -352,8 +393,12 @@ export function PromptEngineClient() {
       if (settings.lockPalette) lock.palette = settings.lockPalette;
 
       // Roll-wide: spread the batch across every recipe in the theme, one
-      // engine roll per recipe with its own derived seed so the
-      // coverage-guaranteed picker walks a different slice of each bank.
+      // engine roll per recipe with its own derived RNG seed. indexOffset +
+      // coverageSeed make the slices behave as ONE batch: the
+      // coverage-guaranteed picker walks a single shared permutation across
+      // all slices (batch-level "every entry before repeats", not just
+      // per-slice), and girl slots fire every Nth prompt of the BATCH rather
+      // than restarting at each slice's first prompt.
       const per = Math.floor(settings.count / recipes.length);
       const extra = settings.count % recipes.length;
       const rolled: GeneratedPrompt[] = [];
@@ -367,6 +412,8 @@ export function PromptEngineClient() {
           recipe,
           n,
           seed: s,
+          indexOffset: rolled.length,
+          coverageSeed: seed,
           theme: settings.theme,
           coverage: settings.coverage,
           texture: settings.texture,
@@ -383,11 +430,8 @@ export function PromptEngineClient() {
               ? { quiet: true }
               : { markStyle: settings.markStyle }
             : {}),
-          ...(settings.girl === "off"
-            ? { girlRate: 0 }
-            : settings.girl === "on"
-              ? { girlRate: normalizeGirlRate(settings.girlRate) }
-              : {}),
+          girlRate:
+            settings.girl === "on" ? normalizeGirlRate(settings.girlRate) : 0,
           ...(th.srefMode != null ? { srefIndex } : {}),
         };
         rolled.push(...roll(opts));
@@ -400,6 +444,18 @@ export function PromptEngineClient() {
             c.prompts,
           )
         : rolled.map(() => ({ status: "ok" as const, bestRatio: 0 }));
+      if (!c && rolled.length > 0) {
+        // House rule: dupes are flagged, never silently included — when we
+        // can't check, say so instead of showing a green-looking batch.
+        setDedupeNotice(
+          "Historical round log unavailable — this batch was NOT checked against past prompts, " +
+            "and round export is disabled (a made-up round number would corrupt the log).",
+        );
+      }
+
+      // The engine's guard loop (and the pop-palette cap) can legally return
+      // fewer prompts than asked; never let that pass silently.
+      setShortfall(Math.max(0, settings.count - rolled.length));
 
       const stored = rolled.map((p) => ({ text: p.text, meta: p.meta }));
       setPrompts(stored);
@@ -407,16 +463,18 @@ export function PromptEngineClient() {
       setSeedsUsed(used);
       setIncludeDupes(false);
 
-      const entry: HistoryEntry = {
-        id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
-        at: new Date().toISOString(),
-        settings: { ...settings },
-        seed,
-        seedsUsed: used,
-        prompts: stored,
-        dedupe: results,
-      };
-      persistHistory([entry, ...history].slice(0, HISTORY_MAX));
+      if (stored.length > 0) {
+        const entry: HistoryEntry = {
+          id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
+          at: new Date().toISOString(),
+          settings: { ...settings },
+          seed,
+          seedsUsed: used,
+          prompts: stored,
+          dedupe: results,
+        };
+        persistHistory([entry, ...history].slice(0, HISTORY_MAX));
+      }
     } catch (err) {
       setGenError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -456,7 +514,11 @@ export function PromptEngineClient() {
   const copyRoundBlock = useCallback(async () => {
     if (!includedPrompts.length) return;
     const c = corpusRef.current;
-    const roundNumber = nextRound(c?.maxRound ?? 0);
+    // Never fabricate a round number: without the corpus the next [rNN] tag is
+    // unknown, and a guessed one collides with a real round in the append-only
+    // log. The button is disabled in this state; this guard is belt-and-braces.
+    if (!c) return;
+    const roundNumber = nextRound(c.maxRound);
     const th = settings.theme;
     const recipeDesc =
       settings.recipe === "wide"
@@ -499,6 +561,7 @@ export function PromptEngineClient() {
     setDedupe(entry.dedupe);
     setSeedsUsed(entry.seedsUsed);
     setIncludeDupes(false);
+    setShortfall(0);
     setShowHistory(false);
   }, []);
 
@@ -625,9 +688,12 @@ export function PromptEngineClient() {
           <div>
             <FieldLabel>
               Seed
-              {seed != null && burnedSet.has(seed) && (
+              {seed != null && burnedInWindow.length > 0 && (
                 <span className="ml-2" style={{ color: "var(--oxide)" }}>
-                  already burned
+                  {burnedInWindow
+                    .map((s) => (s === seed ? "seed" : `seed+${s - seed}`))
+                    .join(", ")}{" "}
+                  already burned — reroll
                 </span>
               )}
             </FieldLabel>
@@ -646,7 +712,7 @@ export function PromptEngineClient() {
               />
               <button
                 type="button"
-                onClick={() => setSeed(randomSeed(burnedSet))}
+                onClick={() => setSeed(randomSeed(burnedSet, seedSpan))}
                 title="Suggest a fresh unburned seed"
                 className="rounded-md border px-2.5 transition-colors hover:border-[var(--border-hover)]"
                 style={{
@@ -658,6 +724,9 @@ export function PromptEngineClient() {
                 <Dices size={16} />
               </button>
             </div>
+            <p className="text-[10px] mt-1" style={{ color: "var(--text-tertiary)" }}>
+              same seed → same batch; &ldquo;burned&rdquo; = already used in a logged round
+            </p>
           </div>
 
           <div>
@@ -692,13 +761,13 @@ export function PromptEngineClient() {
           </div>
 
           <div>
-            <FieldLabel>Sref count pool</FieldLabel>
+            <FieldLabel>Style refs per prompt (--sref)</FieldLabel>
             <div className="flex gap-2">
               {(
                 [
-                  ["default", "theme"],
-                  ["single", "[2]"],
-                  ["varied", "[1,2,2,3]"],
+                  ["default", "theme default"],
+                  ["single", "2 refs"],
+                  ["varied", "1–3 refs"],
                 ] as [SrefPoolChoice, string][]
               ).map(([val, label]) => (
                 <Chip
@@ -875,8 +944,11 @@ export function PromptEngineClient() {
             {/* Girl mode */}
             <div>
               <FieldLabel>Girl mode</FieldLabel>
+              <p className="text-[10px] mb-1.5" style={{ color: "var(--text-tertiary)" }}>
+                weaves the recurring reference-image character into every Nth prompt of the batch
+              </p>
               <div className="flex items-center gap-2 flex-wrap">
-                {(["auto", "off", "on"] as GirlChoice[]).map((g) => (
+                {(["off", "on"] as GirlChoice[]).map((g) => (
                   <Chip
                     key={g}
                     active={settings.girl === g}
@@ -949,6 +1021,31 @@ export function PromptEngineClient() {
             {srefNotice}
           </p>
         )}
+        {dedupeNotice && (
+          <p
+            className="mt-3 text-xs flex items-start gap-1.5"
+            style={{ color: "var(--oxide)" }}
+            role="alert"
+          >
+            <TriangleAlert size={13} className="mt-0.5 shrink-0" />
+            {dedupeNotice}
+          </p>
+        )}
+        {shortfall > 0 && (
+          <p
+            className="mt-3 text-xs flex items-start gap-1.5"
+            style={{ color: "var(--oxide)" }}
+            role="status"
+          >
+            <TriangleAlert size={13} className="mt-0.5 shrink-0" />
+            {prompts.length === 0
+              ? "No prompts could satisfy the current constraints — a locked palette combined " +
+                "with a strict palette-restraint cap rejects every candidate. Loosen the " +
+                "restraint slider or unlock the palette, then generate again."
+              : `Constraints allowed only ${prompts.length} of the ${prompts.length + shortfall} requested prompts — ` +
+                "loosen palette restraint or clear the palette lock to fill the batch."}
+          </p>
+        )}
       </section>
 
       {/* ============================ Results ========================= */}
@@ -993,8 +1090,13 @@ export function PromptEngineClient() {
               <button
                 type="button"
                 onClick={copyRoundBlock}
-                title="Copy a [rNN] block pasteable into fun-exploration-prompts.txt"
-                className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-mono transition-colors hover:border-[var(--border-hover)]"
+                disabled={corpus == null}
+                title={
+                  corpus == null
+                    ? "Round log unavailable — can't number this round safely (a wrong [rNN] tag would corrupt the append-only log). Reload to retry."
+                    : "Copy a [rNN] block pasteable into fun-exploration-prompts.txt"
+                }
+                className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-mono transition-colors hover:border-[var(--border-hover)] disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{
                   background: "var(--bg-surface)",
                   borderColor: "var(--border-subtle)",

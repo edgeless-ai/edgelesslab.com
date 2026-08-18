@@ -2,7 +2,14 @@
 // (public/prompt-engine/corpus.json, exported from the round log).
 
 import { describe, expect, it } from "vitest";
-import { checkBatch, quickRatioBound, ratio, stripFlags } from "../dedupe";
+import {
+  checkBatch,
+  checkBatchAsync,
+  prepareCorpus,
+  quickRatioBound,
+  ratio,
+  stripFlags,
+} from "../dedupe";
 import corpus from "../../../../public/prompt-engine/corpus.json";
 
 const prompts: string[] = corpus.prompts;
@@ -50,6 +57,53 @@ describe("checkBatch vs the real corpus", () => {
       prompts,
     );
     expect(results.map((r) => r.status)).toEqual(["exact", "ok"]);
+  });
+});
+
+describe("checkBatchAsync (the chunked browser path)", () => {
+  it("returns verdicts identical to checkBatch over the same corpus", async () => {
+    const perturbed = prompts[0].replace(/\ba\b/, "one").replace("--s 150", "--s 200");
+    const batch = [
+      prompts[0],
+      perturbed,
+      "completely unrelated gibberish zqx jvw kpf 1234567890 --ar 1:1",
+    ];
+    const sync = checkBatch(batch, prompts);
+    const chunked = await checkBatchAsync(batch, [prepareCorpus(prompts)]);
+    expect(chunked).toEqual(sync);
+  });
+
+  it("checks extra corpora too: a prompt rolled earlier this session flags exact", async () => {
+    const sessionPrompt =
+      "totally novel prompt about nothing in particular --ar 4:5 --s 150";
+    // Not in the static corpus...
+    const [aloneRes] = await checkBatchAsync(
+      [sessionPrompt],
+      [prepareCorpus(prompts)],
+    );
+    expect(aloneRes.status).toBe("ok");
+    // ...but WITH the session corpus appended it must flag, exactly like a
+    // logged prompt would (session batches aren't in the snapshot yet).
+    const [res] = await checkBatchAsync(
+      [sessionPrompt],
+      [prepareCorpus(prompts), prepareCorpus([sessionPrompt])],
+    );
+    expect(res.status).toBe("exact");
+    expect(res.bestRatio).toBe(1);
+  });
+
+  it("reports progress once per prompt, in order", async () => {
+    const calls: Array<[number, number]> = [];
+    await checkBatchAsync(
+      [prompts[0], prompts[1], prompts[2]],
+      [prepareCorpus(prompts.slice(0, 10))],
+      { onProgress: (done, total) => calls.push([done, total]) },
+    );
+    expect(calls).toEqual([
+      [1, 3],
+      [2, 3],
+      [3, 3],
+    ]);
   });
 });
 

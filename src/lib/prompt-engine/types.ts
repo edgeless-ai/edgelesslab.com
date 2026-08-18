@@ -107,6 +107,18 @@ export interface SrefIndex {
 
 // ------------------------------------------------------------------ engine
 
+/**
+ * Mutable pop-palette budget SHARED by every recipe slice of one roll-wide
+ * batch (see RollOptions.saturatedBudget). Deliberately an object rather than
+ * a number: roll() debits `remaining` in place as it emits pop-palette
+ * prompts, so later slices automatically see what earlier slices spent —
+ * no caller-side re-counting of palette metas between slices.
+ */
+export interface SaturatedBudget {
+  /** Pop-palette prompts the whole batch may still emit. May be fractional. */
+  remaining: number;
+}
+
 export interface RollOptions {
   recipe: string;
   n: number;
@@ -130,6 +142,17 @@ export interface RollOptions {
    * in the roll loop. undefined = off.
    */
   maxSaturatedShare?: number;
+  /**
+   * Batch-global palette restraint for multi-slice (roll-wide) callers: one
+   * mutable budget object passed to EVERY slice of the batch. The engine is
+   * the only bookkeeper — it refuses a pop palette once remaining < 1 and
+   * debits remaining on each pop it emits — so restraint holds across the
+   * whole batch instead of rounding down per slice (share 0.35 over six n=4
+   * slices floored each slice to 1 pop: a hard 25% ceiling the slider never
+   * promised). Takes precedence over maxSaturatedShare. Absent → single-roll
+   * blender.py-shaped behavior, unchanged.
+   */
+  saturatedBudget?: SaturatedBudget;
   /**
    * From sref.ts buildSrefIndex(). null/undefined -> museum mode degrades to
    * no sref, like blender.py's ImportError fallback.

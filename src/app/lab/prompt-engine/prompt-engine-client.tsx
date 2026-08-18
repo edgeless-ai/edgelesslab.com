@@ -5,7 +5,8 @@
  *
  * All generation logic lives in the engine module (frozen API); this component
  * only wires controls → RollOptions, renders results, runs the dedup check
- * against the static corpus snapshot, and handles copy/export/history.
+ * (chunked, against the static corpus snapshot PLUS locally saved batches),
+ * and handles copy/export/history.
  *
  * Static-export constraints: corpus.json is fetched lazily (small, needed for
  * unburned-seed suggestion + round numbers); srefs.json (~1.2MB) is fetched
@@ -40,10 +41,16 @@ import type {
   DedupeResult,
   GeneratedPrompt,
   RollOptions,
+  SaturatedBudget,
   SrefIndex,
 } from "@/lib/prompt-engine/types";
 import { buildSrefIndex } from "@/lib/prompt-engine/sref";
-import { checkBatch } from "@/lib/prompt-engine/dedupe";
+import {
+  checkBatch,
+  checkBatchAsync,
+  prepareCorpus,
+  type PreparedCorpus,
+} from "@/lib/prompt-engine/dedupe";
 import { formatRoundBlock, nextRound } from "@/lib/prompt-engine/round";
 
 const { THEMES, INFLUENCE, PALETTE } = banks;
@@ -233,6 +240,28 @@ export function PromptEngineClient() {
   const [genError, setGenError] = useState<string | null>(null);
   const [srefNotice, setSrefNotice] = useState<string | null>(null);
   const [dedupeNotice, setDedupeNotice] = useState<string | null>(null);
+  /** Live "checking N/M" progress while the chunked dedupe scan runs. */
+  const [checkProgress, setCheckProgress] = useState<{
+    done: number;
+    total: number;
+  } | null>(null);
+  /** What the CURRENT batch was actually dupe-checked against. */
+  const [checkInfo, setCheckInfo] = useState<{
+    corpusCount: number;
+    localCount: number;
+    generatedAt: string;
+  } | null>(null);
+  /** History-entry id of the batch on screen (round-export bookkeeping). */
+  const [batchId, setBatchId] = useState<string | null>(null);
+  /**
+   * Session round-export ledger: batch id → the [rNN] number it was exported
+   * under. Without this, every "Copy as round block" this session emits the
+   * SAME corpus-derived tag (e.g. [r21] twice) — colliding round numbers in
+   * the append-only log. Re-copying an exported batch reuses ITS number.
+   */
+  const [sessionRounds, setSessionRounds] = useState<Record<string, number>>({});
+  /** Seeds burned by rounds exported this session (not yet in corpus.json). */
+  const [sessionBurned, setSessionBurned] = useState<number[]>([]);
   /** How many prompts short of the requested count the last roll came up. */
   const [shortfall, setShortfall] = useState(0);
   const [includeDupes, setIncludeDupes] = useState(false);
@@ -241,13 +270,17 @@ export function PromptEngineClient() {
   const [showHistory, setShowHistory] = useState(false);
   const [storageNotice, setStorageNotice] = useState<string | null>(null);
   const [copiedAll, setCopiedAll] = useState(false);
-  const [copiedRound, setCopiedRound] = useState(false);
+  /** Round number of the just-copied block, or null when idle. */
+  const [copiedRound, setCopiedRound] = useState<number | null>(null);
   const [influenceQuery, setInfluenceQuery] = useState("");
 
   const corpusRef = useRef<Corpus | null>(null);
   const [corpus, setCorpus] = useState<Corpus | null>(null);
+  /** Stripped/prepared static corpus, computed once per fetched snapshot. */
+  const preparedRef = useRef<{ source: Corpus; prepared: PreparedCorpus } | null>(
+    null,
+  );
   const srefIndexRef = useRef<SrefIndex | null>(null);
-  const srefFailedRef = useRef(false);
   const [srefReady, setSrefReady] = useState(false);
 
   const theme = THEMES[settings.theme];
@@ -318,9 +351,11 @@ export function PromptEngineClient() {
     };
   }, [loadCorpus]);
 
+  // Burned = logged in corpus.json OR exported as a round block earlier this
+  // session (the snapshot can't know about those yet).
   const burnedSet = useMemo(
-    () => new Set(corpus?.burnedSeeds ?? []),
-    [corpus],
+    () => new Set([...(corpus?.burnedSeeds ?? []), ...sessionBurned]),
+    [corpus, sessionBurned],
   );
 
   /** Burned seeds inside the derived window seed..seed+seedSpan-1. */
@@ -336,8 +371,7 @@ export function PromptEngineClient() {
   /* ------------------------- srefs (1.2MB, lazy) ------------------- */
 
   const loadSrefIndex = useCallback(async () => {
-    if (srefIndexRef.current || srefFailedRef.current)
-      return srefIndexRef.current;
+    if (srefIndexRef.current) return srefIndexRef.current;
     try {
       const res = await fetch("/prompt-engine/srefs.json");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -348,7 +382,9 @@ export function PromptEngineClient() {
       setSrefReady(true);
       return srefIndexRef.current;
     } catch {
-      srefFailedRef.current = true;
+      // No permanent failure latch: like the corpus fetch, the next generate
+      // retries — one flaky fetch of a 1.2MB file must not kill museum refs
+      // for the rest of the session.
       return null;
     }
   }, []);
@@ -411,6 +447,16 @@ export function PromptEngineClient() {
       // than restarting at each slice's first prompt.
       const per = Math.floor(settings.count / recipes.length);
       const extra = settings.count % recipes.length;
+      // Palette restraint is a BATCH-shape control, like girl slots and
+      // coverage. One SHARED mutable budget object (share × requested count)
+      // goes to every slice, and the ENGINE debits it as pops are emitted —
+      // no per-slice bookkeeping here. Per-slice maxSaturatedShare instead
+      // floored each slice's cap (share 0.35 over six n=4 slices = a hard 1
+      // pop per slice, a 25% ceiling the slider never asked for).
+      const paletteBudget: SaturatedBudget | null =
+        settings.maxSaturatedShare < 1
+          ? { remaining: settings.maxSaturatedShare * settings.count }
+          : null;
       const rolled: GeneratedPrompt[] = [];
       const used: number[] = [];
       recipes.forEach((recipe, i) => {
@@ -428,9 +474,7 @@ export function PromptEngineClient() {
           coverage: settings.coverage,
           texture: settings.texture,
           ...(Object.keys(lock).length ? { lock } : {}),
-          ...(settings.maxSaturatedShare < 1
-            ? { maxSaturatedShare: settings.maxSaturatedShare }
-            : {}),
+          ...(paletteBudget ? { saturatedBudget: paletteBudget } : {}),
           ...(srefCountPool ? { srefCountPool } : {}),
           // "quiet" is NOT a mark style in the engine — it's the separate
           // opts.quiet boolean (blender.py --quiet); markStyle only
@@ -448,16 +492,40 @@ export function PromptEngineClient() {
       });
 
       const c = await loadCorpus();
-      const results: DedupeResult[] = c
-        ? checkBatch(
-            rolled.map((p) => p.text),
-            c.prompts,
-          )
-        : rolled.map(() => ({ status: "ok" as const, bestRatio: 0 }));
-      if (!c && rolled.length > 0) {
-        // House rule: dupes are flagged, never silently included — when we
-        // can't check, say so instead of showing a green-looking batch.
-        setDedupeNotice(UNCHECKED_NOTICE);
+      let results: DedupeResult[];
+      if (c) {
+        // The fuzzy scan is the page's only heavy computation (seconds of
+        // CPU at batch 24+): run it chunked so the pending state paints and
+        // progress shows, instead of freezing the tab. The static corpus is
+        // prepared once per snapshot; prompts from locally saved batches
+        // (absent from the snapshot by definition) are checked too.
+        if (preparedRef.current?.source !== c) {
+          preparedRef.current = { source: c, prepared: prepareCorpus(c.prompts) };
+        }
+        const localTexts = history.flatMap((h) =>
+          h.prompts.map((p) => p.text),
+        );
+        const corpora = localTexts.length
+          ? [preparedRef.current.prepared, prepareCorpus(localTexts)]
+          : [preparedRef.current.prepared];
+        results = await checkBatchAsync(
+          rolled.map((p) => p.text),
+          corpora,
+          { onProgress: (done, total) => setCheckProgress({ done, total }) },
+        );
+        setCheckInfo({
+          corpusCount: c.prompts.length,
+          localCount: localTexts.length,
+          generatedAt: c.generatedAt,
+        });
+      } else {
+        results = rolled.map(() => ({ status: "ok" as const, bestRatio: 0 }));
+        setCheckInfo(null);
+        if (rolled.length > 0) {
+          // House rule: dupes are flagged, never silently included — when we
+          // can't check, say so instead of showing a green-looking batch.
+          setDedupeNotice(UNCHECKED_NOTICE);
+        }
       }
 
       // The engine's guard loop (and the pop-palette cap) can legally return
@@ -481,11 +549,15 @@ export function PromptEngineClient() {
           dedupe: results,
           ...(c ? {} : { unchecked: true }),
         };
+        setBatchId(entry.id);
         persistHistory([entry, ...history].slice(0, HISTORY_MAX));
+      } else {
+        setBatchId(null);
       }
     } catch (err) {
       setGenError(err instanceof Error ? err.message : String(err));
     } finally {
+      setCheckProgress(null);
       setGenerating(false);
     }
   }, [
@@ -520,13 +592,19 @@ export function PromptEngineClient() {
   }, [includedPrompts]);
 
   const copyRoundBlock = useCallback(async () => {
-    if (!includedPrompts.length) return;
+    if (!includedPrompts.length || batchId == null) return;
     const c = corpusRef.current;
     // Never fabricate a round number: without the corpus the next [rNN] tag is
     // unknown, and a guessed one collides with a real round in the append-only
     // log. The button is disabled in this state; this guard is belt-and-braces.
     if (!c) return;
-    const roundNumber = nextRound(c.maxRound);
+    // Session-aware numbering: the corpus's maxRound is frozen at snapshot
+    // time, so every export this session would otherwise claim the SAME next
+    // tag. Each newly exported batch takes the next free number; re-copying
+    // an already-exported batch reuses the number it was assigned.
+    const roundNumber =
+      sessionRounds[batchId] ??
+      nextRound(c.maxRound) + Object.keys(sessionRounds).length;
     const th = settings.theme;
     const recipeDesc =
       settings.recipe === "wide"
@@ -546,8 +624,10 @@ export function PromptEngineClient() {
     ].filter(Boolean);
     // Ledger convention in fun-exploration-prompts.txt: numeric ascending,
     // no repeats (burnedSeeds are already coerced to numbers in loadCorpus).
+    // Seeds burned by rounds exported EARLIER this session are included too —
+    // batch B's running ledger must not silently omit batch A's seeds.
     const ledger = Array.from(
-      new Set([...(c?.burnedSeeds ?? []), ...seedsUsed]),
+      new Set([...(c?.burnedSeeds ?? []), ...sessionBurned, ...seedsUsed]),
     ).sort((a, b) => a - b);
     const block = formatRoundBlock(includedPrompts as GeneratedPrompt[], {
       roundNumber,
@@ -557,21 +637,42 @@ export function PromptEngineClient() {
     });
     const ok = await copyText(block);
     if (ok) {
-      setCopiedRound(true);
-      window.setTimeout(() => setCopiedRound(false), 1800);
+      if (sessionRounds[batchId] === undefined) {
+        // First export of this batch: claim the round number and fold its
+        // seeds into the working burned set so later rerolls, seed
+        // suggestions, and ledgers all see them.
+        setSessionRounds((m) => ({ ...m, [batchId]: roundNumber }));
+        setSessionBurned((prev) =>
+          Array.from(new Set([...prev, ...seedsUsed])),
+        );
+      }
+      setCopiedRound(roundNumber);
+      window.setTimeout(() => setCopiedRound(null), 2200);
     }
-  }, [includedPrompts, settings, seedsUsed, flaggedCount, includeDupes]);
+  }, [
+    includedPrompts,
+    settings,
+    seedsUsed,
+    flaggedCount,
+    includeDupes,
+    batchId,
+    sessionRounds,
+    sessionBurned,
+  ]);
 
   const restoreEntry = useCallback((entry: HistoryEntry) => {
     setSettings(normalizeSettings(entry.settings));
     setSeed(entry.seed);
     setPrompts(entry.prompts);
     setSeedsUsed(entry.seedsUsed);
+    setBatchId(entry.id);
     setIncludeDupes(false);
     setShortfall(0);
-    // Stale notices describe the LAST roll, not this restored batch.
+    // Stale notices describe the LAST roll, not this restored batch. The
+    // check-info line does too (this entry's check ran at ITS roll time).
     setGenError(null);
     setSrefNotice(null);
+    setCheckInfo(null);
     // Dedupe state must stay honest across the history round-trip: an
     // `unchecked` entry holds fabricated all-ok results, so run the real
     // check now that the corpus is here — or keep saying it isn't checked.
@@ -752,7 +853,7 @@ export function PromptEngineClient() {
               </button>
             </div>
             <p className="text-[10px] mt-1" style={{ color: "var(--text-tertiary)" }}>
-              same seed → same batch; &ldquo;burned&rdquo; = already used in a logged round
+              same seed → same batch; &ldquo;burned&rdquo; = used in a logged or session-exported round
             </p>
           </div>
 
@@ -821,7 +922,14 @@ export function PromptEngineClient() {
             label="Coverage-guaranteed picks"
             checked={settings.coverage}
             onChange={(v) => setSettings((s) => ({ ...s, coverage: v }))}
-            hint="every bank entry surfaces evenly — no silent favorites"
+            // Honest scope: on themes with the TAGGED subject bank (engine
+            // pickSubject) subjects stay resonance-weighted regardless of
+            // this flag — only untagged banks get the full guarantee.
+            hint={
+              theme?.subjects === "SUBJECTS_LARGE"
+                ? "every influence and subject surfaces evenly — no silent favorites"
+                : "influences surface evenly across the batch; subjects stay resonance-weighted on this theme"
+            }
           />
           <Toggle
             label="Texture"
@@ -1028,7 +1136,13 @@ export function PromptEngineClient() {
             {generating ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
-                {needsSrefs && !srefReady ? "Loading museum refs…" : "Rolling…"}
+                <span role="status" aria-live="polite">
+                  {checkProgress
+                    ? `Checking dupes ${checkProgress.done}/${checkProgress.total}…`
+                    : needsSrefs && !srefReady
+                      ? "Loading museum refs…"
+                      : "Rolling…"}
+                </span>
               </>
             ) : (
               <>
@@ -1128,14 +1242,33 @@ export function PromptEngineClient() {
                 style={{
                   background: "var(--bg-surface)",
                   borderColor: "var(--border-subtle)",
-                  color: copiedRound ? "var(--green)" : "var(--text-secondary)",
+                  color: copiedRound != null ? "var(--green)" : "var(--text-secondary)",
                 }}
               >
-                {copiedRound ? <Check size={13} /> : <ClipboardCopy size={13} />}
-                Copy as round block
+                {copiedRound != null ? <Check size={13} /> : <ClipboardCopy size={13} />}
+                {copiedRound != null
+                  ? `Copied [r${copiedRound}]`
+                  : "Copy as round block"}
               </button>
             </div>
           </div>
+
+          {checkInfo && (
+            <p
+              className="text-[11px] font-mono -mt-1 mb-3"
+              style={{ color: "var(--text-tertiary)" }}
+            >
+              dupe-checked against {checkInfo.corpusCount} prompts logged
+              through{" "}
+              {new Date(checkInfo.generatedAt).toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+              {checkInfo.localCount > 0 &&
+                ` + ${checkInfo.localCount} from batches saved in this browser`}
+            </p>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {prompts.map((p, i) => (
@@ -1391,7 +1524,7 @@ function PromptCard({
               className="mt-1.5 pl-4 break-words"
               style={{ color: "var(--text-tertiary)", lineHeight: 1.5 }}
             >
-              closest logged prompt: {dedupe.closest}
+              closest prior prompt: {dedupe.closest}
             </p>
           )}
         </div>

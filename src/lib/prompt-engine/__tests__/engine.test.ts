@@ -114,6 +114,80 @@ describe("maxSaturatedShare", () => {
   });
 });
 
+describe("saturatedBudget (shared mutable pop-palette ledger)", () => {
+  it("a fresh budget of share * n reproduces maxSaturatedShare prompt-for-prompt", () => {
+    const byShare = roll({
+      recipe: "influence",
+      n: 30,
+      seed: 909,
+      theme: "nous-branded",
+      maxSaturatedShare: 0.2,
+    });
+    const byBudget = roll({
+      recipe: "influence",
+      n: 30,
+      seed: 909,
+      theme: "nous-branded",
+      saturatedBudget: { remaining: 0.2 * 30 },
+    });
+    expect(byBudget.map((p) => p.text)).toEqual(byShare.map((p) => p.text));
+    expect(byBudget.map((p) => p.meta)).toEqual(byShare.map((p) => p.meta));
+  });
+
+  it("the ENGINE debits the ledger in place: remaining drops by exactly the pops emitted", () => {
+    const budget = { remaining: 5 };
+    const batch = roll({
+      recipe: "influence",
+      n: 30,
+      seed: 909,
+      theme: "nous-branded",
+      saturatedBudget: budget,
+    });
+    const pops = batch.filter((p) => p.meta.paletteCategory === "pop").length;
+    expect(pops).toBeLessThanOrEqual(5);
+    expect(budget.remaining).toBe(5 - pops);
+    expect(budget.remaining).toBeGreaterThanOrEqual(0);
+  });
+
+  it("an exhausted ledger forbids pop palettes entirely", () => {
+    const batch = roll({
+      recipe: "influence",
+      n: 20,
+      seed: 909,
+      theme: "nous-branded",
+      saturatedBudget: { remaining: 0 },
+    });
+    expect(batch.filter((p) => p.meta.paletteCategory === "pop")).toHaveLength(0);
+  });
+
+  it("ONE ledger threaded through roll-wide slices enforces the BATCH cap, not a per-slice floor", () => {
+    // The dashboard's roll-wide path: share 0.35 over a 24-prompt batch is an
+    // 8.4-pop budget for the WHOLE batch. Per-slice maxSaturatedShare would
+    // floor each n=4 slice to 1 pop (max 6 — a hard 25% ceiling the slider
+    // never promised). Passing the SAME object to every slice lets pops land
+    // wherever the rolls want them while the batch total honors the slider.
+    const seed = 7207;
+    const recipes = ["influence", "poster", "spectral", "oldschool", "ephemera", "collision"];
+    const budget = { remaining: 0.35 * 24 };
+    const batch = recipes.flatMap((recipe, i) =>
+      roll({
+        recipe,
+        n: 4,
+        seed: seed + i,
+        theme: "nous-branded",
+        indexOffset: i * 4,
+        coverageSeed: seed,
+        saturatedBudget: budget,
+      }),
+    );
+    expect(batch).toHaveLength(24);
+    const pops = batch.filter((p) => p.meta.paletteCategory === "pop").length;
+    expect(pops).toBeLessThanOrEqual(Math.floor(0.35 * 24));
+    expect(budget.remaining).toBeCloseTo(0.35 * 24 - pops, 10);
+    expect(budget.remaining).toBeGreaterThanOrEqual(0);
+  });
+});
+
 describe("girl slots", () => {
   it("prepends the bare ref URL and swaps flags on girl prompts", () => {
     const prompts = roll({ recipe: "influence", n: 6, seed: 303, theme: "nous-branded", girlRate: 3 });

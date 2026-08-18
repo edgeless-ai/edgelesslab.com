@@ -124,27 +124,77 @@ export function quickRatioBound(a: string, b: string): number {
 const NEAR_THRESHOLD = 0.9;
 
 /**
- * check_dupes.py semantics: exact = raw string match against the raw corpus;
- * near = stripped ratio > 0.90 vs the stripped corpus. quickRatioBound skips
- * pairs that cannot improve bestRatio (bound >= true ratio, so verdicts are
- * unchanged by the skip).
+ * A corpus pre-processed for repeated checks: the raw texts, an exact-match
+ * set, and the stripped forms. Stripping ~360 long prompts is the cheap part
+ * of a check but still worth doing once per corpus, not once per generate.
  */
-export function checkBatch(prompts: string[], corpus: string[]): DedupeResult[] {
-  const rawSet = new Set(corpus);
-  const stripped = corpus.map(stripFlags);
-  return prompts.map((p) => {
-    if (rawSet.has(p)) return { status: "exact", bestRatio: 1, closest: p };
-    const ps = stripFlags(p);
-    let bestRatio = 0;
-    let closest: string | undefined;
-    for (let i = 0; i < stripped.length; i++) {
-      if (quickRatioBound(ps, stripped[i]) <= bestRatio) continue;
-      const r = ratio(ps, stripped[i]);
+export interface PreparedCorpus {
+  raw: string[];
+  rawSet: Set<string>;
+  stripped: string[];
+}
+
+export function prepareCorpus(corpus: string[]): PreparedCorpus {
+  return {
+    raw: corpus,
+    rawSet: new Set(corpus),
+    stripped: corpus.map(stripFlags),
+  };
+}
+
+/**
+ * check_dupes.py semantics for ONE prompt against one or more corpora (e.g.
+ * the static snapshot plus prompts rolled earlier this session): exact = raw
+ * string match; near = stripped ratio > 0.90. quickRatioBound skips pairs
+ * that cannot improve bestRatio (bound >= true ratio, so verdicts are
+ * unchanged by the skip). Corpora are scanned in the given order, matching
+ * single-corpus checkBatch exactly when one is passed.
+ */
+export function checkOne(p: string, corpora: readonly PreparedCorpus[]): DedupeResult {
+  for (const c of corpora) {
+    if (c.rawSet.has(p)) return { status: "exact", bestRatio: 1, closest: p };
+  }
+  const ps = stripFlags(p);
+  let bestRatio = 0;
+  let closest: string | undefined;
+  for (const c of corpora) {
+    for (let i = 0; i < c.stripped.length; i++) {
+      if (quickRatioBound(ps, c.stripped[i]) <= bestRatio) continue;
+      const r = ratio(ps, c.stripped[i]);
       if (r > bestRatio) {
         bestRatio = r;
-        closest = corpus[i];
+        closest = c.raw[i];
       }
     }
-    return { status: bestRatio > NEAR_THRESHOLD ? "near" : "ok", bestRatio, closest };
-  });
+  }
+  return { status: bestRatio > NEAR_THRESHOLD ? "near" : "ok", bestRatio, closest };
+}
+
+/** Synchronous batch check (check_dupes.py semantics). */
+export function checkBatch(prompts: string[], corpus: string[]): DedupeResult[] {
+  const prepared = [prepareCorpus(corpus)];
+  return prompts.map((p) => checkOne(p, prepared));
+}
+
+/**
+ * Chunked batch check for the browser: the full fuzzy scan of a default
+ * 24-prompt batch takes seconds of pure CPU, and running it synchronously
+ * right after setState leaves no task boundary for the "Rolling…" state to
+ * paint — the page just hangs. This variant yields a REAL macrotask before
+ * every per-prompt check (including the first, so the pending UI is
+ * guaranteed at least one paint) and reports progress after each. Verdicts
+ * are identical to checkBatch over the same corpora.
+ */
+export async function checkBatchAsync(
+  prompts: string[],
+  corpora: readonly PreparedCorpus[],
+  opts: { onProgress?: (done: number, total: number) => void } = {},
+): Promise<DedupeResult[]> {
+  const out: DedupeResult[] = [];
+  for (let i = 0; i < prompts.length; i++) {
+    await new Promise<void>((r) => setTimeout(r, 0));
+    out.push(checkOne(prompts[i], corpora));
+    opts.onProgress?.(i + 1, prompts.length);
+  }
+  return out;
 }

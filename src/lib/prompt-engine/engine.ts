@@ -139,6 +139,13 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
   });
 
   const paletteByText = new Map(banks.PALETTE.map((p) => [p.text, p.category]));
+  // Two restraint shapes: maxSaturatedShare is the per-roll share cap
+  // (blender.py-shaped, share * n for THIS roll); saturatedBudget is a
+  // mutable ledger shared across the slices of one roll-wide batch — the
+  // engine debits it in place on every pop it emits, so slice k+1 sees what
+  // slices 0..k spent without any caller-side accounting. When both are set
+  // the stricter one wins on each candidate.
+  const budget = opts.saturatedBudget;
   const popCap =
     opts.maxSaturatedShare !== undefined ? opts.maxSaturatedShare * n : Number.POSITIVE_INFINITY;
   let popCount = 0;
@@ -236,12 +243,20 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
     if (seen.has(key) || conflict(vals)) continue;
     const paletteCategory =
       vals.palette !== undefined ? paletteByText.get(vals.palette) : undefined;
-    // maxSaturatedShare: rejection-style cap on the "pop" palette category.
-    // Checked before seen.add so the same axis combo can re-roll a calmer
-    // palette on a later guard iteration.
-    if (paletteCategory === "pop" && popCount + 1 > popCap) continue;
+    // Rejection-style cap on the "pop" palette category. Checked before
+    // seen.add so the same axis combo can re-roll a calmer palette on a later
+    // guard iteration. The shared ledger refuses a pop once less than one
+    // whole unit remains (fractional budgets like 0.35*24 = 8.4 therefore
+    // admit exactly floor(8.4) pops — same rounding as the share cap).
+    if (paletteCategory === "pop") {
+      if (popCount + 1 > popCap) continue;
+      if (budget !== undefined && budget.remaining < 1) continue;
+    }
     seen.add(key);
-    if (paletteCategory === "pop") popCount++;
+    if (paletteCategory === "pop") {
+      popCount++;
+      if (budget !== undefined) budget.remaining -= 1;
+    }
 
     const girl = girlSlot; // every Nth prompt features her
     let flags = girl ? banks.GIRL.flags : banks.FLAGS;

@@ -7,7 +7,7 @@ import { PromptEngineClient } from "./prompt-engine-client";
 export const metadata = createPageMetadata({
   title: "Prompt Engine",
   description:
-    "Combinatorial MidJourney prompt generator — roll wide across themed recipe banks, museum-artwork style refs, coverage-guaranteed picks, and a dedup check against every round ever logged.",
+    "Combinatorial MidJourney prompt generator — roll wide across themed recipe banks, museum-artwork style refs, coverage-guaranteed picks, and a dedup check against the logged round history.",
   path: "/lab/prompt-engine",
   keywords: [
     "MidJourney prompts",
@@ -68,8 +68,9 @@ export default function PromptEnginePage() {
           >
             A combinatorial MidJourney prompt generator. Pick a theme, roll a wide batch across
             its recipes, and copy the results straight into the imagine bar. Every batch is
-            checked against the full historical round log so you never resubmit a prompt that
-            already ran — and museum themes pull real artwork URLs as style references.
+            dedup-checked against a snapshot of the historical round log — plus recent
+            batches saved in your browser — so you don&apos;t resubmit a prompt that already
+            ran. Museum themes pull real artwork URLs as style references.
           </p>
 
           <PromptEngineClient />

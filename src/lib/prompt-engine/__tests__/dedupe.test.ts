@@ -170,3 +170,78 @@ describe("corpus snapshot sanity", () => {
     }
   });
 });
+
+describe("corpus labels → DedupeResult.source", () => {
+  const p = prompts[0];
+
+  it("stamps the matching corpus's label on exact hits", async () => {
+    const [unlabeled] = checkBatch([p], prompts);
+    expect(unlabeled.status).toBe("exact");
+    expect(unlabeled.source).toBeUndefined(); // unlabeled path unchanged
+    const [labeled] = await checkBatchAsync(
+      [p],
+      [prepareCorpus(prompts, "the logged round history")],
+    );
+    expect(labeled.status).toBe("exact");
+    expect(labeled.source).toBe("the logged round history");
+  });
+
+  it("attributes a near match to the corpus that produced the best ratio", async () => {
+    const perturbed = p.replace(/ /g, (m, i) => (i === p.indexOf(" ") ? "  " : m));
+    const [r] = await checkBatchAsync(
+      [perturbed],
+      [
+        prepareCorpus(["completely unrelated tiny text"], "decoy"),
+        prepareCorpus(prompts, "the logged round history"),
+      ],
+    );
+    expect(r.status).toBe("near");
+    expect(r.source).toBe("the logged round history");
+  });
+
+  it("omits source entirely when corpora are unlabeled (checkBatch parity)", async () => {
+    const sync = checkBatch([p, "totally new prompt about nothing"], prompts);
+    const chunked = await checkBatchAsync(
+      [p, "totally new prompt about nothing"],
+      [prepareCorpus(prompts)],
+    );
+    expect(chunked).toEqual(sync);
+    for (const r of chunked) expect("source" in r ? r.source : undefined).toBeUndefined();
+  });
+});
+
+describe("checkBatchAsync withinBatchLabel (internal near-twins)", () => {
+  it("flags the SECOND copy of an internal twin, not the first", async () => {
+    const twin = prompts[0];
+    const res = await checkBatchAsync(
+      ["a fresh unrelated prompt about nothing in particular", twin, twin],
+      [prepareCorpus(["some other unrelated corpus entry"], "corpus")],
+      { withinBatchLabel: "an earlier prompt in this same batch" },
+    );
+    expect(res[0].status).toBe("ok");
+    expect(res[1].status).toBe("ok"); // first copy is accepted
+    expect(res[2].status).toBe("exact"); // second copy flagged against the first
+    expect(res[2].source).toBe("an earlier prompt in this same batch");
+  });
+
+  it("does not chain flags off already-flagged prompts", async () => {
+    const known = prompts[0];
+    // `known` is flagged against the corpus, so it never joins the self
+    // corpus; a batch of two `known`s flags BOTH against the corpus (their
+    // real source), not the second against the first.
+    const res = await checkBatchAsync([known, known], [prepareCorpus(prompts, "corpus")], {
+      withinBatchLabel: "self",
+    });
+    expect(res[0].status).toBe("exact");
+    expect(res[0].source).toBe("corpus");
+    expect(res[1].status).toBe("exact");
+    expect(res[1].source).toBe("corpus");
+  });
+
+  it("verdicts without the option remain identical to checkBatch", async () => {
+    const batch = [prompts[0], "novel text"];
+    expect(await checkBatchAsync(batch, [prepareCorpus(prompts)])).toEqual(
+      checkBatch(batch, prompts),
+    );
+  });
+});

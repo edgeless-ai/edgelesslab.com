@@ -20,6 +20,19 @@ import type {
 } from "./types";
 
 /**
+ * Strip trailing operator-only annotations from a generated prompt so it can
+ * be pasted into the MidJourney imagine bar. blender.py appends
+ * " [GIRL/iw 1.5]" to girl prompts as a marker for the OPERATOR (the original
+ * consumer was an agent driving the browser, who stripped it before typing);
+ * MJ itself rejects the bracket text as a bad parameter. The engine's `text`
+ * keeps the annotation — it is part of the Python-parity output and of the
+ * round-log format — so ONLY clipboard paths should run this.
+ */
+export function stripOperatorAnnotations(text: string): string {
+  return text.replace(/ \[GIRL\/iw [^\]]+\]$/, "");
+}
+
+/**
  * Word-boundary brand match (NOT a substring test -- a naive 'NOUS' in
  * text.upper() false-positives on "luminous"; that exact bug was audited and
  * fixed in the madlib engine, do not reintroduce it).

@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from "vitest";
 import { banks } from "../banks";
-import { brandWordRe, roll } from "../engine";
+import { brandWordRe, roll, stripOperatorAnnotations } from "../engine";
 
 const fineArtKeys = Object.keys(banks.INFLUENCE).filter(
   (k) => banks.INFLUENCE[k].domain === "fine-art",
@@ -325,5 +325,33 @@ describe("sref modes", () => {
   it("museum mode degrades to no sref without a srefIndex", () => {
     const prompts = roll({ recipe: "influence", n: 5, seed: 4103, theme: "art-history-madlib" });
     for (const p of prompts) expect(p.text).not.toContain("--sref");
+  });
+});
+
+describe("stripOperatorAnnotations (MJ clipboard path)", () => {
+  it("removes the trailing [GIRL/iw N] marker from girl prompts", () => {
+    const batch = roll({
+      recipe: "influence",
+      n: 8,
+      seed: 6001,
+      theme: "nous-branded",
+      girlRate: 2,
+    });
+    const girls = batch.filter((p) => p.meta.girl);
+    expect(girls.length).toBeGreaterThan(0);
+    for (const p of girls) {
+      expect(p.text).toMatch(/ \[GIRL\/iw [\d.]+\]$/); // engine text keeps parity
+      const copied = stripOperatorAnnotations(p.text);
+      expect(copied).not.toContain("[GIRL");
+      expect(p.text.startsWith(copied)).toBe(true); // strips ONLY the tail
+    }
+  });
+
+  it("leaves non-girl prompts byte-identical", () => {
+    const batch = roll({ recipe: "influence", n: 6, seed: 6002, theme: "nous-branded" });
+    for (const p of batch) {
+      expect(p.meta.girl).toBe(false);
+      expect(stripOperatorAnnotations(p.text)).toBe(p.text);
+    }
   });
 });

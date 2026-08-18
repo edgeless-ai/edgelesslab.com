@@ -132,13 +132,23 @@ export interface PreparedCorpus {
   raw: string[];
   rawSet: Set<string>;
   stripped: string[];
+  /**
+   * Optional human-readable provenance ("the logged round history", "a batch
+   * saved in this browser…"). When set, a match against this corpus stamps
+   * DedupeResult.source so the UI can say WHERE the dupe came from — a hit
+   * against the append-only log means "this already ran in MJ", while a hit
+   * against a never-exported local batch only means "you rolled this before".
+   * Unlabeled corpora produce results identical to the pre-label behavior.
+   */
+  label?: string;
 }
 
-export function prepareCorpus(corpus: string[]): PreparedCorpus {
+export function prepareCorpus(corpus: string[], label?: string): PreparedCorpus {
   return {
     raw: corpus,
     rawSet: new Set(corpus),
     stripped: corpus.map(stripFlags),
+    ...(label !== undefined ? { label } : {}),
   };
 }
 
@@ -152,11 +162,19 @@ export function prepareCorpus(corpus: string[]): PreparedCorpus {
  */
 export function checkOne(p: string, corpora: readonly PreparedCorpus[]): DedupeResult {
   for (const c of corpora) {
-    if (c.rawSet.has(p)) return { status: "exact", bestRatio: 1, closest: p };
+    if (c.rawSet.has(p)) {
+      return {
+        status: "exact",
+        bestRatio: 1,
+        closest: p,
+        ...(c.label !== undefined ? { source: c.label } : {}),
+      };
+    }
   }
   const ps = stripFlags(p);
   let bestRatio = 0;
   let closest: string | undefined;
+  let source: string | undefined;
   for (const c of corpora) {
     for (let i = 0; i < c.stripped.length; i++) {
       if (quickRatioBound(ps, c.stripped[i]) <= bestRatio) continue;
@@ -164,10 +182,16 @@ export function checkOne(p: string, corpora: readonly PreparedCorpus[]): DedupeR
       if (r > bestRatio) {
         bestRatio = r;
         closest = c.raw[i];
+        source = c.label;
       }
     }
   }
-  return { status: bestRatio > NEAR_THRESHOLD ? "near" : "ok", bestRatio, closest };
+  return {
+    status: bestRatio > NEAR_THRESHOLD ? "near" : "ok",
+    bestRatio,
+    closest,
+    ...(source !== undefined ? { source } : {}),
+  };
 }
 
 /** Synchronous batch check (check_dupes.py semantics). */
@@ -182,18 +206,48 @@ export function checkBatch(prompts: string[], corpus: string[]): DedupeResult[] 
  * right after setState leaves no task boundary for the "Rolling…" state to
  * paint — the page just hangs. This variant yields a REAL macrotask before
  * every per-prompt check (including the first, so the pending UI is
- * guaranteed at least one paint) and reports progress after each. Verdicts
- * are identical to checkBatch over the same corpora.
+ * guaranteed at least one paint) and reports progress after each. Without
+ * `withinBatchLabel`, verdicts are identical to checkBatch over the same
+ * corpora.
+ *
+ * withinBatchLabel additionally checks each prompt against the ACCEPTED
+ * (status "ok") prompts earlier in this same batch, flagging internal
+ * near-twins with that label as the source. check_dupes.py never had this
+ * axis — its batch was always a single roll whose `seen` key already
+ * de-duplicates axis combos — but a multi-recipe roll-wide batch is a
+ * dashboard construct whose slices share no `seen` state, and the house rule
+ * is "dupes flagged, never silently included". Only ok-verdict prompts join
+ * the self corpus, so a pair of internal twins flags exactly one of the two
+ * (dropping flagged prompts keeps one copy instead of losing both).
  */
 export async function checkBatchAsync(
   prompts: string[],
   corpora: readonly PreparedCorpus[],
-  opts: { onProgress?: (done: number, total: number) => void } = {},
+  opts: {
+    onProgress?: (done: number, total: number) => void;
+    withinBatchLabel?: string;
+  } = {},
 ): Promise<DedupeResult[]> {
+  const self: PreparedCorpus | null =
+    opts.withinBatchLabel !== undefined
+      ? {
+          raw: [],
+          rawSet: new Set<string>(),
+          stripped: [],
+          label: opts.withinBatchLabel,
+        }
+      : null;
+  const scan = self ? [...corpora, self] : corpora;
   const out: DedupeResult[] = [];
   for (let i = 0; i < prompts.length; i++) {
     await new Promise<void>((r) => setTimeout(r, 0));
-    out.push(checkOne(prompts[i], corpora));
+    const res = checkOne(prompts[i], scan);
+    out.push(res);
+    if (self && res.status === "ok") {
+      self.raw.push(prompts[i]);
+      self.rawSet.add(prompts[i]);
+      self.stripped.push(stripFlags(prompts[i]));
+    }
     opts.onProgress?.(i + 1, prompts.length);
   }
   return out;

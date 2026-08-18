@@ -205,4 +205,11 @@ export interface DedupeResult {
   status: DedupeStatus;
   bestRatio: number;
   closest?: string;
+  /**
+   * Human-readable label of the corpus the closest match came from (e.g. "the
+   * logged round history" vs "a batch saved in this browser"). Only present
+   * when the matching PreparedCorpus was given a label — unlabeled corpora
+   * (checkBatch, the golden fixtures) produce results identical to before.
+   */
+  source?: string;
 }

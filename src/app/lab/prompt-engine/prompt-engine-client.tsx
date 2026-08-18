@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 
 import { banks } from "@/lib/prompt-engine/banks";
-import { roll } from "@/lib/prompt-engine/engine";
+import { roll, stripOperatorAnnotations } from "@/lib/prompt-engine/engine";
 import type {
   DedupeResult,
   GeneratedPrompt,
@@ -127,6 +127,14 @@ interface HistoryEntry {
    * results. Restore must not present them as a clean bill of health.
    */
   unchecked?: boolean;
+  /**
+   * The [rNN] number this batch was exported under via "Copy as round block",
+   * persisted WITH the batch. Round bookkeeping must survive reloads: if it
+   * lived only in component state, export → reload → export would emit the
+   * same corpus-derived number twice — colliding round tags in the
+   * append-only log, the exact corruption the export path exists to prevent.
+   */
+  exportedRound?: number;
 }
 
 const UNCHECKED_NOTICE =
@@ -175,6 +183,25 @@ function normalizeSettings(s: Settings): Settings {
     girlRate: normalizeGirlRate(s.girlRate),
     markStyle: s.markStyle === "none" ? "wordmark" : s.markStyle,
   };
+}
+
+/**
+ * Cap history at HISTORY_MAX, evicting oldest UNEXPORTED entries first:
+ * exported entries are the round-export ledger (claimed [rNN] numbers +
+ * burned seeds) and must outlive casual rolls. If exported entries alone
+ * exceed the cap they are all kept — that only grows by deliberate exports.
+ */
+function trimHistory(entries: HistoryEntry[]): HistoryEntry[] {
+  let over = entries.length - HISTORY_MAX;
+  if (over <= 0) return entries;
+  const out = [...entries];
+  for (let i = out.length - 1; i >= 0 && over > 0; i--) {
+    if (out[i].exportedRound === undefined) {
+      out.splice(i, 1);
+      over--;
+    }
+  }
+  return out;
 }
 
 function ordinal(n: number): string {
@@ -253,15 +280,6 @@ export function PromptEngineClient() {
   } | null>(null);
   /** History-entry id of the batch on screen (round-export bookkeeping). */
   const [batchId, setBatchId] = useState<string | null>(null);
-  /**
-   * Session round-export ledger: batch id → the [rNN] number it was exported
-   * under. Without this, every "Copy as round block" this session emits the
-   * SAME corpus-derived tag (e.g. [r21] twice) — colliding round numbers in
-   * the append-only log. Re-copying an exported batch reuses ITS number.
-   */
-  const [sessionRounds, setSessionRounds] = useState<Record<string, number>>({});
-  /** Seeds burned by rounds exported this session (not yet in corpus.json). */
-  const [sessionBurned, setSessionBurned] = useState<number[]>([]);
   /** How many prompts short of the requested count the last roll came up. */
   const [shortfall, setShortfall] = useState(0);
   const [includeDupes, setIncludeDupes] = useState(false);
@@ -330,7 +348,7 @@ export function PromptEngineClient() {
         const raw = window.localStorage.getItem(LS_KEY);
         if (raw) {
           const parsed = JSON.parse(raw) as HistoryEntry[];
-          if (Array.isArray(parsed)) setHistory(parsed.slice(0, HISTORY_MAX));
+          if (Array.isArray(parsed)) setHistory(trimHistory(parsed));
         }
       } catch {
         setStorageNotice("Saved history could not be read — starting fresh.");
@@ -351,8 +369,27 @@ export function PromptEngineClient() {
     };
   }, [loadCorpus]);
 
-  // Burned = logged in corpus.json OR exported as a round block earlier this
-  // session (the snapshot can't know about those yet).
+  // Round-export ledger, derived from persisted history (NOT session state —
+  // it must survive reloads, see HistoryEntry.exportedRound). exported = the
+  // batches whose prompts/seeds were handed to the log; their seeds count as
+  // burned even though the corpus snapshot can't know about them yet, and the
+  // next fresh export must number PAST them.
+  const exportedEntries = useMemo(
+    () => history.filter((h) => h.exportedRound !== undefined),
+    [history],
+  );
+  const sessionBurned = useMemo(
+    () => exportedEntries.flatMap((h) => h.seedsUsed),
+    [exportedEntries],
+  );
+  const maxExportedRound = useMemo(
+    () =>
+      exportedEntries.reduce((m, h) => Math.max(m, h.exportedRound ?? 0), 0),
+    [exportedEntries],
+  );
+
+  // Burned = logged in corpus.json OR exported as a round block from this
+  // browser (the snapshot can't know about those yet).
   const burnedSet = useMemo(
     () => new Set([...(corpus?.burnedSeeds ?? []), ...sessionBurned]),
     [corpus, sessionBurned],
@@ -500,22 +537,55 @@ export function PromptEngineClient() {
         // prepared once per snapshot; prompts from locally saved batches
         // (absent from the snapshot by definition) are checked too.
         if (preparedRef.current?.source !== c) {
-          preparedRef.current = { source: c, prepared: prepareCorpus(c.prompts) };
+          preparedRef.current = {
+            source: c,
+            prepared: prepareCorpus(c.prompts, "the logged round history"),
+          };
         }
-        const localTexts = history.flatMap((h) =>
-          h.prompts.map((p) => p.text),
-        );
-        const corpora = localTexts.length
-          ? [preparedRef.current.prepared, prepareCorpus(localTexts)]
-          : [preparedRef.current.prepared];
+        // Local batches split by provenance so a flag can say what it means:
+        // an exported batch's prompts were handed to the log (treat like the
+        // corpus), while a never-exported batch only proves "you rolled this
+        // before in this browser" — without the split, abandoned rolls read
+        // as submission history and the flags slowly cry wolf.
+        const exportedTexts = history
+          .filter((h) => h.exportedRound !== undefined)
+          .flatMap((h) => h.prompts.map((p) => p.text));
+        const draftTexts = history
+          .filter((h) => h.exportedRound === undefined)
+          .flatMap((h) => h.prompts.map((p) => p.text));
+        const corpora = [
+          preparedRef.current.prepared,
+          ...(exportedTexts.length
+            ? [
+                prepareCorpus(
+                  exportedTexts,
+                  "a round exported from this browser",
+                ),
+              ]
+            : []),
+          ...(draftTexts.length
+            ? [
+                prepareCorpus(
+                  draftTexts,
+                  "a batch rolled in this browser but never exported",
+                ),
+              ]
+            : []),
+        ];
         results = await checkBatchAsync(
           rolled.map((p) => p.text),
           corpora,
-          { onProgress: (done, total) => setCheckProgress({ done, total }) },
+          {
+            onProgress: (done, total) => setCheckProgress({ done, total }),
+            // A roll-wide batch is stitched from independent recipe slices
+            // that share no engine `seen` state — flag internal near-twins
+            // too (house rule: dupes flagged, never silently included).
+            withinBatchLabel: "an earlier prompt in this same batch",
+          },
         );
         setCheckInfo({
           corpusCount: c.prompts.length,
-          localCount: localTexts.length,
+          localCount: exportedTexts.length + draftTexts.length,
           generatedAt: c.generatedAt,
         });
       } else {
@@ -550,7 +620,19 @@ export function PromptEngineClient() {
           ...(c ? {} : { unchecked: true }),
         };
         setBatchId(entry.id);
-        persistHistory([entry, ...history].slice(0, HISTORY_MAX));
+        persistHistory(trimHistory([entry, ...history]));
+        // Advance the seed suggestion PAST this roll: "Generate" means "new
+        // batch" to a visitor, but with an unchanged seed a second click
+        // reproduces the identical batch — which the dedupe pass then flags
+        // wall-to-wall as exact duplicates of itself. The batch header keeps
+        // the seeds actually used, so reproducing a roll is still one
+        // copy-back away.
+        setSeed(
+          randomSeed(
+            new Set([...(c?.burnedSeeds ?? []), ...sessionBurned, ...used]),
+            recipes.length,
+          ),
+        );
       } else {
         setBatchId(null);
       }
@@ -566,6 +648,7 @@ export function PromptEngineClient() {
     settings,
     isBranded,
     history,
+    sessionBurned,
     loadCorpus,
     loadSrefIndex,
     persistHistory,
@@ -584,7 +667,12 @@ export function PromptEngineClient() {
 
   const copyAll = useCallback(async () => {
     if (!includedPrompts.length) return;
-    const ok = await copyText(includedPrompts.map((p) => p.text).join("\n"));
+    // MJ-copy path: strip operator-only annotations (" [GIRL/iw 1.5]") —
+    // pasted verbatim they are a parameter error in the imagine bar. The
+    // round-block export keeps them: the log's consumer is the operator.
+    const ok = await copyText(
+      includedPrompts.map((p) => stripOperatorAnnotations(p.text)).join("\n"),
+    );
     if (ok) {
       setCopiedAll(true);
       window.setTimeout(() => setCopiedAll(false), 1800);
@@ -598,13 +686,14 @@ export function PromptEngineClient() {
     // unknown, and a guessed one collides with a real round in the append-only
     // log. The button is disabled in this state; this guard is belt-and-braces.
     if (!c) return;
-    // Session-aware numbering: the corpus's maxRound is frozen at snapshot
-    // time, so every export this session would otherwise claim the SAME next
-    // tag. Each newly exported batch takes the next free number; re-copying
-    // an already-exported batch reuses the number it was assigned.
+    // Persistent numbering: the corpus's maxRound is frozen at snapshot time,
+    // so a fresh export numbers past BOTH it and every round already exported
+    // from this browser (persisted in history — reloads must not reset the
+    // counter and re-issue a taken tag). Re-copying an exported batch reuses
+    // the number it was assigned.
+    const prior = history.find((h) => h.id === batchId)?.exportedRound;
     const roundNumber =
-      sessionRounds[batchId] ??
-      nextRound(c.maxRound) + Object.keys(sessionRounds).length;
+      prior ?? Math.max(nextRound(c.maxRound), maxExportedRound + 1);
     const th = settings.theme;
     const recipeDesc =
       settings.recipe === "wide"
@@ -632,18 +721,24 @@ export function PromptEngineClient() {
     const block = formatRoundBlock(includedPrompts as GeneratedPrompt[], {
       roundNumber,
       seedsUsed,
-      headerNote: bits.join(", "),
+      // The snapshot (and this browser's export memory) can trail the real
+      // log — CLI sessions log rounds too. The human paste step is the last
+      // place a collision can be caught, so the header says what to check.
+      headerNote:
+        bits.join(", ") +
+        `\npaste check: [r${roundNumber}] must not already appear in the log (snapshot may trail CLI rounds)`,
       runningLedger: ledger,
     });
     const ok = await copyText(block);
     if (ok) {
-      if (sessionRounds[batchId] === undefined) {
-        // First export of this batch: claim the round number and fold its
-        // seeds into the working burned set so later rerolls, seed
-        // suggestions, and ledgers all see them.
-        setSessionRounds((m) => ({ ...m, [batchId]: roundNumber }));
-        setSessionBurned((prev) =>
-          Array.from(new Set([...prev, ...seedsUsed])),
+      if (prior === undefined) {
+        // First export of this batch: persist the claimed round number with
+        // the batch (survives reloads) so later rerolls, seed suggestions,
+        // ledgers, and the next export's numbering all see it.
+        persistHistory(
+          history.map((h) =>
+            h.id === batchId ? { ...h, exportedRound: roundNumber } : h,
+          ),
         );
       }
       setCopiedRound(roundNumber);
@@ -656,8 +751,10 @@ export function PromptEngineClient() {
     flaggedCount,
     includeDupes,
     batchId,
-    sessionRounds,
+    history,
+    maxExportedRound,
     sessionBurned,
+    persistHistory,
   ]);
 
   const restoreEntry = useCallback((entry: HistoryEntry) => {
@@ -694,6 +791,19 @@ export function PromptEngineClient() {
 
   const deleteEntry = useCallback(
     (id: string) => {
+      const entry = history.find((h) => h.id === id);
+      // Exported entries ARE the round-export ledger: deleting one forgets
+      // its claimed [rNN] number and burned seeds, so a later export could
+      // re-issue the tag. Make that an informed choice, not a stray click.
+      if (
+        entry?.exportedRound !== undefined &&
+        !window.confirm(
+          `This batch was exported as [r${entry.exportedRound}]. Deleting it makes the page ` +
+            "forget that round number and its burned seeds — a future export could reuse them. Delete anyway?",
+        )
+      ) {
+        return;
+      }
       persistHistory(history.filter((h) => h.id !== id));
     },
     [history, persistHistory],
@@ -853,7 +963,8 @@ export function PromptEngineClient() {
               </button>
             </div>
             <p className="text-[10px] mt-1" style={{ color: "var(--text-tertiary)" }}>
-              same seed → same batch; &ldquo;burned&rdquo; = used in a logged or session-exported round
+              same seed → same batch (a fresh one is suggested after each roll);
+              &ldquo;burned&rdquo; = used in a logged or exported round
             </p>
           </div>
 
@@ -1180,12 +1291,22 @@ export function PromptEngineClient() {
             role="status"
           >
             <TriangleAlert size={13} className="mt-0.5 shrink-0" />
-            {prompts.length === 0
-              ? "No prompts could satisfy the current constraints — a locked palette combined " +
-                "with a strict palette-restraint cap rejects every candidate. Loosen the " +
-                "restraint slider or unlock the palette, then generate again."
-              : `Constraints allowed only ${prompts.length} of the ${prompts.length + shortfall} requested prompts — ` +
-                "loosen palette restraint or clear the palette lock to fill the batch."}
+            {(() => {
+              // Diagnose only causes that are actually active: the engine
+              // comes up short either because the palette-restraint cap
+              // rejects pops (only when the cap/lock is engaged) or because
+              // locked axes exhaust the distinct combinations its guard loop
+              // can find. Blaming the palette when no cap is set sends the
+              // visitor to a slider that won't help.
+              const paletteActive =
+                settings.maxSaturatedShare < 1 || settings.lockPalette != null;
+              const remedy = paletteActive
+                ? "Loosen the palette-restraint slider or unlock the palette, then generate again."
+                : "Clear a locked influence, shrink the batch, or switch recipes to open up more combinations.";
+              return prompts.length === 0
+                ? `No prompts could satisfy the current constraints. ${remedy}`
+                : `Constraints allowed only ${prompts.length} of the ${prompts.length + shortfall} requested prompts. ${remedy}`;
+            })()}
           </p>
         )}
       </section>
@@ -1270,6 +1391,16 @@ export function PromptEngineClient() {
             </p>
           )}
 
+          <p
+            className="text-[11px] font-mono mb-3"
+            style={{ color: "var(--text-tertiary)" }}
+          >
+            house flags: every prompt ends in <code>--s 150 --draft</code> —
+            draft renders fast at preview quality; delete{" "}
+            <code>--draft</code> after pasting when you want a final-quality
+            render
+          </p>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {prompts.map((p, i) => (
               <PromptCard
@@ -1330,6 +1461,12 @@ export function PromptEngineClient() {
                     </div>
                     <div className="text-[11px] font-mono" style={{ color: "var(--text-tertiary)" }}>
                       {new Date(h.at).toLocaleString()} · seeds {h.seedsUsed.join(", ")}
+                      {h.exportedRound !== undefined && (
+                        <span style={{ color: "var(--green)" }}>
+                          {" "}
+                          · exported as [r{h.exportedRound}]
+                        </span>
+                      )}
                       {h.unchecked && (
                         <span style={{ color: "var(--oxide)" }}> · not dupe-checked</span>
                       )}
@@ -1471,7 +1608,10 @@ function PromptCard({
   const flagged = status !== "ok";
 
   const onCopy = async () => {
-    const ok = await copyText(prompt.text);
+    // MJ-copy path: the displayed text may end in an operator-only
+    // annotation (" [GIRL/iw 1.5]") that the imagine bar rejects — strip it
+    // from the clipboard, keep it on screen and in the round-block export.
+    const ok = await copyText(stripOperatorAnnotations(prompt.text));
     if (ok) {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
@@ -1524,7 +1664,11 @@ function PromptCard({
               className="mt-1.5 pl-4 break-words"
               style={{ color: "var(--text-tertiary)", lineHeight: 1.5 }}
             >
-              closest prior prompt: {dedupe.closest}
+              {/* Source matters: "the logged round history" means this
+                  already RAN in MJ; a never-exported local batch only means
+                  it was rolled here before. */}
+              closest prior prompt
+              {dedupe.source ? ` (${dedupe.source})` : ""}: {dedupe.closest}
             </p>
           )}
         </div>

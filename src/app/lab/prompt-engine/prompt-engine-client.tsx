@@ -387,6 +387,11 @@ export function PromptEngineClient() {
       exportedEntries.reduce((m, h) => Math.max(m, h.exportedRound ?? 0), 0),
     [exportedEntries],
   );
+  /** The [rNN] the batch ON SCREEN was exported under, if it was. */
+  const currentExportedRound = useMemo(
+    () => history.find((h) => h.id === batchId)?.exportedRound,
+    [history, batchId],
+  );
 
   // Burned = logged in corpus.json OR exported as a round block from this
   // browser (the snapshot can't know about those yet).
@@ -691,7 +696,7 @@ export function PromptEngineClient() {
     // from this browser (persisted in history — reloads must not reset the
     // counter and re-issue a taken tag). Re-copying an exported batch reuses
     // the number it was assigned.
-    const prior = history.find((h) => h.id === batchId)?.exportedRound;
+    const prior = currentExportedRound;
     const roundNumber =
       prior ?? Math.max(nextRound(c.maxRound), maxExportedRound + 1);
     const th = settings.theme;
@@ -721,12 +726,11 @@ export function PromptEngineClient() {
     const block = formatRoundBlock(includedPrompts as GeneratedPrompt[], {
       roundNumber,
       seedsUsed,
-      // The snapshot (and this browser's export memory) can trail the real
-      // log — CLI sessions log rounds too. The human paste step is the last
-      // place a collision can be caught, so the header says what to check.
-      headerNote:
-        bits.join(", ") +
-        `\npaste check: [r${roundNumber}] must not already appear in the log (snapshot may trail CLI rounds)`,
+      // Header stays descriptive metadata only. The paste-time collision
+      // warning ("snapshot may trail CLI rounds") lives in the UI next to
+      // the copy button — embedding it here would append the same
+      // instruction line to the append-only log on every dashboard round.
+      headerNote: bits.join(", "),
       runningLedger: ledger,
     });
     const ok = await copyText(block);
@@ -752,6 +756,7 @@ export function PromptEngineClient() {
     includeDupes,
     batchId,
     history,
+    currentExportedRound,
     maxExportedRound,
     sessionBurned,
     persistHistory,
@@ -1374,6 +1379,18 @@ export function PromptEngineClient() {
             </div>
           </div>
 
+          {currentExportedRound !== undefined && (
+            <p
+              className="text-[11px] font-mono -mt-1 mb-3"
+              style={{ color: "var(--text-tertiary)" }}
+              role="status"
+            >
+              exported as [r{currentExportedRound}] — before pasting, make
+              sure [r{currentExportedRound}] isn&apos;t already in the log:
+              the snapshot can trail rounds logged outside this page
+            </p>
+          )}
+
           {checkInfo && (
             <p
               className="text-[11px] font-mono -mt-1 mb-3"
@@ -1395,7 +1412,7 @@ export function PromptEngineClient() {
             className="text-[11px] font-mono mb-3"
             style={{ color: "var(--text-tertiary)" }}
           >
-            house flags: every prompt ends in <code>--s 150 --draft</code> —
+            house flags: every prompt carries <code>--s 150 --draft</code> —
             draft renders fast at preview quality; delete{" "}
             <code>--draft</code> after pasting when you want a final-quality
             render

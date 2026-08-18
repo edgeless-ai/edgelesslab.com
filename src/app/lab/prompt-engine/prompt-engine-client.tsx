@@ -114,7 +114,17 @@ interface HistoryEntry {
   seedsUsed: number[];
   prompts: StoredPrompt[];
   dedupe: DedupeResult[];
+  /**
+   * True when the batch was rolled while corpus.json was unreachable: its
+   * `dedupe` entries are fabricated all-ok placeholders, NOT real check
+   * results. Restore must not present them as a clean bill of health.
+   */
+  unchecked?: boolean;
 }
+
+const UNCHECKED_NOTICE =
+  "Historical round log unavailable — this batch was NOT checked against past prompts, " +
+  "and round export is disabled (a made-up round number would corrupt the log).";
 
 const LS_KEY = "el-prompt-engine-history-v1";
 const HISTORY_MAX = 20;
@@ -447,10 +457,7 @@ export function PromptEngineClient() {
       if (!c && rolled.length > 0) {
         // House rule: dupes are flagged, never silently included — when we
         // can't check, say so instead of showing a green-looking batch.
-        setDedupeNotice(
-          "Historical round log unavailable — this batch was NOT checked against past prompts, " +
-            "and round export is disabled (a made-up round number would corrupt the log).",
-        );
+        setDedupeNotice(UNCHECKED_NOTICE);
       }
 
       // The engine's guard loop (and the pop-palette cap) can legally return
@@ -472,6 +479,7 @@ export function PromptEngineClient() {
           seedsUsed: used,
           prompts: stored,
           dedupe: results,
+          ...(c ? {} : { unchecked: true }),
         };
         persistHistory([entry, ...history].slice(0, HISTORY_MAX));
       }
@@ -558,10 +566,28 @@ export function PromptEngineClient() {
     setSettings(normalizeSettings(entry.settings));
     setSeed(entry.seed);
     setPrompts(entry.prompts);
-    setDedupe(entry.dedupe);
     setSeedsUsed(entry.seedsUsed);
     setIncludeDupes(false);
     setShortfall(0);
+    // Stale notices describe the LAST roll, not this restored batch.
+    setGenError(null);
+    setSrefNotice(null);
+    // Dedupe state must stay honest across the history round-trip: an
+    // `unchecked` entry holds fabricated all-ok results, so run the real
+    // check now that the corpus is here — or keep saying it isn't checked.
+    const c = corpusRef.current;
+    if (entry.unchecked && c) {
+      setDedupe(
+        checkBatch(
+          entry.prompts.map((p) => p.text),
+          c.prompts,
+        ),
+      );
+      setDedupeNotice(null);
+    } else {
+      setDedupe(entry.dedupe);
+      setDedupeNotice(entry.unchecked ? UNCHECKED_NOTICE : null);
+    }
     setShowHistory(false);
   }, []);
 
@@ -714,6 +740,7 @@ export function PromptEngineClient() {
                 type="button"
                 onClick={() => setSeed(randomSeed(burnedSet, seedSpan))}
                 title="Suggest a fresh unburned seed"
+                aria-label="Suggest a fresh unburned seed"
                 className="rounded-md border px-2.5 transition-colors hover:border-[var(--border-hover)]"
                 style={{
                   background: "var(--bg-elevated)",
@@ -834,6 +861,7 @@ export function PromptEngineClient() {
           <button
             type="button"
             onClick={() => setShowAdvanced((v) => !v)}
+            aria-expanded={showAdvanced}
             className="flex items-center gap-1 text-xs font-mono uppercase tracking-wider"
             style={{ color: "var(--text-tertiary)" }}
           >
@@ -1126,6 +1154,7 @@ export function PromptEngineClient() {
         <button
           type="button"
           onClick={() => setShowHistory((v) => !v)}
+          aria-expanded={showHistory}
           className="flex items-center gap-2 text-sm font-medium mb-3"
           style={{ color: "var(--text-secondary)" }}
         >
@@ -1168,6 +1197,9 @@ export function PromptEngineClient() {
                     </div>
                     <div className="text-[11px] font-mono" style={{ color: "var(--text-tertiary)" }}>
                       {new Date(h.at).toLocaleString()} · seeds {h.seedsUsed.join(", ")}
+                      {h.unchecked && (
+                        <span style={{ color: "var(--oxide)" }}> · not dupe-checked</span>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -1343,6 +1375,7 @@ function PromptCard({
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
+            aria-expanded={expanded}
             className="inline-flex items-center gap-1"
           >
             <TriangleAlert size={11} />

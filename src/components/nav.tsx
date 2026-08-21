@@ -16,6 +16,7 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { label: "Field Notes", href: "/field-notes" },
+  { label: "Index", href: "/studio" },
   { label: "Systems", href: "/projects" },
   { label: "Blog", href: "/blog" },
   { label: "About", href: "/about" },

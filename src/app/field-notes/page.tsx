@@ -37,7 +37,7 @@ export default function FieldNotesPage() {
             description:
               "Interactive studies, cited science plots, generative systems, and visual research.",
             url: "https://edgelesslab.com/field-notes",
-            numberOfItems: notes.length + 1,
+            numberOfItems: notes.length + 2,
             itemListElement: [
               {
                 "@type": "ListItem",
@@ -45,9 +45,15 @@ export default function FieldNotesPage() {
                 name: "Total Serialism: Field Notes on Algorithmic Constraint",
                 url: "https://edgelesslab.com/total-serialism/field-notes/index.html",
               },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Tartanism: Field Notes on Generative Plaid",
+                url: "https://edgelesslab.com/tartanism/field-notes/index.html",
+              },
               ...notes.map((note, index) => ({
                 "@type": "ListItem",
-                position: index + 2,
+                position: index + 3,
                 name: note.title,
                 url: `https://edgelesslab.com/creative-demos/${note.slug}/`,
               })),
@@ -165,6 +171,80 @@ export default function FieldNotesPage() {
                     />
                   </div>
                 </div>
+              </div>
+            </a>
+          </section>
+
+          <section className="border-b" style={{ borderColor: "var(--ink)" }}>
+            <a
+              href="/tartanism/field-notes/index.html"
+              className="group grid lg:grid-cols-[0.85fr_1.15fr]"
+            >
+              <div
+                className="flex flex-col justify-between p-6 sm:p-9 lg:p-10 lg:order-1 order-2"
+                style={{ background: "var(--paper-deep)", color: "var(--ink)" }}
+              >
+                <div>
+                  <div
+                    className="font-mono text-[10px] uppercase tracking-[0.14em]"
+                    style={{ color: "var(--malachite)" }}
+                  >
+                    Long-form field note / generative plaid
+                  </div>
+                  <h2 className="mt-7 font-editorial text-5xl leading-[0.92] tracking-[-0.035em] sm:text-6xl">
+                    Tartan
+                    <br />
+                    <em className="font-normal">ism.</em>
+                  </h2>
+                  <p className="mt-7 max-w-lg text-sm leading-6" style={{ color: "var(--ink-soft)" }}>
+                    Six weave structures, forty-eight period-correct dye colors,
+                    and a mutation engine that walks the line between generated
+                    plaid and authentic Scottish tartan. Where does a threadcount
+                    stop being a pattern and start being a clan?
+                  </p>
+                </div>
+
+                <div className="mt-10">
+                  <div
+                    className="grid grid-cols-3 gap-px border"
+                    style={{ borderColor: "var(--ink)" }}
+                  >
+                    {[
+                      ["6", "Weaves"],
+                      ["48", "Dye colors"],
+                      ["1", "Mutation engine"],
+                    ].map(([value, label]) => (
+                      <div key={label} className="p-3 sm:p-4">
+                        <div className="font-editorial text-3xl">{value}</div>
+                        <div className="lab-metadata mt-1">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-6 flex items-center justify-between gap-4">
+                    <span className="font-mono text-xs uppercase tracking-[0.1em]">
+                      Read the field note &middot; open the plaid maker
+                    </span>
+                    <ArrowUpRight
+                      aria-hidden="true"
+                      size={20}
+                      className="shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                      style={{ color: "var(--malachite)" }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="relative min-h-[300px] overflow-hidden border-b lg:order-2 order-1 lg:min-h-[440px] lg:border-b-0 lg:border-l"
+                style={{ borderColor: "var(--ink)", background: "var(--ink)" }}
+              >
+                <Image
+                  src="/tartanism/field-notes/assets/og-image.png"
+                  alt="Generative tartan specimens arranged as a plaid field study"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 58vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-[1.015]"
+                />
               </div>
             </a>
           </section>

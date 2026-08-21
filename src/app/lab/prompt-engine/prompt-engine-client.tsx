@@ -913,18 +913,40 @@ export function PromptEngineClient() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
           <div>
             <FieldLabel>Batch size — {settings.count}</FieldLabel>
-            <input
-              type="range"
-              min={4}
-              max={60}
-              step={1}
-              value={settings.count}
-              onChange={(e) =>
-                setSettings((s) => ({ ...s, count: Number(e.target.value) }))
-              }
-              className="w-full accent-[var(--accent)]"
-              aria-label="Batch size"
-            />
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                min={4}
+                max={200}
+                step={1}
+                value={Math.min(settings.count, 200)}
+                onChange={(e) =>
+                  setSettings((s) => ({ ...s, count: Number(e.target.value) }))
+                }
+                className="w-full accent-[var(--accent)]"
+                aria-label="Batch size"
+              />
+              <input
+                type="number"
+                min={4}
+                max={1000}
+                step={1}
+                value={settings.count}
+                onChange={(e) =>
+                  setSettings((s) => ({
+                    ...s,
+                    count: Math.max(4, Math.min(1000, Number(e.target.value) || 4)),
+                  }))
+                }
+                className="w-16 rounded border px-2 py-1 text-sm tabular-nums"
+                style={{ background: "var(--bg-surface)", borderColor: "var(--border-subtle)", color: "var(--text-primary)" }}
+                aria-label="Batch size (exact)"
+              />
+            </div>
+            <p className="mt-1 text-[10px]" style={{ color: "var(--text-tertiary)" }}>
+              Slider to 200; type up to 1000. The engine&apos;s space is ~800M+ unique prompts —
+              roll as wide as you like.
+            </p>
           </div>
 
           <div>

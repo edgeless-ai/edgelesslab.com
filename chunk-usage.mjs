@@ -1,4 +1,5 @@
-const fs=require('fs'),path=require('path');
+import fs from 'fs';
+import path from 'path';
 const manifest=JSON.parse(fs.readFileSync('.next/build-manifest.json','utf8'));
 const app=manifest.pages['/']||{};
 const ssr=app.initial||[];

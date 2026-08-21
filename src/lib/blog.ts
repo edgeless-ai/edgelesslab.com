@@ -8,27 +8,27 @@ const allPosts: BlogPost[] = [
   {
     slug: "kb-audit-circulation",
     editorial: true,
-    title: "We Audited Our AI Knowledge Base — 85% of Our Content Was Invisible to Our Agents",
-    description: "After building a 26,000-document knowledge system for my AI agents, I discovered only 14% was vector-searchable. Here's the audit methodology, the 7-domain findings, and the systematic fix.",
+    title: "We Audited Our AI Knowledge Base: 85% of Our Content Was Invisible to Our Agents",
+    description: "After building a 26,000-document knowledge system for my AI agents, I discovered only 14% was vector-searchable. Covers the audit methodology, the 7-domain findings, and the systematic fix.",
     date: "2026-06-12",
     tags: ["knowledge-base", "ai-agents", "embeddings", "audit", "agent-ops"],
     readTime: "8 min",
     productSlug: "claude-memory-kit",
     ctaHook: "The memory templates and stack libraries that keep agent knowledge searchable instead of invisible, from the system this audit fixed.",
     content: `
-# We Audited Our AI Knowledge Base — 85% of Our Content Was Invisible to Our Agents
+# We Audited Our AI Knowledge Base: 85% of Our Content Was Invisible to Our Agents
 
-Two months ago I wrote about the Knowledge Base Loop — how my AI agents store, retrieve, and cross-reference 7,276 documents in a vector database. I was proud of that post. The system worked.
+Two months ago I wrote about the Knowledge Base Loop: how my AI agents store, retrieve, and cross-reference 7,276 documents in a vector database. I was proud of that post. The system worked.
 
 Then last week I ran a count. I had 26,101 markdown documents in my vault. Only 3,800 had ChromaDB embeddings.
 
 **Eighty-five percent of my knowledge was invisible to my AI.**
 
-My agents had been making decisions — routing tasks, generating creative prompts, analyzing market data — while blind to 22,000 documents I'd already collected and filed. I'd built a library and forgotten to install the lights.
+My agents had been making decisions (routing tasks, generating creative prompts, analyzing market data) while blind to 22,000 documents I'd already collected and filed. I'd built a library and forgotten to install the lights.
 
 ## The Problem: Accumulation ≠ Circulation
 
-Here's what happens when you build an AI agent system that ingests aggressively. Each pipeline works. RSS feeds flow. YouTube transcripts transcribe. Are.na blocks sync. But nobody ever asks: *"Is anything downstream reading this?"*
+This is what happens when you build an AI agent system that ingests aggressively. Each pipeline works. RSS feeds flow. YouTube transcripts transcribe. Are.na blocks sync. But nobody ever asks: *"Is anything downstream reading this?"*
 
 | Knowledge Source | What It Produces | Who Consumes It |
 |---|---|---|
@@ -44,16 +44,16 @@ I was running a write-only knowledge system. Data flowed in. Nothing read it out
 
 I formalized a systematic audit that any agent can run on any domain:
 
-1. **Inventory** — What do we have? Scan vault, ChromaDB, skills, crons, configs.
-2. **Utilization** — What's actually in use? Trace each asset to active pipelines.
-3. **Gap Detection** — Find cross-reference gaps, bridge gaps, ownership gaps.
-4. **Report** — Structured output with priority-ranked actions.
+1. **Inventory:** What do we have? Scan vault, ChromaDB, skills, crons, configs.
+2. **Utilization:** What's actually in use? Trace each asset to active pipelines.
+3. **Gap Detection:** Find cross-reference gaps, bridge gaps, ownership gaps.
+4. **Report:** Structured output with priority-ranked actions.
 
 ## The 7-Domain Findings
 
 **Creative:** We had Tufte principles, 54 design systems, and 233 foundational docs. None connected to the pipeline that produces art. Fixed same day.
 
-**Agent Infrastructure:** Virgil — the agent I'd spent days configuring — was invisible to the entire swarm. Missing from all 7 reference documents. Other agents couldn't route to him.
+**Agent Infrastructure:** Virgil, the agent I'd spent days configuring, was invisible to the entire swarm. Missing from all 7 reference documents. Other agents couldn't route to him.
 
 **Trading:** All crons are script-only. No LLM-driven reflection. Pine Script research disconnected from execution.
 
@@ -1490,7 +1490,7 @@ Here are actual routing choices from my system this week:
 
 ## The Configuration File
 
-Here's my complete production model routing config:
+My complete production model routing config:
 
 \`\`\`yaml
 # model-routing.yaml - Production configuration
@@ -1646,9 +1646,9 @@ Routing saves money. But how do you prevent agents from losing context across se
 
 Want the complete model routing configuration? It's included in:
 
-- **Paperclip OS ($49)** — Full orchestration blueprint
-- **Hermes Deployment Guide ($19)** — Router setup, API server, cron templates
-- **Bundle ($79)** — All 3 products
+- **Paperclip OS ($49):** Full orchestration blueprint
+- **Hermes Deployment Guide ($19):** Router setup, API server, cron templates
+- **Bundle ($79):** All 3 products
 
 [gumroad.com/l/paperclip-os]
 
@@ -1658,7 +1658,7 @@ Want the complete model routing configuration? It's included in:
     slug: "knowledge-base-loop",
     editorial: true,
     title: "The Knowledge Base Loop: Why Your Agents Need a Memory System",
-    description: "How I built a KB Loop based on the Karpathy pattern — ChromaDB, triage scoring, synthesizer agents, and a 0-25 health score. Results: 4.2x context restatements down to 0.3x.",
+    description: "How I built a KB Loop based on the Karpathy pattern: ChromaDB, triage scoring, synthesizer agents, and a 0-25 health score. Results: 4.2x context restatements down to 0.3x.",
     date: "2026-04-19",
     tags: ["AI Agents", "Knowledge Base", "ChromaDB", "Vector Search", "Agent Memory"],
     readTime: "8 min",
@@ -1677,7 +1677,7 @@ For months, my agents were trapped in a nightmare:
 
 > Every session started cold. No memory of yesterday's decisions. No context from last week's research. Each agent woke up like it was day one, repeating conversations, re-explaining constraints, re-learning what "on brand" means for this project.
 
-I was paying for the same context over and over. Worse, the system felt brittle — agents made inconsistent decisions because they lacked shared grounding.
+I was paying for the same context over and over. Worse, the system felt brittle; agents made inconsistent decisions because they lacked shared grounding.
 
 Sound familiar? You're not alone. Most agent systems are stateless by default. ChatGPT doesn't remember your project between sessions. Neither do most coding agents.
 
@@ -1901,8 +1901,8 @@ Running this system for 4 months:
 | Inconsistent agent decisions | ~30% | ~5% |
 | Duplicate research effort | High | Minimal |
 | Time to onboard new agent | 2 hours | 15 minutes |
-| ChromaDB storage | — | 2.1 GB |
-| Monthly sync cost | — | $0 (local) |
+| ChromaDB storage | n/a | 2.1 GB |
+| Monthly sync cost | n/a | $0 (local) |
 
 ---
 
@@ -1930,7 +1930,7 @@ Want to build your own KB Loop?
 
 ## The Real Value
 
-The KB Loop isn't about storage. It's about **compound knowledge** — insights that get better as they circulate through agents.
+The KB Loop isn't about storage. It's about **compound knowledge**: insights that get better as they circulate through agents.
 
 My agents now:
 - Reference decisions from last month
@@ -1946,7 +1946,7 @@ That's the Karpathy Pattern. And it works.
 
 ## Next in Series
 
-**Post 4:** File-Based Agent Communication — why I use rsync + markdown instead of gRPC (and when to upgrade)
+**Post 4:** File-Based Agent Communication: why I use rsync + markdown instead of gRPC (and when to upgrade)
 
 ---
 

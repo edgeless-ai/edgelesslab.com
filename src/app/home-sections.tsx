@@ -31,7 +31,7 @@ const ProjectShowcaseSection = dynamic(
         { slug: "mcp-servers", span: "" },
         { slug: "pen-plotter-art", span: "" },
       ].map(({ slug, span }) => {
-        const project = projects.find((item: any) => item.slug === slug);
+        const project = projects.find((item) => item.slug === slug);
         if (!project)
           throw new Error(`Missing homepage featured project: ${slug}`);
         return {
@@ -84,7 +84,7 @@ const TechShowcaseSection = dynamic(
         "tartanism",
       ].map((slug) => {
         const experiment = experiments.find(
-          (item: any) => item.slug === slug
+          (item) => item.slug === slug
         );
         if (!experiment)
           throw new Error(`Missing homepage experiment: ${slug}`);

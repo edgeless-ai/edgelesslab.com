@@ -2,7 +2,7 @@
 
 import { ArrowUpRight } from "lucide-react";
 
-interface Experiment {
+export interface Experiment {
   title: string;
   category: string;
   description: string;

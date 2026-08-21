@@ -17,6 +17,13 @@ const eslintConfig = defineConfig([
     "build/**",
     "public/flow-viz/**",
     "public/tartanism/**",
+    // Generated/vendored bundles — ~25k JS files that made `pnpm lint` run 40+ min:
+    "public/marimo*/**",
+    "public/total-serialism/**",
+    "public/scoop-scout/**",
+    "public/creative-demos/**",
+    "public/pen-plotter/**",
+    "public/prompt-engine/**",
     "tartanism/**",
     "next-env.d.ts",
   ]),

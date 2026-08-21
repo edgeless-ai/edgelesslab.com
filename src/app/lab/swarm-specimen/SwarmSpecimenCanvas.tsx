@@ -23,7 +23,9 @@ export default function SwarmSpecimenCanvas() {
   const [adding, setAdding] = useState(false);
   const [copied, setCopied] = useState(false);
   const runningRef = useRef(false);
-  runningRef.current = running;
+  useEffect(() => {
+    runningRef.current = running;
+  }, [running]);
 
   const reset = useCallback((newSeed: number) => {
     setRunning(false);

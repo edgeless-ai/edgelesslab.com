@@ -59,7 +59,7 @@ export function build() {
   walk(out);
 
   for (const file of files) {
-    let html = fs.readFileSync(file, 'utf8');
+    const html = fs.readFileSync(file, 'utf8');
     const insertAt = html.lastIndexOf('</head>');
     const snippet = `<script>${finalScript}</script>`;
     if (insertAt === -1 || html.includes(snippet)) continue;

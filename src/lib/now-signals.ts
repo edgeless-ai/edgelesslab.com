@@ -33,7 +33,7 @@ function newestFileDate(filename: string): string | null {
 function statBirthMs(file: string): number | null {
   try {
     const st = fs.statSync(file);
-    const ms = typeof (st as any).birthtimeMs === "number" ? (st as any).birthtimeMs : new Date((st as any).birthtime).getTime();
+    const ms = typeof st.birthtimeMs === "number" ? st.birthtimeMs : new Date(st.birthtime).getTime();
     return Number.isFinite(ms) ? ms : null;
   } catch {
     return null;

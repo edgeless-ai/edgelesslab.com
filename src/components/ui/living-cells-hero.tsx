@@ -62,7 +62,7 @@ export function LivingCellsHero() {
     return () => io.disconnect();
   }, []);
 
-  const easeToTarget = useCallback(() => {
+  const easeToTarget = useCallback(function tick() {
     setPointer((prev) => {
       const target = pointerTargetRef.current;
       const nx = prev.x + (target.x - prev.x) * EASE;
@@ -72,7 +72,7 @@ export function LivingCellsHero() {
         easeRafRef.current = null;
         return target;
       }
-      easeRafRef.current = requestAnimationFrame(easeToTarget);
+      easeRafRef.current = requestAnimationFrame(tick);
       return { x: nx, y: ny };
     });
   }, []);

@@ -34,6 +34,22 @@ export type NowData = {
   recent_work: RecentWork[];
 };
 
+type RawShip = {
+  id?: string;
+  title?: string;
+  source?: string;
+  completed?: string;
+  url?: string;
+};
+
+type RawWork = {
+  id?: string;
+  title?: string;
+  priority?: string;
+  updated?: string;
+  agent_name?: string;
+};
+
 export async function getNowData(): Promise<NowData> {
   try {
     const [shipRes, wallRes] = await Promise.all([
@@ -44,7 +60,7 @@ export async function getNowData(): Promise<NowData> {
     const shipLog = shipRes.ok ? await shipRes.json() : null;
     const wall = wallRes.ok ? await wallRes.json() : null;
 
-    const ships: Ship[] = (shipLog?.ships || []).slice(0, 10).map((s: any) => ({
+    const ships: Ship[] = (shipLog?.ships || []).slice(0, 10).map((s: RawShip) => ({
       id: s.id || '',
       title: s.title || '',
       source: s.source || 'paperclip',
@@ -54,7 +70,7 @@ export async function getNowData(): Promise<NowData> {
 
     const recentWork: RecentWork[] = (wall?.recent_work || [])
       .slice(0, 30)
-      .map((w: any) => ({
+      .map((w: RawWork) => ({
         id: w.id || '',
         title: w.title || '',
         priority: w.priority || 'low',

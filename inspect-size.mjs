@@ -1,6 +1,5 @@
-import { createRequire } from 'module'
-const fs = require('fs')
-const path = require('path')
+import fs from 'fs'
+import path from 'path'
 // crude JS-only size stats for server/client/routes
 const root = '.next/server/app'
 let total=0; let dirs=0; let chunks=[]; let files=0

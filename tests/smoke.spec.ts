@@ -64,6 +64,36 @@ test.describe("static site smoke", () => {
     await expect(page.locator("[data-copy-prompt]").first()).toBeVisible();
   });
 
+  test("/lab/prompt-engine/ generates with a custom-taste subject", async ({ page }) => {
+    await page.goto("/lab/prompt-engine/");
+    await expect(page.getByRole("heading", { name: "Prompt Engine" })).toBeVisible();
+
+    // Open the Customize (bring-your-own-taste) drawer.
+    await page.getByRole("button", { name: /Customize banks/ }).click();
+
+    // Expand the tagged Subjects axis and add a distinctive custom subject.
+    const SUBJECT = "a quokka wearing a brass monocle";
+    await page.getByRole("button", { name: /Subjects \(tagged bank\)/ }).click();
+    await page.getByLabel("Subject text").fill(SUBJECT);
+    await page.getByRole("button", { name: "Add subject" }).click();
+
+    // Replace so ONLY the custom subject can be picked — makes the effect of
+    // the custom bank deterministic in the generated batch.
+    await page
+      .getByRole("switch", { name: /Replace \(use only my entries/ })
+      .click();
+
+    // Generate a real batch; it must roll with the resolved custom banks.
+    await page.getByRole("button", { name: /^Generate/ }).click();
+    const cards = page.locator("[data-prompt-card]");
+    await expect(cards.first()).toBeVisible({ timeout: 20_000 });
+
+    // The custom subject must surface in the real generated output.
+    await expect(
+      cards.filter({ hasText: SUBJECT }).first(),
+    ).toBeVisible({ timeout: 20_000 });
+  });
+
   test("home page has no severe console errors", async ({ page }) => {
     // Known pre-existing issues (2026-07-05), filtered so this test only
     // catches NEW severe errors. Remove entries as the underlying bugs get fixed:

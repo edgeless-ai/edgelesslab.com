@@ -38,12 +38,14 @@ import {
 import { banks } from "@/lib/prompt-engine/banks";
 import { roll, stripOperatorAnnotations } from "@/lib/prompt-engine/engine";
 import type {
+  Banks,
   DedupeResult,
   GeneratedPrompt,
   RollOptions,
   SaturatedBudget,
   SrefIndex,
 } from "@/lib/prompt-engine/types";
+import type { CustomBanks } from "@/lib/prompt-engine/custom-banks";
 import { buildSrefIndex } from "@/lib/prompt-engine/sref";
 import {
   checkBatch,
@@ -52,8 +54,18 @@ import {
   type PreparedCorpus,
 } from "@/lib/prompt-engine/dedupe";
 import { formatRoundBlock, nextRound } from "@/lib/prompt-engine/round";
+import {
+  CustomizeDrawer,
+  loadCustomBanks,
+  saveCustomBanks,
+  resolveBanks,
+  CUSTOM_BANKS_LS_KEY,
+} from "./customize";
 
-const { THEMES, INFLUENCE, PALETTE } = banks;
+// Default banks power the initial theme list + module-level helpers; inside the
+// component every axis read goes through the RESOLVED banks so custom taste
+// (added themes, influences, palettes, …) flows through the whole dashboard.
+const { THEMES } = banks;
 
 const THEME_INFO: Record<string, { label: string; blurb: string }> = {
   "nous-branded": {
@@ -145,7 +157,10 @@ const LS_KEY = "el-prompt-engine-history-v1";
 const HISTORY_MAX = 20;
 const DEFAULT_THEME = Object.keys(THEMES)[0] ?? "nous-branded";
 
-const defaultSettings = (theme: string): Settings => ({
+const defaultSettings = (
+  theme: string,
+  themesMap: Banks["THEMES"] = THEMES,
+): Settings => ({
   theme,
   recipe: "wide",
   count: 24,
@@ -153,7 +168,7 @@ const defaultSettings = (theme: string): Settings => ({
   srefPool: "default",
   coverage: true, // house default: coverage-guaranteed picking ON
   texture: true,
-  markStyle: THEMES[theme]?.markStyle ?? "wordmark",
+  markStyle: themesMap[theme]?.markStyle ?? "wordmark",
   lockInfluence: null,
   lockPalette: null,
   girl: "off",
@@ -292,6 +307,19 @@ export function PromptEngineClient() {
   const [copiedRound, setCopiedRound] = useState<number | null>(null);
   const [influenceQuery, setInfluenceQuery] = useState("");
 
+  // Bring-Your-Own-Taste: the active custom banks (autosaved to localStorage).
+  // resolveBanks merges them onto the frozen defaults; the resolved object is
+  // the single source every axis read + the roll() call below goes through.
+  const [customBanks, setCustomBanks] = useState<CustomBanks>({});
+  const resolved = useMemo<Banks>(
+    () => resolveBanks(banks, customBanks),
+    [customBanks],
+  );
+  const RESOLVED_THEMES = resolved.THEMES;
+  // First render restores from localStorage; skip the autosave that would
+  // otherwise fire on that restore (and clobber storage with {} pre-restore).
+  const customLoadedRef = useRef(false);
+
   const corpusRef = useRef<Corpus | null>(null);
   const [corpus, setCorpus] = useState<Corpus | null>(null);
   /** Stripped/prepared static corpus, computed once per fetched snapshot. */
@@ -301,7 +329,7 @@ export function PromptEngineClient() {
   const srefIndexRef = useRef<SrefIndex | null>(null);
   const [srefReady, setSrefReady] = useState(false);
 
-  const theme = THEMES[settings.theme];
+  const theme = RESOLVED_THEMES[settings.theme];
   const isBranded = theme?.markStyle === "wordmark";
   const needsSrefs = theme?.srefMode != null;
   // Roll-wide burns one derived seed per recipe slice (seed..seed+span-1);
@@ -368,6 +396,39 @@ export function PromptEngineClient() {
       cancelled = true;
     };
   }, [loadCorpus]);
+
+  // Restore the active custom banks once, post-mount (localStorage is
+  // client-only; a parse failure degrades to defaults with a notice). State is
+  // set off a microtask so it is never applied synchronously in the effect body.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      await Promise.resolve();
+      if (cancelled) return;
+      const cb = loadCustomBanks();
+      if (cb) setCustomBanks(cb);
+      else if (window.localStorage.getItem(CUSTOM_BANKS_LS_KEY)) {
+        setStorageNotice("Saved taste pack could not be read — starting from defaults.");
+      }
+      customLoadedRef.current = true;
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Autosave the active custom banks. Skipped until the restore has run so we
+  // never overwrite a stored pack with the pre-restore empty object.
+  useEffect(() => {
+    if (!customLoadedRef.current) return;
+    if (!saveCustomBanks(customBanks)) {
+      void Promise.resolve().then(() =>
+        setStorageNotice(
+          "Could not save custom banks (quota?) — your taste is session-only until you export it.",
+        ),
+      );
+    }
+  }, [customBanks]);
 
   // Round-export ledger, derived from persisted history (NOT session state —
   // it must survive reloads, see HistoryEntry.exportedRound). exported = the
@@ -453,7 +514,15 @@ export function PromptEngineClient() {
     setSrefNotice(null);
     setDedupeNotice(null);
     try {
-      const th = THEMES[settings.theme];
+      const th = RESOLVED_THEMES[settings.theme];
+      if (!th) {
+        // The selected theme vanished (e.g. a custom theme deleted from the
+        // Customize drawer while it was active). Fail soft, don't crash.
+        setGenError(
+          `Theme "${settings.theme}" is no longer defined — pick a theme above.`,
+        );
+        return;
+      }
       const recipes =
         settings.recipe === "wide" ? th.recipes : [settings.recipe];
 
@@ -501,6 +570,7 @@ export function PromptEngineClient() {
           : null;
       const rolled: GeneratedPrompt[] = [];
       const used: number[] = [];
+      const recipeErrors: string[] = [];
       recipes.forEach((recipe, i) => {
         const n = per + (i < extra ? 1 : 0);
         if (n <= 0) return;
@@ -530,8 +600,26 @@ export function PromptEngineClient() {
             settings.girl === "on" ? normalizeGirlRate(settings.girlRate) : 0,
           ...(th.srefMode != null ? { srefIndex } : {}),
         };
-        rolled.push(...roll(opts));
+        // Pass the RESOLVED custom banks so real batches roll with the user's
+        // taste (added entries surface, disabled ones vanish). Absent custom
+        // config, resolveBanks returns the defaults untouched — byte-identical
+        // to the pre-BYO path.
+        // Degrade per recipe: if the user emptied an axis this recipe needs,
+        // the engine throws a clear message — collect it, keep the recipes
+        // that CAN roll (roll-wide should not die because one lane is starved).
+        try {
+          rolled.push(...roll(opts, resolved));
+        } catch (err) {
+          recipeErrors.push(err instanceof Error ? err.message : String(err));
+        }
       });
+      if (recipeErrors.length > 0) {
+        setGenError(
+          rolled.length === 0
+            ? recipeErrors[0]
+            : `Some recipes were skipped: ${[...new Set(recipeErrors)].join(" · ")}`,
+        );
+      }
 
       const c = await loadCorpus();
       let results: DedupeResult[];
@@ -657,6 +745,8 @@ export function PromptEngineClient() {
     loadCorpus,
     loadSrefIndex,
     persistHistory,
+    resolved,
+    RESOLVED_THEMES,
   ]);
 
   /* ------------------------- derived ------------------------------- */
@@ -702,7 +792,7 @@ export function PromptEngineClient() {
     const th = settings.theme;
     const recipeDesc =
       settings.recipe === "wide"
-        ? `roll-wide across ${THEMES[th].recipes.join("/")}`
+        ? `roll-wide across ${RESOLVED_THEMES[th].recipes.join("/")}`
         : `recipe=${settings.recipe}`;
     const bits = [
       `dashboard roll — theme=${th}`,
@@ -760,6 +850,7 @@ export function PromptEngineClient() {
     maxExportedRound,
     sessionBurned,
     persistHistory,
+    RESOLVED_THEMES,
   ]);
 
   const restoreEntry = useCallback((entry: HistoryEntry) => {
@@ -814,21 +905,24 @@ export function PromptEngineClient() {
     [history, persistHistory],
   );
 
-  const setTheme = useCallback((key: string) => {
-    setSettings((prev) => ({
-      ...defaultSettings(key),
-      // keep batch-shape prefs across theme switches
-      count: prev.count,
-      maxSaturatedShare: prev.maxSaturatedShare,
-      texture: prev.texture,
-    }));
-    setInfluenceQuery("");
-  }, []);
+  const setTheme = useCallback(
+    (key: string) => {
+      setSettings((prev) => ({
+        ...defaultSettings(key, RESOLVED_THEMES),
+        // keep batch-shape prefs across theme switches
+        count: prev.count,
+        maxSaturatedShare: prev.maxSaturatedShare,
+        texture: prev.texture,
+      }));
+      setInfluenceQuery("");
+    },
+    [RESOLVED_THEMES],
+  );
 
   const influenceMatches = useMemo(() => {
     const q = influenceQuery.trim().toLowerCase();
     if (!q) return [];
-    return Object.entries(INFLUENCE)
+    return Object.entries(resolved.INFLUENCE)
       .filter(
         ([key, v]) =>
           key.includes(q) ||
@@ -836,12 +930,21 @@ export function PromptEngineClient() {
           v.domain.toLowerCase().includes(q),
       )
       .slice(0, 8);
-  }, [influenceQuery]);
+  }, [influenceQuery, resolved]);
 
   /* ------------------------- render -------------------------------- */
 
   return (
     <div>
+      {/* ======================= Customize (BYO taste) =============== */}
+      <CustomizeDrawer
+        customBanks={customBanks}
+        setCustomBanks={setCustomBanks}
+        resolved={resolved}
+        theme={settings.theme}
+        recipe={settings.recipe}
+      />
+
       {/* ============================ Controls ======================== */}
       <section
         className="rounded-xl border p-5 sm:p-6 mb-8"
@@ -853,7 +956,7 @@ export function PromptEngineClient() {
         {/* Theme cards */}
         <FieldLabel>Theme</FieldLabel>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-          {Object.keys(THEMES).map((key) => {
+          {Object.keys(RESOLVED_THEMES).map((key) => {
             const active = settings.theme === key;
             return (
               <button
@@ -877,7 +980,7 @@ export function PromptEngineClient() {
                   className="text-xs"
                   style={{ color: "var(--text-tertiary)", lineHeight: 1.45 }}
                 >
-                  {THEME_INFO[key]?.blurb ?? `${THEMES[key].recipes.length} recipes`}
+                  {THEME_INFO[key]?.blurb ?? `${RESOLVED_THEMES[key].recipes.length} recipes — custom`}
                 </div>
               </button>
             );
@@ -1139,7 +1242,7 @@ export function PromptEngineClient() {
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono"
                   style={{ background: "var(--accent-muted)", color: "var(--accent)" }}
                 >
-                  {INFLUENCE[settings.lockInfluence]?.name ?? settings.lockInfluence}
+                  {resolved.INFLUENCE[settings.lockInfluence]?.name ?? settings.lockInfluence}
                   <button
                     type="button"
                     aria-label="Clear influence lock"
@@ -1156,7 +1259,7 @@ export function PromptEngineClient() {
                     type="text"
                     value={influenceQuery}
                     onChange={(e) => setInfluenceQuery(e.target.value)}
-                    placeholder="search 97 influences…"
+                    placeholder={`search ${Object.keys(resolved.INFLUENCE).length} influences…`}
                     className="w-full rounded-md border px-2.5 py-1.5 text-sm"
                     style={{
                       background: "var(--bg-surface)",
@@ -1207,7 +1310,7 @@ export function PromptEngineClient() {
                 }}
               >
                 <option value="">— any —</option>
-                {PALETTE.map((p) => (
+                {resolved.PALETTE.map((p) => (
                   <option key={p.text} value={p.text}>
                     [{p.category}] {p.text}
                   </option>

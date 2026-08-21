@@ -12,6 +12,7 @@ import { wrapIndex } from "./coverage";
 import { Rng } from "./rng";
 import { srefUrlsForArtist } from "./sref";
 import type {
+  Banks,
   GeneratedPrompt,
   PromptMeta,
   RollOptions,
@@ -45,12 +46,13 @@ function pickSubject(
   subjects: TaggedSubject[],
   lex: string | undefined,
   avoidFigures: boolean,
+  bnk: Banks,
 ): string {
-  const theme = lex !== undefined ? banks.LEX_THEME[lex] : undefined;
+  const theme = lex !== undefined ? bnk.LEX_THEME[lex] : undefined;
   const prefer = new Set(theme?.resonates ?? []);
   const avoid = new Set(theme?.contradicts ?? []);
   if (avoidFigures) {
-    for (const t of banks.GIRL.badTags) avoid.add(t);
+    for (const t of bnk.GIRL.badTags) avoid.add(t);
   }
   const pool: string[] = [];
   for (const { text, tags } of subjects) {
@@ -80,8 +82,19 @@ function isTagged(bank: TaggedSubject[] | string[]): bank is TaggedSubject[] {
   return bank.length > 0 && typeof bank[0] === "object";
 }
 
-/** Port of blender.py roll(). Returns up to opts.n generated prompts. */
-export function roll(opts: RollOptions): GeneratedPrompt[] {
+/**
+ * Port of blender.py roll(). Returns up to opts.n generated prompts.
+ *
+ * `banksOverride` lets a caller supply a resolved (Bring-Your-Own-Taste) Banks
+ * — see resolveBanks in custom-banks.ts. When it is undefined the engine reads
+ * the module `banks` and behaves BYTE-IDENTICALLY to the default path (Python
+ * parity + golden fixtures unaffected).
+ */
+export function roll(opts: RollOptions, banksOverride?: Banks): GeneratedPrompt[] {
+  const B = banksOverride ?? banks;
+  // Recompute the brand matcher from the ACTIVE banks (module-level brandWordRe
+  // export is unchanged for default callers).
+  const brandRe = new RegExp(B.BRAND_WORD_RE, "iu");
   const { recipe, n, seed } = opts;
   const lock = opts.lock ?? {};
   const girlRate = opts.girlRate ?? 0;
@@ -104,16 +117,16 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
   const coverageSeed = opts.coverageSeed ?? seed;
 
   const rng = new Rng(seed);
-  const recipeDef = banks.RECIPES[recipe];
+  const recipeDef = B.RECIPES[recipe];
   if (!recipeDef) throw new Error(`unknown recipe ${JSON.stringify(recipe)}`);
   const { axes, tmplBranded, tmplUnbranded, arSource } = recipeDef;
 
   // Theme defaults; explicit options override (same precedence as the CLI).
-  const th: Partial<ThemeDef> = (opts.theme && banks.THEMES[opts.theme]) || {};
+  const th: Partial<ThemeDef> = (opts.theme && B.THEMES[opts.theme]) || {};
   const lexicon: string[] | null =
-    th.lexicon === undefined ? banks.LEXICON : th.lexicon === "LEXICON" ? banks.LEXICON : null;
+    th.lexicon === undefined ? B.LEXICON : th.lexicon === "LEXICON" ? B.LEXICON : null;
   let subjectsBank: TaggedSubject[] | string[] =
-    th.subjects === "SUBJECTS_LARGE" ? banks.SUBJECTS_LARGE : banks.SUBJECTS;
+    th.subjects === "SUBJECTS_LARGE" ? B.SUBJECTS_LARGE : B.SUBJECTS;
   const domain = opts.domain || th.influenceDomain || null;
   const domainAny = th.influenceDomainsAny ? new Set(th.influenceDomainsAny) : null;
   const srefMode = opts.srefMode !== undefined ? opts.srefMode : th.srefMode ?? null;
@@ -129,8 +142,8 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
     // the subject text itself (word-boundary match, NOT substring -- see
     // brandWordRe above).
     subjectsBank = subjectsTagged
-      ? (subjectsBank as TaggedSubject[]).filter((s) => !brandWordRe.test(s.text))
-      : (subjectsBank as string[]).filter((s) => !brandWordRe.test(s));
+      ? (subjectsBank as TaggedSubject[]).filter((s) => !brandRe.test(s.text))
+      : (subjectsBank as string[]).filter((s) => !brandRe.test(s));
   }
   let tmpl: string;
   if (branded) {
@@ -144,14 +157,64 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
   }
   const rollAxes = axes.filter((a) => branded || a !== "lexicon");
 
-  const infKeys = Object.keys(banks.INFLUENCE).filter((k) => {
-    const v = banks.INFLUENCE[k];
+  const infKeys = Object.keys(B.INFLUENCE).filter((k) => {
+    const v = B.INFLUENCE[k];
     if (domain && v.domain !== domain) return false;
     if (domainAny && !domainAny.has(v.domain)) return false;
     return true;
   });
 
-  const paletteByText = new Map(banks.PALETTE.map((p) => [p.text, p.category]));
+  // Empty-pool preflight (Bring-Your-Own-Taste): a user can empty any axis in
+  // the Customize drawer (Replace with no entries, or disable every default).
+  // Without this, the roll loop would hit rng.choice([]) -> undefined and throw
+  // a cryptic TypeError (or a NaN->BigInt error on the coverage subject path).
+  // Per the "helpers, not guardrails" contract we do NOT stop the user editing;
+  // instead we throw ONE clear, actionable message naming the empty axis so the
+  // UI (which catches per recipe) can degrade gracefully and tell the user how
+  // to fix it, while other recipes in a roll-wide batch still produce. Locked
+  // axes whose entry was deleted are reported the same way.
+  const emptyAxes: string[] = [];
+  for (const ax of rollAxes) {
+    if (ax === "influence") {
+      if (lock.influence) {
+        const bad = lock.influence.split("+").filter((k) => !B.INFLUENCE[k]);
+        if (bad.length) emptyAxes.push(`Influence (locked "${bad.join(", ")}" no longer exists)`);
+      } else if (infKeys.length === 0) {
+        emptyAxes.push(domain || domainAny ? "Influence (none in the chosen domain)" : "Influence");
+      }
+    } else if (ax === "subject") {
+      if (!lock.subject && subjectsBank.length === 0) emptyAxes.push("Subject");
+    } else if (ax === "mode") {
+      if (lock.mode !== undefined) {
+        if (!B.MODE[parseInt(lock.mode, 10)]) emptyAxes.push("Capture mode (locked index out of range)");
+      } else if (B.MODE.length === 0) emptyAxes.push("Capture mode");
+    } else if (ax === "format") {
+      if (B.FORMAT.length === 0) emptyAxes.push("Format");
+    } else if (ax === "palette") {
+      if (!lock.palette && B.PALETTE.length === 0) emptyAxes.push("Palette");
+    } else if (ax === "modifier") {
+      if (B.MODIFIERS.length === 0) emptyAxes.push("Modifier");
+    } else if (ax === "process") {
+      if (B.PROCESS.length === 0) emptyAxes.push("Process");
+    } else if (ax === "layout") {
+      if (B.LAYOUT.length === 0) emptyAxes.push("Layout");
+    }
+  }
+  if (rollAxes.includes("lexicon") && !lock.lexicon && (lexicon as string[]).length === 0) {
+    emptyAxes.push("Lexicon / wordmark");
+  }
+  if (arSource === "any" && !lock.ar && B.AR_ANY.length === 0) emptyAxes.push("Aspect ratio");
+  if (branded && tmplBranded.includes("{mark}") && !quiet && markStyle === "sentence" && B.BRAND_TAGS.length === 0) {
+    emptyAxes.push("Brand tags");
+  }
+  if (emptyAxes.length > 0) {
+    throw new Error(
+      `Recipe "${recipe}" can't roll — these axes are empty: ${emptyAxes.join(", ")}. ` +
+        `Add entries or re-enable some defaults in Customize.`,
+    );
+  }
+
+  const paletteByText = new Map(B.PALETTE.map((p) => [p.text, p.category]));
   // Two restraint shapes: maxSaturatedShare is the per-roll share cap
   // (blender.py-shaped, share * n for THIS roll); saturatedBudget is a
   // mutable ledger shared across the slices of one roll-wide batch — the
@@ -173,7 +236,7 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
     const vals: Record<string, string> = {};
     let ar = arSource;
     const girlSlot = girlRate > 0 && gidx % girlRate === 0;
-    if (arSource === "any") ar = lock.ar || rng.choice(banks.AR_ANY);
+    if (arSource === "any") ar = lock.ar || rng.choice(B.AR_ANY);
     if (rollAxes.includes("lexicon")) {
       vals.lexicon = lock.lexicon || rng.choice(lexicon as string[]);
     }
@@ -183,8 +246,8 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
         if (lk && lk.includes("+")) {
           // blend two influences: hilma+fisk
           const ks = lk.split("+");
-          vals.inf_name = ks.map((k) => banks.INFLUENCE[k].name).join(" x ");
-          vals.influence = ks.map((k) => banks.INFLUENCE[k].move).join("; ");
+          vals.inf_name = ks.map((k) => B.INFLUENCE[k].name).join(" x ");
+          vals.influence = ks.map((k) => B.INFLUENCE[k].move).join("; ");
           vals._inf = lk;
         } else {
           let k: string;
@@ -195,24 +258,24 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
           } else {
             k = rng.choice(infKeys);
           }
-          vals.influence = banks.INFLUENCE[k].move;
+          vals.influence = B.INFLUENCE[k].move;
           vals._inf = k;
-          vals.inf_name = banks.INFLUENCE[k].name;
+          vals.inf_name = B.INFLUENCE[k].name;
         }
       } else if (ax === "mode") {
-        const m = lock.mode !== undefined ? banks.MODE[parseInt(lock.mode, 10)] : rng.choice(banks.MODE);
+        const m = lock.mode !== undefined ? B.MODE[parseInt(lock.mode, 10)] : rng.choice(B.MODE);
         vals.mode = m.phrase;
         vals.mode_look = m.look;
         if (arSource === "mode") ar = m.ar;
       } else if (ax === "format") {
-        const f = rng.choice(banks.FORMAT);
+        const f = rng.choice(B.FORMAT);
         vals.format = f.phrase;
         if (arSource === "format") ar = f.ar;
       } else if (ax === "subject") {
         if (lock.subject) {
           vals.subject = lock.subject;
         } else if (subjectsTagged) {
-          vals.subject = pickSubject(rng, subjectsBank as TaggedSubject[], vals.lexicon, girlSlot);
+          vals.subject = pickSubject(rng, subjectsBank as TaggedSubject[], vals.lexicon, girlSlot, B);
         } else if (coverage) {
           vals.subject = (subjectsBank as string[])[
             wrapIndex(gidx, subjectsBank.length, coverageSeed + 200)
@@ -221,13 +284,13 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
           vals.subject = rng.choice(subjectsBank as string[]);
         }
       } else if (ax === "modifier") {
-        vals.modifier = rng.choice(banks.MODIFIERS);
+        vals.modifier = rng.choice(B.MODIFIERS);
       } else if (ax === "process") {
-        vals.process = rng.choice(banks.PROCESS);
+        vals.process = rng.choice(B.PROCESS);
       } else if (ax === "palette") {
-        vals.palette = lock.palette || rng.choice(banks.PALETTE).text;
+        vals.palette = lock.palette || rng.choice(B.PALETTE).text;
       } else if (ax === "layout") {
-        vals.layout = rng.choice(banks.LAYOUT);
+        vals.layout = rng.choice(B.LAYOUT);
       }
       // "lexicon" already rolled above
     }
@@ -242,7 +305,7 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
           "no text, purely visual",
         ]);
       } else if (markStyle === "sentence") {
-        vals.mark = rng.choice(banks.BRAND_TAGS);
+        vals.mark = rng.choice(B.BRAND_TAGS);
       } else {
         vals.mark = `wordmark "${lx}"`;
       }
@@ -272,10 +335,10 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
     }
 
     const girl = girlSlot; // every Nth prompt features her
-    let flags = girl ? banks.GIRL.flags : banks.FLAGS;
-    const tag = girl ? ` [GIRL/iw ${banks.GIRL.iw}]` : "";
+    let flags = girl ? B.GIRL.flags : B.FLAGS;
+    const tag = girl ? ` [GIRL/iw ${B.GIRL.iw}]` : "";
     let desc = fill(tmpl, vals);
-    if (opts.texture) desc += `, ${rng.choice(banks.TEXTURE)}`; // digital-vintage grit
+    if (opts.texture) desc += `, ${rng.choice(B.TEXTURE)}`; // digital-vintage grit
     // Museum sref: pull a real artwork by the rolled influence artist as --sref.
     let sref = "";
     const srefN = rng.choice(srefCountPool);
@@ -294,7 +357,7 @@ export function roll(opts: RollOptions): GeneratedPrompt[] {
     if (sref) flags = `${flags} ${sref}`;
     if (girl) {
       // Bare image prompt: the ref URL must LEAD the prompt, unflagged.
-      desc = `${banks.GIRL.ref} ${desc}`;
+      desc = `${B.GIRL.ref} ${desc}`;
     }
     const meta: PromptMeta = {
       index: idx,

@@ -369,6 +369,9 @@ function WeightStepper({
         className="min-w-[26px] text-center text-[11px] font-mono tabular-nums"
         style={{ color: active ? "var(--accent)" : "var(--text-tertiary)" }}
         title={active ? `${v}× more likely in random rolls` : "default weight"}
+        aria-live="polite"
+        aria-atomic="true"
+        aria-label={active ? `weight ${v} times` : "default weight (1 times)"}
       >
         {v}×
       </span>

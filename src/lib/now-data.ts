@@ -56,13 +56,15 @@ type RawWork = {
 // empty data into the static HTML. Reading from disk relative to `process.cwd()`
 // inlines the real values at build; a missing file falls back to null (same
 // graceful behavior as the previous `res.ok ? … : null`).
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function readDataFile(name: string): Promise<any> {
+// Boundary-typed JSON read: the caller declares the expected shape; the single
+// `as T` sits at the JSON.parse boundary where the shape of external data is
+// asserted (not an `any` escape hatch — callers below stay fully type-checked).
+async function readDataFile<T>(name: string): Promise<T | null> {
   try {
     const fs = await import('node:fs/promises');
     const path = await import('node:path');
     const filePath = path.join(process.cwd(), 'public', 'data', name);
-    return JSON.parse(await fs.readFile(filePath, 'utf-8'));
+    return JSON.parse(await fs.readFile(filePath, 'utf-8')) as T;
   } catch {
     return null;
   }
@@ -71,8 +73,12 @@ async function readDataFile(name: string): Promise<any> {
 export async function getNowData(): Promise<NowData> {
   try {
     const [shipLog, wall] = await Promise.all([
-      readDataFile('ship_log.json'),
-      readDataFile('content_wall.json'),
+      readDataFile<{ ships?: RawShip[] }>('ship_log.json'),
+      readDataFile<{
+        recent_work?: RawWork[];
+        summary?: Partial<NowData['summary']>;
+        metrics?: { health_score?: number };
+      }>('content_wall.json'),
     ]);
 
     const ships: Ship[] = (shipLog?.ships || []).slice(0, 10).map((s: RawShip) => ({

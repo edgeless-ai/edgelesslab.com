@@ -496,6 +496,16 @@ function AxisEditor({
               edited
             </span>
           )}
+          {weightCount > 0 && (
+            <span
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-mono rounded"
+              style={{ background: "var(--accent-muted)", color: "var(--accent)" }}
+              title={`${weightCount} entr${weightCount === 1 ? "y" : "ies"} weighted on this axis`}
+            >
+              <Scale size={9} />
+              {weightCount} weighted
+            </span>
+          )}
         </span>
         <span className="text-[11px] font-mono tabular-nums shrink-0" style={{ color: "var(--text-tertiary)" }}>
           {count} live
@@ -510,19 +520,31 @@ function AxisEditor({
               onChange={(v) => onChange({ ...override, replace: v })}
               label="Replace (use only my entries, ignore defaults)"
             />
-            {editedBadge && (
-              <button
-                type="button"
-                onClick={() => {
-                  onChange({});
-                  onClearWeights();
-                }}
-                className="inline-flex items-center gap-1 text-[11px] font-mono"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                <RotateCcw size={11} /> reset axis
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {weightCount > 0 && (
+                <button
+                  type="button"
+                  onClick={onClearWeights}
+                  className="inline-flex items-center gap-1 text-[11px] font-mono"
+                  style={{ color: "var(--text-tertiary)" }}
+                >
+                  <Scale size={11} /> clear weights
+                </button>
+              )}
+              {editedBadge && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange({});
+                    onClearWeights();
+                  }}
+                  className="inline-flex items-center gap-1 text-[11px] font-mono"
+                  style={{ color: "var(--text-tertiary)" }}
+                >
+                  <RotateCcw size={11} /> reset axis
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Add form */}

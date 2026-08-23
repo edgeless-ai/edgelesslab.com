@@ -57,7 +57,60 @@ A "Customize" drawer (collapsible, discoverable, not hidden behind a dev flag):
 - UI: smoke extension — open Customize, add a subject, generate, see it appear;
   export produces valid JSON; import round-trips.
 
-## Non-goals (v1)
-- Per-entry weighting (needs `weight` field through the Python exporter → v2).
-- Community taste-pack gallery / backend sharing (client-side files first → v2).
+## v2 — Per-entry weighting (shipped 2026-08-23)
+
+Users can make any entry more likely in a RANDOM roll. Shipped as a **sidecar
+weight map**, NOT a `weight` field baked into each bank entry, so there was no
+data-shape change, no Python change, and the golden parity fixtures stayed
+byte-identical.
+
+### Taste-pack JSON schema
+Add an optional top-level `weights` object to a taste pack:
+
+```json
+{
+  "weights": {
+    "INFLUENCE":       { "hilma": 3, "fisk": 2 },
+    "SUBJECTS_LARGE":  { "a spiral staircase seen from directly below": 5 },
+    "PALETTE":         { "ink black on cream": 4 }
+  }
+}
+```
+
+- Shape: `axis -> (entry identity string -> number)`. The identity string is the
+  SAME key `disable` uses: entry text for SUBJECTS / SUBJECTS_LARGE / PALETTE,
+  `phrase` for MODE / FORMAT, the influence KEY for INFLUENCE, the string itself
+  for plain string axes (MODIFIERS, LEXICON, LAYOUT, TEXTURE, PROCESS, BRAND_TAGS).
+- A weight > 1 makes an entry proportionally more likely; a missing / non-positive
+  / non-finite weight is treated as 1. To make something rare, raise the others;
+  to remove it, use `disable`.
+- Weights are capped at 1e6 on import (guards a hand-crafted pack from overflowing
+  the cumulative sum). The UI stepper emits whole numbers 1..99; imported JSON may
+  use fractional weights.
+
+### Semantics + guarantees
+- **Parity:** a cumulative weighted pick with all weights equal returns
+  `rng.choice`'s exact index on the same single RNG draw, so the default
+  (no-weights) path is untouched and weighting never perturbs another axis's stream.
+- **Coverage wins:** on a coverage-guaranteed theme the covered axes (Influences,
+  Subjects) are picked by the even wrap permutation, so weights on them are IGNORED
+  (the drawer shows an inline note when the selected theme is coverage-guaranteed).
+- **Composes with resonance:** on the tagged SUBJECTS bank a user weight multiplies
+  the resonance boost, i.e. effective weight = `(1 + 3*boost) * userWeight`.
+
+### Engine + UI wiring
+- `types.ts`: `WeightMap = Partial<Record<WeightableAxis, Record<string, number>>>`;
+  optional `Banks.WEIGHTS`.
+- `custom-banks.ts`: `CustomBanks.weights` passed through `resolveBanks` to
+  `Banks.WEIGHTS`; `validateTastePack` validates it (structural = error, degenerate
+  = warning).
+- `engine.ts`: one-draw `weightedPick` / `weightedPickBy` at each random axis;
+  `posWeight` clamps junk to 1 and caps at 1e6.
+- UI: a −N×+ stepper on every default + added entry, an "N weighted" badge and a
+  "clear weights" control per axis, weights round-tripped through the taste pack +
+  localStorage.
+
+## Non-goals
+- Community taste-pack gallery / backend sharing (client-side files first; the one
+  feature that would genuinely need a backend).
 - No change to the Python source of truth or the golden parity fixtures.

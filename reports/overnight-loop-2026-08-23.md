@@ -46,3 +46,14 @@ verifies live. This removes the shared-checkout dependency that stopped the firs
 - 2026-08-23 23:2x — iter3: theme-aware coverage/weights note in Customize drawer + em-dash fix (30b4cc6f8). Gate green, CI green, live-verified.
 - 2026-08-24 00:0x — iter4: documented weighting v2 in BYO-TASTE-SPEC (schema+semantics). Docs-only; committed to lane (no standalone deploy; rides next code push). Tree green.
 - 2026-08-24 00:2x — iter5: a11y — weight-stepper value announced to screen readers (aria-live) (0ba72032b). Carried the 3 staged docs commits. Gate green, CI green, live-verified.
+- 2026-08-24 00:3x — iter6: STOPPED the loop (disciplined). 5 substantive improvements shipped + live-verified; remaining backlog is subjective (curated preset taste = a taste statement for David to shape; Lab copy; more a11y = reaching). Chose not to pad production with unattended subjective changes.
+
+## MORNING SUMMARY (2026-08-24)
+Overnight loop delivered 5 verified, live-deployed improvements to the MJ prompt engine, each gated (vitest 103 / tsc / eslint / build / 7 playwright), CI-green, and live-verified on edgelesslab.com:
+1. Per-entry weighting (BYO-taste v2) — sidecar weight map, byte-identical golden fixtures, adversarial-reviewed (4 findings fixed). Deployed after rebasing onto the ox-audit PR #18 merge.
+2. Per-axis "N weighted" badge + dedicated "clear weights" control.
+3. Theme-aware coverage/weights note in the Customize drawer.
+4. BYO-TASTE-SPEC weighting docs (schema + semantics for taste-pack authors).
+5. Weight-stepper screen-reader announcements (aria-live).
+Production main = 0ba72032b. Lane `site/prompt-engine-weighting` has 1 undeployed docs-only commit (this log). Loop stopped rather than pad with subjective changes.
+Not done (David's taste input): a curated preset taste pack showcasing weighting; community taste-pack gallery (needs a backend). To re-arm the loop, it lives in this worktree with node_modules ready.

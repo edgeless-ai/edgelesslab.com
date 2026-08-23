@@ -43,3 +43,4 @@ verifies live. This removes the shared-checkout dependency that stopped the firs
 - 2026-08-23 22:3x — weighting feature built + adversarial-reviewed (4 fixes). Loop v1 STOPPED on shared-checkout branch entanglement.
 - 2026-08-23 22:5x — RESOLVED: cherry-picked/rebased weighting onto canonical/main (after ox-audit PR #18 merged), DEPLOYED to production (main eb430dba3), CI green, live-verified (weighting marker served from prod). Loop RE-ARMED in dedicated worktree with auto-deploy.
 - 2026-08-23 23:1x — iter2: per-axis 'N weighted' badge + dedicated 'clear weights' control (519638177). Gate green, CI green, live-verified.
+- 2026-08-23 23:2x — iter3: theme-aware coverage/weights note in Customize drawer + em-dash fix (30b4cc6f8). Gate green, CI green, live-verified.

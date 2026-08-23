@@ -20,6 +20,59 @@ import type {
   ThemeDef,
 } from "./types";
 
+const OWN = Object.prototype.hasOwnProperty;
+
+/**
+ * A usable multiplicity: positive finite number, else 1 (missing/junk => 1).
+ * Capped at 1e6 so a hand-crafted taste pack can't overflow the cumulative sum
+ * to Infinity (which would silently bias every pick to the last entry). The UI
+ * only ever emits 1..99; this guards the imported-JSON path.
+ */
+function posWeight(w: unknown): number {
+  return typeof w === "number" && Number.isFinite(w) && w > 0 ? Math.min(w, 1e6) : 1;
+}
+
+/**
+ * Weighted pick that consumes EXACTLY ONE rng draw — same as rng.choice — so it
+ * never shifts the RNG stream for later axes. Cumulative walk: with all weights
+ * equal it returns rng.choice's index bit-for-bit (floor(next()*n) lands in the
+ * same block the cumulative threshold selects), so a uniform weightOf is
+ * byte-identical to the uniform pick it replaces. `total <= 0` can't happen for
+ * a non-empty list (posWeight >= 1) but is guarded for safety.
+ */
+function weightedPickBy<T>(rng: Rng, items: T[], weightOf: (t: T) => number): T {
+  let total = 0;
+  for (const it of items) total += weightOf(it);
+  if (!(total > 0)) return rng.choice(items);
+  const r = rng.next() * total;
+  let acc = 0;
+  for (const it of items) {
+    acc += weightOf(it);
+    if (r < acc) return it;
+  }
+  return items[items.length - 1]; // float-rounding guard
+}
+
+/**
+ * Pick from `items` honoring an optional weight map keyed by each item's
+ * identity string. When `wmap` is undefined the call is LITERALLY rng.choice
+ * (the default no-weights path stays untouched); when present it routes through
+ * weightedPickBy (still one draw, byte-identical where the user left weights at
+ * the default). Prototype-safe: only own keys are read.
+ */
+function weightedPick<T>(
+  rng: Rng,
+  items: T[],
+  idOf: (t: T) => string,
+  wmap?: Record<string, number>,
+): T {
+  if (!wmap) return rng.choice(items);
+  return weightedPickBy(rng, items, (it) => {
+    const id = idOf(it);
+    return posWeight(OWN.call(wmap, id) ? wmap[id] : 1);
+  });
+}
+
 /**
  * Strip trailing operator-only annotations from a generated prompt so it can
  * be pasted into the MidJourney imagine bar. blender.py appends
@@ -40,13 +93,23 @@ export function stripOperatorAnnotations(text: string): string {
  */
 export const brandWordRe = new RegExp(banks.BRAND_WORD_RE, "iu");
 
-/** blender.py pick_subject: resonance-weighted choice from the TAGGED bank. */
+/**
+ * blender.py pick_subject: resonance-weighted choice from the TAGGED bank.
+ *
+ * `wmap` (optional per-entry user weights, keyed by subject text) COMPOSES with
+ * the resonance boost: an entry's effective weight is (1 + 3*boost) * userWeight.
+ * When wmap is undefined the exact original pool-of-copies + rng.choice runs
+ * (byte-identical); with a uniform wmap the composed weighted pick is
+ * byte-identical too (integer resonance multiplicities are what rng.choice's
+ * pool already encoded).
+ */
 function pickSubject(
   rng: Rng,
   subjects: TaggedSubject[],
   lex: string | undefined,
   avoidFigures: boolean,
   bnk: Banks,
+  wmap?: Record<string, number>,
 ): string {
   const theme = lex !== undefined ? bnk.LEX_THEME[lex] : undefined;
   const prefer = new Set(theme?.resonates ?? []);
@@ -54,14 +117,27 @@ function pickSubject(
   if (avoidFigures) {
     for (const t of bnk.GIRL.badTags) avoid.add(t);
   }
-  const pool: string[] = [];
-  for (const { text, tags } of subjects) {
-    if (tags.some((t) => avoid.has(t))) continue; // cathedral-vs-bazaar contradictions
-    const boost = tags.filter((t) => prefer.has(t)).length;
-    for (let i = 0; i < 1 + 3 * boost; i++) pool.push(text);
+  if (!wmap) {
+    // Original path, untouched.
+    const pool: string[] = [];
+    for (const { text, tags } of subjects) {
+      if (tags.some((t) => avoid.has(t))) continue; // cathedral-vs-bazaar contradictions
+      const boost = tags.filter((t) => prefer.has(t)).length;
+      for (let i = 0; i < 1 + 3 * boost; i++) pool.push(text);
+    }
+    if (pool.length > 0) return rng.choice(pool);
+    return rng.choice(subjects.map((s) => s.text));
   }
-  if (pool.length > 0) return rng.choice(pool);
-  return rng.choice(subjects.map((s) => s.text));
+  // Weighted: dedup to one candidate per subject, weight = resonance * user.
+  const cands: { text: string; w: number }[] = [];
+  for (const { text, tags } of subjects) {
+    if (tags.some((t) => avoid.has(t))) continue;
+    const boost = tags.filter((t) => prefer.has(t)).length;
+    const uw = posWeight(OWN.call(wmap, text) ? wmap[text] : 1);
+    cands.push({ text, w: (1 + 3 * boost) * uw });
+  }
+  if (cands.length > 0) return weightedPickBy(rng, cands, (c) => c.w).text;
+  return weightedPick(rng, subjects.map((s) => s.text), (s) => s, wmap);
 }
 
 /** blender.py _conflict: MODE-implied palettes clash with PROCESS palettes. */
@@ -95,6 +171,9 @@ export function roll(opts: RollOptions, banksOverride?: Banks): GeneratedPrompt[
   // Recompute the brand matcher from the ACTIVE banks (module-level brandWordRe
   // export is unchanged for default callers).
   const brandRe = new RegExp(B.BRAND_WORD_RE, "iu");
+  // Per-entry weights (Bring-Your-Own-Taste). undefined for every axis on the
+  // default path -> weightedPick falls straight through to rng.choice.
+  const W = B.WEIGHTS;
   const { recipe, n, seed } = opts;
   const lock = opts.lock ?? {};
   const girlRate = opts.girlRate ?? 0;
@@ -203,6 +282,7 @@ export function roll(opts: RollOptions, banksOverride?: Banks): GeneratedPrompt[
   if (rollAxes.includes("lexicon") && !lock.lexicon && (lexicon as string[]).length === 0) {
     emptyAxes.push("Lexicon / wordmark");
   }
+  if (opts.texture && B.TEXTURE.length === 0) emptyAxes.push("Texture");
   if (arSource === "any" && !lock.ar && B.AR_ANY.length === 0) emptyAxes.push("Aspect ratio");
   if (branded && tmplBranded.includes("{mark}") && !quiet && markStyle === "sentence" && B.BRAND_TAGS.length === 0) {
     emptyAxes.push("Brand tags");
@@ -238,7 +318,8 @@ export function roll(opts: RollOptions, banksOverride?: Banks): GeneratedPrompt[
     const girlSlot = girlRate > 0 && gidx % girlRate === 0;
     if (arSource === "any") ar = lock.ar || rng.choice(B.AR_ANY);
     if (rollAxes.includes("lexicon")) {
-      vals.lexicon = lock.lexicon || rng.choice(lexicon as string[]);
+      vals.lexicon =
+        lock.lexicon || weightedPick(rng, lexicon as string[], (s) => s, W?.LEXICON);
     }
     for (const ax of rollAxes) {
       if (ax === "influence") {
@@ -256,41 +337,61 @@ export function roll(opts: RollOptions, banksOverride?: Banks): GeneratedPrompt[
           } else if (coverage && infKeys.length > 0) {
             k = infKeys[wrapIndex(gidx, infKeys.length, coverageSeed + 100)];
           } else {
-            k = rng.choice(infKeys);
+            k = weightedPick(rng, infKeys, (x) => x, W?.INFLUENCE);
           }
           vals.influence = B.INFLUENCE[k].move;
           vals._inf = k;
           vals.inf_name = B.INFLUENCE[k].name;
         }
       } else if (ax === "mode") {
-        const m = lock.mode !== undefined ? B.MODE[parseInt(lock.mode, 10)] : rng.choice(B.MODE);
+        const m =
+          lock.mode !== undefined
+            ? B.MODE[parseInt(lock.mode, 10)]
+            : weightedPick(rng, B.MODE, (e) => e.phrase, W?.MODE);
         vals.mode = m.phrase;
         vals.mode_look = m.look;
         if (arSource === "mode") ar = m.ar;
       } else if (ax === "format") {
-        const f = rng.choice(B.FORMAT);
+        const f = weightedPick(rng, B.FORMAT, (e) => e.phrase, W?.FORMAT);
         vals.format = f.phrase;
         if (arSource === "format") ar = f.ar;
       } else if (ax === "subject") {
         if (lock.subject) {
           vals.subject = lock.subject;
         } else if (subjectsTagged) {
-          vals.subject = pickSubject(rng, subjectsBank as TaggedSubject[], vals.lexicon, girlSlot, B);
+          // Coverage wins on this axis: when the theme is coverage-guaranteed we
+          // do NOT apply user weights (pass undefined), honoring the documented
+          // invariant that a covered axis surfaces entries evenly. (Resonance
+          // boost still shapes tagged picks, as it always has.)
+          vals.subject = pickSubject(
+            rng,
+            subjectsBank as TaggedSubject[],
+            vals.lexicon,
+            girlSlot,
+            B,
+            coverage ? undefined : W?.SUBJECTS,
+          );
         } else if (coverage) {
           vals.subject = (subjectsBank as string[])[
             wrapIndex(gidx, subjectsBank.length, coverageSeed + 200)
           ];
         } else {
-          vals.subject = rng.choice(subjectsBank as string[]);
+          vals.subject = weightedPick(
+            rng,
+            subjectsBank as string[],
+            (s) => s,
+            W?.SUBJECTS_LARGE,
+          );
         }
       } else if (ax === "modifier") {
-        vals.modifier = rng.choice(B.MODIFIERS);
+        vals.modifier = weightedPick(rng, B.MODIFIERS, (s) => s, W?.MODIFIERS);
       } else if (ax === "process") {
-        vals.process = rng.choice(B.PROCESS);
+        vals.process = weightedPick(rng, B.PROCESS, (s) => s, W?.PROCESS);
       } else if (ax === "palette") {
-        vals.palette = lock.palette || rng.choice(B.PALETTE).text;
+        vals.palette =
+          lock.palette || weightedPick(rng, B.PALETTE, (e) => e.text, W?.PALETTE).text;
       } else if (ax === "layout") {
-        vals.layout = rng.choice(B.LAYOUT);
+        vals.layout = weightedPick(rng, B.LAYOUT, (s) => s, W?.LAYOUT);
       }
       // "lexicon" already rolled above
     }
@@ -305,7 +406,7 @@ export function roll(opts: RollOptions, banksOverride?: Banks): GeneratedPrompt[
           "no text, purely visual",
         ]);
       } else if (markStyle === "sentence") {
-        vals.mark = rng.choice(B.BRAND_TAGS);
+        vals.mark = weightedPick(rng, B.BRAND_TAGS, (s) => s, W?.BRAND_TAGS);
       } else {
         vals.mark = `wordmark "${lx}"`;
       }
@@ -338,7 +439,7 @@ export function roll(opts: RollOptions, banksOverride?: Banks): GeneratedPrompt[
     let flags = girl ? B.GIRL.flags : B.FLAGS;
     const tag = girl ? ` [GIRL/iw ${B.GIRL.iw}]` : "";
     let desc = fill(tmpl, vals);
-    if (opts.texture) desc += `, ${rng.choice(B.TEXTURE)}`; // digital-vintage grit
+    if (opts.texture) desc += `, ${weightedPick(rng, B.TEXTURE, (s) => s, W?.TEXTURE)}`; // digital-vintage grit
     // Museum sref: pull a real artwork by the rolled influence artist as --sref.
     let sref = "";
     const srefN = rng.choice(srefCountPool);

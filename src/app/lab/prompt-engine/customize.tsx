@@ -126,6 +126,44 @@ function setThemes(cb: CustomBanks, themes: CustomThemes): CustomBanks {
   return rec as unknown as CustomBanks;
 }
 
+/* ---- per-entry weights (top-level `weights` map, keyed by axis then id) ---- */
+
+type WeightsRec = Record<string, Record<string, number>>;
+
+function getWeights(cb: CustomBanks): WeightsRec {
+  const rec = cb as unknown as { weights?: WeightsRec };
+  return rec.weights ?? {};
+}
+
+function getAxisWeights(cb: CustomBanks, axis: AxisKey): Record<string, number> {
+  return getWeights(cb)[axis] ?? {};
+}
+
+/** Set one entry's weight (1 = default, dropped to keep the pack minimal). */
+function setEntryWeight(cb: CustomBanks, axis: AxisKey, id: string, weight: number): CustomBanks {
+  const all: WeightsRec = { ...getWeights(cb) };
+  const axisW = { ...(all[axis] ?? {}) };
+  if (weight === 1) delete axisW[id];
+  else axisW[id] = weight;
+  if (Object.keys(axisW).length === 0) delete all[axis];
+  else all[axis] = axisW;
+  const rec = { ...(cb as unknown as Record<string, unknown>) };
+  if (Object.keys(all).length === 0) delete rec.weights;
+  else rec.weights = all;
+  return rec as unknown as CustomBanks;
+}
+
+/** Drop every weight on one axis (used by "reset axis"). */
+function clearAxisWeights(cb: CustomBanks, axis: AxisKey): CustomBanks {
+  const all: WeightsRec = { ...getWeights(cb) };
+  if (!(axis in all)) return cb;
+  delete all[axis];
+  const rec = { ...(cb as unknown as Record<string, unknown>) };
+  if (Object.keys(all).length === 0) delete rec.weights;
+  else rec.weights = all;
+  return rec as unknown as CustomBanks;
+}
+
 /* ------------------------------------------------------------------ */
 /* Axis metadata                                                      */
 /* ------------------------------------------------------------------ */
@@ -144,6 +182,12 @@ interface AxisMeta {
   renderAddForm: (onAdd: (entry: unknown) => void) => ReactNode;
   /** Label for an entry sitting in the user's add collection. */
   addLabel: (entry: unknown) => string;
+  /**
+   * Identity string of an ARRAY-axis add entry — the SAME key the engine weights
+   * by (entry text / phrase / the string itself). Omitted for INFLUENCE, whose
+   * identity is the record key (already known at the call site).
+   */
+  idOf?: (entry: unknown) => string;
   /** INFLUENCE only: its `add` is a keyed record, not an array. */
   record?: boolean;
 }
@@ -290,6 +334,58 @@ function MiniSwitch({
   );
 }
 
+/**
+ * Compact − N× + stepper for per-entry weighting. Integer 1..99 (1 = default,
+ * i.e. no weight stored). The engine also accepts fractional weights from an
+ * imported taste pack; the UI keeps to whole multipliers for legibility.
+ */
+function WeightStepper({
+  value,
+  onChange,
+  label,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+  label: string;
+}) {
+  const v = value || 1;
+  const active = v !== 1;
+  const clamp = (x: number) => Math.max(1, Math.min(99, Math.round(x)));
+  const btn =
+    "w-5 h-5 inline-flex items-center justify-center rounded text-[13px] leading-none font-mono transition-colors disabled:opacity-30";
+  return (
+    <div className="inline-flex items-center gap-0.5 shrink-0" role="group" aria-label={`weight for ${label}`}>
+      <button
+        type="button"
+        aria-label={`decrease weight for ${label}`}
+        onClick={() => onChange(clamp(v - 1))}
+        disabled={v <= 1}
+        className={btn}
+        style={{ background: "var(--bg-elevated)", color: "var(--text-secondary)" }}
+      >
+        −
+      </button>
+      <span
+        className="min-w-[26px] text-center text-[11px] font-mono tabular-nums"
+        style={{ color: active ? "var(--accent)" : "var(--text-tertiary)" }}
+        title={active ? `${v}× more likely in random rolls` : "default weight"}
+      >
+        {v}×
+      </span>
+      <button
+        type="button"
+        aria-label={`increase weight for ${label}`}
+        onClick={() => onChange(clamp(v + 1))}
+        disabled={v >= 99}
+        className={btn}
+        style={{ background: "var(--bg-elevated)", color: "var(--text-secondary)" }}
+      >
+        +
+      </button>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Generic AxisEditor                                                 */
 /* ------------------------------------------------------------------ */
@@ -299,26 +395,38 @@ function AxisEditor({
   override,
   onChange,
   resolvedCount: count,
+  weights,
+  onWeight,
+  onClearWeights,
 }: {
   meta: AxisMeta;
   override: AxisOverride;
   onChange: (next: AxisOverride) => void;
   resolvedCount: number;
+  weights: Record<string, number>;
+  onWeight: (id: string, weight: number) => void;
+  onClearWeights: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const disable = override.disable ?? [];
   const replace = override.replace ?? false;
   const disabledSet = useMemo(() => new Set(override.disable ?? []), [override.disable]);
+  const weightCount = Object.keys(weights).length;
 
   // add is an array for every axis except INFLUENCE (a keyed record). Normalize
-  // to a list of { id, label } for display + removal regardless.
-  const addItems = useMemo<{ id: string; label: string }[]>(() => {
+  // to a list of { id, idKey, label }: `id` addresses the entry for removal,
+  // `idKey` is its ENGINE identity string (for weighting).
+  const addItems = useMemo<{ id: string; idKey: string; label: string }[]>(() => {
     if (meta.record) {
       const rec = (override.add as Record<string, unknown> | undefined) ?? {};
-      return Object.entries(rec).map(([k, v]) => ({ id: k, label: meta.addLabel(v) }));
+      return Object.entries(rec).map(([k, v]) => ({ id: k, idKey: k, label: meta.addLabel(v) }));
     }
     const arr = (override.add as unknown[] | undefined) ?? [];
-    return arr.map((e, i) => ({ id: String(i), label: meta.addLabel(e) }));
+    return arr.map((e, i) => ({
+      id: String(i),
+      idKey: meta.idOf ? meta.idOf(e) : meta.addLabel(e),
+      label: meta.addLabel(e),
+    }));
   }, [override.add, meta]);
   const addCount = addItems.length;
 
@@ -355,7 +463,7 @@ function AxisEditor({
     }
   };
 
-  const editedBadge = addCount > 0 || disable.length > 0 || replace;
+  const editedBadge = addCount > 0 || disable.length > 0 || replace || weightCount > 0;
 
   return (
     <div
@@ -405,7 +513,10 @@ function AxisEditor({
             {editedBadge && (
               <button
                 type="button"
-                onClick={() => onChange({})}
+                onClick={() => {
+                  onChange({});
+                  onClearWeights();
+                }}
                 className="inline-flex items-center gap-1 text-[11px] font-mono"
                 style={{ color: "var(--text-tertiary)" }}
               >
@@ -429,6 +540,11 @@ function AxisEditor({
                     style={{ background: "var(--accent-muted)", color: "var(--accent)" }}
                   >
                     <span className="truncate max-w-[240px]">{item.label}</span>
+                    <WeightStepper
+                      value={weights[item.idKey] ?? 1}
+                      onChange={(w) => onWeight(item.idKey, w)}
+                      label={item.label}
+                    />
                     <button type="button" aria-label="Remove entry" onClick={() => removeAdd(item.id)}>
                       <X size={11} />
                     </button>
@@ -467,11 +583,20 @@ function AxisEditor({
                   >
                     {d.label}
                   </span>
-                  <MiniSwitch
-                    checked={!off}
-                    onChange={() => toggleDisable(d.key)}
-                    label={off ? `Enable ${d.label}` : `Disable ${d.label}`}
-                  />
+                  <div className="flex items-center gap-2 shrink-0">
+                    {!off && !replace && (
+                      <WeightStepper
+                        value={weights[d.key] ?? 1}
+                        onChange={(w) => onWeight(d.key, w)}
+                        label={d.label}
+                      />
+                    )}
+                    <MiniSwitch
+                      checked={!off}
+                      onChange={() => toggleDisable(d.key)}
+                      label={off ? `Enable ${d.label}` : `Disable ${d.label}`}
+                    />
+                  </div>
                 </li>
               );
             })}
@@ -509,6 +634,7 @@ function makeStringMeta(axis: AxisKey, label: string, source: string[]): AxisMet
     defaults: source.map((s) => ({ key: s, label: s })),
     renderAddForm: (onAdd) => <StringAddForm onAdd={onAdd} />,
     addLabel: (e) => String(e),
+    idOf: (e) => String(e),
   };
 }
 
@@ -643,6 +769,7 @@ function buildAxisMetas(): AxisMeta[] {
     defaults: banks.SUBJECTS.map((s) => ({ key: s.text, label: s.text })),
     renderAddForm: (onAdd) => <SubjectsAddForm onAdd={onAdd} />,
     addLabel: (e) => (e as { text: string }).text,
+    idOf: (e) => (e as { text: string }).text,
   });
   metas.push({
     axis: "INFLUENCE",
@@ -667,6 +794,7 @@ function buildAxisMetas(): AxisMeta[] {
       const v = e as { text: string; category: string };
       return `[${v.category}] ${v.text}`;
     },
+    idOf: (e) => (e as { text: string }).text,
   });
   metas.push({
     axis: "MODE",
@@ -674,6 +802,7 @@ function buildAxisMetas(): AxisMeta[] {
     defaults: banks.MODE.map((m) => ({ key: m.phrase, label: m.phrase })),
     renderAddForm: (onAdd) => <ModeAddForm onAdd={onAdd} />,
     addLabel: (e) => (e as { phrase: string }).phrase,
+    idOf: (e) => (e as { phrase: string }).phrase,
   });
   metas.push({
     axis: "FORMAT",
@@ -681,6 +810,7 @@ function buildAxisMetas(): AxisMeta[] {
     defaults: banks.FORMAT.map((f) => ({ key: f.phrase, label: f.phrase })),
     renderAddForm: (onAdd) => <FormatAddForm onAdd={onAdd} />,
     addLabel: (e) => (e as { phrase: string }).phrase,
+    idOf: (e) => (e as { phrase: string }).phrase,
   });
   for (const { axis, label, source } of STRING_AXES) {
     metas.push(makeStringMeta(axis, label, source));
@@ -1217,6 +1347,11 @@ export function CustomizeDrawer({
           {/* Axis editors */}
           <div>
             <FieldLabel>Axes</FieldLabel>
+            <p className="text-[11px] mb-2" style={{ color: "var(--text-tertiary)" }}>
+              Add, disable, or replace entries on any axis. The −N×+ stepper weights an
+              entry so it shows up more often in random rolls (a coverage-guaranteed axis
+              ignores weights — it already surfaces everything evenly).
+            </p>
             <div className="space-y-2">
               {metas.map((meta) => (
                 <AxisEditor
@@ -1225,6 +1360,9 @@ export function CustomizeDrawer({
                   override={getAxis(customBanks, meta.axis)}
                   onChange={(next) => setCustomBanks(setAxis(customBanks, meta.axis, next))}
                   resolvedCount={resolvedCount(resolved, meta.axis)}
+                  weights={getAxisWeights(customBanks, meta.axis)}
+                  onWeight={(id, w) => setCustomBanks(setEntryWeight(customBanks, meta.axis, id, w))}
+                  onClearWeights={() => setCustomBanks(clearAxisWeights(customBanks, meta.axis))}
                 />
               ))}
             </div>
@@ -1252,8 +1390,11 @@ export function loadCustomBanks(): CustomBanks | null {
     const raw = window.localStorage.getItem(CUSTOM_BANKS_LS_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed === "object") return parsed as CustomBanks;
-    return null;
+    // Defense in depth: local state flows straight into roll(), so validate it
+    // the same way an imported pack is. Warnings are degenerate-but-legal (the
+    // pack still applies); only a structurally unusable blob is dropped.
+    const res = validateTastePack(parsed);
+    return res.ok ? (res.value ?? null) : null;
   } catch {
     return null;
   }

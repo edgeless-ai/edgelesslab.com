@@ -15,6 +15,7 @@ import type {
   PaletteEntry,
   TaggedSubject,
   ThemeDef,
+  WeightMap,
 } from "./types";
 
 // --------------------------------------------------------------- custom types
@@ -63,6 +64,14 @@ export interface CustomBanks {
   themes?: Record<string, ThemeDef>;
   /** Regex SOURCE (no flags) overriding Banks.BRAND_WORD_RE. */
   brandWordRe?: string;
+  /**
+   * Per-entry weights: axis -> (entry identity string -> weight). A weight > 1
+   * makes an entry proportionally more likely in a RANDOM roll; missing entries
+   * roll at weight 1. Ignored for an axis rolled by coverage (coverage wins).
+   * The identity string matches `disable` (entry text / phrase / influence key /
+   * the string itself). Passed through to the resolved Banks unchanged.
+   */
+  weights?: WeightMap;
 }
 
 // --------------------------------------------------------------- merge helpers
@@ -125,6 +134,9 @@ export function resolveBanks(defaults: Banks, custom: CustomBanks = {}): Banks {
     BRAND_TAGS: mergeArray(defaults.BRAND_TAGS, custom.BRAND_TAGS, (s) => s),
     THEMES: { ...defaults.THEMES, ...(custom.themes ?? {}) },
     BRAND_WORD_RE: custom.brandWordRe ?? defaults.BRAND_WORD_RE,
+    // Pass-through: undefined when the pack sets no weights, so the engine's
+    // W?.AXIS reads stay undefined and every pick falls through to rng.choice.
+    WEIGHTS: custom.weights,
   };
 }
 
@@ -212,7 +224,7 @@ export function validateTastePack(json: unknown): {
   }
 
   for (const [key, raw] of Object.entries(json)) {
-    if (key === "themes" || key === "brandWordRe") continue;
+    if (key === "themes" || key === "brandWordRe" || key === "weights") continue;
     const kind = AXIS_KINDS[key];
     if (!kind) {
       warnings.push(`unknown axis "${key}" ignored`);
@@ -285,6 +297,38 @@ export function validateTastePack(json: unknown): {
           errors.push(`theme "${name}".subjects must be "SUBJECTS" or "SUBJECTS_LARGE"`);
         } else if (t.subjects !== "SUBJECTS" && t.subjects !== "SUBJECTS_LARGE") {
           warnings.push(`theme "${name}" references unknown subject bank "${t.subjects}"`);
+        }
+      }
+    }
+  }
+
+  // weights: axis -> (identity string -> positive number). Structural problems
+  // (not an object, an axis value that is not a record) are errors; degenerate
+  // values (non-positive / non-finite, an unknown axis) are non-blocking
+  // warnings — the engine treats any junk weight as 1, so the pack still rolls.
+  if (json.weights !== undefined) {
+    if (!isPlainObject(json.weights)) {
+      errors.push("weights must be an object keyed by axis name");
+    } else {
+      for (const [axis, wmap] of Object.entries(json.weights)) {
+        if (!AXIS_KINDS[axis]) {
+          warnings.push(`weights axis "${axis}" is unknown and will be ignored`);
+          continue;
+        }
+        if (!isPlainObject(wmap)) {
+          errors.push(`weights."${axis}" must be an object of entry -> number`);
+          continue;
+        }
+        for (const [entry, w] of Object.entries(wmap)) {
+          if (typeof w !== "number" || !Number.isFinite(w) || w <= 0) {
+            warnings.push(
+              `weights."${axis}"."${entry}" is not a positive number; it will roll at 1`,
+            );
+          } else if (w > 1e6) {
+            warnings.push(
+              `weights."${axis}"."${entry}" is very large; it will be capped at 1,000,000`,
+            );
+          }
         }
       }
     }

@@ -45,3 +45,4 @@ verifies live. This removes the shared-checkout dependency that stopped the firs
 - 2026-08-23 23:1x — iter2: per-axis 'N weighted' badge + dedicated 'clear weights' control (519638177). Gate green, CI green, live-verified.
 - 2026-08-23 23:2x — iter3: theme-aware coverage/weights note in Customize drawer + em-dash fix (30b4cc6f8). Gate green, CI green, live-verified.
 - 2026-08-24 00:0x — iter4: documented weighting v2 in BYO-TASTE-SPEC (schema+semantics). Docs-only; committed to lane (no standalone deploy; rides next code push). Tree green.
+- 2026-08-24 00:2x — iter5: a11y — weight-stepper value announced to screen readers (aria-live) (0ba72032b). Carried the 3 staged docs commits. Gate green, CI green, live-verified.

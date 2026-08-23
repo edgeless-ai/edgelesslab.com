@@ -1372,8 +1372,22 @@ export function CustomizeDrawer({
             <p className="text-[11px] mb-2" style={{ color: "var(--text-tertiary)" }}>
               Add, disable, or replace entries on any axis. The −N×+ stepper weights an
               entry so it shows up more often in random rolls (a coverage-guaranteed axis
-              ignores weights — it already surfaces everything evenly).
+              ignores weights; it already surfaces everything evenly).
             </p>
+            {resolved.THEMES[theme]?.coverage && (
+              <p
+                className="flex items-start gap-1.5 text-[11px] mb-2 rounded-md border px-2.5 py-1.5"
+                style={{ borderColor: "var(--border-subtle)", background: "var(--bg-elevated)", color: "var(--text-secondary)" }}
+                role="note"
+              >
+                <Scale size={12} className="mt-0.5 shrink-0" style={{ color: "var(--text-tertiary)" }} />
+                <span>
+                  The selected theme <strong style={{ color: "var(--text-primary)" }}>{theme}</strong> is
+                  coverage-guaranteed, so weights on Influences and Subjects are ignored for it (they
+                  surface evenly). Pick a theme with coverage off for those weights to take effect.
+                </span>
+              </p>
+            )}
             <div className="space-y-2">
               {metas.map((meta) => (
                 <AxisEditor

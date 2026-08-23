@@ -67,7 +67,7 @@ function getServerSnapshot(): Theme {
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const resolvedTheme = useSyncExternalStore(
+  const resolvedTheme = useSyncExternalStore<"light" | "dark">(
     subscribe,
     () => getResolvedTheme(getStoredTheme()),
     () => "dark"

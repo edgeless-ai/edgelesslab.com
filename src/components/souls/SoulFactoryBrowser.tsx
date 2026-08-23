@@ -1,9 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import { EnrichedSoulRow } from "./SoulRow";
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 
 interface SoulSummary {
   slug: string;
@@ -16,61 +13,106 @@ interface SoulSummary {
 interface SoulsResponse {
   souls: SoulSummary[];
   count: number;
+  available?: boolean;
+  message?: string;
 }
 
-const url = new URL('http://127.0.0.1:8000/v1/souls');
-  if (category && category !== 'all') url.searchParams.set('category', category);
-  if (query) url.searchParams.set('limit', '200');
+interface CategoryStat {
+  name: string;
+  count: number;
+  avgQuality: number;
+  totalQuality: number;
+}
+
+async function fetchSouls(category: string, query: string): Promise<SoulsResponse> {
+  const url = new URL("/api/souls", window.location.origin);
+  if (category && category !== "all") url.searchParams.set("category", category);
+  if (query) url.searchParams.set("limit", "200");
 
   const res = await fetch(url.toString(), {
-    headers: { Accept: 'application/json' },
-    next: { revalidate: 60 },
+    headers: { Accept: "application/json" },
   });
   if (!res.ok) throw new Error(`souls endpoint failed (${res.status})`);
-  return (await res.json()) as SoulSummary[];
+  return (await res.json()) as SoulsResponse;
+}
 
 export function SoulFactoryBrowser() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
+  const [data, setData] = useState<SoulSummary[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["soul-factory"],
-    queryFn: () => fetchSouls().then((r) => r.souls),
-    staleTime: 60_000,
-  });
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoading(true);
+    setIsError(false);
+    fetchSouls(category, query)
+      .then((r) => {
+        if (!cancelled) setData(r.souls);
+      })
+      .catch(() => {
+        if (!cancelled) setIsError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [category, query, reloadKey]);
+
+  const refetch = () => setReloadKey((k) => k + 1);
 
   const sourceLabel = "real Soul Factory /v1/souls";
 
-  const filtered = (data ?? []).filter((soul) => {
-    const matchesQuery =
-      !query ||
-      [soul.slug, soul.name, soul.category]
-        .some((field) =>
-          field.toLowerCase().includes(query.toLowerCase())
-        );
-    const matchesCategory =
-      category === "all" || soul.category === category;
-    return matchesQuery && matchesCategory;
-  });
+  const filtered = useMemo(
+    () =>
+      (data ?? []).filter((soul) => {
+        const matchesQuery =
+          !query ||
+          [soul.slug, soul.name, soul.category].some((field) =>
+            field.toLowerCase().includes(query.toLowerCase())
+          );
+        const matchesCategory = category === "all" || soul.category === category;
+        return matchesQuery && matchesCategory;
+      }),
+    [data, query, category]
+  );
 
-  const stats = [
-    ...(data ?? []).reduce((acc, soul) => {
+  const stats: CategoryStat[] = useMemo(() => {
+    const byCategory = (data ?? []).reduce((acc, soul) => {
       const key = soul.category || "Uncategorized";
       const current = acc.get(key) ?? { count: 0, avgQuality: 0, totalQuality: 0 };
       current.count += 1;
       current.totalQuality += Number(soul.quality_score || 0);
       current.avgQuality = Number((current.totalQuality / current.count).toFixed(2));
       return acc.set(key, current);
-    }, new Map<string, { count: number; avgQuality: number; totalQuality: number }>()),
-  ].map(([name, value]) => ({ name, ...value }));
+    }, new Map<string, { count: number; avgQuality: number; totalQuality: number }>());
+    return [...byCategory].map(([name, value]) => ({ name, ...value }));
+  }, [data]);
 
-  const categories = [
-    ...new Set(
-      (data ?? [])
-        .map((soul) => soul.category)
-        .filter((category): category is string => Boolean(category))
-    ),
-  ];
+  const categories = useMemo(
+    () => [
+      ...new Set(
+        (data ?? [])
+          .map((soul) => soul.category)
+          .filter((c): c is string => Boolean(c))
+      ),
+    ],
+    [data]
+  );
+
+  const avgQuality =
+    data?.length
+      ? Number(
+          (
+            data.reduce((sum, soul) => sum + Number(soul.quality_score || 0), 0) /
+            data.length
+          ).toFixed(2)
+        )
+      : "—";
 
   return (
     <div className="space-y-6">
@@ -85,23 +127,15 @@ export function SoulFactoryBrowser() {
         </div>
         <div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground">Avg quality score</p>
-          <p className="text-sm font-medium">
-            {data?.length
-              ? Number(
-                  (
-                    data.reduce((sum, soul) => sum + Number(soul.quality_score || 0), 0) /
-                    data.length
-                  ).toFixed(2)
-                )
-              : "—"}
-          </p>
+          <p className="text-sm font-medium">{avgQuality}</p>
         </div>
       </header>
 
       <div className="grid gap-4 md:grid-cols-5">
         <aside className="space-y-4 md:col-span-2">
           <div className="space-y-2">
-            <Input
+            <input
+              className="h-9 w-full rounded-md border border-border/70 bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search souls by name or slug"
@@ -112,17 +146,21 @@ export function SoulFactoryBrowser() {
               onChange={(event) => setCategory(event.target.value)}
             >
               <option value="all">All categories</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
                 </option>
               ))}
             </select>
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>{filtered.length} matching souls</span>
-              <Button variant="ghost" size="sm" onClick={() => refetch()}>
+              <button
+                type="button"
+                className="rounded-md px-2 py-1 text-xs font-medium hover:bg-muted/40"
+                onClick={refetch}
+              >
                 Refresh
-              </Button>
+              </button>
             </div>
           </div>
 
@@ -158,7 +196,21 @@ export function SoulFactoryBrowser() {
           ) : (
             <div className="grid gap-3">
               {filtered.map((soul) => (
-                <EnrichedSoulRow key={soul.slug} soul={soul} source={sourceLabel} />
+                <div
+                  key={soul.slug}
+                  className="flex items-center justify-between rounded-xl border border-border/60 px-4 py-3"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{soul.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {soul.slug} · {soul.category}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right text-xs text-muted-foreground">
+                    <p>quality {soul.quality_score}</p>
+                    <p>used {soul.times_used}×</p>
+                  </div>
+                </div>
               ))}
               {!filtered.length ? (
                 <p className="text-sm text-muted-foreground">No souls match this filter.</p>

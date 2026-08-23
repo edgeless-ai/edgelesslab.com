@@ -210,7 +210,7 @@ export function step(s: SimState): SimState {
   // settle: mission complete (majority arrived) or ecology collapsed (all dead)
   const stillAlive = s.agents.filter((a) => a.alive).length;
   const missionDone = arrived >= Math.ceil(s.agents.length / 2);
-  let settled = s.settled;
+  let settled: boolean = s.settled;
   if (!settled && (missionDone || stillAlive === 0 || tick > 700)) {
     settled = true;
     s.events.push({

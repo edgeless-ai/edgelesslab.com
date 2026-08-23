@@ -50,15 +50,36 @@ type RawWork = {
   agent_name?: string;
 };
 
+// Read a JSON data file from the filesystem at build time. Under
+// `output: 'export'` there is no origin to resolve a relative `fetch('/data/…')`
+// against at prerender, so an HTTP fetch throws `Failed to parse URL` and bakes
+// empty data into the static HTML. Reading from disk relative to `process.cwd()`
+// inlines the real values at build; a missing file falls back to null (same
+// graceful behavior as the previous `res.ok ? … : null`).
+// Boundary-typed JSON read: the caller declares the expected shape; the single
+// `as T` sits at the JSON.parse boundary where the shape of external data is
+// asserted (not an `any` escape hatch — callers below stay fully type-checked).
+async function readDataFile<T>(name: string): Promise<T | null> {
+  try {
+    const fs = await import('node:fs/promises');
+    const path = await import('node:path');
+    const filePath = path.join(process.cwd(), 'public', 'data', name);
+    return JSON.parse(await fs.readFile(filePath, 'utf-8')) as T;
+  } catch {
+    return null;
+  }
+}
+
 export async function getNowData(): Promise<NowData> {
   try {
-    const [shipRes, wallRes] = await Promise.all([
-      fetch('/data/ship_log.json', { next: { revalidate: 60 } }),
-      fetch('/data/content_wall.json', { next: { revalidate: 60 } }),
+    const [shipLog, wall] = await Promise.all([
+      readDataFile<{ ships?: RawShip[] }>('ship_log.json'),
+      readDataFile<{
+        recent_work?: RawWork[];
+        summary?: Partial<NowData['summary']>;
+        metrics?: { health_score?: number };
+      }>('content_wall.json'),
     ]);
-
-    const shipLog = shipRes.ok ? await shipRes.json() : null;
-    const wall = wallRes.ok ? await wallRes.json() : null;
 
     const ships: Ship[] = (shipLog?.ships || []).slice(0, 10).map((s: RawShip) => ({
       id: s.id || '',
@@ -112,7 +133,7 @@ export async function getNowData(): Promise<NowData> {
       },
       fleet,
       ships,
-      recent_work,
+      recent_work: recentWork,
     };
   } catch (error) {
     return {

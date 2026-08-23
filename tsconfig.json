@@ -41,6 +41,8 @@
     "node_modules",
     "products",
     "docs/source-refs",
-    ".next"
+    ".next",
+    "out",
+    "public/**/app/**"
   ]
 }

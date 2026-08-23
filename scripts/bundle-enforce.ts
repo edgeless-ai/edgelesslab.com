@@ -29,11 +29,6 @@ const checks = [
     name: 'route_signature_stable',
     description: 'Route metadata signatures are stable after build',
     run: async () => {
-      const globs = [
-        path.join(OUT_DIR, '*.txt'),
-        path.join(OUT_DIR, '**', '*.txt'),
-        path.join(OUT_DIR, '_next', 'static', 'chunks', '*.js'),
-      ];
       const seen = new Map<string, string>();
       async function walk(dir: string) {
         for (const entry of await fs.promises.readdir(dir, { withFileTypes: true })) {
@@ -102,7 +97,7 @@ const checks = [
 ];
 
 async function run() {
-  const strict = process.argv.includes('--strict');
+  const warn = process.argv.includes('--warn') || process.argv.includes('--no-fail');
   let failed = 0;
   for (const check of checks) {
     try {
@@ -111,7 +106,7 @@ async function run() {
     } catch (error) {
       console.log(`[FAIL] ${check.name}: ${check.description} | ${(error as Error).message}`);
       failed += 1;
-      if (strict) {
+      if (!warn) {
         process.exitCode = 1;
       }
     }

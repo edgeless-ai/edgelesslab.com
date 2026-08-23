@@ -11,7 +11,7 @@ export interface EdgelessPalette {
   background: string
 }
 
-const EDGELESS_PALETTES: EdgelessPalette[] = [
+export const EDGELESS_PALETTES: EdgelessPalette[] = [
   { name: 'indigo-dark', foreground: '#818CF8', background: '#09090B' },
   { name: 'indigo-light', foreground: '#A5B4FC', background: '#111113' },
   { name: 'emerald-dark', foreground: '#34D399', background: '#09090B' },
@@ -218,7 +218,7 @@ export interface AvvatarOptions {
   palette?: string
 }
 
-function avvatar(options: AvvatarOptions = {}): string {
+export function avvatar(options: AvvatarOptions = {}): string {
   const {
     seed = Math.random().toString(),
     size = 100,
@@ -237,7 +237,7 @@ function avvatar(options: AvvatarOptions = {}): string {
   return renderSVG(pattern, size, fg, bg, padding, shape)
 }
 
-function avvatarDataUri(options: AvvatarOptions = {}): string {
+export function avvatarDataUri(options: AvvatarOptions = {}): string {
   const svg = avvatar(options)
   const base64 = typeof Buffer !== 'undefined'
     ? Buffer.from(svg).toString('base64')
@@ -245,7 +245,7 @@ function avvatarDataUri(options: AvvatarOptions = {}): string {
   return `data:image/svg+xml;base64,${base64}`
 }
 
-function downloadSvg(svg: string, filename = 'avvatar.svg') {
+export function downloadSvg(svg: string, filename = 'avvatar.svg') {
   const blob = new Blob([svg], { type: 'image/svg+xml' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')

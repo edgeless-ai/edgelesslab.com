@@ -1,0 +1,83 @@
+# The Week "pip install" Became the Last Mile
+
+**Four videos, one devlog series, one packaging tool: IndyDevDan's diffbro showed that Poetry is the bridge between "it works on my machine" and "pip install diffbro" — and that bridge is the last mile of AI tooling distribution.**
+
+Here's what IndyDevDan published between August 2 and August 9, 2026:
+
+- **[Introducing DIFFBRO](https://www.youtube.com/watch?v=5oXh5SvPJ-M)** — The launch: diffbro, an open-source pip-installable CLI that runs git diffs through ChatGPT for an AI peer review before code reaches a human reviewer. Closing out a devlog series that built it with Python, Poetry, and Aider.
+- **[Git + AI = DIFFBRO: AI Coding the future of code reviews](https://www.youtube.com/watch?v=20SpUcFzfYI)** — The framing: AI-assisted code review as part of a broader shift from writing code to using AI tools that write and review code. Setting up the thesis ahead of the build.
+- **[AI Devlog: Coding an AI powered, Code Review, CLI tool](https://www.youtube.com/watch?v=2AsHCRJFf3A)** — The build: wiring GPT model selection and file-type include/exclude flags into a Python CLI.
+- **[pip install YOUR-PACKAGE: Building your first python package](https://www.youtube.com/watch?v=0vVtbMdmbds)** — The packaging: building and publishing a real pip-installable Python CLI package using Poetry, ChatGPT, and Aider.
+
+The first three videos are about the code. The fourth is about the **distribution**. And the tool that makes that distribution work is Poetry.
+
+---
+
+## The Gap Between Script and Tool
+
+Every developer has a folder of scripts that "would be useful" if other people could run them. The gap between a script and a tool is distribution — and for Python, distribution means `pyproject.toml`, build, and `pypi publish`.
+
+Poetry closes that gap in a way that matters for the AI-assisted coding era:
+
+**Poetry gives you a single source of truth.** `pyproject.toml` replaces `setup.py`, `requirements.txt`, `MANIFEST.in`, and `setup.cfg`. One file. One dependency resolver. One build system. When you're using ChatGPT or Aider to generate your packaging configuration, having a single file to point at reduces the surface area for errors.
+
+**Poetry's dependency resolver is strict.** It catches conflicts before they reach users. In the AI coding workflow where you're iterating fast and adding dependencies as you go, having a resolver that tells you *now* that `requests>=2.31` conflicts with `httpx>=0.27` saves you from discovering it in a CI pipeline later.
+
+**Poetry handles the publish workflow.** `poetry build` and `poetry publish` are two commands. The friction is gone. IndyDevDan's walkthrough shows exactly this: write the code, configure Poetry, build, publish. The entire pipeline from working code to `pip install` is minutes.
+
+---
+
+## The Poetry + Aider + ChatGPT Workflow
+
+The fourth video in the series is the most practical because it shows a repeatable workflow:
+
+1. **ChatGPT writes the packaging config** — tell it "I need a Poetry-based CLI tool" and it generates the `pyproject.toml` with the right `[tool.poetry.scripts]` entry point, dependency declarations, and Python version constraints.
+2. **Aider applies the changes** — the generated config gets written into the project, dependencies are installed, and any structural changes (moving files, adding `__init__.py`) happen automatically.
+3. **Poetry validates and builds** — `poetry build` confirms the package structure, resolves dependencies, and produces a distributable artifact.
+4. **Poetry publishes** — `poetry publish` ships it to PyPI.
+
+The loop is tight. ChatGPT provides the spec, Aider executes the spec, Poetry validates and ships. Each tool handles the part it's best at.
+
+This is the pattern that matters: **AI generates the packaging config, AI modifies the codebase to match the config, and a deterministic tool validates and publishes.** The human is the reviewer, not the typist.
+
+---
+
+## What It Means for Our Stack
+
+The Edgeless swarm runs on Python scripts. We have dozens of them — cron jobs, pipeline scripts, enrichment tools, API bridges. Most of them have never been packaged.
+
+The diffbro series makes a concrete case for changing that:
+
+**1. Every script that's useful to more than one person deserves a `pyproject.toml`.** Poetry makes this trivial. A `pyproject.toml` with a `[tool.poetry.scripts]` entry point turns a script into a CLI that anyone can install with `pip install`. The overhead is negligible; the distribution gain is enormous.
+
+**2. The ChatGPT + Aider + Poetry loop is a packaging template we should codify.** We have a skill for "write a Python script." We should have a skill for "package this script for distribution." The prompt template is: take the script, generate a `pyproject.toml` with entry point, add `click` or `typer` for CLI argument parsing, configure Poetry, build, publish. That's a 30-minute workflow, not a day-long project.
+
+**3. Pip-installable CLIs are a better distribution model than MCP servers for internal tools.** MCP is great for tool integration. But for a CLI tool that a developer runs in their terminal, `pip install` is simpler, more composable, and doesn't require a running server. The diffbro model (CLI with stdin/stdout) is the right default for internal developer tools.
+
+---
+
+## The Canonical Video
+
+If you watch one, watch *[pip install YOUR-PACKAGE](https://www.youtube.com/watch?v=0vVtbMdmbds)*. It's the shortest video in the series and the most practical. It shows the entire workflow from working code to published package, and it answers the question that every developer who's ever written a useful script has asked: "How do I get this into someone else's hands?"
+
+The answer is Poetry. Two commands. Minutes. Done.
+
+---
+
+## What to Build Next
+
+1. **Poetry packaging template** — a canonical starter template for packaging any Hermes script as a pip-installable CLI, with the ChatGPT prompt template, Aider workflow, and Poetry config
+2. **Script audit** — scan the Edgeless codebase for scripts that are generally useful but not packaged; prioritize by internal usage frequency
+3. **Poetry entry-point generator** — a small CLI that takes a Python script path and generates the complete `pyproject.toml`, entry point, and `click` wrapper, so the barrier to packaging is basically zero
+4. **Internal PyPI** — a private package index for tools that aren't ready for public distribution but should be installable across the VPS, Mac, and any future infrastructure
+
+---
+
+*Related posts:*
+- [The Week CLIs Became AI's Distribution Channel](/blog/cli-tools-week)
+- [The Week Multi-Agent Orchestration Stopped Being Optional](/blog/multi-agent-orchestration-week)
+- [710 Tasks and the Bottleneck That Wasn't](/blog/the-bottleneck-that-wasnt)
+
+---
+
+*This post was synthesized from 4 YouTube videos by IndyDevDan published between August 2-9, 2026. Full analysis in the Edgeless knowledge vault.*

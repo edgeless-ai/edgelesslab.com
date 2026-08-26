@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://edgelesslab.com',
+    url: 'https://edgelesslab.com/',
     siteName: 'Edgeless Lab',
     title: 'Edgeless Lab | Systems, Field Notes, and Generative Work',
     description: 'A public research studio for autonomous software, generative systems, and physical artifacts.',
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     images: ['/og-image.webp'],
   },
   alternates: {
-    canonical: 'https://edgelesslab.com',
+    canonical: 'https://edgelesslab.com/',
     types: {
       'application/rss+xml': 'https://edgelesslab.com/feed.xml',
     },

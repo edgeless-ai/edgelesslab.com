@@ -67,3 +67,4 @@ returning HTTP 200 is not sufficient evidence that client-side behavior works.
 - The public writing section is called Blog. The experimental archive is
   called Field Notes.
 - Shop remains visible, but Shop implementation is a separate product surface.
+- The content pipeline, including the Pre-Sold Post template and checklist gate, is documented in `docs/content-pipeline.md`. Any post linking to a product page must use the Repel → Dissolve → Invite structure documented there.

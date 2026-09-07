@@ -4,6 +4,7 @@
 
 import { describe, expect, it } from "vitest";
 import { banks } from "../banks";
+import { resolveBanks } from "../custom-banks";
 import { brandWordRe, roll, stripOperatorAnnotations } from "../engine";
 
 const fineArtKeys = Object.keys(banks.INFLUENCE).filter(
@@ -308,6 +309,123 @@ describe("batch-global positioning (roll-wide's indexOffset + coverageSeed)", ()
         roll({ recipe: "influence", n: 2, seed: 1, theme: "nous-branded", indexOffset: bad }),
       ).toThrow(/indexOffset must be a non-negative integer/);
     }
+  });
+});
+
+describe("per-entry weighting (Bring-Your-Own-Taste)", () => {
+  const opts = {
+    recipe: "influence",
+    n: 24,
+    seed: 909,
+    theme: "nous-branded",
+    coverage: false, // force the random path so weights actually apply
+  } as const;
+
+  it("an empty overlay (WEIGHTS undefined) is byte-identical to no override", () => {
+    const bare = roll(opts);
+    const resolved = roll(opts, resolveBanks(banks, {}));
+    expect(resolved.map((p) => p.text)).toEqual(bare.map((p) => p.text));
+    expect(resolved.map((p) => p.meta)).toEqual(bare.map((p) => p.meta));
+  });
+
+  it("UNIFORM weights (every entry the same) reproduce the uniform roll bit-for-bit", () => {
+    // The parity proof as a test: a cumulative weighted pick with all weights
+    // equal returns rng.choice's exact index, so weighting every influence 7x
+    // changes nothing. If this drifts, the RNG-stream invariant broke.
+    const uniform: Record<string, number> = {};
+    for (const k of Object.keys(banks.INFLUENCE)) uniform[k] = 7;
+    const weighted = roll(opts, resolveBanks(banks, { weights: { INFLUENCE: uniform } }));
+    const bare = roll(opts);
+    expect(weighted.map((p) => p.text)).toEqual(bare.map((p) => p.text));
+  });
+
+  it("a heavily up-weighted entry dominates the random rolls", () => {
+    const target = Object.keys(banks.INFLUENCE)[3];
+    const resolved = resolveBanks(banks, { weights: { INFLUENCE: { [target]: 1000 } } });
+    const batch = roll({ ...opts, n: 30 }, resolved);
+    const hits = batch.filter((p) => p.meta.influenceKey === target).length;
+    // ~1000/(1000+others) per draw -> nearly every prompt. Conservative bound.
+    expect(hits).toBeGreaterThanOrEqual(20);
+    // ...and without the weight the same seed does NOT saturate that key.
+    const plain = roll({ ...opts, n: 30 });
+    expect(plain.filter((p) => p.meta.influenceKey === target).length).toBeLessThan(hits);
+  });
+
+  it("stays deterministic under weights (same seed + weights => same batch)", () => {
+    const resolved = resolveBanks(banks, { weights: { INFLUENCE: { [Object.keys(banks.INFLUENCE)[0]]: 5 } } });
+    const a = roll(opts, resolved);
+    const b = roll(opts, resolved);
+    expect(a.map((p) => p.text)).toEqual(b.map((p) => p.text));
+  });
+
+  it("is IGNORED on a coverage axis — coverage still surfaces every entry evenly", () => {
+    // art-history-madlib rolls influence by the coverage permutation, not at
+    // random; weighting one key 1000x must not dent the even first-wrap coverage.
+    const fineArt = Object.keys(banks.INFLUENCE).filter((k) => banks.INFLUENCE[k].domain === "fine-art");
+    const resolved = resolveBanks(banks, { weights: { INFLUENCE: { [fineArt[0]]: 1000 } } });
+    const prompts = roll({ recipe: "influence", n: fineArt.length, seed: 5001, theme: "art-history-madlib" }, resolved);
+    const keys = prompts.map((p) => p.meta.influenceKey);
+    expect(new Set(keys).size).toBe(fineArt.length);
+    expect(new Set(keys)).toEqual(new Set(fineArt));
+  });
+
+  it("is IGNORED on a coverage-guaranteed TAGGED-subject theme (colorist-typography)", () => {
+    // Regression: subjectsTagged is checked before coverage, so a coverage theme
+    // with a tagged SUBJECTS bank must still ignore user weights on that axis.
+    // Proof: weighting one subject 1000x leaves the batch byte-identical.
+    const theme = "colorist-typography";
+    expect(banks.THEMES[theme]?.coverage).toBe(true);
+    expect(banks.THEMES[theme]?.subjects).toBe("SUBJECTS");
+    const target = banks.SUBJECTS[0].text;
+    const ropts = { recipe: banks.THEMES[theme].recipes[0], n: 20, seed: 4242, theme };
+    const weighted = roll(ropts, resolveBanks(banks, { weights: { SUBJECTS: { [target]: 1000 } } }));
+    const bare = roll(ropts);
+    expect(weighted.map((p) => p.text)).toEqual(bare.map((p) => p.text));
+  });
+
+  it("weights the tagged SUBJECTS random path when coverage is OFF", () => {
+    const target = banks.SUBJECTS[2].text;
+    const ropts = { recipe: "collision", n: 30, seed: 4242, theme: "colorist-typography", coverage: false };
+    const hits = roll(ropts, resolveBanks(banks, { weights: { SUBJECTS: { [target]: 1000 } } })).filter(
+      (p) => p.meta.subject === target,
+    ).length;
+    expect(hits).toBeGreaterThanOrEqual(15);
+  });
+
+  it("treats non-positive / non-finite weights as 1 and never crashes", () => {
+    const keys = Object.keys(banks.INFLUENCE);
+    const resolved = resolveBanks(banks, {
+      weights: { INFLUENCE: { [keys[0]]: 0, [keys[1]]: -5, [keys[2]]: NaN } },
+    });
+    const batch = roll({ ...opts, n: 12 }, resolved);
+    expect(batch).toHaveLength(12);
+    // A zero-weighted key is treated as 1, so it is still reachable (not muted).
+    const bigger = roll({ ...opts, n: 400 }, resolved);
+    expect(bigger.some((p) => p.meta.influenceKey === keys[0])).toBe(true);
+  });
+
+  it("weights the SUBJECTS_LARGE random path too", () => {
+    // photo + nous-branded with coverage off rolls SUBJECTS_LARGE at random.
+    const active = banks.SUBJECTS_LARGE.filter((s) => !brandWordRe.test(s));
+    const target = active[10];
+    const resolved = resolveBanks(banks, { weights: { SUBJECTS_LARGE: { [target]: 1000 } } });
+    const batch = roll({ recipe: "photo", n: 30, seed: 6101, theme: "art-history-madlib", coverage: false }, resolved);
+    const hits = batch.filter((p) => p.meta.subject === target).length;
+    expect(hits).toBeGreaterThanOrEqual(18);
+  });
+});
+
+describe("empty-axis preflight — TEXTURE", () => {
+  it("throws a clear message when TEXTURE is emptied and the texture toggle is on", () => {
+    const resolved = resolveBanks(banks, { TEXTURE: { replace: true } });
+    expect(() =>
+      roll({ recipe: "influence", n: 1, seed: 1, theme: "nous-branded", texture: true }, resolved),
+    ).toThrow(/Texture/);
+  });
+
+  it("does not trip when the texture toggle is off (TEXTURE unused)", () => {
+    const resolved = resolveBanks(banks, { TEXTURE: { replace: true } });
+    expect(roll({ recipe: "influence", n: 1, seed: 1, theme: "nous-branded" }, resolved)).toHaveLength(1);
   });
 });
 

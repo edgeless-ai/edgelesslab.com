@@ -7,7 +7,7 @@ import { PromptEngineClient } from "./prompt-engine-client";
 export const metadata = createPageMetadata({
   title: "Prompt Engine",
   description:
-    "Combinatorial MidJourney prompt generator — roll wide across themed recipe banks, museum-artwork style refs, coverage-guaranteed picks, and a dedup check against the logged round history.",
+    "Combinatorial MidJourney prompt generator. Roll wide across themed recipe banks with museum-artwork style refs, coverage-guaranteed picks, and a dedup check against the logged round history. Bring your own taste: customize every axis and weight entries, all client-side.",
   path: "/lab/prompt-engine",
   keywords: [
     "MidJourney prompts",
@@ -16,6 +16,8 @@ export const metadata = createPageMetadata({
     "combinatorial prompt engine",
     "museum sref",
     "art direction",
+    "custom prompt banks",
+    "taste pack",
   ],
 });
 
@@ -30,7 +32,7 @@ export default function PromptEnginePage() {
           "@type": "WebApplication",
           name: "Edgeless Lab Prompt Engine",
           description:
-            "Combinatorial MidJourney prompt generator with museum style-references and historical dedup.",
+            "Combinatorial MidJourney prompt generator with museum style-references, historical dedup, and fully customizable, weightable prompt banks.",
           url: "https://edgelesslab.com/lab/prompt-engine",
           applicationCategory: "DesignApplication",
           operatingSystem: "Any",
@@ -70,7 +72,9 @@ export default function PromptEnginePage() {
             its recipes, and copy the results straight into the imagine bar. Every batch is
             dedup-checked against a snapshot of the historical round log — plus recent
             batches saved in your browser — so you don&apos;t resubmit a prompt that already
-            ran. Museum themes pull real artwork URLs as style references.
+            ran. Museum themes pull real artwork URLs as style references. Open Customize to
+            bring your own taste: add, disable, or weight entries on any axis, and export the
+            result as a taste pack.
           </p>
 
           <PromptEngineClient />

@@ -350,3 +350,35 @@ describe("validateTastePack — empty theme recipes", () => {
     expect(res.warnings.some((w) => /no recipes/.test(w))).toBe(true);
   });
 });
+
+describe("weights — resolveBanks pass-through + validation", () => {
+  it("copies a pack's weights onto the resolved Banks.WEIGHTS", () => {
+    const r = resolveBanks(banks, { weights: { INFLUENCE: { hilma: 5 } } });
+    expect(r.WEIGHTS).toEqual({ INFLUENCE: { hilma: 5 } });
+  });
+
+  it("leaves WEIGHTS undefined when the pack sets none (byte-identical merge)", () => {
+    expect(resolveBanks(banks, {}).WEIGHTS).toBeUndefined();
+    expect(resolveBanks(banks, { LEXICON: { add: ["X"] } }).WEIGHTS).toBeUndefined();
+  });
+
+  it("accepts a well-formed weights field", () => {
+    const res = validateTastePack({ weights: { INFLUENCE: { hilma: 3 }, PALETTE: { "x on y": 2 } } });
+    expect(res.ok).toBe(true);
+    expect(res.warnings).toHaveLength(0);
+  });
+
+  it("errors when weights is not an object, or an axis value is not a record", () => {
+    expect(validateTastePack({ weights: 5 }).ok).toBe(false);
+    expect(validateTastePack({ weights: { INFLUENCE: 5 } }).ok).toBe(false);
+  });
+
+  it("warns (does not error) on an unknown axis or a non-positive weight", () => {
+    const res = validateTastePack({
+      weights: { NOPE: { a: 2 }, INFLUENCE: { hilma: 0, af: -3, bad: "x" as unknown as number } },
+    });
+    expect(res.ok).toBe(true);
+    expect(res.warnings.some((w) => /unknown/.test(w))).toBe(true);
+    expect(res.warnings.filter((w) => /roll at 1/.test(w)).length).toBeGreaterThanOrEqual(3);
+  });
+});

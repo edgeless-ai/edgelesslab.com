@@ -65,6 +65,38 @@ export interface GirlConfig {
   flags: string;
 }
 
+/**
+ * Axes that support per-entry weighting (all the axes roll() picks at RANDOM via
+ * rng.choice). Coverage-guaranteed axes (influence/subject when a theme's
+ * coverage is on) are picked by the even wrap permutation, not at random, so
+ * weights do not apply there — coverage wins.
+ */
+export type WeightableAxis =
+  | "SUBJECTS"
+  | "SUBJECTS_LARGE"
+  | "INFLUENCE"
+  | "PALETTE"
+  | "MODE"
+  | "FORMAT"
+  | "MODIFIERS"
+  | "PROCESS"
+  | "LAYOUT"
+  | "LEXICON"
+  | "TEXTURE"
+  | "BRAND_TAGS";
+
+/**
+ * Per-entry weights: axis -> (entry IDENTITY STRING -> weight). The identity
+ * string is the SAME key `disable` uses (entry text for SUBJECTS/PALETTE,
+ * `phrase` for MODE/FORMAT, the influence KEY for INFLUENCE, the string itself
+ * for plain string axes). A weight > 1 makes an entry proportionally more likely
+ * in a random roll; a missing / non-positive / non-finite weight is treated as
+ * 1. With every weight equal (the default), a weighted pick is BYTE-IDENTICAL to
+ * the uniform rng.choice it replaces (same single RNG draw, same index), so the
+ * golden fixtures and the no-weights path are unaffected.
+ */
+export type WeightMap = Partial<Record<WeightableAxis, Record<string, number>>>;
+
 export interface Banks {
   SUBJECTS: TaggedSubject[];
   SUBJECTS_LARGE: string[];
@@ -86,6 +118,12 @@ export interface Banks {
   GIRL: GirlConfig;
   /** Regex SOURCE (no flags) for word-boundary brand matching. */
   BRAND_WORD_RE: string;
+  /**
+   * Optional per-entry weights (Bring-Your-Own-Taste). Absent on the shipped
+   * default banks; resolveBanks copies a taste pack's `weights` here. undefined
+   * => every axis rolls uniformly, exactly as before.
+   */
+  WEIGHTS?: WeightMap;
 }
 
 // ------------------------------------------------------------------- sref

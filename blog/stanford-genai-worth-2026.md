@@ -1,3 +1,10 @@
+---
+title: "The $172B Question: What Generative AI Is Actually Worth"
+description: "Stanford's Digital Economy Lab measured U.S. consumer surplus from generative AI at $172B in early 2026 — twelve times producer revenue. The Lindahl-price argument for why models are underpriced."
+date: 2026-06-26
+tags: ["AI Economics", "Consumer Surplus", "Research", "Agentic OS"]
+---
+
 # The $172B Question: What Generative AI Is Actually Worth
 
 Most AI coverage treats the technology as a cost problem: training compute, inference pricing, API margins. That frame misses the real story. In April 2026, Stanford's Digital Economy Lab published a working paper that tried to measure generative AI the way economists measure welfare — not by what firms charge, but by what users would refuse to give up.

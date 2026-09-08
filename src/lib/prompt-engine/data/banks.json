@@ -959,13 +959,11 @@
   "HERMES",
   "NOUS RESEARCH",
   "HERMES",
-  "PSYCHE",
   "FORGE",
   "DisTrO",
-  "ATROPOS",
-  "PSYCHE",
   "FORGE",
   "DisTrO",
+  "PSYCHE",
   "ATROPOS",
   "DISTRIBUTED INTELLIGENCE",
   "OPEN SOURCE",
@@ -1481,6 +1479,176 @@
    "name": "Russian Constructivism",
    "domain": "fine-art",
    "move": "diagonal photomontage, red-black-white agitprop geometry, bold sans type"
+  },
+  "durer": {
+   "name": "Albrecht Dürer",
+   "domain": "fine-art",
+   "move": "Northern Renaissance master engraving, meticulous crosshatch, symbolic dense detail"
+  },
+  "goya": {
+   "name": "Francisco Goya",
+   "domain": "fine-art",
+   "move": "dark satirical etching, grotesque social critique, stark chiaroscuro"
+  },
+  "rubens": {
+   "name": "Peter Paul Rubens",
+   "domain": "fine-art",
+   "move": "Flemish Baroque dynamism, muscular figures, rich warm color, dramatic movement"
+  },
+  "vandyck": {
+   "name": "Anthony van Dyck",
+   "domain": "fine-art",
+   "move": "Flemish Baroque court portraiture, elegant elongation, silken fabric rendering"
+  },
+  "sargent": {
+   "name": "John Singer Sargent",
+   "domain": "fine-art",
+   "move": "Gilded Age bravura brushwork, dazzling fabric highlights, society portraiture"
+  },
+  "callot": {
+   "name": "Jacques Callot",
+   "domain": "fine-art",
+   "move": "Baroque etching of teeming miniature figures, satirical grotesque, fine needle-line"
+  },
+  "daumier": {
+   "name": "Honoré Daumier",
+   "domain": "fine-art",
+   "move": "lithographic caricature, loose expressive line, biting social satire"
+  },
+  "sorolla": {
+   "name": "Joaquín Sorolla",
+   "domain": "fine-art",
+   "move": "Spanish Luminism, sun-dazzled beach scenes, dazzling light on water"
+  },
+  "shahn": {
+   "name": "Ben Shahn",
+   "domain": "fine-art",
+   "move": "WPA-era social realism, angular figures, muted flat color, quiet political conscience"
+  },
+  "piene": {
+   "name": "Otto Piene",
+   "domain": "fine-art",
+   "move": "ZERO-group kinetic light art, fire-painting scorch, radiant stencil grids"
+  },
+  "luyken": {
+   "name": "Jan Luyken",
+   "domain": "fine-art",
+   "move": "Dutch Golden Age etching, biblical and moralizing genre scenes, fine crosshatch"
+  },
+  "breitner": {
+   "name": "George Hendrik Breitner",
+   "domain": "fine-art",
+   "move": "Amsterdam Impressionism, gritty urban street scenes, loose tonal brushwork"
+  },
+  "schinkel": {
+   "name": "Karl Friedrich Schinkel",
+   "domain": "fine-art",
+   "move": "Prussian neoclassical grandeur, luminous Romantic ruins, monumental facades"
+  },
+  "hollar": {
+   "name": "Wenceslaus Hollar",
+   "domain": "fine-art",
+   "move": "Bohemian etching, exacting topographic panorama, fine linear precision"
+  },
+  "chodowiecki": {
+   "name": "Daniel Chodowiecki",
+   "domain": "fine-art",
+   "move": "German Enlightenment engraving, small intimate genre and morality scenes"
+  },
+  "dellabella": {
+   "name": "Stefano della Bella",
+   "domain": "fine-art",
+   "move": "Italian Baroque etching, festival and military pageantry, fluid confident line"
+  },
+  "whistler": {
+   "name": "James McNeill Whistler",
+   "domain": "fine-art",
+   "move": "Tonalist nocturnes, muted atmospheric harmony, art-for-art's-sake restraint"
+  },
+  "tempesta": {
+   "name": "Antonio Tempesta",
+   "domain": "fine-art",
+   "move": "Mannerist etching of battle and hunt scenes, dense energetic composition"
+  },
+  "bartolozzi": {
+   "name": "Francesco Bartolozzi",
+   "domain": "fine-art",
+   "move": "English stipple engraving, delicate dotted tonal softness"
+  },
+  "raimondi": {
+   "name": "Marcantonio Raimondi",
+   "domain": "fine-art",
+   "move": "Renaissance reproductive engraving, precise classical line after Raphael"
+  },
+  "church": {
+   "name": "Frederic Edwin Church",
+   "domain": "fine-art",
+   "move": "Hudson River School sublime, luminous panoramic wilderness light"
+  },
+  "homer": {
+   "name": "Winslow Homer",
+   "domain": "fine-art",
+   "move": "American realist marine painting, rugged sea and rural life, muscular natural light"
+  },
+  "rowlandson": {
+   "name": "Thomas Rowlandson",
+   "domain": "fine-art",
+   "move": "English satirical caricature, loose ink-and-wash, boisterous social comedy"
+  },
+  "beham": {
+   "name": "Sebald Beham",
+   "domain": "fine-art",
+   "move": "German Little Master engraving, tiny dense Renaissance genre detail"
+  },
+  "depasse": {
+   "name": "Crispijn de Passe the Elder",
+   "domain": "fine-art",
+   "move": "Dutch engraving, ornate allegorical and emblematic composition"
+  },
+  "galle": {
+   "name": "Philips Galle",
+   "domain": "fine-art",
+   "move": "Dutch Renaissance engraving, refined classical and mythological line work"
+  },
+  "dehooghe": {
+   "name": "Romeyn de Hooghe",
+   "domain": "fine-art",
+   "move": "Dutch Baroque etching, propagandistic dense allegorical satire"
+  },
+  "monti": {
+   "name": "Paolo Monti",
+   "domain": "photography",
+   "move": "stark modernist architectural photography, precise geometric black-and-white framing"
+  },
+  "evans": {
+   "name": "Walker Evans",
+   "domain": "photography",
+   "move": "deadpan documentary photography, plain-style frontal vernacular Americana"
+  },
+  "stieglitz": {
+   "name": "Alfred Stieglitz",
+   "domain": "photography",
+   "move": "Photo-Secessionist pictorialism, painterly soft-focus urban and cloud studies"
+  },
+  "frank": {
+   "name": "Robert Frank",
+   "domain": "photography",
+   "move": "gritty grainy black-and-white, alienated road-trip documentary realism"
+  },
+  "brady": {
+   "name": "Mathew Brady",
+   "domain": "photography",
+   "move": "Civil War-era wet-plate photography, sober formal documentary gravity"
+  },
+  "watkins": {
+   "name": "Carleton Watkins",
+   "domain": "photography",
+   "move": "19th-century frontier photography, monumental wilderness plate composition"
+  },
+  "frith": {
+   "name": "Francis Frith",
+   "domain": "photography",
+   "move": "Victorian expedition photography, sepia panoramic views of Egypt and the Levant"
   }
  },
  "RECIPES": {
@@ -1572,10 +1740,10 @@
     "collision"
    ],
    "lexicon": "LEXICON",
-   "subjects": "SUBJECTS",
+   "subjects": "SUBJECTS_LARGE",
    "influenceDomain": null,
    "srefMode": null,
-   "coverage": false,
+   "coverage": true,
    "modifiers": false,
    "markStyle": "wordmark"
   },
@@ -1589,11 +1757,15 @@
    ],
    "lexicon": null,
    "subjects": "SUBJECTS_LARGE",
-   "influenceDomain": "fine-art",
+   "influenceDomain": null,
    "srefMode": "museum",
    "coverage": true,
    "modifiers": true,
    "markStyle": "none",
+   "influenceDomainsAny": [
+    "fine-art",
+    "photography"
+   ],
    "srefCountPool": [
     1,
     2,

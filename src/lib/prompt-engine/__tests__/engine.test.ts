@@ -7,21 +7,25 @@ import { banks } from "../banks";
 import { resolveBanks } from "../custom-banks";
 import { brandWordRe, roll, stripOperatorAnnotations } from "../engine";
 
-const fineArtKeys = Object.keys(banks.INFLUENCE).filter(
-  (k) => banks.INFLUENCE[k].domain === "fine-art",
-);
+// art-history-madlib's influence pool is theme-driven (influenceDomainsAny), so
+// derive the eligible keys from the theme rather than hardcoding a domain/count.
+// The exported banks grow over time; a hardcoded 32 rotted once already.
+const madlibDomains = new Set(banks.THEMES["art-history-madlib"].influenceDomainsAny ?? ["fine-art"]);
+const madlibKeys = Object.keys(banks.INFLUENCE).filter((k) => madlibDomains.has(banks.INFLUENCE[k].domain));
+const POOL = madlibKeys.length;
 
 describe("coverage guarantee", () => {
   it("surfaces every fine-art influence before any repeats within a wrap", () => {
-    expect(fineArtKeys).toHaveLength(32);
-    const prompts = roll({ recipe: "influence", n: 40, seed: 5001, theme: "art-history-madlib" });
-    expect(prompts).toHaveLength(40);
-    const firstWrap = prompts.slice(0, 32).map((p) => p.meta.influenceKey);
-    expect(new Set(firstWrap).size).toBe(32);
-    expect(new Set(firstWrap)).toEqual(new Set(fineArtKeys));
-    // The wrap boundary re-keys, so positions 32..39 stay inside the bank too.
-    for (const p of prompts.slice(32)) {
-      expect(fineArtKeys).toContain(p.meta.influenceKey);
+    expect(POOL).toBeGreaterThan(1);
+    const n = POOL + 8;
+    const prompts = roll({ recipe: "influence", n, seed: 5001, theme: "art-history-madlib" });
+    expect(prompts).toHaveLength(n);
+    const firstWrap = prompts.slice(0, POOL).map((p) => p.meta.influenceKey);
+    expect(new Set(firstWrap).size).toBe(POOL);
+    expect(new Set(firstWrap)).toEqual(new Set(madlibKeys));
+    // The wrap boundary re-keys, so positions past the pool stay inside the bank too.
+    for (const p of prompts.slice(POOL)) {
+      expect(madlibKeys).toContain(p.meta.influenceKey);
     }
   });
 
@@ -240,16 +244,17 @@ describe("batch-global positioning (roll-wide's indexOffset + coverageSeed)", ()
 
   it("slices sharing a coverageSeed walk ONE permutation: full batch-level influence coverage", () => {
     // Simulates the dashboard's roll-wide over art-history-madlib (recipes
-    // influence + photo, both with the influence axis, 32 fine-art keys):
+    // influence + photo, both with the influence axis, POOL eligible keys):
     // per-slice RNG seeds differ (seed, seed+1) exactly like the client, but
     // the shared coverageSeed + contiguous indexOffset keep the coverage
-    // picker on one batch-wide permutation — all 32 influences appear across
-    // the 32-prompt batch with zero repeats. With independent per-slice
+    // picker on one batch-wide permutation — all POOL influences appear across
+    // the POOL-prompt batch with zero repeats. With independent per-slice
     // restarts (the old behavior) this test fails with cross-slice repeats.
     const seed = 5001;
+    const half = Math.floor(POOL / 2);
     const a = roll({
       recipe: "influence",
-      n: 16,
+      n: half,
       seed,
       theme: "art-history-madlib",
       indexOffset: 0,
@@ -257,16 +262,16 @@ describe("batch-global positioning (roll-wide's indexOffset + coverageSeed)", ()
     });
     const b = roll({
       recipe: "photo",
-      n: 16,
+      n: POOL - half,
       seed: seed + 1,
       theme: "art-history-madlib",
       indexOffset: a.length,
       coverageSeed: seed,
     });
     const keys = [...a, ...b].map((p) => p.meta.influenceKey);
-    expect(keys).toHaveLength(32);
-    expect(new Set(keys).size).toBe(32);
-    expect(new Set(keys)).toEqual(new Set(fineArtKeys));
+    expect(keys).toHaveLength(POOL);
+    expect(new Set(keys).size).toBe(POOL);
+    expect(new Set(keys)).toEqual(new Set(madlibKeys));
   });
 
   it("girl slots follow the batch-global index, not the slice-local one", () => {
@@ -361,12 +366,11 @@ describe("per-entry weighting (Bring-Your-Own-Taste)", () => {
   it("is IGNORED on a coverage axis — coverage still surfaces every entry evenly", () => {
     // art-history-madlib rolls influence by the coverage permutation, not at
     // random; weighting one key 1000x must not dent the even first-wrap coverage.
-    const fineArt = Object.keys(banks.INFLUENCE).filter((k) => banks.INFLUENCE[k].domain === "fine-art");
-    const resolved = resolveBanks(banks, { weights: { INFLUENCE: { [fineArt[0]]: 1000 } } });
-    const prompts = roll({ recipe: "influence", n: fineArt.length, seed: 5001, theme: "art-history-madlib" }, resolved);
+    const resolved = resolveBanks(banks, { weights: { INFLUENCE: { [madlibKeys[0]]: 1000 } } });
+    const prompts = roll({ recipe: "influence", n: POOL, seed: 5001, theme: "art-history-madlib" }, resolved);
     const keys = prompts.map((p) => p.meta.influenceKey);
-    expect(new Set(keys).size).toBe(fineArt.length);
-    expect(new Set(keys)).toEqual(new Set(fineArt));
+    expect(new Set(keys).size).toBe(POOL);
+    expect(new Set(keys)).toEqual(new Set(madlibKeys));
   });
 
   it("is IGNORED on a coverage-guaranteed TAGGED-subject theme (colorist-typography)", () => {

@@ -68,6 +68,11 @@ test.describe("static site smoke", () => {
     await page.goto("/lab/prompt-engine/");
     await expect(page.getByRole("heading", { name: "Prompt Engine" })).toBeVisible();
 
+    // This flow customizes the TAGGED subject bank, so pick the theme that reads
+    // from it. As of the r30 bank refresh the default (Nous Branded) draws from
+    // the wide subject bank, where these tagged entries never surface.
+    await page.getByRole("button", { name: /Colorist Typography/ }).click();
+
     // Open the Customize (bring-your-own-taste) drawer.
     await page.getByRole("button", { name: /Customize banks/ }).click();
 
@@ -126,9 +131,9 @@ test("public swarm Field Note is discoverable and interactive", async ({ page })
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/field-notes/");
   const link = page.locator('a[href="/creative-demos/connected-learning-swarm/"]');
-  await expect(link).toContainText("A swarm that learns");
+  await expect(link).toContainText("The Return Path");
   await link.click();
-  await expect(page.getByRole("heading", { name: "A swarm that learns." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "The Return Path", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Play walkthrough" }).click();
   await expect(page.locator("#trace-counter")).toHaveText("Handoff 1 / 11");
   await expect(page.locator("#packet-layer animateMotion")).toHaveCount(1);
@@ -154,7 +159,7 @@ test("public swarm Field Note is discoverable and interactive", async ({ page })
 test("public swarm Field Note fits a mobile viewport", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/creative-demos/connected-learning-swarm/");
-  await expect(page.getByRole("heading", { name: "A swarm that learns." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "The Return Path", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Play walkthrough" })).toBeVisible();
   const fits = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
   expect(fits).toBe(true);

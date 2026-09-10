@@ -68,6 +68,7 @@ const LEGACY_TAGS = new Map(
 );
 
 const FEATURED = new Set([
+  "connected-learning-swarm",
   "flow-field-particle-ecosystem",
   "tartan-weave-synth",
   "harmonograph-lissajous",
@@ -135,6 +136,7 @@ function descriptionFrom(html: string, title: string): string {
 }
 
 function categoryFrom(slug: string, html: string, tags: string[]): string {
+  if (tags.includes("Architecture")) return "Systems";
   const legacy = LEGACY_TAGS.get(slug);
   if (legacy) return legacy;
 

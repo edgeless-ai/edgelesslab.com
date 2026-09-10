@@ -118,3 +118,46 @@ test.describe("static site smoke", () => {
     expect(errors).toEqual([]);
   });
 });
+
+// The publishable architecture is an independent public document, not a view
+// into operational data. Exercise its real controls in the static export.
+test("public swarm Field Note is discoverable and interactive", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/field-notes/");
+  const link = page.locator('a[href="/creative-demos/connected-learning-swarm/"]');
+  await expect(link).toContainText("A swarm that learns");
+  await link.click();
+  await expect(page.getByRole("heading", { name: "A swarm that learns." })).toBeVisible();
+  await page.getByRole("button", { name: "Play walkthrough" }).click();
+  await expect(page.locator("#trace-counter")).toHaveText("Handoff 1 / 11");
+  await expect(page.locator("#packet-layer animateMotion")).toHaveCount(1);
+  await expect(page.locator(".graph-edge.active .wire")).toHaveCSS("stroke", "rgb(198, 242, 78)");
+  await page.getByRole("button", { name: "Pause" }).click();
+  await page.getByRole("button", { name: "Work engine", exact: true }).click();
+  await page.getByLabel("Follow a scenario", { exact: true }).selectOption("failure");
+  await page.getByRole("button", { name: "Next handoff" }).click();
+  await page.getByRole("button", { name: "Next handoff" }).click();
+  await expect(page.locator("#trace-counter")).toHaveText("Handoff 2 / 5");
+  await page.getByRole("button", { name: "Inspect Bounded recovery", exact: true }).click();
+  await expect(page.locator("#detail-title")).toHaveText("Bounded recovery");
+  await page.getByRole("button", { name: "Field sheet", exact: true }).click();
+  await expect(page.locator("#architecture-svg")).toHaveAttribute("data-theme", "light");
+  await page.getByRole("button", { name: "Present", exact: true }).click();
+  await page.getByRole("button", { name: "Hide guide", exact: true }).click();
+  await expect(page.locator(".walkthrough")).not.toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".walkthrough")).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("public swarm Field Note fits a mobile viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/creative-demos/connected-learning-swarm/");
+  await expect(page.getByRole("heading", { name: "A swarm that learns." })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Play walkthrough" })).toBeVisible();
+  const fits = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+  expect(fits).toBe(true);
+  await page.getByRole("button", { name: "Zoom in", exact: true }).click();
+  await expect(page.locator("#zoom-label")).toHaveText("125%");
+});

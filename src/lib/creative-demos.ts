@@ -9,6 +9,14 @@ export interface CreativeDemo {
 
 export const creativeDemos: CreativeDemo[] = [
   {
+    slug: "connected-learning-swarm",
+    title: "A swarm that learns",
+    description: "An interactive reference architecture for conversation, agent coordination, evidence, and feedback. Explore three diagrams and six guided scenarios.",
+    tags: ["Systems", "Agents", "Architecture", "Interactive"],
+    date: "2026-09-10",
+    hasControls: true,
+  },
+  {
     slug: "tartan-weave-synth",
     title: "Tartan Weave Synth",
     description: "A full textile system based on Tartanism: formal threadcount notation, 48 dye colors, 6 loom structures, separate warp and weft, material studies, mutation, and recipe export.",

@@ -64,6 +64,13 @@ const failures = [];
 for (const file of htmlFiles) {
   try {
     const html = await readFile(file, "utf8");
+    // Standalone interactive documents can own styles for states that do not
+    // exist in the initial DOM. Preserve their inline CSS when opted in.
+    if (/<html\b[^>]*\bdata-preserve-inline-styles\b/i.test(html)) {
+      skipped++;
+      continue;
+    }
+
     // Skip files that carry no stylesheet/style references — critters has
     // nothing to inline there, and its HTML parser can crash on bare
     // non-HTML stubs (e.g. google-site-verification files).

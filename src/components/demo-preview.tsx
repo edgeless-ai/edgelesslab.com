@@ -12,6 +12,7 @@ const POSTERS = [
 ];
 
 function posterForSlug(slug: string) {
+  if (slug === "connected-learning-swarm") return "/creative-demos/connected-learning-swarm/system.png";
   if (slug === "flow-field-particle-ecosystem") return POSTERS[0];
   if (slug === "harmonograph-lissajous") return POSTERS[1];
 

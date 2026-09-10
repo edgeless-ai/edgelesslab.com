@@ -10,8 +10,8 @@ export interface CreativeDemo {
 export const creativeDemos: CreativeDemo[] = [
   {
     slug: "connected-learning-swarm",
-    title: "A swarm that learns",
-    description: "An interactive reference architecture for conversation, agent coordination, evidence, and feedback. Explore three diagrams and six guided scenarios.",
+    title: "The Return Path",
+    description: "How conversation becomes evidence, work, and feedback. Explore three architecture diagrams and six guided scenarios.",
     tags: ["Systems", "Agents", "Architecture", "Interactive"],
     date: "2026-09-10",
     hasControls: true,

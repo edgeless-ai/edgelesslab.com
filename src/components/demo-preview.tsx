@@ -28,6 +28,20 @@ export function DemoPreview({ slug, title }: { slug: string; title: string }) {
   const [loaded, setLoaded] = useState(false);
   const tartan = slug === "tartan-weave-synth";
 
+  // An editorial proposal must not inherit an unrelated art poster or live-demo label.
+  if (slug === "borrow-the-creative-loop") {
+    return (
+      <div
+        className="mb-4 flex aspect-[16/10] w-full flex-col justify-between rounded-md border p-5"
+        style={{ borderColor: "var(--border-subtle)", background: "var(--paper)", color: "var(--ink)" }}
+      >
+        <span className="font-mono text-xs uppercase tracking-widest">Design study</span>
+        <span className="font-serif text-3xl leading-tight">One gesture.<br />Many paths.<br />A way back.</span>
+        <span className="font-mono text-xs">Thread Commons · Not built</span>
+      </div>
+    );
+  }
+
   function deactivate() {
     setActive(false);
     setLoaded(false);

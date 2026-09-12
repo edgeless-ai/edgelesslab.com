@@ -79,6 +79,7 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/blog"
+                  prefetch={false}
                   className="inline-flex min-h-11 items-center gap-2 rounded-sm border px-5 text-sm font-medium transition-colors hover:text-white"
                   style={{
                     borderColor: "var(--border-focus)",
@@ -168,7 +169,7 @@ export default function Home() {
                   after a system meets reality.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
-                  <Link href="/blog" className="inline-flex items-center gap-2 font-mono text-xs uppercase" style={{ color: "var(--malachite)" }}>
+                  <Link href="/blog" prefetch={false} className="inline-flex items-center gap-2 font-mono text-xs uppercase" style={{ color: "var(--malachite)" }}>
                     All posts <ArrowRight size={13} />
                   </Link>
                   <Link href="/feed.xml" className="inline-flex items-center gap-2 font-mono text-xs uppercase" style={{ color: "var(--ink-soft)" }}>

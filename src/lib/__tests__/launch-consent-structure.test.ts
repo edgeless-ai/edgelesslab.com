@@ -13,6 +13,15 @@ function nodes(source: ts.Node, predicate: (node: ts.Node) => boolean) {
   return result;
 }
 
+test("Home secondary Blog links defer their large route payload until navigation", () => {
+  const links = nodes(parse("src/app/page.tsx"), (node) => ts.isJsxOpeningElement(node) && node.tagName.getText() === "Link") as ts.JsxOpeningElement[];
+  const attributes = links.map((link) => Object.fromEntries(link.attributes.properties.filter(ts.isJsxAttribute).map((a) => [a.name.getText(), a.initializer?.getText()])));
+  const blogLinks = attributes.filter((a) => a.href === '"/blog"');
+  expect(blogLinks).toHaveLength(2);
+  for (const a of blogLinks) expect(a.prefetch).toBe("{false}");
+  expect(attributes.some((a) => a.href === '"/field-notes"' && a.prefetch !== "{false}")).toBe(true);
+});
+
 test.each(["src/app/page.tsx", "src/app/field-notes/page.tsx", "src/components/blog-client.tsx", "src/app/about/page.tsx", "src/app/privacy/page.tsx", "src/app/terms/page.tsx", "src/app/not-found.tsx"])("%s has one focusable main landmark for the skip link", (path) => {
   const mains = nodes(parse(path), (node) => ts.isJsxOpeningElement(node) && node.tagName.getText() === "main") as ts.JsxOpeningElement[];
   expect(mains).toHaveLength(1);

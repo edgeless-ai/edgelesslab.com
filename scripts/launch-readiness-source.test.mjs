@@ -103,6 +103,7 @@ test("agent kit follows the RSS feed without collecting email or reporting false
 
 test("Maison keeps its audience dialog hidden, labelled, keyboard accessible and honest about email handoff", () => {
   const html = read("public/maison/index.html");
+  assert.match(html, /<html\b[^>]*\bdata-preserve-inline-styles\b/);
   assert.match(html, /<main id="main-content" tabindex="-1">/);
   assert.match(html, /id="audience"[^>]+hidden inert/);
   for (const id of ["af_name", "af_work", "af_note"]) {

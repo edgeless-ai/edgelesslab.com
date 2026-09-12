@@ -274,6 +274,19 @@ export function auditExport(
     const reason = exclusionFor(route, html);
     const head = headMetadata(html);
     const issues = [];
+    if (route === "/maison/") {
+      // Critters sees only the initial DOM; the dialog/status rules must survive
+      // export even though their active classes are applied later by JavaScript.
+      const styles = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1]).join("\n");
+      const required = [
+        /\.modal\.on\s*\{[^}]*opacity\s*:\s*1\s*[;}]/,
+        /\.modal\.on\s*\{[^}]*pointer-events\s*:\s*auto\s*[;}]/,
+        /\.modal\.on\s+\.sheet\s*\{[^}]*transform\s*:\s*none\s*[;}]/,
+        /\.status\.open\s+\.dot\s*\{/,
+      ];
+      if (required.some((rule) => !rule.test(styles)))
+        failures.push({ route, kind: "missing-interactive-styles" });
+    }
     if (
       fixturePaths.has(route) &&
       !/\bnoindex\b/i.test(head.meta.get("robots") ?? "")

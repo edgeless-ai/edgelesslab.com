@@ -14,6 +14,18 @@ import {
 } from "./launch-readiness.mjs";
 const html =
   '<!doctype html><html><head><title>Study &amp; Evidence</title></head><body><h1>Study</h1><p>A published description of a system responding to deliberate input.</p><script>window.keep="unchanged"</script></body></html>';
+test("export audit rejects stripped Maison interactive state styles", (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "launch-maison-"));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(dir, "maison"));
+  fs.writeFileSync(path.join(dir, "sitemap.xml"), "<urlset></urlset>");
+  const file = path.join(dir, "maison/index.html");
+  const document = html.replace("</head>", '<style>.modal{opacity:0;pointer-events:none}</style></head>');
+  fs.writeFileSync(file, document);
+  assert.ok(auditExport(dir).failures.some((x) => x.kind === "missing-interactive-styles"));
+  fs.writeFileSync(file, document.replace("</style>", ".modal.on{opacity:1;pointer-events:auto}.modal.on .sheet{transform:none}.status.open .dot{background:green}</style>"));
+  assert.ok(!auditExport(dir).failures.some((x) => x.kind === "missing-interactive-styles"));
+});
 test("adds static metadata from existing text while keeping body intact; second repair is idempotent", () => {
   const r = repairMetadata(html, "/creative-demos/study/");
   assert.match(r.html, /name="description" content="A published description/);

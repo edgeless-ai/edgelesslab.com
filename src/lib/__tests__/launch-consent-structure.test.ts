@@ -13,7 +13,7 @@ function nodes(source: ts.Node, predicate: (node: ts.Node) => boolean) {
   return result;
 }
 
-test.each(["src/app/page.tsx", "src/app/field-notes/page.tsx", "src/components/blog-client.tsx", "src/app/about/page.tsx", "src/app/privacy/page.tsx", "src/app/terms/page.tsx"])("%s has one focusable main landmark for the skip link", (path) => {
+test.each(["src/app/page.tsx", "src/app/field-notes/page.tsx", "src/components/blog-client.tsx", "src/app/about/page.tsx", "src/app/privacy/page.tsx", "src/app/terms/page.tsx", "src/app/not-found.tsx"])("%s has one focusable main landmark for the skip link", (path) => {
   const mains = nodes(parse(path), (node) => ts.isJsxOpeningElement(node) && node.tagName.getText() === "main") as ts.JsxOpeningElement[];
   expect(mains).toHaveLength(1);
   const attributes = Object.fromEntries(mains[0].attributes.properties.filter(ts.isJsxAttribute).map((a) => [a.name.getText(), a.initializer?.getText()]));

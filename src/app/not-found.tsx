@@ -31,7 +31,7 @@ export default function NotFound() {
       </Script>
       <Nav />
 
-      <main id="main-content" className="flex-1 flex items-center justify-center px-6 py-32">
+      <main id="main-content" tabIndex={-1} className="flex-1 flex items-center justify-center px-6 py-32">
         <div className="max-w-lg text-center">
           <p
             className="text-8xl font-bold font-mono mb-6"

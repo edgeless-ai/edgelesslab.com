@@ -165,7 +165,7 @@ export function FeaturedArtifact() {
         borderColor: "var(--border-subtle)",
       }}
     >
-      <div className="flex items-center justify-between border-b px-4 py-3">
+      <div className="flex items-center justify-between border-b px-4 py-3" style={{ background: "var(--bg-surface)" }}>
         <span className="lab-metadata" style={{ color: "var(--text-tertiary)" }}>
           Flow field 023 / live study
         </span>

@@ -1,0 +1,2722 @@
+{
+  "schemaVersion": 1,
+  "auditedAt": "2026-09-12",
+  "scope": "Exact source and target pairs only; archive assets still broken. New misses fail regression.",
+  "missingReferences": [
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/dbf91a68d715.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/25c1124826af.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/f3bd0831e0cd.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/0359428cdf79.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/1868435e261f.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/e3c5a899ec75.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/b6948ed1ed26.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/0851074e6573.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/ee61bc28cc23.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/2bb263a896cb.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/90edc251f6a0.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/475133b1a5e9.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/e378b2562665.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/4a15b5d91836.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/ae48904a1f24.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/e96b79da01d2.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/68f52a2caf8d.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/27dc465237ab.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/a4bd400dea6f.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/e71d777be7a2.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/548c7286dec9.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/c34756364133.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/8d4ec0523f77.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/eea365da457a.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/3c815eea11b8.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/345dfab8ce09.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/fad1a143d885.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/5432a7f9c1bc.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/089ed89349d1.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/c35c980c05ad.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/7f6ffccb340c.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/9110f34ec2cb.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/5f203587b083.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/ce2564293dae.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/821ccc048140.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/29585edfbe87.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/a82cabbad2d5.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/be53665214c7.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/5fc15bf24955.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/819b987381c3.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/d4c2e050f102.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/4c9a76ead6bb.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/12b86f8288f1.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/71aaa364ea3e.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/ad44636e5255.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/b0f9c6652de1.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/excalidraw.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/3bcd4d6ab22c.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/excalidraw.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/1ebac8453c56.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/excalidraw.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/edc2d0749bfe.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/excalidraw.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/ee0d60b3e9ad.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/excalidraw.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/efb0506b4ae9.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/excalidraw.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/153f33ad6c3e.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/519dbc076e55.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/4bcfd2503b90.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/cd712b91a52d.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/0150044d2088.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/83697e5cf416.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/cc31272663d4.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/9eb27ca90179.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/2b2b356e1ab6.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/72fcadebbade.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/bedfb2d89277.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/20067691ef61.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/29a1cdb1cd4e.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/ff2cb2b8d593.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/0d04ff5c1579.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/92c519ca1573.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/0cb6f1ec6be6.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/a35648da9a43.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/5b55781f9f70.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/d8f2588f4425.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/711c32b1cf36.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/2033886dcdd9.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/9535792440fe.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/0db5c115e3f3.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/7785220eb475.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/62dfe09b5fd2.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/ba4b6b96d93c.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/9257aeb6194a.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/d9f551b78298.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/linear.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/ab7df29ff2b9.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/5c9deac14a40.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/2ba1d8002a38.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/5bd8aef9ceb6.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/0f915afede2d.woff",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/79dc879b874e.woff",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/bef4905422cc.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/be6c1642c7d9.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/7a76be268ad7.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/eb5ed6497a29.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/07919fe11f25.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/2a13d719f4ad.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/252a52396fa3.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/5dd886854cff.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/1ebf67cc6f8c.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/e862cbe07147.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/a2a45f79e07a.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/1b11ef625297.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/7459b6aa199f.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/bbd671f2fbb1.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/699090b68073.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/6587286fd1f7.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/5ab1025621db.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/f64b1faca8ae.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/0105f4999868.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/c174b0e6a27a.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/620d2b506633.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/731003556a0f.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/27d5a7e42d71.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/568d308aa03b.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/9965bedb420a.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/34c6b93adc98.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/617f12ffd1ec.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/3c246abc9ab7.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/969797183b75.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/9603c453f167.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/c41728a91f04.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/5d8b802107c8.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/d91ccf311e39.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/58abd1270d9d.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/341e9e109081.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/9bd3e304784b.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/f3f82c718c92.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/a8265bcdb3f9.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/f0ae8beffca1.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/8795fc690d83.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/cd3e865ad9a0.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/be61b370d94e.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/98594c47eca7.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/9d95a24b390e.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/3e5d23b3a031.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/pudding-cool.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/79733bb2020d.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/c92033c4c2ba.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/1a408c15e6b0.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/e4fbf2f3de76.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/a022e6b26575.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/425a3e1611de.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/479448f33f4d.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/02f9b3cf8bac.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/138424e067fa.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/d8fc23bc37e0.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/96801445bc82.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/54f5a311eece.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/1f12cf1b9dda.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/fonts/5e3ba48c5238.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/26cc4cc9dfc1.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/1e934ad140a5.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/8ddc6508372c.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/2782ab4ade74.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/0ca694f2060c.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/d4348aa8be3c.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/513df80b6a24.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/459f8fe5453b.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/673b6f25c16e.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/4a160a244a37.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/95a4ec339f4d.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/a9262e7da23d.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/eaf3eae916c0.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/b90d7678a3a3.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/b1e74d0f59d9.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/7bdbfd1b8ef9.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/1cc0dc53a6fb.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/2007eb1650a9.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/f4b19072ac62.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/636b3217cd68.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/129386197305.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/0cc8a7e01c5a.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/f70f5974a155.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/a41ee15f3170.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/a0bbf47186a7.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/7e0d035a3e5b.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/7f3c5b41b789.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/69638c39933e.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/e40c920071aa.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/3a51c8d8f622.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/a8d8161ab34b.jpeg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/316ddf05a761.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/c69bdd227b76.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/fcf4163ec50f.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/4acc71612f55.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/9e33cfd526d5.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/ed32f9cf361b.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/289905a71d29.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/212ecd5e39f4.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/0af24c6a40c9.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/dba08ff6841e.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/e55151e7ef18.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/834c3c606cfd.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/afb4f9216c66.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/00a8baa2593f.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/26f2e1645fbc.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/cc9050dc204b.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/bdf751a2bf41.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/a3e374ba7925.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/dfaf6abe8b92.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/b5633de4f892.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/682df50b14db.jpeg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/d6cc9973f049.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/657cbd1dd7c5.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/b10d4dfdf92a.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/a5ab5e5f097a.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/1b1f9695bf4e.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/ca01a265d5d8.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/e2f77711831d.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/a45b5b493ba8.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/ef97169f0ca9.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/videos/3f83f2510702.mp4",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/8f88c6f1575b.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/10d517e202a0.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/fca08c8c865f.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/93c5472cf723.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/8d7846652f68.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/13d16c38b81e.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/d9f6d89d9172.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/f9a43df28a0b.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/a5458952c3c7.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/b2077162a693.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/77afe293ea46.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/115fde9bbd9d.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/d21a23fef311.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/50570de5bd30.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/71ff5f0770c1.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/98b3a534ac6a.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/eb496bbb4be8.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/29259565f2cc.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/ee81e386d620.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/e050cd5ff09f.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/ff8025c5bd79.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/391c4afd5b26.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/39d4538ca373.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/51a4ee11d1f2.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/8c58d982c927.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/2645623a308f.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/e076d87a6ffd.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/198d3643d962.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/2fd86b104fa6.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/b00792da32b8.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/2a9c00e46e7d.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/svg/58816befdeb0.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/1fd88077fd48.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/videos/4ed0f8abda1f.mp4",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/videos/a320fdeef883.mp4",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/videos/9b4d26029465.mp4",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/videos/e2f070f81fa1.mp4",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/videos/42231f6d9263.mp4",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/replicate.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/305bc0c2164e.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/dbf91a68d715.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/25c1124826af.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/f3bd0831e0cd.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/0359428cdf79.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/1868435e261f.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/e3c5a899ec75.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/b6948ed1ed26.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/0851074e6573.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/ee61bc28cc23.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/2bb263a896cb.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/90edc251f6a0.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/475133b1a5e9.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/e378b2562665.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/4a15b5d91836.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/ae48904a1f24.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/e96b79da01d2.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/68f52a2caf8d.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/27dc465237ab.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/a4bd400dea6f.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/e71d777be7a2.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/548c7286dec9.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/c34756364133.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/8d4ec0523f77.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/eea365da457a.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/3c815eea11b8.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/345dfab8ce09.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/fad1a143d885.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/5432a7f9c1bc.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/089ed89349d1.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/c35c980c05ad.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/7f6ffccb340c.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/9110f34ec2cb.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/5f203587b083.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/ce2564293dae.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/821ccc048140.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/29585edfbe87.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/a82cabbad2d5.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/be53665214c7.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/5fc15bf24955.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/819b987381c3.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/d4c2e050f102.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/4c9a76ead6bb.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/12b86f8288f1.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/71aaa364ea3e.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/ad44636e5255.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/b0f9c6652de1.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/5c9deac14a40.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/2ba1d8002a38.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/5bd8aef9ceb6.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/0f915afede2d.woff",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/79dc879b874e.woff",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/bef4905422cc.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/be6c1642c7d9.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/7a76be268ad7.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/eb5ed6497a29.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/07919fe11f25.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/2a13d719f4ad.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/252a52396fa3.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/5dd886854cff.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/1ebf67cc6f8c.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/e862cbe07147.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/a2a45f79e07a.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/1b11ef625297.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/7459b6aa199f.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/bbd671f2fbb1.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/699090b68073.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/6587286fd1f7.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/5ab1025621db.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/f64b1faca8ae.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/0105f4999868.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/c174b0e6a27a.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/620d2b506633.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/731003556a0f.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/27d5a7e42d71.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/568d308aa03b.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/9965bedb420a.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/34c6b93adc98.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/617f12ffd1ec.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/3c246abc9ab7.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/969797183b75.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/9603c453f167.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/c41728a91f04.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/5d8b802107c8.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/d91ccf311e39.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/58abd1270d9d.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/341e9e109081.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/9bd3e304784b.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/f3f82c718c92.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/a8265bcdb3f9.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/f0ae8beffca1.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/8795fc690d83.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/cd3e865ad9a0.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/be61b370d94e.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/98594c47eca7.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/9d95a24b390e.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/3e5d23b3a031.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/data-narrative.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/79733bb2020d.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/infinite-board.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/3bcd4d6ab22c.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/infinite-board.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/1ebac8453c56.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/infinite-board.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/edc2d0749bfe.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/infinite-board.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/ee0d60b3e9ad.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/infinite-board.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/efb0506b4ae9.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/infinite-board.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/153f33ad6c3e.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/c92033c4c2ba.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/1a408c15e6b0.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/e4fbf2f3de76.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/a022e6b26575.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/425a3e1611de.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/479448f33f4d.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/02f9b3cf8bac.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/138424e067fa.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/d8fc23bc37e0.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/96801445bc82.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/54f5a311eece.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/1f12cf1b9dda.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/5e3ba48c5238.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/26cc4cc9dfc1.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/1e934ad140a5.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/8ddc6508372c.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/2782ab4ade74.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/0ca694f2060c.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/d4348aa8be3c.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/513df80b6a24.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/459f8fe5453b.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/673b6f25c16e.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/4a160a244a37.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/95a4ec339f4d.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/a9262e7da23d.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/eaf3eae916c0.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/b90d7678a3a3.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/b1e74d0f59d9.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/7bdbfd1b8ef9.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/1cc0dc53a6fb.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/2007eb1650a9.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/f4b19072ac62.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/636b3217cd68.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/129386197305.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/0cc8a7e01c5a.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/f70f5974a155.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/a41ee15f3170.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/a0bbf47186a7.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/7e0d035a3e5b.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/7f3c5b41b789.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/69638c39933e.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/e40c920071aa.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/3a51c8d8f622.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/a8d8161ab34b.jpeg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/316ddf05a761.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/c69bdd227b76.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/fcf4163ec50f.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/4acc71612f55.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/9e33cfd526d5.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/ed32f9cf361b.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/289905a71d29.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/212ecd5e39f4.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/0af24c6a40c9.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/dba08ff6841e.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/e55151e7ef18.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/834c3c606cfd.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/afb4f9216c66.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/00a8baa2593f.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/26f2e1645fbc.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/cc9050dc204b.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/bdf751a2bf41.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/a3e374ba7925.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/dfaf6abe8b92.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/b5633de4f892.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/682df50b14db.jpeg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/d6cc9973f049.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/657cbd1dd7c5.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/b10d4dfdf92a.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/a5ab5e5f097a.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/1b1f9695bf4e.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/ca01a265d5d8.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/e2f77711831d.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/a45b5b493ba8.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/ef97169f0ca9.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/videos/3f83f2510702.mp4",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/8f88c6f1575b.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/10d517e202a0.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/fca08c8c865f.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/93c5472cf723.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/8d7846652f68.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/13d16c38b81e.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/d9f6d89d9172.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/f9a43df28a0b.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/a5458952c3c7.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/b2077162a693.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/77afe293ea46.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/115fde9bbd9d.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/d21a23fef311.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/50570de5bd30.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/71ff5f0770c1.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/98b3a534ac6a.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/eb496bbb4be8.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/29259565f2cc.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/ee81e386d620.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/e050cd5ff09f.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/ff8025c5bd79.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/391c4afd5b26.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/39d4538ca373.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/51a4ee11d1f2.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/8c58d982c927.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/2645623a308f.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/e076d87a6ffd.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/198d3643d962.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/2fd86b104fa6.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/b00792da32b8.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/2a9c00e46e7d.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/58816befdeb0.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/1fd88077fd48.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/videos/4ed0f8abda1f.mp4",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/videos/a320fdeef883.mp4",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/videos/9b4d26029465.mp4",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/videos/e2f070f81fa1.mp4",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/videos/42231f6d9263.mp4",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/model-gallery.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/305bc0c2164e.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/ffcde2172238.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/24e39e56ce5e.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/dd7af5d0d815.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/cc2d982f6389.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/29519e7c06cc.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/dd46e357cfd1.webp",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/0b693b05699d.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/280920855dda.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/040ed134342c.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/56a26fbbbeba.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/08a7bb697d84.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/75120b3063f5.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/03f591e87a6d.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/6c2ca8a32a6c.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/7f7de63656ca.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/7f047dc93235.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/52299ed50113.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/817bb2864f15.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/7c9d2d702292.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/369735511fe1.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/cddce4d6b3d1.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/804310b12b46.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/2da9819096c4.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/247bc208c152.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/a73633b16ced.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/1f83188d07f2.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/6f9b0bb977bf.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/e8db7c949fc1.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/46253d44c419.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/c26aa4c88839.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/7a960af849a9.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/25d6181dcb77.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/5f6f0199fbe7.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/33ffc484d23d.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/c25b97bdbb6c.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/21c5bb470b3a.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/9b10d333fbe1.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/318a1557a4a5.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/aa5ab33947a8.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/c1af328f42bc.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/4fd280724bad.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/fd123ae9a574.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/27837665843e.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/c0b08bf22ee8.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/a81850b9de64.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/2cc4bbee6146.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/1b3337dd6dc1.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/debf4f9a0c2e.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/25e6d42b0f89.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/6fc2172dec97.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/svg/e013d972275b.svg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/519dbc076e55.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/4bcfd2503b90.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/cd712b91a52d.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/fonts/0150044d2088.woff2",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/83697e5cf416.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/cc31272663d4.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/9eb27ca90179.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/2b2b356e1ab6.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/72fcadebbade.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/bedfb2d89277.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/20067691ef61.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/29a1cdb1cd4e.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/ff2cb2b8d593.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/0d04ff5c1579.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/92c519ca1573.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/0cb6f1ec6be6.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/a35648da9a43.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/5b55781f9f70.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/d8f2588f4425.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/711c32b1cf36.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/2033886dcdd9.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/9535792440fe.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/0db5c115e3f3.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/7785220eb475.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/62dfe09b5fd2.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/ba4b6b96d93c.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/9257aeb6194a.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/d9f551b78298.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/product-canvas.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/ab7df29ff2b9.avif",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    }
+  ]
+}

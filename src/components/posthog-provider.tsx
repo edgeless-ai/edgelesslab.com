@@ -2,78 +2,38 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import type posthog from "posthog-js";
-
-const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
-
-let initialized = false;
-let initPromise: Promise<typeof posthog | null> | null = null;
-
-function getCurrentUrl(pathname: string | null) {
-  if (typeof window === "undefined") return undefined;
-  return window.origin + (pathname || window.location.pathname);
-}
-
-async function ensurePostHog() {
-  if (!POSTHOG_KEY) return null;
-  if (initPromise) return initPromise;
-
-  initPromise = (async () => {
-    const { default: ph } = await import("posthog-js");
-    if (!initialized) {
-      const options: Parameters<typeof ph.init>[1] & { web_vitals?: boolean } = {
-        api_host: POSTHOG_HOST,
-        person_profiles: "identified_only",
-        capture_pageview: false,
-        capture_pageleave: true,
-        autocapture: true,
-        capture_performance: false,
-        web_vitals: false,
-      };
-      ph.init(POSTHOG_KEY, options);
-      initialized = true;
-    }
-    return ph;
-  })();
-
-  return initPromise;
-}
+import { AnalyticsConsentPanel } from "@/components/analytics-consent-panel";
+import { captureConsentedEvent, CONSENT_CHANGED_EVENT, CONSENT_STORAGE_KEY, reconcileAnalyticsConsent } from "@/lib/analytics-consent";
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  // Dynamically import posthog-js on first user interaction or after LCP
   useEffect(() => {
-    async function capturePageview() {
-      const ph = await ensurePostHog();
-      if (!ph) return;
-      ph.capture("$pageview", { $current_url: getCurrentUrl(pathname) });
+    function sync() {
+      if (reconcileAnalyticsConsent()) {
+        window.location.reload();
+        return;
+      }
+      void captureConsentedEvent("$pageview", {
+        $current_url: window.location.origin + (pathname || window.location.pathname),
+      });
     }
-
-    if (initialized) {
-      capturePageview();
-      return;
+    function onStorage(event: StorageEvent) {
+      if (event.key === CONSENT_STORAGE_KEY || event.key === null) {
+        // Use the event value so a rapid reject/reaccept in another tab still
+        // invalidates work from the earlier consent session.
+        reconcileAnalyticsConsent(event.newValue === "accepted" ? "accepted" : event.newValue === "rejected" ? "rejected" : null);
+        sync();
+      }
     }
-
-    // Defer until interaction (guarantees LCP isn't blocked)
-    const onInteraction = () => {
-      window.removeEventListener("pointerdown", onInteraction);
-      window.removeEventListener("keydown", onInteraction);
-      capturePageview();
+    sync();
+    window.addEventListener(CONSENT_CHANGED_EVENT, sync);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener(CONSENT_CHANGED_EVENT, sync);
+      window.removeEventListener("storage", onStorage);
     };
-    window.addEventListener("pointerdown", onInteraction, { once: true });
-    window.addEventListener("keydown", onInteraction, { once: true });
-
-    // Fallback: init after 8 seconds even without interaction
-    const fallback = setTimeout(() => {
-      window.removeEventListener("pointerdown", onInteraction);
-      window.removeEventListener("keydown", onInteraction);
-      capturePageview();
-    }, 8000);
-
-    return () => clearTimeout(fallback);
   }, [pathname]);
 
-  return children;
+  return <>{children}<AnalyticsConsentPanel /></>;
 }

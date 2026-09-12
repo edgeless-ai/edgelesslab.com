@@ -9,1180 +9,1188 @@
 body { background: var(--bg); color: var(--fg); font-family: 'SF Mono', Monaco, monospace; margin: 0; padding: 2rem; }
 header { border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 2rem; }
 h1 { margin: 0; font-size: 1.5rem; color: var(--accent); }
-.sub { color: #7a8a8a; font-size: 0.85rem; margin-top: 0.5rem; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+.sub { color: #809090; font-size: 0.85rem; margin-top: 0.5rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr)); gap: 1.5rem; }
 .card { background: var(--muted); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; transition: border-color 0.2s; }
 .card:hover { border-color: var(--accent); }
+.card .preview { display: block; }
+a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.card:focus-within { border-color: var(--accent); }
+.preview-unavailable { height: 200px; display: flex; align-items: center; justify-content: center; color: var(--fg); }
+.incomplete-original { display: block; padding: 1rem; color: var(--accent); overflow-wrap: anywhere; }
 .card img { width: 100%; height: 200px; object-fit: cover; display: block; }
 .card .meta { padding: 1rem; }
-.card .name { font-size: 0.9rem; color: var(--accent); margin: 0 0 0.25rem; }
-.card .category { font-size: 0.75rem; color: #7a8a8a; text-transform: uppercase; letter-spacing: 0.05em; }
-.stats { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: #7a8a8a; }
+.card .name { overflow-wrap: anywhere; font-size: 0.9rem; color: var(--accent); margin: 0 0 0.25rem; }
+.card .category { overflow-wrap: anywhere; font-size: 0.75rem; color: #809090; text-transform: uppercase; letter-spacing: 0.05em; }
+.stats { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: #809090; }
 </style>
 </head>
 <body>
+<main>
 <header>
 <h1>Edgeless Skill Gallery</h1>
 <div class="sub">166 skills rendered as 3D artifacts. Each generated from SKILL.md frontmatter.</div>
+<p class="sub">Select a preview to open the original PNG.</p>
 </header>
 <div class="grid">
 <div class="card">
-<img src="renders/academic_paper.png" alt="academic-paper" loading="lazy">
+<a class="preview" href="/renders/academic_paper.png" aria-label="Open original academic-paper"><img src="/gallery-thumbnails/1ab66a972f94725d6db9.webp" alt="academic-paper" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">academic-paper</div>
 <div class="category">academic_paper</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/academic_research.png" alt="academic-research" loading="lazy">
+<a class="preview" href="/renders/academic_research.png" aria-label="Open original academic-research"><img src="/gallery-thumbnails/57f53bd715039bbc0450.webp" alt="academic-research" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">academic-research</div>
 <div class="category">academic_research</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/academic_review.png" alt="academic-review" loading="lazy">
+<a class="preview" href="/renders/academic_review.png" aria-label="Open original academic-review"><img src="/gallery-thumbnails/1ab66a972f94725d6db9.webp" alt="academic-review" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">academic-review</div>
 <div class="category">academic_review</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/ios_app_distribution.png" alt="apple_ios-app-distribution" loading="lazy">
+<a class="preview" href="/renders/ios_app_distribution.png" aria-label="Open original apple_ios-app-distribution"><img src="/gallery-thumbnails/bd35ebd17725c2ee7e0d.webp" alt="apple_ios-app-distribution" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">apple_ios-app-distribution</div>
 <div class="category">ios_app_distribution</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/claude_code.png" alt="autonomous-ai-agents_claude-code" loading="lazy">
+<a class="preview" href="/renders/claude_code.png" aria-label="Open original autonomous-ai-agents_claude-code"><img src="/gallery-thumbnails/e4af6b2e95e426d673f0.webp" alt="autonomous-ai-agents_claude-code" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">autonomous-ai-agents_claude-code</div>
 <div class="category">claude_code</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/codex.png" alt="autonomous-ai-agents_codex" loading="lazy">
+<a class="preview" href="/renders/codex.png" aria-label="Open original autonomous-ai-agents_codex"><img src="/gallery-thumbnails/e4af6b2e95e426d673f0.webp" alt="autonomous-ai-agents_codex" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">autonomous-ai-agents_codex</div>
 <div class="category">codex</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/compound_orchestrator.png" alt="autonomous-ai-agents_compound-orchestrator" loading="lazy">
+<a class="preview" href="/renders/compound_orchestrator.png" aria-label="Open original autonomous-ai-agents_compound-orchestrator"><img src="/gallery-thumbnails/e4af6b2e95e426d673f0.webp" alt="autonomous-ai-agents_compound-orchestrator" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">autonomous-ai-agents_compound-orchestrator</div>
 <div class="category">compound_orchestrator</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/goal_loop.png" alt="autonomous-ai-agents_goal-loop" loading="lazy">
+<a class="preview" href="/renders/goal_loop.png" aria-label="Open original autonomous-ai-agents_goal-loop"><img src="/gallery-thumbnails/8d6e59fb6cfbb77283b4.webp" alt="autonomous-ai-agents_goal-loop" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">autonomous-ai-agents_goal-loop</div>
 <div class="category">goal_loop</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/hermes_agent.png" alt="autonomous-ai-agents_hermes-agent" loading="lazy">
+<a class="preview" href="/renders/hermes_agent.png" aria-label="Open original autonomous-ai-agents_hermes-agent"><img src="/gallery-thumbnails/66eb6663c20716d584e2.webp" alt="autonomous-ai-agents_hermes-agent" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">autonomous-ai-agents_hermes-agent</div>
 <div class="category">hermes_agent</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/hermes_multi_agent_discord.png" alt="autonomous-ai-agents_hermes-multi-agent-discord" loading="lazy">
+<a class="preview" href="/renders/hermes_multi_agent_discord.png" aria-label="Open original autonomous-ai-agents_hermes-multi-agent-discord"><img src="/gallery-thumbnails/048a7f7914499b83972f.webp" alt="autonomous-ai-agents_hermes-multi-agent-discord" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">autonomous-ai-agents_hermes-multi-agent-discord</div>
 <div class="category">hermes_multi_agent_discord</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/llms_txt_fleet_sync.png" alt="autonomous-ai-agents_llms-txt-fleet-sync" loading="lazy">
+<a class="preview" href="/renders/llms_txt_fleet_sync.png" aria-label="Open original autonomous-ai-agents_llms-txt-fleet-sync"><img src="/gallery-thumbnails/a233c1b069da7159715b.webp" alt="autonomous-ai-agents_llms-txt-fleet-sync" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">autonomous-ai-agents_llms-txt-fleet-sync</div>
 <div class="category">llms_txt_fleet_sync</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/opencode.png" alt="autonomous-ai-agents_opencode" loading="lazy">
+<a class="preview" href="/renders/opencode.png" aria-label="Open original autonomous-ai-agents_opencode"><img src="/gallery-thumbnails/c1d1012e931f34b2258b.webp" alt="autonomous-ai-agents_opencode" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">autonomous-ai-agents_opencode</div>
 <div class="category">opencode</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/swarm_operations.png" alt="autonomous-ai-agents_swarm-operations" loading="lazy">
+<a class="preview" href="/renders/swarm_operations.png" aria-label="Open original autonomous-ai-agents_swarm-operations"><img src="/gallery-thumbnails/d04d9273f63020d9df38.webp" alt="autonomous-ai-agents_swarm-operations" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">autonomous-ai-agents_swarm-operations</div>
 <div class="category">swarm_operations</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/baoyu_comic_pipeline.png" alt="baoyu-comic-pipeline" loading="lazy">
+<a class="preview" href="/renders/baoyu_comic_pipeline.png" aria-label="Open original baoyu-comic-pipeline"><img src="/gallery-thumbnails/dd5228b69c7cdd98640e.webp" alt="baoyu-comic-pipeline" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">baoyu-comic-pipeline</div>
 <div class="category">baoyu_comic_pipeline</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/cli_dashboards.png" alt="cli-dashboards" loading="lazy">
+<a class="preview" href="/renders/cli_dashboards.png" aria-label="Open original cli-dashboards"><img src="/gallery-thumbnails/05897734c8aeb94def75.webp" alt="cli-dashboards" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">cli-dashboards</div>
 <div class="category">cli_dashboards</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/coding.png" alt="coding" loading="lazy">
+<a class="preview" href="/renders/coding.png" aria-label="Open original coding"><img src="/gallery-thumbnails/05897734c8aeb94def75.webp" alt="coding" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">coding</div>
 <div class="category">coding</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/3d_asset_pipeline.png" alt="creative_3d-asset-pipeline" loading="lazy">
+<a class="preview" href="/renders/3d_asset_pipeline.png" aria-label="Open original creative_3d-asset-pipeline"><img src="/gallery-thumbnails/dd0421cf846ebf5231d2.webp" alt="creative_3d-asset-pipeline" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_3d-asset-pipeline</div>
 <div class="category">3d_asset_pipeline</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/blender_3d_pipeline.png" alt="creative_blender-3d-pipeline" loading="lazy">
+<a class="preview" href="/renders/blender_3d_pipeline.png" aria-label="Open original creative_blender-3d-pipeline"><img src="/gallery-thumbnails/dd0421cf846ebf5231d2.webp" alt="creative_blender-3d-pipeline" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_blender-3d-pipeline</div>
 <div class="category">blender_3d_pipeline</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/blender_asset_pipeline.png" alt="creative_blender-asset-pipeline" loading="lazy">
+<a class="preview" href="/renders/blender_asset_pipeline.png" aria-label="Open original creative_blender-asset-pipeline"><img src="/gallery-thumbnails/dd0421cf846ebf5231d2.webp" alt="creative_blender-asset-pipeline" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_blender-asset-pipeline</div>
 <div class="category">blender_asset_pipeline</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/blender_cad_pipeline.png" alt="creative_blender-cad-pipeline" loading="lazy">
+<a class="preview" href="/renders/blender_cad_pipeline.png" aria-label="Open original creative_blender-cad-pipeline"><img src="/gallery-thumbnails/dd0421cf846ebf5231d2.webp" alt="creative_blender-cad-pipeline" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_blender-cad-pipeline</div>
 <div class="category">blender_cad_pipeline</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/brand_voice.png" alt="creative_brand-voice" loading="lazy">
+<a class="preview" href="/renders/brand_voice.png" aria-label="Open original creative_brand-voice"><img src="/gallery-thumbnails/dd0421cf846ebf5231d2.webp" alt="creative_brand-voice" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_brand-voice</div>
 <div class="category">brand_voice</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/content_engine.png" alt="creative_content-engine" loading="lazy">
+<a class="preview" href="/renders/content_engine.png" aria-label="Open original creative_content-engine"><img src="/gallery-thumbnails/60078f60901a56ac6498.webp" alt="creative_content-engine" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_content-engine</div>
 <div class="category">content_engine</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/creative_deliverables.png" alt="creative_creative-deliverables" loading="lazy">
+<a class="preview" href="/renders/creative_deliverables.png" aria-label="Open original creative_creative-deliverables"><img src="/gallery-thumbnails/dd0421cf846ebf5231d2.webp" alt="creative_creative-deliverables" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_creative-deliverables</div>
 <div class="category">creative_deliverables</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/ideation.png" alt="creative_creative-ideation" loading="lazy">
+<a class="preview" href="/renders/ideation.png" aria-label="Open original creative_creative-ideation"><img src="/gallery-thumbnails/a9ec5f659f5b58e75eba.webp" alt="creative_creative-ideation" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_creative-ideation</div>
 <div class="category">ideation</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/design_system_evaluation.png" alt="creative_design-system-evaluation" loading="lazy">
+<a class="preview" href="/renders/design_system_evaluation.png" aria-label="Open original creative_design-system-evaluation"><img src="/gallery-thumbnails/3e531fa9280c116e031e.webp" alt="creative_design-system-evaluation" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_design-system-evaluation</div>
 <div class="category">design_system_evaluation</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/design_systems_studio.png" alt="creative_design-systems-studio" loading="lazy">
+<a class="preview" href="/renders/design_systems_studio.png" aria-label="Open original creative_design-systems-studio"><img src="/gallery-thumbnails/37428e75090d9a2dbd96.webp" alt="creative_design-systems-studio" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_design-systems-studio</div>
 <div class="category">design_systems_studio</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/fal_ai_media.png" alt="creative_fal-ai-media" loading="lazy">
+<a class="preview" href="/renders/fal_ai_media.png" aria-label="Open original creative_fal-ai-media"><img src="/gallery-thumbnails/50cbb861f0f504fdd1ad.webp" alt="creative_fal-ai-media" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_fal-ai-media</div>
 <div class="category">fal_ai_media</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/frontend_slides.png" alt="creative_frontend-slides" loading="lazy">
+<a class="preview" href="/renders/frontend_slides.png" aria-label="Open original creative_frontend-slides"><img src="/gallery-thumbnails/072e90790f8d13817a53.webp" alt="creative_frontend-slides" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_frontend-slides</div>
 <div class="category">frontend_slides</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/hermes_aesthetic.png" alt="creative_hermes-aesthetic" loading="lazy">
+<a class="preview" href="/renders/hermes_aesthetic.png" aria-label="Open original creative_hermes-aesthetic"><img src="/gallery-thumbnails/56f1326eea835a9a28a6.webp" alt="creative_hermes-aesthetic" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_hermes-aesthetic</div>
 <div class="category">hermes_aesthetic</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/humanizer.png" alt="creative_humanizer" loading="lazy">
+<a class="preview" href="/renders/humanizer.png" aria-label="Open original creative_humanizer"><img src="/gallery-thumbnails/06a3bb3976ce6fb277d5.webp" alt="creative_humanizer" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_humanizer</div>
 <div class="category">humanizer</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/nous_girl_content_pipeline.png" alt="creative_nous-girl-content-pipeline" loading="lazy">
+<a class="preview" href="/renders/nous_girl_content_pipeline.png" aria-label="Open original creative_nous-girl-content-pipeline"><img src="/gallery-thumbnails/ea3a25541d56e604f773.webp" alt="creative_nous-girl-content-pipeline" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_nous-girl-content-pipeline</div>
 <div class="category">nous_girl_content_pipeline</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/patch_generator.png" alt="creative_patch-generator" loading="lazy">
+<a class="preview" href="/renders/patch_generator.png" aria-label="Open original creative_patch-generator"><img src="/gallery-thumbnails/a9bf1a431a66f166e0bd.webp" alt="creative_patch-generator" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">creative_patch-generator</div>
 <div class="category">patch_generator</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/cron_skill_review.png" alt="cron-skill-review" loading="lazy">
+<a class="preview" href="/renders/cron_skill_review.png" aria-label="Open original cron-skill-review"><img src="/gallery-thumbnails/88343999d0fc792d26a7.webp" alt="cron-skill-review" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">cron-skill-review</div>
 <div class="category">cron_skill_review</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/jupyter_live_kernel.png" alt="data-science_jupyter-live-kernel" loading="lazy">
+<a class="preview" href="/renders/jupyter_live_kernel.png" aria-label="Open original data-science_jupyter-live-kernel"><img src="/gallery-thumbnails/d888f2e0964ce057c49a.webp" alt="data-science_jupyter-live-kernel" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">data-science_jupyter-live-kernel</div>
 <div class="category">jupyter_live_kernel</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/multi_source_data_pipeline.png" alt="data-science_multi-source-data-pipeline" loading="lazy">
+<a class="preview" href="/renders/multi_source_data_pipeline.png" aria-label="Open original data-science_multi-source-data-pipeline"><img src="/gallery-thumbnails/f32188e0534299a57de0.webp" alt="data-science_multi-source-data-pipeline" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">data-science_multi-source-data-pipeline</div>
 <div class="category">multi_source_data_pipeline</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/agent_fleet_capability_audit.png" alt="devops_agent-fleet-capability-audit" loading="lazy">
+<a class="preview" href="/renders/agent_fleet_capability_audit.png" aria-label="Open original devops_agent-fleet-capability-audit"><img src="/gallery-thumbnails/fb9b7a66f93d5b90bb15.webp" alt="devops_agent-fleet-capability-audit" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">devops_agent-fleet-capability-audit</div>
 <div class="category">agent_fleet_capability_audit</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/agent_optimization_infrastructure.png" alt="devops_agent-optimization-infrastructure" loading="lazy">
+<a class="preview" href="/renders/agent_optimization_infrastructure.png" aria-label="Open original devops_agent-optimization-infrastructure"><img src="/gallery-thumbnails/88343999d0fc792d26a7.webp" alt="devops_agent-optimization-infrastructure" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">devops_agent-optimization-infrastructure</div>
 <div class="category">agent_optimization_infrastructure</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/backroom_protocol.png" alt="devops_backroom-protocol" loading="lazy">
+<a class="preview" href="/renders/backroom_protocol.png" aria-label="Open original devops_backroom-protocol"><img src="/gallery-thumbnails/88343999d0fc792d26a7.webp" alt="devops_backroom-protocol" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">devops_backroom-protocol</div>
 <div class="category">backroom_protocol</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/cron_health_diagnostic.png" alt="devops_cron-health-diagnostic" loading="lazy">
+<a class="preview" href="/renders/cron_health_diagnostic.png" aria-label="Open original devops_cron-health-diagnostic"><img src="/gallery-thumbnails/88343999d0fc792d26a7.webp" alt="devops_cron-health-diagnostic" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">devops_cron-health-diagnostic</div>
 <div class="category">cron_health_diagnostic</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/cron_skill_review.png" alt="devops_cron-skill-review" loading="lazy">
+<a class="preview" href="/renders/cron_skill_review.png" aria-label="Open original devops_cron-skill-review"><img src="/gallery-thumbnails/88343999d0fc792d26a7.webp" alt="devops_cron-skill-review" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">devops_cron-skill-review</div>
 <div class="category">cron_skill_review</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/fleet_self_healing_operations.png" alt="devops_fleet-self-healing-operations" loading="lazy">
+<a class="preview" href="/renders/fleet_self_healing_operations.png" aria-label="Open original devops_fleet-self-healing-operations"><img src="/gallery-thumbnails/e45eea4d50014b42d596.webp" alt="devops_fleet-self-healing-operations" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">devops_fleet-self-healing-operations</div>
 <div class="category">fleet_self_healing_operations</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/mcp_to_skill_proxy.png" alt="devops_mcp-to-skill-proxy" loading="lazy">
+<a class="preview" href="/renders/mcp_to_skill_proxy.png" aria-label="Open original devops_mcp-to-skill-proxy"><img src="/gallery-thumbnails/4854efd893f334d8693e.webp" alt="devops_mcp-to-skill-proxy" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">devops_mcp-to-skill-proxy</div>
 <div class="category">mcp_to_skill_proxy</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/nous_portal.png" alt="devops_nous-portal" loading="lazy">
+<a class="preview" href="/renders/nous_portal.png" aria-label="Open original devops_nous-portal"><img src="/gallery-thumbnails/731fd379429cae28ae56.webp" alt="devops_nous-portal" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">devops_nous-portal</div>
 <div class="category">nous_portal</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/paperclip_api.png" alt="devops_paperclip-api" loading="lazy">
+<a class="preview" href="/renders/paperclip_api.png" aria-label="Open original devops_paperclip-api"><img src="/gallery-thumbnails/7d041b82f183f5d268e3.webp" alt="devops_paperclip-api" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">devops_paperclip-api</div>
 <div class="category">paperclip_api</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/paperclip_hermes_config_sync.png" alt="devops_paperclip-hermes-config-sync" loading="lazy">
+<a class="preview" href="/renders/paperclip_hermes_config_sync.png" aria-label="Open original devops_paperclip-hermes-config-sync"><img src="/gallery-thumbnails/420870fb6687f654a367.webp" alt="devops_paperclip-hermes-config-sync" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">devops_paperclip-hermes-config-sync</div>
 <div class="category">paperclip_hermes_config_sync</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/skill_library_maintenance.png" alt="devops_skill-library-maintenance" loading="lazy">
+<a class="preview" href="/renders/skill_library_maintenance.png" aria-label="Open original devops_skill-library-maintenance"><img src="/gallery-thumbnails/beddd0f574b6dff338f6.webp" alt="devops_skill-library-maintenance" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">devops_skill-library-maintenance</div>
 <div class="category">skill_library_maintenance</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/subprocess_api_key_patterns.png" alt="devops_subprocess-api-key-patterns" loading="lazy">
+<a class="preview" href="/renders/subprocess_api_key_patterns.png" aria-label="Open original devops_subprocess-api-key-patterns"><img src="/gallery-thumbnails/9c8f7949bab62c857e9d.webp" alt="devops_subprocess-api-key-patterns" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">devops_subprocess-api-key-patterns</div>
 <div class="category">subprocess_api_key_patterns</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/swarm_coordination.png" alt="devops_swarm-coordination" loading="lazy">
+<a class="preview" href="/renders/swarm_coordination.png" aria-label="Open original devops_swarm-coordination"><img src="/gallery-thumbnails/0262122848492077ab4c.webp" alt="devops_swarm-coordination" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">devops_swarm-coordination</div>
 <div class="category">swarm_coordination</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/discord_swarm_ombudsman.png" alt="discord-swarm-ombudsman" loading="lazy">
+<a class="preview" href="/renders/discord_swarm_ombudsman.png" aria-label="Open original discord-swarm-ombudsman"><img src="/gallery-thumbnails/51765fdd0ffb432c9e5f.webp" alt="discord-swarm-ombudsman" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">discord-swarm-ombudsman</div>
 <div class="category">discord_swarm_ombudsman</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/dmux_workflows.png" alt="dmux-workflows" loading="lazy">
+<a class="preview" href="/renders/dmux_workflows.png" aria-label="Open original dmux-workflows"><img src="/gallery-thumbnails/dfc6f9c20ed1601e4fc8.webp" alt="dmux-workflows" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">dmux-workflows</div>
 <div class="category">dmux_workflows</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/docs.png" alt="docs" loading="lazy">
+<a class="preview" href="/renders/docs.png" aria-label="Open original docs"><img src="/gallery-thumbnails/bbf71530115ca2008e98.webp" alt="docs" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">docs</div>
 <div class="category">docs</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/drafting.png" alt="drafting" loading="lazy">
+<a class="preview" href="/renders/drafting.png" aria-label="Open original drafting"><img src="/gallery-thumbnails/3e4db09f810fcf4c29ff.webp" alt="drafting" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">drafting</div>
 <div class="category">drafting</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/edgeless_guard.png" alt="edgeless-guard" loading="lazy">
+<a class="preview" href="/renders/edgeless_guard.png" aria-label="Open original edgeless-guard"><img src="/gallery-thumbnails/66dbd85d1ab4935c40c0.webp" alt="edgeless-guard" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">edgeless-guard</div>
 <div class="category">edgeless_guard</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/email_intelligence_engineer.png" alt="email-intelligence-engineer" loading="lazy">
+<a class="preview" href="/renders/email_intelligence_engineer.png" aria-label="Open original email-intelligence-engineer"><img src="/gallery-thumbnails/a89c91cb7d1884f2a62b.webp" alt="email-intelligence-engineer" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">email-intelligence-engineer</div>
 <div class="category">email_intelligence_engineer</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/eval_harness.png" alt="eval-harness" loading="lazy">
+<a class="preview" href="/renders/eval_harness.png" aria-label="Open original eval-harness"><img src="/gallery-thumbnails/59cb459f071529323fcd.webp" alt="eval-harness" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">eval-harness</div>
 <div class="category">eval_harness</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/rss_triage_pipeline.png" alt="feeds_rss-triage-pipeline" loading="lazy">
+<a class="preview" href="/renders/rss_triage_pipeline.png" aria-label="Open original feeds_rss-triage-pipeline"><img src="/gallery-thumbnails/4cb76bfc2762ee068b78.webp" alt="feeds_rss-triage-pipeline" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">feeds_rss-triage-pipeline</div>
 <div class="category">rss_triage_pipeline</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/agent_introspection_debugging.png" alt="general_agent-introspection-debugging" loading="lazy">
+<a class="preview" href="/renders/agent_introspection_debugging.png" aria-label="Open original general_agent-introspection-debugging"><img src="/gallery-thumbnails/dd5228b69c7cdd98640e.webp" alt="general_agent-introspection-debugging" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">general_agent-introspection-debugging</div>
 <div class="category">agent_introspection_debugging</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/agent_sort.png" alt="general_agent-sort" loading="lazy">
+<a class="preview" href="/renders/agent_sort.png" aria-label="Open original general_agent-sort"><img src="/gallery-thumbnails/dd5228b69c7cdd98640e.webp" alt="general_agent-sort" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">general_agent-sort</div>
 <div class="category">agent_sort</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/strategic_compact.png" alt="general_strategic-compact" loading="lazy">
+<a class="preview" href="/renders/strategic_compact.png" aria-label="Open original general_strategic-compact"><img src="/gallery-thumbnails/c4861182044e8f7d7db2.webp" alt="general_strategic-compact" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">general_strategic-compact</div>
 <div class="category">strategic_compact</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/github_code_review_v2.png" alt="github_github-code-review-v2" loading="lazy">
+<a class="preview" href="/renders/github_code_review_v2.png" aria-label="Open original github_github-code-review-v2"><img src="/gallery-thumbnails/f7aeb27e572ce90bddbe.webp" alt="github_github-code-review-v2" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">github_github-code-review-v2</div>
 <div class="category">github_code_review_v2</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/github_repo_management.png" alt="github_github-repo-management" loading="lazy">
+<a class="preview" href="/renders/github_repo_management.png" aria-label="Open original github_github-repo-management"><img src="/gallery-thumbnails/cd55e7d21cdbd1fd062f.webp" alt="github_github-repo-management" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">github_github-repo-management</div>
 <div class="category">github_repo_management</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/graphify.png" alt="graphify" loading="lazy">
+<a class="preview" href="/renders/graphify.png" aria-label="Open original graphify"><img src="/gallery-thumbnails/1630ca64bba5f5652e51.webp" alt="graphify" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">graphify</div>
 <div class="category">graphify</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/incident_response_commander.png" alt="incident-response-commander" loading="lazy">
+<a class="preview" href="/renders/incident_response_commander.png" aria-label="Open original incident-response-commander"><img src="/gallery-thumbnails/dcd180a7faae5809f87c.webp" alt="incident-response-commander" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">incident-response-commander</div>
 <div class="category">incident_response_commander</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/infrastructure_maintainer.png" alt="infrastructure-maintainer" loading="lazy">
+<a class="preview" href="/renders/infrastructure_maintainer.png" aria-label="Open original infrastructure-maintainer"><img src="/gallery-thumbnails/48a971a16f985ced9e31.webp" alt="infrastructure-maintainer" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">infrastructure-maintainer</div>
 <div class="category">infrastructure_maintainer</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/ios_build_troubleshooting.png" alt="ios-build-troubleshooting" loading="lazy">
+<a class="preview" href="/renders/ios_build_troubleshooting.png" aria-label="Open original ios-build-troubleshooting"><img src="/gallery-thumbnails/809a9bc623a9da9d60b6.webp" alt="ios-build-troubleshooting" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">ios-build-troubleshooting</div>
 <div class="category">ios_build_troubleshooting</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/kb_curation.png" alt="kb-curation" loading="lazy">
+<a class="preview" href="/renders/kb_curation.png" aria-label="Open original kb-curation"><img src="/gallery-thumbnails/9d47f0f411466b87d15f.webp" alt="kb-curation" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">kb-curation</div>
 <div class="category">kb_curation</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/fastmcp.png" alt="mcp_fastmcp" loading="lazy">
+<a class="preview" href="/renders/fastmcp.png" aria-label="Open original mcp_fastmcp"><img src="/gallery-thumbnails/b05efde66f00a93f3bf6.webp" alt="mcp_fastmcp" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mcp_fastmcp</div>
 <div class="category">fastmcp</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/mcp_server_scaffold.png" alt="mcp_mcp-server-scaffold" loading="lazy">
+<a class="preview" href="/renders/mcp_server_scaffold.png" aria-label="Open original mcp_mcp-server-scaffold"><img src="/gallery-thumbnails/58664e3b3dc1010406f8.webp" alt="mcp_mcp-server-scaffold" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mcp_mcp-server-scaffold</div>
 <div class="category">mcp_server_scaffold</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/mcporter.png" alt="mcp_mcporter" loading="lazy">
+<a class="preview" href="/renders/mcporter.png" aria-label="Open original mcp_mcporter"><img src="/gallery-thumbnails/9e9c75945f82d9cd262a.webp" alt="mcp_mcporter" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mcp_mcporter</div>
 <div class="category">mcporter</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/native_mcp.png" alt="mcp_native-mcp" loading="lazy">
+<a class="preview" href="/renders/native_mcp.png" aria-label="Open original mcp_native-mcp"><img src="/gallery-thumbnails/26a8ee5c31a7935eb87f.webp" alt="mcp_native-mcp" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mcp_native-mcp</div>
 <div class="category">native_mcp</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/supadata_skill.png" alt="media_supadata-skill" loading="lazy">
+<a class="preview" href="/renders/supadata_skill.png" aria-label="Open original media_supadata-skill"><img src="/gallery-thumbnails/5386b3c9031d1724b86c.webp" alt="media_supadata-skill" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">media_supadata-skill</div>
 <div class="category">supadata_skill</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/video_editing.png" alt="media_video-editing" loading="lazy">
+<a class="preview" href="/renders/video_editing.png" aria-label="Open original media_video-editing"><img src="/gallery-thumbnails/a5b938d13653fdf5c599.webp" alt="media_video-editing" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">media_video-editing</div>
 <div class="category">video_editing</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/youtube_likes_pipeline.png" alt="media_youtube-likes-pipeline" loading="lazy">
+<a class="preview" href="/renders/youtube_likes_pipeline.png" aria-label="Open original media_youtube-likes-pipeline"><img src="/gallery-thumbnails/1122bcc91832031467fd.webp" alt="media_youtube-likes-pipeline" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">media_youtube-likes-pipeline</div>
 <div class="category">youtube_likes_pipeline</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/chroma.png" alt="mlops_chroma" loading="lazy">
+<a class="preview" href="/renders/chroma.png" aria-label="Open original mlops_chroma"><img src="/gallery-thumbnails/e4af6b2e95e426d673f0.webp" alt="mlops_chroma" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_chroma</div>
 <div class="category">chroma</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/modal_serverless_gpu.png" alt="mlops_cloud_modal" loading="lazy">
+<a class="preview" href="/renders/modal_serverless_gpu.png" aria-label="Open original mlops_cloud_modal"><img src="/gallery-thumbnails/d07ad292fa55afd9b128.webp" alt="mlops_cloud_modal" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_cloud_modal</div>
 <div class="category">modal_serverless_gpu</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/evaluating_llms_harness.png" alt="mlops_evaluation_lm-evaluation-harness" loading="lazy">
+<a class="preview" href="/renders/evaluating_llms_harness.png" aria-label="Open original mlops_evaluation_lm-evaluation-harness"><img src="/gallery-thumbnails/000fa66f4d2e9feaecd6.webp" alt="mlops_evaluation_lm-evaluation-harness" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_evaluation_lm-evaluation-harness</div>
 <div class="category">evaluating_llms_harness</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/weights_and_biases.png" alt="mlops_evaluation_weights-and-biases" loading="lazy">
+<a class="preview" href="/renders/weights_and_biases.png" aria-label="Open original mlops_evaluation_weights-and-biases"><img src="/gallery-thumbnails/a5080c02818ded837404.webp" alt="mlops_evaluation_weights-and-biases" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_evaluation_weights-and-biases</div>
 <div class="category">weights_and_biases</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/huggingface_hub.png" alt="mlops_huggingface-hub" loading="lazy">
+<a class="preview" href="/renders/huggingface_hub.png" aria-label="Open original mlops_huggingface-hub"><img src="/gallery-thumbnails/02e30a20d75a776644f9.webp" alt="mlops_huggingface-hub" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_huggingface-hub</div>
 <div class="category">huggingface_hub</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/llama_cpp.png" alt="mlops_inference_llama-cpp" loading="lazy">
+<a class="preview" href="/renders/llama_cpp.png" aria-label="Open original mlops_inference_llama-cpp"><img src="/gallery-thumbnails/8685674b51741d614d2f.webp" alt="mlops_inference_llama-cpp" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_inference_llama-cpp</div>
 <div class="category">llama_cpp</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/obliteratus.png" alt="mlops_inference_obliteratus" loading="lazy">
+<a class="preview" href="/renders/obliteratus.png" aria-label="Open original mlops_inference_obliteratus"><img src="/gallery-thumbnails/8780db201bd79492f70b.webp" alt="mlops_inference_obliteratus" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_inference_obliteratus</div>
 <div class="category">obliteratus</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/outlines.png" alt="mlops_inference_outlines" loading="lazy">
+<a class="preview" href="/renders/outlines.png" aria-label="Open original mlops_inference_outlines"><img src="/gallery-thumbnails/c06b91dc5e95af7eb5ce.webp" alt="mlops_inference_outlines" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_inference_outlines</div>
 <div class="category">outlines</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/serving_llms_vllm.png" alt="mlops_inference_vllm" loading="lazy">
+<a class="preview" href="/renders/serving_llms_vllm.png" aria-label="Open original mlops_inference_vllm"><img src="/gallery-thumbnails/6de9d35dbe4279165920.webp" alt="mlops_inference_vllm" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_inference_vllm</div>
 <div class="category">serving_llms_vllm</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/llm_fine_tuning.png" alt="mlops_llm-fine-tuning" loading="lazy">
+<a class="preview" href="/renders/llm_fine_tuning.png" aria-label="Open original mlops_llm-fine-tuning"><img src="/gallery-thumbnails/8326049bea1f204e5b11.webp" alt="mlops_llm-fine-tuning" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_llm-fine-tuning</div>
 <div class="category">llm_fine_tuning</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/mle_workflow.png" alt="mlops_mle-workflow" loading="lazy">
+<a class="preview" href="/renders/mle_workflow.png" aria-label="Open original mlops_mle-workflow"><img src="/gallery-thumbnails/e20b01051c7f297a7592.webp" alt="mlops_mle-workflow" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_mle-workflow</div>
 <div class="category">mle_workflow</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/audiocraft_audio_generation.png" alt="mlops_models_audiocraft" loading="lazy">
+<a class="preview" href="/renders/audiocraft_audio_generation.png" aria-label="Open original mlops_models_audiocraft"><img src="/gallery-thumbnails/e4af6b2e95e426d673f0.webp" alt="mlops_models_audiocraft" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_models_audiocraft</div>
 <div class="category">audiocraft_audio_generation</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/segment_anything_model.png" alt="mlops_models_segment-anything" loading="lazy">
+<a class="preview" href="/renders/segment_anything_model.png" aria-label="Open original mlops_models_segment-anything"><img src="/gallery-thumbnails/82d10df8351168c83100.webp" alt="mlops_models_segment-anything" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_models_segment-anything</div>
 <div class="category">segment_anything_model</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/stable_diffusion_image_generation.png" alt="mlops_models_stable-diffusion" loading="lazy">
+<a class="preview" href="/renders/stable_diffusion_image_generation.png" aria-label="Open original mlops_models_stable-diffusion"><img src="/gallery-thumbnails/25b408e4c4ab34da73b7.webp" alt="mlops_models_stable-diffusion" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_models_stable-diffusion</div>
 <div class="category">stable_diffusion_image_generation</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/whisper.png" alt="mlops_models_whisper" loading="lazy">
+<a class="preview" href="/renders/whisper.png" aria-label="Open original mlops_models_whisper"><img src="/gallery-thumbnails/f73a97cb8d768c132857.webp" alt="mlops_models_whisper" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_models_whisper</div>
 <div class="category">whisper</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/dspy.png" alt="mlops_research_dspy" loading="lazy">
+<a class="preview" href="/renders/dspy.png" aria-label="Open original mlops_research_dspy"><img src="/gallery-thumbnails/475e49c96183bd135df2.webp" alt="mlops_research_dspy" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_research_dspy</div>
 <div class="category">dspy</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/axolotl.png" alt="mlops_training_axolotl" loading="lazy">
+<a class="preview" href="/renders/axolotl.png" aria-label="Open original mlops_training_axolotl"><img src="/gallery-thumbnails/e4af6b2e95e426d673f0.webp" alt="mlops_training_axolotl" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_training_axolotl</div>
 <div class="category">axolotl</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/peft_fine_tuning.png" alt="mlops_training_peft" loading="lazy">
+<a class="preview" href="/renders/peft_fine_tuning.png" aria-label="Open original mlops_training_peft"><img src="/gallery-thumbnails/29e3f3f5365e3f51bcaa.webp" alt="mlops_training_peft" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_training_peft</div>
 <div class="category">peft_fine_tuning</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/pytorch_fsdp.png" alt="mlops_training_pytorch-fsdp-original" loading="lazy">
+<a class="preview" href="/renders/pytorch_fsdp.png" aria-label="Open original mlops_training_pytorch-fsdp-original"><img src="/gallery-thumbnails/efed8ab56865c7226683.webp" alt="mlops_training_pytorch-fsdp-original" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_training_pytorch-fsdp-original</div>
 <div class="category">pytorch_fsdp</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/fine_tuning_with_trl.png" alt="mlops_training_trl-fine-tuning" loading="lazy">
+<a class="preview" href="/renders/fine_tuning_with_trl.png" aria-label="Open original mlops_training_trl-fine-tuning"><img src="/gallery-thumbnails/052d5e23c0e34fb7a355.webp" alt="mlops_training_trl-fine-tuning" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_training_trl-fine-tuning</div>
 <div class="category">fine_tuning_with_trl</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/unsloth.png" alt="mlops_training_unsloth" loading="lazy">
+<a class="preview" href="/renders/unsloth.png" aria-label="Open original mlops_training_unsloth"><img src="/gallery-thumbnails/4f176801237b437621e9.webp" alt="mlops_training_unsloth" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">mlops_training_unsloth</div>
 <div class="category">unsloth</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/monitoring.png" alt="monitoring" loading="lazy">
+<a class="preview" href="/renders/monitoring.png" aria-label="Open original monitoring"><img src="/gallery-thumbnails/ca47ad63aa093b0d7698.webp" alt="monitoring" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">monitoring</div>
 <div class="category">monitoring</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/obsidian.png" alt="note-taking_obsidian" loading="lazy">
+<a class="preview" href="/renders/obsidian.png" aria-label="Open original note-taking_obsidian"><img src="/gallery-thumbnails/c09e8759214d1682ed93.webp" alt="note-taking_obsidian" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">note-taking_obsidian</div>
 <div class="category">obsidian</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/nous_portal_gateway.png" alt="nous_nous-portal-gateway" loading="lazy">
+<a class="preview" href="/renders/nous_portal_gateway.png" aria-label="Open original nous_nous-portal-gateway"><img src="/gallery-thumbnails/c14c7e0a8a45d5382699.webp" alt="nous_nous-portal-gateway" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">nous_nous-portal-gateway</div>
 <div class="category">nous_portal_gateway</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/ops_alert.png" alt="ops-alert" loading="lazy">
+<a class="preview" href="/renders/ops_alert.png" aria-label="Open original ops-alert"><img src="/gallery-thumbnails/4da232e7d71f53979fea.webp" alt="ops-alert" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">ops-alert</div>
 <div class="category">ops_alert</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/paperclip_fleet_analyzer.png" alt="paperclip-fleet-analyzer" loading="lazy">
+<a class="preview" href="/renders/paperclip_fleet_analyzer.png" aria-label="Open original paperclip-fleet-analyzer"><img src="/gallery-thumbnails/2dedc72221a34a5a8006.webp" alt="paperclip-fleet-analyzer" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">paperclip-fleet-analyzer</div>
 <div class="category">paperclip_fleet_analyzer</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/planning.png" alt="planning" loading="lazy">
+<a class="preview" href="/renders/planning.png" aria-label="Open original planning"><img src="/gallery-thumbnails/2581eaba1120c76af0f8.webp" alt="planning" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">planning</div>
 <div class="category">planning</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/blog_post_pipeline.png" alt="product_blog-post-pipeline" loading="lazy">
+<a class="preview" href="/renders/blog_post_pipeline.png" aria-label="Open original product_blog-post-pipeline"><img src="/gallery-thumbnails/12966fc4389c79d676d0.webp" alt="product_blog-post-pipeline" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">product_blog-post-pipeline</div>
 <div class="category">blog_post_pipeline</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/indie_product_manufacturing.png" alt="product_indie-product-manufacturing" loading="lazy">
+<a class="preview" href="/renders/indie_product_manufacturing.png" aria-label="Open original product_indie-product-manufacturing"><img src="/gallery-thumbnails/abef9045a9b3101137eb.webp" alt="product_indie-product-manufacturing" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">product_indie-product-manufacturing</div>
 <div class="category">indie_product_manufacturing</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/investor_materials.png" alt="product_investor-materials" loading="lazy">
+<a class="preview" href="/renders/investor_materials.png" aria-label="Open original product_investor-materials"><img src="/gallery-thumbnails/a20c3df25f2519afa0b1.webp" alt="product_investor-materials" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">product_investor-materials</div>
 <div class="category">investor_materials</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/investor_outreach.png" alt="product_investor-outreach" loading="lazy">
+<a class="preview" href="/renders/investor_outreach.png" aria-label="Open original product_investor-outreach"><img src="/gallery-thumbnails/3e587bd13fe3b06f8af9.webp" alt="product_investor-outreach" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">product_investor-outreach</div>
 <div class="category">investor_outreach</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/product_capability.png" alt="product_product-capability" loading="lazy">
+<a class="preview" href="/renders/product_capability.png" aria-label="Open original product_product-capability"><img src="/gallery-thumbnails/d15743b890a61d3fe4f3.webp" alt="product_product-capability" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">product_product-capability</div>
 <div class="category">product_capability</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/productized_service_creator.png" alt="product_productized-service-creator" loading="lazy">
+<a class="preview" href="/renders/productized_service_creator.png" aria-label="Open original product_productized-service-creator"><img src="/gallery-thumbnails/3cb1a68e96147ac976d1.webp" alt="product_productized-service-creator" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">product_productized-service-creator</div>
 <div class="category">productized_service_creator</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/social_media_scheduler.png" alt="product_social-media-scheduler" loading="lazy">
+<a class="preview" href="/renders/social_media_scheduler.png" aria-label="Open original product_social-media-scheduler"><img src="/gallery-thumbnails/cd7afdc242cdfc87b8f3.webp" alt="product_social-media-scheduler" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">product_social-media-scheduler</div>
 <div class="category">social_media_scheduler</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/systematic_trading_design.png" alt="product_systematic-trading-design" loading="lazy">
+<a class="preview" href="/renders/systematic_trading_design.png" aria-label="Open original product_systematic-trading-design"><img src="/gallery-thumbnails/36de4877893d2d24ef8d.webp" alt="product_systematic-trading-design" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">product_systematic-trading-design</div>
 <div class="category">systematic_trading_design</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/tortillaria_ops.png" alt="product_tortillaria-ops" loading="lazy">
+<a class="preview" href="/renders/tortillaria_ops.png" aria-label="Open original product_tortillaria-ops"><img src="/gallery-thumbnails/e203d3a48f5816dca70e.webp" alt="product_tortillaria-ops" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">product_tortillaria-ops</div>
 <div class="category">tortillaria_ops</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/local_backlog_triage.png" alt="productivity_local-backlog-triage" loading="lazy">
+<a class="preview" href="/renders/local_backlog_triage.png" aria-label="Open original productivity_local-backlog-triage"><img src="/gallery-thumbnails/8cd51f8456c1af153b1d.webp" alt="productivity_local-backlog-triage" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">productivity_local-backlog-triage</div>
 <div class="category">local_backlog_triage</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/maps.png" alt="productivity_maps" loading="lazy">
+<a class="preview" href="/renders/maps.png" aria-label="Open original productivity_maps"><img src="/gallery-thumbnails/b3bace87ce6dda64ced0.webp" alt="productivity_maps" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">productivity_maps</div>
 <div class="category">maps</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/send_email.png" alt="productivity_send-email" loading="lazy">
+<a class="preview" href="/renders/send_email.png" aria-label="Open original productivity_send-email"><img src="/gallery-thumbnails/a715d6cd01c5ff33d527.webp" alt="productivity_send-email" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">productivity_send-email</div>
 <div class="category">send_email</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/proof_of_completion.png" alt="proof-of-completion" loading="lazy">
+<a class="preview" href="/renders/proof_of_completion.png" aria-label="Open original proof-of-completion"><img src="/gallery-thumbnails/138fe1be9d28ab9e0adf.webp" alt="proof-of-completion" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">proof-of-completion</div>
 <div class="category">proof_of_completion</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/recall.png" alt="recall" loading="lazy">
+<a class="preview" href="/renders/recall.png" aria-label="Open original recall"><img src="/gallery-thumbnails/3297921dc4bcaad1d387.webp" alt="recall" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">recall</div>
 <div class="category">recall</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/godmode.png" alt="red-teaming_godmode" loading="lazy">
+<a class="preview" href="/renders/godmode.png" aria-label="Open original red-teaming_godmode"><img src="/gallery-thumbnails/b76097b968ab61cbb4ac.webp" alt="red-teaming_godmode" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">red-teaming_godmode</div>
 <div class="category">godmode</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/research.png" alt="research" loading="lazy">
+<a class="preview" href="/renders/research.png" aria-label="Open original research"><img src="/gallery-thumbnails/416b40529469e0357dcf.webp" alt="research" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">research</div>
 <div class="category">research</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/cultural_heritage_apis.png" alt="research_cultural-heritage-apis" loading="lazy">
+<a class="preview" href="/renders/cultural_heritage_apis.png" aria-label="Open original research_cultural-heritage-apis"><img src="/gallery-thumbnails/d0a6166e5b561575e3e4.webp" alt="research_cultural-heritage-apis" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">research_cultural-heritage-apis</div>
 <div class="category">cultural_heritage_apis</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/documentation_lookup.png" alt="research_documentation-lookup" loading="lazy">
+<a class="preview" href="/renders/documentation_lookup.png" aria-label="Open original research_documentation-lookup"><img src="/gallery-thumbnails/4cca473d9aa7d3e886e1.webp" alt="research_documentation-lookup" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">research_documentation-lookup</div>
 <div class="category">documentation_lookup</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/exa_search.png" alt="research_exa-search" loading="lazy">
+<a class="preview" href="/renders/exa_search.png" aria-label="Open original research_exa-search"><img src="/gallery-thumbnails/6462081c34e438e0e3ed.webp" alt="research_exa-search" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">research_exa-search</div>
 <div class="category">exa_search</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/market_research.png" alt="research_market-research" loading="lazy">
+<a class="preview" href="/renders/market_research.png" aria-label="Open original research_market-research"><img src="/gallery-thumbnails/af0ba973a5727647f8e6.webp" alt="research_market-research" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">research_market-research</div>
 <div class="category">market_research</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/polymarket.png" alt="research_polymarket" loading="lazy">
+<a class="preview" href="/renders/polymarket.png" aria-label="Open original research_polymarket"><img src="/gallery-thumbnails/4c32b7c1d17ae6b2c95a.webp" alt="research_polymarket" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">research_polymarket</div>
 <div class="category">polymarket</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/research_paper_writing.png" alt="research_research-paper-writing-original" loading="lazy">
+<a class="preview" href="/renders/research_paper_writing.png" aria-label="Open original research_research-paper-writing-original"><img src="/gallery-thumbnails/9dcf7b06f2468b21beac.webp" alt="research_research-paper-writing-original" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">research_research-paper-writing-original</div>
 <div class="category">research_paper_writing</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/tradingview_pine_automation.png" alt="research_tradingview-pine-automation" loading="lazy">
+<a class="preview" href="/renders/tradingview_pine_automation.png" aria-label="Open original research_tradingview-pine-automation"><img src="/gallery-thumbnails/eea13e01f938e81da7fe.webp" alt="research_tradingview-pine-automation" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">research_tradingview-pine-automation</div>
 <div class="category">tradingview_pine_automation</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/tradingview_mcp.png" alt="research_tradingview-skill" loading="lazy">
+<a class="preview" href="/renders/tradingview_mcp.png" aria-label="Open original research_tradingview-skill"><img src="/gallery-thumbnails/7c439b70915af7f1c559.webp" alt="research_tradingview-skill" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">research_tradingview-skill</div>
 <div class="category">tradingview_mcp</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/review.png" alt="review" loading="lazy">
+<a class="preview" href="/renders/review.png" aria-label="Open original review"><img src="/gallery-thumbnails/05a37d99c56dc2eeb67a.webp" alt="review" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">review</div>
 <div class="category">review</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/code_simplifier.png" alt="rtk_.claude_skills_code-simplifier" loading="lazy">
+<a class="preview" href="/renders/code_simplifier.png" aria-label="Open original rtk_.claude_skills_code-simplifier"><img src="/gallery-thumbnails/05897734c8aeb94def75.webp" alt="rtk_.claude_skills_code-simplifier" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">rtk_.claude_skills_code-simplifier</div>
 <div class="category">code_simplifier</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/design_patterns.png" alt="rtk_.claude_skills_design-patterns" loading="lazy">
+<a class="preview" href="/renders/design_patterns.png" aria-label="Open original rtk_.claude_skills_design-patterns"><img src="/gallery-thumbnails/1f3c4f8d5b00b8661f7f.webp" alt="rtk_.claude_skills_design-patterns" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">rtk_.claude_skills_design-patterns</div>
 <div class="category">design_patterns</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/issue_triage.png" alt="rtk_.claude_skills_issue-triage" loading="lazy">
+<a class="preview" href="/renders/issue_triage.png" aria-label="Open original rtk_.claude_skills_issue-triage"><img src="/gallery-thumbnails/b2e199a1adfa090ea8d6.webp" alt="rtk_.claude_skills_issue-triage" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">rtk_.claude_skills_issue-triage</div>
 <div class="category">issue_triage</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/performance.png" alt="rtk_.claude_skills_performance" loading="lazy">
+<a class="preview" href="/renders/performance.png" aria-label="Open original rtk_.claude_skills_performance"><img src="/gallery-thumbnails/0c215be7d309d4ba5e7b.webp" alt="rtk_.claude_skills_performance" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">rtk_.claude_skills_performance</div>
 <div class="category">performance</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/pr_review.png" alt="rtk_.claude_skills_pr-review" loading="lazy">
+<a class="preview" href="/renders/pr_review.png" aria-label="Open original rtk_.claude_skills_pr-review"><img src="/gallery-thumbnails/59f560f5c994e14dcc29.webp" alt="rtk_.claude_skills_pr-review" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">rtk_.claude_skills_pr-review</div>
 <div class="category">pr_review</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/pr_triage.png" alt="rtk_.claude_skills_pr-triage" loading="lazy">
+<a class="preview" href="/renders/pr_triage.png" aria-label="Open original rtk_.claude_skills_pr-triage"><img src="/gallery-thumbnails/df7d2ecf76841d9a9b3f.webp" alt="rtk_.claude_skills_pr-triage" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">rtk_.claude_skills_pr-triage</div>
 <div class="category">pr_triage</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/repo_recap.png" alt="rtk_.claude_skills_repo-recap" loading="lazy">
+<a class="preview" href="/renders/repo_recap.png" aria-label="Open original rtk_.claude_skills_repo-recap"><img src="/gallery-thumbnails/8fe7fe346f8ae957507d.webp" alt="rtk_.claude_skills_repo-recap" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">rtk_.claude_skills_repo-recap</div>
 <div class="category">repo_recap</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/rtk_tdd.png" alt="rtk_.claude_skills_rtk-tdd" loading="lazy">
+<a class="preview" href="/renders/rtk_tdd.png" aria-label="Open original rtk_.claude_skills_rtk-tdd"><img src="/gallery-thumbnails/466e29c7ac370e62ea35.webp" alt="rtk_.claude_skills_rtk-tdd" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">rtk_.claude_skills_rtk-tdd</div>
 <div class="category">rtk_tdd</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/rtk_triage.png" alt="rtk_.claude_skills_rtk-triage" loading="lazy">
+<a class="preview" href="/renders/rtk_triage.png" aria-label="Open original rtk_.claude_skills_rtk-triage"><img src="/gallery-thumbnails/6d541eef52977826c6d8.webp" alt="rtk_.claude_skills_rtk-triage" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">rtk_.claude_skills_rtk-triage</div>
 <div class="category">rtk_triage</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/security_guardian.png" alt="rtk_.claude_skills_security-guardian" loading="lazy">
+<a class="preview" href="/renders/security_guardian.png" aria-label="Open original rtk_.claude_skills_security-guardian"><img src="/gallery-thumbnails/65183334782dc03a88b4.webp" alt="rtk_.claude_skills_security-guardian" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">rtk_.claude_skills_security-guardian</div>
 <div class="category">security_guardian</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/ship.png" alt="rtk_.claude_skills_ship" loading="lazy">
+<a class="preview" href="/renders/ship.png" aria-label="Open original rtk_.claude_skills_ship"><img src="/gallery-thumbnails/c705e58b88be29ebe075.webp" alt="rtk_.claude_skills_ship" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">rtk_.claude_skills_ship</div>
 <div class="category">ship</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/tdd_rust.png" alt="rtk_.claude_skills_tdd-rust" loading="lazy">
+<a class="preview" href="/renders/tdd_rust.png" aria-label="Open original rtk_.claude_skills_tdd-rust"><img src="/gallery-thumbnails/f309a5281625e2463598.webp" alt="rtk_.claude_skills_tdd-rust" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">rtk_.claude_skills_tdd-rust</div>
 <div class="category">tdd_rust</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/scrapping.png" alt="scraping-intel" loading="lazy">
+<a class="preview" href="/renders/scrapping.png" aria-label="Open original scraping-intel"><img src="/gallery-thumbnails/c47d4c8ab7d346180401.webp" alt="scraping-intel" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">scraping-intel</div>
 <div class="category">scrapping</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/1password.png" alt="security_1password" loading="lazy">
+<a class="preview" href="/renders/1password.png" aria-label="Open original security_1password"><img src="/gallery-thumbnails/42875d7c9f9105f2523c.webp" alt="security_1password" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">security_1password</div>
 <div class="category">1password</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/signal_extraction_layer.png" alt="signal-extraction-layer" loading="lazy">
+<a class="preview" href="/renders/signal_extraction_layer.png" aria-label="Open original signal-extraction-layer"><img src="/gallery-thumbnails/25225fe63cceb5fa571e.webp" alt="signal-extraction-layer" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">signal-extraction-layer</div>
 <div class="category">signal_extraction_layer</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/openhue.png" alt="smart-home_openhue" loading="lazy">
+<a class="preview" href="/renders/openhue.png" aria-label="Open original smart-home_openhue"><img src="/gallery-thumbnails/206da87a719c615b55b0.webp" alt="smart-home_openhue" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">smart-home_openhue</div>
 <div class="category">openhue</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/crosspost.png" alt="social-media_crosspost" loading="lazy">
+<div class="preview-unavailable">Preview unavailable</div>
+<a class="incomplete-original" href="/renders/crosspost.png">social-media_crosspost original (incomplete)</a>
 <div class="meta">
 <div class="name">social-media_crosspost</div>
 <div class="category">crosspost</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/discord.png" alt="social-media_discord" loading="lazy">
+<a class="preview" href="/renders/discord.png" aria-label="Open original social-media_discord"><img src="/gallery-thumbnails/b184087b53c2d3c812ae.webp" alt="social-media_discord" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">social-media_discord</div>
 <div class="category">discord</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/x_api.png" alt="social-media_x-api" loading="lazy">
+<a class="preview" href="/renders/x_api.png" aria-label="Open original social-media_x-api"><img src="/gallery-thumbnails/aa74ee379c4c47e307eb.webp" alt="social-media_x-api" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">social-media_x-api</div>
 <div class="category">x_api</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/xitter.png" alt="social-media_xitter" loading="lazy">
+<a class="preview" href="/renders/xitter.png" aria-label="Open original social-media_xitter"><img src="/gallery-thumbnails/59e652e1722f9fa99bd6.webp" alt="social-media_xitter" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">social-media_xitter</div>
 <div class="category">xitter</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/api_design.png" alt="software-development_api-design" loading="lazy">
+<a class="preview" href="/renders/api_design.png" aria-label="Open original software-development_api-design"><img src="/gallery-thumbnails/05897734c8aeb94def75.webp" alt="software-development_api-design" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_api-design</div>
 <div class="category">api_design</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/backend_patterns.png" alt="software-development_backend-patterns" loading="lazy">
+<a class="preview" href="/renders/backend_patterns.png" aria-label="Open original software-development_backend-patterns"><img src="/gallery-thumbnails/05897734c8aeb94def75.webp" alt="software-development_backend-patterns" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_backend-patterns</div>
 <div class="category">backend_patterns</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/browser_automation_patterns.png" alt="software-development_browser-automation-patterns" loading="lazy">
+<a class="preview" href="/renders/browser_automation_patterns.png" aria-label="Open original software-development_browser-automation-patterns"><img src="/gallery-thumbnails/05897734c8aeb94def75.webp" alt="software-development_browser-automation-patterns" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_browser-automation-patterns</div>
 <div class="category">browser_automation_patterns</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/coding_standards.png" alt="software-development_coding-standards" loading="lazy">
+<a class="preview" href="/renders/coding_standards.png" aria-label="Open original software-development_coding-standards"><img src="/gallery-thumbnails/05897734c8aeb94def75.webp" alt="software-development_coding-standards" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_coding-standards</div>
 <div class="category">coding_standards</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/e2e_testing.png" alt="software-development_e2e-testing" loading="lazy">
+<a class="preview" href="/renders/e2e_testing.png" aria-label="Open original software-development_e2e-testing"><img src="/gallery-thumbnails/a7b940c332f1b66b847e.webp" alt="software-development_e2e-testing" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_e2e-testing</div>
 <div class="category">e2e_testing</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/frontend_patterns.png" alt="software-development_frontend-patterns" loading="lazy">
+<a class="preview" href="/renders/frontend_patterns.png" aria-label="Open original software-development_frontend-patterns"><img src="/gallery-thumbnails/c54eb4d99da064ecbe30.webp" alt="software-development_frontend-patterns" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_frontend-patterns</div>
 <div class="category">frontend_patterns</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/hermes_agent_skill_authoring.png" alt="software-development_hermes-agent-skill-authoring" loading="lazy">
+<a class="preview" href="/renders/hermes_agent_skill_authoring.png" aria-label="Open original software-development_hermes-agent-skill-authoring"><img src="/gallery-thumbnails/3e570dfa6d1247261efe.webp" alt="software-development_hermes-agent-skill-authoring" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_hermes-agent-skill-authoring</div>
 <div class="category">hermes_agent_skill_authoring</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/hermes_s6_container_supervision.png" alt="software-development_hermes-s6-container-supervision" loading="lazy">
+<a class="preview" href="/renders/hermes_s6_container_supervision.png" aria-label="Open original software-development_hermes-s6-container-supervision"><img src="/gallery-thumbnails/37ee1562c574ff5f3acc.webp" alt="software-development_hermes-s6-container-supervision" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_hermes-s6-container-supervision</div>
 <div class="category">hermes_s6_container_supervision</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/proof_of_completion.png" alt="software-development_proof-of-completion" loading="lazy">
+<a class="preview" href="/renders/proof_of_completion.png" aria-label="Open original software-development_proof-of-completion"><img src="/gallery-thumbnails/138fe1be9d28ab9e0adf.webp" alt="software-development_proof-of-completion" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_proof-of-completion</div>
 <div class="category">proof_of_completion</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/skill_creator.png" alt="software-development_skill-creator" loading="lazy">
+<a class="preview" href="/renders/skill_creator.png" aria-label="Open original software-development_skill-creator"><img src="/gallery-thumbnails/b55deb5817ffb197aed1.webp" alt="software-development_skill-creator" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_skill-creator</div>
 <div class="category">skill_creator</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/subagent_driven_development.png" alt="software-development_subagent-driven-development" loading="lazy">
+<a class="preview" href="/renders/subagent_driven_development.png" aria-label="Open original software-development_subagent-driven-development"><img src="/gallery-thumbnails/528bce3a43da8863bc9d.webp" alt="software-development_subagent-driven-development" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_subagent-driven-development</div>
 <div class="category">subagent_driven_development</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/systematic_debugging.png" alt="software-development_systematic-debugging" loading="lazy">
+<a class="preview" href="/renders/systematic_debugging.png" aria-label="Open original software-development_systematic-debugging"><img src="/gallery-thumbnails/49801af537d05cdd3de0.webp" alt="software-development_systematic-debugging" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_systematic-debugging</div>
 <div class="category">systematic_debugging</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/tdd_workflow.png" alt="software-development_tdd-workflow" loading="lazy">
+<a class="preview" href="/renders/tdd_workflow.png" aria-label="Open original software-development_tdd-workflow"><img src="/gallery-thumbnails/96038da90deae44e7ccd.webp" alt="software-development_tdd-workflow" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_tdd-workflow</div>
 <div class="category">tdd_workflow</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/verification_loop.png" alt="software-development_verification-loop" loading="lazy">
+<a class="preview" href="/renders/verification_loop.png" aria-label="Open original software-development_verification-loop"><img src="/gallery-thumbnails/58e428bd6ddaf9a4e577.webp" alt="software-development_verification-loop" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_verification-loop</div>
 <div class="category">verification_loop</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/web_dev_ops.png" alt="software-development_web-dev-ops" loading="lazy">
+<a class="preview" href="/renders/web_dev_ops.png" aria-label="Open original software-development_web-dev-ops"><img src="/gallery-thumbnails/4bdf6daa871bc86fd44e.webp" alt="software-development_web-dev-ops" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_web-dev-ops</div>
 <div class="category">web_dev_ops</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/writing_plans.png" alt="software-development_writing-plans" loading="lazy">
+<a class="preview" href="/renders/writing_plans.png" aria-label="Open original software-development_writing-plans"><img src="/gallery-thumbnails/486bfd856932270e73e4.webp" alt="software-development_writing-plans" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">software-development_writing-plans</div>
 <div class="category">writing_plans</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/touchdesigner_generative_art.png" alt="touchdesigner-generative-art" loading="lazy">
+<a class="preview" href="/renders/touchdesigner_generative_art.png" aria-label="Open original touchdesigner-generative-art"><img src="/gallery-thumbnails/f80b373775a06a3fd987.webp" alt="touchdesigner-generative-art" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">touchdesigner-generative-art</div>
 <div class="category">touchdesigner_generative_art</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/triage.png" alt="triage" loading="lazy">
+<a class="preview" href="/renders/triage.png" aria-label="Open original triage"><img src="/gallery-thumbnails/5017e955fcb1fd723882.webp" alt="triage" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">triage</div>
 <div class="category">triage</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/vault_knowledge_ops.png" alt="vault-knowledge-ops" loading="lazy">
+<a class="preview" href="/renders/vault_knowledge_ops.png" aria-label="Open original vault-knowledge-ops"><img src="/gallery-thumbnails/e67121dcd24fc4855a64.webp" alt="vault-knowledge-ops" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">vault-knowledge-ops</div>
 <div class="category">vault_knowledge_ops</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/verify_before_claiming.png" alt="verify-before-claiming" loading="lazy">
+<a class="preview" href="/renders/verify_before_claiming.png" aria-label="Open original verify-before-claiming"><img src="/gallery-thumbnails/d3d1ad582b332a246d26.webp" alt="verify-before-claiming" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">verify-before-claiming</div>
 <div class="category">verify_before_claiming</div>
 </div>
 </div>
 <div class="card">
-<img src="renders/youtube_summarizer.png" alt="youtube-summarizer" loading="lazy">
+<a class="preview" href="/renders/youtube_summarizer.png" aria-label="Open original youtube-summarizer"><img src="/gallery-thumbnails/d12f1faeff4aa078fc62.webp" alt="youtube-summarizer" loading="lazy" width="640" height="640" decoding="async"></a>
 <div class="meta">
 <div class="name">youtube-summarizer</div>
 <div class="category">youtube_summarizer</div>
@@ -1190,7 +1198,8 @@ h1 { margin: 0; font-size: 1.5rem; color: var(--accent); }
 </div>
 </div>
 <div class="stats">
-Total: 166 renders | Directory: /Users/djm/claude-projects/edgelesslab-design-system/blender-glb-pipeline/renders
+166 gallery entries · 165 previews available
 </div>
+</main>
 </body>
 </html>

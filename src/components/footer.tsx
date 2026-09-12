@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { SubscribeForm } from "@/components/subscribe-form";
+import { openAnalyticsSettings } from "@/lib/analytics-consent";
 
 const toolLinks = [
   { label: "Systems", href: "/projects" },
@@ -31,13 +32,6 @@ export function Footer() {
             Follow the lab
           </h3>
           <SubscribeForm source="footer" />
-          <Link
-            href="/feed.xml"
-            className="mt-3 inline-flex items-center gap-1 font-mono text-xs"
-            style={{ color: "var(--text-tertiary)" }}
-          >
-            Prefer RSS <ArrowUpRight size={11} />
-          </Link>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
@@ -146,6 +140,7 @@ export function Footer() {
                 { label: "GitHub", href: "https://github.com/edgeless-ai", external: true },
                 { label: "Email", href: "mailto:david@edgelesslab.com", external: true },
                 { label: "Privacy", href: "/privacy", external: false },
+                { label: "Terms", href: "/terms", external: false },
               ].map((item) => (
                 <li key={item.label}>
                   {item.external ? (
@@ -168,6 +163,11 @@ export function Footer() {
                   )}
                 </li>
               ))}
+              <li>
+                <button type="button" onClick={openAnalyticsSettings} className="min-h-11 text-left text-[13px] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4" style={{ color: "var(--text-secondary)" }}>
+                  Analytics settings
+                </button>
+              </li>
             </ul>
           </div>
         </div>

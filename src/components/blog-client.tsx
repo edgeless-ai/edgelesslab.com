@@ -68,7 +68,7 @@ export function BlogSearch({
 
   return (
     <>
-      <main className="pt-32 pb-20 px-6">
+      <main id="main-content" tabIndex={-1} className="pt-32 pb-20 px-6">
         <div className="max-w-[920px] mx-auto">
           <div className="flex items-center gap-2.5 mb-6">
             <span

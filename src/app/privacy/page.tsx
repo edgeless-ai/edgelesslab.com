@@ -16,7 +16,7 @@ export default function PrivacyPolicy() {
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
       <Nav />
 
-      <section className="px-6 pt-32 pb-20">
+      <main id="main-content" tabIndex={-1} className="px-6 pt-32 pb-20">
         <div className="max-w-[1280px] mx-auto">
           <Link
             href="/"
@@ -159,7 +159,7 @@ export default function PrivacyPolicy() {
             </Section>
           </div>
         </div>
-      </section>
+      </main>
 
       <Footer />
     </div>

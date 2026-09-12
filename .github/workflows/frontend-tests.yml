@@ -30,5 +30,8 @@ jobs:
       - name: Check static-export font preloads
         run: npm run test:font-preloads
 
+      - name: Check launch readiness regressions
+        run: npm run test:launch
+
       - name: Run vitest
         run: npx vitest run

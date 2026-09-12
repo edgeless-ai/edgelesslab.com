@@ -67,7 +67,7 @@ html[data-theme="light"] {
   --foreground: var(--text-primary);
 }
 
-[data-theme="light"] :root {
+:root[data-theme="light"] {
   /* Light Lab palette — high-contrast, clean */
   --bg-base: #FAFAFA;
   --bg-surface: #FFFFFF;
@@ -85,7 +85,7 @@ html[data-theme="light"] {
   --text-secondary: rgba(0, 0, 0, 0.65);
   --text-tertiary: rgba(0, 0, 0, 0.58);
 
-  --accent: #4D7C0F;
+  --accent: #3F6212;
   --accent-hover: #3F6212;
   --accent-muted: rgba(77, 124, 15, 0.10);
   --accent-contrast: #FAFFF2;
@@ -93,6 +93,8 @@ html[data-theme="light"] {
 
   --green: #10B981;
   --green-muted: rgba(16, 185, 129, 0.10);
+  --relay: #315DAB;
+  --relay-muted: rgba(49, 93, 171, 0.10);
 
   --background: var(--bg-base);
   --foreground: var(--text-primary);

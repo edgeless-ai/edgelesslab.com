@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "prebuild": "./scripts/preserve-standalone.sh save",
-    "build": "npm run check:design-system && npm run test:font-preloads && next build",
-    "postbuild": "node scripts/run-critters.mjs && find out -name '*.js.map' -delete && find out -name '*.css.map' -delete && ./scripts/preserve-standalone.sh restore && mkdir -p out/pen-plotter/assets && rsync -a --exclude=medium --exclude=mediums-all pen-plotter/assets/ out/pen-plotter/assets/ && ([ -d pen-plotter/fxhash ] && cp -r pen-plotter/fxhash out/pen-plotter/ || true) && ([ -d pen-plotter/kandinsky-to-canvas ] && cp -r pen-plotter/kandinsky-to-canvas out/pen-plotter/ || true) && npx pagefind --site out",
+    "build": "npm run check:design-system && npm run test:font-preloads && npm run test:launch && next build",
+    "postbuild": "node scripts/run-critters.mjs && find out -name '*.js.map' -delete && find out -name '*.css.map' -delete && ./scripts/preserve-standalone.sh restore && mkdir -p out/pen-plotter/assets && rsync -a --exclude=medium --exclude=mediums-all pen-plotter/assets/ out/pen-plotter/assets/ && ([ -d pen-plotter/fxhash ] && cp -r pen-plotter/fxhash out/pen-plotter/ || true) && ([ -d pen-plotter/kandinsky-to-canvas ] && cp -r pen-plotter/kandinsky-to-canvas out/pen-plotter/ || true) && npm run repair:launch && npm run check:launch && npx pagefind --site out",
     "start": "next start",
     "lint": "npm run check:design-system && eslint && node scripts/lint-experiments.mjs && npm run lint:voice",
     "lint:blog-links": "node scripts/lint-blog-links.mjs",
@@ -17,7 +17,10 @@
     "worker:ingest:dev": "npx wrangler dev --config workers/ingest/wrangler.toml",
     "worker:ingest:deploy": "npx wrangler deploy --config workers/ingest/wrangler.toml",
     "check:design-system": "node scripts/design-system/check.mjs && node --test scripts/design-system/check.test.mjs && tsc --noEmit --incremental false",
-    "test:font-preloads": "node --test scripts/critters-font-preloads.test.mjs"
+    "test:font-preloads": "node --test scripts/critters-font-preloads.test.mjs",
+    "test:launch": "node --test scripts/launch-readiness.test.mjs scripts/launch-readiness-source.test.mjs scripts/launch-readiness-gallery.test.mjs workers/ingest/worker.test.mjs",
+    "repair:launch": "node scripts/launch-readiness.mjs --repair --known-blockers scripts/launch-readiness-known-blockers.json --report .next/launch-readiness-report.json",
+    "check:launch": "node scripts/launch-readiness.mjs --known-blockers scripts/launch-readiness-known-blockers.json"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.8",

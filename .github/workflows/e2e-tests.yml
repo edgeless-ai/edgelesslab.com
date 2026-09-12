@@ -39,6 +39,9 @@ jobs:
       - name: Run Playwright smoke tests
         run: npx playwright test
 
+      - name: Run analytics consent regression tests
+        run: npx playwright test --config tests/consent.config.ts
+
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v4

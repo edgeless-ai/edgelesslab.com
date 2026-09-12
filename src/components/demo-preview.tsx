@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const POSTERS = [
   "/total-serialism/field-notes/assets/specimens/flow-fields.png",
@@ -26,7 +26,27 @@ function posterForSlug(slug: string) {
 export function DemoPreview({ slug, title }: { slug: string; title: string }) {
   const [active, setActive] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [posterVisible, setPosterVisible] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const loadTimerRef = useRef<number | null>(null);
   const tartan = slug === "tartan-weave-synth";
+
+  useEffect(() => {
+    const preview = previewRef.current;
+    if (!preview || tartan) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setPosterVisible(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: "160px" });
+    observer.observe(preview);
+    return () => observer.disconnect();
+  }, [tartan]);
+
+  useEffect(() => () => {
+    if (loadTimerRef.current !== null) window.clearTimeout(loadTimerRef.current);
+  }, []);
 
   // An editorial proposal must not inherit an unrelated art poster or live-demo label.
   if (slug === "borrow-the-creative-loop") {
@@ -43,12 +63,15 @@ export function DemoPreview({ slug, title }: { slug: string; title: string }) {
   }
 
   function deactivate() {
+    if (loadTimerRef.current !== null) window.clearTimeout(loadTimerRef.current);
+    loadTimerRef.current = null;
     setActive(false);
     setLoaded(false);
   }
 
   return (
     <div
+      ref={previewRef}
       className="group/preview relative mb-4 aspect-[16/10] w-full overflow-hidden rounded-md border"
       style={{
         borderColor: "var(--border-subtle)",
@@ -67,12 +90,38 @@ export function DemoPreview({ slug, title }: { slug: string; title: string }) {
                 "repeating-linear-gradient(90deg, transparent 0 9%, rgba(198,242,78,.82) 9% 11%, transparent 11% 26%, rgba(122,162,255,.7) 26% 30%, transparent 30% 50%)",
                 "repeating-linear-gradient(0deg, #121820 0 8%, #24382e 8% 19%, #0c0d10 19% 34%, #3f1e24 34% 39%, #121820 39% 50%)",
               ].join(",")
-            : `linear-gradient(rgba(9,9,11,.04), rgba(9,9,11,.28)), url("${posterForSlug(slug)}")`,
+            : undefined,
           opacity: loaded ? 0 : 1,
           zIndex: 2,
         }}
         aria-hidden="true"
-      />
+      >
+        {!tartan && (
+          // The adjacent card title names the study; its poster is decorative.
+          // Discover the image near the viewport; native lazy loading alone
+          // downloads these posters far ahead of their cards in Chrome.
+          <>
+            {posterVisible && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={posterForSlug(slug)}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            )}
+            <noscript>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={posterForSlug(slug)} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+            </noscript>
+            <span
+              className="absolute inset-0"
+              style={{ background: "linear-gradient(rgba(9,9,11,.04), rgba(9,9,11,.28))" }}
+            />
+          </>
+        )}
+      </div>
 
       {active && (
         <iframe
@@ -82,7 +131,13 @@ export function DemoPreview({ slug, title }: { slug: string; title: string }) {
           tabIndex={-1}
           aria-hidden
           scrolling="no"
-          onLoad={() => window.setTimeout(() => setLoaded(true), 650)}
+          onLoad={() => {
+            if (loadTimerRef.current !== null) window.clearTimeout(loadTimerRef.current);
+            loadTimerRef.current = window.setTimeout(() => {
+              loadTimerRef.current = null;
+              setLoaded(true);
+            }, 650);
+          }}
           // @ts-expect-error `inert` is a valid HTML attribute.
           inert=""
           className="absolute inset-0 h-full w-full"

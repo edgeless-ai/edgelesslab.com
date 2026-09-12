@@ -40,10 +40,13 @@ export function FeaturedArtifact() {
     let width = 0;
     let height = 0;
     let elapsed = 0;
+    let density = 0;
+    let inView = false;
+    let needsReset = true;
 
     function reset() {
       const bounds = element.getBoundingClientRect();
-      const density = Math.min(window.devicePixelRatio || 1, 2);
+      density = Math.min(window.devicePixelRatio || 1, 2);
       width = Math.max(1, bounds.width);
       height = Math.max(1, bounds.height);
       element.width = Math.round(width * density);
@@ -64,9 +67,12 @@ export function FeaturedArtifact() {
           phase: random() * Math.PI * 2,
         };
       });
+      needsReset = false;
     }
 
     function drawField(time: number) {
+      frameRef.current = null;
+      if (!inView || document.hidden) return;
       elapsed = time * 0.00032;
       const pointer = pointerRef.current;
 
@@ -133,27 +139,57 @@ export function FeaturedArtifact() {
       }
     }
 
-    const observer = new ResizeObserver(() => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-      reset();
+    function stop() {
+      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+    }
+
+    function resume() {
+      if (!inView || document.hidden || frameRef.current !== null) return;
+      if (needsReset) reset();
       drawField(performance.now());
+    }
+
+    const observer = new ResizeObserver(() => {
+      const bounds = element.getBoundingClientRect();
+      if (
+        Math.max(1, bounds.width) === width &&
+        Math.max(1, bounds.height) === height &&
+        Math.min(window.devicePixelRatio || 1, 2) === density
+      ) return;
+      stop();
+      needsReset = true;
+      resume();
     });
 
+    const visibility = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      if (inView) resume();
+      else stop();
+    });
+
+    const onVisibilityChange = () => {
+      if (document.hidden) stop();
+      else resume();
+    };
+
     observer.observe(element);
-    reset();
-    drawField(performance.now());
+    visibility.observe(element);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     const onMotionChange = () => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-      reset();
-      drawField(performance.now());
+      stop();
+      needsReset = true;
+      resume();
     };
     media.addEventListener("change", onMotionChange);
 
     return () => {
       observer.disconnect();
+      visibility.disconnect();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       media.removeEventListener("change", onMotionChange);
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+      stop();
     };
   }, []);
 

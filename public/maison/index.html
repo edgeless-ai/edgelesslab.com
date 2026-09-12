@@ -590,6 +590,19 @@
     d.scrollIntoView({behavior:'smooth',block:'nearest'});
     return b;
   }
+  function maisonRequestBody(message,prior){
+    // Bound only the context sent to the concierge; retain the full transcript.
+    var history=prior.slice(-8).filter(function(entry){
+      return entry && (entry.role==='user'||entry.role==='assistant') &&
+        typeof entry.content==='string' && entry.content.trim().length>0 && entry.content.length<=8000;
+    }).map(function(entry){return {role:entry.role,content:entry.content};});
+    var payload={session:maisonSession,message:message,history:history};
+    var body=JSON.stringify(payload), encoder=new TextEncoder();
+    while(encoder.encode(body).byteLength>24576 && history.length){
+      history.shift(); body=JSON.stringify(payload);
+    }
+    return body;
+  }
   async function sendMaison(e){
     e.preventDefault(); if(maisonBusy) return false;
     var inp=document.getElementById('salonInput'), msg=inp.value.trim(); if(!msg) return false;
@@ -598,22 +611,24 @@
     var b=maisonAdd('The Concierge','is attending to you…',false); b.classList.add('composing');
     try{
       var r=await fetch(MAISON_API+'/maison/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({session:maisonSession,message:msg,history:maisonHist.slice(0,-1)})});
+        body:maisonRequestBody(msg,maisonHist.slice(0,-1))});
       var d=await r.json();
-      if(d.error){ b.textContent=d.error; }
+      if(!r.ok || d.error || typeof d.id!=='string' || !d.id || d.id.length>128){
+        b.textContent=typeof d.error==='string'?d.error:'The concierge could not receive your message. Do try again.';
+      }
       else {
         var got=false;
         for(var i=0;i<70;i++){
           await new Promise(function(res){setTimeout(res,3000);});
-          var pr=await fetch(MAISON_API+'/maison/chat/'+d.id); if(!pr.ok) continue;
+          var pr=await fetch(MAISON_API+'/maison/chat/'+encodeURIComponent(d.id)); if(!pr.ok) continue;
           var pd=await pr.json();
-          if(pd.status==='done'){ b.classList.remove('composing'); b.textContent=pd.reply;
+          if(pd.status==='done' && typeof pd.reply==='string'){ b.textContent=pd.reply;
             maisonHist.push({role:'assistant',content:pd.reply}); got=true; break; }
         }
         if(!got){ b.textContent='The concierge is detained a while longer than usual. Do try once more.'; }
       }
     }catch(err){ b.textContent='Forgive me — a moment’s difficulty at the door. Do try again.'; }
-    maisonBusy=false; document.getElementById('salonSend').disabled=false; inp.focus();
+    finally{ b.classList.remove('composing'); maisonBusy=false; document.getElementById('salonSend').disabled=false; inp.focus(); }
     return false;
   }
   maisonStatus(); setInterval(maisonStatus,30000);

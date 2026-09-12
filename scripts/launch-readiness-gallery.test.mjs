@@ -50,8 +50,13 @@ test("gallery loads lazy thumbnails with intrinsic dimensions and links to each 
   );
   assert.equal(
     images.length,
-    165,
-    "one of 166 cards has an unavailable preview",
+    166,
+    "all 166 cards have a verified preview",
+  );
+  const cards = Array.from(html.matchAll(/<div class="card"/g)).length;
+  assert.ok(
+    html.includes(`${cards} gallery entries · ${images.length} previews available`),
+    "visible availability count must match the rendered cards and previews",
   );
   const rows = new Map(manifest().images.map((row) => [row.sourceUrl, row]));
   for (const match of html.matchAll(
@@ -80,7 +85,7 @@ test("gallery loads lazy thumbnails with intrinsic dimensions and links to each 
 test("gallery previews fit the transfer budget and preserve original masters", () => {
   const data = manifest();
   const thumbnails = new Map();
-  assert.equal(data.images.length, 163);
+  assert.equal(data.images.length, 164);
   for (const row of data.images) {
     assert.equal(
       sha256(readPublic(row.sourceUrl)),
@@ -93,21 +98,25 @@ test("gallery previews fit the transfer budget and preserve original masters", (
     assert.ok(row.width <= 640 && row.height <= 640);
     thumbnails.set(row.thumbnailUrl, bytes.length);
   }
-  assert.equal(thumbnails.size, 141);
+  assert.equal(thumbnails.size, 142);
   assert.ok(
     Array.from(thumbnails.values()).reduce((sum, size) => sum + size, 0) <
       2_000_000,
   );
 });
 
-test("truncated crosspost master has an honest placeholder and remains unchanged", () => {
+test("crosspost uses the complete verified historical original and its own compact preview", () => {
   const html = readPublic("/gallery.html").toString();
   const data = manifest();
-  assert.equal(data.unavailable.length, 1);
-  const row = data.unavailable[0];
-  assert.equal(row.sourceUrl, "/renders/crosspost.png");
+  assert.equal(data.unavailable.length, 0);
+  const row = data.images.find((image) => image.sourceUrl === "/renders/crosspost.png");
+  assert.ok(row);
+  assert.equal(row.sourceSha256, "03c07c382b062de4df4c5f45c8066e45b644f2fc40f238e08420566a564dd3c1");
   assert.equal(sha256(readPublic(row.sourceUrl)), row.sourceSha256);
-  assert.match(html, /Preview unavailable/);
-  assert.match(html, /href="\/renders\/crosspost\.png"[^>]*>[^<]*incomplete/i);
+  assert.equal(readPublic(row.sourceUrl).length, 4037517);
+  assert.equal(data.restorations[0].sourceRevision, "8c34aeee157d92a8ba357e514097e03077c1e6e6");
+  assert.ok(html.includes(`src="${row.thumbnailUrl}"`));
+  assert.match(html, /alt="A faceted turquoise sphere and a smaller pale sphere encircled by an orbital ring on a dark background\."/);
+  assert.doesNotMatch(html, /Preview unavailable|original \(incomplete\)/);
   assert.doesNotMatch(html, /<img\b[^>]*src="[^\"]*crosspost\.png"/);
 });

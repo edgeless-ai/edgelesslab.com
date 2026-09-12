@@ -30,18 +30,57 @@ existing noindex documents are preserved. This check covers declarative HTML,
 CSS, and social-image references; it does not prove JavaScript-generated links,
 external destinations, browser behavior, or content/legal approval.
 
-The audited archive still has **543 missing asset reference pairs**. The exact
-source/target pairs are recorded in `scripts/launch-readiness-known-blockers.json`.
-They remain blocked pending restoration of the original capture assets. The
+The original audit found **543 missing archive asset reference pairs**. The
+September 12 recovery repaired 536 pairs using 293 original assets, leaving
+**7 missing pairs** for two Excalidraw canvas images, a Cosmos video poster,
+and a Neal.fun merchandise image. The exact remaining source/target pairs are
+recorded in `scripts/launch-readiness-known-blockers.json`; recovered pairs are
+removed from that list so missing them again fails the build. They remain
+blocked pending restoration of the missing original capture assets. The
 build reports `structural-checks-pass-with-unresolved-archive-blockers` when only
 those known failures remain; every new missing reference fails the check. An
 unsitemapped standalone route is reported for indexing review, not silently
 treated as an intentional exclusion.
 
-The gallery uses 141 shared WebP thumbnails totaling 1,691,086 bytes. Its public
+`scripts/launch-readiness-restored-assets.json` records restored asset hashes,
+byte lengths, target routes and provenance. Original capture bytes are retained;
+incorrect capture filename extensions are corrected to their actual formats.
+Archive aliases share one verified file per original asset, saving 78,043,786
+bytes in the static export instead of publishing duplicate image, video and font
+files. All alias routes retain their artwork; only duplicates added during the
+recovery were removed, after a byte comparison with the retained file.
+For Neal.fun and Excalidraw fonts, the original URLs are verified using Ditto's
+URL-derived filenames, but historical byte equality is unavailable: these are
+current bytes from the original host. Offline tests reject zero bytes, altered
+hashes, wrong served formats, and restored targets reintroduced as known misses.
+Image alternatives were reviewed against actual recovered images. Four empty
+alternatives remain unresolved because the two Excalidraw images are missing.
+
+The exported development hubs use their existing 93-entry public algorithm
+catalog. Their local HMR server is opt-in with `?hmr=1` on localhost; a failed
+connection retains static preview behavior. The algorithm template resolves
+its shared dependencies in its current location and documents paths to adjust
+when copying it. These repairs address actual requests, not fixture exclusions.
+
+The homepage field pauses drawing outside the viewport or in a hidden tab,
+preserves trails on resume, and resets only when its size or motion preference
+changes. Poster images load within 160px of the viewport, with a no-JavaScript
+fallback; live previews and pointer interaction remain available. Controlled
+browser transfer and animation checks are required in addition to Lighthouse.
+
+Maison sends at most eight valid prior entries within a 24KiB UTF-8 request
+body, retaining the full displayed transcript. A rejected or missing chat ID
+does not start polling, and error paths clear the composing state. The separate
+Maison Worker must enforce the matching bounds; frontend checks alone do not
+establish backend validation.
+
+The gallery uses 142 shared WebP thumbnails totaling 1,705,698 bytes. Its public
 manifest records original and thumbnail hashes, dimensions, and URLs. Original
-PNGs are unchanged and accessible from previews. The truncated `crosspost.png`
-master has an explicit unavailable preview and an incomplete-original link.
+PNGs are preserved and accessible from previews. The truncated `crosspost.png`
+was restored to its complete 4,037,517-byte original from Git revision
+`8c34aeee157d92a8ba357e514097e03077c1e6e6`; its 14,612-byte preview now uses an
+alternative written after viewing that original. The other masters remain
+unchanged, and the restoration's revision/hash are recorded in the manifest.
 Six blog PNGs were compressed losslessly, saving 113,117 bytes without changing
 their RGBA pixels.
 

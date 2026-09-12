@@ -10,8 +10,8 @@
  *       aspectRatio: 1,           // 1 = square, 0.75 = portrait, etc.
  *       minSize: 400,
  *       maxSize: 1200,
- *       onResize: (width, height) => { /* redraw */ },
- *       onError: (error) => { /* handle */ }
+ *       onResize: (width, height) => { redraw(); },
+ *       onError: (error) => { handleError(error); }
  *     });
  *   </script>
  */

@@ -9,6 +9,14 @@ export interface CreativeDemo {
 
 export const creativeDemos: CreativeDemo[] = [
   {
+    slug: "borrow-the-creative-loop",
+    title: "Borrow the creative loop, not the artwork",
+    description: "A design study for Thread Commons: original gesture-driven strands, reversible variation, and an acceptance card. Proposed creative instruments, not a working demo.",
+    tags: ["Creative direction", "Design study", "Textile"],
+    date: "2026-09-10",
+    hasControls: false,
+  },
+  {
     slug: "connected-learning-swarm",
     title: "The Return Path",
     description: "How conversation becomes evidence, work, and feedback. Explore three architecture diagrams and six guided scenarios.",

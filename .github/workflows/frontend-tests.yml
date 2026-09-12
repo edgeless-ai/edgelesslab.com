@@ -24,5 +24,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check Support design system and TypeScript
+        run: npm run check:design-system
+
+      - name: Check static-export font preloads
+        run: npm run test:font-preloads
+
       - name: Run vitest
         run: npx vitest run

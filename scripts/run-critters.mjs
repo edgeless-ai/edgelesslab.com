@@ -15,7 +15,7 @@
  * (silently swallowed by the trailing `&& true`). The correct interface is the
  * JS API used here.
  */
-import Critters from "critters";
+import { createExportCritters } from "./critters-font-preloads.mjs";
 import { readdir, readFile, writeFile, unlink, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -39,20 +39,7 @@ async function walk(dir) {
 
 // Merge all css files per page into the critical extraction, and let the
 // remaining CSS be pruned so the external files shrink.
-const critters = new Critters({
-  path: OUT_DIR,
-  publicPath: "/",
-  preload: "media", // media="print" onload swap — async, not render-blocking
-  noscriptFallback: true, // <noscript><link rel=stylesheet></noscript>
-  pruneSource: true, // remove inlined rules from external files
-  reduceInlineStyles: true,
-  mergeStylesheets: true, // one <style> per page
-  inlineThreshold: 0,
-  minimumExternalSize: 0,
-  preloadFonts: true,
-  fonts: false,
-  logLevel: "warn",
-});
+const critters = createExportCritters(OUT_DIR);
 
 const htmlFiles = await walk(OUT_DIR);
 console.log(`critters: found ${htmlFiles.length} html files`);

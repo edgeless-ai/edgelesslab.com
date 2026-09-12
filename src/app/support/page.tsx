@@ -1,4 +1,7 @@
-import Link from "next/link";
+import {
+  Surface, Main, Container, Heading, Text, Section,
+  List, ListItem, Strong, BackLink, InlineLink,
+} from "@/components/design-system/primitives";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { createPageMetadata } from "@/lib/metadata";
@@ -13,110 +16,86 @@ export const metadata = createPageMetadata({
 
 export default function Support() {
   return (
-    <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
+    <Surface elevation="none">
       <Nav />
 
-      <section className="px-6 pt-32 pb-20">
-        <div className="max-w-[1280px] mx-auto">
-          <Link
-            href="/"
-            className="inline-block text-[13px] mb-8 transition-colors"
-            style={{ color: "var(--text-tertiary)" }}
-          >
+      <Main>
+        <Container measure="page">
+          <BackLink href="/">
             &larr; Edgeless Lab
-          </Link>
+          </BackLink>
 
-          <h1
-            className="text-[32px] font-bold tracking-tight mb-2"
-            style={{ color: "var(--text-primary)" }}
-          >
+          <Heading kind="title">
             Support
-          </h1>
-          <p className="text-sm mb-16" style={{ color: "var(--text-tertiary)" }}>
+          </Heading>
+          <Text variant="subtitle">
             Questions, bug reports, or feature requests -- we&apos;d love to hear from you.
-          </p>
+          </Text>
 
-          <div className="max-w-[640px] prose-custom">
-            <p className="text-sm mb-12" style={{ color: "var(--text-secondary)" }}>
+          <Container measure="reading">
+            <Text variant="body">
               Email{" "}
-              <a href="mailto:help@edgelesslab.com">
-                <strong>help@edgelesslab.com</strong>
-              </a>{" "}
+              <InlineLink href="mailto:help@edgelesslab.com">
+                <Strong>help@edgelesslab.com</Strong>
+              </InlineLink>{" "}
               for any Edgeless Lab app or product. We typically respond within
               1&ndash;2 business days.
-            </p>
+            </Text>
 
-            <Section title="The Clapper">
-              <p>
+            <Section spaceAfter="section">
+              <Heading kind="section">The Clapper</Heading>
+              <Text>
                 Hands-free camera control -- clap to record video, take photos,
                 flip the camera, and more. All sound detection happens entirely
                 on your device: no audio is ever recorded, stored, or
                 transmitted, and the app collects no data.
-              </p>
-              <p>Common questions:</p>
-              <ul>
-                <li>
-                  <strong>Detection feels too sensitive or not sensitive
-                  enough</strong> -- adjust the Sensitivity slider in Settings.
-                </li>
-                <li>
-                  <strong>Gestures do the wrong thing</strong> -- every
+              </Text>
+              <Text>Common questions:</Text>
+              <List>
+                <ListItem>
+                  <Strong>Detection feels too sensitive or not sensitive
+                  enough</Strong> -- adjust the Sensitivity slider in Settings.
+                </ListItem>
+                <ListItem>
+                  <Strong>Gestures do the wrong thing</Strong> -- every
                   gesture&apos;s action is configurable in Settings &rarr;
                   Gesture Mappings.
-                </li>
-                <li>
-                  <strong>Microphone or camera access</strong> -- The Clapper
+                </ListItem>
+                <ListItem>
+                  <Strong>Microphone or camera access</Strong> -- The Clapper
                   needs mic access to hear claps and camera access to record.
                   You can change these anytime in iOS Settings &rarr; The
                   Clapper.
-                </li>
-                <li>
-                  <strong>Microphone use</strong> -- The Clapper only listens
+                </ListItem>
+                <ListItem>
+                  <Strong>Microphone use</Strong> -- The Clapper only listens
                   while the app is open. The mic is always released when you
                   leave the app.
-                </li>
-              </ul>
+                </ListItem>
+              </List>
             </Section>
 
-            <Section title="photoMerge">
-              <p>
+            <Section spaceAfter="section">
+              <Heading kind="section">photoMerge</Heading>
+              <Text>
                 Merge and blend photos on iOS. For support, use the email
                 above.
-              </p>
+              </Text>
             </Section>
 
-            <Section title="Digital Products">
-              <p>
+            <Section spaceAfter="section">
+              <Heading kind="section">Digital Products</Heading>
+              <Text>
                 Products purchased through Gumroad are delivered by Gumroad.
                 If you have download or payment issues, check your Gumroad
                 receipt first, then email us and we&apos;ll sort it out.
-              </p>
+              </Text>
             </Section>
-          </div>
-        </div>
-      </section>
+          </Container>
+        </Container>
+      </Main>
 
       <Footer />
-    </div>
-  );
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="mb-10">
-      <h2
-        className="text-lg font-semibold mb-4"
-        style={{ color: "var(--accent)" }}
-      >
-        {title}
-      </h2>
-      <div>{children}</div>
-    </section>
+    </Surface>
   );
 }

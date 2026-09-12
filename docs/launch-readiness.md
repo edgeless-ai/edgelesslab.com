@@ -2,6 +2,9 @@
 
 Run `pnpm run test:launch` for offline metadata, link/catalog, gallery, and ingest
 Worker regressions. The normal build and Frontend Tests CI run these checks.
+All three deployment/check workflows install the frozen `pnpm-lock.yaml` with
+pnpm 11, so their SDK version matches production. The legacy npm lockfile is not
+the deployment dependency authority; use pnpm for local acceptance as well.
 Worker tests mock the upstream service and do not send analytics or email.
 Run `pnpm exec playwright test --config tests/consent.config.ts` after a build
 with a PostHog public project key. These tests intercept analytics HTTP requests,

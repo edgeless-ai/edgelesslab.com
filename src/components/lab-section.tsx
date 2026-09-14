@@ -16,6 +16,8 @@ type LabSectionProps = {
   status?: string;
   /** Pill color. Defaults to lime accent. */
   tone?: Tone;
+  /** "paper" retones the frame/corner/status for a warm field-sheet ground. */
+  surface?: "dark" | "paper";
   children: ReactNode;
   className?: string;
   id?: string;
@@ -30,6 +32,7 @@ export function LabSection({
   label,
   status,
   tone = "accent",
+  surface = "dark",
   children,
   className,
   id,
@@ -38,7 +41,7 @@ export function LabSection({
   return (
     <section
       id={id}
-      className={`lab-section${className ? ` ${className}` : ""}`}
+      className={`lab-section${surface === "paper" ? " lab-section--paper" : ""}${className ? ` ${className}` : ""}`}
     >
       <span className="lab-section__pill lab-metadata" style={pill}>
         {label}

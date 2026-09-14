@@ -10,17 +10,21 @@ export type Stat = {
   label: string;
   /** Bar height as a fraction of the track, 0..1. */
   ratio: number;
-  tone?: "accent" | "malachite";
+  tone?: "accent" | "malachite" | "ink" | "oxide";
 };
 
 type StatBarsProps = {
   stats: Stat[];
+  /** "paper" retones the tracks/labels for a warm field-sheet ground. */
+  surface?: "dark" | "paper";
   className?: string;
 };
 
 const TONE_VAR: Record<NonNullable<Stat["tone"]>, string> = {
   accent: "var(--accent)",
   malachite: "var(--malachite)",
+  ink: "var(--ink)",
+  oxide: "var(--oxide)",
 };
 
 /**
@@ -29,7 +33,7 @@ const TONE_VAR: Record<NonNullable<Stat["tone"]>, string> = {
  * transition toggled when the chart scrolls into view. Reduced-motion shows the
  * final state immediately.
  */
-export function StatBars({ stats, className }: StatBarsProps) {
+export function StatBars({ stats, surface = "dark", className }: StatBarsProps) {
   const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -57,7 +61,7 @@ export function StatBars({ stats, className }: StatBarsProps) {
   return (
     <div
       ref={ref}
-      className={`stat-bars${visible ? " is-visible" : ""}${className ? ` ${className}` : ""}`}
+      className={`stat-bars${visible ? " is-visible" : ""}${surface === "paper" ? " stat-bars--paper" : ""}${className ? ` ${className}` : ""}`}
     >
       {stats.map((stat, index) => {
         const color = TONE_VAR[stat.tone ?? "accent"];

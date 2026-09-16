@@ -15,12 +15,13 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Placeholder figures — swap for real numbers before this ships.
+// Real figures pulled from the repo (2026-09): Total Serialism = 98 algorithms,
+// creative-demos.ts = 40 Field Notes, blog.ts = 33 posts, data.ts = 27 systems.
 const STATS: Stat[] = [
-  { value: "98", label: "Plotter generators", ratio: 1.0, tone: "ink" },
-  { value: "40+", label: "Field Notes", ratio: 0.55, tone: "malachite" },
-  { value: "12", label: "Systems in production", ratio: 0.34, tone: "oxide" },
-  { value: "6", label: "Safety hooks live", ratio: 0.22, tone: "ink" },
+  { value: "98", label: "Plotter-ready algorithms", ratio: 1.0, tone: "ink" },
+  { value: "40", label: "Field Notes published", ratio: 0.42, tone: "malachite" },
+  { value: "33", label: "Reports & essays", ratio: 0.35, tone: "oxide" },
+  { value: "27", label: "Systems documented", ratio: 0.29, tone: "ink" },
 ];
 
 const NOTES = [
@@ -150,6 +151,42 @@ export default function PaperBrutalistPreview() {
                 </h2>
               </Reveal>
               <StatBars stats={STATS} surface="paper" />
+            </LabSection>
+          </div>
+        </div>
+
+        {/* Total Serialism — flagship destination */}
+        <div className="px-6">
+          <div className="mx-auto max-w-[1280px]">
+            <LabSection label="Total Serialism" status="LIVE / 98 SKETCHES" tone="malachite" surface="paper" className="mt-24">
+              <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+                <Reveal>
+                  <h2
+                    className="brutal-head"
+                    style={{ fontSize: "clamp(2.25rem, 6vw, 5rem)", color: "var(--ink)" }}
+                  >
+                    Ninety-eight
+                    <br />
+                    algorithms,
+                    <br />
+                    <span style={{ color: "var(--malachite)" }}>plotter-ready.</span>
+                  </h2>
+                </Reveal>
+                <Reveal delay={0.1}>
+                  <p className="max-w-md text-sm leading-6" style={{ color: "var(--ink-soft)" }}>
+                    Every algorithmic art family, each a self-contained
+                    interactive sketch with real-time controls and one-click SVG
+                    export, built for the pen plotter. Browse the full catalog.
+                  </p>
+                  <a
+                    href="/total-serialism/app/"
+                    className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-sm px-6 text-sm font-medium transition-transform hover:-translate-y-0.5"
+                    style={{ background: "var(--malachite)", color: "var(--paper)" }}
+                  >
+                    Open Total Serialism <ArrowUpRight size={16} />
+                  </a>
+                </Reveal>
+              </div>
             </LabSection>
           </div>
         </div>

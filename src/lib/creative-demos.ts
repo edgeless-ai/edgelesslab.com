@@ -17,6 +17,22 @@ export const creativeDemos: CreativeDemo[] = [
     hasControls: false,
   },
   {
+    slug: "the-rule-and-the-machine",
+    title: "The Rule and the Machine",
+    description: "Generative art as one idea rediscovered for sixty years, from oscilloscope traces in 1950 to the browser. 83 nodes and the relations between them, compiled from N4L into a graph database.",
+    tags: ["Art History", "Graph", "SSTorytime", "Interactive"],
+    date: "2026-09-17",
+    hasControls: true,
+  },
+  {
+    slug: "code-as-a-field-of-relation",
+    title: "Code as a Field of Relation",
+    description: "Thirty years of a single practice stored as a graph instead of a list. LIA's software art read through its relations rather than its dates — 21 nodes, every edge sourced.",
+    tags: ["Generative", "Graph", "SSTorytime", "Interactive"],
+    date: "2026-09-17",
+    hasControls: true,
+  },
+  {
     slug: "connected-learning-swarm",
     title: "The Return Path",
     description: "How conversation becomes evidence, work, and feedback. Explore three architecture diagrams and six guided scenarios.",

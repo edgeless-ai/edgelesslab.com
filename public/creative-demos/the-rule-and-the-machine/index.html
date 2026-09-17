@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>The Rule and the Machine — Field Notes</title><meta name="description" content="Generative art as one idea rediscovered for sixty years — from oscilloscope traces in 1950 to the browser. 83 nodes and the relations between them, compiled from N4L."><style>
+:root{--bg:#0b0c0f;--panel:#12141a;--line:#232733;--ink:#e8e6e1;--dim:#8a8f9c;
+--acc:#c9ff3d;--acc2:#6ad6ff;--warm:#ffb45c}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+font:15px/1.6 ui-sans-serif,-apple-system,"Segoe UI",Inter,sans-serif}
+a{color:var(--acc2);text-decoration:none;border-bottom:1px solid #2c4d5e}
+a:hover{border-bottom-color:var(--acc2)}
+.wrap{max-width:1180px;margin:0 auto;padding:48px 24px 96px}
+.eyebrow{font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+letter-spacing:.22em;text-transform:uppercase;color:var(--acc)}
+h1{font-size:clamp(30px,5vw,54px);line-height:1.04;margin:16px 0 12px;
+letter-spacing:-.02em;font-weight:680}
+.lede{font-size:19px;color:var(--dim);max-width:66ch;margin:0 0 8px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0 40px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:4px 12px;
+font:600 11px/1.6 ui-monospace,Menlo,monospace;color:var(--dim)}
+.chip b{color:var(--acc);font-weight:600}
+h2{font-size:24px;margin:56px 0 14px;letter-spacing:-.01em;font-weight:640}
+h3{font-size:15px;margin:28px 0 8px;color:var(--acc);font-weight:640;
+font-family:ui-monospace,Menlo,monospace;letter-spacing:.04em}
+p{max-width:72ch}
+.grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,1fr);gap:22px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+padding:18px}
+#stage{position:relative;overflow:hidden}
+svg{display:block;width:100%;height:auto}
+.node circle{fill:#1b2030;stroke:var(--line);stroke-width:1.4;cursor:pointer;
+transition:.15s}
+.node text{fill:var(--dim);font:11px ui-monospace,Menlo,monospace;
+pointer-events:none}
+.node:hover circle{stroke:var(--acc);fill:#232a3d}
+.node.ghost circle{fill:#141821;stroke:#2a2f3c}
+.node.ghost text{fill:#5b6070}
+.node.ghost:hover circle{stroke:var(--acc2);fill:#1a2030}
+.node.sel circle{fill:var(--acc);stroke:var(--acc)}
+.node.sel text{fill:var(--ink)}
+.node.hit circle{stroke:var(--acc2)}
+.edge{stroke:#3a4152;stroke-width:1.1;fill:none;opacity:.75}
+.edge.dim{opacity:.08}
+.edge.hi{stroke:var(--acc2);stroke-width:2;opacity:1}
+.rel{display:flex;flex-direction:column;gap:7px}
+.rel .row{display:grid;grid-template-columns:1fr;gap:2px;border-left:2px solid
+var(--line);padding:2px 0 2px 10px}
+.rel .row.cr{border-left-color:var(--acc)}
+.rel .row.ex{border-left-color:var(--warm)}
+.rel .row.src{border-left-color:#3a4152}
+.rel .row.inc{border-left-color:#2a2f3c;opacity:.8}
+.arrow{font:600 10px/1.5 ui-monospace,Menlo,monospace;color:var(--acc);
+text-transform:uppercase;letter-spacing:.08em}
+.arrow.dim{color:var(--dim)}
+.target{font-size:13px}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}
+button.f{border:1px solid var(--line);background:transparent;color:var(--dim);
+border-radius:999px;padding:5px 11px;cursor:pointer;
+font:600 11px/1.4 ui-monospace,Menlo,monospace}
+button.f.on{border-color:var(--acc);color:var(--acc)}
+button.f:hover{color:var(--ink)}
+.n4l{background:#08090c;border:1px solid var(--line);border-radius:12px;
+padding:16px;overflow:auto;max-height:440px;
+font:12px/1.62 ui-monospace,Menlo,monospace;color:#b9c0cf;white-space:pre}
+.n4l .k{color:var(--acc)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);
+vertical-align:top}
+th{color:var(--acc);font:600 10.5px/1.6 ui-monospace,Menlo,monospace;
+text-transform:uppercase;letter-spacing:.1em}
+td.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--dim)}
+.shot{border:1px solid var(--line);border-radius:12px;display:block;width:100%;
+height:auto}
+.cap{font-size:12px;color:var(--dim);margin-top:8px}
+footer{margin-top:72px;padding-top:22px;border-top:1px solid var(--line);
+color:var(--dim);font-size:13px}
+.lg{display:flex;gap:16px;flex-wrap:wrap;font:11px/1.6 ui-monospace,Menlo,
+monospace;color:var(--dim);margin:10px 0 0}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+margin-right:6px;vertical-align:1px}
+</style></head><body><div class="wrap"><div class="eyebrow">SSTorytime field note · genart.n4l</div><h1>The Rule and the Machine</h1><p class="lede">Generative art as one idea rediscovered for sixty years — from oscilloscope traces in 1950 to the browser. 83 nodes and the relations between them, compiled from N4L.</p><div class="meta"><span class="chip"><b>Field note</b></span><span class="chip">83 nodes</span><span class="chip">Art history</span><span class="chip">Graph</span><span class="chip">Interactive</span><span class="chip">SSTorytime</span><span class="chip">N4L</span></div><div class="grid"><div><div class="card" id="stage"><svg id="g" viewBox="0 0 900 620"></svg><div class="filters" id="filters"></div><div class="lg"><span><i class="dot" style="background:#c9ff3d"></i>creates</span><span><i class="dot" style="background:#ffb45c"></i>is an example of</span><span><i class="dot" style="background:#6ad6ff"></i>leads to / year</span><span><i class="dot" style="background:#3a4152"></i>source, note, property</span><span><i class="dot" style="background:#141821;border:1px solid #2a2f3c"></i>small node: a target, not a declared subject</span></div></div><p class="cap">Hover to trace. Click a node to read its relations. Every edge below is drawn from the graph source, not hand-drawn.</p></div><div class="card"><h3 id="sel-name">click a node</h3><div class="rel" id="rel"></div></div></div>
+<h2>The argument</h2>
+<p>Generative art is usually told as a story about tools: plotters, then
+Processing, then the web, then diffusion models. That story is true and it
+explains almost nothing, because the same idea keeps being rediscovered by
+people who had no access to the previous version.</p>
+<p>The idea is that <strong>the artist writes down a rule and something
+else carries it out</strong>. Once you state it that way the lineage stops
+being about hardware. Sol LeWitt's wall drawings (1968) are generative art
+made of sentences. <em>Cybernetic Serendipity</em> (1968) is the moment the
+gallery system agreed. AARON (1973) is the first serious attempt to make
+the executing system an author. Processing (2001) is the moment the
+executing system became something an artist could reasonably learn.</p>
+
+<h2>Two lineages, one idea</h2>
+<p>The graph separates two things a timeline tends to merge:</p>
+<table>
+<tr><th>Lineage</th><th>Node</th><th>What it contributes</th></tr>
+<tr><td class="mono">instruction</td><td>Wall Drawings</td><td>the rule as the artwork, execution as delegated</td></tr>
+<tr><td class="mono">system</td><td>AARON</td><td>the executing system as an autonomous author</td></tr>
+<tr><td class="mono">notation</td><td>Design By Numbers</td><td>a language artists can actually write in</td></tr>
+<tr><td class="mono">distribution</td><td>Processing → p5.js</td><td>the idea reaching a mass of practitioners</td></tr>
+</table>
+<p>AARON matters more than its visibility suggests. Harold Cohen spent
+decades on a single question — if the machine draws it, who is the author —
+and that question is now the central one in the field. The graph makes the
+line from AARON to the present explicit rather than implied.</p>
+
+<h2>Where LIA sits</h2>
+<p>LIA is one thread in this graph, not the subject of it. TURUX.at (1997)
+is net art; Sum05 (2005) appears alongside
+<code>Generator.x</code>, the exhibition where the scene named itself; and
+<code>Little Boxes</code> is the suburban grid run through that system.
+Placing the practice inside the larger history is more honest than
+centring it — and it is what the graph structure reports rather than what
+a writer decided.</p>
+<h2>The source</h2><p>Every node and arrow in the drawing above comes from this file. Nodes with a source URL are traceable; the compiler warns on any edge that cannot be resolved.</p><div class="n4l">-genart
+
+ :: generative art, art history, computer art, algorithmic art, code art, net art ::
+
+ computer art                (<span class=\"k\">about</span>)     generative art
+   &quot;                         (<span class=\"k\">describe</span>)  art in which the artist cedes some control to an autonomous system
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Computer_art&quot;
+
+ generative art              (<span class=\"k\">about</span>)     autonomous system
+   &quot;                         (<span class=\"k\">note</span>)      the artist defines rules; the system produces the outcome
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Generative_art&quot;
+
+ Oscillons                   (<span class=\"k\">year</span>)      1950
+   &quot;                         (<span class=\"k\">cr</span>)        Ben F. Laposky
+   &quot;                         (<span class=\"k\">describe</span>)  first works made by an electronic analogue computer displayed on an oscilloscope
+   &quot;                         (<span class=\"k\">ex</span>)        computer art
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Computer_art&quot;
+
+ Ben F. Laposky              (<span class=\"k\">about</span>)     computer art
+   &quot;                         (<span class=\"k\">note</span>)      American mathematician; made the earliest known computer art
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Computer_art&quot;
+
+ Frieder Nake                (<span class=\"k\">about</span>)     computer art
+   &quot;                         (<span class=\"k\">cr</span>)        Polygon Drawings
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Computer_art&quot;
+
+ Polygon Drawings            (<span class=\"k\">year</span>)      1965
+   &quot;                         (<span class=\"k\">cr</span>)        Frieder Nake
+   &quot;                         (<span class=\"k\">describe</span>)  plotter drawings from a random-number generating program
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Computer_art&quot;
+
+ Georg Nees                  (<span class=\"k\">about</span>)     computer art
+   &quot;                         (<span class=\"k\">note</span>)      exhibited early computer-generated plotter drawings in Stuttgart
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Computer_art&quot;
+
+ A. Michael Noll             (<span class=\"k\">about</span>)     computer art
+   &quot;                         (<span class=\"k\">note</span>)      Bell Labs researcher; produced Computer-Generated Pictures in 1965
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Computer_art&quot;
+
+ Herbert W. Franke           (<span class=\"k\">about</span>)     computer art
+   &quot;                         (<span class=\"k\">note</span>)      German scientist and pioneer of algorithmic art theory
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Computer_art&quot;
+
+ Cybernetic Serendipity      (<span class=\"k\">year</span>)      1968
+   &quot;                         (<span class=\"k\">describe</span>)  landmark exhibition of computer and cybernetic art at the Institute of Contemporary Arts London
+   &quot;                         (<span class=\"k\">note</span>)      curated by Jasia Reichardt; the moment computer art entered the gallery system
+   &quot;                         (<span class=\"k\">ex</span>)        computer art
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Cybernetic_Serendipity&quot;
+
+ Sol LeWitt                 (<span class=\"k\">about</span>)     generative art
+   &quot;                         (<span class=\"k\">cr</span>)        Wall Drawings
+   &quot;                         (<span class=\"k\">note</span>)      conceptual predecessor: the work is an instruction set executed by others
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Sol_LeWitt&quot;
+
+ Wall Drawings               (<span class=\"k\">year</span>)      1968
+   &quot;                         (<span class=\"k\">cr</span>)        Sol LeWitt
+   &quot;                         (<span class=\"k\">describe</span>)  written instructions that others execute as the artwork
+   &quot;                         (<span class=\"k\">note</span>)      generative before generative art had a name; separates program from execution
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Sol_LeWitt&quot;
+
+ Vera Molnar                 (<span class=\"k\">about</span>)     computer art
+   &quot;                         (<span class=\"k\">note</span>)      Hungarian-French artist; systematic geometric variation by hand and by computer from the 1960s
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Vera_Molnar&quot;
+
+ Manfred Mohr                (<span class=\"k\">about</span>)     computer art
+   &quot;                         (<span class=\"k\">note</span>)      German artist; the first solo exhibition of computer-generated work in 1971
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Computer_art&quot;
+
+ AARON                       (<span class=\"k\">year</span>)      1973
+   &quot;                         (<span class=\"k\">describe</span>)  autonomous program that produces drawings without a human in the loop
+   &quot;                         (<span class=\"k\">note</span>)      the longest-running attempt to make a machine that is the author
+   &quot;                         (<span class=\"k\">ex</span>)        generative art
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/AARON&quot;
+
+ Harold Cohen                (<span class=\"k\">about</span>)     computer art
+   &quot;                         (<span class=\"k\">cr</span>)        AARON
+   &quot;                         (<span class=\"k\">note</span>)      asked the question the field is still arguing: who is the author
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/AARON&quot;
+
+ John Maeda                  (<span class=\"k\">about</span>)     code art
+   &quot;                         (<span class=\"k\">cr</span>)        Design By Numbers
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Design_by_Numbers&quot;
+
+ Design By Numbers           (<span class=\"k\">year</span>)      1999
+   &quot;                         (<span class=\"k\">cr</span>)        John Maeda
+   &quot;                         (<span class=\"k\">describe</span>)  a programming environment built to teach artists to write code
+   &quot;                         (<span class=\"k\">note</span>)      direct ancestor of the Processing language
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Design_by_Numbers&quot;
+
+ TURUX.at                    (<span class=\"k\">year</span>)      1997
+   &quot;                         (<span class=\"k\">cr</span>)        LIA
+   &quot;                         (<span class=\"k\">describe</span>)  interactive generative art on the web
+   &quot;                         (<span class=\"k\">note</span>)      21 interactive works; code as the medium rather than a tool
+   &quot;                         (<span class=\"k\">ex</span>)        net art
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://liaworks.com/software-art/turux-at-an-early-work-of-interactive-art-1997-present&quot;
+
+ LIA                         (<span class=\"k\">about</span>)     code art
+   &quot;                         (<span class=\"k\">cr</span>)        TURUX.at
+   &quot;                         (<span class=\"k\">cr</span>)        Sum05
+   &quot;                         (<span class=\"k\">cr</span>)        Little Boxes
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://liaworks.com/about&quot;
+
+ Processing                  (<span class=\"k\">year</span>)      2001
+   &quot;                         (<span class=\"k\">cr</span>)        Casey Reas
+   &quot;                         (<span class=\"k\">cr</span>)        Ben Fry
+   &quot;                         (<span class=\"k\">describe</span>)  open sketchbook language and IDE that normalised code as an art material
+   &quot;                         (<span class=\"k\">note</span>)      the wave of generative art after 2001 is largely downstream of this
+   &quot;                         (evolve-fr) Design By Numbers
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Processing&quot;
+
+ Casey Reas                  (<span class=\"k\">about</span>)     code art
+   &quot;                         (<span class=\"k\">cr</span>)        Processing
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/Processing&quot;
+
+ Generator.x                 (<span class=\"k\">year</span>)      2005
+   &quot;                         (<span class=\"k\">describe</span>)  exhibition presenting generative art as a codified practice
+   &quot;                         (<span class=\"k\">note</span>)      the moment the scene named itself and organised
+   &quot;                         (<span class=\"k\">ex</span>)        generative art
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://ab5d.xyz/artists/lia&quot;
+
+ Sum05                       (<span class=\"k\">year</span>)      2005
+   &quot;                         (<span class=\"k\">cr</span>)        LIA
+   &quot;                         (<span class=\"k\">describe</span>)  algorithmic rules directing autonomous agents through a bounded system
+   &quot;                         (<span class=\"k\">ex</span>)        Generator.x
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://ab5d.xyz/artists/lia&quot;
+
+ p5.js                      (<span class=\"k\">year</span>)      2014
+   &quot;                         (<span class=\"k\">describe</span>)  JavaScript rewrite of Processing's ideas for the browser
+   &quot;                         (evolve-fr) Processing
+   &quot;                         (<span class=\"k\">note</span>)      made generative work a web-native practice again
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://en.wikipedia.org/wiki/P5.js&quot;
+
+ Little Boxes                (<span class=\"k\">year</span>)      2015
+   &quot;                         (<span class=\"k\">cr</span>)        LIA
+   &quot;                         (<span class=\"k\">describe</span>)  abstract suburban cityscapes generated by code
+   &quot;                         (<span class=\"k\">note</span>)      title refers to the 1962 Malvina Reynolds song
+   &quot;                         (<span class=\"k\">source</span>)    &quot;https://ab5d.xyz/artists/lia&quot;</div><h2>Evidence from the running database</h2><p>The capture below is the live viewer for <code>Cybernetic Serendipity</code>, read out of Postgres.</p><img class="shot" src="genart-live.png" alt="SSTorytime viewer showing the Cybernetic Serendipity node"><p class="cap">Live node view, chapter <code>genart</code>.</p><h2>What the compiler caught</h2><p>Three things, all now fixed in the source. The <code>(cr)</code> arrow had been written backwards on one edge — <code>AARON (cr) Harold Cohen</code> reads as <em>AARON creates Harold Cohen</em>, which is false. Two concepts had been split by capitalisation (<code>Computer art</code> and <code>computer art</code> became separate nodes). And one warning is a false positive worth knowing about: SSTorytime flags a <em>possible note to self</em> when a node's name appears inside its own source URL, which it does for <code>AARON</code>.</p><p>This is the useful part of a typed graph. It fails loudly when you assert something false.</p><footer><p><strong>Provenance.</strong> This note renders <code>genart.n4l</code>, an N4L graph compiled and loaded into a local SSTorytime Postgres instance. The <code>.n4l</code> file is the source of truth; the database is a rebuildable cache. Node names, arrow types and every target are read directly from that source. SSTorytime is by Mark Burgess.</p><p class="mono" style="font-size:12px;color:#8a8f9c">Generated 2026-09-17 · Edgeless Lab</p></footer></div><script>var DATA=[{"name": "computer art", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "generative art"}, {"a": "describe", "t": "art in which the artist cedes some control to an autonomous system"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Computer_art"}], "incoming": [{"a": "ex", "t": "Oscillons"}, {"a": "about", "t": "Ben F. Laposky"}, {"a": "about", "t": "Frieder Nake"}, {"a": "about", "t": "Georg Nees"}, {"a": "about", "t": "A. Michael Noll"}, {"a": "about", "t": "Herbert W. Franke"}, {"a": "ex", "t": "Cybernetic Serendipity"}, {"a": "about", "t": "Vera Molnar"}, {"a": "about", "t": "Manfred Mohr"}, {"a": "about", "t": "Harold Cohen"}]}, {"name": "generative art", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "autonomous system"}, {"a": "note", "t": "the artist defines rules; the system produces the outcome"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Generative_art"}], "incoming": [{"a": "about", "t": "computer art"}, {"a": "about", "t": "Sol LeWitt"}, {"a": "ex", "t": "AARON"}, {"a": "ex", "t": "Generator.x"}]}, {"name": "Oscillons", "year": 1950, "kind": "computer art", "declared": true, "rels": [{"a": "year", "t": "1950"}, {"a": "cr", "t": "Ben F. Laposky"}, {"a": "describe", "t": "first works made by an electronic analogue computer displayed on an oscilloscope"}, {"a": "ex", "t": "computer art"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Computer_art"}], "incoming": []}, {"name": "Ben F. Laposky", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "computer art"}, {"a": "note", "t": "American mathematician; made the earliest known computer art"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Computer_art"}], "incoming": [{"a": "cr", "t": "Oscillons"}]}, {"name": "Frieder Nake", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "computer art"}, {"a": "cr", "t": "Polygon Drawings"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Computer_art"}], "incoming": [{"a": "cr", "t": "Polygon Drawings"}]}, {"name": "Polygon Drawings", "year": 1965, "kind": "", "declared": true, "rels": [{"a": "year", "t": "1965"}, {"a": "cr", "t": "Frieder Nake"}, {"a": "describe", "t": "plotter drawings from a random-number generating program"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Computer_art"}], "incoming": [{"a": "cr", "t": "Frieder Nake"}]}, {"name": "Georg Nees", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "computer art"}, {"a": "note", "t": "exhibited early computer-generated plotter drawings in Stuttgart"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Computer_art"}], "incoming": []}, {"name": "A. Michael Noll", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "computer art"}, {"a": "note", "t": "Bell Labs researcher; produced Computer-Generated Pictures in 1965"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Computer_art"}], "incoming": []}, {"name": "Herbert W. Franke", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "computer art"}, {"a": "note", "t": "German scientist and pioneer of algorithmic art theory"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Computer_art"}], "incoming": []}, {"name": "Cybernetic Serendipity", "year": 1968, "kind": "computer art", "declared": true, "rels": [{"a": "year", "t": "1968"}, {"a": "describe", "t": "landmark exhibition of computer and cybernetic art at the Institute of Contemporary Arts London"}, {"a": "note", "t": "curated by Jasia Reichardt; the moment computer art entered the gallery system"}, {"a": "ex", "t": "computer art"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Cybernetic_Serendipity"}], "incoming": []}, {"name": "Sol LeWitt", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "generative art"}, {"a": "cr", "t": "Wall Drawings"}, {"a": "note", "t": "conceptual predecessor: the work is an instruction set executed by others"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Sol_LeWitt"}], "incoming": [{"a": "cr", "t": "Wall Drawings"}]}, {"name": "Wall Drawings", "year": 1968, "kind": "", "declared": true, "rels": [{"a": "year", "t": "1968"}, {"a": "cr", "t": "Sol LeWitt"}, {"a": "describe", "t": "written instructions that others execute as the artwork"}, {"a": "note", "t": "generative before generative art had a name; separates program from execution"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Sol_LeWitt"}], "incoming": [{"a": "cr", "t": "Sol LeWitt"}]}, {"name": "Vera Molnar", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "computer art"}, {"a": "note", "t": "Hungarian-French artist; systematic geometric variation by hand and by computer from the 1960s"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Vera_Molnar"}], "incoming": []}, {"name": "Manfred Mohr", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "computer art"}, {"a": "note", "t": "German artist; the first solo exhibition of computer-generated work in 1971"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Computer_art"}], "incoming": []}, {"name": "AARON", "year": 1973, "kind": "generative art", "declared": true, "rels": [{"a": "year", "t": "1973"}, {"a": "describe", "t": "autonomous program that produces drawings without a human in the loop"}, {"a": "note", "t": "the longest-running attempt to make a machine that is the author"}, {"a": "ex", "t": "generative art"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/AARON"}], "incoming": [{"a": "cr", "t": "Harold Cohen"}]}, {"name": "Harold Cohen", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "computer art"}, {"a": "cr", "t": "AARON"}, {"a": "note", "t": "asked the question the field is still arguing: who is the author"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/AARON"}], "incoming": []}, {"name": "John Maeda", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "code art"}, {"a": "cr", "t": "Design By Numbers"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Design_by_Numbers"}], "incoming": [{"a": "cr", "t": "Design By Numbers"}]}, {"name": "Design By Numbers", "year": 1999, "kind": "", "declared": true, "rels": [{"a": "year", "t": "1999"}, {"a": "cr", "t": "John Maeda"}, {"a": "describe", "t": "a programming environment built to teach artists to write code"}, {"a": "note", "t": "direct ancestor of the Processing language"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Design_by_Numbers"}], "incoming": [{"a": "cr", "t": "John Maeda"}, {"a": "evolve-fr", "t": "Processing"}]}, {"name": "TURUX.at", "year": 1997, "kind": "net art", "declared": true, "rels": [{"a": "year", "t": "1997"}, {"a": "cr", "t": "LIA"}, {"a": "describe", "t": "interactive generative art on the web"}, {"a": "note", "t": "21 interactive works; code as the medium rather than a tool"}, {"a": "ex", "t": "net art"}, {"a": "source", "t": "https://liaworks.com/software-art/turux-at-an-early-work-of-interactive-art-1997-present"}], "incoming": [{"a": "cr", "t": "LIA"}]}, {"name": "LIA", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "code art"}, {"a": "cr", "t": "TURUX.at"}, {"a": "cr", "t": "Sum05"}, {"a": "cr", "t": "Little Boxes"}, {"a": "source", "t": "https://liaworks.com/about"}], "incoming": [{"a": "cr", "t": "TURUX.at"}, {"a": "cr", "t": "Sum05"}, {"a": "cr", "t": "Little Boxes"}]}, {"name": "Processing", "year": 2001, "kind": "", "declared": true, "rels": [{"a": "year", "t": "2001"}, {"a": "cr", "t": "Casey Reas"}, {"a": "cr", "t": "Ben Fry"}, {"a": "describe", "t": "open sketchbook language and IDE that normalised code as an art material"}, {"a": "note", "t": "the wave of generative art after 2001 is largely downstream of this"}, {"a": "evolve-fr", "t": "Design By Numbers"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Processing"}], "incoming": [{"a": "cr", "t": "Casey Reas"}, {"a": "evolve-fr", "t": "p5.js"}]}, {"name": "Casey Reas", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "code art"}, {"a": "cr", "t": "Processing"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/Processing"}], "incoming": [{"a": "cr", "t": "Processing"}]}, {"name": "Generator.x", "year": 2005, "kind": "generative art", "declared": true, "rels": [{"a": "year", "t": "2005"}, {"a": "describe", "t": "exhibition presenting generative art as a codified practice"}, {"a": "note", "t": "the moment the scene named itself and organised"}, {"a": "ex", "t": "generative art"}, {"a": "source", "t": "https://ab5d.xyz/artists/lia"}], "incoming": [{"a": "ex", "t": "Sum05"}]}, {"name": "Sum05", "year": 2005, "kind": "Generator.x", "declared": true, "rels": [{"a": "year", "t": "2005"}, {"a": "cr", "t": "LIA"}, {"a": "describe", "t": "algorithmic rules directing autonomous agents through a bounded system"}, {"a": "ex", "t": "Generator.x"}, {"a": "source", "t": "https://ab5d.xyz/artists/lia"}], "incoming": [{"a": "cr", "t": "LIA"}]}, {"name": "p5.js", "year": 2014, "kind": "", "declared": true, "rels": [{"a": "year", "t": "2014"}, {"a": "describe", "t": "JavaScript rewrite of Processing's ideas for the browser"}, {"a": "evolve-fr", "t": "Processing"}, {"a": "note", "t": "made generative work a web-native practice again"}, {"a": "source", "t": "https://en.wikipedia.org/wiki/P5.js"}], "incoming": []}, {"name": "Little Boxes", "year": 2015, "kind": "", "declared": true, "rels": [{"a": "year", "t": "2015"}, {"a": "cr", "t": "LIA"}, {"a": "describe", "t": "abstract suburban cityscapes generated by code"}, {"a": "note", "t": "title refers to the 1962 Malvina Reynolds song"}, {"a": "source", "t": "https://ab5d.xyz/artists/lia"}], "incoming": [{"a": "cr", "t": "LIA"}]}, {"name": "art in which the artist cedes some control to an autonomous system", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "computer art"}]}, {"name": "https://en.wikipedia.org/wiki/Computer_art", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "computer art"}, {"a": "source", "t": "Oscillons"}, {"a": "source", "t": "Ben F. Laposky"}, {"a": "source", "t": "Frieder Nake"}, {"a": "source", "t": "Polygon Drawings"}, {"a": "source", "t": "Georg Nees"}, {"a": "source", "t": "A. Michael Noll"}, {"a": "source", "t": "Herbert W. Franke"}, {"a": "source", "t": "Manfred Mohr"}]}, {"name": "autonomous system", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "about", "t": "generative art"}]}, {"name": "the artist defines rules; the system produces the outcome", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "generative art"}]}, {"name": "https://en.wikipedia.org/wiki/Generative_art", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "generative art"}]}, {"name": "1950", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "year", "t": "Oscillons"}]}, {"name": "first works made by an electronic analogue computer displayed on an oscilloscope", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "Oscillons"}]}, {"name": "American mathematician; made the earliest known computer art", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Ben F. Laposky"}]}, {"name": "1965", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "year", "t": "Polygon Drawings"}]}, {"name": "plotter drawings from a random-number generating program", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "Polygon Drawings"}]}, {"name": "exhibited early computer-generated plotter drawings in Stuttgart", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Georg Nees"}]}, {"name": "Bell Labs researcher; produced Computer-Generated Pictures in 1965", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "A. Michael Noll"}]}, {"name": "German scientist and pioneer of algorithmic art theory", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Herbert W. Franke"}]}, {"name": "1968", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "year", "t": "Cybernetic Serendipity"}, {"a": "year", "t": "Wall Drawings"}]}, {"name": "landmark exhibition of computer and cybernetic art at the Institute of Contemporary Arts London", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "Cybernetic Serendipity"}]}, {"name": "curated by Jasia Reichardt; the moment computer art entered the gallery system", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Cybernetic Serendipity"}]}, {"name": "https://en.wikipedia.org/wiki/Cybernetic_Serendipity", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "Cybernetic Serendipity"}]}, {"name": "conceptual predecessor: the work is an instruction set executed by others", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Sol LeWitt"}]}, {"name": "https://en.wikipedia.org/wiki/Sol_LeWitt", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "Sol LeWitt"}, {"a": "source", "t": "Wall Drawings"}]}, {"name": "written instructions that others execute as the artwork", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "Wall Drawings"}]}, {"name": "generative before generative art had a name; separates program from execution", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Wall Drawings"}]}, {"name": "Hungarian-French artist; systematic geometric variation by hand and by computer from the 1960s", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Vera Molnar"}]}, {"name": "https://en.wikipedia.org/wiki/Vera_Molnar", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "Vera Molnar"}]}, {"name": "German artist; the first solo exhibition of computer-generated work in 1971", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Manfred Mohr"}]}, {"name": "1973", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "year", "t": "AARON"}]}, {"name": "autonomous program that produces drawings without a human in the loop", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "AARON"}]}, {"name": "the longest-running attempt to make a machine that is the author", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "AARON"}]}, {"name": "https://en.wikipedia.org/wiki/AARON", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "AARON"}, {"a": "source", "t": "Harold Cohen"}]}, {"name": "asked the question the field is still arguing: who is the author", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Harold Cohen"}]}, {"name": "code art", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "about", "t": "John Maeda"}, {"a": "about", "t": "LIA"}, {"a": "about", "t": "Casey Reas"}]}, {"name": "https://en.wikipedia.org/wiki/Design_by_Numbers", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "John Maeda"}, {"a": "source", "t": "Design By Numbers"}]}, {"name": "1999", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "year", "t": "Design By Numbers"}]}, {"name": "a programming environment built to teach artists to write code", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "Design By Numbers"}]}, {"name": "direct ancestor of the Processing language", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Design By Numbers"}]}, {"name": "1997", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "year", "t": "TURUX.at"}]}, {"name": "interactive generative art on the web", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "TURUX.at"}]}, {"name": "21 interactive works; code as the medium rather than a tool", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "TURUX.at"}]}, {"name": "net art", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "ex", "t": "TURUX.at"}]}, {"name": "https://liaworks.com/software-art/turux-at-an-early-work-of-interactive-art-1997-present", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "TURUX.at"}]}, {"name": "https://liaworks.com/about", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "LIA"}]}, {"name": "2001", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "year", "t": "Processing"}]}, {"name": "Ben Fry", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "cr", "t": "Processing"}]}, {"name": "open sketchbook language and IDE that normalised code as an art material", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "Processing"}]}, {"name": "the wave of generative art after 2001 is largely downstream of this", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Processing"}]}, {"name": "https://en.wikipedia.org/wiki/Processing", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "Processing"}, {"a": "source", "t": "Casey Reas"}]}, {"name": "2005", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "year", "t": "Generator.x"}, {"a": "year", "t": "Sum05"}]}, {"name": "exhibition presenting generative art as a codified practice", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "Generator.x"}]}, {"name": "the moment the scene named itself and organised", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Generator.x"}]}, {"name": "https://ab5d.xyz/artists/lia", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "Generator.x"}, {"a": "source", "t": "Sum05"}, {"a": "source", "t": "Little Boxes"}]}, {"name": "algorithmic rules directing autonomous agents through a bounded system", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "Sum05"}]}, {"name": "2014", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "year", "t": "p5.js"}]}, {"name": "JavaScript rewrite of Processing's ideas for the browser", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "p5.js"}]}, {"name": "made generative work a web-native practice again", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "p5.js"}]}, {"name": "https://en.wikipedia.org/wiki/P5.js", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "p5.js"}]}, {"name": "2015", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "year", "t": "Little Boxes"}]}, {"name": "abstract suburban cityscapes generated by code", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "Little Boxes"}]}, {"name": "title refers to the 1962 Malvina Reynolds song", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Little Boxes"}]}];var LAYOUT="timeline";
+var ARROW={cr:{k:'creates',c:'cr'},crtd:{k:'is created by',c:'cr'},
+ex:{k:'is an example of',c:'ex'},'is an example of':{k:'is an example of',c:'ex'},
+year:{k:'year',c:''},'happened in years':{k:'year',c:''},
+source:{k:'has source',c:'src'},note:{k:'note',c:'src'},
+describe:{k:'describes',c:'src'},'about topic':{k:'is about',c:''}};
+function arrowInfo(a){return ARROW[a]||{k:a,c:''};}
+var W=900,H=620,pad=70;
+var svg=document.getElementById('g');
+function el(n,a){var e=document.createElementNS('http://www.w3.org/2000/svg',n);
+for(var k in a)e.setAttribute(k,a[k]);return e;}
+var pos={},i,N=DATA.length;
+var years=DATA.map(function(d){return d.year;}).filter(Boolean);
+var ymin=Math.min.apply(null,years),ymax=Math.max.apply(null,years);
+var undated=DATA.filter(function(d){return !d.year;});
+var dated=DATA.filter(function(d){return d.year;});
+if(LAYOUT==='timeline'){
+  dated.forEach(function(d,i){
+    var x=pad+(W-2*pad)*((d.year-ymin)/Math.max(1,(ymax-ymin)));
+    pos[d.name]={x:x,y:120+((i*67)%300)};
+  });
+  undated.forEach(function(d,i){
+    pos[d.name]={x:pad+(i%6)*130,y:H-58-Math.floor(i/6)*34};
+  });
+}else{
+  var cx=W/2,cy=H/2-10;var maxr=Math.min(W,H)/2-70;
+  DATA.forEach(function(d,i){
+    var r=d.year?maxr*(0.35+0.65*((d.year-ymin)/Math.max(1,(ymax-ymin)))):maxr*0.2;
+    var a=-Math.PI/2+(2*Math.PI*i/N);
+    pos[d.name]={x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)};
+  });
+}
+var relMap={};DATA.forEach(function(d){relMap[d.name]=d.rels;});
+var edgeLayer=el('g',{});svg.appendChild(edgeLayer);
+var nodeLayer=el('g',{});svg.appendChild(nodeLayer);
+var edges=[];
+if(LAYOUT==='timeline'){DATA.forEach(function(d){
+  var yr=(d.rels.find(function(r){return r.a==='year'||r.a==='happened in years';})||{}).t;
+  var prev=null;
+  DATA.forEach(function(o){var oy=(o.rels.find(function(r){return r.a==='year'||r.a==='happened in years';})||{}).t;
+    if(oy&&yr&&Number(oy)<Number(yr)&&(!prev||Number(oy)>Number(prev.rels__y||-1))){prev=o;}});
+});}
+DATA.forEach(function(d){
+  d.rels.forEach(function(r){
+    if(!pos[r.t])return;
+    var info=arrowInfo(r.a);
+    if(info.c==='src'&&r.a==='source')return;
+    var e=el('path',{d:'M'+pos[d.name].x+','+pos[d.name].y+' Q'+
+      ((pos[d.name].x+pos[r.t].x)/2)+','+(((pos[d.name].y+pos[r.t].y)/2)-26)+' '+
+      pos[r.t].x+','+pos[r.t].y,'class':'edge','data-a':r.a,
+      'data-s':d.name,'data-t':r.t});
+    e.setAttribute('marker-end','url(#ah)');
+    edgeLayer.appendChild(e);edges.push(e);
+  });
+});
+var defs=el('defs',{});
+var mk=el('marker',{id:'ah',viewBox:'0 0 10 10',refX:'9',refY:'5',
+  markerWidth:'5',markerHeight:'5',orient:'auto-start-reverse'});
+mk.appendChild(el('path',{d:'M0,0 L10,5 L0,10 z',fill:'#3a4152'}));
+defs.appendChild(mk);svg.insertBefore(defs,svg.firstChild);
+DATA.forEach(function(d){
+  var p=pos[d.name];
+  var g=el('g',{class:'node'+(d.declared?'':' ghost'),'data-n':d.name});
+  var r=d.declared?(d.rels.filter(function(x){return x.a==='source';}).length?9:7):4;
+  g.appendChild(el('circle',{cx:p.x,cy:p.y,r:r}));
+  var a=Math.atan2(p.y-H/2,p.x-W/2);
+  var tx=el('text',{x:p.x+Math.cos(a)*(r+7),y:p.y+Math.sin(a)*(r+7)+3,
+    'text-anchor':Math.cos(a)>0.2?'start':(Math.cos(a)<-0.2?'end':'middle')});
+  tx.textContent=d.name.length>28?d.name.slice(0,27)+'…':d.name;
+  g.appendChild(tx);
+  g.addEventListener('click',function(){select(d.name);});
+  g.addEventListener('mouseenter',function(){trace(d.name,true);});
+  g.addEventListener('mouseleave',function(){trace(null);});
+  nodeLayer.appendChild(g);
+});
+function trace(name,hi){
+  edges.forEach(function(e){
+    if(!name){e.classList.remove('dim','hi');return;}
+    var s=e.getAttribute('data-s'),t=e.getAttribute('data-t');
+    var on=(s===name||t===name);
+    e.classList.toggle('dim',!on);e.classList.toggle('hi',on);
+  });
+}
+function select(name){
+  document.querySelectorAll('.node').forEach(function(n){
+    n.classList.toggle('sel',n.getAttribute('data-n')===name);});
+  document.getElementById('sel-name').textContent=name;
+  var box=document.getElementById('rel');box.innerHTML='';
+  relMap[name].forEach(function(r){
+    var info=arrowInfo(r.a);if(info.c==='src'&&r.a==='note')return;
+    var row=document.createElement('div');row.className='row '+info.c;
+    var a=document.createElement('div');a.className='arrow'+(info.c?'':' dim');
+    a.textContent=info.k;
+    var t=document.createElement('div');t.className='target';
+    if(r.a==='source'){
+      t.innerHTML='<a href="'+r.t.replace(/"/g,'')+'" target="_blank" rel="noopener">'+r.t.replace(/"/g,'')+'</a>';
+    }else{t.textContent=r.t;}
+    row.appendChild(a);row.appendChild(t);box.appendChild(row);
+  });
+  (relMap[name].incoming||[]).forEach(function(r){
+    var info=arrowInfo(r.a);
+    var row=document.createElement('div');row.className='row '+'inc';
+    var a=document.createElement('div');a.className='arrow dim';
+    a.textContent='referenced by';
+    var t=document.createElement('div');t.className='target';
+    t.textContent=r.t+'  ('+info.k+')';
+    row.appendChild(a);row.appendChild(t);box.appendChild(row);
+  });
+  trace(name,true);
+}
+var FILTERS=[['all','every edge'],['cr','creates'],['ex','is an example of'],
+  ['year','year'],['source','has source']];
+var fb=document.getElementById('filters');
+FILTERS.forEach(function(f,i){
+  var b=document.createElement('button');b.className='f'+(i===0?' on':'');
+  b.textContent=f[1];
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.f').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    edges.forEach(function(e){
+      var on=f[0]==='all'||e.getAttribute('data-a')===f[0]||
+        (f[0]==='year'&&(e.getAttribute('data-a')==='happened in years'));
+      e.classList.toggle('dim',!on);
+    });
+  });
+  fb.appendChild(b);
+});
+</script></body></html>

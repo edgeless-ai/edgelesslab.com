@@ -135,7 +135,13 @@ function descriptionFrom(html: string, title: string): string {
     : `${title} is an interactive study from the Edgeless Lab archive.`;
 }
 
-function categoryFrom(slug: string, html: string, tags: string[]): string {
+function categoryFrom(
+  slug: string,
+  html: string,
+  tags: string[],
+  explicit?: string
+): string {
+  if (explicit) return explicit;
   if (tags.includes("Architecture")) return "Systems";
   const legacy = LEGACY_TAGS.get(slug);
   if (legacy) return legacy;
@@ -188,7 +194,12 @@ export function getFieldNotes(): FieldNote[] {
       const description = normalizeProse(
         explicit?.description ?? descriptionFrom(html, title)
       );
-      const category = categoryFrom(slug, html, explicit?.tags ?? []);
+      const category = categoryFrom(
+        slug,
+        html,
+        explicit?.tags ?? [],
+        explicit?.category
+      );
       const citedPlot = fs.existsSync(path.join(directory, "plot.svg"));
 
       return {

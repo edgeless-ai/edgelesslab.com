@@ -5,6 +5,13 @@ export interface CreativeDemo {
   tags: string[];
   date: string;
   hasControls: boolean;
+  /**
+   * Explicit field-note category. Optional and additive: when present it
+   * overrides keyword inference, which inspects only the first 1800 chars
+   * of the demo HTML (usually inline CSS) and can misclassify a page whose
+   * stylesheet happens to mention a font or a letter.
+   */
+  category?: string;
 }
 
 export const creativeDemos: CreativeDemo[] = [
@@ -23,6 +30,7 @@ export const creativeDemos: CreativeDemo[] = [
     tags: ["Art History", "Graph", "SSTorytime", "Interactive"],
     date: "2026-09-17",
     hasControls: true,
+    category: "Art history",
   },
   {
     slug: "code-as-a-field-of-relation",
@@ -31,6 +39,7 @@ export const creativeDemos: CreativeDemo[] = [
     tags: ["Generative", "Graph", "SSTorytime", "Interactive"],
     date: "2026-09-17",
     hasControls: true,
+    category: "Art history",
   },
   {
     slug: "connected-learning-swarm",

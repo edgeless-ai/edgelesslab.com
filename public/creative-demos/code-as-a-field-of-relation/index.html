@@ -20,6 +20,9 @@ font:600 11px/1.6 ui-monospace,Menlo,monospace;color:var(--dim)}
 h2{font-size:24px;margin:56px 0 14px;letter-spacing:-.01em;font-weight:640}
 h3{font-size:15px;margin:28px 0 8px;color:var(--acc);font-weight:640;
 font-family:ui-monospace,Menlo,monospace;letter-spacing:.04em}
+h4{font-size:11px;margin:14px 0 6px;color:var(--dim);font-weight:600;
+font-family:ui-monospace,Menlo,monospace;letter-spacing:.12em;
+text-transform:uppercase}
 p{max-width:72ch}
 .grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,1fr);gap:22px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
@@ -32,32 +35,49 @@ transition:.15s}
 .node text{fill:var(--dim);font:11px ui-monospace,Menlo,monospace;
 pointer-events:none}
 .node:hover circle{stroke:var(--acc);fill:#232a3d}
+.node:focus{outline:none}
+.node:focus circle{stroke:var(--acc);stroke-width:2.6;fill:#232a3d}
+.node:focus text{fill:var(--ink)}
 .node.ghost circle{fill:#141821;stroke:#2a2f3c}
 .node.ghost text{fill:#5b6070}
 .node.ghost:hover circle{stroke:var(--acc2);fill:#1a2030}
+.node.value circle{fill:#0f1219;stroke:#22262f}
+.node.value text{fill:#4e5361}
 .node.sel circle{fill:var(--acc);stroke:var(--acc)}
 .node.sel text{fill:var(--ink)}
 .node.hit circle{stroke:var(--acc2)}
 .edge{stroke:#3a4152;stroke-width:1.1;fill:none;opacity:.75}
+.edge.prop{stroke:#252a37;stroke-width:.9;stroke-dasharray:3 3}
 .edge.dim{opacity:.08}
-.edge.hi{stroke:var(--acc2);stroke-width:2;opacity:1}
+.edge.prop.dim{opacity:.06}
+.edge.fhi{opacity:1;stroke:var(--acc2);stroke-width:2;stroke-dasharray:none}
+.edge.hi{stroke:var(--acc1);stroke-width:3.5}
+@media(prefers-reduced-motion:reduce){
+.node circle{transition:none}
+}
 .rel{display:flex;flex-direction:column;gap:7px}
 .rel .row{display:grid;grid-template-columns:1fr;gap:2px;border-left:2px solid
 var(--line);padding:2px 0 2px 10px}
 .rel .row.cr{border-left-color:var(--acc)}
 .rel .row.ex{border-left-color:var(--warm)}
 .rel .row.src{border-left-color:#3a4152}
+.rel .row.prop{border-left-color:#2f3646}
 .rel .row.inc{border-left-color:#2a2f3c;opacity:.8}
 .arrow{font:600 10px/1.5 ui-monospace,Menlo,monospace;color:var(--acc);
 text-transform:uppercase;letter-spacing:.08em}
 .arrow.dim{color:var(--dim)}
+.arrow.prop{color:var(--warm)}
 .target{font-size:13px}
+.kbdnote{font:400 11px/1.6 ui-monospace,Menlo,monospace;color:var(--dim);margin:10px 0 0}
 .filters{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}
 button.f{border:1px solid var(--line);background:transparent;color:var(--dim);
 border-radius:999px;padding:5px 11px;cursor:pointer;
 font:600 11px/1.4 ui-monospace,Menlo,monospace}
 button.f.on{border-color:var(--acc);color:var(--acc)}
 button.f:hover{color:var(--ink)}
+button.f:focus{outline:none}
+button.f:focus-visible,button.f:focus{outline:2px solid var(--acc2);
+outline-offset:1px}
 .n4l{background:#08090c;border:1px solid var(--line);border-radius:12px;
 padding:16px;overflow:auto;max-height:440px;
 font:12px/1.62 ui-monospace,Menlo,monospace;color:#b9c0cf;white-space:pre}
@@ -77,7 +97,14 @@ color:var(--dim);font-size:13px}
 monospace;color:var(--dim);margin:10px 0 0}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;
 margin-right:6px;vertical-align:1px}
-</style></head><body><div class="wrap"><div class="eyebrow">SSTorytime field note · lia.n4l</div><h1>Code as a Field of Relation</h1><p class="lede">Thirty years of a single practice, stored as a graph instead of a list. LIA's software art, read through the relations rather than the dates.</p><div class="meta"><span class="chip"><b>Field note</b></span><span class="chip">21 nodes</span><span class="chip">Generative</span><span class="chip">Graph</span><span class="chip">Interactive</span><span class="chip">SSTorytime</span><span class="chip">N4L</span></div><div class="grid"><div><div class="card" id="stage"><svg id="g" viewBox="0 0 900 620"></svg><div class="filters" id="filters"></div><div class="lg"><span><i class="dot" style="background:#c9ff3d"></i>creates</span><span><i class="dot" style="background:#ffb45c"></i>is an example of</span><span><i class="dot" style="background:#6ad6ff"></i>leads to / year</span><span><i class="dot" style="background:#3a4152"></i>source, note, property</span><span><i class="dot" style="background:#141821;border:1px solid #2a2f3c"></i>small node: a target, not a declared subject</span></div></div><p class="cap">Hover to trace. Click a node to read its relations. Every edge below is drawn from the graph source, not hand-drawn.</p></div><div class="card"><h3 id="sel-name">click a node</h3><div class="rel" id="rel"></div></div></div>
+.dash{display:inline-block;width:14px;height:0;border-top:1px dashed #6a7285;
+margin-right:6px;vertical-align:3px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.noscript{border:1px solid var(--line);border-left:3px solid var(--warm);
+border-radius:10px;padding:12px 14px;color:var(--dim);font-size:13.5px}
+</style></head><body><div class="wrap"><div class="eyebrow">SSTorytime field note · lia.n4l</div><h1>Code as a Field of Relation</h1><p class="lede">Thirty years of a single practice, stored as a graph instead of a list. LIA's software art, read through the relations rather than the dates.</p><div class="meta"><span class="chip"><b>Field note</b></span><span class="chip">21 nodes</span><span class="chip">Generative</span><span class="chip">Graph</span><span class="chip">Interactive</span><span class="chip">SSTorytime</span><span class="chip">N4L</span></div><div class="grid"><div><div class="card" id="stage"><svg id="g" viewBox="0 0 900 620" role="group" aria-label="Relation graph: 21 nodes and 18 drawn edges. Each node is a button; press Enter to read its relations in the panel beside the drawing."></svg><div class="filters" id="filters" role="group" aria-label="Filter edges by arrow type"></div><div class="lg"><span><i class="dot" style="background:#c9ff3d"></i>creates</span><span><i class="dot" style="background:#ffb45c"></i>is an example of</span><span><i class="dot" style="background:#3a4152"></i>other structural arrows</span><span><i class="dash"></i>property edge: about, describe, note, year (metadata, dashed and dimmed by default)</span><span><i class="dot" style="background:#141821;border:1px solid #2a2f3c"></i>small node: a target, not a declared subject</span></div></div><p class="cap">Hover to trace. Tab to a node and press Enter to read its relations. Every edge below is drawn from the graph source, not hand-drawn.</p><noscript><div class="noscript"><strong>The drawing needs JavaScript.</strong> The graph it renders has 21 nodes and 18 drawn edges; the complete N4L source it was read from is printed in full further down this page.</div></noscript>
+<p class="kbdnote" id="kbdnote">Keyboard: Tab to a node, Enter or Space to select it. Screen readers: the summary line is announced; the relation rows are not individually announced. Not yet tested with VoiceOver or NVDA.</p></div><div class="card" role="region" aria-labelledby="sel-name"><h3 id="sel-name">no node selected</h3><p class="sr-only" id="status" aria-live="polite"></p><div class="rel" id="rel"></div></div></div>
 <h2>Why a graph, and not a page</h2>
 <p>LIA's work resists a chronological list because the interesting thing is
 not what came after what. <em>TURUX.at</em> (1997) matters because it is
@@ -114,10 +141,16 @@ you nothing. The fix is to make the <em>works</em> the load-bearing nodes
 and let the practice be a context rather than a centre. That is why
 <code>LIA</code> carries the year range and the medium, while the works
 carry their own lineage.</p>
+<p>The drawing opens in <strong>structure only</strong>: five nodes that
+declare something, wired by <code>creates</code> and
+<code>is an example of</code>. The other sixteen nodes are values — a town,
+a date, a remark, a URL — not subjects. Select <em>every edge</em> to bring
+the property edges back, and they come back dashed, because a remark is not
+a relation.</p>
 <p>The result is a small graph in which you can ask a question a list
 cannot answer: follow <code>creates</code> out of any node and you are
-walking the actual body of work; follow <code>is an example of</code> and
-you are walking the medium.</p>
+walking the actual body of work; follow <code>is an example of</code> and you
+are walking the medium.</p>
 <h2>The source</h2><p>This is the complete graph. It is short on purpose.</p><div class="n4l">-lia
 
  :: LIA, software art, generative art, net art, art history ::
@@ -149,12 +182,22 @@ you are walking the medium.</p>
    &quot;                          (<span class=\"k\">describe</span>)  abstract suburban cityscapes generated by code
    &quot;                          (<span class=\"k\">note</span>)      title refers to the 1962 Malvina Reynolds song; colour-spread bug kept as cheeky blue / cheeky red
    &quot;                          (<span class=\"k\">source</span>)    &quot;https://ab5d.xyz/artists/lia&quot;</div><h2>Evidence from the running database</h2><p>The screenshot below is the SSTorytime viewer, driven by a headless browser against the local instance, querying the <code>LIA</code> node. It is a capture of the real database, not a mock-up.</p><img class="shot" src="lia-live.png" alt="SSTorytime viewer showing the LIA causal cone"><p class="cap">The live causal cone for <code>LIA</code>, read from Postgres through the SSTorytime http_server.</p><footer><p><strong>Provenance.</strong> This note renders <code>lia.n4l</code>, an N4L graph compiled and loaded into a local SSTorytime Postgres instance. The <code>.n4l</code> file is the source of truth; the database is a rebuildable cache. Node names, arrow types and every target are read directly from that source. SSTorytime is by Mark Burgess.</p><p class="mono" style="font-size:12px;color:#8a8f9c">Generated 2026-09-17 · Edgeless Lab</p></footer></div><script>var DATA=[{"name": "LIA", "year": null, "kind": "", "declared": true, "rels": [{"a": "about", "t": "software art"}, {"a": "born", "t": "Graz, Austria"}, {"a": "cr", "t": "TURUX.at"}, {"a": "cr", "t": "Sum05"}, {"a": "cr", "t": "Little Boxes"}, {"a": "note", "t": "Austrian artist; code as primary working material since 1995"}, {"a": "source", "t": "https://liaworks.com/about"}], "incoming": []}, {"name": "TURUX.at", "year": 1997, "kind": "", "declared": true, "rels": [{"a": "year", "t": "1997"}, {"a": "describe", "t": "earliest examples of interactive generative art on the web"}, {"a": "note", "t": "21 interactive works; LIA contribution to a collaboration"}, {"a": "source", "t": "https://liaworks.com/software-art/turux-at-an-early-work-of-interactive-art-1997-present"}], "incoming": [{"a": "cr", "t": "LIA"}]}, {"name": "Sum05", "year": 2005, "kind": "Generator.x", "declared": true, "rels": [{"a": "year", "t": "2005"}, {"a": "describe", "t": "algorithmic rules directing autonomous agents through a bounded system"}, {"a": "ex", "t": "Generator.x"}, {"a": "source", "t": "https://ab5d.xyz/artists/lia"}], "incoming": [{"a": "cr", "t": "LIA"}]}, {"name": "Generator.x", "year": 2005, "kind": "", "declared": true, "rels": [{"a": "year", "t": "2005"}, {"a": "describe", "t": "exhibition Art from Code, National Museum of Art Architecture and Design Norway"}, {"a": "note", "t": "curator panel presenting generative art as a codified practice"}, {"a": "source", "t": "https://ab5d.xyz/artists/lia"}], "incoming": [{"a": "ex", "t": "Sum05"}]}, {"name": "Little Boxes", "year": 2015, "kind": "", "declared": true, "rels": [{"a": "year", "t": "2015"}, {"a": "describe", "t": "abstract suburban cityscapes generated by code"}, {"a": "note", "t": "title refers to the 1962 Malvina Reynolds song; colour-spread bug kept as cheeky blue / cheeky red"}, {"a": "source", "t": "https://ab5d.xyz/artists/lia"}], "incoming": [{"a": "cr", "t": "LIA"}]}, {"name": "software art", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "about", "t": "LIA"}]}, {"name": "Graz, Austria", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "born", "t": "LIA"}]}, {"name": "Austrian artist; code as primary working material since 1995", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "LIA"}]}, {"name": "https://liaworks.com/about", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "LIA"}]}, {"name": "1997", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "year", "t": "TURUX.at"}]}, {"name": "earliest examples of interactive generative art on the web", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "TURUX.at"}]}, {"name": "21 interactive works; LIA contribution to a collaboration", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "TURUX.at"}]}, {"name": "https://liaworks.com/software-art/turux-at-an-early-work-of-interactive-art-1997-present", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "TURUX.at"}]}, {"name": "2005", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "year", "t": "Sum05"}, {"a": "year", "t": "Generator.x"}]}, {"name": "algorithmic rules directing autonomous agents through a bounded system", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "Sum05"}]}, {"name": "https://ab5d.xyz/artists/lia", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "source", "t": "Sum05"}, {"a": "source", "t": "Generator.x"}, {"a": "source", "t": "Little Boxes"}]}, {"name": "exhibition Art from Code, National Museum of Art Architecture and Design Norway", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "Generator.x"}]}, {"name": "curator panel presenting generative art as a codified practice", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Generator.x"}]}, {"name": "2015", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "year", "t": "Little Boxes"}]}, {"name": "abstract suburban cityscapes generated by code", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "describe", "t": "Little Boxes"}]}, {"name": "title refers to the 1962 Malvina Reynolds song; colour-spread bug kept as cheeky blue / cheeky red", "year": null, "kind": "", "declared": false, "rels": [], "incoming": [{"a": "note", "t": "Little Boxes"}]}];var LAYOUT="radial";
+/* Structural arrows link one subject to another. Property arrows carry a
+   literal value out of a node (a date, a topic, a remark). Keeping the two
+   apart is what stops the drawing from being a sentence cloud. */
+var STRUCT_ARROWS=['cr','crtd','is created by','ex','is an example of',
+  'evolve-fr','born'];
+var PROP_ARROWS=['about','about topic','describe','note','year',
+  'happened in years'];
 var ARROW={cr:{k:'creates',c:'cr'},crtd:{k:'is created by',c:'cr'},
 ex:{k:'is an example of',c:'ex'},'is an example of':{k:'is an example of',c:'ex'},
 year:{k:'year',c:''},'happened in years':{k:'year',c:''},
-source:{k:'has source',c:'src'},note:{k:'note',c:'src'},
-describe:{k:'describes',c:'src'},'about topic':{k:'is about',c:''}};
+source:{k:'has source',c:'src'},note:{k:'note',c:'prop'},
+describe:{k:'describes',c:'prop'},'about topic':{k:'is about',c:'prop'},
+about:{k:'is about',c:'prop'},born:{k:'born in',c:''},
+'evolve-fr':{k:'evolves from',c:''}};
 function arrowInfo(a){return ARROW[a]||{k:a,c:''};}
+function isProp(a){return PROP_ARROWS.indexOf(a)>=0;}
 var W=900,H=620,pad=70;
 var svg=document.getElementById('g');
 function el(n,a){var e=document.createElementNS('http://www.w3.org/2000/svg',n);
@@ -163,11 +206,18 @@ var pos={},i,N=DATA.length;
 var years=DATA.map(function(d){return d.year;}).filter(Boolean);
 var ymin=Math.min.apply(null,years),ymax=Math.max.apply(null,years);
 var undated=DATA.filter(function(d){return !d.year;});
-var dated=DATA.filter(function(d){return d.year;});
+var dated=DATA.filter(function(d){return d.year;}).slice()
+  .sort(function(a,b){return a.year-b.year;});
 if(LAYOUT==='timeline'){
+  /* Author B: the original placed dated nodes at a vertical position that
+     was a modulo of the loop index and encoded nothing, which is why labels
+     collided. Replaced with a regular row grid ordered by year; the label
+     de-collision pass below then removes the residual overlaps. */
+  var rows=Math.max(1,Math.round(Math.sqrt(dated.length)));
+  var rowGap=(H-190)/Math.max(1,rows-1);
   dated.forEach(function(d,i){
     var x=pad+(W-2*pad)*((d.year-ymin)/Math.max(1,(ymax-ymin)));
-    pos[d.name]={x:x,y:120+((i*67)%300)};
+    pos[d.name]={x:x,y:120+(i%rows)*rowGap};
   });
   undated.forEach(function(d,i){
     pos[d.name]={x:pad+(i%6)*130,y:H-58-Math.floor(i/6)*34};
@@ -181,15 +231,57 @@ if(LAYOUT==='timeline'){
   });
 }
 var relMap={};DATA.forEach(function(d){relMap[d.name]=d.rels;});
+
+/* ---- label de-collision (Author B) ------------------------------------
+   Labels are placed around each node, then a greedy pass shifts a label
+   vertically until it stops intersecting the labels already placed.
+   Declared subjects are placed first so they keep their natural position. */
+var CH=6.55, LH=14;
+function initLabel(d){
+  var p=pos[d.name];
+  var a=Math.atan2(p.y-H/2,p.x-W/2);
+  var r=d.declared?(hasSource(d)?9:7):4;
+  var txt=d.name.length>28?d.name.slice(0,27)+'\u2026':d.name;
+  var tx=p.x+Math.cos(a)*(r+7), ty=p.y+Math.sin(a)*(r+7)+3;
+  var anchor=Math.cos(a)>0.2?'start':(Math.cos(a)<-0.2?'end':'middle');
+  d._r=r; d._a=a; d._txt=txt; d._tx=tx; d._ty=ty; d._anchor=anchor;
+}
+function hasSource(d){
+  return d.rels.some(function(x){return x.a==='source';});
+}
+function boxFor(tx,ty,anchor,txt){
+  var w=txt.length*CH;
+  var x0=anchor==='start'?tx:(anchor==='end'?tx-w:tx-w/2);
+  return {x0:x0,y0:ty-LH*0.75,w:w,h:LH};
+}
+function hits(b,c){
+  return b.x0<c.x0+c.w && c.x0<b.x0+b.w && b.y0<c.y0+c.h && c.y0<b.y0+b.h;
+}
+DATA.forEach(initLabel);
+var order=DATA.slice().sort(function(a,b){
+  return (b.declared?1:0)-(a.declared?1:0);});
+var placed=[],STEPS=[0,1,-1,2,-2,3,-3,4,-4,5,-5,6,-6,7,-7,8,-8];
+order.forEach(function(d){
+  var base=boxFor(d._tx,d._ty,d._anchor,d._txt);
+  var best=null,bestN=1e9,bestTy=d._ty;
+  for(var s=0;s<STEPS.length;s++){
+    var ty=d._ty+STEPS[s]*LH;
+    var y0=ty-LH*0.75;
+    if(y0<6||y0+LH>H-6)continue;
+    var cand=boxFor(d._tx,ty,d._anchor,d._txt);
+    var n=0;
+    for(var p=0;p<placed.length;p++){if(hits(cand,placed[p]))n++;}
+    if(n<bestN){bestN=n;best=cand;bestTy=ty;}
+    if(n===0)break;
+  }
+  if(!best){best=base;bestTy=d._ty;}
+  d._lab=best; d._ly=bestTy; placed.push(best);
+});
+
+/* ---- edges ---- */
 var edgeLayer=el('g',{});svg.appendChild(edgeLayer);
 var nodeLayer=el('g',{});svg.appendChild(nodeLayer);
 var edges=[];
-if(LAYOUT==='timeline'){DATA.forEach(function(d){
-  var yr=(d.rels.find(function(r){return r.a==='year'||r.a==='happened in years';})||{}).t;
-  var prev=null;
-  DATA.forEach(function(o){var oy=(o.rels.find(function(r){return r.a==='year'||r.a==='happened in years';})||{}).t;
-    if(oy&&yr&&Number(oy)<Number(yr)&&(!prev||Number(oy)>Number(prev.rels__y||-1))){prev=o;}});
-});}
 DATA.forEach(function(d){
   d.rels.forEach(function(r){
     if(!pos[r.t])return;
@@ -197,7 +289,8 @@ DATA.forEach(function(d){
     if(info.c==='src'&&r.a==='source')return;
     var e=el('path',{d:'M'+pos[d.name].x+','+pos[d.name].y+' Q'+
       ((pos[d.name].x+pos[r.t].x)/2)+','+(((pos[d.name].y+pos[r.t].y)/2)-26)+' '+
-      pos[r.t].x+','+pos[r.t].y,'class':'edge','data-a':r.a,
+      pos[r.t].x+','+pos[r.t].y,'class':'edge'+(isProp(r.a)?' prop':''),
+      'data-a':r.a,'data-kind':isProp(r.a)?'property':'structural',
       'data-s':d.name,'data-t':r.t});
     e.setAttribute('marker-end','url(#ah)');
     edgeLayer.appendChild(e);edges.push(e);
@@ -208,71 +301,152 @@ var mk=el('marker',{id:'ah',viewBox:'0 0 10 10',refX:'9',refY:'5',
   markerWidth:'5',markerHeight:'5',orient:'auto-start-reverse'});
 mk.appendChild(el('path',{d:'M0,0 L10,5 L0,10 z',fill:'#3a4152'}));
 defs.appendChild(mk);svg.insertBefore(defs,svg.firstChild);
+
+/* ---- nodes ---- */
 DATA.forEach(function(d){
   var p=pos[d.name];
-  var g=el('g',{class:'node'+(d.declared?'':' ghost'),'data-n':d.name});
-  var r=d.declared?(d.rels.filter(function(x){return x.a==='source';}).length?9:7):4;
-  g.appendChild(el('circle',{cx:p.x,cy:p.y,r:r}));
-  var a=Math.atan2(p.y-H/2,p.x-W/2);
-  var tx=el('text',{x:p.x+Math.cos(a)*(r+7),y:p.y+Math.sin(a)*(r+7)+3,
-    'text-anchor':Math.cos(a)>0.2?'start':(Math.cos(a)<-0.2?'end':'middle')});
-  tx.textContent=d.name.length>28?d.name.slice(0,27)+'…':d.name;
-  g.appendChild(tx);
+  var incoming=d.incoming||[];
+  var onlyProp=!d.declared && incoming.length>0 &&
+    incoming.every(function(r){return isProp(r.a);});
+  var cls='node'+(d.declared?'':' ghost')+(onlyProp?' value':'');
+  var g=el('g',{class:cls,'data-n':d.name,tabindex:'0',role:'button',
+    'aria-label':d.name+', '+(d.declared?'declared subject':'target only')+
+      ', '+(d.rels.length?d.rels.length+' outgoing relation'+
+        (d.rels.length===1?'':'s'):'no outgoing relations')+
+      ', '+incoming.length+' incoming. Press Enter to read the relations.'});
+  g.appendChild(el('circle',{cx:p.x,cy:p.y,r:d._r}));
+  g.appendChild(el('text',{x:d._tx,y:d._ly,'text-anchor':d._anchor,
+    'aria-hidden':'true'}));
+  g.lastChild.textContent=d._txt;
   g.addEventListener('click',function(){select(d.name);});
+  g.addEventListener('keydown',function(ev){
+    if(ev.key==='Enter'||ev.key===' '||ev.key==='Spacebar'){
+      ev.preventDefault();select(d.name);}
+  });
+  g.addEventListener('focus',function(){trace(d.name,true);});
+  g.addEventListener('blur',function(){trace(null);});
   g.addEventListener('mouseenter',function(){trace(d.name,true);});
   g.addEventListener('mouseleave',function(){trace(null);});
   nodeLayer.appendChild(g);
 });
 function trace(name,hi){
   edges.forEach(function(e){
-    if(!name){e.classList.remove('dim','hi');return;}
+    if(!name){e.classList.remove('hi');return;}
     var s=e.getAttribute('data-s'),t=e.getAttribute('data-t');
-    var on=(s===name||t===name);
-    e.classList.toggle('dim',!on);e.classList.toggle('hi',on);
+    e.classList.toggle('hi',(s===name||t===name));
   });
+}
+function say(msg){document.getElementById('status').textContent=msg;}
+
+/* ---- relations panel (Author B: metadata grouped as metadata) ---- */
+function row(label,value,cls,href,aria){
+  var d=document.createElement('div');d.className='row '+cls;
+  d.setAttribute('role','listitem');if(aria)d.setAttribute('aria-label',aria);
+  var a=document.createElement('div');
+  a.className='arrow'+(cls==='inc'||cls==='prop'?' dim':'');
+  a.textContent=label;
+  var t=document.createElement('div');t.className='target';
+  if(href){var l=document.createElement('a');
+    l.href=href;l.target='_blank';l.rel='noopener';l.textContent=value;
+    t.appendChild(l);}
+  else{t.textContent=value;}
+  d.appendChild(a);d.appendChild(t);return d;
+}
+function section(box,title){
+  var h=document.createElement('h4');h.textContent=title;box.appendChild(h);
 }
 function select(name){
   document.querySelectorAll('.node').forEach(function(n){
     n.classList.toggle('sel',n.getAttribute('data-n')===name);});
   document.getElementById('sel-name').textContent=name;
   var box=document.getElementById('rel');box.innerHTML='';
-  relMap[name].forEach(function(r){
-    var info=arrowInfo(r.a);if(info.c==='src'&&r.a==='note')return;
-    var row=document.createElement('div');row.className='row '+info.c;
-    var a=document.createElement('div');a.className='arrow'+(info.c?'':' dim');
-    a.textContent=info.k;
-    var t=document.createElement('div');t.className='target';
-    if(r.a==='source'){
-      t.innerHTML='<a href="'+r.t.replace(/"/g,'')+'" target="_blank" rel="noopener">'+r.t.replace(/"/g,'')+'</a>';
-    }else{t.textContent=r.t;}
-    row.appendChild(a);row.appendChild(t);box.appendChild(row);
+  box.setAttribute('role','list');
+  var rels=relMap[name]||[],incoming=(relMap[name]&&relMap[name].incoming)||[];
+  var structural=[],props=[],sources=[];
+  rels.forEach(function(r){
+    if(r.a==='source'){sources.push(r);}
+    else if(isProp(r.a)){props.push(r);}
+    else{structural.push(r);}
   });
-  (relMap[name].incoming||[]).forEach(function(r){
-    var info=arrowInfo(r.a);
-    var row=document.createElement('div');row.className='row '+'inc';
-    var a=document.createElement('div');a.className='arrow dim';
-    a.textContent='referenced by';
-    var t=document.createElement('div');t.className='target';
-    t.textContent=r.t+'  ('+info.k+')';
-    row.appendChild(a);row.appendChild(t);box.appendChild(row);
-  });
+  if(structural.length){
+    section(box,'Relations');
+    structural.forEach(function(r){
+      var info=arrowInfo(r.a);
+      box.appendChild(row(info.k,r.t,info.c||'',
+        '','Relation: '+info.k+' '+r.t));
+    });
+  }
+  if(props.length){
+    section(box,'Properties of this node');
+    props.forEach(function(r){
+      var info=arrowInfo(r.a);
+      box.appendChild(row(info.k,r.t,'prop','',
+        'Property: '+info.k+' '+r.t));
+    });
+  }
+  if(sources.length){
+    section(box,'Source');
+    sources.forEach(function(r){
+      var u=r.t.replace(/"/g,'');
+      box.appendChild(row('source',u,'src',u,'Source link: '+u));
+    });
+  }
+  if(incoming.length){
+    section(box,'Referenced by');
+    incoming.forEach(function(r){
+      var info=arrowInfo(r.a);
+      box.appendChild(row('referenced by',r.t+', '+info.k,'inc','',
+        'Referenced by '+r.t+' via '+info.k));
+    });
+  }
+  say('Selected '+name+'. '+structural.length+' relations, '+
+    props.length+' properties, '+sources.length+' sources, '+
+    incoming.length+' incoming.');
   trace(name,true);
 }
-var FILTERS=[['all','every edge'],['cr','creates'],['ex','is an example of'],
-  ['year','year'],['source','has source']];
-var fb=document.getElementById('filters');
-FILTERS.forEach(function(f,i){
-  var b=document.createElement('button');b.className='f'+(i===0?' on':'');
-  b.textContent=f[1];
-  b.addEventListener('click',function(){
-    document.querySelectorAll('.f').forEach(function(x){x.classList.remove('on');});
-    b.classList.add('on');
-    edges.forEach(function(e){
-      var on=f[0]==='all'||e.getAttribute('data-a')===f[0]||
-        (f[0]==='year'&&(e.getAttribute('data-a')==='happened in years'));
-      e.classList.toggle('dim',!on);
-    });
-  });
-  fb.appendChild(b);
+
+/* ---- filters (Author B: generated from the arrows actually drawn) ---- */
+var drawn={},structCount=0;
+edges.forEach(function(e){
+  var a=e.getAttribute('data-a');
+  drawn[a]=(drawn[a]||0)+1;
+  if(!isProp(a))structCount++;
 });
+var FILTERS=[{id:'all',label:'every edge ('+edges.length+')'}];
+if(structCount&&structCount<edges.length){
+  FILTERS.push({id:'struct',label:'structure only ('+structCount+')'});
+}
+Object.keys(drawn).sort(function(a,b){
+  var pa=isProp(a)?1:0,pb=isProp(b)?1:0;
+  if(pa!==pb)return pa-pb;
+  return drawn[b]-drawn[a];
+}).forEach(function(a){
+  FILTERS.push({id:'arrow:'+a,label:arrowInfo(a).k+' ('+drawn[a]+')',arrow:a});
+});
+var current=FILTERS.length>1?FILTERS[1]:FILTERS[0];
+function applyFilter(f){
+  edges.forEach(function(e){
+    var a=e.getAttribute('data-a');
+    var on=f.id==='all'?true:(f.id==='struct'?!isProp(a):a===f.arrow);
+    e.classList.toggle('dim',!on);
+    e.classList.toggle('fhi',on&&f.id!=='all');
+  });
+  say('Filter '+f.label+'.');
+}
+var fb=document.getElementById('filters');
+var btns=FILTERS.map(function(f,i){
+  var b=document.createElement('button');
+  b.type='button';b.className='f'+(f===current?' on':'');
+  b.textContent=f.label;
+  b.setAttribute('aria-pressed',f===current?'true':'false');
+  b.addEventListener('click',function(){
+    current=f;
+    btns.forEach(function(x){x.classList.remove('on');
+      x.setAttribute('aria-pressed','false');});
+    b.classList.add('on');b.setAttribute('aria-pressed','true');
+    applyFilter(f);
+  });
+  fb.appendChild(b);return b;
+});
+applyFilter(current);
 </script></body></html>

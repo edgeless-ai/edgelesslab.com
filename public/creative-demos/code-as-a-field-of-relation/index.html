@@ -230,21 +230,45 @@ if(LAYOUT==='timeline'){
     pos[d.name]={x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)};
   });
 }
-var relMap={};DATA.forEach(function(d){relMap[d.name]=d.rels;});
+/* Author B2, CR4: this used to store only the outgoing rels array, so the
+   panel's relMap[name].incoming was always undefined and every node was
+   announced as "0 incoming" while the aria-label said otherwise. The map
+   now carries the node record; incoming is taken from the drawn-edge index
+   in the panel itself, never from a separate tally. */
+var relMap={};
+DATA.forEach(function(d){relMap[d.name]={rels:d.rels,incoming:d.incoming||[]};});
 
-/* ---- label de-collision (Author B) ------------------------------------
-   Labels are placed around each node, then a greedy pass shifts a label
-   vertically until it stops intersecting the labels already placed.
-   Declared subjects are placed first so they keep their natural position. */
-var CH=6.55, LH=14;
-function initLabel(d){
-  var p=pos[d.name];
-  var a=Math.atan2(p.y-H/2,p.x-W/2);
-  var r=d.declared?(hasSource(d)?9:7):4;
-  var txt=d.name.length>28?d.name.slice(0,27)+'\u2026':d.name;
-  var tx=p.x+Math.cos(a)*(r+7), ty=p.y+Math.sin(a)*(r+7)+3;
-  var anchor=Math.cos(a)>0.2?'start':(Math.cos(a)<-0.2?'end':'middle');
-  d._r=r; d._a=a; d._txt=txt; d._tx=tx; d._ty=ty; d._anchor=anchor;
+/* ---- caption text (Author B r2, CR2) ----------------------------------
+   A node whose name is a source URL must not be captioned with that URL.
+   urlCaption() derives prose from the URL (last meaningful path segment,
+   underscores and hyphens read as spaces, word-boundary truncation) and
+   falls back to the bare host when the segment carries no words. The node
+   name itself is untouched: data-n, the aria-label, the href and the
+   relations panel all keep the full URL verbatim. */
+function isUrl(s){return /^https?:\/\//i.test(s);}
+var SEG_STOP={'about':1,'index':1,'home':1,'main':1,'wiki':1,'en':1,
+  'contact':1,'page':1,'node':1,'view':1,'works':1,'artists':1};
+function urlCaption(u){
+  var s=u.replace(/^https?:\/\//i,'').replace(/^www\./i,'');
+  var cut=s.search(/[?#]/); if(cut>=0)s=s.slice(0,cut);
+  var parts=s.split('/'),host=parts.shift().toLowerCase(),segs=[],i;
+  for(i=0;i<parts.length;i++){if(parts[i])segs.push(parts[i]);}
+  var seg=segs.length?segs[segs.length-1]:'';
+  try{seg=decodeURIComponent(seg);}catch(e){}
+  seg=seg.replace(/\.(html?|php|aspx?|jsp|pdf)$/i,'')
+         .replace(/[_\-.]+/g,' ').replace(/\s+/g,' ').trim();
+  var label=(seg.length>2&&seg.length<70&&!SEG_STOP[seg.toLowerCase()])?seg:host;
+  label=label.replace(/^\d+\s+/,'');
+  if(label.length>34){
+    var t=label.slice(0,34),sp=t.lastIndexOf(' ');
+    if(sp>16)t=t.slice(0,sp);
+    label=t.replace(/[,\s]+$/,'')+'\u2026';
+  }
+  return label.length>1?label:host;
+}
+function captionText(name){
+  if(isUrl(name))return urlCaption(name);
+  return name.length>28?name.slice(0,27)+'\u2026':name;
 }
 function hasSource(d){
   return d.rels.some(function(x){return x.a==='source';});
@@ -257,25 +281,69 @@ function boxFor(tx,ty,anchor,txt){
 function hits(b,c){
   return b.x0<c.x0+c.w && c.x0<b.x0+b.w && b.y0<c.y0+c.h && c.y0<b.y0+b.h;
 }
+var M=14,M0=6;   /* soft placement margin / hard measured margin, viewBox units */
+function initLabel(d){
+  var p=pos[d.name];
+  var a=Math.atan2(p.y-H/2,p.x-W/2);
+  var r=d.declared?(hasSource(d)?9:7):4;
+  var txt=captionText(d.name);
+  d._r=r; d._a=a; d._txt=txt;
+}
+
+/* ---- frame-safe caption placement (Author B r2, CR1) ------------------
+   The frame is the svg viewBox (0 0 W H) with overflow hidden, so any part
+   of a caption outside it is cut off no matter how wide the viewport is.
+   place() therefore never returns a box that crosses the frame: it clamps
+   the caption inside [M, W-M] x [M, H-M], and side=1 flips the caption to
+   the other side of its node when the natural side is where the crowding
+   is. Text size and the captions themselves are unchanged. */
+var CH=6.55, LH=14;
+function place(d,side,dy){
+  var p=pos[d.name],cosA=Math.cos(d._a),sinA=Math.sin(d._a),r=d._r;
+  var tx,anchor;
+  if(side===0){tx=p.x+cosA*(r+7);
+    anchor=cosA>0.2?'start':(cosA<-0.2?'end':'middle');}
+  else{tx=p.x-cosA*(r+7);
+    anchor=cosA>0.2?'end':(cosA<-0.2?'start':'middle');}
+  var ty=p.y+sinA*(r+7)+3+dy,w=d._txt.length*CH;
+  var x0=anchor==='start'?tx:(anchor==='end'?tx-w:tx-w/2);
+  if(x0<M){tx+=(M-x0);x0=M;}
+  if(x0+w>W-M){tx-=(x0+w-(W-M));}
+  var y0=ty-LH*0.75;
+  if(y0<M){ty+=(M-y0);}
+  else if(y0+LH>H-M){ty-=(y0+LH-(H-M));}
+  return {tx:tx,ty:ty,anchor:anchor};
+}
+function setLabel(d,c){
+  d._tx=c.tx; d._ty=c.ty; d._anchor=c.anchor;
+  if(d._textEl){
+    d._textEl.setAttribute('x',c.tx);
+    d._textEl.setAttribute('y',c.ty);
+    d._textEl.setAttribute('text-anchor',c.anchor);
+  }
+}
 DATA.forEach(initLabel);
 var order=DATA.slice().sort(function(a,b){
   return (b.declared?1:0)-(a.declared?1:0);});
-var placed=[],STEPS=[0,1,-1,2,-2,3,-3,4,-4,5,-5,6,-6,7,-7,8,-8];
+var placed=[],STEPS=[0,1,-1,2,-2,3,-3,4,-4,5,-5,6,-6,7,-7,8,-8,9,-9,10,-10,
+  11,-11,12,-12];
 order.forEach(function(d){
-  var base=boxFor(d._tx,d._ty,d._anchor,d._txt);
-  var best=null,bestN=1e9,bestTy=d._ty;
-  for(var s=0;s<STEPS.length;s++){
-    var ty=d._ty+STEPS[s]*LH;
-    var y0=ty-LH*0.75;
-    if(y0<6||y0+LH>H-6)continue;
-    var cand=boxFor(d._tx,ty,d._anchor,d._txt);
-    var n=0;
-    for(var p=0;p<placed.length;p++){if(hits(cand,placed[p]))n++;}
-    if(n<bestN){bestN=n;best=cand;bestTy=ty;}
-    if(n===0)break;
+  var best=null,bestN=1e9,bestBox=null;
+  /* Author B r2: search by displacement level first and side second, so a
+     caption is flipped to the other side of its node before it is pushed
+     a long way down the frame. Natural side still wins at equal cost. */
+  for(var s=0;s<STEPS.length&&bestN!==0;s++){
+    for(var si=0;si<2;si++){
+      var c=place(d,si,STEPS[s]*LH);
+      var box=boxFor(c.tx,c.ty,c.anchor,d._txt);
+      var n=0;
+      for(var p=0;p<placed.length;p++){if(hits(box,placed[p]))n++;}
+      if(n<bestN){bestN=n;best=c;bestBox=box;}
+      if(n===0)break;
+    }
   }
-  if(!best){best=base;bestTy=d._ty;}
-  d._lab=best; d._ly=bestTy; placed.push(best);
+  if(!best){best=place(d,0,0);bestBox=boxFor(best.tx,best.ty,best.anchor,d._txt);}
+  d._lab=bestBox; d._ly=best.ty; setLabel(d,best); placed.push(bestBox);
 });
 
 /* ---- edges ---- */
@@ -296,6 +364,21 @@ DATA.forEach(function(d){
     edgeLayer.appendChild(e);edges.push(e);
   });
 });
+/* ---- drawn-edge index (Author B2, CR3/CR4) ---------------------------
+   One authoritative tally of what is actually on screen. Every count the
+   page states about a node -- aria-label, panel summary, panel rows -- is
+   read from here, so no stated number can disagree with the drawing.
+   A declared 'source' link is skipped by the renderer above, so it is not
+   in this index and must not be counted in any of those places. */
+var outDrawn={},inDrawn={};
+edges.forEach(function(e){
+  var s=e.getAttribute('data-s'),t=e.getAttribute('data-t');
+  outDrawn[s]=(outDrawn[s]||0)+1;
+  (inDrawn[t]=inDrawn[t]||[]).push(e);
+});
+function drawnOut(name){return outDrawn[name]||0;}
+function drawnIn(name){return inDrawn[name]||[];}
+
 var defs=el('defs',{});
 var mk=el('marker',{id:'ah',viewBox:'0 0 10 10',refX:'9',refY:'5',
   markerWidth:'5',markerHeight:'5',orient:'auto-start-reverse'});
@@ -305,19 +388,28 @@ defs.appendChild(mk);svg.insertBefore(defs,svg.firstChild);
 /* ---- nodes ---- */
 DATA.forEach(function(d){
   var p=pos[d.name];
+  /* Author B2, CR3: the aria-label used to count d.rels.length, which
+     includes a declared 'source' link that the renderer never draws, so it
+     overstated the outgoing count by +1 on every node that carries one.
+     The stated number is now the number of drawn edges whose data-s is this
+     node, read from the drawn-edge index. Incoming is read from the same
+     index (edges whose data-t is this node) so the label, the panel and the
+     drawing cannot disagree. */
+  var nOut=drawnOut(d.name),nIn=drawnIn(d.name).length;
   var incoming=d.incoming||[];
   var onlyProp=!d.declared && incoming.length>0 &&
     incoming.every(function(r){return isProp(r.a);});
   var cls='node'+(d.declared?'':' ghost')+(onlyProp?' value':'');
   var g=el('g',{class:cls,'data-n':d.name,tabindex:'0',role:'button',
     'aria-label':d.name+', '+(d.declared?'declared subject':'target only')+
-      ', '+(d.rels.length?d.rels.length+' outgoing relation'+
-        (d.rels.length===1?'':'s'):'no outgoing relations')+
-      ', '+incoming.length+' incoming. Press Enter to read the relations.'});
+      ', '+(nOut?nOut+' outgoing relation'+(nOut===1?'':'s'):
+        'no outgoing relations')+
+      ', '+nIn+' incoming. Press Enter to read the relations.'});
   g.appendChild(el('circle',{cx:p.x,cy:p.y,r:d._r}));
   g.appendChild(el('text',{x:d._tx,y:d._ly,'text-anchor':d._anchor,
     'aria-hidden':'true'}));
   g.lastChild.textContent=d._txt;
+  d._textEl=g.lastChild;
   g.addEventListener('click',function(){select(d.name);});
   g.addEventListener('keydown',function(ev){
     if(ev.key==='Enter'||ev.key===' '||ev.key==='Spacebar'){
@@ -329,6 +421,70 @@ DATA.forEach(function(d){
   g.addEventListener('mouseleave',function(){trace(null);});
   nodeLayer.appendChild(g);
 });
+
+/* ---- measured caption pass (Author B r2) ------------------------------
+   The placement above works from estimated text metrics, which can be a
+   fraction of a pixel off and drift a caption over the frame edge. This
+   pass reads the real rendered boxes: first it pulls any caption that
+   still crosses the frame back inside (CR1), then it re-runs de-collision
+   against real boxes so clamping cannot introduce an overlap. */
+function measuredBox(d){
+  var b=d._textEl.getBBox();
+  return {x0:b.x,y0:b.y,w:b.width,h:b.height};
+}
+function overlapRatio(a,b){
+  var x0=Math.max(a.x0,b.x0),x1=Math.min(a.x0+a.w,b.x0+b.w);
+  var y0=Math.max(a.y0,b.y0),y1=Math.min(a.y0+a.h,b.y0+b.h);
+  if(x1<=x0||y1<=y0)return 0;
+  var small=Math.min(a.w*a.h,b.w*b.h);
+  return small>0?((x1-x0)*(y1-y0))/small:0;
+}
+function worstMeasured(d){
+  var w=0;
+  for(var i=0;i<DATA.length;i++){
+    var o=DATA[i]; if(o===d)continue;
+    var r=overlapRatio(d._m,o._m);
+    if(r>w)w=r;
+  }
+  return w;
+}
+function refreshMeasured(){DATA.forEach(function(d){d._m=measuredBox(d);});}
+refreshMeasured();
+DATA.forEach(function(d){
+  var b=d._m,dx=0,dy=0;
+  if(b.x0<M0)dx=M0-b.x0;
+  if(b.x0+b.w>W-M0)dx=(W-M0)-(b.x0+b.w);
+  if(b.y0<M0)dy=M0-b.y0;
+  if(b.y0+b.h>H-M0)dy=(H-M0)-(b.y0+b.h);
+  if(dx||dy){
+    d._tx+=dx; d._ty+=dy;
+    d._textEl.setAttribute('x',d._tx);
+    d._textEl.setAttribute('y',d._ty);
+    d._m=measuredBox(d);
+  }
+});
+for(var pass=0;pass<3;pass++){
+  var bad=[];
+  DATA.forEach(function(d){if(worstMeasured(d)>0.05)bad.push(d);});
+  if(!bad.length)break;
+  bad.forEach(function(d){
+    var cur=worstMeasured(d);
+    var keep={tx:d._tx,ty:d._ty,anchor:d._anchor};
+    var done=false;
+    for(var s=0;s<STEPS.length&&!done;s++){
+      for(var si=0;si<2;si++){
+        var c=place(d,si,STEPS[s]*LH);
+        setLabel(d,c);
+        d._m=measuredBox(d);
+        var w=worstMeasured(d);
+        if(w<=0.05){keep=c;done=true;break;}
+        if(w<cur){cur=w;keep=c;}
+      }
+    }
+    setLabel(d,keep); d._m=measuredBox(d);
+  });
+}
+
 function trace(name,hi){
   edges.forEach(function(e){
     if(!name){e.classList.remove('hi');return;}
@@ -361,7 +517,13 @@ function select(name){
   document.getElementById('sel-name').textContent=name;
   var box=document.getElementById('rel');box.innerHTML='';
   box.setAttribute('role','list');
-  var rels=relMap[name]||[],incoming=(relMap[name]&&relMap[name].incoming)||[];
+  /* Author B2, CR4: incoming relations come from the drawn-edge index, so
+     the panel can only list edges that are actually on screen, and the
+     count it reports equals the number of drawn edges terminating here. */
+  var rec=relMap[name]||{rels:[],incoming:[]};
+  var rels=rec.rels;
+  var incoming=drawnIn(name).map(function(e){
+    return {a:e.getAttribute('data-a'),t:e.getAttribute('data-s')};});
   var structural=[],props=[],sources=[];
   rels.forEach(function(r){
     if(r.a==='source'){sources.push(r);}
@@ -392,11 +554,12 @@ function select(name){
     });
   }
   if(incoming.length){
-    section(box,'Referenced by');
+    section(box,'Referenced by (drawn incoming edges)');
     incoming.forEach(function(r){
       var info=arrowInfo(r.a);
-      box.appendChild(row('referenced by',r.t+', '+info.k,'inc','',
-        'Referenced by '+r.t+' via '+info.k));
+      var cap=captionText(r.t);
+      box.appendChild(row(cap,info.k+' ('+r.a+')','inc','',
+        'Incoming relation from '+r.t+': '+info.k+', arrow '+r.a));
     });
   }
   say('Selected '+name+'. '+structural.length+' relations, '+

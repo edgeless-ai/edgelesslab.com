@@ -7,13 +7,17 @@ import { LabSection } from "@/components/lab-section";
 import { StatBars, type Stat } from "@/components/stat-bars";
 import { LabTerminal } from "@/components/lab-terminal";
 import { Reveal } from "@/components/reveal";
+import { createPageMetadata } from "@/lib/metadata";
 
 import "@/styles/lab-kit.css";
 
-export const metadata: Metadata = {
-  title: "Paper-brutalist — preview",
-  robots: { index: false, follow: false },
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "Field Index",
+  description:
+    "A public research studio for autonomous software, generative systems, and physical artifacts. Ninety-eight plotter-ready algorithms, forty Field Notes, and the systems behind them.",
+  path: "/lab/paper",
+  keywords: ["generative art", "pen plotter", "Total Serialism", "field notes", "autonomous systems"],
+});
 
 // Real figures pulled from the repo (2026-09): Total Serialism = 98 algorithms,
 // creative-demos.ts = 40 Field Notes, blog.ts = 33 posts, data.ts = 27 systems.

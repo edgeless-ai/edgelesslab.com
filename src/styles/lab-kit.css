@@ -322,3 +322,51 @@
 .stat-bars--paper .stat-bars__label {
   color: var(--ink-faint);
 }
+
+/* Paper page: re-tone the shared Nav / Footer / subscribe form for the paper
+   ground without editing them. They read theme variables via inline styles, so
+   overriding the variables on a wrapper is enough. `.paper-capture` (outer)
+   snapshots the dark-lab accents first so the dark Systems island can restore
+   them; `.paper-page` (inner) applies the paper palette. */
+.paper-capture {
+  --lime: var(--accent);
+  --mint: var(--green);
+}
+
+.paper-page {
+  --background: var(--paper);
+  --bg-base: var(--paper);
+  --bg-surface: var(--paper-deep);
+  --bg-surface-hover: var(--paper-deep);
+  --bg-elevated: var(--paper);
+  --bg-raised: var(--paper-deep);
+  --bg-glass: color-mix(in srgb, var(--paper) 88%, transparent);
+  --bg-glass-solid: var(--paper);
+  --border-subtle: var(--paper-rule);
+  --border-focus: var(--ink-faint);
+  --border-hover: var(--ink-faint);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-soft);
+  --text-tertiary: var(--ink-faint);
+  --accent: var(--malachite);
+  --accent-hover: var(--malachite-deep);
+  --accent-contrast: var(--paper);
+  --accent-muted: color-mix(in srgb, var(--malachite) 14%, transparent);
+  --accent-ghost: color-mix(in srgb, var(--malachite) 8%, transparent);
+  --green: var(--malachite);
+}
+
+/* Inside the dark island, restore the Night Lab accents and dark chrome. */
+.paper-page .dither-dark {
+  --background: var(--ink);
+  --bg-base: var(--ink);
+  --bg-surface: var(--ink-soft);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.12);
+  --text-primary: var(--paper);
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-tertiary: rgba(255, 255, 255, 0.55);
+  --accent: var(--lime);
+  --accent-contrast: var(--ink);
+  --green: var(--mint);
+}

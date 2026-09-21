@@ -15,7 +15,7 @@ export const metadata: Metadata = createPageMetadata({
   title: "Field Index",
   description:
     "A public research studio for autonomous software, generative systems, and physical artifacts. Ninety-eight plotter-ready algorithms, forty Field Notes, and the systems behind them.",
-  path: "/lab/paper",
+  path: "/field-index",
   keywords: ["generative art", "pen plotter", "Total Serialism", "field notes", "autonomous systems"],
 });
 
@@ -34,9 +34,10 @@ const NOTES = [
   { code: "A3", title: "Tartan weave synthesizer", meta: "Generative / textile" },
 ];
 
-export default function PaperBrutalistPreview() {
+export default function FieldIndexPage() {
   return (
-    <div className="field-sheet flex min-h-full flex-col" style={{ color: "var(--ink)" }}>
+    <div className="paper-capture field-sheet flex min-h-full flex-col" style={{ color: "var(--ink)" }}>
+     <div className="paper-page flex min-h-full flex-col">
       <Nav />
 
       <main id="main-content" className="px-6 pb-24 pt-32">
@@ -197,6 +198,7 @@ export default function PaperBrutalistPreview() {
       </main>
 
       <Footer />
+     </div>
     </div>
   );
 }

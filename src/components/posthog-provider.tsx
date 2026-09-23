@@ -3,20 +3,30 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { AnalyticsConsentPanel } from "@/components/analytics-consent-panel";
-import { captureConsentedEvent, CONSENT_CHANGED_EVENT, CONSENT_STORAGE_KEY, reconcileAnalyticsConsent } from "@/lib/analytics-consent";
+import { captureConsentedEvent, captureCookielessPageview, CONSENT_CHANGED_EVENT, CONSENT_STORAGE_KEY, getAnalyticsConsent, reconcileAnalyticsConsent } from "@/lib/analytics-consent";
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    function sync() {
+    async function sync() {
       if (reconcileAnalyticsConsent()) {
         window.location.reload();
         return;
       }
-      void captureConsentedEvent("$pageview", {
+      // Always send cookieless pageview — works before and after consent
+      const site = typeof window !== "undefined" && window.location.hostname.endsWith("shop.edgelesslab.com") ? "shop" : "main";
+      await captureCookielessPageview({
         $current_url: window.location.origin + (pathname || window.location.pathname),
+        site,
       });
+      // If consented, also fire the full tracked pageview
+      const choice = getAnalyticsConsent();
+      if (choice === "accepted") {
+        await captureConsentedEvent("$pageview", {
+          $current_url: window.location.origin + (pathname || window.location.pathname),
+        });
+      }
     }
     function onStorage(event: StorageEvent) {
       if (event.key === CONSENT_STORAGE_KEY || event.key === null) {

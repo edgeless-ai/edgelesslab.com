@@ -53,9 +53,18 @@ export default function PrivacyPolicy() {
                 >
                   PostHog
                 </a>{" "}
-                for privacy-friendly analytics. PostHog collects anonymous page
-                views and interaction data to help us improve the site. No
-                advertising or cross-site tracking is used.
+                for privacy-friendly analytics. PostHog collects anonymous
++                page views and interaction data to help us improve the site.
++                No advertising or cross-site tracking is used.
++              </p>
++              <p>
++                Before you accept analytics, PostHog sends cookieless pageview
++                events (no cookies, no localStorage, no identifiers) to count
++                site traffic. After you accept, full analytics activate with
++                cross-subdomain cookie sharing for shop.edgelesslab.com. You
++                can reject analytics at any time — cookieless counting
++                continues, identifiers are cleared. See our{" "}
++                <a href="/privacy">Privacy Policy</a> for details.
               </p>
               <p>
                 We do not collect your name, email, or personal information

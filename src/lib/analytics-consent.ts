@@ -15,6 +15,7 @@ let sdk: typeof posthog | null = null;
 let pending: Promise<typeof posthog | null> | null = null;
 let transport: AbortController | null = null;
 let retired = false;
+let cookielessInited = false;
 
 export function getAnalyticsConsent(): AnalyticsConsent {
   if (typeof window === "undefined") return null;
@@ -23,7 +24,6 @@ export function getAnalyticsConsent(): AnalyticsConsent {
     const stored = window.localStorage.getItem(CONSENT_STORAGE_KEY);
     return stored === "accepted" || stored === "rejected" ? stored : null;
   } catch {
-    // When storage is blocked, an explicit choice applies only to this page.
     return sessionChoice;
   }
 }
@@ -37,9 +37,9 @@ export function getConsentedAnonymousId() {
   try {
     const stored = window.localStorage.getItem(ANALYTICS_ID_KEY);
     if (stored) return stored;
-  } catch { /* A blocked store uses the page session below. */ }
+  } catch { /* session below */ }
   sessionId ??= crypto.randomUUID();
-  try { window.localStorage.setItem(ANALYTICS_ID_KEY, sessionId); } catch { /* Session-only identifier. */ }
+  try { window.localStorage.setItem(ANALYTICS_ID_KEY, sessionId); } catch { /* session-only */ }
   return sessionId;
 }
 
@@ -54,7 +54,7 @@ function clearAnalyticsStorage() {
         const key = storage.key(index);
         if (key && isAnalyticsKey(key)) storage.removeItem(key);
       }
-    } catch { /* Storage can be disabled by the browser. */ }
+    } catch { /* blocked */ }
   }
   const domains = [""];
   const labels = window.location.hostname.split(".");
@@ -73,6 +73,39 @@ function clearAnalyticsStorage() {
   }
 }
 
+/** Init PostHog in cookieless mode — always sends anonymous pageviews, no consent needed. */
+async function ensureCookieless() {
+  if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return null;
+  if (cookielessInited && sdk) return sdk;
+  const { default: ph } = await import("posthog-js");
+  if (cookielessInited) return sdk;
+  ph.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
+    person_profiles: "identified_only",
+    cookieless_mode: "always",
+    persistence: "memory",
+    capture_pageview: false,
+    capture_pageleave: true,
+    autocapture: false,
+    capture_performance: false,
+    disable_session_recording: true,
+    disable_surveys: true,
+    disable_conversations: true,
+    disable_product_tours: true,
+    disable_external_dependency_loading: true,
+    advanced_disable_flags: true,
+    cross_subdomain_cookie: true,
+    opt_out_persistence_by_default: true,
+    request_batching: false,
+    api_transport: "fetch",
+    fetch_options: { cache: "no-store" },
+    before_send: (event) => event,
+  });
+  sdk = ph;
+  cookielessInited = true;
+  return ph;
+}
+
 /** Returns true when the UI must reload to retire a previously loaded SDK. */
 export function reconcileAnalyticsConsent(choice = getAnalyticsConsent()) {
   if (observedChoice !== choice) {
@@ -83,8 +116,6 @@ export function reconcileAnalyticsConsent(choice = getAnalyticsConsent()) {
   if (choice === "accepted") return retired;
   if (sdk && !retired) {
     retired = true;
-    // Keep this signal aborted for retry/unload paths. Reaccepting requires a
-    // fresh page and must never reactivate a previous consent session's queue.
     transport?.abort();
     sdk.opt_out_capturing();
     sdk.set_config({ disable_persistence: true, autocapture: false, capture_pageleave: false });
@@ -116,8 +147,6 @@ async function ensureAnalytics() {
     const { default: ph } = await import("posthog-js");
     if (!hasAnalyticsConsent() || startedAt !== generation) return null;
     transport = new AbortController();
-    // The installed SDK passes fetch_options through to fetch, including retries.
-    // disable_beacon prevents an unabortable fallback on navigation.
     const fetchOptions = { cache: "no-store" as RequestCache, signal: transport.signal, keepalive: false };
     ph.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
       api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
@@ -138,6 +167,7 @@ async function ensureAnalytics() {
       disable_beacon: true,
       fetch_options: fetchOptions,
       before_send: (event) => hasAnalyticsConsent() ? event : null,
+      cross_subdomain_cookie: true,
     });
     sdk = ph;
     ph.opt_in_capturing({ captureEventName: false });
@@ -155,6 +185,17 @@ export async function captureConsentedEvent(event: string, properties?: Record<s
   const startedAt = generation;
   const ph = await ensureAnalytics();
   if (ph && hasAnalyticsConsent() && startedAt === generation) ph.capture(event, properties);
+}
+
+export async function captureCookielessPageview(properties?: Record<string, unknown>) {
+  const ph = await ensureCookieless();
+  if (!ph) return;
+  const site = typeof window !== "undefined" && window.location.hostname.endsWith("shop.edgelesslab.com") ? "shop" : "main";
+  ph.capture("$pageview", {
+    $current_url: typeof window !== "undefined" ? window.location.origin + window.location.pathname : undefined,
+    site,
+    ...properties,
+  });
 }
 
 export function openAnalyticsSettings() {

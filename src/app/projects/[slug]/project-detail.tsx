@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Nav } from "@/components/nav";
 import { JsonLd } from "@/components/json-ld";
 import { Footer } from "@/components/footer";
+import { EtsyCallout } from "@/components/etsy-callout";
 import type { projects } from "@/lib/data";
 
 type Project = (typeof projects)[number];
@@ -233,6 +234,7 @@ export function ProjectDetail({ project }: { project: Project }) {
         </section>
       </main>
 
+      <EtsyCallout originals heading="Buy an original" />
       <Footer />
     </div>
   );

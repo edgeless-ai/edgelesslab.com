@@ -4,6 +4,7 @@ import { JsonLd } from "@/components/json-ld";
 import { createPageMetadata } from "@/lib/metadata";
 import { ProductsGrid } from "@/components/products-grid";
 import { ProductsSubtitle } from "@/components/products-subtitle";
+import { EtsyCallout } from "@/components/etsy-callout";
 import { products } from "@/lib/data";
 
 export const metadata = createPageMetadata({
@@ -80,6 +81,7 @@ export default function ProductsPage() {
       </section>
       </main>
 
+      <EtsyCallout heading="LineFields on Etsy" />
       <Footer />
     </div>
   );

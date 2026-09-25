@@ -228,7 +228,8 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                     />
                   </div>
                 )}
-                <EtsyCallout packs heading="Get the loop packs" />
+                {experiment.slug === "tartanism" && <EtsyCallout packs heading="Get the loop packs" />}
+                {experiment.slug === "pen-plotter-pipeline" && <EtsyCallout originals heading="Own a plotted original" />}
 
                 {/* Long description paragraphs */}
                 {hasLongDescription && (

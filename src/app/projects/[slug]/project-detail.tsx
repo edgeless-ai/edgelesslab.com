@@ -234,7 +234,7 @@ export function ProjectDetail({ project }: { project: Project }) {
         </section>
       </main>
 
-      <EtsyCallout originals heading="Buy an original" />
+      {project.slug === "pen-plotter-art" && <EtsyCallout originals heading="Buy an original" />}
       <Footer />
     </div>
   );

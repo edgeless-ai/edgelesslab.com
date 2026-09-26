@@ -8,6 +8,7 @@ import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
 import { BlogArticle } from "@/components/blog-article";
 import { RelatedPosts } from "@/components/related-posts";
+import { EtsyCallout } from "@/components/etsy-callout";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -255,6 +256,14 @@ export default async function BlogPostPage({
 
           {/* Related Posts */}
           <RelatedPosts current={post} allPosts={posts} />
+
+          {/* Etsy links for tartan blog posts */}
+          {(slug === "when-plaid-becomes-tartan" || slug === "tartan-weave-synth") && (
+            <EtsyCallout packs heading="Get the loop packs" />
+          )}
+          {(slug === "generative-art-pen-plotters" || slug === "generative-art-algorithms-that-work") && (
+            <EtsyCallout originals heading="Own a plotted original" />
+          )}
 
           {/* Back link */}
           <div className="mt-12 pt-8 border-t" style={{ borderColor: "var(--border-subtle)" }}>

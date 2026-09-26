@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer";
 import { GenerativeAscii } from "@/components/generative-ascii";
 import { PenPlotterGallery } from "@/components/pen-plotter-gallery";
 import { ExcalidrawDiagrams } from "@/components/excalidraw-diagrams";
+import { EtsyCallout } from "@/components/etsy-callout";
 import type { experiments } from "@/lib/data";
 
 type Experiment = (typeof experiments)[number];
@@ -227,6 +228,7 @@ export function ExperimentDetail({ experiment }: { experiment: Experiment }) {
                     />
                   </div>
                 )}
+                <EtsyCallout packs heading="Get the loop packs" />
 
                 {/* Long description paragraphs */}
                 {hasLongDescription && (

@@ -1,3 +1,16 @@
+---
+slug: wei-name-service-edgeless-wei
+title: edgeless.wei: On-Chain Identity, One Domain at a Time
+description: We registered edgeless.wei as the canonical on-chain identity for the swarm. One domain, one identity, no namespace sprawl.
+date: 2026-09-28
+tags:
+- Web3
+- ENS
+- Identity
+- On-Chain
+readTime: 5 min
+---
+
 # edgeless.wei: On-Chain Identity, One Domain at a Time
 
 **Date:** 2026-09-27
@@ -31,4 +44,4 @@ We registered `edgeless.wei` as the canonical on-chain identity for the swarm. E
 
 ## The one-line version
 
-Your name, on-chain, without the hex.// wei-name-service-edgeless-wei.md
+Your name, on-chain, without the hex.

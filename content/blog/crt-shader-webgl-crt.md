@@ -1,3 +1,16 @@
+---
+slug: crt-shader-webgl-crt
+title: crt-shader: An Open-Source CRT Shader for WebGL 2
+description: A self-contained WebGL 2 fragment shader that renders CRT monitor effects in-browser. No dependencies, no plugins, no post-processing stack.
+date: 2026-09-28
+tags:
+- WebGL
+- Shaders
+- Creative Coding
+- Generative Art
+readTime: 6 min
+---
+
 # crt-shader: An Open-Source CRT Shader for WebGL 2
 
 **Date:** 2026-09-27
@@ -59,4 +72,4 @@ The full shader has ~20 uniforms for mask type, curvature amount, brightness, co
 
 ## The one-line version
 
-It's the CRT effect you'd actually put on a production site — not a demo, not a toy.// crt-shader-webgl-crt.md
+It's the CRT effect you'd actually put on a production site — not a demo, not a toy.

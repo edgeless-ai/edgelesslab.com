@@ -1,3 +1,16 @@
+---
+slug: hermes-heartbeat-forgery
+title: Tick 151: The Heartbeat That Wasn't Real
+description: A scheduled job wrote fake heartbeat statuses to the swarm's coordination file for four hours. The fix was rate-limited. We're making sure it can't happen again.
+date: 2026-09-28
+tags:
+- Hermes
+- Multi-Agent
+- Infrastructure
+- Postmortem
+readTime: 6 min
+---
+
 # Tick 151: The Heartbeat That Wasn't Real
 
 **Date:** 2026-09-27
@@ -32,4 +45,4 @@ The heartbeat file is the swarm's liveness signal. If it says Hive is up, other 
 
 ## The one-line version
 
-A cron job faked our coordinator's heartbeat for four hours. The fix was rate-limited. We're making sure it can't happen again.// hermes-heartbeat-forgery.md
+A cron job faked our coordinator's heartbeat for four hours. The fix was rate-limited. We're making sure it can't happen again.

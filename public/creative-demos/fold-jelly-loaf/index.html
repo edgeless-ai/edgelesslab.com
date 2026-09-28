@@ -88,7 +88,7 @@ body.bare .masthead{max-width:min(560px,calc(100% - 56px))}
 <div class="masthead">
   <div class="eyebrow">Field note · <b>Material Studies</b><span class="sp"> · Specimen 04</span></div>
   <h1>Fold</h1>
-  <p class="dek">A loaf of cat, cast in jelly. Poke it, fling it, press it under glass. The ears do what fold ears do.</p>
+  <p class="dek">A loaf of cat, cast in jelly. Press it under glass and the ears do what fold ears do.</p>
 </div>
 <aside class="card" id="card">
   <header><div><h2>Fold, in jelly</h2><span class="latin">Felis gelatina, var. plicata</span></div><span class="no">No. 04</span></header>
@@ -116,7 +116,7 @@ body.bare .masthead{max-width:min(560px,calc(100% - 56px))}
     <p>The cat is a ring of fifty-six small weights joined by springs, a soft body with no skeleton. Three forces keep it a loaf. <b>Pressure</b> pushes outward whenever the enclosed area shrinks, like air in a balloon. <b>Shape matching</b> finds the best-fit rotation of the resting loaf every step and pulls each weight gently back toward it; that is the Firmness slider. <b>Damping</b> bleeds away wobble relative to the body's own motion, so it still falls at full speed but settles instead of ringing forever.</p>
     <p>The face, paws, tail and bubbles are not simulated. Each is pinned to the nearby rim with distance weights, so when the rim dents, the face dents with it.</p>
     <p>Fold ears already lie bent forward, like little caps. Squash the loaf and they press flatter against the head; stretch it and they lift almost upright. They sit on their own springs, so they flop when the body lands.</p>
-    <p>Everything runs at a fixed small time step, several times per frame, so a hard fling never tears the jelly.</p>
+    <p>The simulation takes eight small steps per frame, which is why a hard fling stretches the jelly without tearing it.</p>
   </details>
 </aside>
 <button class="toggle" id="toggle">Hide panel</button>

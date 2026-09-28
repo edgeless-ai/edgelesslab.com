@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>When everything fails at once</title>
-<meta name="description" content="Twenty models, one router, one health checker. Kill models, throttle them, or kill the router and watch a naive checker eject the whole pool, then turn on the rule that blames the shared dependency instead.">
+<meta name="description" content="A pool of twenty models behind one router and a health checker. Kill the router and a naive checker ejects every model; a smarter rule notices they all failed together and blames the router instead.">
 <meta name="theme-color" content="#0b0c0f">
 <style>
 :root{--bg:#0b0c0f;--ink:#ecebe6;--mute:#8b8f98;--dim:#5a5e66;--line:rgba(255,255,255,.09);--card:rgba(16,17,21,.84);--acc:#c9ff3d;--warn:#ffb347;--bad:#ff5d5d;--serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -90,7 +90,7 @@ body.bare .masthead{max-width:min(560px,calc(100% - 56px))}
 <div class="masthead">
   <div class="eyebrow">Field note · <b>Systems</b><span class="sp"> · Specimen 01</span></div>
   <h1>When everything fails at once</h1>
-  <p class="dek">Twenty models, one router, one health checker. Break things and watch who gets the blame.</p>
+  <p class="dek">A pool of twenty models sits behind a single router, and a health checker decides who stays. Break something and see who gets blamed.</p>
 </div>
 <aside class="card" id="card">
   <header><div><h2>Failover specimen</h2><span class="latin">Router, pool &amp; checker</span></div><span class="no">No. 01</span></header>
@@ -112,10 +112,10 @@ body.bare .masthead{max-width:min(560px,calc(100% - 56px))}
   </div>
   <ol class="log" id="log" aria-live="polite"></ol>
   <details class="inside"><summary>Inside the experiment</summary>
-    <p>Five agents send requests through one router into a pool of twenty models. Every few seconds a <b>health checker</b> sweeps the pool and pulls out any model that is failing. When one model breaks, that is exactly right: tap a model to kill it and watch it get ejected.</p>
+    <p>Five agents send requests through one router into a pool of twenty models. Every few seconds a <b>health checker</b> sweeps the pool and pulls out any model that is failing. When one model breaks, ejecting it is the right call. Tap a model to kill it and watch the next sweep throw it out.</p>
     <p>Now <b>kill the router</b>. Its outbound connection breaks, so every call it makes fails, and each failure is logged against the model it was calling. From where the checker sits, all twenty models died in the same second. The naive checker does what it was told and ejects all of them. The pool is empty, and even after the router is fixed, traffic has nowhere to go until each model earns its way back in.</p>
-    <p>The <b>smart rule</b> asks one more question: did everything fail at once? Twenty independent models almost never fail together. Something they all share does. So when most of the pool fails in the same sweep, it keeps the pool, blames the router and raises the alarm there.</p>
-    <p>Throttled models fail only when they are busy. That is the in-between case a checker has to get right too.</p>
+    <p>The <b>smart rule</b> asks one more question: did everything fail at once? Twenty independent models almost never die in the same second, but anything they all depend on can take them down at once. So when most of the pool fails in one sweep, the smart checker keeps the pool and puts the alarm on the router.</p>
+    <p>Throttled models fail only when they are busy, which is the awkward middle case: sometimes healthy, sometimes not, depending on when the checker looks.</p>
   </details>
 </aside>
 <button class="toggle" id="toggle">Hide panel</button>

@@ -87,7 +87,7 @@ body.bare .masthead{max-width:min(560px,calc(100% - 56px))}
 <div class="masthead">
   <div class="eyebrow">Field note · <b>Statistics</b><span class="sp"> · Specimen 03</span></div>
   <h1>Are options paying you enough?</h1>
-  <p class="dek">Selling a put is selling insurance. The price you charge is implied volatility. The claims you pay are realized volatility.</p>
+  <p class="dek">Selling a put is selling insurance: implied volatility sets what you charge, and realized volatility decides what you pay out.</p>
 </div>
 <aside class="card" id="card">
   <header><div><h2>Premium specimen</h2><span class="latin">Short put, one contract</span></div><span class="no">No. 03</span></header>
@@ -111,8 +111,8 @@ body.bare .masthead{max-width:min(560px,calc(100% - 56px))}
   <p class="disclaim">Simulation. Not trading advice.</p>
   <details class="inside"><summary>Inside the experiment</summary>
     <p>You sell one put: you collect a <b>premium</b> today, and if the price finishes below the strike you pay the difference. Most of the time nothing happens and you keep the premium. Sometimes you pay a lot.</p>
-    <p>The premium is set by <b>implied volatility</b>, the market's guess of how much the price will move. What you actually pay out is set by <b>realized volatility</b>, how much it really moves. Each glowing line is one possible future; red ones finish below the strike and cost you money.</p>
-    <p>The gauge shows <b>IV ÷ RV</b>, the ratio behind "vol-adjusted yield". Above 1 you are charging more than the risk you carry, so on average you win. Below about 1 you are underpricing the insurance, and the seller loses on average, even though most individual trades still look like wins. That gap between win rate and edge is the trap.</p>
+    <p><b>Implied volatility</b>, the market's guess of how much the price will move, sets the premium. <b>Realized volatility</b>, how much it really moves, sets what you pay out. Each glowing line is one possible future; red ones finish below the strike and cost you money.</p>
+    <p>The gauge shows <b>IV ÷ RV</b>, the ratio behind "vol-adjusted yield". Above 1 you are charging more than the risk you carry, so on average you win. Below about 1 you are underpricing the insurance, and the seller loses on average, even though most individual trades still look like wins. A 75% win rate can hide a losing strategy.</p>
     <p>Switch to <b>fat tails</b> and the same realized volatility arrives as rare jumps. The average loss grows, so a ratio slightly above 1 can still lose. "Vol shock" doubles realized vol for a moment to show how fast the edge flips.</p>
   </details>
 </aside>

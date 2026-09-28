@@ -18,7 +18,7 @@ export const creativeDemos: CreativeDemo[] = [
   {
     slug: "router-failover-lab",
     title: "When everything fails at once",
-    description: "Twenty models, one router, one health checker. Kill models or throttle them, then kill the router and watch a naive checker eject the whole pool. A smart rule blames the shared dependency instead.",
+    description: "A pool of twenty models behind one router and a health checker. Kill the router and a naive checker ejects every model; a smarter rule notices they all failed together and blames the router instead.",
     tags: ["Systems", "Reliability", "Agents", "Interactive"],
     date: "2026-09-27",
     hasControls: true,

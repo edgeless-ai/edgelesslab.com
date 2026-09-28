@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>324 variants, zero edges</title>
+<meta name="description" content="Try up to a thousand trading-rule variants on a random walk. The best one always looks brilliant in-sample, falls back into the random-entry band out-of-sample, and its deflated Sharpe says why. Simulation. Not trading advice.">
+<meta name="theme-color" content="#0b0c0f">
+<style>
+:root{--bg:#0b0c0f;--ink:#ecebe6;--mute:#8b8f98;--dim:#5a5e66;--line:rgba(255,255,255,.09);--card:rgba(16,17,21,.84);--acc:#c9ff3d;--warn:#ffb347;--bad:#ff5d5d;--serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+#stage{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.masthead{position:fixed;left:28px;top:24px;max-width:min(560px,calc(100% - 360px));pointer-events:none;z-index:2}
+.eyebrow{font:600 10px/1.2 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+.eyebrow b{color:var(--acc);font-weight:600}
+.masthead h1{font:italic 400 clamp(28px,3.9vw,50px)/1.02 var(--serif);letter-spacing:-.012em;margin:10px 0 8px;text-wrap:balance}
+.dek{font:400 14.5px/1.45 var(--serif);color:#b4b6bc;max-width:44ch}
+.card{position:fixed;right:20px;top:20px;width:300px;max-height:calc(100% - 40px);overflow:auto;overscroll-behavior:contain;background:var(--card);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:14px;padding:14px 16px 16px;font-size:12px;z-index:3;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .25s;scrollbar-width:thin}
+.card>header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:4px}
+.card h2{font:italic 400 18px/1.1 var(--serif)}
+.card .no{font:10px var(--mono);color:var(--mute);letter-spacing:.14em}
+.card .latin{display:block;font:italic 12px var(--serif);color:var(--mute);margin-top:3px}
+.lbl{display:flex;justify-content:space-between;align-items:baseline;font:600 9.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin:14px 0 7px}
+.lbl output{font-weight:500;color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1px solid var(--line);border-radius:9px;padding:2px;gap:2px;background:rgba(0,0,0,.25)}
+.seg button,.btn{font:500 11.5px/1 var(--sans);color:var(--ink);background:transparent;border:0;border-radius:7px;padding:8px 4px;cursor:pointer;touch-action:manipulation;transition:background .15s,color .15s}
+.seg button:hover{background:rgba(255,255,255,.06)}
+.seg button[aria-pressed=true]{background:var(--acc);color:#0b0c0f;font-weight:600}
+.btn{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:9px 6px}
+.btn:hover{background:rgba(255,255,255,.08)}
+.btn:active{transform:translateY(1px)}
+.btn.wide{width:100%;margin-top:14px;padding:11px 8px;font-weight:600;letter-spacing:.02em}
+.btn.danger{border-color:rgba(255,93,93,.45);color:#ffb1b1}
+.btn.danger[aria-pressed=true]{background:var(--bad);color:#0b0c0f;border-color:var(--bad)}
+.btn.go{border-color:rgba(201,255,61,.45);color:var(--acc)}
+.btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;touch-action:pan-y}
+input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:3px;background:linear-gradient(90deg,var(--acc) var(--p,50%),rgba(255,255,255,.12) var(--p,50%))}
+input[type=range]::-moz-range-track{height:3px;border-radius:3px;background:rgba(255,255,255,.12)}
+input[type=range]::-moz-range-progress{height:3px;border-radius:3px;background:var(--acc)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6.5px;border-radius:50%;background:#0b0c0f;border:2px solid var(--acc);box-shadow:0 0 0 4px rgba(201,255,61,.08)}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:#0b0c0f;border:2px solid var(--acc)}
+.swatches{display:flex;gap:8px}
+.swatches button{flex:1;height:30px;border-radius:8px;border:1px solid var(--line);cursor:pointer;position:relative;font:500 9.5px var(--mono);letter-spacing:.06em;color:#0b0c0f}
+.swatches button[aria-pressed=true]{outline:2px solid var(--acc);outline-offset:2px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:14px}
+.stat{background:#111216;padding:8px 10px 9px}
+.stat span{display:block;font:600 9px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--mute)}
+.stat strong{display:block;font:500 17px/1 var(--mono);font-variant-numeric:tabular-nums;margin-top:6px;white-space:nowrap}
+.stat strong.good{color:var(--acc)}.stat strong.bad{color:var(--bad)}.stat strong.warn{color:var(--warn)}
+details.inside{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+details.inside summary{cursor:pointer;list-style:none;font:italic 400 15px var(--serif);display:flex;justify-content:space-between;align-items:center}
+details.inside summary::-webkit-details-marker{display:none}
+details.inside summary::after{content:"+";font:400 16px var(--mono);color:var(--acc)}
+details.inside[open] summary::after{content:"\2013"}
+details.inside p{font:400 13px/1.55 var(--serif);color:#c3c5ca;margin-top:9px}
+details.inside p b{color:var(--ink);font-weight:600}
+.toggle{position:fixed;right:20px;bottom:18px;z-index:4;font:600 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:9px 13px;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.foot{position:fixed;left:28px;bottom:18px;font:500 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);pointer-events:none;z-index:2;max-width:calc(100% - 380px)}
+.foot em{font-style:normal;color:var(--mute)}
+body.bare .card{transform:translateX(calc(100% + 40px));opacity:0;pointer-events:none}
+body.bare .foot{max-width:calc(100% - 160px)}
+body.bare .masthead{max-width:min(560px,calc(100% - 56px))}
+@media (max-width:760px){
+  .masthead{left:16px;top:14px;max-width:calc(100% - 110px)}
+  .masthead h1{font-size:27px;margin:7px 0 4px}
+  .dek{font-size:13px;display:none}
+  .card{left:10px;right:10px;top:auto;bottom:10px;width:auto;max-height:44vh;border-radius:14px;padding:10px 12px 12px}
+  .card>header{display:none}
+  .card{display:flex;flex-direction:column}
+  .card>*{flex-shrink:0}
+  .card>.stats{order:-1;margin:0 0 2px}
+  .eyebrow .sp{display:none}
+  .stat{padding:7px 9px}
+  .stat strong{font-size:15px;margin-top:4px}
+  .lbl{margin:10px 0 6px}
+  .toggle{top:14px;right:12px;bottom:auto}
+  .foot{display:none}
+  body.bare .card{transform:translateY(calc(100% + 30px))}
+}
+.verdict{margin-top:12px;font:italic 14px/1.4 var(--serif);color:#c3c5ca}
+.verdict b{font-style:normal;font:600 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;margin-right:6px}
+.disclaim{margin-top:12px;font:600 9.5px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--warn)}
+</style>
+</head>
+<body>
+<canvas id="stage" aria-label="Charts: a random-walk price, the best in-sample equity curve out of many strategy variants against a random-entry band, and the deflated Sharpe ratio as the number of variants grows."></canvas>
+<div class="masthead">
+  <div class="eyebrow">Field note · <b>Statistics</b><span class="sp"> · Specimen 02</span></div>
+  <h1>324 variants, zero edges</h1>
+  <p class="dek">Search enough rules on pure noise and one of them will look like genius. Then it meets data it has not seen.</p>
+</div>
+<aside class="card" id="card">
+  <header><div><h2>Overfit specimen</h2><span class="latin">Selectio fortuita</span></div><span class="no">No. 02</span></header>
+  <label class="lbl" for="nv">Variants tried <output id="oN"></output></label>
+  <input type="range" id="nv" min="0" max="1000" value="0">
+  <div class="lbl">In-sample / out-of-sample</div>
+  <div class="seg" data-key="split"><button aria-pressed="false" data-v=".5">50 / 50</button><button aria-pressed="true" data-v=".6">60 / 40</button><button aria-pressed="false" data-v=".75">75 / 25</button></div>
+  <div class="btns"><button class="btn go" id="sweepN">Sweep 1→1000</button><button class="btn" id="seed">New seed</button><button class="btn" id="replay">Replay</button></div>
+  <div class="stats">
+    <div class="stat"><span>Best in-sample</span><strong id="sIS" class="good">–</strong></div>
+    <div class="stat"><span>Out-of-sample</span><strong id="sOOS">–</strong></div>
+    <div class="stat"><span>Luck alone gives</span><strong id="sSR0">–</strong></div>
+    <div class="stat"><span>Deflated Sharpe</span><strong id="sDSR">–</strong></div>
+  </div>
+  <p class="verdict" id="verdict"></p>
+  <p class="disclaim">Simulation. Not trading advice.</p>
+  <details class="inside"><summary>Inside the experiment</summary>
+    <p>The price here is a <b>random walk</b>: each day's move is a coin toss, so no rule can have a real edge. Each variant is a plausible-looking trading rule (a moving-average cross, a breakout, a mean-reversion trigger) with randomly chosen settings. They are all noise strategies.</p>
+    <p>We fit on the <b>in-sample</b> window and keep the variant with the best Sharpe ratio. With one variant, that is a coin toss. With 324, the winner looks superb, because you picked the luckiest of 324 coin tosses. Then the <b>out-of-sample</b> window arrives. The winner's past luck buys it nothing: its Sharpe there is a fresh coin toss, sometimes up and sometimes down, averaging zero across seeds. Mostly it drifts inside the grey band, which is where random entries live.</p>
+    <p>The <b>deflated Sharpe ratio</b> (Bailey &amp; López de Prado) corrects for that. It asks how good the best result would look from luck alone, given how many variants you tried, how much their results spread, and how many of them were really independent (near-duplicate rules count as fewer tries). Then it reports the probability that the winner beats that bar. The more you search, the higher the bar climbs.</p>
+    <p>Honest backtests report how many variants were tried. "We tried 324 things and this one worked" is a very different sentence from "this worked".</p>
+  </details>
+</aside>
+<button class="toggle" id="toggle">Hide panel</button>
+<div class="foot">Simulation. Not trading advice · <em>drag the variants slider</em> · H hides the panel</div>
+<script>
+const $=s=>document.querySelector(s);
+const cv=$('#stage');let g=cv.getContext('2d');let W=0,H=0,DPR=1,R={x:0,y:0,w:1,h:1};
+function stageRect(){const m=$('.masthead').getBoundingClientRect(),c=$('#card'),bare=document.body.classList.contains('bare'),mob=W<=760;const x=mob?16:28,y=m.bottom+(mob?10:20);let w=W-x-(mob?16:28),h=H-y-(mob?14:46);if(!bare){if(mob)h=c.offsetTop-10-y;else w=c.offsetLeft-28-x}return{x,y,w:Math.max(80,w),h:Math.max(80,h)}}
+function resize(){DPR=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);g.setTransform(DPR,0,0,DPR,0,0);R=stageRect();layout()}
+addEventListener('resize',resize);
+const segs={};document.querySelectorAll('.seg').forEach(el=>{segs[el.dataset.key]=el.querySelector('[aria-pressed=true]').dataset.v;el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));segs[el.dataset.key]=b.dataset.v;onSeg(el.dataset.key,b.dataset.v)})});
+function fillRange(el){el.style.setProperty('--p',((el.value-el.min)/(el.max-el.min)*100)+'%')}
+document.querySelectorAll('input[type=range]').forEach(el=>{fillRange(el);el.addEventListener('input',()=>fillRange(el))});
+$('#toggle').onclick=()=>{const b=document.body.classList.toggle('bare');$('#toggle').textContent=b?'Show panel':'Hide panel';resize()};
+addEventListener('keydown',e=>{if((e.key==='h'||e.key==='H')&&!e.target.closest('input'))$('#toggle').click()});
+function loop(fn){let last=performance.now();function f(now){const dt=Math.min(1/30,(now-last)/1000);last=now;fn(dt,now/1000);requestAnimationFrame(f)}requestAnimationFrame(f)}
+const T=504,MAXV=1000,NB=300,ACC='#c9ff3d',RED='#ff5d5d',AMB='#ffb347',EG=0.5772156649;
+const nvEl=$('#nv');
+let rho=0,seed=9,ret,price,V=[],band,frac=.6,split=302,runs,n=324,reveal=1,revealGoal=1,sweepAnim=null,dirty=true,layer=null,lg=null,P={};
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function gauss(r){let u=0;while(!u)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r())}
+function Phi(x){const t=1/(1+.2316419*Math.abs(x)),d=.3989422804*Math.exp(-x*x/2),p=d*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p}
+function PhiInv(p){const a=[-39.6968302866538,220.946098424521,-275.928510446969,138.357751867269,-30.6647980661472,2.50662827745924],b=[-54.4760987982241,161.585836858041,-155.698979859887,66.8013118877197,-13.2806815528857],c=[-.00778489400243029,-.322396458041136,-2.40075827716184,-2.54973253934373,4.37466414146497,2.93816398269878],d=[.00778469570904146,.32246712907004,2.445134137143,3.75440866190742];
+  if(p<.02425){const q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)}
+  if(p>1-.02425){const q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)}
+  const q=p-.5,r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1)}
+function gen(){const r=mulberry32(seed*9973+17);ret=new Float64Array(T);price=new Float64Array(T);let lp=0;
+  for(let t=0;t<T;t++){ret[t]=t?gauss(r)*.011:0;lp+=ret[t];price[t]=100*Math.exp(lp)}
+  const cs=new Float64Array(T+1),cs2=new Float64Array(T+1);for(let t=0;t<T;t++){cs[t+1]=cs[t]+price[t];cs2[t+1]=cs2[t]+price[t]*price[t]}
+  const ma=(t,L)=>(cs[t+1]-cs[t+1-L])/L;
+  V=[];for(let k=0;k<MAXV;k++){const type=(r()*3)|0,dir=r()<.5?-1:1,pos=new Int8Array(T);let name;
+    if(type===0){const f=2+((r()*18)|0),s=f+6+((r()*60)|0);name=`MA ${f}/${s}`;for(let t=s;t<T;t++)pos[t]=(ma(t,f)>ma(t,s)?1:-1)*dir}
+    else if(type===1){const L=5+((r()*55)|0);name=`Breakout ${L}`;let cur=0;for(let t=L;t<T;t++){let hi=-1e9,lo=1e9;for(let j=t-L;j<t;j++){if(price[j]>hi)hi=price[j];if(price[j]<lo)lo=price[j]}if(price[t]>hi)cur=dir;else if(price[t]<lo)cur=-dir;pos[t]=cur}}
+    else{const L=5+((r()*35)|0),th=.5+r()*1.5;name=`Revert ${L}/${th.toFixed(1)}σ`;let cur=0;for(let t=L;t<T;t++){const m=ma(t,L),v=Math.max(1e-9,(cs2[t+1]-cs2[t+1-L])/L-m*m),z=(price[t]-m)/Math.sqrt(v);if(z>th)cur=-dir;else if(z<-th)cur=dir;else if(Math.abs(z)<.2)cur=0;pos[t]=cur}}
+    const s=new Float32Array(T),cum=new Float32Array(T);for(let t=1;t<T;t++){s[t]=pos[t-1]*ret[t];cum[t]=cum[t-1]+s[t]}
+    V.push({name,s,cum,type})}
+  // random-entry baseline: coin-flip direction, geometric holding periods
+  const B=[];for(let k=0;k<NB;k++){const c=new Float32Array(T);let p=0;for(let t=1;t<T;t++){if(r()<.1)p=r()<.34?0:r()<.5?1:-1;c[t]=c[t-1]+p*ret[t]}B.push(c)}
+  band={lo:new Float32Array(T),mid:new Float32Array(T),hi:new Float32Array(T)};const col=new Float32Array(NB);
+  for(let t=0;t<T;t++){for(let k=0;k<NB;k++)col[k]=B[k][t];col.sort();band.lo[t]=col[(NB*.05)|0];band.mid[t]=col[NB>>1];band.hi[t]=col[(NB*.95)|0]}
+  evalSplit()}
+function moments(s,a,b){let m=0,k=b-a;for(let t=a;t<b;t++)m+=s[t];m/=k;let v=0,s3=0,s4=0;for(let t=a;t<b;t++){const d=s[t]-m;v+=d*d;s3+=d*d*d;s4+=d*d*d*d}v/=k;const sd=Math.sqrt(v);return{m,sd,sr:sd>1e-12?m/sd:0,g3:sd>1e-12?s3/k/(v*sd):0,g4:sd>1e-12?s4/k/(v*v):3}}
+function evalSplit(){split=Math.round(T*frac);V.forEach(v=>{v.is=moments(v.s,1,split);v.oos=moments(v.s,split,T)});
+  runs=[];let best=0,mean=0,M2=0;const Tis=split-1;
+  // effective independent trials: many variants are near-duplicates, so use mean |correlation| of in-sample returns
+  const rr=mulberry32(seed+7);let rs=0,rc=0;for(let q=0;q<1500;q++){const a=V[(rr()*MAXV)|0],b=V[(rr()*MAXV)|0];if(a===b||a.is.sd<1e-12||b.is.sd<1e-12)continue;let c=0;for(let t=1;t<split;t++)c+=(a.s[t]-a.is.m)*(b.s[t]-b.is.m);rs+=Math.abs(c/(Tis*a.is.sd*b.is.sd));rc++}rho=rc?rs/rc:0;
+  for(let i=0;i<MAXV;i++){const x=V[i].is.sr,k=i+1,d=x-mean;mean+=d/k;M2+=d*(x-mean);if(x>V[best].is.sr)best=i;
+    const varSR=k>1?M2/(k-1):0,ne=rho+(1-rho)*k,sr0=ne>1.0001?Math.sqrt(varSR)*((1-EG)*PhiInv(1-1/ne)+EG*PhiInv(1-1/(ne*Math.E))):0;
+    const b=V[best].is,den=Math.sqrt(Math.max(1e-6,1-b.g3*b.sr+(b.g4-1)/4*b.sr*b.sr)),dsr=Phi((b.sr-sr0)*Math.sqrt(Tis-1)/den);
+    runs.push({ne,best,is:b.sr*Math.sqrt(252),oos:V[best].oos.sr*Math.sqrt(252),sr0:sr0*Math.sqrt(252),dsr})}
+  dirty=true}
+function nFromSlider(v){return Math.max(1,Math.round(Math.exp(v/1000*Math.log(1000))))}
+function sliderFromN(k){return Math.round(Math.log(k)/Math.log(1000)*1000)}
+function layout(){const gap=R.w<560?26:34,bh=Math.max(110,Math.min(210,R.h*.34));
+  P.eq={x:R.x+34,y:R.y+30,w:R.w-34,h:R.h-bh-gap-30-24};P.px={x:P.eq.x,y:P.eq.y,w:P.eq.w,h:Math.max(28,P.eq.h*.2)};P.eq.y+=P.px.h+30;P.eq.h-=P.px.h+30;
+  const by=R.y+R.h-bh,hw=(R.w-34-gap)/2;P.sr={x:R.x+34,y:by,w:hw,h:bh-16};P.ds={x:R.x+34+hw+gap,y:by,w:hw,h:bh-16};dirty=true}
+function ax(p,lo,hi,fmt,ticks){g.font='500 9px ui-monospace,Menlo,monospace';g.textAlign='right';g.fillStyle='#5a5e66';g.strokeStyle='rgba(255,255,255,.06)';g.lineWidth=1;
+  ticks.forEach(v=>{const y=Math.round(p.y+p.h-(v-lo)/(hi-lo)*p.h)+.5;if(y<p.y-1||y>p.y+p.h+1)return;g.beginPath();g.moveTo(p.x,y);g.lineTo(p.x+p.w,y);g.stroke();g.fillText(fmt(v),p.x-6,y+3)})}
+function title(p,s,s2){g.textAlign='left';g.font='600 9px ui-monospace,Menlo,monospace';g.fillStyle='#8b8f98';g.fillText(s,p.x,p.y-9);if(s2){const w=g.measureText(s).width;g.fillStyle='#5a5e66';g.fillText(s2,p.x+w+8,p.y-9)}}
+let yLo=-1,yHi=1;
+function paintLayer(){if(!layer||layer.width!==cv.width||layer.height!==cv.height){layer=document.createElement('canvas');layer.width=cv.width;layer.height=cv.height;lg=layer.getContext('2d')}
+  const main=g;g=lg;g.setTransform(DPR,0,0,DPR,0,0);g.clearRect(0,0,W,H);const run=runs[n-1],best=V[run.best];
+  // price strip
+  const px=P.px;let pl=1e9,ph=-1e9;price.forEach(v=>{pl=Math.min(pl,v);ph=Math.max(ph,v)});title(px,'PRICE','random walk, seed '+seed);
+  g.beginPath();for(let t=0;t<T;t++){const x=px.x+t/(T-1)*px.w,y=px.y+px.h-(price[t]-pl)/(ph-pl||1)*px.h;g[t?'lineTo':'moveTo'](x,y)}g.strokeStyle='rgba(236,235,230,.45)';g.lineWidth=1;g.stroke();
+  // equity panel range
+  const e=P.eq,cloudN=Math.min(n,90);let lo=0,hi=0;for(let t=0;t<T;t+=3){lo=Math.min(lo,band.lo[t],best.cum[t]);hi=Math.max(hi,band.hi[t],best.cum[t])}
+  for(let k=0;k<cloudN;k++){const c=V[k].cum;for(let t=0;t<T;t+=6){if(c[t]<lo)lo=c[t];if(c[t]>hi)hi=c[t]}}const pad=(hi-lo)*.08;yLo=lo-pad;yHi=hi+pad;
+  const X=t=>e.x+t/(T-1)*e.w,Y=v=>e.y+e.h-(v-yLo)/(yHi-yLo)*e.h;
+  const step=(yHi-yLo)*100>60?20:(yHi-yLo)*100>24?10:5,tk=[];for(let v=Math.ceil(yLo*100/step)*step;v<=yHi*100;v+=step)tk.push(v/100);
+  ax(e,yLo,yHi,v=>(v>0?'+':'')+Math.round(v*100)+'%',tk);
+  title(e,'EQUITY',e.w>520?'lime: best of '+n+' · grey band: random entries, 5–95%':'best of '+n+' vs random band');
+  // split shading
+  const sx=X(split);g.fillStyle='rgba(255,255,255,.025)';g.fillRect(sx,e.y,e.x+e.w-sx,e.h);g.strokeStyle='rgba(236,235,230,.35)';g.setLineDash([3,4]);g.beginPath();g.moveTo(Math.round(sx)+.5,px.y);g.lineTo(Math.round(sx)+.5,e.y+e.h);g.stroke();g.setLineDash([]);
+  g.font='600 9px ui-monospace,Menlo,monospace';g.fillStyle='#8b8f98';g.textAlign='right';const nar=e.w<520;g.fillText(nar?'IN-SAMPLE':'IN-SAMPLE · FITTED',sx-8,e.y+e.h-8);g.textAlign='left';g.fillText(nar?'OUT-OF-SAMPLE':'OUT-OF-SAMPLE · UNSEEN',sx+8,e.y+e.h-8);
+  // band
+  g.beginPath();for(let t=0;t<T;t++)g.lineTo(X(t),Y(band.hi[t]));for(let t=T-1;t>=0;t--)g.lineTo(X(t),Y(band.lo[t]));g.closePath();g.fillStyle='rgba(236,235,230,.085)';g.fill();
+  g.beginPath();for(let t=0;t<T;t+=2)g.lineTo(X(t),Y(band.mid[t]));g.strokeStyle='rgba(236,235,230,.18)';g.stroke();
+  // cloud of other variants
+  g.strokeStyle=`rgba(201,255,61,${Math.max(.035,.16/Math.sqrt(cloudN))})`;g.lineWidth=1;for(let k=0;k<cloudN;k++){if(k===run.best)continue;const c=V[k].cum;g.beginPath();for(let t=0;t<T;t+=3)g.lineTo(X(t),Y(c[t]));g.stroke()}
+  g.strokeStyle='rgba(255,255,255,.14)';g.beginPath();g.moveTo(e.x,Y(0)+.5);g.lineTo(e.x+e.w,Y(0)+.5);g.stroke();
+  // bottom-left: best IS sharpe vs luck-only bar, over n (log x)
+  const s=P.sr,LX=k=>s.x+Math.log(k)/Math.log(MAXV)*s.w;let smax=0,smin=0;runs.forEach(r=>{smax=Math.max(smax,r.is,r.sr0);smin=Math.min(smin,r.oos)});smax=Math.ceil(smax+.3);smin=Math.floor(smin-.2);
+  const SY=v=>s.y+s.h-(v-smin)/(smax-smin)*s.h;ax(s,smin,smax,v=>v.toFixed(0),Array.from({length:smax-smin+1},(_,i)=>smin+i));
+  title(s,'SHARPE vs VARIANTS',s.w>250?'annualized':'');
+  g.beginPath();runs.forEach((r,i)=>g.lineTo(LX(i+1),SY(r.sr0)));g.strokeStyle='rgba(236,235,230,.55)';g.setLineDash([4,4]);g.lineWidth=1.3;g.stroke();g.setLineDash([]);
+  g.beginPath();runs.forEach((r,i)=>g.lineTo(LX(i+1),SY(r.oos)));g.strokeStyle='rgba(255,93,93,.75)';g.lineWidth=1.2;g.stroke();
+  g.beginPath();runs.forEach((r,i)=>g.lineTo(LX(i+1),SY(r.is)));g.strokeStyle=ACC;g.lineWidth=1.8;g.stroke();
+  xlog(s);legend(s,[[ACC,'best in-sample'],['rgba(236,235,230,.7)','luck alone'],[RED,'its out-of-sample']]);
+  // bottom-right: DSR over n
+  const d=P.ds,DY=v=>d.y+d.h-v*d.h,DX=k=>d.x+Math.log(k)/Math.log(MAXV)*d.w;ax(d,0,1,v=>Math.round(v*100)+'%',[0,.5,.95]);title(d,'DEFLATED SHARPE',d.w>250?'P(real edge)':'');
+  g.fillStyle='rgba(201,255,61,.06)';g.fillRect(d.x,d.y,d.w,DY(.95)-d.y);g.font='500 9px ui-monospace,Menlo,monospace';g.fillStyle='rgba(201,255,61,.6)';g.textAlign='right';g.fillText('credible ≥ 95%',d.x+d.w-4,d.y+11);
+  g.beginPath();g.moveTo(d.x,DY(0));runs.forEach((r,i)=>g.lineTo(DX(i+1),DY(r.dsr)));g.lineTo(d.x+d.w,DY(0));g.closePath();g.fillStyle='rgba(236,235,230,.08)';g.fill();
+  g.beginPath();runs.forEach((r,i)=>g.lineTo(DX(i+1),DY(r.dsr)));g.strokeStyle='rgba(236,235,230,.85)';g.lineWidth=1.4;g.stroke();xlog(d);
+  g=main;dirty=false;P.X=X;P.Y=Y;P.LX=LX;P.SY=SY;P.DX=DX;P.DY=DY}
+function xlog(p){g.font='500 9px ui-monospace,Menlo,monospace';g.fillStyle='#5a5e66';g.textAlign='center';[1,10,100,1000].forEach(k=>{const x=p.x+Math.log(k)/Math.log(MAXV)*p.w;g.fillText(k,Math.min(p.x+p.w-10,Math.max(p.x+4,x)),p.y+p.h+13)})}
+function legend(p,items){if(p.w<230)return;g.font='500 9px ui-monospace,Menlo,monospace';g.textAlign='left';let x=p.x+6;items.forEach(([c,l])=>{g.fillStyle=c;g.fillRect(x,p.y+6,10,2);g.fillStyle='#8b8f98';g.fillText(l,x+14,p.y+10);x+=g.measureText(l).width+26})}
+function draw(dt,now){
+  if(sweepAnim){sweepAnim.u+=dt/7;const k=Math.max(1,Math.round(Math.exp(Math.min(1,sweepAnim.u)*Math.log(MAXV))));if(k!==n){setN(k,false);nvEl.value=sliderFromN(k);fillRange(nvEl)}if(sweepAnim.u>=1){sweepAnim=null;$('#sweepN').textContent='Sweep 1→1000'}}
+  if(dirty)paintLayer();
+  if(reveal<revealGoal)reveal=Math.min(revealGoal,reveal+dt/3.6);
+  g.fillStyle='#0b0c0f';g.fillRect(0,0,W,H);g.drawImage(layer,0,0,W,H);
+  const run=runs[n-1],best=V[run.best],e=P.eq,X=P.X,Y=P.Y;
+  // reveal schedule: 0-.42 in-sample, hold, .55-1 out-of-sample
+  const isU=Math.min(1,reveal/.42),oosU=Math.max(0,Math.min(1,(reveal-.55)/.45)),tEnd=reveal>=.55?split+Math.round((T-1-split)*oosU):Math.round(1+(split-1)*isU);
+  g.save();g.shadowColor='rgba(201,255,61,.55)';g.shadowBlur=10;g.beginPath();for(let t=0;t<=Math.min(tEnd,split);t++)g.lineTo(X(t),Y(best.cum[t]));g.strokeStyle=ACC;g.lineWidth=2.2;g.stroke();g.restore();
+  if(tEnd>split){g.beginPath();for(let t=split;t<=tEnd;t++)g.lineTo(X(t),Y(best.cum[t]));g.strokeStyle='#ecebe6';g.lineWidth=2;g.stroke()}
+  const hx=X(tEnd),hy=Y(best.cum[tEnd]);g.beginPath();g.arc(hx,hy,3.5,0,7);g.fillStyle=tEnd>split?'#ecebe6':ACC;g.fill();
+  if(reveal>=.42){const ix=X(split),iy=Y(best.cum[split]);g.font='italic 13px "Iowan Old Style",Palatino,Georgia,serif';g.fillStyle=ACC;g.textAlign='right';g.fillText(`Sharpe ${run.is.toFixed(2)}`,ix-8,Math.max(e.y+32,iy-12))}
+  if(tEnd>=T-1){g.font='italic 13px "Iowan Old Style",Palatino,Georgia,serif';g.fillStyle=run.oos>0?'#ecebe6':RED;g.textAlign='right';g.fillText(`then ${run.oos.toFixed(2)}`,e.x+e.w-4,hy<e.y+e.h/2?Math.min(e.y+e.h-8,hy+20):Math.max(e.y+32,hy-12))}
+  g.font='500 10px ui-monospace,Menlo,monospace';g.fillStyle='#8b8f98';g.textAlign='left';g.fillText(best.name,e.x+6,e.y+14);
+  // markers on bottom charts
+  const s=P.sr,d=P.ds,mx=P.LX(n),dx=P.DX(n);g.strokeStyle='rgba(236,235,230,.35)';g.lineWidth=1;g.beginPath();g.moveTo(mx+.5,s.y);g.lineTo(mx+.5,s.y+s.h);g.moveTo(dx+.5,d.y);g.lineTo(dx+.5,d.y+d.h);g.stroke();
+  [[mx,P.SY(run.is),ACC],[mx,P.SY(run.sr0),'#ecebe6'],[mx,P.SY(run.oos),RED],[dx,P.DY(run.dsr),'#ecebe6']].forEach(([x,y,c])=>{g.beginPath();g.arc(x,y,3.4,0,7);g.fillStyle='#0b0c0f';g.fill();g.lineWidth=1.6;g.strokeStyle=c;g.stroke()});
+}
+function stats(){const r=runs[n-1],f=v=>(v>=0?' ':'')+v.toFixed(2);$('#oN').textContent=n.toLocaleString();
+  $('#sIS').textContent=f(r.is);const o=$('#sOOS');o.textContent=f(r.oos);o.className=r.oos>.5?'good':r.oos>0?'warn':'bad';$('#sSR0').textContent=f(r.sr0);
+  const d=$('#sDSR');d.textContent=Math.round(r.dsr*100)+'%';d.className=r.dsr>=.95?'good':r.dsr>=.5?'warn':'bad';
+  $('#verdict').innerHTML=n===1?'<b>One try</b>No search, so nothing to deflate. Still one coin toss.':r.dsr>=.95?'<b>Passes</b>A rare lucky seed. Re-roll and see if it holds.':`<b>Luck</b>Luck alone predicts about ${r.sr0.toFixed(1)} for the best of ${n.toLocaleString()}. Deflated, the chance of a real edge is ${Math.round(r.dsr*100)}%.`}
+function setN(k,anim){n=k;dirty=true;if(anim){reveal=0;revealGoal=1}else reveal=revealGoal=1;stats()}
+nvEl.addEventListener('input',()=>{sweepAnim=null;$('#sweepN').textContent='Sweep 1→1000';setN(nFromSlider(+nvEl.value),false)});
+$('#seed').onclick=()=>{seed=1+((Math.random()*99999)|0);gen();setN(n,true)};
+$('#replay').onclick=()=>{reveal=0;revealGoal=1};
+$('#sweepN').onclick=()=>{if(sweepAnim){sweepAnim=null;$('#sweepN').textContent='Sweep 1→1000';return}sweepAnim={u:0};$('#sweepN').textContent='Stop';};
+function onSeg(k,v){if(k==='split'){frac=+v;evalSplit();setN(n,true)}}
+nvEl.value=sliderFromN(324);/*default n*/fillRange(nvEl);
+resize();gen();setN(324,true);
+loop((dt,now)=>draw(dt,now));
+</script>
+</body>
+</html>

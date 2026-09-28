@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>When everything fails at once</title>
+<meta name="description" content="Twenty models, one router, one health checker. Kill models, throttle them, or kill the router and watch a naive checker eject the whole pool, then turn on the rule that blames the shared dependency instead.">
+<meta name="theme-color" content="#0b0c0f">
+<style>
+:root{--bg:#0b0c0f;--ink:#ecebe6;--mute:#8b8f98;--dim:#5a5e66;--line:rgba(255,255,255,.09);--card:rgba(16,17,21,.84);--acc:#c9ff3d;--warn:#ffb347;--bad:#ff5d5d;--serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+#stage{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.masthead{position:fixed;left:28px;top:24px;max-width:min(560px,calc(100% - 360px));pointer-events:none;z-index:2}
+.eyebrow{font:600 10px/1.2 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+.eyebrow b{color:var(--acc);font-weight:600}
+.masthead h1{font:italic 400 clamp(28px,3.9vw,50px)/1.02 var(--serif);letter-spacing:-.012em;margin:10px 0 8px;text-wrap:balance}
+.dek{font:400 14.5px/1.45 var(--serif);color:#b4b6bc;max-width:44ch}
+.card{position:fixed;right:20px;top:20px;width:300px;max-height:calc(100% - 40px);overflow:auto;overscroll-behavior:contain;background:var(--card);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:14px;padding:14px 16px 16px;font-size:12px;z-index:3;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .25s;scrollbar-width:thin}
+.card>header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:4px}
+.card h2{font:italic 400 18px/1.1 var(--serif)}
+.card .no{font:10px var(--mono);color:var(--mute);letter-spacing:.14em}
+.card .latin{display:block;font:italic 12px var(--serif);color:var(--mute);margin-top:3px}
+.lbl{display:flex;justify-content:space-between;align-items:baseline;font:600 9.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin:14px 0 7px}
+.lbl output{font-weight:500;color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1px solid var(--line);border-radius:9px;padding:2px;gap:2px;background:rgba(0,0,0,.25)}
+.seg button,.btn{font:500 11.5px/1 var(--sans);color:var(--ink);background:transparent;border:0;border-radius:7px;padding:8px 4px;cursor:pointer;touch-action:manipulation;transition:background .15s,color .15s}
+.seg button:hover{background:rgba(255,255,255,.06)}
+.seg button[aria-pressed=true]{background:var(--acc);color:#0b0c0f;font-weight:600}
+.btn{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:9px 6px}
+.btn:hover{background:rgba(255,255,255,.08)}
+.btn:active{transform:translateY(1px)}
+.btn.wide{width:100%;margin-top:14px;padding:11px 8px;font-weight:600;letter-spacing:.02em}
+.btn.danger{border-color:rgba(255,93,93,.45);color:#ffb1b1}
+.btn.danger[aria-pressed=true]{background:var(--bad);color:#0b0c0f;border-color:var(--bad)}
+.btn.go{border-color:rgba(201,255,61,.45);color:var(--acc)}
+.btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;touch-action:pan-y}
+input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:3px;background:linear-gradient(90deg,var(--acc) var(--p,50%),rgba(255,255,255,.12) var(--p,50%))}
+input[type=range]::-moz-range-track{height:3px;border-radius:3px;background:rgba(255,255,255,.12)}
+input[type=range]::-moz-range-progress{height:3px;border-radius:3px;background:var(--acc)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6.5px;border-radius:50%;background:#0b0c0f;border:2px solid var(--acc);box-shadow:0 0 0 4px rgba(201,255,61,.08)}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:#0b0c0f;border:2px solid var(--acc)}
+.swatches{display:flex;gap:8px}
+.swatches button{flex:1;height:30px;border-radius:8px;border:1px solid var(--line);cursor:pointer;position:relative;font:500 9.5px var(--mono);letter-spacing:.06em;color:#0b0c0f}
+.swatches button[aria-pressed=true]{outline:2px solid var(--acc);outline-offset:2px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:14px}
+.stat{background:#111216;padding:8px 10px 9px}
+.stat span{display:block;font:600 9px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--mute)}
+.stat strong{display:block;font:500 17px/1 var(--mono);font-variant-numeric:tabular-nums;margin-top:6px;white-space:nowrap}
+.stat strong.good{color:var(--acc)}.stat strong.bad{color:var(--bad)}.stat strong.warn{color:var(--warn)}
+details.inside{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+details.inside summary{cursor:pointer;list-style:none;font:italic 400 15px var(--serif);display:flex;justify-content:space-between;align-items:center}
+details.inside summary::-webkit-details-marker{display:none}
+details.inside summary::after{content:"+";font:400 16px var(--mono);color:var(--acc)}
+details.inside[open] summary::after{content:"\2013"}
+details.inside p{font:400 13px/1.55 var(--serif);color:#c3c5ca;margin-top:9px}
+details.inside p b{color:var(--ink);font-weight:600}
+.toggle{position:fixed;right:20px;bottom:18px;z-index:4;font:600 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:9px 13px;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.foot{position:fixed;left:28px;bottom:18px;font:500 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);pointer-events:none;z-index:2;max-width:calc(100% - 380px)}
+.foot em{font-style:normal;color:var(--mute)}
+body.bare .card{transform:translateX(calc(100% + 40px));opacity:0;pointer-events:none}
+body.bare .foot{max-width:calc(100% - 160px)}
+body.bare .masthead{max-width:min(560px,calc(100% - 56px))}
+@media (max-width:760px){
+  .masthead{left:16px;top:14px;max-width:calc(100% - 110px)}
+  .masthead h1{font-size:27px;margin:7px 0 4px}
+  .dek{font-size:13px;display:none}
+  .card{left:10px;right:10px;top:auto;bottom:10px;width:auto;max-height:44vh;border-radius:14px;padding:10px 12px 12px}
+  .card>header{display:none}
+  .card{display:flex;flex-direction:column}
+  .card>*{flex-shrink:0}
+  .card>.stats{order:-1;margin:0 0 2px}
+  .eyebrow .sp{display:none}
+  .stat{padding:7px 9px}
+  .stat strong{font-size:15px;margin-top:4px}
+  .lbl{margin:10px 0 6px}
+  .toggle{top:14px;right:12px;bottom:auto}
+  .foot{display:none}
+  body.bare .card{transform:translateY(calc(100% + 30px))}
+}
+.log{list-style:none;margin-top:12px;font:11px/1.5 var(--mono);color:var(--mute);min-height:66px}
+.log li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log li:first-child{color:var(--ink)}
+.log li.bad{color:#ff9d9d}.log li.warn{color:var(--warn)}.log li.good{color:var(--acc)}
+</style>
+</head>
+<body>
+<canvas id="stage" aria-label="Animated diagram: requests flow from five agents through a router into twenty model nodes. Tap a model or the router to break it."></canvas>
+<div class="masthead">
+  <div class="eyebrow">Field note · <b>Systems</b><span class="sp"> · Specimen 01</span></div>
+  <h1>When everything fails at once</h1>
+  <p class="dek">Twenty models, one router, one health checker. Break things and watch who gets the blame.</p>
+</div>
+<aside class="card" id="card">
+  <header><div><h2>Failover specimen</h2><span class="latin">Router, pool &amp; checker</span></div><span class="no">No. 01</span></header>
+  <div class="lbl">Tap a model to</div>
+  <div class="seg" data-key="tool"><button aria-pressed="true" data-v="kill">Kill</button><button aria-pressed="false" data-v="limit">Throttle</button><button aria-pressed="false" data-v="heal">Heal</button></div>
+  <div class="lbl">Health checker</div>
+  <div class="seg" data-key="rule"><button aria-pressed="true" data-v="naive">Naive</button><button aria-pressed="false" data-v="smart">Smart rule</button></div>
+  <label class="lbl" for="traffic">Traffic <output id="oTraffic"></output></label>
+  <input type="range" id="traffic" min="4" max="40" value="16">
+  <label class="lbl" for="sweep">Sweep every <output id="oSweep"></output></label>
+  <input type="range" id="sweep" min="15" max="60" value="28">
+  <button class="btn wide danger" id="killRouter" aria-pressed="false">Kill the router</button>
+  <div class="btns"><button class="btn" id="chaos">Break 3</button><button class="btn" id="reset">Reset</button><button class="btn" id="pause">Pause</button></div>
+  <div class="stats">
+    <div class="stat"><span>Success · 6s</span><strong id="sSucc">100%</strong></div>
+    <div class="stat"><span>Pool size</span><strong id="sPool">20/20</strong></div>
+    <div class="stat"><span>Dropped</span><strong id="sDrop">0</strong></div>
+    <div class="stat"><span>Router</span><strong id="sRouter">OK</strong></div>
+  </div>
+  <ol class="log" id="log" aria-live="polite"></ol>
+  <details class="inside"><summary>Inside the experiment</summary>
+    <p>Five agents send requests through one router into a pool of twenty models. Every few seconds a <b>health checker</b> sweeps the pool and pulls out any model that is failing. When one model breaks, that is exactly right: tap a model to kill it and watch it get ejected.</p>
+    <p>Now <b>kill the router</b>. Its outbound connection breaks, so every call it makes fails, and each failure is logged against the model it was calling. From where the checker sits, all twenty models died in the same second. The naive checker does what it was told and ejects all of them. The pool is empty, and even after the router is fixed, traffic has nowhere to go until each model earns its way back in.</p>
+    <p>The <b>smart rule</b> asks one more question: did everything fail at once? Twenty independent models almost never fail together. Something they all share does. So when most of the pool fails in the same sweep, it keeps the pool, blames the router and raises the alarm there.</p>
+    <p>Throttled models fail only when they are busy. That is the in-between case a checker has to get right too.</p>
+  </details>
+</aside>
+<button class="toggle" id="toggle">Hide panel</button>
+<div class="foot">Tap a model to break it · tap the router to break <em>that</em> · H hides the panel</div>
+<script>
+const $=s=>document.querySelector(s);
+const cv=$('#stage');let g=cv.getContext('2d');let W=0,H=0,DPR=1,R={x:0,y:0,w:1,h:1};
+function stageRect(){const m=$('.masthead').getBoundingClientRect(),c=$('#card'),bare=document.body.classList.contains('bare'),mob=W<=760;const x=mob?16:28,y=m.bottom+(mob?10:20);let w=W-x-(mob?16:28),h=H-y-(mob?14:46);if(!bare){if(mob)h=c.offsetTop-10-y;else w=c.offsetLeft-28-x}return{x,y,w:Math.max(80,w),h:Math.max(80,h)}}
+function resize(){DPR=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);g.setTransform(DPR,0,0,DPR,0,0);R=stageRect();layout()}
+addEventListener('resize',resize);
+const segs={};document.querySelectorAll('.seg').forEach(el=>{segs[el.dataset.key]=el.querySelector('[aria-pressed=true]').dataset.v;el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));segs[el.dataset.key]=b.dataset.v;onSeg(el.dataset.key,b.dataset.v)})});
+function fillRange(el){el.style.setProperty('--p',((el.value-el.min)/(el.max-el.min)*100)+'%')}
+document.querySelectorAll('input[type=range]').forEach(el=>{fillRange(el);el.addEventListener('input',()=>fillRange(el))});
+$('#toggle').onclick=()=>{const b=document.body.classList.toggle('bare');$('#toggle').textContent=b?'Show panel':'Hide panel';resize()};
+addEventListener('keydown',e=>{if((e.key==='h'||e.key==='H')&&!e.target.closest('input'))$('#toggle').click()});
+function loop(fn){let last=performance.now();function f(now){const dt=Math.min(1/30,(now-last)/1000);last=now;fn(dt,now/1000);requestAnimationFrame(f)}requestAnimationFrame(f)}
+const N=20,RED='#ff5d5d',ACC='#c9ff3d',AMB='#ffb347';
+let nodes=[],agents=[],router={x:0,y:0},parts=[],rings=[],hist=[],recent=[],logs=[];
+let routerDown=false,suspect=0,dropped=0,sweepT=0,sweep=null,sweepNo=0,spawnAcc=0,rr=0,t=0,histT=0,paused=false,emptyWarned=false;
+let vertical=false,pool={x:0,y:0,w:0,h:0},TL={x:0,y:0,w:0,h:0},nr=12;
+const traffic=$('#traffic'),sweepEl=$('#sweep');
+function sprite(col){const c=document.createElement('canvas');c.width=c.height=48;const x=c.getContext('2d'),gr=x.createRadialGradient(24,24,0,24,24,24);gr.addColorStop(0,col);gr.addColorStop(.18,col);gr.addColorStop(.4,col+'55');gr.addColorStop(1,col+'00');x.fillStyle=gr;x.fillRect(0,0,48,48);return c}
+const GLOW={ok:sprite('#c9ff3d'),bad:sprite('#ff5d5d'),amb:sprite('#ffb347')};
+function addLog(s,cls=''){logs.unshift({s:`${t.toFixed(0).padStart(3,' ')}s  ${s}`,cls});logs.length=Math.min(logs.length,4);$('#log').innerHTML=logs.map(l=>`<li class="${l.cls}">${l.s}</li>`).join('')}
+function reset(){nodes=Array.from({length:N},(_,i)=>({i,name:'m'+String(i+1).padStart(2,'0'),alive:true,limited:false,inPool:true,ok:0,fail:0,tokens:1.5,passes:0,hit:0,flash:0,fcol:RED,held:0,x:0,y:0,seen:false}));
+  parts=[];rings=[];hist=[];recent=[];logs=[];routerDown=false;suspect=0;dropped=0;sweepT=0;sweep=null;sweepNo=0;t=0;histT=0;emptyWarned=false;
+  setRouterBtn();layout();addLog('pool of 20 online','good')}
+function setRouterBtn(){const b=$('#killRouter');b.setAttribute('aria-pressed',routerDown);b.textContent=routerDown?'Restore the router':'Kill the router'}
+function layout(){
+  const tl=Math.max(44,Math.min(74,R.h*.15));TL={x:R.x,y:R.y+R.h-tl,w:R.w,h:tl};
+  const A={x:R.x,y:R.y,w:R.w,h:R.h-tl-18};vertical=A.w<A.h*1.05;
+  agents=[];
+  if(!vertical){for(let i=0;i<5;i++)agents.push({x:A.x+Math.min(40,A.w*.05),y:A.y+A.h*(.14+.72*i/4)});router={x:A.x+A.w*.3,y:A.y+A.h/2};pool={x:A.x+A.w*.5,y:A.y,w:A.w*.5,h:A.h}}
+  else{for(let i=0;i<5;i++)agents.push({x:A.x+A.w*(.1+.8*i/4),y:A.y+14});router={x:A.x+A.w/2,y:A.y+A.h*.24};pool={x:A.x,y:A.y+A.h*.4,w:A.w,h:A.h*.6}}
+  let best=4,bs=1e9;for(let c=2;c<=10;c++){const r=Math.ceil(N/c),s=Math.abs(Math.log((pool.w/c)/(pool.h/r)));if(s<bs){bs=s;best=c}}
+  const cols=best,rows=Math.ceil(N/cols),cw=pool.w/cols,ch=pool.h/rows;nr=Math.max(7,Math.min(19,Math.min(cw,ch)*.27));
+  nodes.forEach((n,i)=>{n.x=pool.x+cw*(i%cols+.5);n.y=pool.y+ch*(Math.floor(i/cols)+.5)});
+}
+function pick(){const p=nodes.filter(n=>n.inPool);if(!p.length)return null;rr=(rr+1)%p.length;return p[rr]}
+function record(ok){recent.push({t,ok})}
+function outcome(n){if(routerDown)return 'router';if(!n.alive)return 'dead';if(n.limited){if(n.tokens>=1){n.tokens-=1;return 'ok'}return '429'}return 'ok'}
+function spawn(){const a=agents[(Math.random()*5)|0];parts.push({ph:0,u:0,dur:.42+Math.random()*.14,x0:a.x,y0:a.y,x1:router.x,y1:router.y,j:(Math.random()-.5)*26,n:null,col:'ok',x:a.x,y:a.y})}
+function startSweep(){sweepNo++;const pooled=nodes.filter(n=>n.inPool);let fails=0;
+  nodes.forEach(n=>{const probeFail=routerDown||!n.alive||(n.limited&&n.tokens<1);const trafFail=n.fail>=2&&n.fail/(n.ok+n.fail)>.5;n.verdict=probeFail||trafFail;n.seen=false;if(n.inPool&&n.verdict)fails++;n.ok=0;n.fail=0});
+  const correlated=segs.rule==='smart'&&pooled.length>=4&&fails>=Math.ceil(pooled.length*.8);
+  sweep={u:0,correlated,ej:[],back:[],fails,pooled:pooled.length};
+  if(correlated){suspect=1;addLog(`sweep ${sweepNo}: ${fails}/${pooled.length} at once: blame the router`,'warn')}
+  else suspect=0}
+function applyVerdict(n){n.seen=true;
+  if(n.inPool){if(n.verdict){if(sweep.correlated){n.held=1}else{n.inPool=false;n.passes=0;n.flash=1;n.fcol=AMB;sweep.ej.push(n.name)}}}
+  else{if(!n.verdict){if(++n.passes>=2){n.inPool=true;n.flash=1;n.fcol=ACC;sweep.back.push(n.name)}}else n.passes=0}}
+function names(a){return a.length>4?`${a.length} models`:a.join(', ')}
+function endSweep(){if(sweep.ej.length)addLog(`sweep ${sweepNo}: ejected ${names(sweep.ej)}`,sweep.ej.length>4?'bad':'warn');
+  if(sweep.back.length)addLog(`sweep ${sweepNo}: re-admitted ${names(sweep.back)}`,'good');
+  const size=nodes.filter(n=>n.inPool).length;if(size===0&&!emptyWarned){emptyWarned=true;addLog('pool empty: every request now 503s','bad')}if(size>0)emptyWarned=false;sweep=null}
+function step(dt){t+=dt;
+  spawnAcc+=dt*+traffic.value;while(spawnAcc>=1){spawnAcc-=1;spawn()}
+  nodes.forEach(n=>{if(n.limited)n.tokens=Math.min(1.5,n.tokens+dt*.34);n.hit*=Math.exp(-dt*5);n.flash*=Math.exp(-dt*2.2);n.held*=Math.exp(-dt*1.6)});
+  for(let k=parts.length-1;k>=0;k--){const p=parts[k];p.u+=dt/p.dur;
+    if(p.u>=1){if(p.ph===0){const n=pick();if(!n){rings.push({x:router.x,y:router.y,r:6,a:1,col:RED});dropped++;record(false);parts.splice(k,1);continue}
+        p.ph=1;p.u=0;p.n=n;p.x0=router.x;p.y0=router.y;p.x1=n.x;p.y1=n.y;p.dur=.5+Math.random()*.12;if(routerDown)p.col='bad';continue}
+      const n=p.n,o=outcome(n);if(o==='ok'){n.ok++;n.hit=1;record(true);rings.push({x:n.x,y:n.y,r:nr*.7,a:.55,col:ACC})}
+      else{n.fail++;dropped++;record(false);n.flash=Math.max(n.flash,.8);n.fcol=o==='429'?AMB:RED;rings.push({x:n.x,y:n.y,r:nr*.6,a:1,col:o==='429'?AMB:RED})}
+      parts.splice(k,1);continue}
+    const e=p.u<.5?2*p.u*p.u:1-Math.pow(-2*p.u+2,2)/2,dx=p.x1-p.x0,dy=p.y1-p.y0,L=Math.hypot(dx,dy)||1,s=Math.sin(Math.PI*e)*p.j;
+    p.x=p.x0+dx*e-dy/L*s;p.y=p.y0+dy*e+dx/L*s}
+  for(let k=rings.length-1;k>=0;k--){const r=rings[k];r.r+=dt*38;r.a-=dt*1.9;if(r.a<=0)rings.splice(k,1)}
+  sweepT+=dt;const iv=sweepEl.value/10;if(!sweep&&sweepT>=iv){sweepT=0;startSweep()}
+  if(sweep){sweep.u+=dt/.8;const sx=pool.x+pool.w*Math.min(1,sweep.u);nodes.forEach(n=>{if(!n.seen&&n.x<=sx+.5)applyVerdict(n)});if(sweep.u>=1){nodes.forEach(n=>{if(!n.seen)applyVerdict(n)});endSweep()}}
+  if(!routerDown&&!sweep)suspect*=Math.exp(-dt*.25);
+  while(recent.length&&recent[0].t<t-6)recent.shift();
+  histT+=dt;if(histT>.25){histT=0;const ok=recent.filter(r=>r.ok).length;hist.push({s:recent.length?ok/recent.length:1,p:nodes.filter(n=>n.inPool).length/N,d:routerDown});if(hist.length>180)hist.shift()}
+}
+function rr_(x,y,w,h,r){g.beginPath();g.roundRect?g.roundRect(x,y,w,h,r):g.rect(x,y,w,h)}
+function draw(now){g.fillStyle='#0b0c0f';g.fillRect(0,0,W,H);
+  // faint specimen grid
+  g.fillStyle='rgba(255,255,255,.035)';for(let x=R.x;x<R.x+R.w;x+=22)for(let y=R.y;y<TL.y-8;y+=22)g.fillRect(x,y,1,1);
+  // wires
+  g.lineWidth=1;agents.forEach(a=>{g.strokeStyle='rgba(255,255,255,.08)';g.beginPath();g.moveTo(a.x,a.y);g.lineTo(router.x,router.y);g.stroke()});
+  nodes.forEach(n=>{if(!n.inPool)return;g.strokeStyle=routerDown?'rgba(255,93,93,.10)':'rgba(201,255,61,.075)';g.beginPath();g.moveTo(router.x,router.y);const mx=(router.x+n.x)/2,my=(router.y+n.y)/2;g.quadraticCurveTo(vertical?n.x:mx,vertical?my:n.y,n.x,n.y);g.stroke()});
+  // sweep beam
+  if(sweep){const sx=pool.x+pool.w*Math.min(1,sweep.u),gr=g.createLinearGradient(sx-60,0,sx,0);const c=sweep.correlated?'255,179,71':'201,255,61';gr.addColorStop(0,`rgba(${c},0)`);gr.addColorStop(1,`rgba(${c},.13)`);g.fillStyle=gr;g.fillRect(sx-60,pool.y-6,60,pool.h+12);g.fillStyle=`rgba(${c},.9)`;g.fillRect(sx-1,pool.y-6,1.5,pool.h+12);
+    g.font='600 9px ui-monospace,Menlo,monospace';g.fillStyle=`rgba(${c},.9)`;g.fillText(`HEALTH CHECK #${sweepNo}`,Math.min(sx+6,pool.x+pool.w-92),pool.y-10)}
+  // nodes
+  g.textAlign='center';g.font=`500 ${Math.max(8,Math.min(10,nr*.6))}px ui-monospace,Menlo,monospace`;
+  nodes.forEach(n=>{const out=!n.inPool;g.globalAlpha=out?.38:1;
+    if(n.hit>.05&&!out){g.globalCompositeOperation='lighter';const s=nr*3.2*(.6+n.hit*.6);g.globalAlpha=n.hit*.55;g.drawImage(GLOW.ok,n.x-s/2,n.y-s/2,s,s);g.globalAlpha=1;g.globalCompositeOperation='source-over'}
+    g.beginPath();g.arc(n.x,n.y,nr,0,7);g.fillStyle=out?'#0e0f12':'#14161b';g.fill();
+    g.lineWidth=1.4;g.setLineDash(out?[3,3]:[]);g.strokeStyle=!n.alive?RED:n.limited?AMB:out?'#6b6f77':'rgba(201,255,61,.75)';g.stroke();g.setLineDash([]);
+    if(n.limited){g.beginPath();g.arc(n.x,n.y,nr-3.5,-Math.PI/2,-Math.PI/2+Math.PI*2*Math.min(1,n.tokens/1.5));g.strokeStyle='rgba(255,179,71,.8)';g.lineWidth=2;g.stroke()}
+    if(!n.alive){const s=nr*.38;g.beginPath();g.moveTo(n.x-s,n.y-s);g.lineTo(n.x+s,n.y+s);g.moveTo(n.x+s,n.y-s);g.lineTo(n.x-s,n.y+s);g.strokeStyle=RED;g.lineWidth=1.6;g.stroke()}
+    else if(!n.limited){g.beginPath();g.arc(n.x,n.y,nr*.22+n.hit*nr*.18,0,7);g.fillStyle=out?'#555':ACC;g.fill()}
+    if(n.flash>.03){g.beginPath();g.arc(n.x,n.y,nr+3+(1-n.flash)*6,0,7);g.strokeStyle=n.fcol;g.globalAlpha=n.flash*(out?1.6:1);g.lineWidth=2;g.stroke();g.globalAlpha=out?.38:1}
+    if(n.held>.03){g.beginPath();g.arc(n.x,n.y,nr+4,0,7);g.strokeStyle=AMB;g.globalAlpha=n.held;g.setLineDash([2,3]);g.lineWidth=1.5;g.stroke();g.setLineDash([]);g.globalAlpha=1}
+    g.globalAlpha=out?.5:.8;g.fillStyle=out?'#8b8f98':'#b9bcc2';g.fillText(out?n.name+' out':n.name,n.x,n.y+nr+12);g.globalAlpha=1});
+  // agents
+  agents.forEach((a,i)=>{rr_(a.x-9,a.y-9,18,18,4);g.fillStyle='#14161b';g.fill();g.strokeStyle='rgba(236,235,230,.55)';g.lineWidth=1.2;g.stroke();g.fillStyle='#b9bcc2';g.font='500 9px ui-monospace,Menlo,monospace';g.textAlign=vertical?'center':'left';g.fillText('A'+(i+1),vertical?a.x:a.x+15,vertical?a.y+22:a.y+3)});
+  // router
+  const rs=Math.max(20,nr*1.55),flick=routerDown?(.65+.35*Math.sin(now*23)*Math.sin(now*7)):1;
+  if(suspect>.05){const s=rs*5*(1+.08*Math.sin(now*5));g.globalCompositeOperation='lighter';g.globalAlpha=.5*suspect;g.drawImage(GLOW.amb,router.x-s/2,router.y-s/2,s,s);g.globalAlpha=1;g.globalCompositeOperation='source-over'}
+  g.beginPath();for(let k=0;k<6;k++){const a=Math.PI/6+k*Math.PI/3;g.lineTo(router.x+Math.cos(a)*rs,router.y+Math.sin(a)*rs)}g.closePath();g.fillStyle=routerDown?'#2a1113':'#15171c';g.fill();g.lineWidth=1.8;g.strokeStyle=routerDown?`rgba(255,93,93,${flick})`:suspect>.3?AMB:ACC;g.stroke();
+  g.textAlign='center';g.fillStyle=routerDown?RED:'#ecebe6';g.font='600 9px ui-monospace,Menlo,monospace';g.fillText(routerDown?'DOWN':'ROUTER',router.x,router.y+3);
+  if(suspect>.3){g.fillStyle=AMB;g.font='italic 13px "Iowan Old Style",Palatino,Georgia,serif';g.fillText('suspect: the shared dependency',router.x,router.y+rs+18)}
+  // particles
+  g.globalCompositeOperation='lighter';parts.forEach(p=>{const s=p.col==='bad'?13:11;g.drawImage(p.col==='bad'?GLOW.bad:GLOW.ok,p.x-s/2,p.y-s/2,s,s)});
+  rings.forEach(r=>{g.beginPath();g.arc(r.x,r.y,r.r,0,7);g.strokeStyle=r.col;g.globalAlpha=Math.max(0,r.a)*.8;g.lineWidth=1.3;g.stroke()});g.globalAlpha=1;g.globalCompositeOperation='source-over';
+  // empty pool banner
+  if(!nodes.some(n=>n.inPool)){g.fillStyle='rgba(255,93,93,.92)';g.font='600 11px ui-monospace,Menlo,monospace';g.textAlign='center';g.fillText('POOL EMPTY · 503 NO HEALTHY UPSTREAM',pool.x+pool.w/2,pool.y+pool.h+4-Math.max(0,pool.h*.02)+ (vertical?0:0))}
+  // timeline
+  const T=TL;g.strokeStyle='rgba(255,255,255,.08)';g.lineWidth=1;g.beginPath();g.moveTo(T.x,T.y+.5);g.lineTo(T.x+T.w,T.y+.5);g.moveTo(T.x,T.y+T.h-.5);g.lineTo(T.x+T.w,T.y+T.h-.5);g.stroke();
+  const L=hist.length,dx=T.w/179;
+  if(L>1){const x0=T.x+T.w-(L-1)*dx;
+    hist.forEach((h,i)=>{if(h.d){g.fillStyle='rgba(255,93,93,.08)';g.fillRect(x0+i*dx,T.y,dx+.5,T.h)}});
+    g.beginPath();g.moveTo(x0,T.y+T.h);hist.forEach((h,i)=>g.lineTo(x0+i*dx,T.y+T.h-h.p*(T.h-8)));g.lineTo(x0+(L-1)*dx,T.y+T.h);g.closePath();g.fillStyle='rgba(236,235,230,.07)';g.fill();
+    g.beginPath();hist.forEach((h,i)=>g[i?'lineTo':'moveTo'](x0+i*dx,T.y+T.h-h.s*(T.h-8)-1));g.strokeStyle=ACC;g.lineWidth=1.5;g.stroke()}
+  g.textAlign='left';g.font='600 9px ui-monospace,Menlo,monospace';g.fillStyle='#8b8f98';g.fillText('SUCCESS RATE',T.x,T.y-6);g.fillStyle='#5a5e66';g.fillText('  ·  POOL SIZE (GREY)  ·  LAST 45 S',T.x+72,T.y-6);
+}
+function stats(){const ok=recent.filter(r=>r.ok).length,s=recent.length?ok/recent.length:1,size=nodes.filter(n=>n.inPool).length;
+  const e=$('#sSucc');e.textContent=Math.round(s*100)+'%';e.className=s>.95?'good':s>.6?'warn':'bad';
+  const p=$('#sPool');p.textContent=size+'/'+N;p.className=size===N?'good':size>=10?'warn':'bad';
+  $('#sDrop').textContent=dropped.toLocaleString();
+  const r=$('#sRouter');r.textContent=routerDown?'DOWN':suspect>.3?'SUSPECT':'OK';r.className=routerDown?'bad':suspect>.3?'warn':'good'}
+function labels(){$('#oTraffic').textContent=traffic.value+' req/s';$('#oSweep').textContent=(sweepEl.value/10).toFixed(1)+' s'}
+traffic.oninput=labels;sweepEl.oninput=labels;
+function toggleRouter(){routerDown=!routerDown;setRouterBtn();addLog(routerDown?'router upstream broken':'router restored',routerDown?'bad':'good')}
+$('#killRouter').onclick=toggleRouter;
+$('#reset').onclick=reset;
+$('#pause').onclick=()=>{paused=!paused;$('#pause').textContent=paused?'Play':'Pause'};
+$('#chaos').onclick=()=>{const live=nodes.filter(n=>n.alive);for(let k=0;k<3&&live.length;k++){const n=live.splice((Math.random()*live.length)|0,1)[0];n.alive=false;n.flash=1;n.fcol=RED}addLog('3 models broken','bad')};
+function onSeg(k,v){if(k==='rule'&&v==='naive')suspect=0;if(k==='rule')addLog(v==='smart'?'smart rule on: correlated failure blames the router':'naive checker: every failure is the model\'s fault',v==='smart'?'good':'')}
+function hitNode(x,y){let b=null,bd=(nr+12)**2;nodes.forEach(n=>{const d=(n.x-x)**2+(n.y-y)**2;if(d<bd){bd=d;b=n}});return b}
+cv.addEventListener('pointerdown',e=>{const x=e.clientX,y=e.clientY;
+  if(Math.hypot(x-router.x,y-router.y)<Math.max(26,nr*1.8)){toggleRouter();return}
+  const n=hitNode(x,y);if(!n)return;const tool=segs.tool;
+  if(tool==='kill'){n.alive=false;n.limited=false;n.fcol=RED;addLog(`${n.name} killed`,'bad')}
+  else if(tool==='limit'){n.alive=true;n.limited=true;n.tokens=.5;n.fcol=AMB;addLog(`${n.name} rate-limited`,'warn')}
+  else{n.alive=true;n.limited=false;n.fcol=ACC;addLog(`${n.name} healed${n.inPool?'':', waiting for 2 clean sweeps'}`,'good')}
+  n.flash=1});
+cv.addEventListener('pointermove',e=>{cv.style.cursor=(hitNode(e.clientX,e.clientY)||Math.hypot(e.clientX-router.x,e.clientY-router.y)<Math.max(26,nr*1.8))?'pointer':'crosshair'});
+labels();resize();reset();
+let st=0;loop((dt,now)=>{if(!paused)step(dt);draw(now);if((st+=dt)>.2){st=0;stats()}});
+</script>
+</body>
+</html>

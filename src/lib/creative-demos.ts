@@ -16,6 +16,42 @@ export interface CreativeDemo {
 
 export const creativeDemos: CreativeDemo[] = [
   {
+    slug: "router-failover-lab",
+    title: "When everything fails at once",
+    description: "Twenty models, one router, one health checker. Kill models or throttle them, then kill the router and watch a naive checker eject the whole pool. A smart rule blames the shared dependency instead.",
+    tags: ["Systems", "Reliability", "Agents", "Interactive"],
+    date: "2026-09-27",
+    hasControls: true,
+    category: "Systems",
+  },
+  {
+    slug: "variant-deflation-lab",
+    title: "324 variants, zero edges",
+    description: "Try up to a thousand trading-rule variants on a random walk. The in-sample winner looks brilliant, drifts back into the random-entry band out of sample, and the deflated Sharpe ratio shows why. Simulation. Not trading advice.",
+    tags: ["Statistics", "Backtesting", "Overfitting", "Interactive"],
+    date: "2026-09-27",
+    hasControls: true,
+    category: "Statistics",
+  },
+  {
+    slug: "vol-yield-gauge",
+    title: "Are options paying you enough?",
+    description: "Sell a put and watch simulated price paths decide whether the premium covered the losses. Implied over realized volatility on a gauge; below about 1, the seller loses on average. Simulation. Not trading advice.",
+    tags: ["Statistics", "Options", "Volatility", "Interactive"],
+    date: "2026-09-27",
+    hasControls: true,
+    category: "Statistics",
+  },
+  {
+    slug: "fold-jelly-loaf",
+    title: "Fold: a loaf of jelly cat",
+    description: "A material study: a loaf-shaped fold-eared cat cast in soft-body jelly. Poke it, grab and fling it, or press it under a glass slide and watch the ears fold flat.",
+    tags: ["Material Study", "Soft Body", "Physics", "Interactive"],
+    date: "2026-09-27",
+    hasControls: true,
+    category: "Material Studies",
+  },
+  {
     slug: "the-rule-and-the-machine",
     title: "The Rule and the Machine",
     description: "Generative art as one idea rediscovered for sixty years, from oscilloscope traces in 1950 to the browser. 83 nodes and the relations between them, compiled from N4L into a graph database.",

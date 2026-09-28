@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Are options paying you enough?</title>
+<meta name="description" content="Sell a put, then watch hundreds of simulated price paths decide whether the premium covered the losses. Implied versus realized volatility, on a gauge. Simulation. Not trading advice.">
+<meta name="theme-color" content="#0b0c0f">
+<style>
+:root{--bg:#0b0c0f;--ink:#ecebe6;--mute:#8b8f98;--dim:#5a5e66;--line:rgba(255,255,255,.09);--card:rgba(16,17,21,.84);--acc:#c9ff3d;--warn:#ffb347;--bad:#ff5d5d;--serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+#stage{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.masthead{position:fixed;left:28px;top:24px;max-width:min(560px,calc(100% - 360px));pointer-events:none;z-index:2}
+.eyebrow{font:600 10px/1.2 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+.eyebrow b{color:var(--acc);font-weight:600}
+.masthead h1{font:italic 400 clamp(28px,3.9vw,50px)/1.02 var(--serif);letter-spacing:-.012em;margin:10px 0 8px;text-wrap:balance}
+.dek{font:400 14.5px/1.45 var(--serif);color:#b4b6bc;max-width:44ch}
+.card{position:fixed;right:20px;top:20px;width:300px;max-height:calc(100% - 40px);overflow:auto;overscroll-behavior:contain;background:var(--card);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:14px;padding:14px 16px 16px;font-size:12px;z-index:3;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .25s;scrollbar-width:thin}
+.card>header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:4px}
+.card h2{font:italic 400 18px/1.1 var(--serif)}
+.card .no{font:10px var(--mono);color:var(--mute);letter-spacing:.14em}
+.card .latin{display:block;font:italic 12px var(--serif);color:var(--mute);margin-top:3px}
+.lbl{display:flex;justify-content:space-between;align-items:baseline;font:600 9.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin:14px 0 7px}
+.lbl output{font-weight:500;color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1px solid var(--line);border-radius:9px;padding:2px;gap:2px;background:rgba(0,0,0,.25)}
+.seg button,.btn{font:500 11.5px/1 var(--sans);color:var(--ink);background:transparent;border:0;border-radius:7px;padding:8px 4px;cursor:pointer;touch-action:manipulation;transition:background .15s,color .15s}
+.seg button:hover{background:rgba(255,255,255,.06)}
+.seg button[aria-pressed=true]{background:var(--acc);color:#0b0c0f;font-weight:600}
+.btn{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:9px 6px}
+.btn:hover{background:rgba(255,255,255,.08)}
+.btn:active{transform:translateY(1px)}
+.btn.wide{width:100%;margin-top:14px;padding:11px 8px;font-weight:600;letter-spacing:.02em}
+.btn.danger{border-color:rgba(255,93,93,.45);color:#ffb1b1}
+.btn.danger[aria-pressed=true]{background:var(--bad);color:#0b0c0f;border-color:var(--bad)}
+.btn.go{border-color:rgba(201,255,61,.45);color:var(--acc)}
+.btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;touch-action:pan-y}
+input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:3px;background:linear-gradient(90deg,var(--acc) var(--p,50%),rgba(255,255,255,.12) var(--p,50%))}
+input[type=range]::-moz-range-track{height:3px;border-radius:3px;background:rgba(255,255,255,.12)}
+input[type=range]::-moz-range-progress{height:3px;border-radius:3px;background:var(--acc)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6.5px;border-radius:50%;background:#0b0c0f;border:2px solid var(--acc);box-shadow:0 0 0 4px rgba(201,255,61,.08)}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:#0b0c0f;border:2px solid var(--acc)}
+.swatches{display:flex;gap:8px}
+.swatches button{flex:1;height:30px;border-radius:8px;border:1px solid var(--line);cursor:pointer;position:relative;font:500 9.5px var(--mono);letter-spacing:.06em;color:#0b0c0f}
+.swatches button[aria-pressed=true]{outline:2px solid var(--acc);outline-offset:2px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:14px}
+.stat{background:#111216;padding:8px 10px 9px}
+.stat span{display:block;font:600 9px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--mute)}
+.stat strong{display:block;font:500 17px/1 var(--mono);font-variant-numeric:tabular-nums;margin-top:6px;white-space:nowrap}
+.stat strong.good{color:var(--acc)}.stat strong.bad{color:var(--bad)}.stat strong.warn{color:var(--warn)}
+details.inside{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+details.inside summary{cursor:pointer;list-style:none;font:italic 400 15px var(--serif);display:flex;justify-content:space-between;align-items:center}
+details.inside summary::-webkit-details-marker{display:none}
+details.inside summary::after{content:"+";font:400 16px var(--mono);color:var(--acc)}
+details.inside[open] summary::after{content:"\2013"}
+details.inside p{font:400 13px/1.55 var(--serif);color:#c3c5ca;margin-top:9px}
+details.inside p b{color:var(--ink);font-weight:600}
+.toggle{position:fixed;right:20px;bottom:18px;z-index:4;font:600 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:9px 13px;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.foot{position:fixed;left:28px;bottom:18px;font:500 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);pointer-events:none;z-index:2;max-width:calc(100% - 380px)}
+.foot em{font-style:normal;color:var(--mute)}
+body.bare .card{transform:translateX(calc(100% + 40px));opacity:0;pointer-events:none}
+body.bare .foot{max-width:calc(100% - 160px)}
+body.bare .masthead{max-width:min(560px,calc(100% - 56px))}
+@media (max-width:760px){
+  .masthead{left:16px;top:14px;max-width:calc(100% - 110px)}
+  .masthead h1{font-size:27px;margin:7px 0 4px}
+  .dek{font-size:13px;display:none}
+  .card{left:10px;right:10px;top:auto;bottom:10px;width:auto;max-height:44vh;border-radius:14px;padding:10px 12px 12px}
+  .card>header{display:none}
+  .card{display:flex;flex-direction:column}
+  .card>*{flex-shrink:0}
+  .card>.stats{order:-1;margin:0 0 2px}
+  .eyebrow .sp{display:none}
+  .stat{padding:7px 9px}
+  .stat strong{font-size:15px;margin-top:4px}
+  .lbl{margin:10px 0 6px}
+  .toggle{top:14px;right:12px;bottom:auto}
+  .foot{display:none}
+  body.bare .card{transform:translateY(calc(100% + 30px))}
+}
+.disclaim{margin-top:12px;font:600 9.5px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--warn)}
+</style>
+</head>
+<body>
+<canvas id="stage" aria-label="Simulated price paths against a short put strike, a gauge of implied over realized volatility, and a histogram of the seller's profit and loss."></canvas>
+<div class="masthead">
+  <div class="eyebrow">Field note · <b>Statistics</b><span class="sp"> · Specimen 03</span></div>
+  <h1>Are options paying you enough?</h1>
+  <p class="dek">Selling a put is selling insurance. The price you charge is implied volatility. The claims you pay are realized volatility.</p>
+</div>
+<aside class="card" id="card">
+  <header><div><h2>Premium specimen</h2><span class="latin">Short put, one contract</span></div><span class="no">No. 03</span></header>
+  <label class="lbl" for="iv">Implied vol · what you charge <output id="oIV"></output></label>
+  <input type="range" id="iv" min="5" max="100" value="32">
+  <label class="lbl" for="rv">Realized vol · what happens <output id="oRV"></output></label>
+  <input type="range" id="rv" min="5" max="100" value="26">
+  <label class="lbl" for="days">Days to expiry <output id="oD"></output></label>
+  <input type="range" id="days" min="3" max="90" value="30">
+  <label class="lbl" for="otm">Strike below spot <output id="oK"></output></label>
+  <input type="range" id="otm" min="0" max="20" value="5">
+  <div class="lbl">Tails</div>
+  <div class="seg" data-key="tails"><button aria-pressed="true" data-v="normal">Normal</button><button aria-pressed="false" data-v="fat">Fat · with jumps</button></div>
+  <div class="btns"><button class="btn go" id="shock">Vol shock</button><button class="btn" id="reset">Reset</button><button class="btn" id="pause">Pause</button></div>
+  <div class="stats">
+    <div class="stat"><span>Premium in</span><strong id="sPrem" class="good">–</strong></div>
+    <div class="stat"><span>Avg loss out</span><strong id="sLoss">–</strong></div>
+    <div class="stat"><span>Edge / contract</span><strong id="sEdge">–</strong></div>
+    <div class="stat"><span>Win rate</span><strong id="sWin">–</strong></div>
+  </div>
+  <p class="disclaim">Simulation. Not trading advice.</p>
+  <details class="inside"><summary>Inside the experiment</summary>
+    <p>You sell one put: you collect a <b>premium</b> today, and if the price finishes below the strike you pay the difference. Most of the time nothing happens and you keep the premium. Sometimes you pay a lot.</p>
+    <p>The premium is set by <b>implied volatility</b>, the market's guess of how much the price will move. What you actually pay out is set by <b>realized volatility</b>, how much it really moves. Each glowing line is one possible future; red ones finish below the strike and cost you money.</p>
+    <p>The gauge shows <b>IV ÷ RV</b>, the ratio behind "vol-adjusted yield". Above 1 you are charging more than the risk you carry, so on average you win. Below about 1 you are underpricing the insurance, and the seller loses on average, even though most individual trades still look like wins. That gap between win rate and edge is the trap.</p>
+    <p>Switch to <b>fat tails</b> and the same realized volatility arrives as rare jumps. The average loss grows, so a ratio slightly above 1 can still lose. "Vol shock" doubles realized vol for a moment to show how fast the edge flips.</p>
+  </details>
+</aside>
+<button class="toggle" id="toggle">Hide panel</button>
+<div class="foot">Simulation. Not trading advice · <em>no tickers, no recommendations</em> · H hides the panel</div>
+<script>
+const $=s=>document.querySelector(s);
+const cv=$('#stage');let g=cv.getContext('2d');let W=0,H=0,DPR=1,R={x:0,y:0,w:1,h:1};
+function stageRect(){const m=$('.masthead').getBoundingClientRect(),c=$('#card'),bare=document.body.classList.contains('bare'),mob=W<=760;const x=mob?16:28,y=m.bottom+(mob?10:20);let w=W-x-(mob?16:28),h=H-y-(mob?14:46);if(!bare){if(mob)h=c.offsetTop-10-y;else w=c.offsetLeft-28-x}return{x,y,w:Math.max(80,w),h:Math.max(80,h)}}
+function resize(){DPR=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);g.setTransform(DPR,0,0,DPR,0,0);R=stageRect();layout()}
+addEventListener('resize',resize);
+const segs={};document.querySelectorAll('.seg').forEach(el=>{segs[el.dataset.key]=el.querySelector('[aria-pressed=true]').dataset.v;el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));segs[el.dataset.key]=b.dataset.v;onSeg(el.dataset.key,b.dataset.v)})});
+function fillRange(el){el.style.setProperty('--p',((el.value-el.min)/(el.max-el.min)*100)+'%')}
+document.querySelectorAll('input[type=range]').forEach(el=>{fillRange(el);el.addEventListener('input',()=>fillRange(el))});
+$('#toggle').onclick=()=>{const b=document.body.classList.toggle('bare');$('#toggle').textContent=b?'Show panel':'Hide panel';resize()};
+addEventListener('keydown',e=>{if((e.key==='h'||e.key==='H')&&!e.target.closest('input'))$('#toggle').click()});
+function loop(fn){let last=performance.now();function f(now){const dt=Math.min(1/30,(now-last)/1000);last=now;fn(dt,now/1000);requestAnimationFrame(f)}requestAnimationFrame(f)}
+const ACC='#c9ff3d',RED='#ff5d5d',AMB='#ffb347',S0=100,LAM=5,MJ=-.07,SJ=.05;
+const ivEl=$('#iv'),rvEl=$('#rv'),dEl=$('#days'),kEl=$('#otm');
+let P={},batches=[],cur=null,acc,paused=false,needle={a:0,v:0},shock=0,hist=new Float64Array(44),pr={};
+function Phi(x){const t=1/(1+.2316419*Math.abs(x)),d=.3989422804*Math.exp(-x*x/2),p=d*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p}
+function bsPut(S,K,s,t){if(t<=0||s<=0)return Math.max(K-S,0);const st=s*Math.sqrt(t),d1=(Math.log(S/K)+s*s*t/2)/st;return K*Phi(-(d1-st))-S*Phi(-d1)}
+let spare=null;function gauss(){if(spare!==null){const s=spare;spare=null;return s}let u=0;while(!u)u=Math.random();const v=Math.random(),r=Math.sqrt(-2*Math.log(u));spare=r*Math.sin(2*Math.PI*v);return r*Math.cos(2*Math.PI*v)}
+function poisson(l){let k=0,p=Math.exp(-l),s=p,u=Math.random();while(u>s&&k<30){k++;p*=l/k;s+=p}return k}
+function params(){const iv=ivEl.value/100,rv0=rvEl.value/100,rv=rv0*(1+shock),days=+dEl.value,t=days/365,K=S0*(1-kEl.value/100),fat=segs.tails==='fat';
+  const ej=Math.exp(MJ+SJ*SJ/2)-1,jv=LAM*(MJ*MJ+SJ*SJ),sd2=fat?Math.max(.0004,rv*rv-jv):rv*rv;
+  return{iv,rv,rv0,days,t,K,fat,prem:bsPut(S0,K,iv,t),expLoss:fat?null:bsPut(S0,K,rv,t),sd:Math.sqrt(sd2),drift:-sd2/2-(fat?LAM*ej:0)}}
+function terminal(p){let x=p.drift*p.t+p.sd*Math.sqrt(p.t)*gauss();if(p.fat){const k=poisson(LAM*p.t);for(let j=0;j<k;j++)x+=MJ+SJ*gauss()}return S0*Math.exp(x)}
+function newBatch(){const p=pr,steps=Math.max(12,Math.min(90,p.days)),dt=p.t/steps,paths=[];
+  for(let k=0;k<22;k++){const a=new Float32Array(steps+1);let x=0;a[0]=S0;for(let s=1;s<=steps;s++){x+=p.drift*dt+p.sd*Math.sqrt(dt)*gauss();if(p.fat&&Math.random()<LAM*dt)x+=MJ+SJ*gauss();a[s]=S0*Math.exp(x)}paths.push(a)}
+  cur={paths,steps,u:0,hold:0};}
+function resetAcc(){acc={n:0,loss:0,wins:0,worst:0};hist.fill(0);batches=[];pr=params();newBatch()}
+function record(ST){const p=pr,pay=Math.max(p.K-ST,0);acc.n++;acc.loss+=pay;if(pay<p.prem)acc.wins++;acc.worst=Math.max(acc.worst,pay-p.prem);
+  const pnl=p.prem-pay,lo=-P.hlo,b=Math.max(0,Math.min(hist.length-1,Math.floor((pnl-lo)/(p.prem-lo)*(hist.length-1))));hist[b]++}
+function layout(){const narrow=R.w<620;P.narrow=narrow;
+  if(!narrow){const lw=R.w*.6;P.path={x:R.x+34,y:R.y+26,w:lw-34-10,h:R.h-50};const cx=R.x+lw+34,cw=R.w-lw-34;const gr=Math.min(cw*.4,R.h*.24);P.gauge={x:cx,y:R.y+10,w:cw,h:gr*1.42+44};P.bars={x:cx,y:P.gauge.y+P.gauge.h+18,w:cw,h:50};P.hist={x:cx,y:P.bars.y+P.bars.h+36,w:cw,h:R.y+R.h-(P.bars.y+P.bars.h+36)-24}}
+  else{const ph=R.h*.5;P.path={x:R.x+30,y:R.y+22,w:R.w-30,h:ph-40};const by=R.y+ph+4,hw=(R.w-16)/2;const gr=Math.min(hw*.42,(R.h-ph)*.3);P.gauge={x:R.x,y:by,w:hw,h:gr*1.42+40};P.bars={x:R.x,y:P.gauge.y+P.gauge.h+10,w:hw,h:44};P.hist={x:R.x+hw+16,y:by+18,w:hw,h:R.y+R.h-by-40}}}
+function lbl(x,y,s,c='#8b8f98',al='left'){g.font='600 9px ui-monospace,Menlo,monospace';g.fillStyle=c;g.textAlign=al;g.fillText(s,x,y)}
+function drawPaths(){const p=pr,a=P.path,sig=Math.max(p.rv,p.iv),span=Math.exp(2.8*sig*Math.sqrt(p.t)),lo=Math.min(S0/span,p.K*.93),hi=S0*span;
+  const Y=v=>a.y+a.h-(Math.log(v)-Math.log(lo))/(Math.log(hi)-Math.log(lo))*a.h,X=f=>a.x+f*a.w;P.Y=Y;
+  lbl(a.x,a.y-10,'PRICE PATHS');lbl(a.x+76,a.y-10,`${p.days} days · realized ${Math.round(p.rv*100)}%${p.fat?' · with jumps':''}`,'#5a5e66');
+  // zones: cushion between strike and break-even, loss below break-even
+  const yK=Y(p.K),be=p.K-p.prem,yB=Y(Math.max(lo,be));
+  g.fillStyle='rgba(255,179,71,.06)';g.fillRect(a.x,yK,a.w,yB-yK);g.fillStyle='rgba(255,93,93,.07)';g.fillRect(a.x,yB,a.w,a.y+a.h-yB);
+  g.strokeStyle='rgba(255,255,255,.07)';g.lineWidth=1;[.25,.5,.75,1].forEach(f=>{g.beginPath();g.moveTo(X(f)+.5,a.y);g.lineTo(X(f)+.5,a.y+a.h);g.stroke()});
+  g.beginPath();g.moveTo(a.x,Y(S0)+.5);g.lineTo(a.x+a.w,Y(S0)+.5);g.strokeStyle='rgba(236,235,230,.25)';g.setLineDash([2,4]);g.stroke();
+  g.beginPath();g.moveTo(a.x,yK+.5);g.lineTo(a.x+a.w,yK+.5);g.strokeStyle=AMB;g.setLineDash([]);g.lineWidth=1.2;g.stroke();
+  g.beginPath();g.moveTo(a.x,yB+.5);g.lineTo(a.x+a.w,yB+.5);g.strokeStyle='rgba(255,93,93,.6)';g.setLineDash([5,4]);g.lineWidth=1;g.stroke();g.setLineDash([]);
+  lbl(a.x-6,Y(S0)+3,'spot','#5a5e66','right');lbl(a.x-6,yK+3,'strike',AMB,'right');if(yB-yK>11)lbl(a.x-6,yB+3,'b/e','#ff9d9d','right');
+  lbl(a.x+a.w-4,yK-5,`premium cushion ${p.prem.toFixed(2)}`,'rgba(255,179,71,.85)','right');lbl(a.x+a.w-4,Math.min(a.y+a.h-6,yB+13),'seller pays more than premium','rgba(255,93,93,.8)','right');
+  ['today','','','','expiry'].forEach((s,i)=>s&&lbl(X(i/4),a.y+a.h+13,s,'#5a5e66',i?'right':'left'));
+  // paths
+  const all=[...batches.map((b,i)=>({b,alpha:.1+.08*i,done:true})),cur&&{b:cur,alpha:1,done:false}].filter(Boolean);
+  g.lineJoin='round';
+  all.forEach(({b,alpha,done})=>{const upto=done?b.steps:Math.min(b.steps,Math.floor(b.u*b.steps));
+    b.paths.forEach(path=>{const end=path[upto],below=end<p.K;g.beginPath();for(let s=0;s<=upto;s++)g.lineTo(X(s/b.steps),Y(path[s]));
+      if(done){g.strokeStyle=below?`rgba(255,93,93,${alpha*.8})`:`rgba(201,255,61,${alpha*.55})`;g.lineWidth=1;g.stroke()}
+      else{g.strokeStyle=below?'rgba(255,93,93,.16)':'rgba(201,255,61,.13)';g.lineWidth=5;g.stroke();g.strokeStyle=below?'rgba(255,93,93,.9)':'rgba(201,255,61,.8)';g.lineWidth=1.3;g.stroke();
+        if(b.u>=1){g.beginPath();g.arc(X(1),Y(end),2.6,0,7);g.fillStyle=below?RED:ACC;g.fill()}}})})}
+function drawGauge(now){const p=pr,G=P.gauge,cx=G.x+G.w/2,r=(G.h-(P.narrow?40:44))/1.42,cy=G.y+r+14,A0=Math.PI,A1=2*Math.PI,lo=.5,hi=2;
+  const ang=v=>A0+(Math.max(lo,Math.min(hi,v))-lo)/(hi-lo)*(A1-A0);
+  lbl(G.x,G.y+4,'IV ÷ RV');
+  // track segments
+  const seg=(a,b,c)=>{g.beginPath();g.arc(cx,cy,r,ang(a),ang(b));g.strokeStyle=c;g.lineWidth=Math.max(8,r*.13);g.lineCap='butt';g.stroke()};
+  seg(.5,.97,'rgba(255,93,93,.55)');seg(.97,1.03,'rgba(255,179,71,.7)');seg(1.03,2,'rgba(201,255,61,.45)');
+  for(let v=.5;v<=2.001;v+=.1){const a=ang(v),maj=Math.abs(v*2-Math.round(v*2))<.01,r1=r-(maj?r*.2:r*.13),r2=r-r*.09;g.beginPath();g.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);g.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);g.strokeStyle=maj?'rgba(236,235,230,.6)':'rgba(236,235,230,.25)';g.lineWidth=1;g.stroke();
+    if(maj){const rr=r-r*.32;g.font=`500 ${Math.max(8,r*.09)}px ui-monospace,Menlo,monospace`;g.fillStyle='#8b8f98';g.textAlign='center';g.fillText(v.toFixed(1),cx+Math.cos(a)*rr,cy+Math.sin(a)*rr+3)}}
+  // needle (spring)
+  const a=needle.a,len=r*.92;g.save();g.shadowColor='rgba(0,0,0,.6)';g.shadowBlur=8;g.shadowOffsetY=3;g.beginPath();g.moveTo(cx+Math.cos(a+Math.PI/2)*3.5,cy+Math.sin(a+Math.PI/2)*3.5);g.lineTo(cx+Math.cos(a)*len,cy+Math.sin(a)*len);g.lineTo(cx+Math.cos(a-Math.PI/2)*3.5,cy+Math.sin(a-Math.PI/2)*3.5);g.closePath();g.fillStyle='#ecebe6';g.fill();g.restore();
+  g.beginPath();g.arc(cx,cy,7,0,7);g.fillStyle='#0b0c0f';g.fill();g.strokeStyle='#ecebe6';g.lineWidth=2;g.stroke();
+  const ratio=p.iv/p.rv,col=ratio<.97?RED:ratio<1.03?AMB:ACC;
+  g.font=`italic ${Math.max(20,r*.34)}px "Iowan Old Style",Palatino,Georgia,serif`;g.fillStyle=col;g.textAlign='center';g.fillText(ratio.toFixed(2)+'×',cx,cy+Math.max(22,r*.36));
+  lbl(cx,cy+Math.max(36,r*.36+16),ratio<.97?'SELLER LOSES ON AVERAGE':ratio<1.03?'ROUGHLY FAIR':'SELLER PAID FOR THE RISK',col,'center');
+  needle.target=ang(ratio)}
+function drawBars(){const p=pr,B=P.bars,avg=acc.n?acc.loss/acc.n:0,m=Math.max(p.prem,avg,1e-6)*1.1,lw=B.w-78;
+  [[`premium`,p.prem,ACC],[`avg loss`,avg,RED]].forEach(([l,v,c],i)=>{const y=B.y+i*20;lbl(B.x,y+9,l.toUpperCase());g.fillStyle='rgba(255,255,255,.06)';g.fillRect(B.x+64,y+2,lw,9);g.fillStyle=c;g.fillRect(B.x+64,y+2,lw*v/m,9);g.font='500 10px ui-monospace,Menlo,monospace';g.fillStyle='#ecebe6';g.textAlign='right';g.fillText(v.toFixed(2),B.x+B.w,y+10)})}
+function drawHist(){const p=pr,Hh=P.hist;if(Hh.h<40)return;lbl(Hh.x,Hh.y-8,'SELLER P&L PER PATH');let mx=0;for(let i=0;i<hist.length-1;i++)mx=Math.max(mx,hist[i]);const top=hist[hist.length-1];mx=Math.max(mx,1);
+  const bw=Hh.w/hist.length,lo=-P.hlo,bin=i=>lo+(i+.5)/(hist.length-1)*(p.prem-lo);for(let i=0;i<hist.length;i++){const last=i===hist.length-1,h=Math.min(1,hist[i]/mx)*(Hh.h-14);g.fillStyle=last?ACC:bin(i)>=0?'rgba(201,255,61,.4)':'rgba(255,93,93,.75)';g.fillRect(Hh.x+i*bw+1,Hh.y+Hh.h-h,bw-2,h);
+    if(last&&top>mx){g.fillStyle='#0b0c0f';g.fillRect(Hh.x+i*bw,Hh.y+10,bw,3)}}
+  const zx=Hh.x+(0-lo)/(p.prem-lo)*(hist.length-1)*bw;g.strokeStyle='rgba(236,235,230,.5)';g.setLineDash([2,3]);g.beginPath();g.moveTo(zx,Hh.y+12);g.lineTo(zx,Hh.y+Hh.h);g.stroke();g.setLineDash([]);if(Hh.x+Hh.w-zx>34)lbl(zx,Hh.y+Hh.h+13,'0','#8b8f98','center');
+  if(acc.n){lbl(Hh.x+Hh.w,Hh.y+6,`kept all ${Math.round(hist[hist.length-1]/acc.n*100)}%`,ACC,'right')}
+  g.strokeStyle='rgba(255,255,255,.12)';g.beginPath();g.moveTo(Hh.x,Hh.y+Hh.h+.5);g.lineTo(Hh.x+Hh.w,Hh.y+Hh.h+.5);g.stroke();
+  lbl(Hh.x,Hh.y+Hh.h+13,`−${P.hlo.toFixed(0)}`,'#5a5e66');lbl(Hh.x+Hh.w,Hh.y+Hh.h+13,`+${p.prem.toFixed(2)}`,'#5a5e66','right')}
+function step(dt){if(shock>0){shock=Math.max(0,shock-dt*.22);pr=params();if(!shock){acc={n:0,loss:0,wins:0,worst:0};hist.fill(0);labels()}}
+  const p=pr;P.hlo=Math.max(p.prem*4,p.K-S0*Math.exp(-3.2*Math.max(p.rv,.05)*Math.sqrt(p.t)));
+  for(let k=0;k<260;k++)record(terminal(p));
+  cur.u+=dt/1.7;if(cur.u>=1){if(!cur.done){cur.done=true}cur.hold+=dt;if(cur.hold>.45){batches.push(cur);if(batches.length>3)batches.shift();newBatch()}}}
+function draw(dt,now){g.fillStyle='#0b0c0f';g.fillRect(0,0,W,H);drawPaths();drawGauge(now);drawBars();drawHist();
+  const k=90,c=9;needle.v+=((needle.target??Math.PI)-needle.a)*k*dt-needle.v*c*dt;needle.a+=needle.v*dt}
+function stats(){const p=pr,avg=acc.n?acc.loss/acc.n:0,edge=(p.prem-avg)*100;$('#sPrem').textContent=p.prem.toFixed(2);$('#sLoss').textContent=avg.toFixed(2);
+  const e=$('#sEdge');e.textContent=(edge>=0?'+':'−')+'$'+Math.abs(edge).toFixed(0);e.className=edge>0?'good':'bad';$('#sWin').textContent=acc.n?Math.round(acc.wins/acc.n*100)+'%':'–'}
+function labels(){$('#oIV').textContent=ivEl.value+'%';$('#oRV').textContent=rvEl.value+'%'+(shock>.01?` → ${Math.round(pr.rv*100)}%`:'');$('#oD').textContent=dEl.value;$('#oK').textContent=kEl.value+'%'}
+[ivEl,rvEl,dEl,kEl].forEach(el=>el.addEventListener('input',()=>{shock=0;resetAcc();labels()}));
+function onSeg(){resetAcc()}
+$('#reset').onclick=()=>{ivEl.value=32;rvEl.value=26;dEl.value=30;kEl.value=5;[ivEl,rvEl,dEl,kEl].forEach(fillRange);shock=0;resetAcc();labels()};
+$('#pause').onclick=()=>{paused=!paused;$('#pause').textContent=paused?'Play':'Pause'};
+$('#shock').onclick=()=>{shock=1;acc={n:0,loss:0,wins:0,worst:0};hist.fill(0);pr=params()};
+resize();resetAcc();labels();needle.a=Math.PI;
+let st=0;loop((dt,now)=>{if(!paused)step(dt);draw(dt,now);if((st+=dt)>.15){st=0;stats();if(shock>0)labels()}});
+</script>
+</body>
+</html>

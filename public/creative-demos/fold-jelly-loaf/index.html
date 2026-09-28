@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fold: a loaf of jelly cat</title>
+<meta name="description" content="A material study: a loaf-shaped fold-eared cat made of soft-body jelly. Poke it, grab and fling it, or press it flat under a glass slide and watch the ears fold down.">
+<meta name="theme-color" content="#0b0c0f">
+<style>
+:root{--bg:#0b0c0f;--ink:#ecebe6;--mute:#8b8f98;--dim:#5a5e66;--line:rgba(255,255,255,.09);--card:rgba(16,17,21,.84);--acc:#c9ff3d;--warn:#ffb347;--bad:#ff5d5d;--serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+#stage{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.masthead{position:fixed;left:28px;top:24px;max-width:min(560px,calc(100% - 360px));pointer-events:none;z-index:2}
+.eyebrow{font:600 10px/1.2 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+.eyebrow b{color:var(--acc);font-weight:600}
+.masthead h1{font:italic 400 clamp(28px,3.9vw,50px)/1.02 var(--serif);letter-spacing:-.012em;margin:10px 0 8px;text-wrap:balance}
+.dek{font:400 14.5px/1.45 var(--serif);color:#b4b6bc;max-width:44ch}
+.card{position:fixed;right:20px;top:20px;width:300px;max-height:calc(100% - 40px);overflow:auto;overscroll-behavior:contain;background:var(--card);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:14px;padding:14px 16px 16px;font-size:12px;z-index:3;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .25s;scrollbar-width:thin}
+.card>header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:4px}
+.card h2{font:italic 400 18px/1.1 var(--serif)}
+.card .no{font:10px var(--mono);color:var(--mute);letter-spacing:.14em}
+.card .latin{display:block;font:italic 12px var(--serif);color:var(--mute);margin-top:3px}
+.lbl{display:flex;justify-content:space-between;align-items:baseline;font:600 9.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin:14px 0 7px}
+.lbl output{font-weight:500;color:var(--ink);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1px solid var(--line);border-radius:9px;padding:2px;gap:2px;background:rgba(0,0,0,.25)}
+.seg button,.btn{font:500 11.5px/1 var(--sans);color:var(--ink);background:transparent;border:0;border-radius:7px;padding:8px 4px;cursor:pointer;touch-action:manipulation;transition:background .15s,color .15s}
+.seg button:hover{background:rgba(255,255,255,.06)}
+.seg button[aria-pressed=true]{background:var(--acc);color:#0b0c0f;font-weight:600}
+.btn{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:9px 6px}
+.btn:hover{background:rgba(255,255,255,.08)}
+.btn:active{transform:translateY(1px)}
+.btn.wide{width:100%;margin-top:14px;padding:11px 8px;font-weight:600;letter-spacing:.02em}
+.btn.danger{border-color:rgba(255,93,93,.45);color:#ffb1b1}
+.btn.danger[aria-pressed=true]{background:var(--bad);color:#0b0c0f;border-color:var(--bad)}
+.btn.go{border-color:rgba(201,255,61,.45);color:var(--acc)}
+.btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;touch-action:pan-y}
+input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:3px;background:linear-gradient(90deg,var(--acc) var(--p,50%),rgba(255,255,255,.12) var(--p,50%))}
+input[type=range]::-moz-range-track{height:3px;border-radius:3px;background:rgba(255,255,255,.12)}
+input[type=range]::-moz-range-progress{height:3px;border-radius:3px;background:var(--acc)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6.5px;border-radius:50%;background:#0b0c0f;border:2px solid var(--acc);box-shadow:0 0 0 4px rgba(201,255,61,.08)}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:#0b0c0f;border:2px solid var(--acc)}
+.swatches{display:flex;gap:8px}
+.swatches button{flex:1;height:30px;border-radius:8px;border:1px solid var(--line);cursor:pointer;position:relative;font:500 9.5px var(--mono);letter-spacing:.06em;color:#0b0c0f}
+.swatches button[aria-pressed=true]{outline:2px solid var(--acc);outline-offset:2px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:14px}
+.stat{background:#111216;padding:8px 10px 9px}
+.stat span{display:block;font:600 9px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--mute)}
+.stat strong{display:block;font:500 17px/1 var(--mono);font-variant-numeric:tabular-nums;margin-top:6px;white-space:nowrap}
+.stat strong.good{color:var(--acc)}.stat strong.bad{color:var(--bad)}.stat strong.warn{color:var(--warn)}
+details.inside{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+details.inside summary{cursor:pointer;list-style:none;font:italic 400 15px var(--serif);display:flex;justify-content:space-between;align-items:center}
+details.inside summary::-webkit-details-marker{display:none}
+details.inside summary::after{content:"+";font:400 16px var(--mono);color:var(--acc)}
+details.inside[open] summary::after{content:"\2013"}
+details.inside p{font:400 13px/1.55 var(--serif);color:#c3c5ca;margin-top:9px}
+details.inside p b{color:var(--ink);font-weight:600}
+.toggle{position:fixed;right:20px;bottom:18px;z-index:4;font:600 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:9px 13px;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.foot{position:fixed;left:28px;bottom:18px;font:500 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);pointer-events:none;z-index:2;max-width:calc(100% - 380px)}
+.foot em{font-style:normal;color:var(--mute)}
+body.bare .card{transform:translateX(calc(100% + 40px));opacity:0;pointer-events:none}
+body.bare .foot{max-width:calc(100% - 160px)}
+body.bare .masthead{max-width:min(560px,calc(100% - 56px))}
+@media (max-width:760px){
+  .masthead{left:16px;top:14px;max-width:calc(100% - 110px)}
+  .masthead h1{font-size:27px;margin:7px 0 4px}
+  .dek{font-size:13px;display:none}
+  .card{left:10px;right:10px;top:auto;bottom:10px;width:auto;max-height:44vh;border-radius:14px;padding:10px 12px 12px}
+  .card>header{display:none}
+  .card{display:flex;flex-direction:column}
+  .card>*{flex-shrink:0}
+  .card>.stats{order:-1;margin:0 0 2px}
+  .eyebrow .sp{display:none}
+  .stat{padding:7px 9px}
+  .stat strong{font-size:15px;margin-top:4px}
+  .lbl{margin:10px 0 6px}
+  .toggle{top:14px;right:12px;bottom:auto}
+  .foot{display:none}
+  body.bare .card{transform:translateY(calc(100% + 30px))}
+}
+.btns.four{grid-template-columns:repeat(4,1fr)}
+#stage.grab{cursor:grab}#stage.grabbing{cursor:grabbing}#stage.poke{cursor:pointer}#stage.slide{cursor:ns-resize}
+</style>
+</head>
+<body>
+<canvas id="stage" aria-label="A soft jelly cat shaped like a loaf of bread. Poke it, grab and fling it, or press it under a glass slide."></canvas>
+<div class="masthead">
+  <div class="eyebrow">Field note · <b>Material Studies</b><span class="sp"> · Specimen 04</span></div>
+  <h1>Fold</h1>
+  <p class="dek">A loaf of cat, cast in jelly. Poke it, fling it, press it under glass. The ears do what fold ears do.</p>
+</div>
+<aside class="card" id="card">
+  <header><div><h2>Fold, in jelly</h2><span class="latin">Felis gelatina, var. plicata</span></div><span class="no">No. 04</span></header>
+  <div class="lbl">Hand</div>
+  <div class="seg" data-key="mode"><button aria-pressed="true" data-v="poke">Poke</button><button aria-pressed="false" data-v="grab">Grab</button><button aria-pressed="false" data-v="slide">Glass slide</button></div>
+  <div class="lbl">Variety</div>
+  <div class="swatches" id="sw">
+    <button aria-pressed="true" data-v="0" style="background:#a7afbf" aria-label="Earl grey">GREY</button>
+    <button aria-pressed="false" data-v="1" style="background:#ffbe63" aria-label="Yuzu ginger">YUZU</button>
+    <button aria-pressed="false" data-v="2" style="background:#f1e3cf" aria-label="Milk cream">MILK</button>
+    <button aria-pressed="false" data-v="3" style="background:#3b3b46;color:#ecebe6" aria-label="Black sesame">SESAME</button>
+  </div>
+  <label class="lbl" for="firm">Firmness <output id="oF"></output></label>
+  <input type="range" id="firm" min="0" max="100" value="45">
+  <label class="lbl" for="damp">Damping <output id="oD"></output></label>
+  <input type="range" id="damp" min="0" max="100" value="30">
+  <div class="btns four"><button class="btn go" id="nudge">Nudge</button><button class="btn" id="drop">Drop</button><button class="btn" id="reset">Reset</button><button class="btn" id="pause">Pause</button></div>
+  <div class="stats">
+    <div class="stat"><span>Squash</span><strong id="sSq">0%</strong></div>
+    <div class="stat"><span>Ear fold</span><strong id="sEar">0°</strong></div>
+    <div class="stat"><span>Wobble</span><strong id="sWob">0</strong></div>
+    <div class="stat"><span>Purr</span><strong id="sPurr" class="good">0</strong></div>
+  </div>
+  <details class="inside"><summary>Inside the experiment</summary>
+    <p>The cat is a ring of fifty-six small weights joined by springs, a soft body with no skeleton. Three forces keep it a loaf. <b>Pressure</b> pushes outward whenever the enclosed area shrinks, like air in a balloon. <b>Shape matching</b> finds the best-fit rotation of the resting loaf every step and pulls each weight gently back toward it; that is the Firmness slider. <b>Damping</b> bleeds away wobble relative to the body's own motion, so it still falls at full speed but settles instead of ringing forever.</p>
+    <p>The face, paws, tail and bubbles are not simulated. Each is pinned to the nearby rim with distance weights, so when the rim dents, the face dents with it.</p>
+    <p>Fold ears already lie bent forward, like little caps. Squash the loaf and they press flatter against the head; stretch it and they lift almost upright. They sit on their own springs, so they flop when the body lands.</p>
+    <p>Everything runs at a fixed small time step, several times per frame, so a hard fling never tears the jelly.</p>
+  </details>
+</aside>
+<button class="toggle" id="toggle">Hide panel</button>
+<div class="foot">Poke · grab and fling · press under glass · <em>H hides the panel</em></div>
+<script>
+const $=s=>document.querySelector(s);
+const cv=$('#stage');let g=cv.getContext('2d');let W=0,H=0,DPR=1,R={x:0,y:0,w:1,h:1};
+function stageRect(){const m=$('.masthead').getBoundingClientRect(),c=$('#card'),bare=document.body.classList.contains('bare'),mob=W<=760;const x=mob?16:28,y=m.bottom+(mob?10:20);let w=W-x-(mob?16:28),h=H-y-(mob?14:46);if(!bare){if(mob)h=c.offsetTop-10-y;else w=c.offsetLeft-28-x}return{x,y,w:Math.max(80,w),h:Math.max(80,h)}}
+function resize(){DPR=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);g.setTransform(DPR,0,0,DPR,0,0);R=stageRect();layout()}
+addEventListener('resize',resize);
+const segs={};document.querySelectorAll('.seg').forEach(el=>{segs[el.dataset.key]=el.querySelector('[aria-pressed=true]').dataset.v;el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));segs[el.dataset.key]=b.dataset.v;onSeg(el.dataset.key,b.dataset.v)})});
+function fillRange(el){el.style.setProperty('--p',((el.value-el.min)/(el.max-el.min)*100)+'%')}
+document.querySelectorAll('input[type=range]').forEach(el=>{fillRange(el);el.addEventListener('input',()=>fillRange(el))});
+$('#toggle').onclick=()=>{const b=document.body.classList.toggle('bare');$('#toggle').textContent=b?'Show panel':'Hide panel';resize()};
+addEventListener('keydown',e=>{if((e.key==='h'||e.key==='H')&&!e.target.closest('input'))$('#toggle').click()});
+function loop(fn){let last=performance.now();function f(now){const dt=Math.min(1/30,(now-last)/1000);last=now;fn(dt,now/1000);requestAnimationFrame(f)}requestAnimationFrame(f)}
+const N=56,SUB=8,VARS=[
+  {base:'#a7afbf',dark:'#6e7689',light:'#dfe4ee',stripe:'rgba(88,96,116,.55)',eye:'#1d2027',ear:'#f0a9b3'},
+  {base:'#ffbe63',dark:'#d98a2b',light:'#ffe2a6',stripe:'rgba(214,122,32,.55)',eye:'#2a1c10',ear:'#f7a39e'},
+  {base:'#f1e3cf',dark:'#cdb89a',light:'#fff8ee',stripe:'rgba(196,168,128,.4)',eye:'#2b2420',ear:'#f4b0b4'},
+  {base:'#3b3b46',dark:'#23232b',light:'#6b6b7c',stripe:'rgba(0,0,0,0)',eye:'#f2d64b',ear:'#9b6a78'}];
+const firmEl=$('#firm'),dampEl=$('#damp');
+let V=VARS[0],sc=1,A=150,B=95,floorY=0,cx0=0;
+let X=new Float64Array(N),Y=new Float64Array(N),VX=new Float64Array(N),VY=new Float64Array(N),FX=new Float64Array(N),FY=new Float64Array(N);
+let RX=new Float64Array(N),RY=new Float64Array(N),rcx=0,rcy=0,L1=new Float64Array(N),L2=new Float64Array(N),A0=1,H0=1;
+let com={x:0,y:0,th:0},GX=new Float64Array(N),GY=new Float64Array(N),feats={},earL,earR,ear={a:0,v:0},squash=1,paused=false;
+let ptr={x:-999,y:-999,down:false,vx:0,vy:0,t:0},grab=null,plate=null,pokeHold=null,purr=0,pokeGlow=0,blinkT=2,blink=0,wobble=0,lastHeadVy=0,t=0,hover=false;
+// ---------- rest shape: flat-bottomed loaf, resampled to equal arc length
+function restShape(){const M=720,px=[],py=[];for(let k=0;k<M;k++){const th=k/M*Math.PI*2,c=Math.cos(th),s=Math.sin(th),n=s>0?5.5:2.5;px.push(A*Math.sign(c)*Math.pow(Math.abs(c),2/n));py.push(B*Math.sign(s)*Math.pow(Math.abs(s),2/n)*(s>0?.9:1))}
+  const cum=[0];for(let k=1;k<=M;k++){const j=k%M;cum.push(cum[k-1]+Math.hypot(px[j]-px[k-1],py[j]-py[k-1]))}const Ltot=cum[M];let k=0;
+  for(let i=0;i<N;i++){const target=i/N*Ltot;while(cum[k+1]<target)k++;const f=(target-cum[k])/(cum[k+1]-cum[k]||1),j=(k+1)%M;RX[i]=px[k]+(px[j]-px[k])*f;RY[i]=py[k]+(py[j]-py[k])*f}
+  rcx=0;rcy=0;for(let i=0;i<N;i++){rcx+=RX[i];rcy+=RY[i]}rcx/=N;rcy/=N;
+  for(let i=0;i<N;i++){const j=(i+1)%N,k2=(i+2)%N;L1[i]=Math.hypot(RX[j]-RX[i],RY[j]-RY[i]);L2[i]=Math.hypot(RX[k2]-RX[i],RY[k2]-RY[i])}
+  A0=Math.abs(area(RX,RY));let mn=1e9,mx=-1e9;for(let i=0;i<N;i++){mn=Math.min(mn,RY[i]);mx=Math.max(mx,RY[i])}H0=mx-mn;
+  // features, in rest coordinates
+  const F=(x,y)=>({rx:x*A,ry:y*B,x:0,y:0,w:null});
+  feats={eyeL:F(-.3,-.3),eyeR:F(.3,-.3),nose:F(0,-.1),mouth:F(0,.0),blushL:F(-.5,-.02),blushR:F(.5,-.02),wL:F(-.36,-.07),wR:F(.36,-.07),
+    st0:F(0,-.78),st1:F(-.16,-.74),st2:F(.16,-.74),st0b:F(0,-.55),st1b:F(-.2,-.52),st2b:F(.2,-.52),spec:F(-.52,-.6),spec2:F(.6,-.45),
+    pawL:F(-.3,.8),pawR:F(-.02,.82),t0:F(.99,.45),t1:F(.97,.92),t2:F(.7,1.0),t3:F(.42,.99),t4:F(.22,.92),
+    b0:F(-.62,.35),b1:F(.55,.2),b2:F(-.1,.55),b3:F(.72,-.2)};
+  for(const k in feats){const f=feats[k],w=new Float64Array(N);let s=0;for(let i=0;i<N;i++){const d2=(f.rx-RX[i])**2+(f.ry-RY[i])**2+(.08*A)**2;w[i]=1/(d2*Math.sqrt(d2));s+=w[i]}for(let i=0;i<N;i++)w[i]/=s;f.w=w}
+  const near=(x,y)=>{let b=0,bd=1e18;for(let i=0;i<N;i++){const d=(RX[i]-x)**2+(RY[i]-y)**2;if(d<bd){bd=d;b=i}}return b};
+  earL=near(-.5*A,-B);earR=near(.5*A,-B)}
+function area(x,y){let s=0;for(let i=0;i<N;i++){const j=(i+1)%N;s+=x[i]*y[j]-x[j]*y[i]}return s/2}
+function place(lift=0){for(let i=0;i<N;i++){X[i]=cx0+RX[i]-rcx;Y[i]=floorY-(H0*.9*.5)+RY[i]-rcy-lift-2;VX[i]=VY[i]=0}
+  // put the loaf's lowest point on the floor
+  let mx=-1e9;for(let i=0;i<N;i++)mx=Math.max(mx,Y[i]);for(let i=0;i<N;i++)Y[i]+=floorY-mx-lift;ear.a=0;ear.v=0}
+function layout(){const old=sc;sc=Math.max(.42,Math.min(1.35,Math.min(R.w/430,R.h/340)));A=150*sc;B=95*sc;floorY=R.y+R.h*.8;cx0=R.x+R.w/2;restShape();
+  if(!X.some(v=>v))place();else{let mx=-1e9,sx=0;for(let i=0;i<N;i++){mx=Math.max(mx,Y[i]);sx+=X[i]}sx/=N;const f=sc/old;for(let i=0;i<N;i++){X[i]=cx0+(X[i]-sx)*f;Y[i]=floorY+(Y[i]-mx)*f}}}
+// ---------- physics
+function shapeMatch(){let cx=0,cy=0;for(let i=0;i<N;i++){cx+=X[i];cy+=Y[i]}cx/=N;cy/=N;let s=0,c=0;
+  for(let i=0;i<N;i++){const qx=RX[i]-rcx,qy=RY[i]-rcy,px=X[i]-cx,py=Y[i]-cy;s+=qx*py-qy*px;c+=qx*px+qy*py}
+  const th=Math.atan2(s,c),co=Math.cos(th),si=Math.sin(th);for(let i=0;i<N;i++){const qx=RX[i]-rcx,qy=RY[i]-rcy;GX[i]=cx+co*qx-si*qy;GY[i]=cy+si*qx+co*qy}com.x=cx;com.y=cy;com.th=th}
+function substep(h){const firm=firmEl.value/100,km=18+Math.pow(firm,1.6)*520,kp=520+firm*900,damp=.6+Math.pow(dampEl.value/100,1.3)*14,G=1500*sc,ks=2600,kd=5;
+  FX.fill(0);FY.fill(0);shapeMatch();let mvx=0,mvy=0;for(let i=0;i<N;i++){mvx+=VX[i];mvy+=VY[i]}mvx/=N;mvy/=N;
+  const a=area(X,Y),sg=Math.sign(a)||1,P=kp*(A0/Math.max(A0*.15,Math.abs(a))-1);
+  for(let i=0;i<N;i++){const j=(i+1)%N,k=(i+2)%N;
+    spring(i,j,L1[i],ks,kd);spring(i,k,L2[i],ks*.35,kd*.5);
+    const dx=X[j]-X[i],dy=Y[j]-Y[i],fx=P*sg*dy/2,fy=-P*sg*dx/2;FX[i]+=fx;FY[i]+=fy;FX[j]+=fx;FY[j]+=fy;
+    FX[i]+=km*(GX[i]-X[i])-damp*(VX[i]-mvx);FY[i]+=km*(GY[i]-Y[i])-damp*(VY[i]-mvy)+G}
+  if(grab){for(const q of grab.pts){const tx=ptr.x+q.ox,ty=ptr.y+q.oy;FX[q.i]+=q.w*(1100*(tx-X[q.i])-38*(VX[q.i]-ptr.vx));FY[q.i]+=q.w*(1100*(ty-Y[q.i])-38*(VY[q.i]-ptr.vy))-G*q.w*.9}}
+  if(pokeHold){const r=58*sc;for(let i=0;i<N;i++){const d=Math.hypot(X[i]-ptr.x,Y[i]-ptr.y),w=Math.exp(-((d/r)**2));if(w<.02)continue;const n=normal(i,sg);FX[i]-=n[0]*w*2600*sc;FY[i]-=n[1]*w*2600*sc}}
+  const L=R.x+6,Rr=R.x+R.w-6;
+  for(let i=0;i<N;i++){VX[i]+=FX[i]*h;VY[i]+=FY[i]*h;VX[i]*=1-.08*h;VY[i]*=1-.08*h;X[i]+=VX[i]*h;Y[i]+=VY[i]*h;
+    if(Y[i]>floorY){Y[i]=floorY;if(VY[i]>0)VY[i]*=-.12;VX[i]*=Math.exp(-22*h)}
+    if(X[i]<L){X[i]=L;if(VX[i]<0)VX[i]*=-.3}if(X[i]>Rr){X[i]=Rr;if(VX[i]>0)VX[i]*=-.3}if(Y[i]<R.y-400*sc){Y[i]=R.y-400*sc;VY[i]=Math.max(0,VY[i])}
+    if(plate&&plate.on&&Math.abs(X[i]-plate.x)<plate.hw&&Y[i]<plate.y){Y[i]=plate.y;if(VY[i]<plate.vy)VY[i]=plate.vy;VX[i]*=Math.exp(-6*h)}}}
+function spring(i,j,L0,k,kd){const dx=X[j]-X[i],dy=Y[j]-Y[i],d=Math.hypot(dx,dy)||1e-6,ux=dx/d,uy=dy/d,rv=(VX[j]-VX[i])*ux+(VY[j]-VY[i])*uy,f=k*(d-L0)+kd*rv;FX[i]+=f*ux;FY[i]+=f*uy;FX[j]-=f*ux;FY[j]-=f*uy}
+function normal(i,sg){const a=(i+N-1)%N,b=(i+1)%N,dx=X[b]-X[a],dy=Y[b]-Y[a],l=Math.hypot(dx,dy)||1;return[sg*dy/l,-sg*dx/l]}
+function feat(f){let dx=0,dy=0;const w=f.w;for(let i=0;i<N;i++){dx+=w[i]*(X[i]-GX[i]);dy+=w[i]*(Y[i]-GY[i])}const co=Math.cos(com.th),si=Math.sin(com.th),qx=f.rx-rcx,qy=f.ry-rcy;f.x=com.x+co*qx-si*qy+dx;f.y=com.y+si*qx+co*qy+dy;return f}
+function step(dt){t+=dt;const h=dt/SUB;
+  if(plate){const tgt=plate.on?Math.min(ptr.y,floorY-H0*.2):Math.min(plate.y,R.y-60);const ny=plate.y+(tgt-plate.y)*Math.min(1,dt*(plate.on?12:5));plate.vy=(ny-plate.y)/dt;plate.y=ny;plate.x+=(ptr.x-plate.x)*Math.min(1,dt*10);if(!plate.on&&plate.y<=R.y-50)plate=null}
+  for(let s=0;s<SUB;s++)substep(h);
+  shapeMatch();let mn=1e9,mx=-1e9,e=0,mvx=0,mvy=0;for(let i=0;i<N;i++){mn=Math.min(mn,Y[i]);mx=Math.max(mx,Y[i]);mvx+=VX[i];mvy+=VY[i]}mvx/=N;mvy/=N;
+  for(let i=0;i<N;i++)e+=(VX[i]-mvx)**2+(VY[i]-mvy)**2;wobble+=(Math.min(100,Math.sqrt(e/N)/(3*sc))-wobble)*Math.min(1,dt*6);
+  // squash along the body's own up axis
+  const co=Math.cos(com.th),si=Math.sin(com.th);let lo=1e9,hi=-1e9;for(let i=0;i<N;i++){const v=-si*(X[i]-com.x)+co*(Y[i]-com.y);lo=Math.min(lo,v);hi=Math.max(hi,v)}squash=(hi-lo)/H0;
+  // ears on a floppy spring: fold flat when squashed, lift a little when stretched
+  const sq=Math.max(0,Math.min(1,(.93-squash)/.28)),st=Math.max(0,Math.min(1,(squash-1)/.25)),tgt=sq*40-st*52;
+  const head=(VY[earL]+VY[earR])/2;ear.v+=(head-lastHeadVy)*.012/sc;lastHeadVy=head;ear.v+=((tgt-ear.a)*230-ear.v*9)*dt;ear.a+=ear.v*dt;ear.a=Math.max(-60,Math.min(55,ear.a));
+  purr=Math.max(0,purr-dt*(plate&&plate.on?-14:5));purr=Math.min(100,purr);pokeGlow*=Math.exp(-dt*2.5);
+  blinkT-=dt;if(blinkT<0){blink=.14;blinkT=2.2+Math.random()*3.5}blink=Math.max(0,blink-dt);
+  if(ptr.down&&segs.mode==='poke'&&pokeHold&&t-pokeHold.t>.05)purr=Math.min(100,purr+dt*8)}
+// ---------- render
+const SPEC=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d'),gr=x.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,'rgba(255,255,255,.95)');gr.addColorStop(.35,'rgba(255,255,255,.35)');gr.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=gr;x.fillRect(0,0,64,64);return c})();
+function bodyPath(ox=0,oy=0){g.beginPath();const mx=(i,j)=>(X[i]+X[j])/2+ox,my=(i,j)=>(Y[i]+Y[j])/2+oy;g.moveTo(mx(N-1,0),my(N-1,0));for(let i=0;i<N;i++){const j=(i+1)%N;g.quadraticCurveTo(X[i]+ox,Y[i]+oy,mx(i,j),my(i,j))}g.closePath()}
+function drawFloor(){const l=R.x,r=R.x+R.w;const gr=g.createLinearGradient(0,floorY,0,R.y+R.h);gr.addColorStop(0,'rgba(255,255,255,.035)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(l,floorY,R.w,R.y+R.h-floorY);
+  g.strokeStyle='rgba(236,235,230,.16)';g.lineWidth=1;g.beginPath();g.moveTo(l,floorY+.5);g.lineTo(r,floorY+.5);g.stroke();
+  const unit=20*sc,n0=Math.ceil((l-cx0)/unit),n1=Math.floor((r-cx0)/unit);g.font='500 8.5px ui-monospace,Menlo,monospace';g.textAlign='center';
+  for(let k=n0;k<=n1;k++){const x=cx0+k*unit,maj=k%5===0;g.fillStyle=maj?'rgba(236,235,230,.35)':'rgba(236,235,230,.14)';g.fillRect(Math.round(x),floorY+4,1,maj?7:4);if(maj&&Math.abs(k)<=20){g.fillStyle='rgba(236,235,230,.3)';g.fillText(Math.abs(k/5*5),x,floorY+22)}}
+  g.font='italic 13px "Iowan Old Style",Palatino,Georgia,serif';g.fillStyle='rgba(236,235,230,.5)';g.fillText('Fig. 4. Felis gelatina, var. plicata, in loaf posture',cx0,Math.min(R.y+R.h-4,floorY+44))}
+function drawShadow(){let mnx=1e9,mxx=-1e9,mxy=-1e9;for(let i=0;i<N;i++){mnx=Math.min(mnx,X[i]);mxx=Math.max(mxx,X[i]);mxy=Math.max(mxy,Y[i])}
+  const hgt=Math.max(0,floorY-mxy),w=(mxx-mnx)*(.55+Math.min(.5,hgt/(500*sc))),cx=(mnx+mxx)/2,al=.62*Math.exp(-hgt/(140*sc));
+  g.save();g.translate(cx,floorY);g.scale(1,.16);const gr=g.createRadialGradient(0,0,0,0,0,w*.62);gr.addColorStop(0,`rgba(0,0,0,${al})`);gr.addColorStop(.6,`rgba(0,0,0,${al*.45})`);gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(-w,-w,w*2,w*2);
+  // light passing through the jelly lands on the floor as a faint caustic
+  g.globalCompositeOperation='lighter';const c2=g.createRadialGradient(w*.08,-w*.25,0,w*.08,-w*.25,w*.42);c2.addColorStop(0,hexA(V.base,.16*Math.exp(-hgt/(200*sc))));c2.addColorStop(1,hexA(V.base,0));g.fillStyle=c2;g.fillRect(-w,-w*1.2,w*2,w*2);g.restore();g.globalCompositeOperation='source-over'}
+function hexA(h,a){const n=parseInt(h.slice(1),16);return`rgba(${n>>16},${n>>8&255},${n&255},${a})`}
+function drawEar(i,side){const a=(i+N-2)%N,b=(i+2)%N,bx=(X[a]+X[b])/2,by=(Y[a]+Y[b])/2,dx=X[b]-X[a],dy=Y[b]-Y[a],len=Math.hypot(dx,dy)||1,sg=Math.sign(area(X,Y))||1;
+  let nx=sg*dy/len,ny=-sg*dx/len;const deg=92+ear.a,fold=deg*Math.PI/180*side,co=Math.cos(fold),si=Math.sin(fold),ex=nx*co-ny*si,ey=nx*si+ny*co,el=A*.42*(1-.3*Math.max(0,Math.min(1,(deg-50)/85)));
+  const tx=bx+ex*el,ty=by+ey*el,b1x=X[a]-nx*4*sc,b1y=Y[a]-ny*4*sc,b2x=X[b]-nx*4*sc,b2y=Y[b]-ny*4*sc;
+  const earPath=(o)=>{g.beginPath();g.moveTo(b1x,b1y+o);g.quadraticCurveTo(bx+ex*el*.55-ey*el*.35*side,by+ey*el*.55+ex*el*.35*side+o,tx,ty+o);g.quadraticCurveTo(bx+ex*el*.5+ey*el*.3*side,by+ey*el*.5-ex*el*.3*side+o,b2x,b2y+o);g.closePath()};
+  earPath(4*sc);g.fillStyle=hexA(V.dark,.35);g.fill();
+  g.beginPath();g.moveTo(b1x,b1y);g.quadraticCurveTo(bx+ex*el*.55-ey*el*.35*side,by+ey*el*.55+ex*el*.35*side,tx,ty);g.quadraticCurveTo(bx+ex*el*.5+ey*el*.3*side,by+ey*el*.5-ex*el*.3*side,b2x,b2y);g.closePath();
+  const gr=g.createLinearGradient(bx,by,tx,ty);gr.addColorStop(0,V.base);gr.addColorStop(1,V.dark);g.fillStyle=gr;g.fill();g.strokeStyle=hexA(V.dark,.9);g.lineWidth=1.5*sc;g.stroke();
+  const ix=bx+ex*el*.2,iy=by+ey*el*.2;g.beginPath();g.moveTo(ix-dx*.22,iy-dy*.22);g.quadraticCurveTo(bx+ex*el*.6,by+ey*el*.6,bx+ex*el*.72,by+ey*el*.72);g.quadraticCurveTo(bx+ex*el*.55,by+ey*el*.55,ix+dx*.22,iy+dy*.22);g.closePath();g.fillStyle=hexA(V.ear,.75);g.fill();
+  // the fold crease
+  g.beginPath();g.moveTo(bx+ex*el*.25-dx*.28,by+ey*el*.25-dy*.28);g.quadraticCurveTo(bx+ex*el*.4,by+ey*el*.4,bx+ex*el*.25+dx*.28,by+ey*el*.25+dy*.28);g.strokeStyle=hexA(V.dark,.5);g.lineWidth=1.4*sc;g.stroke()}
+function drawCat(){for(const k in feats)feat(feats[k]);const f=feats,happy=squash<.86||pokeGlow>.25||purr>55,wide=(grab&&squash>1.08)||Math.abs(VY[0])>900*sc;
+  const jit=purr>40?Math.sin(t*90)*(purr-40)/60*.8*sc:0;g.save();g.translate(jit,0);
+  // body
+  bodyPath();let mny=1e9,mxy=-1e9;for(let i=0;i<N;i++){mny=Math.min(mny,Y[i]);mxy=Math.max(mxy,Y[i])}
+  const gr=g.createLinearGradient(0,mny,0,mxy);gr.addColorStop(0,V.light);gr.addColorStop(.35,V.base);gr.addColorStop(1,V.dark);g.fillStyle=gr;g.fill();
+  g.save();bodyPath();g.clip();
+  const ss=g.createRadialGradient(com.x+A*.1,com.y+B*.2,0,com.x+A*.1,com.y+B*.2,A*1.1);ss.addColorStop(0,hexA(V.light,.55));ss.addColorStop(.5,hexA(V.light,.12));ss.addColorStop(1,hexA(V.light,0));g.fillStyle=ss;g.fillRect(com.x-A*2,com.y-B*3,A*4,B*6);
+  // tabby stripes
+  g.strokeStyle=V.stripe;g.lineCap='round';g.lineWidth=5*sc;[['st0','st0b'],['st1','st1b'],['st2','st2b']].forEach(([a,b])=>{g.beginPath();g.moveTo(f[a].x,f[a].y-B*.3);g.quadraticCurveTo(f[a].x,f[a].y,f[b].x,f[b].y);g.stroke()});
+  // rim light and inner shade
+  bodyPath();g.lineWidth=14*sc;g.strokeStyle='rgba(255,255,255,.10)';g.stroke();bodyPath(0,6*sc);g.lineWidth=20*sc;g.strokeStyle=hexA(V.dark,.25);g.stroke();
+  // trapped air bubbles
+  ['b0','b1','b2','b3'].forEach((k,i)=>{const r=(2.2+i%2*1.8)*sc;g.beginPath();g.arc(f[k].x,f[k].y,r,0,7);g.strokeStyle='rgba(255,255,255,.35)';g.lineWidth=.9;g.stroke();g.beginPath();g.arc(f[k].x-r*.35,f[k].y-r*.35,r*.3,0,7);g.fillStyle='rgba(255,255,255,.6)';g.fill()});
+  g.restore();
+  bodyPath();g.strokeStyle=hexA(V.dark,.8);g.lineWidth=1.3*sc;g.stroke();
+  drawEar(earL,1);drawEar(earR,-1);
+  // paws + tail
+  for(const k of['pawL','pawR']){const p=f[k];g.beginPath();g.ellipse(p.x,p.y,A*.13,B*.1,com.th,0,7);g.fillStyle=V.light;g.fill();g.strokeStyle=hexA(V.dark,.5);g.lineWidth=1*sc;g.stroke();for(const o of[-.4,.4]){g.beginPath();g.moveTo(p.x+o*A*.1,p.y-B*.02);g.lineTo(p.x+o*A*.1,p.y+B*.06);g.stroke()}}
+  g.beginPath();g.moveTo(f.t0.x,f.t0.y);g.bezierCurveTo(f.t1.x,f.t1.y,f.t2.x,f.t2.y,f.t3.x,f.t3.y);g.quadraticCurveTo(f.t4.x,f.t4.y,f.t4.x-A*.06,f.t4.y-B*.04);g.lineCap='round';g.strokeStyle=hexA(V.dark,.95);g.lineWidth=B*.2;g.stroke();g.strokeStyle=V.base;g.lineWidth=B*.14;g.stroke();g.save();g.translate(0,-B*.03);g.strokeStyle=hexA(V.light,.55);g.lineWidth=B*.04;g.stroke();g.restore();
+  // face
+  const ew=Math.hypot(f.eyeR.x-f.eyeL.x,f.eyeR.y-f.eyeL.y)/(A*.6),er=A*.085*Math.max(.7,Math.min(1.3,ew));
+  for(const s of['blushL','blushR']){g.beginPath();g.ellipse(f[s].x,f[s].y,A*.09,B*.05,com.th,0,7);g.fillStyle=hexA(V.ear,.35+pokeGlow*.3);g.fill()}
+  for(const k of['eyeL','eyeR']){const e=f[k];
+    if(happy||blink>0){g.beginPath();if(happy){g.arc(e.x,e.y+er*.35,er*.8,Math.PI*1.15+com.th,Math.PI*1.85+com.th)}else{g.moveTo(e.x-er*.8,e.y);g.lineTo(e.x+er*.8,e.y)}g.strokeStyle=V.eye==='#f2d64b'?'#101014':'#1d2027';g.lineWidth=2.4*sc;g.lineCap='round';g.stroke();continue}
+    const rr=wide?er*1.25:er,px=hover?Math.max(-1,Math.min(1,(ptr.x-e.x)/(A*2))):0,py=hover?Math.max(-1,Math.min(1,(ptr.y-e.y)/(B*2))):0;
+    g.beginPath();g.ellipse(e.x,e.y,rr,rr*1.08,com.th,0,7);g.fillStyle=V.eye;g.fill();
+    if(V.eye==='#f2d64b'){g.beginPath();g.ellipse(e.x+px*rr*.3,e.y+py*rr*.3,rr*.28,rr*.8,com.th,0,7);g.fillStyle='#111';g.fill()}
+    g.beginPath();g.arc(e.x-rr*.32+px*rr*.2,e.y-rr*.36+py*rr*.2,rr*.3,0,7);g.fillStyle='rgba(255,255,255,.92)';g.fill();g.beginPath();g.arc(e.x+rr*.3+px*rr*.2,e.y+rr*.28+py*rr*.2,rr*.12,0,7);g.fill()}
+  const n=f.nose;g.beginPath();g.moveTo(n.x-A*.035,n.y-B*.025);g.lineTo(n.x+A*.035,n.y-B*.025);g.lineTo(n.x,n.y+B*.03);g.closePath();g.fillStyle=V.ear;g.fill();
+  const m=f.mouth,mw=A*.05;g.beginPath();g.moveTo(n.x,n.y+B*.03);g.lineTo(m.x,m.y-B*.01);g.moveTo(m.x-mw*2,m.y-B*.02);g.quadraticCurveTo(m.x-mw,m.y+B*.05,m.x,m.y-B*.01);g.quadraticCurveTo(m.x+mw,m.y+B*.05,m.x+mw*2,m.y-B*.02);g.strokeStyle=hexA(V.eye==='#f2d64b'?'#101014':'#3a2b2b',.8);g.lineWidth=1.6*sc;g.lineCap='round';g.stroke();
+  g.strokeStyle=V.eye==='#f2d64b'?'rgba(236,235,230,.55)':'rgba(255,255,255,.75)';g.lineWidth=1*sc;for(const [k,s] of[['wL',-1],['wR',1]]){const w=f[k];for(const o of[-.05,.02,.09]){g.beginPath();g.moveTo(w.x,w.y+o*B);g.quadraticCurveTo(w.x+s*A*.22,w.y+o*B*1.6-B*.03,w.x+s*A*.42,w.y+o*B*2.6)}g.stroke()}
+  // gloss
+  g.globalCompositeOperation='lighter';const sp=f.spec,sw=A*.55;g.save();g.translate(sp.x,sp.y);g.rotate(com.th-.5);g.scale(1,.42);g.globalAlpha=.42;g.drawImage(SPEC,-sw/2,-sw/2,sw,sw);g.restore();
+  g.save();g.translate(f.spec2.x,f.spec2.y);g.rotate(com.th+.6);g.scale(1,.35);g.globalAlpha=.18;g.drawImage(SPEC,-sw*.3,-sw*.3,sw*.6,sw*.6);g.restore();
+  g.globalAlpha=.85;g.beginPath();g.ellipse(sp.x-A*.05,sp.y-B*.02,A*.035,B*.018,com.th-.5,0,7);g.fillStyle='#fff';g.fill();g.globalAlpha=1;g.globalCompositeOperation='source-over';
+  if(purr>40){g.font=`italic ${13*sc+4}px "Iowan Old Style",Palatino,Georgia,serif`;g.fillStyle=`rgba(236,235,230,${(purr-40)/80})`;g.textAlign='left';const hx=f.st2.x+A*.55,hy=f.st2.y-B*.25;g.fillText('prrr',hx+Math.sin(t*3)*3,hy-((t*18)%20))}
+  g.restore()}
+function drawPlate(){if(!plate)return;const w=plate.hw*2,x=plate.x-plate.hw,y=plate.y-14*sc,h=14*sc,al=plate.on?1:Math.max(0,1-(plate.y<R.y?1:0));
+  g.save();g.globalAlpha=al;g.fillStyle='rgba(200,230,255,.10)';g.strokeStyle='rgba(220,240,255,.55)';g.lineWidth=1;g.beginPath();g.roundRect?g.roundRect(x,y,w,h,3*sc):g.rect(x,y,w,h);g.fill();g.stroke();
+  g.fillStyle='rgba(255,255,255,.5)';g.fillRect(x+6,y+2,w-12,1);g.font='600 8.5px ui-monospace,Menlo,monospace';g.fillStyle='rgba(220,240,255,.7)';g.textAlign='right';g.fillText('SLIDE 04 · 76 × 26 MM',x+w-8,y-5);g.restore()}
+function drawCursor(){if(!hover&&!ptr.down)return;const m=segs.mode;if(m==='poke'){g.beginPath();g.arc(ptr.x,ptr.y,ptr.down?9:6,0,7);g.strokeStyle=ptr.down?'#c9ff3d':'rgba(236,235,230,.5)';g.lineWidth=1.5;g.stroke()}}
+function draw(){g.fillStyle='#0b0c0f';g.fillRect(0,0,W,H);drawFloor();drawShadow();drawCat();drawPlate();drawCursor()}
+// ---------- input
+function local(e){return{x:e.clientX,y:e.clientY}}
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);const p=local(e);ptr.x=p.x;ptr.y=p.y;ptr.vx=ptr.vy=0;ptr.t=performance.now();ptr.down=true;const m=segs.mode;
+  if(m==='grab'){const inside=inBody(p.x,p.y);const d=[];for(let i=0;i<N;i++)d.push([Math.hypot(X[i]-p.x,Y[i]-p.y),i]);d.sort((a,b)=>a[0]-b[0]);
+    if(d[0][0]<70*sc||inside){const k=inside?N:7,pts=d.slice(0,k).map(([dd,i])=>({i,ox:X[i]-p.x,oy:Y[i]-p.y,w:inside?.55:Math.max(.25,1-dd/(90*sc))}));grab={pts};cv.className='grabbing'}}
+  else if(m==='poke'){let hit=0;const r=58*sc,sg=Math.sign(area(X,Y))||1;for(let i=0;i<N;i++){const d=Math.hypot(X[i]-p.x,Y[i]-p.y),w=Math.exp(-((d/r)**2));if(w<.02)continue;hit=Math.max(hit,w);const n=normal(i,sg);VX[i]-=n[0]*w*520*sc;VY[i]-=n[1]*w*520*sc}
+    if(hit>.15||inBody(p.x,p.y)){pokeHold={t};pokeGlow=1;purr=Math.min(100,purr+9)}}
+  else if(m==='slide'){let top=1e9;for(let i=0;i<N;i++)top=Math.min(top,Y[i]);plate={on:true,x:p.x,y:Math.min(top-30*sc,p.y-10),vy:0,hw:A*1.35}}});
+cv.addEventListener('pointermove',e=>{const p=local(e),now=performance.now(),dt=Math.max(.008,(now-ptr.t)/1000);ptr.vx=ptr.vx*.5+(p.x-ptr.x)/dt*.5;ptr.vy=ptr.vy*.5+(p.y-ptr.y)/dt*.5;ptr.x=p.x;ptr.y=p.y;ptr.t=now;hover=e.pointerType==='mouse';
+  if(!ptr.down)cv.className=segs.mode==='grab'?(inBody(p.x,p.y)?'grab':''):segs.mode})
+function up(){ptr.down=false;if(grab){grab=null;cv.className='grab'}pokeHold=null;if(plate)plate.on=false}
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);cv.addEventListener('pointerleave',()=>{hover=false});
+function inBody(x,y){let c=false;for(let i=0,j=N-1;i<N;j=i++){if((Y[i]>y)!==(Y[j]>y)&&x<(X[j]-X[i])*(y-Y[i])/(Y[j]-Y[i])+X[i])c=!c}return c}
+function onSeg(k,v){cv.className=v}
+$('#sw').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('#sw').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));V=VARS[+b.dataset.v];pokeGlow=.6});
+$('#nudge').onclick=()=>{const dir=Math.random()<.5?-1:1,spin=(Math.random()-.5)*6;for(let i=0;i<N;i++){VX[i]+=dir*(260+Math.random()*80)*sc-(Y[i]-com.y)*spin;VY[i]+=-620*sc+(X[i]-com.x)*spin}};
+$('#drop').onclick=()=>{place(Math.min(R.h*.55,floorY-R.y-H0*.2));for(let i=0;i<N;i++)VX[i]=(Math.random()-.5)*20};
+$('#reset').onclick=()=>{place();purr=0;wobble=0};
+$('#pause').onclick=()=>{paused=!paused;$('#pause').textContent=paused?'Play':'Pause'};
+function labels(){const f=+firmEl.value,d=+dampEl.value;$('#oF').textContent=f<25?'wobbly':f<55?'set':f<80?'firm':'gummy';$('#oD').textContent=d<25?'springy':d<60?'soft':'syrup'}
+firmEl.oninput=labels;dampEl.oninput=labels;
+function stats(){$('#sSq').textContent=Math.round((1-squash)*100)+'%';$('#sEar').textContent=Math.round(92+ear.a)+'°';$('#sWob').textContent=Math.round(wobble);const p=$('#sPurr');p.textContent=Math.round(purr)}
+resize();place();labels();
+let st=0;loop((dt)=>{if(!paused)step(dt);draw();if((st+=dt)>.12){st=0;stats()}});
+</script>
+</body>
+</html>

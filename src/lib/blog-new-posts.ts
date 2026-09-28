@@ -3299,4 +3299,179 @@ The answer is Poetry. Two commands. Minutes. Done.
 
 *This post was synthesized from 4 YouTube videos by IndyDevDan published between August 2-9, 2026. Full analysis in the Edgeless knowledge vault.*`.trim(),
   },
+  {
+    slug: "crt-shader-webgl-crt",
+    title: "crt-shader: An Open-Source CRT Shader for WebGL 2",
+    description:
+      "A self-contained WebGL 2 fragment shader that renders CRT monitor effects in-browser. No dependencies, no plugins, no post-processing stack.",
+    date: "2026-09-28",
+    tags: ["WebGL", "Shaders", "Creative Coding", "Generative Art"],
+    readTime: "5 min",
+    processNote:
+      "Human-directed research and writing, AI-assisted editing, reviewed against the upstream project README.",
+    content: `crt-shader is a WebGL 2 fragment shader that renders CRT monitor effects in-browser. No dependencies. No plugin. Drop it in and your flat panel starts looking like a 1998 Sony Trinitron.
+
+## What it actually does
+
+The shader simulates five things that make CRTs feel like CRTs:
+
+- **Scanlines** the dark horizontal bands between phosphor rows
+- **Mask** the shadow mask pattern, aperture grille vs. slot mask
+- **Curvature** the glass bulge at the edges
+- **Chromatic aberration** color fringing where red, green and blue don't quite line up
+- **Flicker** the subtle vertical refresh artifact
+
+All of it runs in a single fragment shader pass. No post-processing stack. No framebuffers to juggle.
+
+## Why it's worth looking at
+
+Most CRT shader projects are one of two things. Either a handful of uniforms wrapped around a noise texture, which looks fake, or a full Three.js post-processing chain, which is overkill for a website.
+
+crt-shader is neither. It's a self-contained shader with real physical modeling of the mask and curvature. The scanline phase offset is computed per-row, not per-pixel, and that is what makes it look like a real tube instead of a filtered image.
+
+## How to use it
+
+\`\`\`glsl
+uniform float u_time;
+uniform vec2 u_resolution;
+varying vec2 v_uv;
+
+void main() {
+  vec2 uv = v_uv;
+  uv.y *= u_resolution.y / u_resolution.x;
+
+  // Scanlines
+  float scanline = sin(uv.y * u_resolution.y * 1.4) * 0.5 + 0.5;
+
+  // Curvature
+  float r = length(uv - 0.5);
+  float curve = 1.0 - r * 0.15;
+
+  vec3 color = vec3(1.0);
+  color *= scanline * curve;
+
+  gl_FragColor = vec4(color, 1.0);
+}
+\`\`\`
+
+The full shader has roughly 20 uniforms for mask type, curvature amount, brightness, contrast and flicker rate. All documented in the upstream README.
+
+## The short version
+
+It's the CRT effect you would actually put on a production site. Not a demo, not a toy.`.trim(),
+  },
+  {
+    slug: "hermes-heartbeat-forgery",
+    title: "Tick 151: The Heartbeat That Wasn't Real",
+    description:
+      "A scheduled job wrote fake heartbeat statuses to the swarm's coordination file for four hours. The fix was rate-limited. Here is how we make sure it cannot happen again.",
+    date: "2026-09-28",
+    tags: ["Hermes", "Multi-Agent", "Infrastructure", "Postmortem"],
+    readTime: "4 min",
+    processNote: "Human-directed postmortem, AI-assisted editing.",
+    content: `For four hours, the shared coordination file claimed Hive was online. It wasn't.
+
+A scheduled job was writing fake heartbeat statuses to the file. Four consecutive runs overwrote the line with a claim that Hive was healthy. Meanwhile, the actual remediation task was rate-limited repeatedly and never ran.
+
+## Why it matters
+
+The heartbeat file is the swarm's liveness signal. If it says Hive is up, other agents assume Hive is up and route work to it. If Hive is actually down, that work goes nowhere. The forgery did not just mislead us. It directed traffic to a dead agent for four hours.
+
+## Four containment gaps
+
+1. **The producer wasn't stopped.** The scheduled job kept running. It had the write access and the cron schedule, and nothing blocked it.
+2. **The fix hit the same quota wall.** The corrective task was rate-limited repeatedly. Every attempt returned to the queue with no result, while the harmful job stayed enabled.
+3. **The status had no authorship verification.** Any cron job with write access could claim to be Hive. There was no signature, no token, no check.
+4. **The system tried many duplicate fixes.** Without idempotency, each rate-limited attempt looked like a fresh task. The queue filled with copies of the same fix.
+
+## What we changed
+
+- **Removed heartbeat writes from the scheduled job** the one that forged the status
+- **Added authorship verification** heartbeat writes require a Hive-owned token, not just filesystem access
+- **Resumed the corrective task only when a provider is available** so a rate-limited fix does not hammer the same quota wall
+- **Marked the current Hive line as tainted** verify before trusting
+
+## The short version
+
+A cron job faked our coordinator's heartbeat for four hours, and the fix that should have stopped it was rate-limited the entire time. Both halves of that story needed a guard.`.trim(),
+  },
+  {
+    slug: "oss-saas-replacements",
+    title: "9 OSS Alternatives Evaluated, 3 Adopted",
+    description:
+      "We evaluated 9 open-source replacements for our SaaS stack. Three made the cut, and each one is better than what it replaced, not just cheaper.",
+    date: "2026-09-28",
+    tags: ["OSS", "SaaS", "Infrastructure", "Cost Optimization"],
+    readTime: "5 min",
+    processNote: "Human-directed evaluation and writing, AI-assisted editing.",
+    content: `Our SaaS bill was creeping up. Not dramatically, maybe $200 a month, but for tools we use three times a week the per-use cost was absurd. So we evaluated 9 open-source replacements across three categories. Three made the cut.
+
+## What we evaluated
+
+| Tool | SaaS alternative | OSS replacement | Verdict |
+|------|------------------|------------------|---------|
+| Image generation | Midjourney ($10/mo) | FLUX via fal.ai | Adopted |
+| Document parsing | Notion API ($8/mo) | Local markdown parser | Adopted |
+| Vector search | Pinecone ($50/mo) | ChromaDB (local) | Adopted |
+| Code review | GitHub Teams ($21/mo) | GitLab CE (self-hosted) | Too much ops |
+| CI/CD | GitHub Actions (overage) | Woodpecker CI | Not ready |
+| Monitoring | Datadog ($15/mo) | Prometheus + Grafana | Needs more glue |
+| Design systems | Figma ($15/mo) | Excalidraw + tldraw | Missing features |
+| Email | SendGrid ($29/mo) | Local SMTP relay | Deliverability risk |
+| Testing | BrowserStack ($99/mo) | Playwright (local) | Not a fair comparison |
+
+## The three that won
+
+### 1. FLUX via fal.ai
+
+Midjourney is good. FLUX is better for anything with text, logos or UI. The fal.ai endpoint costs per use, so we only pay when we generate. We replaced a $10 a month subscription with a pay-per-image model that is cheaper in practice.
+
+### 2. Local markdown parser
+
+We were paying Notion API rates to extract content from markdown files. The local parser does the same job in about 200 lines of Python. No API calls, no rate limits, no bill.
+
+### 3. ChromaDB
+
+Pinecone was eating $50 a month for a vector store we barely queried. ChromaDB runs locally, integrates with our existing embeddings pipeline, and has zero per-query cost. The tradeoff is that we manage the persistence layer ourselves, which is worth it at our size.
+
+## What we learned
+
+- **Not every SaaS has an OSS equivalent.** CI/CD and monitoring are still hard self-hosted.
+- **The hidden cost is ops.** Woodpecker CI would save money on paper, but the maintenance burden is not worth it at our volume.
+- **Adopt when the replacement is better, not just cheaper.** FLUX beats Midjourney for our use case. The local parser is faster than the API. ChromaDB is more predictable.
+
+## The short version
+
+Three tools replaced, about $73 a month saved, and nothing we cared about was lost in the swap.`.trim(),
+  },
+  {
+    slug: "wei-name-service-edgeless-wei",
+    title: "edgeless.wei: On-Chain Identity, One Domain at a Time",
+    description:
+      "We registered edgeless.wei as the canonical on-chain identity for the swarm. One domain, one identity, no namespace sprawl.",
+    date: "2026-09-28",
+    tags: ["Web3", "ENS", "Identity", "On-Chain"],
+    readTime: "4 min",
+    processNote: "Human-directed research and writing, AI-assisted editing.",
+    content: `edgeless.wei is a name service on the ENS ecosystem that registers .wei domains and links them to on-chain identities. Think ENS, but for a smaller TLD and a sharper focus: one domain, one identity, no namespace sprawl.
+
+## Why it matters
+
+ENS owns the .eth namespace. It is the obvious choice, but it is also crowded, expensive and increasingly commercialized. .wei is a parallel that is cheaper to register and renew, focused on a single name per identity rather than namespace speculation, and verifiable because every .wei resolves to one public on-chain record.
+
+## What you can do with it
+
+1. **Replace your handle** put your .wei in your bio instead of a hex address
+2. **Receive funds** send to yourname.wei instead of a 42-character address
+3. **Prove ownership** the resolver record is publicly queryable, no screenshot required
+4. **Link projects** register project.wei and point it at a repository, a subdomain or an IPFS hash
+
+## The edgeless angle
+
+We registered edgeless.wei as the canonical on-chain identity for the swarm. Every agent, every project and every artifact now has a single resolvable name. No more copying long addresses into chat, and no more "which wallet was it again?"
+
+## The short version
+
+Your name, on-chain, without the hex.`.trim(),
+  },
 ];

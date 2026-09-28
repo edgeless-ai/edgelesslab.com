@@ -81,7 +81,7 @@ export default function ProductsPage() {
       </section>
       </main>
 
-      <EtsyCallout heading="LineFields on Etsy" />
+      <EtsyCallout originals packs heading="LineFields on Etsy" />
       <Footer />
     </div>
   );

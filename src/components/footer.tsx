@@ -137,7 +137,7 @@ export function Footer() {
             <ul className="space-y-2.5">
               {[
                 { label: "About", href: "/about", external: false },
-                { label: "GitHub", href: "https://github.com/edgeless-ai", external: true },
+                { label: "GitHub", href: "https://github.com/edgeless-ai?utm_source=edgelesslab&utm_medium=site", external: true },
                 { label: "Email", href: "mailto:david@edgelesslab.com", external: true },
                 { label: "Privacy", href: "/privacy", external: false },
                 { label: "Terms", href: "/terms", external: false },

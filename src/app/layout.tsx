@@ -121,7 +121,7 @@ export default function RootLayout({
           "founder": { "@id": "https://edgelesslab.com/#david-murray" },
           "logo": "https://edgelesslab.com/favicon.svg",
           "sameAs": [
-            "https://github.com/edgeless-ai",
+            "https://github.com/edgeless-ai?utm_source=edgelesslab&utm_medium=site",
             "https://edgelessai.gumroad.com",
             "https://huggingface.co/EdgelessLab",
             "https://linefields.etsy.com"
@@ -141,7 +141,7 @@ export default function RootLayout({
             "url": "https://edgelesslab.com"
           },
           "sameAs": [
-            "https://github.com/thedavidmurray",
+            "https://github.com/thedavidmurray?utm_source=edgelesslab&utm_medium=site",
             "https://huggingface.co/thedavidmurray",
             "https://linefields.etsy.com",
             "https://www.fxhash.xyz/u/thedavidmurray"

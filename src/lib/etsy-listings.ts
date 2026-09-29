@@ -1,8 +1,10 @@
 /**
- * Etsy listing data for LineFields shop links on edgelesslab.com.
+ * LineFields (Etsy) listings linked from edgelesslab.com.
  *
- * Listing IDs verified against the Etsy API / shop LineFields.
- * UTM tags: utm_source=edgelesslab (not etsy — the loop direction).
+ * Source of truth: Etsy Open API v3, shop 66822827 (claude-projects
+ * docs/projects/traffic-1000/etsy-listings-api.json, pulled 2026-09-24).
+ * IDs, titles and prices must match that pull; re-pull before editing.
+ * UTM: utm_source=edgelesslab (site → Etsy direction), utm_content = page the link sits on.
  */
 
 export interface EtsyListing {
@@ -16,55 +18,36 @@ const SHOP_URL = "https://www.etsy.com/shop/LineFields";
 const UTM = "utm_source=edgelesslab&utm_medium=site&utm_campaign=linefields";
 
 export function listingUrl(id: number, page: string): string {
-  return `${SHOP_URL}/listing/${id}?${UTM}&utm_content=${page}`;
+  return `https://www.etsy.com/listing/${id}?${UTM}&utm_content=${page}`;
 }
 
-/** Pen plotter originals — shown on /projects/pen-plotter-art/ */
+const listing = (id: number, title: string, price: string, page: string): EtsyListing => ({
+  id,
+  title,
+  price,
+  url: listingUrl(id, page),
+});
+
+/** 1/1 pen-plotter originals, plotted to order, plus the custom commission. */
 export const PLOTTER_ORIGINALS: EtsyListing[] = [
-  {
-    id: 4535392785,
-    title: "Custom Pen Plotter Commission",
-    price: "$375",
-    url: listingUrl(4535392785, "pen-plotter-art"),
-  },
-  {
-    id: 4535423190,
-    title: "Electric Tartan — Plotter Original",
-    price: "$185",
-    url: listingUrl(4535423190, "pen-plotter-art"),
-  },
-  {
-    id: 4535410927,
-    title: "Jewel Tone — Plotter Original",
-    price: "$185",
-    url: listingUrl(4535410927, "pen-plotter-art"),
-  },
-  {
-    id: 4535408813,
-    title: "Strange Attractor — Plotter Original",
-    price: "$165",
-    url: listingUrl(4535408813, "pen-plotter-art"),
-  },
+  listing(4535392785, "Custom pen-plotter commission", "$375", "pen-plotter-art"),
+  listing(4535308274, "Flow Field No. 262 — original", "$425", "pen-plotter-art"),
+  listing(4535296029, "Op Art No. 288 — original", "$345", "pen-plotter-art"),
+  listing(4535308176, "Moiré No. 957 — original", "$365", "pen-plotter-art"),
+  listing(4535296223, "Molnár Study No. 92 — original", "$325", "pen-plotter-art"),
+  listing(4535308352, "LeWitt Field No. 111 — original", "$325", "pen-plotter-art"),
 ];
 
-/** Loop packs — shown on /lab/tartanism/ and tartan blog posts */
+/** Seamless tartan video loop packs (digital downloads). */
 export const LOOP_PACKS: EtsyListing[] = [
-  {
-    id: 4535423190,
-    title: "Electric Tartan Loop Pack",
-    price: "$29",
-    url: listingUrl(4535423190, "tartanism"),
-  },
-  {
-    id: 4535410927,
-    title: "Jewel Tone Loop Pack",
-    price: "$29",
-    url: listingUrl(4535410927, "tartanism"),
-  },
+  listing(4535423190, "Electric Tartan Loop Pack", "$18", "tartanism"),
+  listing(4535410927, "Jewel Tone Tartan Loop Pack", "$18", "tartanism"),
+  listing(4534637127, "Tartan Plaid Loops — 20 videos", "$8.99", "tartanism"),
+  listing(4535270298, "Christmas Tartan Loops", "$8.99", "tartanism"),
 ];
 
-/** Shop link — shown on /products/ and shop.edgelesslab.com */
+/** Whole-shop link. */
 export const SHOP_LINK = {
-  url: `${SHOP_URL}?${UTM}&utm_content=products-page`,
+  url: `${SHOP_URL}?${UTM}&utm_content=shop`,
   title: "LineFields on Etsy",
 };

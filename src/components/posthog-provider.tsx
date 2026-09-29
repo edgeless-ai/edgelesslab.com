@@ -14,15 +14,14 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
         window.location.reload();
         return;
       }
-      // Always send cookieless pageview — works before and after consent
-      const site = typeof window !== "undefined" && window.location.hostname.endsWith("shop.edgelesslab.com") ? "shop" : "main";
-      await captureCookielessPageview({
-        $current_url: window.location.origin + (pathname || window.location.pathname),
-        site,
-      });
-      // If consented, also fire the full tracked pageview
       const choice = getAnalyticsConsent();
+      // Cookieless pageview only when consented — matches consent regression tests
       if (choice === "accepted") {
+        const site = typeof window !== "undefined" && window.location.hostname.endsWith("shop.edgelesslab.com") ? "shop" : "main";
+        await captureCookielessPageview({
+          $current_url: window.location.origin + (pathname || window.location.pathname),
+          site,
+        });
         await captureConsentedEvent("$pageview", {
           $current_url: window.location.origin + (pathname || window.location.pathname),
         });

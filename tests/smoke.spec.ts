@@ -51,6 +51,47 @@ test.describe("static site smoke", () => {
     await expect(page).toHaveTitle(/edgeless/i);
   });
 
+  test("home workbench exposes live work, a connections map, and contact routes", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto("/");
+
+    await expect(page.getByRole("heading", { name: "What's running now." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "From field note to working artifact." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Start with why you're writing." })).toBeVisible();
+    await expect(page.locator('[data-work-card="Total Serialism"] a[href="/total-serialism/app/"]')).toBeVisible();
+    await expect(page.locator('a[href^="mailto:david@edgelesslab.com?subject=Speaking"]')).toBeVisible();
+
+    const card = page.locator('[data-work-card="Agent safeguards"]');
+    const handle = page.getByRole("button", { name: "Drag Agent safeguards card" });
+    await handle.scrollIntoViewIfNeeded();
+    await expect(handle).toBeVisible();
+    const before = await card.evaluate((element) => getComputedStyle(element).transform);
+    const box = await handle.boundingBox();
+    expect(box).not.toBeNull();
+    if (box) {
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(box.x + box.width / 2 + 36, box.y + box.height / 2 + 18, { steps: 4 });
+      await page.mouse.up();
+    }
+    await expect
+      .poll(() => card.evaluate((element) => getComputedStyle(element).transform))
+      .not.toBe(before);
+    expect(errors).toEqual([]);
+  });
+
+  test("home workbench fits a 390px viewport", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: "What's running now." })).toBeVisible();
+    const dragHandles = page.locator('button[aria-label^="Drag "][aria-label$=" card"]');
+    await expect(dragHandles).toHaveCount(4);
+    await expect(dragHandles.first()).toBeHidden();
+    const fits = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+    expect(fits).toBe(true);
+  });
+
   test("/lab/marimo/ lists 25 marimo.edgelesslab.com demos", async ({ page }) => {
     const response = await page.goto("/lab/marimo/");
     expect(response?.status()).toBe(200);

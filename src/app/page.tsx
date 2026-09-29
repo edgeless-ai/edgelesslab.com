@@ -4,6 +4,7 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { DemoPreview } from "@/components/demo-preview";
 import { FeaturedArtifact } from "@/components/featured-artifact";
+import { HomeWorkbench } from "@/components/home-workbench";
 import { posts } from "@/lib/blog";
 import { projects } from "@/lib/data";
 import { getFieldNotes } from "@/lib/field-notes.server";
@@ -21,6 +22,33 @@ const PROJECT_OUTCOMES: Record<string, string> = {
   "mcp-servers": "One protocol layer across knowledge, tools, and agents",
   "pen-plotter-art": "98 plotter-ready generators from screen to SVG",
 };
+
+const CONTACT_PATHS = [
+  {
+    intent: "Build a private AI system",
+    detail: "For agent infrastructure, knowledge systems, and difficult automation work.",
+    href: "/services/private-ai-systems",
+    action: "Scope a build",
+  },
+  {
+    intent: "Commission creative technology",
+    detail: "For generative systems, interactive installations, and physical-computing work.",
+    href: "mailto:david@edgelesslab.com?subject=Creative%20technology%20commission",
+    action: "Describe the commission",
+  },
+  {
+    intent: "Invite David to speak",
+    detail: "For talks and workshops about autonomous systems, creative code, or building in public.",
+    href: "mailto:david@edgelesslab.com?subject=Speaking%20or%20workshop%20invitation",
+    action: "Send the brief",
+  },
+  {
+    intent: "Press or partnership",
+    detail: "For interviews, collaborations, licensing, and studio partnerships.",
+    href: "mailto:david@edgelesslab.com?subject=Press%20or%20partnership",
+    action: "Start the conversation",
+  },
+];
 
 export default function Home() {
   const fieldNotes = getFieldNotes();
@@ -63,10 +91,11 @@ export default function Home() {
                 className="mt-8 max-w-xl text-base leading-7 sm:text-lg"
                 style={{ color: "var(--text-secondary)" }}
               >
-                Edgeless Lab is a public research studio for autonomous
-                software, generative systems, and physical artifacts. I build
-                under real constraints, publish how the work changes, and turn
-                the strongest results into useful tools and editions.
+                I design resilient AI agent infrastructure and generative
+                systems that survive contact with reality. Edgeless Lab is the
+                public studio where I build under real constraints, publish how
+                the work changes, and turn the strongest results into useful
+                tools and physical editions.
               </p>
 
               <div className="mt-9 flex flex-wrap gap-3">
@@ -100,6 +129,8 @@ export default function Home() {
             <FeaturedArtifact />
           </div>
         </section>
+
+        <HomeWorkbench />
 
         <section className="px-6 py-20 sm:py-28">
           <div className="mx-auto max-w-[1280px]">
@@ -279,6 +310,48 @@ export default function Home() {
                 <span className="text-lg font-medium">Work with David</span>
                 <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
               </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t px-6 py-20 sm:py-28" style={{ borderColor: "var(--border-subtle)" }}>
+          <div className="mx-auto max-w-[1280px]">
+            <div className="mb-10 grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+              <div>
+                <div className="lab-metadata mb-4" style={{ color: "var(--relay)" }}>
+                  Contact / choose your route
+                </div>
+                <h2 className="font-editorial text-5xl leading-[0.95] sm:text-7xl">
+                  Start with why you&apos;re writing.
+                </h2>
+              </div>
+              <p className="max-w-xl text-sm leading-6" style={{ color: "var(--text-secondary)" }}>
+                No rate card and no generic intake form. Pick the closest intent,
+                share the constraint, and David will reply with the right next step.
+              </p>
+            </div>
+
+            <div className="grid gap-px border md:grid-cols-2" style={{ borderColor: "var(--border-subtle)", background: "var(--border-subtle)" }}>
+              {CONTACT_PATHS.map((path, index) => (
+                <a
+                  key={path.intent}
+                  href={path.href}
+                  className="group flex min-h-[180px] flex-col p-6 sm:min-h-[220px] sm:p-8"
+                  style={{ background: "var(--bg-surface)" }}
+                >
+                  <span className="lab-metadata" style={{ color: "var(--text-tertiary)" }}>
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="mt-8 text-2xl font-semibold tracking-[-0.025em]">{path.intent}</h3>
+                  <p className="mt-3 max-w-lg text-sm leading-6" style={{ color: "var(--text-secondary)" }}>
+                    {path.detail}
+                  </p>
+                  <span className="mt-auto flex items-center justify-between gap-4 pt-8 text-sm" style={{ color: "var(--accent)" }}>
+                    {path.action}
+                    <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+                  </span>
+                </a>
+              ))}
             </div>
           </div>
         </section>

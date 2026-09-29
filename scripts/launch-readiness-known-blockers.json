@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "auditedAt": "2026-09-12",
+  "scope": "Exact source and target pairs only; archive assets still broken. New misses fail regression.",
+  "missingReferences": [
+    {
+      "source": "/creative-demos/ditto/cosmos.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/0851074e6573.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/excalidraw.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/efb0506b4ae9.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/ditto/excalidraw.html",
+      "targetPath": "/creative-demos/ditto/public/assets/cloned/images/153f33ad6c3e.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/curation-space.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/0851074e6573.jpg",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/infinite-board.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/efb0506b4ae9.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/infinite-board.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/153f33ad6c3e.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    },
+    {
+      "source": "/creative-demos/site-studies/playground.html",
+      "targetPath": "/creative-demos/site-studies/public/assets/cloned/images/cc2d982f6389.png",
+      "reason": "Original archived clone asset absent at audit 2026-09-12; not repaired or passed."
+    }
+  ],
+  "recoveryReview": "2026-09-12",
+  "originalAuditPairs": 543
+}

@@ -31,6 +31,13 @@ STANDALONE_DIRS=(
   "total-serialism"
 )
 
+# Next exports /lab/[slug] over this public standalone dashboard. Restore
+# from authoritative public source after Critters, before Pagefind indexes out/.
+DASHBOARD="lab/pen-plotter-autoresearch"
+if [[ "${1:-}" == "save" || "${1:-}" == "restore" || "${1:-}" == "check" ]]; then
+  test -f "$PROJECT_DIR/public/$DASHBOARD/index.html"
+fi
+
 case "${1:-}" in
   save)
     echo "[preserve] Verifying standalone source before build..."
@@ -42,6 +49,10 @@ case "${1:-}" in
     ;;
 
   restore)
+    mkdir -p "$PROJECT_DIR/out/$DASHBOARD"
+    cp -R "$PROJECT_DIR/public/$DASHBOARD/." "$PROJECT_DIR/out/$DASHBOARD/"
+    diff -r -x '__next.*' -x 'index.txt' "$PROJECT_DIR/public/$DASHBOARD" "$PROJECT_DIR/out/$DASHBOARD"
+    echo "[preserve] Restored and verified $DASHBOARD before indexing."
     echo "[preserve] Verifying standalone source after build..."
     for dir in "${STANDALONE_DIRS[@]}"; do
       test -d "$PROJECT_DIR/$dir"

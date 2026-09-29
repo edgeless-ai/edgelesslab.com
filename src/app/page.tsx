@@ -38,7 +38,7 @@ export default function Home() {
     <div className="flex min-h-full flex-col" style={{ background: "var(--bg-base)" }}>
       <Nav />
 
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <section className="relative overflow-hidden px-6 pb-16 pt-32 sm:pb-24 sm:pt-40">
           <div className="mx-auto grid max-w-[1280px] gap-14 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
             <div>
@@ -79,6 +79,7 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/blog"
+                  prefetch={false}
                   className="inline-flex min-h-11 items-center gap-2 rounded-sm border px-5 text-sm font-medium transition-colors hover:text-white"
                   style={{
                     borderColor: "var(--border-focus)",
@@ -168,7 +169,7 @@ export default function Home() {
                   after a system meets reality.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
-                  <Link href="/blog" className="inline-flex items-center gap-2 font-mono text-xs uppercase" style={{ color: "var(--malachite)" }}>
+                  <Link href="/blog" prefetch={false} className="inline-flex items-center gap-2 font-mono text-xs uppercase" style={{ color: "var(--malachite)" }}>
                     All posts <ArrowRight size={13} />
                   </Link>
                   <Link href="/feed.xml" className="inline-flex items-center gap-2 font-mono text-xs uppercase" style={{ color: "var(--ink-soft)" }}>

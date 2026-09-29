@@ -340,15 +340,21 @@
         </div>
     </div>
 
-    <div class="hmr-status connected" id="hmrStatus">
+    <div class="hmr-status disconnected" id="hmrStatus">
         <div class="hmr-indicator"></div>
-        <span>HMR Connected</span>
+        <span>Static preview — HMR is local only</span>
     </div>
 
-    <!-- Load HMR Client -->
-    <script src="/hmr/client.js"></script>
-    
     <script type="module">
+        // Opt into the existing local HMR server with ?hmr=1. A static preview
+        // uses the published catalog and remains usable without a dev server.
+        const useHMR = ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname) &&
+            new URLSearchParams(location.search).get("hmr") === "1";
+        if (useHMR) {
+            try { await import("/hmr/client.js"); }
+            catch { document.querySelector('#hmrStatus span').textContent = 'HMR unavailable — static preview'; }
+        }
+        const catalogURL = new URL("algorithm-catalog.json", location.href);
         class AlgorithmHub {
             constructor() {
                 this.algorithms = [];
@@ -367,8 +373,23 @@
 
             async loadAlgorithms() {
                 try {
-                    const response = await fetch('/api/algorithms');
-                    this.algorithms = await response.json();
+                    if (useHMR && window.__hmrClient) {
+                        const response = await fetch('/api/algorithms');
+                        if (!response.ok) throw new Error('Local algorithm service unavailable');
+                        this.algorithms = await response.json();
+                    } else {
+                        const response = await fetch(catalogURL);
+                        if (!response.ok) throw new Error('Published catalog unavailable');
+                        const catalog = await response.json();
+                        this.algorithms = catalog.algorithms.map(algorithm => ({
+                            title: algorithm.name,
+                            path: new URL(algorithm.path, catalogURL).pathname,
+                            features: {
+                                hasSVG: algorithm.hasExport.includes('svg'),
+                                hasGIF: algorithm.hasExport.includes('gif')
+                            }
+                        }));
+                    }
                     this.filteredAlgorithms = [...this.algorithms];
                 } catch (error) {
                     console.error('Failed to load algorithms:', error);
@@ -462,10 +483,8 @@
 
             getCategory(path) {
                 const parts = path.split('/');
-                if (parts.length > 1) {
-                    return parts[1]; // algorithms/[category]/...
-                }
-                return 'uncategorized';
+                const categoryIndex = parts.indexOf('algorithms') + 1;
+                return categoryIndex > 0 ? (parts[categoryIndex] || 'uncategorized') : 'uncategorized';
             }
 
             render() {

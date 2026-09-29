@@ -1638,7 +1638,7 @@ The overhead of routing (latency, complexity) only pays off at scale. For 10+ ag
 
 Routing saves money. But how do you prevent agents from losing context across sessions? 
 
-[The Knowledge Base Loop →](./post-3-knowledge-base-loop)
+[The Knowledge Base Loop →](/blog/knowledge-base-loop/)
 
 ---
 

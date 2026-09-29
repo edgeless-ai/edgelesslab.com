@@ -52,6 +52,23 @@ export const creativeDemos: CreativeDemo[] = [
     category: "Material Studies",
   },
   {
+    slug: "jev-decision-audit",
+    title: "Six Evals on a Decision Model",
+    description: "What broke when we measured a decision model against our own workflows: our labels were a default fill, our injection filter failed open, and one threshold was wrong. Real scores from six harnesses — move the cut point on the voice-gating eval and watch precision and recall trade off.",
+    tags: ["Evaluation", "Decision model", "Prompt injection", "Interactive"],
+    date: "2026-09-19",
+    hasControls: true,
+    category: "Measurement",
+  },
+  {
+    slug: "borrow-the-creative-loop",
+    title: "Borrow the creative loop, not the artwork",
+    description: "A design study for Thread Commons: original gesture-driven strands, reversible variation, and an acceptance card. Proposed creative instruments, not a working demo.",
+    tags: ["Creative direction", "Design study", "Textile"],
+    date: "2026-09-10",
+    hasControls: false,
+  },
+  {
     slug: "the-rule-and-the-machine",
     title: "The Rule and the Machine",
     description: "Generative art as one idea rediscovered for sixty years, from oscilloscope traces in 1950 to the browser. 83 nodes and the relations between them, compiled from N4L into a graph database.",

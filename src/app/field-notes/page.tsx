@@ -28,7 +28,7 @@ export default function FieldNotesPage() {
     <div className="flex min-h-full flex-col" style={{ background: "var(--bg-base)" }}>
       <Nav />
 
-      <main id="main-content" className="field-sheet pt-28 sm:pt-32">
+      <main id="main-content" tabIndex={-1} className="field-sheet pt-28 sm:pt-32">
         <JsonLd
           data={{
             "@context": "https://schema.org",

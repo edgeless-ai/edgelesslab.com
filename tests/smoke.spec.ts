@@ -6,6 +6,43 @@ import { test, expect, type ConsoleMessage } from "@playwright/test";
  */
 
 test.describe("static site smoke", () => {
+  test("creative-loop study is discoverable without implying a built demo", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto("/field-notes/");
+    await page.getByRole("button", { name: /^Curated / }).click();
+    await page.getByRole("searchbox", { name: "Search Field Notes" }).fill("Borrow the creative loop");
+    const card = page.locator('a[href="/creative-demos/borrow-the-creative-loop/"]');
+    await expect(card).toBeVisible();
+    await expect(card).toContainText("Not built");
+    await card.hover();
+    await expect(card.locator("iframe")).toHaveCount(0);
+    await card.click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Borrow the creative loop, not the artwork");
+    await expect(page.getByText("Status: a design study, not a working instrument.", { exact: true })).toBeVisible();
+    await expect(page.locator("canvas, iframe")).toHaveCount(0);
+    const download = page.waitForEvent("download");
+    await page.getByRole("link", { name: /Download the prototype acceptance card/ }).click();
+    expect((await download).suggestedFilename()).toBe("acceptance-card.md");
+    const cardResponse = await page.request.get("/creative-demos/borrow-the-creative-loop/acceptance-card.md");
+    expect(cardResponse.status()).toBe(200);
+    expect(await cardResponse.text()).toContain("all instrument tests NOT RUN");
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(errors).toEqual([]);
+  });
+
+  test("creative-loop study is indexed by site search", async ({ page }) => {
+    await page.goto("/blog/");
+    await page.getByRole("button", { name: /Search/ }).click();
+    const searchInput = page.getByRole("textbox", { name: "Search site content" });
+    // Opening resets the query and focuses on the next animation frame.
+    await expect(searchInput).toBeFocused();
+    await searchInput.fill("Borrow the creative loop");
+    await expect(searchInput).toHaveValue("Borrow the creative loop");
+    await expect(page.locator("[data-index]").filter({ hasText: /Borrow the creative loop/i }).first()).toBeVisible({ timeout: 10_000 });
+  });
+
   test("home page responds with nav and hero", async ({ page }) => {
     const response = await page.goto("/");
     expect(response?.status()).toBe(200);

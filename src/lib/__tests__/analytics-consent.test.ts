@@ -193,3 +193,69 @@ describe("optional analytics consent", () => {
     expect(window.localStorage.getItem(consent.ANALYTICS_ID_KEY)).toBeNull();
   });
 });
+
+// Cookieless pageviews are sent before, during, and after the consent choice.
+// ensureCookieless is private; it is exercised indirectly through the exported
+// captureCookielessPageview, and the hoisted sdk mock exposes the init config.
+describe("cookieless pageviews", () => {
+  test("fires before any consent with cookieless_mode always", async () => {
+    const consent = await import("../analytics-consent");
+    await consent.captureCookielessPageview();
+    expect(sdk.init).toHaveBeenCalledTimes(1);
+    expect(sdk.init.mock.calls[0][1]).toMatchObject({
+      cookieless_mode: "always",
+      persistence: "memory",
+      capture_pageview: false,
+      autocapture: false,
+      capture_performance: false,
+      disable_session_recording: true,
+      opt_out_persistence_by_default: true,
+      request_batching: false,
+      api_transport: "fetch",
+    });
+    expect(sdk.capture).toHaveBeenCalledTimes(1);
+    expect(sdk.capture.mock.calls[0][0]).toBe("$pageview");
+    expect(sdk.capture.mock.calls[0][1]).toMatchObject({ site: "main" });
+  });
+
+  test("inits the SDK only once across multiple pageviews", async () => {
+    const consent = await import("../analytics-consent");
+    await consent.captureCookielessPageview({ $current_url: "/a" });
+    await consent.captureCookielessPageview({ $current_url: "/b" });
+    await consent.captureCookielessPageview({ $current_url: "/c" });
+    expect(sdk.init).toHaveBeenCalledTimes(1);
+    expect(sdk.capture).toHaveBeenCalledTimes(3);
+  });
+
+  test("reports the shop site on shop.edgelesslab.com", async () => {
+    window.location.hostname = "shop.edgelesslab.com";
+    const consent = await import("../analytics-consent");
+    await consent.captureCookielessPageview();
+    expect(sdk.capture.mock.calls[0][1]).toMatchObject({ site: "shop" });
+  });
+
+  test("merges caller properties onto the pageview", async () => {
+    const consent = await import("../analytics-consent");
+    await consent.captureCookielessPageview({ site: "main", route: "/pricing" });
+    expect(sdk.capture.mock.calls[0][1]).toMatchObject({ site: "main", route: "/pricing" });
+  });
+
+  test("does not init when no PostHog key is configured", async () => {
+    vi.stubEnv("NEXT_PUBLIC_POSTHOG_KEY", "");
+    const consent = await import("../analytics-consent");
+    await consent.captureCookielessPageview();
+    expect(sdk.init).not.toHaveBeenCalled();
+    expect(sdk.capture).not.toHaveBeenCalled();
+  });
+
+  test("survives revocation - cookieless is consent-independent", async () => {
+    const consent = await import("../analytics-consent");
+    consent.setAnalyticsConsent("rejected");
+    await consent.captureCookielessPageview();
+    expect(sdk.init).toHaveBeenCalledTimes(1);
+    expect(sdk.capture).toHaveBeenCalledTimes(1);
+    // Revoking consent must not retire the cookieless SDK or its transports.
+    expect(sdk.opt_out_capturing).not.toHaveBeenCalled();
+    expect(sdk.set_config).not.toHaveBeenCalled();
+  });
+});

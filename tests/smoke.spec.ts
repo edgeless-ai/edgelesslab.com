@@ -142,9 +142,34 @@ test.describe("static site smoke", () => {
     await expect(page.locator("[data-copy-prompt]").first()).toBeVisible();
   });
 
+  test("/lab/prompt-engine/ wide engine rolls with a pinned register", async ({ page }) => {
+    await page.goto("/lab/prompt-engine/");
+    await expect(page.getByRole("button", { name: /^Wide/ })).toHaveAttribute("aria-pressed", "true");
+
+    // The register list fills once the lazily loaded wide.py banks arrive.
+    const register = page.getByLabel("Register");
+    await expect(register).toBeEnabled({ timeout: 20_000 });
+    await register.selectOption({ index: 5 });
+    const pinned = await register.inputValue();
+    expect(pinned).not.toBe("");
+
+    await page.getByRole("button", { name: /^Generate/ }).click();
+    const cards = page.locator("[data-prompt-card]");
+    await expect(cards.first()).toBeVisible({ timeout: 20_000 });
+    const n = await cards.count();
+    expect(n).toBeGreaterThanOrEqual(12);
+    await expect(cards.filter({ hasText: pinned })).toHaveCount(n);
+    await expect(cards.first()).toContainText(/--ar \S+ --s \d+/);
+    // coverage state persisted to this browser
+    await expect(page.getByText(/candidates walked/)).toBeVisible();
+  });
+
   test("/lab/prompt-engine/ generates with a custom-taste subject", async ({ page }) => {
     await page.goto("/lab/prompt-engine/");
     await expect(page.getByRole("heading", { name: "Prompt Engine" })).toBeVisible();
+
+    // Taste packs customize the classic (blender.py) engine; wide is the default.
+    await page.getByRole("button", { name: /^Classic themes/ }).click();
 
     // This flow customizes the TAGGED subject bank, so pick the theme that reads
     // from it. As of the r30 bank refresh the default (Nous Branded) draws from

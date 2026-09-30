@@ -30,6 +30,22 @@ function gcd(a: number, b: number): number {
   return a;
 }
 
+// Memoized per n: the list only depends on n, and the wide engine calls
+// wrapIndex thousands of times per roll over pools of ~1,700 entries.
+const STRIDES = new Map<number, number[]>();
+function coprimeStrides(n: number): number[] {
+  let strides = STRIDES.get(n);
+  if (!strides) {
+    strides = [];
+    for (let s = 3; s < n; s++) {
+      if (gcd(s, n) === 1) strides.push(s);
+    }
+    if (strides.length === 0) strides.push(1);
+    STRIDES.set(n, strides);
+  }
+  return strides;
+}
+
 /**
  * Affine permutation of 0..n-1, re-keyed every wrap of n (port of blender.py
  * _wrap_index). Within one wrap every index appears exactly once (fairness
@@ -39,11 +55,7 @@ function gcd(a: number, b: number): number {
 export function wrapIndex(k: number, n: number, salt = 0): number {
   const pos = k % n;
   const wrap = Math.floor(k / n);
-  const strides: number[] = [];
-  for (let s = 3; s < n; s++) {
-    if (gcd(s, n) === 1) strides.push(s);
-  }
-  if (strides.length === 0) strides.push(1);
+  const strides = coprimeStrides(n);
   const a = strides[Number(mix(BigInt(wrap), BigInt(salt + 11)) % BigInt(strides.length))];
   const b = Number(mix(BigInt(wrap), BigInt(salt + 12)) % BigInt(n));
   return (pos * a + b) % n;

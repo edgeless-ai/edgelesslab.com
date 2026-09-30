@@ -228,6 +228,8 @@ export interface PromptMeta {
   mode?: string;
   format?: string;
   lexicon?: string;
+  /** wide engine only: the aesthetic register the prompt renders in. */
+  register?: string;
 }
 
 export interface GeneratedPrompt {

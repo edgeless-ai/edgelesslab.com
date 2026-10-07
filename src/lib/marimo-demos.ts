@@ -202,7 +202,22 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["Constrained Decoding", "Interpretability"],
   },
+  {
+    slug: "borwein-falsifier",
+    title: "Borwein Falsifier Demo",
+    description:
+      "Interactive demonstration of Borwein-Borwein 2001 exact falsification — adjust n and tolerance to observe the precise n=7 deficit where the pattern breaks, with live validation and reactive controls.",
+    category: "Research",
+    tags: ["Mathematics", "Falsification", "Counterexample"],
+  },
 
+  {
+    slug: "2609.30489-bioeval-audit-sensitivity",
+    title: "When hard benchmark items are the warning signal",
+    description: "Recompute BioEVAL's 16/20 versus 5/20 expert-audit result and test how the enrichment changes under explicit counterfactual hard-item counts.",
+    category: "Research",
+    tags: ["benchmark audit", "item quality", "Fisher exact test", "bioengineering"],
+  },
   // Reactive
   {
     slug: "curve-editor",
@@ -219,6 +234,14 @@ export const marimoDemos: MarimoDemo[] = [
       "A minimal demo of marimo's reactive dataflow driving a live animation loop — change one cell, watch the whole graph re-run downstream.",
     category: "Reactive",
     tags: ["Dataflow", "Animation", "marimo"],
+  },
+  {
+    slug: "2609.26911-twincheck-zero-harm-bound",
+    title: "TwinCheck: What Does Zero Observed Harm Bound?",
+    description:
+      "Reproduce TwinCheck's 0/71 harmful-intervention confidence bound and explore how zero-event evidence tightens with sample size.",
+    category: "Research",
+    tags: ["agent safety", "statistical bounds", "tool agents", "verification"],
   },
 ];
 

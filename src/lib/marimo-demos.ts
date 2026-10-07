@@ -202,7 +202,22 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["Constrained Decoding", "Interpretability"],
   },
+  {
+    slug: "borwein-falsifier",
+    title: "Borwein Falsifier Demo",
+    description:
+      "Interactive demonstration of Borwein-Borwein 2001 exact falsification — adjust n and tolerance to observe the precise n=7 deficit where the pattern breaks, with live validation and reactive controls.",
+    category: "Research",
+    tags: ["Mathematics", "Falsification", "Counterexample"],
+  },
 
+  {
+    slug: "2609.30489-bioeval-audit-sensitivity",
+    title: "When hard benchmark items are the warning signal",
+    description: "Recompute BioEVAL's 16/20 versus 5/20 expert-audit result and test how the enrichment changes under explicit counterfactual hard-item counts.",
+    category: "Research",
+    tags: ["benchmark audit", "item quality", "Fisher exact test", "bioengineering"],
+  },
   // Reactive
   {
     slug: "curve-editor",
@@ -226,6 +241,21 @@ export const marimoDemos: MarimoDemo[] = [
     description: "Explore why VCR-Bench's clean-accuracy leader is not its robust-accuracy leader, and stress-test the ranking under an explicitly hypothetical ASR multiplier.",
     category: "AI evaluation",
     tags: ["video classification", "adversarial robustness", "benchmarking", "published data"],
+  },
+  {
+    slug: "2609.26911-twincheck-zero-harm-bound",
+    title: "TwinCheck: What Does Zero Observed Harm Bound?",
+    description:
+      "Reproduce TwinCheck's 0/71 harmful-intervention confidence bound and explore how zero-event evidence tightens with sample size.",
+    category: "Research",
+    tags: ["agent safety", "statistical bounds", "tool agents", "verification"],
+  },
+  {
+    slug: "2610.04198-alodlm-depth-allocation",
+    title: "ALoDLM Token-Depth Allocator",
+    description: "Explore how entropy commitment and cumulative halting allocate recurrent depth across deterministic synthetic token positions, with paper-anchored layer accounting and explicit speed-claim boundaries.",
+    category: "Research",
+    tags: ["diffusion language models", "adaptive compute", "recurrence", "inference"],
   },
 ];
 

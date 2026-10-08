@@ -2,7 +2,7 @@ export interface MarimoDemo {
   slug: string;
   title: string;
   description: string;
-  category: "Finance/GPU" | "Generative" | "Algorithms" | "Reactive" | "Research";
+  category: "Finance/GPU" | "Generative" | "Algorithms" | "Reactive" | "Research" | "AI evaluation";
   tags: string[];
 }
 
@@ -220,12 +220,20 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Reactive",
     tags: ["Dataflow", "Animation", "marimo"],
   },
+  {
+    slug: "2610.08936-clean-vs-robustness",
+    title: "Clean accuracy is not adversarial robustness",
+    description: "Explore why VCR-Bench's clean-accuracy leader is not its robust-accuracy leader, and stress-test the ranking under an explicitly hypothetical ASR multiplier.",
+    category: "AI evaluation",
+    tags: ["video classification", "adversarial robustness", "benchmarking", "published data"],
+  },
 ];
 
-export const marimoCategories: MarimoDemo["category"][] = [
-  "Finance/GPU",
-  "Generative",
-  "Algorithms",
-  "Reactive",
-  "Research",
-];
+   export const marimoCategories: MarimoDemo["category"][] = [
+     "Finance/GPU",
+     "Generative",
+     "Algorithms",
+     "Reactive",
+     "Research",
+     "AI evaluation",
+   ];

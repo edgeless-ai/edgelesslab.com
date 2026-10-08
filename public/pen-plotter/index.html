@@ -889,11 +889,23 @@ body {
   padding: 4rem;
   z-index: 9999;
   opacity: 0;
-  transition: opacity 250ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .lightbox.is-open {
   display: flex;
   opacity: 1;
+}
+/* Unsupported browsers keep the plain display toggle. */
+@supports (transition-behavior: allow-discrete) {
+  .lightbox {
+    transition: opacity 250ms cubic-bezier(0.2, 0.8, 0.2, 1), display 250ms;
+    transition-behavior: allow-discrete;
+  }
+  @starting-style {
+    .lightbox.is-open { opacity: 0; }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lightbox { transition: none; }
 }
 .lightbox__inner {
   display: grid;
@@ -1997,7 +2009,7 @@ body {
 </section>
 
 <!-- ─── lightbox ─── -->
-<div class="lightbox" id="lightbox" aria-hidden="true">
+<div class="lightbox" id="lightbox" aria-hidden="true" inert>
   <button class="lightbox__close" id="lightbox-close" aria-label="Close">×</button>
   <div class="lightbox__inner">
     <figure class="lightbox__plate">
@@ -2249,6 +2261,7 @@ body {
     lbMetaScore.textContent = p.score.toFixed(1);
     lightbox.classList.add('is-open');
     lightbox.setAttribute('aria-hidden', 'false');
+    lightbox.inert = false;
 
     // prefetch neighbors
     [-1, 1].forEach(d => {
@@ -2262,6 +2275,7 @@ body {
   function closeLightbox() {
     lightbox.classList.remove('is-open');
     lightbox.setAttribute('aria-hidden', 'true');
+    lightbox.inert = true;
     activeIndex = -1;
   }
 

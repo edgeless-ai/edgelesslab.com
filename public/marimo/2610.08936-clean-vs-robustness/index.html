@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2610.08936-clean-vs-robustness</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\"marimo==0.23.16\"]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n    mo.md(\"\"\"\n    # Clean accuracy is not adversarial robustness\n\n    **Question:** can clean video-classification accuracy select the model that remains most accurate under attack?\n\n    This app transcribes all **19 model rows in Table 2** of [VCR-Bench](https://arxiv.org/abs/2610.08936v1). At the 100% default, points reproduce the paper's averaged clean accuracy, attack success rate (ASR), and robust accuracy under its reported protocol: a fixed Kinetics-400 subset, seed 42, and fixed attack budgets. Move the control to run a **hypothetical sensitivity analysis** that scales every published ASR equally; it is not a benchmark rerun.\n    \"\"\")\n    return (mo,)\n\n\n@app.cell\ndef _(mo):\n    attack_scale = mo.ui.slider(\n        0, 150, value=100, step=10,\n        label=\"Attack efficacy relative to Table 2 (%)\",\n        show_value=True,\n    )\n    mo.vstack([\n        attack_scale,\n        mo.md(\"**100% is the published operating point.** Other values are derived counterfactuals, not measured attacks.\"),\n    ])\n    return (attack_scale,)\n\n\n@app.cell\ndef _(attack_scale, mo):\n    _rows = [\n        (\"ActionCLIP\", 66.91, 72.38, 18.48), (\"AMD\", 77.75, 72.55, 21.34),\n        (\"C2D\", 66.93, 69.21, 20.61), (\"ILA\", 79.64, 66.17, 26.95),\n        (\"MViTv2\", 75.66, 67.57, 24.54), (\"ONE-PEACE\", 71.09, 60.66, 27.96),\n        (\"R(2+1)D\", 46.96, 76.92, 10.84), (\"TAdaFormer\", 79.96, 49.50, 40.38),\n        (\"TANet\", 60.55, 67.03, 19.96), (\"TimeSformer\", 75.18, 66.06, 25.52),\n        (\"TPN\", 63.12, 59.63, 25.48), (\"TSM\", 63.09, 54.91, 28.45),\n        (\"TSMNonLocal\", 62.64, 64.22, 22.41), (\"TSN\", 67.84, 58.41, 28.21),\n        (\"UniFormer\", 76.51, 68.37, 24.20), (\"UniFormerV2\", 86.73, 68.89, 26.98),\n        (\"Video Swin\", 74.77, 62.03, 28.39), (\"VideoMAE\", 76.70, 69.06, 23.73),\n        (\"VideoMAEv2\", 84.12, 66.02, 28.59),\n    ]\n    _scale = int(attack_scale.value)\n    _derived = []\n    for _name, _clean, _asr, _reported in _rows:\n        _effective = min(100.0, _asr * _scale / 100.0)\n        _robust = _clean * (1.0 - _effective / 100.0)\n        _derived.append((_name, _clean, _asr, _reported, _robust))\n\n    def _rank(_values):\n        _order = sorted(range(len(_values)), key=lambda _i: _values[_i])\n        _out = [0] * len(_values)\n        for _position, _index in enumerate(_order, start=1):\n            _out[_index] = _position\n        return _out\n\n    def _corr(_left, _right):\n        _left_mean = sum(_left) / len(_left)\n        _right_mean = sum(_right) / len(_right)\n        _numerator = sum((_x - _left_mean) * (_y - _right_mean) for _x, _y in zip(_left, _right))\n        _denominator = (\n            sum((_x - _left_mean) ** 2 for _x in _left)\n            * sum((_y - _right_mean) ** 2 for _y in _right)\n        ) ** 0.5\n        return _numerator / _denominator\n\n    _rho = _corr(\n        _rank([_row[1] for _row in _rows]),\n        _rank([_row[2] for _row in _rows]),\n    )\n    _winner = max(_derived, key=lambda _row: _row[4])\n    _max_error = max(abs(_reported - _clean * (1 - _asr / 100)) for _, _clean, _asr, _reported in _rows)\n\n    _left, _top, _width, _height = 72, 28, 780, 380\n    _xpos = lambda _value: _left + (_value - 45) / 45 * _width\n    _ypos = lambda _value: _top + _height - _value / 90 * _height\n    _parts = [\n        '\u003Csvg data-chart=\"vcr-clean-robust\" viewBox=\"0 0 900 470\" role=\"img\" '\n        'aria-label=\"Clean accuracy versus derived robust accuracy for 19 video classifiers\" '\n        'style=\"width:100%;height:auto;font-family:system-ui;background:#fbfaf7;border:1px solid #ddd6c8;border-radius:12px\"\u003E',\n        '\u003Crect x=\"72\" y=\"28\" width=\"780\" height=\"380\" fill=\"#fff\"/\u003E',\n    ]\n    for _tick in (0, 20, 40, 60, 80):\n        _y = _ypos(_tick)\n        _parts.append(f'\u003Cline x1=\"72\" y1=\"{_y:.1f}\" x2=\"852\" y2=\"{_y:.1f}\" stroke=\"#e7e2d9\"/\u003E')\n        _parts.append(f'\u003Ctext x=\"62\" y=\"{_y + 4:.1f}\" text-anchor=\"end\" font-size=\"12\" fill=\"#625d55\"\u003E{_tick}\u003C/text\u003E')\n    for _tick in (50, 60, 70, 80, 90):\n        _x = _xpos(_tick)\n        _parts.append(f'\u003Ctext x=\"{_x:.1f}\" y=\"430\" text-anchor=\"middle\" font-size=\"12\" fill=\"#625d55\"\u003E{_tick}\u003C/text\u003E')\n    for _name, _clean, _asr, _reported, _robust in _derived:\n        _color = \"#d5672f\" if _name == \"TAdaFormer\" else \"#236b8e\" if _name == \"UniFormerV2\" else \"#7b8790\"\n        _radius = 8 if _name in (\"TAdaFormer\", \"UniFormerV2\") else 5\n        _parts.append(\n            f'\u003Ccircle cx=\"{_xpos(_clean):.1f}\" cy=\"{_ypos(_robust):.1f}\" r=\"{_radius}\" fill=\"{_color}\" fill-opacity=\"0.85\"\u003E'\n            f'\u003Ctitle\u003E{_name}: clean {_clean:.2f}%, derived robust {_robust:.2f}%\u003C/title\u003E\u003C/circle\u003E'\n        )\n        if _name in (\"TAdaFormer\", \"UniFormerV2\"):\n            _parts.append(\n                f'\u003Ctext x=\"{_xpos(_clean) - 8:.1f}\" y=\"{_ypos(_robust) - 12:.1f}\" text-anchor=\"end\" '\n                f'font-size=\"12\" font-weight=\"650\" fill=\"{_color}\"\u003E{_name}\u003C/text\u003E'\n            )\n    _parts.extend([\n        '\u003Cline x1=\"72\" y1=\"408\" x2=\"852\" y2=\"408\" stroke=\"#433f39\"/\u003E',\n        '\u003Cline x1=\"72\" y1=\"28\" x2=\"72\" y2=\"408\" stroke=\"#433f39\"/\u003E',\n        '\u003Ctext x=\"462\" y=\"458\" text-anchor=\"middle\" font-size=\"14\" fill=\"#433f39\"\u003EPublished clean accuracy (%)\u003C/text\u003E',\n        '\u003Ctext x=\"18\" y=\"218\" text-anchor=\"middle\" font-size=\"14\" fill=\"#433f39\" transform=\"rotate(-90 18 218)\"\u003ERobust accuracy (%)\u003C/text\u003E',\n        '\u003C/svg\u003E',\n    ])\n    _svg = \"\".join(_parts)\n    _status = mo.md(\n        f\"\"\"### Operating point: {_scale}% attack efficacy \u00b7 top robust: {_winner[0]} {_winner[4]:.2f}%\n\n    **Published diagnostic:** clean accuracy versus ASR has Spearman \u03c1 = **{_rho:.3f}** across 19 Table 2 rows. At 100%, `robust = clean \u00d7 (1 \u2212 ASR)` reconciles every published row within **{_max_error:.3f} percentage points** (rounding error).\n\n    The clean-accuracy leader is **UniFormerV2 (86.73%)**; the published robust-accuracy leader is **TAdaFormer (40.38%)**. The ranking reversal is the point: clean performance alone is not a robustness selector. Values away from 100% apply one equal ASR multiplier and do not model attack-specific adaptation, perceptual cost, or a new threat model.\"\"\"\n    )\n    mo.vstack([_status, mo.Html(_svg)])\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%22marimo%3D%3D0.23.16%22%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20mo.md(%22%22%22%0A%20%20%20%20%23%20Clean%20accuracy%20is%20not%20adversarial%20robustness%0A%0A%20%20%20%20**Question%3A**%20can%20clean%20video-classification%20accuracy%20select%20the%20model%20that%20remains%20most%20accurate%20under%20attack%3F%0A%0A%20%20%20%20This%20app%20transcribes%20all%20**19%20model%20rows%20in%20Table%202**%20of%20%5BVCR-Bench%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2610.08936v1).%20At%20the%20100%25%20default%2C%20points%20reproduce%20the%20paper's%20averaged%20clean%20accuracy%2C%20attack%20success%20rate%20(ASR)%2C%20and%20robust%20accuracy%20under%20its%20reported%20protocol%3A%20a%20fixed%20Kinetics-400%20subset%2C%20seed%2042%2C%20and%20fixed%20attack%20budgets.%20Move%20the%20control%20to%20run%20a%20**hypothetical%20sensitivity%20analysis**%20that%20scales%20every%20published%20ASR%20equally%3B%20it%20is%20not%20a%20benchmark%20rerun.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%20(mo%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20attack_scale%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%200%2C%20150%2C%20value%3D100%2C%20step%3D10%2C%0A%20%20%20%20%20%20%20%20label%3D%22Attack%20efficacy%20relative%20to%20Table%202%20(%25)%22%2C%0A%20%20%20%20%20%20%20%20show_value%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20attack_scale%2C%0A%20%20%20%20%20%20%20%20mo.md(%22**100%25%20is%20the%20published%20operating%20point.**%20Other%20values%20are%20derived%20counterfactuals%2C%20not%20measured%20attacks.%22)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%20(attack_scale%2C)%0A%0A%0A%40app.cell%0Adef%20_(attack_scale%2C%20mo)%3A%0A%20%20%20%20_rows%20%3D%20%5B%0A%20%20%20%20%20%20%20%20(%22ActionCLIP%22%2C%2066.91%2C%2072.38%2C%2018.48)%2C%20(%22AMD%22%2C%2077.75%2C%2072.55%2C%2021.34)%2C%0A%20%20%20%20%20%20%20%20(%22C2D%22%2C%2066.93%2C%2069.21%2C%2020.61)%2C%20(%22ILA%22%2C%2079.64%2C%2066.17%2C%2026.95)%2C%0A%20%20%20%20%20%20%20%20(%22MViTv2%22%2C%2075.66%2C%2067.57%2C%2024.54)%2C%20(%22ONE-PEACE%22%2C%2071.09%2C%2060.66%2C%2027.96)%2C%0A%20%20%20%20%20%20%20%20(%22R(2%2B1)D%22%2C%2046.96%2C%2076.92%2C%2010.84)%2C%20(%22TAdaFormer%22%2C%2079.96%2C%2049.50%2C%2040.38)%2C%0A%20%20%20%20%20%20%20%20(%22TANet%22%2C%2060.55%2C%2067.03%2C%2019.96)%2C%20(%22TimeSformer%22%2C%2075.18%2C%2066.06%2C%2025.52)%2C%0A%20%20%20%20%20%20%20%20(%22TPN%22%2C%2063.12%2C%2059.63%2C%2025.48)%2C%20(%22TSM%22%2C%2063.09%2C%2054.91%2C%2028.45)%2C%0A%20%20%20%20%20%20%20%20(%22TSMNonLocal%22%2C%2062.64%2C%2064.22%2C%2022.41)%2C%20(%22TSN%22%2C%2067.84%2C%2058.41%2C%2028.21)%2C%0A%20%20%20%20%20%20%20%20(%22UniFormer%22%2C%2076.51%2C%2068.37%2C%2024.20)%2C%20(%22UniFormerV2%22%2C%2086.73%2C%2068.89%2C%2026.98)%2C%0A%20%20%20%20%20%20%20%20(%22Video%20Swin%22%2C%2074.77%2C%2062.03%2C%2028.39)%2C%20(%22VideoMAE%22%2C%2076.70%2C%2069.06%2C%2023.73)%2C%0A%20%20%20%20%20%20%20%20(%22VideoMAEv2%22%2C%2084.12%2C%2066.02%2C%2028.59)%2C%0A%20%20%20%20%5D%0A%20%20%20%20_scale%20%3D%20int(attack_scale.value)%0A%20%20%20%20_derived%20%3D%20%5B%5D%0A%20%20%20%20for%20_name%2C%20_clean%2C%20_asr%2C%20_reported%20in%20_rows%3A%0A%20%20%20%20%20%20%20%20_effective%20%3D%20min(100.0%2C%20_asr%20*%20_scale%20%2F%20100.0)%0A%20%20%20%20%20%20%20%20_robust%20%3D%20_clean%20*%20(1.0%20-%20_effective%20%2F%20100.0)%0A%20%20%20%20%20%20%20%20_derived.append((_name%2C%20_clean%2C%20_asr%2C%20_reported%2C%20_robust))%0A%0A%20%20%20%20def%20_rank(_values)%3A%0A%20%20%20%20%20%20%20%20_order%20%3D%20sorted(range(len(_values))%2C%20key%3Dlambda%20_i%3A%20_values%5B_i%5D)%0A%20%20%20%20%20%20%20%20_out%20%3D%20%5B0%5D%20*%20len(_values)%0A%20%20%20%20%20%20%20%20for%20_position%2C%20_index%20in%20enumerate(_order%2C%20start%3D1)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_out%5B_index%5D%20%3D%20_position%0A%20%20%20%20%20%20%20%20return%20_out%0A%0A%20%20%20%20def%20_corr(_left%2C%20_right)%3A%0A%20%20%20%20%20%20%20%20_left_mean%20%3D%20sum(_left)%20%2F%20len(_left)%0A%20%20%20%20%20%20%20%20_right_mean%20%3D%20sum(_right)%20%2F%20len(_right)%0A%20%20%20%20%20%20%20%20_numerator%20%3D%20sum((_x%20-%20_left_mean)%20*%20(_y%20-%20_right_mean)%20for%20_x%2C%20_y%20in%20zip(_left%2C%20_right))%0A%20%20%20%20%20%20%20%20_denominator%20%3D%20(%0A%20%20%20%20%20%20%20%20%20%20%20%20sum((_x%20-%20_left_mean)%20**%202%20for%20_x%20in%20_left)%0A%20%20%20%20%20%20%20%20%20%20%20%20*%20sum((_y%20-%20_right_mean)%20**%202%20for%20_y%20in%20_right)%0A%20%20%20%20%20%20%20%20)%20**%200.5%0A%20%20%20%20%20%20%20%20return%20_numerator%20%2F%20_denominator%0A%0A%20%20%20%20_rho%20%3D%20_corr(%0A%20%20%20%20%20%20%20%20_rank(%5B_row%5B1%5D%20for%20_row%20in%20_rows%5D)%2C%0A%20%20%20%20%20%20%20%20_rank(%5B_row%5B2%5D%20for%20_row%20in%20_rows%5D)%2C%0A%20%20%20%20)%0A%20%20%20%20_winner%20%3D%20max(_derived%2C%20key%3Dlambda%20_row%3A%20_row%5B4%5D)%0A%20%20%20%20_max_error%20%3D%20max(abs(_reported%20-%20_clean%20*%20(1%20-%20_asr%20%2F%20100))%20for%20_%2C%20_clean%2C%20_asr%2C%20_reported%20in%20_rows)%0A%0A%20%20%20%20_left%2C%20_top%2C%20_width%2C%20_height%20%3D%2072%2C%2028%2C%20780%2C%20380%0A%20%20%20%20_xpos%20%3D%20lambda%20_value%3A%20_left%20%2B%20(_value%20-%2045)%20%2F%2045%20*%20_width%0A%20%20%20%20_ypos%20%3D%20lambda%20_value%3A%20_top%20%2B%20_height%20-%20_value%20%2F%2090%20*%20_height%0A%20%20%20%20_parts%20%3D%20%5B%0A%20%20%20%20%20%20%20%20'%3Csvg%20data-chart%3D%22vcr-clean-robust%22%20viewBox%3D%220%200%20900%20470%22%20role%3D%22img%22%20'%0A%20%20%20%20%20%20%20%20'aria-label%3D%22Clean%20accuracy%20versus%20derived%20robust%20accuracy%20for%2019%20video%20classifiers%22%20'%0A%20%20%20%20%20%20%20%20'style%3D%22width%3A100%25%3Bheight%3Aauto%3Bfont-family%3Asystem-ui%3Bbackground%3A%23fbfaf7%3Bborder%3A1px%20solid%20%23ddd6c8%3Bborder-radius%3A12px%22%3E'%2C%0A%20%20%20%20%20%20%20%20'%3Crect%20x%3D%2272%22%20y%3D%2228%22%20width%3D%22780%22%20height%3D%22380%22%20fill%3D%22%23fff%22%2F%3E'%2C%0A%20%20%20%20%5D%0A%20%20%20%20for%20_tick%20in%20(0%2C%2020%2C%2040%2C%2060%2C%2080)%3A%0A%20%20%20%20%20%20%20%20_y%20%3D%20_ypos(_tick)%0A%20%20%20%20%20%20%20%20_parts.append(f'%3Cline%20x1%3D%2272%22%20y1%3D%22%7B_y%3A.1f%7D%22%20x2%3D%22852%22%20y2%3D%22%7B_y%3A.1f%7D%22%20stroke%3D%22%23e7e2d9%22%2F%3E')%0A%20%20%20%20%20%20%20%20_parts.append(f'%3Ctext%20x%3D%2262%22%20y%3D%22%7B_y%20%2B%204%3A.1f%7D%22%20text-anchor%3D%22end%22%20font-size%3D%2212%22%20fill%3D%22%23625d55%22%3E%7B_tick%7D%3C%2Ftext%3E')%0A%20%20%20%20for%20_tick%20in%20(50%2C%2060%2C%2070%2C%2080%2C%2090)%3A%0A%20%20%20%20%20%20%20%20_x%20%3D%20_xpos(_tick)%0A%20%20%20%20%20%20%20%20_parts.append(f'%3Ctext%20x%3D%22%7B_x%3A.1f%7D%22%20y%3D%22430%22%20text-anchor%3D%22middle%22%20font-size%3D%2212%22%20fill%3D%22%23625d55%22%3E%7B_tick%7D%3C%2Ftext%3E')%0A%20%20%20%20for%20_name%2C%20_clean%2C%20_asr%2C%20_reported%2C%20_robust%20in%20_derived%3A%0A%20%20%20%20%20%20%20%20_color%20%3D%20%22%23d5672f%22%20if%20_name%20%3D%3D%20%22TAdaFormer%22%20else%20%22%23236b8e%22%20if%20_name%20%3D%3D%20%22UniFormerV2%22%20else%20%22%237b8790%22%0A%20%20%20%20%20%20%20%20_radius%20%3D%208%20if%20_name%20in%20(%22TAdaFormer%22%2C%20%22UniFormerV2%22)%20else%205%0A%20%20%20%20%20%20%20%20_parts.append(%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ccircle%20cx%3D%22%7B_xpos(_clean)%3A.1f%7D%22%20cy%3D%22%7B_ypos(_robust)%3A.1f%7D%22%20r%3D%22%7B_radius%7D%22%20fill%3D%22%7B_color%7D%22%20fill-opacity%3D%220.85%22%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctitle%3E%7B_name%7D%3A%20clean%20%7B_clean%3A.2f%7D%25%2C%20derived%20robust%20%7B_robust%3A.2f%7D%25%3C%2Ftitle%3E%3C%2Fcircle%3E'%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20%20%20%20%20if%20_name%20in%20(%22TAdaFormer%22%2C%20%22UniFormerV2%22)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_parts.append(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7B_xpos(_clean)%20-%208%3A.1f%7D%22%20y%3D%22%7B_ypos(_robust)%20-%2012%3A.1f%7D%22%20text-anchor%3D%22end%22%20'%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f'font-size%3D%2212%22%20font-weight%3D%22650%22%20fill%3D%22%7B_color%7D%22%3E%7B_name%7D%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20)%0A%20%20%20%20_parts.extend(%5B%0A%20%20%20%20%20%20%20%20'%3Cline%20x1%3D%2272%22%20y1%3D%22408%22%20x2%3D%22852%22%20y2%3D%22408%22%20stroke%3D%22%23433f39%22%2F%3E'%2C%0A%20%20%20%20%20%20%20%20'%3Cline%20x1%3D%2272%22%20y1%3D%2228%22%20x2%3D%2272%22%20y2%3D%22408%22%20stroke%3D%22%23433f39%22%2F%3E'%2C%0A%20%20%20%20%20%20%20%20'%3Ctext%20x%3D%22462%22%20y%3D%22458%22%20text-anchor%3D%22middle%22%20font-size%3D%2214%22%20fill%3D%22%23433f39%22%3EPublished%20clean%20accuracy%20(%25)%3C%2Ftext%3E'%2C%0A%20%20%20%20%20%20%20%20'%3Ctext%20x%3D%2218%22%20y%3D%22218%22%20text-anchor%3D%22middle%22%20font-size%3D%2214%22%20fill%3D%22%23433f39%22%20transform%3D%22rotate(-90%2018%20218)%22%3ERobust%20accuracy%20(%25)%3C%2Ftext%3E'%2C%0A%20%20%20%20%20%20%20%20'%3C%2Fsvg%3E'%2C%0A%20%20%20%20%5D)%0A%20%20%20%20_svg%20%3D%20%22%22.join(_parts)%0A%20%20%20%20_status%20%3D%20mo.md(%0A%20%20%20%20%20%20%20%20f%22%22%22%23%23%23%20Operating%20point%3A%20%7B_scale%7D%25%20attack%20efficacy%20%C2%B7%20top%20robust%3A%20%7B_winner%5B0%5D%7D%20%7B_winner%5B4%5D%3A.2f%7D%25%0A%0A%20%20%20%20**Published%20diagnostic%3A**%20clean%20accuracy%20versus%20ASR%20has%20Spearman%20%CF%81%20%3D%20**%7B_rho%3A.3f%7D**%20across%2019%20Table%202%20rows.%20At%20100%25%2C%20%60robust%20%3D%20clean%20%C3%97%20(1%20%E2%88%92%20ASR)%60%20reconciles%20every%20published%20row%20within%20**%7B_max_error%3A.3f%7D%20percentage%20points**%20(rounding%20error).%0A%0A%20%20%20%20The%20clean-accuracy%20leader%20is%20**UniFormerV2%20(86.73%25)**%3B%20the%20published%20robust-accuracy%20leader%20is%20**TAdaFormer%20(40.38%25)**.%20The%20ranking%20reversal%20is%20the%20point%3A%20clean%20performance%20alone%20is%20not%20a%20robustness%20selector.%20Values%20away%20from%20100%25%20apply%20one%20equal%20ASR%20multiplier%20and%20do%20not%20model%20attack-specific%20adaptation%2C%20perceptual%20cost%2C%20or%20a%20new%20threat%20model.%22%22%22%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5B_status%2C%20mo.Html(_svg)%5D)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

@@ -19,9 +19,19 @@ pnpm dev
 
 ## Contributing
 
+## Marimo Demos
+
+Published marimo demos are available under `/public/marimo/`.
+
+- [Clean accuracy is not adversarial robustness](https://marimo.edgelesslab.com/2610.08936-clean-vs-robustness/)
+
+
 Small, reviewable changes preferred. After editing routes or content, run
 `pnpm build` and preview `out/` before opening a PR.
 
+## Marimo Demos
+Published marimo demos are available under .
+- [Clean accuracy is not adversarial robustness](https://marimo.edgelesslab.com/2610.08936-clean-vs-robustness/)
 ## Deploy
 
 This repository deploys to GitHub Pages. Pushing to the `main` branch triggers the Pages workflow in `.github/workflows/deploy.yml`.

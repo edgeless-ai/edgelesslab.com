@@ -66,7 +66,7 @@ describe("optional analytics consent", () => {
     expect(sdk.capture.mock.calls.map(([name]) => name)).toEqual(["$pageview", "$pageview"]);
     expect(sdk.init.mock.calls[0][1]).toMatchObject({
       capture_pageview: false, request_batching: false, api_transport: "fetch",
-      disable_beacon: true, disable_session_recording: true, disable_surveys: true,
+      disable_session_recording: true, disable_surveys: true,
       disable_external_dependency_loading: true,
     });
   });

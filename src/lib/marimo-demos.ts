@@ -228,8 +228,8 @@ export const marimoDemos: MarimoDemo[] = [
     description: "Explore why VCR-Bench's clean-accuracy leader is not its robust-accuracy leader, and stress-test the ranking under an explicitly hypothetical ASR multiplier.",
     category: "AI evaluation",
     tags: ["video classification", "adversarial robustness", "benchmarking", "published data"],
-    state: "ready_for_publication",
-    publishedUrl: undefined,
+    state: "published",
+    publishedUrl: "https://marimo.edgelesslab.com/2610.08936-clean-vs-robustness/",
   },
 ];
 

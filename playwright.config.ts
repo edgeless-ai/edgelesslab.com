@@ -11,7 +11,7 @@ const PORT = process.env.SMOKE_PORT || "8877";
  */
 export default defineConfig({
   testDir: "tests",
-  testMatch: "smoke.spec.ts",
+  testMatch: ["smoke.spec.ts", "swarm-specimen.spec.ts"],
   timeout: 30_000,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",

@@ -93,7 +93,8 @@ export default function RootLayout({
       <head>
         <PerformancePreload />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
-        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' us.i.posthog.com us-assets.i.posthog.com gumroad.com; connect-src 'self' us.i.posthog.com us-assets.i.posthog.com gumroad.com https://edgeless-ingest.djm-claude-assistant.workers.dev; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src 'self' gumroad.com;" />
+        {/* tldraw probes/exports use object URLs and inline font data in SVG exports. */}
+        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' us.i.posthog.com us-assets.i.posthog.com gumroad.com; connect-src 'self' blob: us.i.posthog.com us-assets.i.posthog.com gumroad.com https://edgeless-ingest.djm-claude-assistant.workers.dev; img-src 'self' blob: data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src 'self' gumroad.com;" />
         {/* Preconnect hints moved to PerformancePreload component for centralized management */}
         <script
           dangerouslySetInnerHTML={{

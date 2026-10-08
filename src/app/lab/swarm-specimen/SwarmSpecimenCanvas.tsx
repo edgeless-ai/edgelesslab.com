@@ -4,6 +4,7 @@ import { Tldraw, createShapeId, useValue, type Editor, type TLShapeId } from "tl
 import "tldraw/tldraw.css";
 import "./swarm-specimen.css";
 import { SpecimenShapeUtil, simAtom } from "./shapes";
+import { specimenAssetUrls } from "./assets";
 import { initState, step, labNote, ROLES, FIELD, type SimState } from "./sim";
 
 const customShapeUtils = [SpecimenShapeUtil];
@@ -114,7 +115,7 @@ export default function SwarmSpecimenCanvas() {
   return (
     <div className="ss-wrap">
       <div className="ss-canvas" onClickCapture={onCanvasClick} style={{ cursor: adding ? "crosshair" : undefined }}>
-        <Tldraw shapeUtils={customShapeUtils} onMount={onMount} hideUi />
+        <Tldraw assetUrls={specimenAssetUrls} shapeUtils={customShapeUtils} onMount={onMount} hideUi />
       </div>
       <Controls
         running={running}

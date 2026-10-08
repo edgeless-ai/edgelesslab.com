@@ -1,0 +1,406 @@
+{
+  "version": "3.15.6",
+  "fonts": {
+    "tldraw_mono": {
+      "url": "/tldraw/3.15.6/fonts/IBMPlexMono-Medium.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/IBMPlexMono-Medium.woff2",
+      "sha256": "8c2c290cbd998fa1f647e4572aca6ebbd72589551b0f3f9f8bb8628fbb8219d5",
+      "bytes": 46724
+    },
+    "tldraw_mono_italic": {
+      "url": "/tldraw/3.15.6/fonts/IBMPlexMono-MediumItalic.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/IBMPlexMono-MediumItalic.woff2",
+      "sha256": "c82b35693328411c756b51c7b5cb48b6cd1f4f24a0b1261857831b137e6202b5",
+      "bytes": 51344
+    },
+    "tldraw_mono_bold": {
+      "url": "/tldraw/3.15.6/fonts/IBMPlexMono-Bold.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/IBMPlexMono-Bold.woff2",
+      "sha256": "5788454f0ba4bd6300752c474215c4dd926682fa173ae1c6252d57828b6a235d",
+      "bytes": 46684
+    },
+    "tldraw_mono_italic_bold": {
+      "url": "/tldraw/3.15.6/fonts/IBMPlexMono-BoldItalic.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/IBMPlexMono-BoldItalic.woff2",
+      "sha256": "b0bfaa05c90c662c164ca0515ec42baddac93129eab1af067f8872d84f10df46",
+      "bytes": 50624
+    },
+    "tldraw_serif": {
+      "url": "/tldraw/3.15.6/fonts/IBMPlexSerif-Medium.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/IBMPlexSerif-Medium.woff2",
+      "sha256": "2eb75e035155ea1d0805fafaa012f7083e5034f935f17cfcc650b17bdf530c2d",
+      "bytes": 72604
+    },
+    "tldraw_serif_italic": {
+      "url": "/tldraw/3.15.6/fonts/IBMPlexSerif-MediumItalic.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/IBMPlexSerif-MediumItalic.woff2",
+      "sha256": "4e2f4abd7970ec8d957041100dac8eee78e70efb94bfe3e4356628b833e78a30",
+      "bytes": 77900
+    },
+    "tldraw_serif_bold": {
+      "url": "/tldraw/3.15.6/fonts/IBMPlexSerif-Bold.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/IBMPlexSerif-Bold.woff2",
+      "sha256": "1ba2fa015458f36efe822137627f75df1ee340e6d1c0d92c7ca5a3b423db75d9",
+      "bytes": 68940
+    },
+    "tldraw_serif_italic_bold": {
+      "url": "/tldraw/3.15.6/fonts/IBMPlexSerif-BoldItalic.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/IBMPlexSerif-BoldItalic.woff2",
+      "sha256": "cf7e4359cdfc697d90ea785091a9fa289db8f064aed5c099001b08dba97c1805",
+      "bytes": 73992
+    },
+    "tldraw_sans": {
+      "url": "/tldraw/3.15.6/fonts/IBMPlexSans-Medium.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/IBMPlexSans-Medium.woff2",
+      "sha256": "5660f8a658f8bb50dbc005232f885eadffd2bc1c235c4f6fbb63469d1f9cde6d",
+      "bytes": 66740
+    },
+    "tldraw_sans_italic": {
+      "url": "/tldraw/3.15.6/fonts/IBMPlexSans-MediumItalic.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/IBMPlexSans-MediumItalic.woff2",
+      "sha256": "16f11ab3543e3d1e2704407378aafa4ddb570ad11f6a476eeaa4ec6e67fc30e8",
+      "bytes": 71204
+    },
+    "tldraw_sans_bold": {
+      "url": "/tldraw/3.15.6/fonts/IBMPlexSans-Bold.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/IBMPlexSans-Bold.woff2",
+      "sha256": "fa7130d854a660b39a7fc9e6e0f2dc23dba5f1346e2adea3e1fe37b6d884133d",
+      "bytes": 63012
+    },
+    "tldraw_sans_italic_bold": {
+      "url": "/tldraw/3.15.6/fonts/IBMPlexSans-BoldItalic.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/IBMPlexSans-BoldItalic.woff2",
+      "sha256": "73d57000ee0fa7d6e1dd3a9fe5901c2d7c71904af9a935dbbc1d44abc9574c1f",
+      "bytes": 66632
+    },
+    "tldraw_draw": {
+      "url": "/tldraw/3.15.6/fonts/Shantell_Sans-Informal_Regular.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/Shantell_Sans-Informal_Regular.woff2",
+      "sha256": "071f39874fcae274e7096eb85a5ac43975ba3dcdc2aa4929d734a13b31cffbba",
+      "bytes": 153500
+    },
+    "tldraw_draw_italic": {
+      "url": "/tldraw/3.15.6/fonts/Shantell_Sans-Informal_Regular_Italic.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/Shantell_Sans-Informal_Regular_Italic.woff2",
+      "sha256": "75451f6e8dcfa19aeaedaa5e794f72588c86be18c28bbf95bdabb21c10f18ac6",
+      "bytes": 155424
+    },
+    "tldraw_draw_bold": {
+      "url": "/tldraw/3.15.6/fonts/Shantell_Sans-Informal_Bold.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/Shantell_Sans-Informal_Bold.woff2",
+      "sha256": "d22b90388a4bd185d87b7a8d64dbf2cea3134d1060266c7c06a9d8f113bb7d82",
+      "bytes": 151268
+    },
+    "tldraw_draw_italic_bold": {
+      "url": "/tldraw/3.15.6/fonts/Shantell_Sans-Informal_Bold_Italic.woff2",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/fonts/Shantell_Sans-Informal_Bold_Italic.woff2",
+      "sha256": "f238d9ed3e3f0337df368c70b4aee03ca59971028cf32370b296931f15e1f1be",
+      "bytes": 152332
+    }
+  },
+  "images": [
+    {
+      "url": "/tldraw/3.15.6/translations/en.json",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/translations/en.json",
+      "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "bytes": 3
+    },
+    {
+      "url": "/tldraw/3.15.6/icons/icon/0_merged.svg",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/icons/icon/0_merged.svg",
+      "sha256": "2b3540fd7bedfee61c0a9faeba8eaf70663a0be39ac6cdac30937cb0a0447604",
+      "bytes": 53830
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/tldraw.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/tldraw.png",
+      "sha256": "5a92f8e6d02978cb6ec55615e3293ebc9371be49b7cf16e8e2bdcecec4333444",
+      "bytes": 380
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/figma.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/figma.png",
+      "sha256": "56a3455c7ea12b755b4715d68593529d3beca2b289ba9d09fde314945b34da9b",
+      "bytes": 1060
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/google_maps.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/google_maps.png",
+      "sha256": "db60324a2f3e26c65289bcc469eb8ae5ca1797ecae2b534ac4db4a6032aef65f",
+      "bytes": 1498
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/val_town.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/val_town.png",
+      "sha256": "b1ac407575c7f73c202619aacda738e3c33f7c4996db85699428252711d214f2",
+      "bytes": 270
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/codesandbox.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/codesandbox.png",
+      "sha256": "e5880c4a9473d45ef186560360d6a578ffa1e43d2b2723c2fdc5fc5b110c99b0",
+      "bytes": 145
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/codepen.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/codepen.png",
+      "sha256": "ec649b2e3797cb38df083364ecdf3d6fe3d4c8707d11b835796bf7dc01689a1b",
+      "bytes": 1292
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/scratch.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/scratch.png",
+      "sha256": "f7e56912122fd9436b6132f46fe245c4fa71f1e27210e7447ca913452f54c836",
+      "bytes": 2813
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/youtube.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/youtube.png",
+      "sha256": "0b266ee441df322d1f0aa83bb855740bd4e75310d45c409e4c8bf3af9d590519",
+      "bytes": 686
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/google_calendar.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/google_calendar.png",
+      "sha256": "ae13bc34b3343b62c48fa906041c2d52ff12c520b961d86d0e9e19f5d560a879",
+      "bytes": 632
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/google_slides.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/google_slides.png",
+      "sha256": "cffce7f6e6dc6729d5cc79233169eed94a5fe01aa92fd1e8be1d8e894d4c8e56",
+      "bytes": 1196
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/github_gist.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/github_gist.png",
+      "sha256": "819ea0c1eb8bbfcc718d40794133dfc8eaf919c27a2b64e6236fc1f9ff8e7fb4",
+      "bytes": 697
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/replit.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/replit.png",
+      "sha256": "38300169ecb5e6b5bbd1e04e6559c8a0915d158ddbe1e2d3d5c3cbac8dffa6f0",
+      "bytes": 358
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/felt.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/felt.png",
+      "sha256": "8f2922ebc495cbf048b8fcaa36623a8f20dcd0dd3946882fc7f8af8375aae05d",
+      "bytes": 672
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/spotify.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/spotify.png",
+      "sha256": "7a82ed4815c581c6f4d741621e7202f422191636493fd41d3a0ee7ca5a582ac1",
+      "bytes": 1504
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/vimeo.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/vimeo.png",
+      "sha256": "78006cad29d790a277749fa7987e47e51659a55622bf62108a6167535288eb1c",
+      "bytes": 641
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/excalidraw.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/excalidraw.png",
+      "sha256": "5793dd2fadbbe9748c119d1753dcfb84e0491725287eca7762f294c9be026f5a",
+      "bytes": 588
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/observable.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/observable.png",
+      "sha256": "fcfcea7f25260a3b6c5d1fd8b1eb9da4bd9684010676fed8fe5b0f25981ee8f6",
+      "bytes": 503
+    },
+    {
+      "url": "/tldraw/3.15.6/embed-icons/desmos.png",
+      "sourceUrl": "https://cdn.tldraw.com/3.15.6/embed-icons/desmos.png",
+      "sha256": "d7ef10476c3bc13d2263da0d1852680141d38462788ace0d94b6f4e6cd383876",
+      "bytes": 1294
+    }
+  ],
+  "icons": {
+    "align-bottom": "/tldraw/3.15.6/icons/icon/0_merged.svg#align-bottom",
+    "align-center-horizontal": "/tldraw/3.15.6/icons/icon/0_merged.svg#align-center-horizontal",
+    "align-center-vertical": "/tldraw/3.15.6/icons/icon/0_merged.svg#align-center-vertical",
+    "align-left": "/tldraw/3.15.6/icons/icon/0_merged.svg#align-left",
+    "align-right": "/tldraw/3.15.6/icons/icon/0_merged.svg#align-right",
+    "align-top": "/tldraw/3.15.6/icons/icon/0_merged.svg#align-top",
+    "alt": "/tldraw/3.15.6/icons/icon/0_merged.svg#alt",
+    "arrow-arc": "/tldraw/3.15.6/icons/icon/0_merged.svg#arrow-arc",
+    "arrow-cycle": "/tldraw/3.15.6/icons/icon/0_merged.svg#arrow-cycle",
+    "arrow-elbow": "/tldraw/3.15.6/icons/icon/0_merged.svg#arrow-elbow",
+    "arrow-left": "/tldraw/3.15.6/icons/icon/0_merged.svg#arrow-left",
+    "arrowhead-arrow": "/tldraw/3.15.6/icons/icon/0_merged.svg#arrowhead-arrow",
+    "arrowhead-bar": "/tldraw/3.15.6/icons/icon/0_merged.svg#arrowhead-bar",
+    "arrowhead-diamond": "/tldraw/3.15.6/icons/icon/0_merged.svg#arrowhead-diamond",
+    "arrowhead-dot": "/tldraw/3.15.6/icons/icon/0_merged.svg#arrowhead-dot",
+    "arrowhead-none": "/tldraw/3.15.6/icons/icon/0_merged.svg#arrowhead-none",
+    "arrowhead-square": "/tldraw/3.15.6/icons/icon/0_merged.svg#arrowhead-square",
+    "arrowhead-triangle-inverted": "/tldraw/3.15.6/icons/icon/0_merged.svg#arrowhead-triangle-inverted",
+    "arrowhead-triangle": "/tldraw/3.15.6/icons/icon/0_merged.svg#arrowhead-triangle",
+    "blob": "/tldraw/3.15.6/icons/icon/0_merged.svg#blob",
+    "bold": "/tldraw/3.15.6/icons/icon/0_merged.svg#bold",
+    "bookmark": "/tldraw/3.15.6/icons/icon/0_merged.svg#bookmark",
+    "bring-forward": "/tldraw/3.15.6/icons/icon/0_merged.svg#bring-forward",
+    "bring-to-front": "/tldraw/3.15.6/icons/icon/0_merged.svg#bring-to-front",
+    "broken": "/tldraw/3.15.6/icons/icon/0_merged.svg#broken",
+    "bulletList": "/tldraw/3.15.6/icons/icon/0_merged.svg#bulletList",
+    "check-circle": "/tldraw/3.15.6/icons/icon/0_merged.svg#check-circle",
+    "check": "/tldraw/3.15.6/icons/icon/0_merged.svg#check",
+    "chevron-down": "/tldraw/3.15.6/icons/icon/0_merged.svg#chevron-down",
+    "chevron-left": "/tldraw/3.15.6/icons/icon/0_merged.svg#chevron-left",
+    "chevron-right": "/tldraw/3.15.6/icons/icon/0_merged.svg#chevron-right",
+    "chevron-up": "/tldraw/3.15.6/icons/icon/0_merged.svg#chevron-up",
+    "chevrons-ne": "/tldraw/3.15.6/icons/icon/0_merged.svg#chevrons-ne",
+    "chevrons-sw": "/tldraw/3.15.6/icons/icon/0_merged.svg#chevrons-sw",
+    "clipboard-copied": "/tldraw/3.15.6/icons/icon/0_merged.svg#clipboard-copied",
+    "clipboard-copy": "/tldraw/3.15.6/icons/icon/0_merged.svg#clipboard-copy",
+    "code": "/tldraw/3.15.6/icons/icon/0_merged.svg#code",
+    "color": "/tldraw/3.15.6/icons/icon/0_merged.svg#color",
+    "comment": "/tldraw/3.15.6/icons/icon/0_merged.svg#comment",
+    "corners": "/tldraw/3.15.6/icons/icon/0_merged.svg#corners",
+    "crop": "/tldraw/3.15.6/icons/icon/0_merged.svg#crop",
+    "cross-2": "/tldraw/3.15.6/icons/icon/0_merged.svg#cross-2",
+    "cross-circle": "/tldraw/3.15.6/icons/icon/0_merged.svg#cross-circle",
+    "dash-dashed": "/tldraw/3.15.6/icons/icon/0_merged.svg#dash-dashed",
+    "dash-dotted": "/tldraw/3.15.6/icons/icon/0_merged.svg#dash-dotted",
+    "dash-draw": "/tldraw/3.15.6/icons/icon/0_merged.svg#dash-draw",
+    "dash-solid": "/tldraw/3.15.6/icons/icon/0_merged.svg#dash-solid",
+    "disconnected": "/tldraw/3.15.6/icons/icon/0_merged.svg#disconnected",
+    "discord": "/tldraw/3.15.6/icons/icon/0_merged.svg#discord",
+    "distribute-horizontal": "/tldraw/3.15.6/icons/icon/0_merged.svg#distribute-horizontal",
+    "distribute-vertical": "/tldraw/3.15.6/icons/icon/0_merged.svg#distribute-vertical",
+    "dot": "/tldraw/3.15.6/icons/icon/0_merged.svg#dot",
+    "dots-horizontal": "/tldraw/3.15.6/icons/icon/0_merged.svg#dots-horizontal",
+    "dots-vertical": "/tldraw/3.15.6/icons/icon/0_merged.svg#dots-vertical",
+    "download": "/tldraw/3.15.6/icons/icon/0_merged.svg#download",
+    "drag-handle-dots": "/tldraw/3.15.6/icons/icon/0_merged.svg#drag-handle-dots",
+    "duplicate": "/tldraw/3.15.6/icons/icon/0_merged.svg#duplicate",
+    "edit": "/tldraw/3.15.6/icons/icon/0_merged.svg#edit",
+    "external-link": "/tldraw/3.15.6/icons/icon/0_merged.svg#external-link",
+    "fill-fill": "/tldraw/3.15.6/icons/icon/0_merged.svg#fill-fill",
+    "fill-none": "/tldraw/3.15.6/icons/icon/0_merged.svg#fill-none",
+    "fill-pattern": "/tldraw/3.15.6/icons/icon/0_merged.svg#fill-pattern",
+    "fill-semi": "/tldraw/3.15.6/icons/icon/0_merged.svg#fill-semi",
+    "fill-solid": "/tldraw/3.15.6/icons/icon/0_merged.svg#fill-solid",
+    "follow": "/tldraw/3.15.6/icons/icon/0_merged.svg#follow",
+    "following": "/tldraw/3.15.6/icons/icon/0_merged.svg#following",
+    "font-draw": "/tldraw/3.15.6/icons/icon/0_merged.svg#font-draw",
+    "font-mono": "/tldraw/3.15.6/icons/icon/0_merged.svg#font-mono",
+    "font-sans": "/tldraw/3.15.6/icons/icon/0_merged.svg#font-sans",
+    "font-serif": "/tldraw/3.15.6/icons/icon/0_merged.svg#font-serif",
+    "geo-arrow-down": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-arrow-down",
+    "geo-arrow-left": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-arrow-left",
+    "geo-arrow-right": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-arrow-right",
+    "geo-arrow-up": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-arrow-up",
+    "geo-check-box": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-check-box",
+    "geo-cloud": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-cloud",
+    "geo-diamond": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-diamond",
+    "geo-ellipse": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-ellipse",
+    "geo-heart": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-heart",
+    "geo-hexagon": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-hexagon",
+    "geo-octagon": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-octagon",
+    "geo-oval": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-oval",
+    "geo-pentagon": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-pentagon",
+    "geo-rectangle": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-rectangle",
+    "geo-rhombus-2": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-rhombus-2",
+    "geo-rhombus": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-rhombus",
+    "geo-star": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-star",
+    "geo-trapezoid": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-trapezoid",
+    "geo-triangle": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-triangle",
+    "geo-x-box": "/tldraw/3.15.6/icons/icon/0_merged.svg#geo-x-box",
+    "github": "/tldraw/3.15.6/icons/icon/0_merged.svg#github",
+    "group": "/tldraw/3.15.6/icons/icon/0_merged.svg#group",
+    "heading": "/tldraw/3.15.6/icons/icon/0_merged.svg#heading",
+    "help-circle": "/tldraw/3.15.6/icons/icon/0_merged.svg#help-circle",
+    "highlight": "/tldraw/3.15.6/icons/icon/0_merged.svg#highlight",
+    "horizontal-align-end": "/tldraw/3.15.6/icons/icon/0_merged.svg#horizontal-align-end",
+    "horizontal-align-middle": "/tldraw/3.15.6/icons/icon/0_merged.svg#horizontal-align-middle",
+    "horizontal-align-start": "/tldraw/3.15.6/icons/icon/0_merged.svg#horizontal-align-start",
+    "info-circle": "/tldraw/3.15.6/icons/icon/0_merged.svg#info-circle",
+    "italic": "/tldraw/3.15.6/icons/icon/0_merged.svg#italic",
+    "leading": "/tldraw/3.15.6/icons/icon/0_merged.svg#leading",
+    "link": "/tldraw/3.15.6/icons/icon/0_merged.svg#link",
+    "list": "/tldraw/3.15.6/icons/icon/0_merged.svg#list",
+    "lock": "/tldraw/3.15.6/icons/icon/0_merged.svg#lock",
+    "manual": "/tldraw/3.15.6/icons/icon/0_merged.svg#manual",
+    "menu": "/tldraw/3.15.6/icons/icon/0_merged.svg#menu",
+    "minus": "/tldraw/3.15.6/icons/icon/0_merged.svg#minus",
+    "mixed": "/tldraw/3.15.6/icons/icon/0_merged.svg#mixed",
+    "pack": "/tldraw/3.15.6/icons/icon/0_merged.svg#pack",
+    "plus": "/tldraw/3.15.6/icons/icon/0_merged.svg#plus",
+    "question-mark-circle": "/tldraw/3.15.6/icons/icon/0_merged.svg#question-mark-circle",
+    "question-mark": "/tldraw/3.15.6/icons/icon/0_merged.svg#question-mark",
+    "redo": "/tldraw/3.15.6/icons/icon/0_merged.svg#redo",
+    "reset-zoom": "/tldraw/3.15.6/icons/icon/0_merged.svg#reset-zoom",
+    "rotate-ccw": "/tldraw/3.15.6/icons/icon/0_merged.svg#rotate-ccw",
+    "rotate-cw": "/tldraw/3.15.6/icons/icon/0_merged.svg#rotate-cw",
+    "send-backward": "/tldraw/3.15.6/icons/icon/0_merged.svg#send-backward",
+    "send-to-back": "/tldraw/3.15.6/icons/icon/0_merged.svg#send-to-back",
+    "share-1": "/tldraw/3.15.6/icons/icon/0_merged.svg#share-1",
+    "size-extra-large": "/tldraw/3.15.6/icons/icon/0_merged.svg#size-extra-large",
+    "size-large": "/tldraw/3.15.6/icons/icon/0_merged.svg#size-large",
+    "size-medium": "/tldraw/3.15.6/icons/icon/0_merged.svg#size-medium",
+    "size-small": "/tldraw/3.15.6/icons/icon/0_merged.svg#size-small",
+    "spline-cubic": "/tldraw/3.15.6/icons/icon/0_merged.svg#spline-cubic",
+    "spline-line": "/tldraw/3.15.6/icons/icon/0_merged.svg#spline-line",
+    "stack-horizontal": "/tldraw/3.15.6/icons/icon/0_merged.svg#stack-horizontal",
+    "stack-vertical": "/tldraw/3.15.6/icons/icon/0_merged.svg#stack-vertical",
+    "status-offline": "/tldraw/3.15.6/icons/icon/0_merged.svg#status-offline",
+    "stretch-horizontal": "/tldraw/3.15.6/icons/icon/0_merged.svg#stretch-horizontal",
+    "stretch-vertical": "/tldraw/3.15.6/icons/icon/0_merged.svg#stretch-vertical",
+    "strike": "/tldraw/3.15.6/icons/icon/0_merged.svg#strike",
+    "text-align-center": "/tldraw/3.15.6/icons/icon/0_merged.svg#text-align-center",
+    "text-align-left": "/tldraw/3.15.6/icons/icon/0_merged.svg#text-align-left",
+    "text-align-right": "/tldraw/3.15.6/icons/icon/0_merged.svg#text-align-right",
+    "toggle-off": "/tldraw/3.15.6/icons/icon/0_merged.svg#toggle-off",
+    "toggle-on": "/tldraw/3.15.6/icons/icon/0_merged.svg#toggle-on",
+    "tool-arrow": "/tldraw/3.15.6/icons/icon/0_merged.svg#tool-arrow",
+    "tool-eraser": "/tldraw/3.15.6/icons/icon/0_merged.svg#tool-eraser",
+    "tool-frame": "/tldraw/3.15.6/icons/icon/0_merged.svg#tool-frame",
+    "tool-hand": "/tldraw/3.15.6/icons/icon/0_merged.svg#tool-hand",
+    "tool-highlight": "/tldraw/3.15.6/icons/icon/0_merged.svg#tool-highlight",
+    "tool-laser": "/tldraw/3.15.6/icons/icon/0_merged.svg#tool-laser",
+    "tool-line": "/tldraw/3.15.6/icons/icon/0_merged.svg#tool-line",
+    "tool-media": "/tldraw/3.15.6/icons/icon/0_merged.svg#tool-media",
+    "tool-note": "/tldraw/3.15.6/icons/icon/0_merged.svg#tool-note",
+    "tool-pencil": "/tldraw/3.15.6/icons/icon/0_merged.svg#tool-pencil",
+    "tool-pointer": "/tldraw/3.15.6/icons/icon/0_merged.svg#tool-pointer",
+    "tool-screenshot": "/tldraw/3.15.6/icons/icon/0_merged.svg#tool-screenshot",
+    "tool-text": "/tldraw/3.15.6/icons/icon/0_merged.svg#tool-text",
+    "trash": "/tldraw/3.15.6/icons/icon/0_merged.svg#trash",
+    "twitter": "/tldraw/3.15.6/icons/icon/0_merged.svg#twitter",
+    "underline": "/tldraw/3.15.6/icons/icon/0_merged.svg#underline",
+    "undo": "/tldraw/3.15.6/icons/icon/0_merged.svg#undo",
+    "ungroup": "/tldraw/3.15.6/icons/icon/0_merged.svg#ungroup",
+    "unlock": "/tldraw/3.15.6/icons/icon/0_merged.svg#unlock",
+    "vertical-align-end": "/tldraw/3.15.6/icons/icon/0_merged.svg#vertical-align-end",
+    "vertical-align-middle": "/tldraw/3.15.6/icons/icon/0_merged.svg#vertical-align-middle",
+    "vertical-align-start": "/tldraw/3.15.6/icons/icon/0_merged.svg#vertical-align-start",
+    "warning-triangle": "/tldraw/3.15.6/icons/icon/0_merged.svg#warning-triangle",
+    "zoom-in": "/tldraw/3.15.6/icons/icon/0_merged.svg#zoom-in",
+    "zoom-out": "/tldraw/3.15.6/icons/icon/0_merged.svg#zoom-out"
+  },
+  "embedIcons": {
+    "tldraw": "/tldraw/3.15.6/embed-icons/tldraw.png",
+    "figma": "/tldraw/3.15.6/embed-icons/figma.png",
+    "google_maps": "/tldraw/3.15.6/embed-icons/google_maps.png",
+    "val_town": "/tldraw/3.15.6/embed-icons/val_town.png",
+    "codesandbox": "/tldraw/3.15.6/embed-icons/codesandbox.png",
+    "codepen": "/tldraw/3.15.6/embed-icons/codepen.png",
+    "scratch": "/tldraw/3.15.6/embed-icons/scratch.png",
+    "youtube": "/tldraw/3.15.6/embed-icons/youtube.png",
+    "google_calendar": "/tldraw/3.15.6/embed-icons/google_calendar.png",
+    "google_slides": "/tldraw/3.15.6/embed-icons/google_slides.png",
+    "github_gist": "/tldraw/3.15.6/embed-icons/github_gist.png",
+    "replit": "/tldraw/3.15.6/embed-icons/replit.png",
+    "felt": "/tldraw/3.15.6/embed-icons/felt.png",
+    "spotify": "/tldraw/3.15.6/embed-icons/spotify.png",
+    "vimeo": "/tldraw/3.15.6/embed-icons/vimeo.png",
+    "excalidraw": "/tldraw/3.15.6/embed-icons/excalidraw.png",
+    "observable": "/tldraw/3.15.6/embed-icons/observable.png",
+    "desmos": "/tldraw/3.15.6/embed-icons/desmos.png"
+  }
+}

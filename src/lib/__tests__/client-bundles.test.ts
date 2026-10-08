@@ -58,6 +58,26 @@ test("analysis opts into webpack and retains static-export settings", async () =
   expect(manifest.scripts.analyze).toBe("ANALYZE=true npm run build -- --webpack");
 });
 
+test("pnpm preserves CLI metadata for binary packages shared with the npm lock", () => {
+  const packagesSection = readFileSync("pnpm-lock.yaml", "utf8").split("\nsnapshots:")[0];
+  const packages = new Map(
+    [...packagesSection.matchAll(/^  (\S.*?):\n((?:    .*\n|\n)*)/gm)].map((match) => [match[1].replace(/^'|'$/g, ""), match[2]])
+  );
+  const npmLock = JSON.parse(readFileSync("package-lock.json", "utf8"));
+  let checked = 0;
+  for (const [location, metadata] of Object.entries(npmLock.packages)) {
+    const entry = metadata as { version?: string; bin?: string | Record<string, string> };
+    if (!entry.bin || !location.includes("node_modules/")) continue;
+    const key = `${location.split("node_modules/").at(-1)}@${entry.version}`;
+    const block = packages.get(key);
+    // The independent locks can resolve different transitive versions.
+    if (block === undefined) continue;
+    expect(block, `${key}: missing pnpm CLI binary metadata`).toMatch(/^    hasBin: true$/m);
+    checked += 1;
+  }
+  expect(checked).toBeGreaterThan(0);
+});
+
 test("the tldraw editor and shader component retain client-only dynamic boundaries", () => {
   assertClientBoundary("src/app/lab/swarm-specimen/SwarmSpecimenEmbed.tsx", "./SwarmSpecimenCanvas");
   assertClientBoundary("src/components/hero-section.tsx", "@/components/hero-shader-bg");

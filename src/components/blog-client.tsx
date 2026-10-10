@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Search, X } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
-import type { BlogPost } from "@/lib/blog";
+import type { BlogPostSummary } from "@/lib/blog-types";
 
 // Deduplicate tag counts (some posts share same tag variants)
 function normalizeTag(tag: string) {
@@ -13,7 +13,7 @@ function normalizeTag(tag: string) {
 export function BlogSearch({
   allPosts,
 }: {
-  allPosts: BlogPost[];
+  allPosts: BlogPostSummary[];
   tagCounts: { tag: string; count: number }[];
 }) {
   const [query, setQuery] = useState("");
@@ -251,7 +251,7 @@ export function BlogSearch({
   );
 }
 
-function BlogPostCard({ post }: { post: BlogPost }) {
+function BlogPostCard({ post }: { post: BlogPostSummary }) {
   return (
     <div
       style={{

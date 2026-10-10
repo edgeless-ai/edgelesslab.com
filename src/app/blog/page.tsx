@@ -1,4 +1,5 @@
 import { posts } from "@/lib/blog";
+import { toBlogPostSummary } from "@/lib/blog-types";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { BlogSearch } from "@/components/blog-client";
@@ -82,7 +83,7 @@ export default function BlogPage() {
         }}
       />
 
-      <BlogSearch allPosts={sortedPosts} tagCounts={tagCounts} />
+      <BlogSearch allPosts={sortedPosts.map(toBlogPostSummary)} tagCounts={tagCounts} />
 
       <Footer />
     </div>

@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "./scripts/preserve-standalone.sh save",
-    "build": "npm run check:design-system && npm run test:font-preloads && npm run test:launch && next build",
+    "prebuild": "node scripts/prepare-pen-plotter-fonts.mjs && ./scripts/preserve-standalone.sh save",
+    "build": "npm run check:design-system && npm run test:font-preloads && npm run test:launch && npm run test:plotter && next build",
+    "test:plotter": "node --test scripts/pen-plotter-performance.test.mjs",
     "postbuild": "node scripts/run-critters.mjs && find out -name '*.js.map' -delete && find out -name '*.css.map' -delete && ./scripts/preserve-standalone.sh restore && mkdir -p out/pen-plotter/assets && rsync -a --exclude=medium --exclude=mediums-all pen-plotter/assets/ out/pen-plotter/assets/ && ([ -d pen-plotter/fxhash ] && cp -r pen-plotter/fxhash out/pen-plotter/ || true) && ([ -d pen-plotter/kandinsky-to-canvas ] && cp -r pen-plotter/kandinsky-to-canvas out/pen-plotter/ || true) && npm run repair:launch && npm run check:launch && npx pagefind --site out",
     "start": "next start",
     "lint": "npm run check:design-system && eslint && node scripts/lint-experiments.mjs && npm run lint:voice",

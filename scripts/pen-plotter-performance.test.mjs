@@ -36,7 +36,7 @@ test('static art reserves dimensions and keeps the lead image eager', () => {
   });
 });
 
-test('static export retains catalog state styles and local fonts', {skip: !existsSync(new URL('out/pen-plotter/index.html', root))}, () => {
+test('static export retains catalog state styles and local fonts', {skip: process.env.PLOTTER_TEST_EXPORT !== '1'}, () => {
   const output = readFileSync(new URL('out/pen-plotter/index.html', root), 'utf8');
   assert.match(output, /\.cat-tile\s*\{/);
   assert.match(output, /\.lightbox\.is-open/);

@@ -694,7 +694,8 @@ body {
   padding-top: 0.6rem;
 }
 .cat-cta__cta {
-  color: var(--amber);
+  /* Paper on ink meets AA for this small label; amber is only 3.81:1. */
+  color: var(--paper);
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -1462,6 +1463,7 @@ body {
 </header>
 
 <!-- ─── HERO ─── -->
+<main id="main-content">
 <section class="hero">
 
   <div class="hero__filing">
@@ -1993,6 +1995,8 @@ body {
 
   </div>
 </section>
+
+</main>
 
 <!-- ─── lightbox ─── -->
 <div class="lightbox" id="lightbox" aria-hidden="true">

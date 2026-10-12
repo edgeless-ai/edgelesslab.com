@@ -165,3 +165,34 @@ Diagnosis:
 Do not change DNS or remove `CNAME` to solve this symptom. The 2026-07-29
 incident was caused by pushing to the personal fork while the organization
 repository owned the domain.
+
+## Gumroad Overlay CSP
+
+A CSP source of `gumroad.com` does not include its subdomains. The loader at
+`https://gumroad.com/js/gumroad.js` loads its bundle and overlay styles from
+`https://assets.gumroad.com`, which must be allowed in both `script-src` and
+`style-src`. Its overlay design stylesheet also loads fonts from that asset
+origin, which must be allowed in `font-src`. The catalog links to
+`https://edgelessai.gumroad.com`, so that
+merchant origin must also be allowed in `frame-src`. The parent overlay does
+not require additional `connect-src` origins; requests made inside the merchant
+iframe are governed by Gumroad's own response policy, not the parent meta CSP.
+Prefer these explicit HTTPS hosts over a blanket wildcard.
+
+`npm run test:launch` includes source-policy regression tests. After building,
+serve `out/` locally and run the real-network browser probe:
+
+```bash
+node scripts/verify-gumroad-csp.mjs http://127.0.0.1:8877 /path/to/local-evidence
+```
+
+After the reviewed production deployment, run the same probe against the
+custom domain:
+
+```bash
+node scripts/verify-gumroad-csp.mjs https://edgelesslab.com /path/to/live-evidence
+```
+
+It checks `/products/`, `/`, and `/about/`, clicks a catalog purchase/download
+link without buying anything, and writes `browser-report.json` and an overlay
+screenshot. A local screenshot is not evidence of production deployment.

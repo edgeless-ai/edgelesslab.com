@@ -1,46 +1,59 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { AnalyticsConsentPanel } from "@/components/analytics-consent-panel";
-import { captureConsentedEvent, captureCookielessPageview, CONSENT_CHANGED_EVENT, CONSENT_STORAGE_KEY, getAnalyticsConsent, reconcileAnalyticsConsent } from "@/lib/analytics-consent";
+import { captureConsentedEvent, CONSENT_CHANGED_EVENT, CONSENT_STORAGE_KEY, hasAnalyticsConsent, reconcileAnalyticsConsent } from "@/lib/analytics-consent";
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const lastPageview = useRef<string | null>(null);
 
   useEffect(() => {
-    async function sync() {
+    let pollTimer: ReturnType<typeof setInterval> | null = null;
+
+    function sync() {
       if (reconcileAnalyticsConsent()) {
         window.location.reload();
         return;
       }
-      const choice = getAnalyticsConsent();
-      // Cookieless pageview only when consented — matches consent regression tests
-      if (choice === "accepted") {
-        const site = typeof window !== "undefined" && window.location.hostname.endsWith("shop.edgelesslab.com") ? "shop" : "main";
-        await captureCookielessPageview({
-          $current_url: window.location.origin + (pathname || window.location.pathname),
-          site,
-        });
-        await captureConsentedEvent("$pageview", {
-          $current_url: window.location.origin + (pathname || window.location.pathname),
-        });
+      if (!hasAnalyticsConsent()) {
+        lastPageview.current = null;
+        return;
+      }
+      const url = window.location.origin + (pathname || window.location.pathname);
+      if (lastPageview.current !== url) {
+        lastPageview.current = url;
+        void captureConsentedEvent("$pageview", { $current_url: url, site: "main" });
       }
     }
+
     function onStorage(event: StorageEvent) {
       if (event.key === CONSENT_STORAGE_KEY || event.key === null) {
-        // Use the event value so a rapid reject/reaccept in another tab still
-        // invalidates work from the earlier consent session.
-        reconcileAnalyticsConsent(event.newValue === "accepted" ? "accepted" : event.newValue === "rejected" ? "rejected" : null);
         sync();
       }
     }
+
+    function onCookiePoll() {
+      sync();
+    }
+
+    function onReveal() {
+      sync();
+    }
+
     sync();
     window.addEventListener(CONSENT_CHANGED_EVENT, sync);
     window.addEventListener("storage", onStorage);
+    window.addEventListener("focus", onReveal);
+    window.addEventListener("pageshow", onReveal);
+    pollTimer = setInterval(onCookiePoll, 1000);
     return () => {
       window.removeEventListener(CONSENT_CHANGED_EVENT, sync);
       window.removeEventListener("storage", onStorage);
+      window.removeEventListener("focus", onReveal);
+      window.removeEventListener("pageshow", onReveal);
+      if (pollTimer) clearInterval(pollTimer);
     };
   }, [pathname]);
 

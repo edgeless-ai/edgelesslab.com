@@ -1,7 +1,15 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const CONSENT_KEY = "edgeless.analytics-consent.v1";
 const trackingHost = /https:\/\/(?:[^/]+\.)?posthog\.com\//;
+
+test.beforeEach(async ({ context }) => {
+  // PostHog intentionally excludes webdriver visitors; exercise normal visitor behavior.
+  await context.addInitScript(() => {
+    Object.defineProperty(navigator, "webdriver", { get: () => false });
+    // Chromium can expose HeadlessChrome in client hints despite a normal UA.
+    Object.defineProperty(navigator, "userAgentData", { get: () => undefined });
+  });
+});
 
 async function analyticsStorage(page: Page) {
   return page.evaluate(() => ({
@@ -9,6 +17,13 @@ async function analyticsStorage(page: Page) {
     session: Object.keys(sessionStorage).filter((key) => /^(ph_|__ph_)/.test(key)),
     cookies: document.cookie.split(";").map((cookie) => cookie.trim()).filter((cookie) => /^(ph_|__ph_)/.test(cookie)),
   }));
+}
+
+async function consentCookie(page: Page) {
+  return page.evaluate(() => {
+    const match = document.cookie.match(/(?:^|; )edgeless\.analytics-consent\.v2=([^;]+)/);
+    return match ? match[1] : null;
+  });
 }
 
 test("no optional analytics before choice, after rejection, or after navigation", async ({ page, context }) => {
@@ -25,11 +40,12 @@ test("no optional analytics before choice, after rejection, or after navigation"
   await page.waitForTimeout(9000); // Covers the former 8-second unconditional startup.
   expect(requests).toEqual([]);
   expect(await analyticsStorage(page)).toEqual({ local: [], session: [], cookies: [] });
+  expect(await consentCookie(page)).toBeNull();
   await page.getByRole("button", { name: "Reject analytics", exact: true }).click();
   await page.reload();
   await expect(page.getByRole("heading", { name: "Analytics & cookies" })).toHaveCount(0);
   await page.goto("/about/");
-  expect(await page.evaluate((key) => localStorage.getItem(key), CONSENT_KEY)).toBe("rejected");
+  expect(await consentCookie(page)).toBe("rejected");
   expect(requests).toEqual([]);
   expect(await analyticsStorage(page)).toEqual({ local: [], session: [], cookies: [] });
   const settings = page.getByRole("button", { name: "Analytics settings", exact: true });
@@ -49,14 +65,15 @@ test("accepted analytics, failed-request revocation, and fresh reacceptance", as
   });
   await page.goto("/");
   await page.getByRole("button", { name: "Accept analytics", exact: true }).click();
-  // This check deliberately requires the build's existing PostHog project key.
+  // Build with the synthetic PUBLIC test key; all PostHog requests are intercepted.
   await expect.poll(() => requests.length, { timeout: 12_000 }).toBeGreaterThan(0);
+  expect(await consentCookie(page)).toBe("accepted");
   await page.getByRole("button", { name: "Analytics settings", exact: true }).click();
   await Promise.all([
     page.waitForEvent("domcontentloaded"),
     page.getByRole("button", { name: "Revoke analytics consent", exact: true }).click(),
   ]);
-  expect(await page.evaluate((key) => localStorage.getItem(key), CONSENT_KEY)).toBe("rejected");
+  expect(await consentCookie(page)).toBe("rejected");
   const afterRevoke = requests.length;
   await page.waitForTimeout(9000); // Covers SDK failed-request retries after opt-out.
   expect(requests.length).toBe(afterRevoke);
@@ -65,7 +82,7 @@ test("accepted analytics, failed-request revocation, and fresh reacceptance", as
   await page.getByRole("button", { name: "Analytics settings", exact: true }).click();
   await page.getByRole("button", { name: "Accept analytics", exact: true }).click();
   await expect.poll(() => requests.length).toBeGreaterThan(afterRevoke);
-  expect(await page.evaluate((key) => localStorage.getItem(key), CONSENT_KEY)).toBe("accepted");
+  expect(await consentCookie(page)).toBe("accepted");
 });
 
 test("existing unconsented identifiers are cleared and mobile controls fit", async ({ page, context }) => {
@@ -86,4 +103,46 @@ test("existing unconsented identifiers are cleared and mobile controls fit", asy
     expect(box!.x + box!.width).toBeLessThanOrEqual(375);
     expect(box!.height).toBeGreaterThanOrEqual(44);
   }
+});
+
+test("legacy acceptance is not revived and storage cannot override cookie rejection", async ({ page, context }) => {
+  const requests: string[] = [];
+  await context.route(trackingHost, (route) => { requests.push(route.request().url()); return route.abort(); });
+  await context.addInitScript(() => {
+    localStorage.setItem("edgeless.analytics-consent.v1", "accepted");
+    localStorage.setItem("edgeless.analytics-consent.v2", "accepted");
+  });
+  await page.goto("/");
+  await expect(page.getByRole("button", { name: "Accept analytics", exact: true })).toBeVisible();
+  expect(await consentCookie(page)).toBeNull();
+  await page.getByRole("button", { name: "Reject analytics", exact: true }).click();
+  await page.reload();
+  await page.waitForTimeout(2500);
+  expect(await consentCookie(page)).toBe("rejected");
+  expect(requests).toEqual([]);
+});
+
+test("cookie polling and focus do not repeat pageviews; route navigation captures once", async ({ page, context }) => {
+  const pageviews: string[] = [];
+  await context.route(trackingHost, (route) => {
+    const request = route.request();
+    const data = request.postData() || "";
+    // Count event endpoint attempts; SDK telemetry and configuration are not pageviews.
+    if (/\/e\//.test(request.url())) pageviews.push(data);
+    return route.fulfill({ json: { status: "Ok" } });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Accept analytics", exact: true }).click();
+  await expect.poll(() => pageviews.length).toBe(1);
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event("focus")); window.dispatchEvent(new Event("pageshow"));
+    window.dispatchEvent(new StorageEvent("storage", { key: "edgeless.analytics-consent.v2", newValue: "accepted" }));
+  });
+  await page.waitForTimeout(3200);
+  expect(pageviews).toHaveLength(1);
+  await page.locator('nav a[href="/about/"], nav a[href="/about"]').first().click();
+  await expect(page).toHaveURL(/\/about\/?$/);
+  await expect.poll(() => pageviews.length).toBe(2);
+  await page.waitForTimeout(2200);
+  expect(pageviews).toHaveLength(2);
 });

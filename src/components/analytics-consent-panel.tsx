@@ -12,6 +12,8 @@ export function AnalyticsConsentPanel() {
   const opener = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    let pollTimer: ReturnType<typeof setInterval> | null = null;
+
     function sync() { setChoice(getAnalyticsConsent()); setReady(true); }
     function open() {
       opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -20,14 +22,23 @@ export function AnalyticsConsentPanel() {
     function onStorage(event: StorageEvent) {
       if (event.key === CONSENT_STORAGE_KEY || event.key === null) sync();
     }
+    function onCookiePoll() { sync(); }
+    function onReveal() { sync(); }
+
     sync();
     window.addEventListener(CONSENT_SETTINGS_EVENT, open);
     window.addEventListener(CONSENT_CHANGED_EVENT, sync);
     window.addEventListener("storage", onStorage);
+    window.addEventListener("focus", onReveal);
+    window.addEventListener("pageshow", onReveal);
+    pollTimer = setInterval(onCookiePoll, 1000);
     return () => {
       window.removeEventListener(CONSENT_SETTINGS_EVENT, open);
       window.removeEventListener(CONSENT_CHANGED_EVENT, sync);
       window.removeEventListener("storage", onStorage);
+      window.removeEventListener("focus", onReveal);
+      window.removeEventListener("pageshow", onReveal);
+      if (pollTimer) clearInterval(pollTimer);
     };
   }, []);
   useEffect(() => { if (settings) title.current?.focus(); }, [settings]);

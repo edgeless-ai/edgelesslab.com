@@ -3,6 +3,7 @@ import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
 import { createPageMetadata } from "@/lib/metadata";
 import { ProductsGrid } from "@/components/products-grid";
+import { GumroadButton } from "@/components/gumroad-button";
 import { ProductsSubtitle } from "@/components/products-subtitle";
 import { EtsyCallout } from "@/components/etsy-callout";
 import { products } from "@/lib/data";
@@ -57,10 +58,10 @@ export default function ProductsPage() {
           </div>
 
           <div className="mb-12 flex flex-wrap items-center gap-3">
-            <a
-              href="https://edgelessai.gumroad.com/l/claude-memory-kit"
-              target="_blank"
-              rel="noopener noreferrer"
+            <GumroadButton
+              href="https://edgelessai.gumroad.com/l/claude-memory-kit?utm_source=edgelesslab&utm_medium=website&utm_campaign=products&utm_content=hero"
+              price="$29"
+              productName="Claude Memory Kit Pro"
               className="inline-flex h-10 items-center gap-2 border px-5 font-mono text-xs uppercase tracking-[0.1em] transition-colors"
               style={{
                 color: "var(--green)",
@@ -69,10 +70,10 @@ export default function ProductsPage() {
               }}
             >
               <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--green)" }} />
-              Start with Claude Memory Kit
-            </a>
+              Get Claude Memory Kit Pro
+            </GumroadButton>
             <span className="font-mono text-[11px]" style={{ color: "var(--text-tertiary)" }}>
-              Open references first
+              12 templates · 5 stack libraries
             </span>
           </div>
 

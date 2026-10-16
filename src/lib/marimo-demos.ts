@@ -270,6 +270,13 @@ export const marimoDemos: MarimoDemo[] = [
   },
 ];
 
+// A published URL is added only after live verification. Keep legacy/unpublished
+// records above for restoration, but never infer a runnable URL from a slug.
+export type PublishedMarimoDemo = MarimoDemo & { published_url: string };
+export const publishedMarimoDemos = marimoDemos.filter(
+  (demo): demo is PublishedMarimoDemo => Boolean(demo.published_url),
+);
+
    export const marimoCategories: MarimoDemo["category"][] = [
      "Finance/GPU",
      "Generative",

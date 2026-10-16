@@ -2,6 +2,7 @@ export interface MarimoDemo {
   slug: string;
   title: string;
   description: string;
+  published_url?: string | null;
   category: "Finance/GPU" | "Generative" | "Algorithms" | "Reactive" | "Research" | "AI evaluation";
   tags: string[];
 }
@@ -205,6 +206,7 @@ export const marimoDemos: MarimoDemo[] = [
   {
     slug: "borwein-falsifier",
     title: "Borwein Falsifier Demo",
+    published_url: "https://marimo.edgelesslab.com/borwein-falsifier/",
     description:
       "Interactive demonstration of Borwein-Borwein 2001 exact falsification — adjust n and tolerance to observe the precise n=7 deficit where the pattern breaks, with live validation and reactive controls.",
     category: "Research",
@@ -238,6 +240,7 @@ export const marimoDemos: MarimoDemo[] = [
   {
     slug: "2610.08936-clean-vs-robustness",
     title: "Clean accuracy is not adversarial robustness",
+    published_url: "https://marimo.edgelesslab.com/2610.08936-clean-vs-robustness/",
     description: "Explore why VCR-Bench's clean-accuracy leader is not its robust-accuracy leader, and stress-test the ranking under an explicitly hypothetical ASR multiplier.",
     category: "AI evaluation",
     tags: ["video classification", "adversarial robustness", "benchmarking", "published data"],
@@ -257,7 +260,22 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["diffusion language models", "adaptive compute", "recurrence", "inference"],
   },
+  {
+    slug: "2609.38201-speculative-tool-exec",
+    title: "When does speculative tool execution pay?",
+    description: "Break-even analysis for overlapping tool execution",
+    published_url: "https://marimo.edgelesslab.com/2609.38201-speculative-tool-exec/",
+    category: "Research",
+    tags: ["agents", "tool use", "speculative execution", "latency"],
+  },
 ];
+
+// A published URL is added only after live verification. Keep legacy/unpublished
+// records above for restoration, but never infer a runnable URL from a slug.
+export type PublishedMarimoDemo = MarimoDemo & { published_url: string };
+export const publishedMarimoDemos = marimoDemos.filter(
+  (demo): demo is PublishedMarimoDemo => Boolean(demo.published_url),
+);
 
    export const marimoCategories: MarimoDemo["category"][] = [
      "Finance/GPU",

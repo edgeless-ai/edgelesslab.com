@@ -12,7 +12,7 @@
 - Published **Edgeless Free Kit** with its clean cover, full contents list and verified archive. Approved customer path: `https://edgelessai.gumroad.com/l/edgeless-free-kit?wanted=true&price=0`.
 - Consolidated 17 resources with a two-page START-HERE.pdf, browser contents page, and SHA-256 file manifest. Uploaded archive downloaded back: byte-for-byte match, CRC valid, **10,439,098 bytes**. Removed bundled dependencies, generated builds, bytecode, and sales-listing drafts; retained original licenses. Prompt OS includes its complete team edition once, rather than three duplicate tiers.
 - Archives checked for extraction integrity and Python syntax parsed. Materials date to March–April 2026: compatibility with current services is **not integration-tested**. Prepared package/page explicitly label these as references requiring review and current vendor documentation, not current production guarantees.
-- One-CTA /products page, consent-aware click tracking and link to the existing `/services/private-ai-systems` offer prepared in an isolated worktree. Legacy product URLs now describe the consolidation (or retirement) rather than advertising unusable files and prices. The public catalog/search index now offers only the free kit.
+- Deployed the one-CTA /products page with consent-aware click tracking and link to `/services/private-ai-systems` on canonical main. Legacy product URLs now describe the consolidation (or retirement) rather than advertising unusable files and prices. The public catalog/search index now offers only the free kit.
 
 ### Approved checkout decision
 
@@ -56,7 +56,7 @@ Seller API readback: **0 lifetime claims on all 22 records**, so baseline emails
 
 Isolated dependency installation fixed the inherited cross-worktree executable wrappers. Full static export succeeded. Full Vitest run: **176 passed across 17 test files**; replaced superseded paid-kit regression assertions.
 
-Release gate: require exact-head Frontend Tests, E2E Tests and Pages deployment, then production desktop/mobile /products and actual checkout verification. Deployment evidence is recorded on task t_70d5046b.
+Deployed implementation **b0690afb956d4ca5b1da9a99ddb13c898354d0d9** to canonical main. Exact-head Frontend Tests (38852604496), E2E Tests (38852604472), and CI/CD with successful Deploy to GitHub Pages (38852604481) passed. Local Playwright: **14 passed**. Clean Chromium on the custom domain at desktop 1440×1000 and mobile 390×844: HTTP 200, one kit CTA, no stale paid claims, no horizontal overflow, **0 /products CSP violations and 0 page errors**. Both actual CTA clicks reached the published kit at **US$0** with required-email validation and no visible card/amount fields. No email entered and no claim/payment submitted. Gumroad's separate checkout emits Google Fonts CSP warnings under its own policy; those do not occur on /products and did not block the free checkout. Final release handoff is recorded on task t_70d5046b.
 
 ## CRO kickoff — 2026-10-15
 

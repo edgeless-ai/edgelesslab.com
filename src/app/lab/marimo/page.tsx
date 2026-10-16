@@ -40,7 +40,7 @@ export default function MarimoPage() {
             "@type": "ListItem",
             position: i + 1,
             name: demo.title,
-            url: `https://edgelesslab.com/marimo/${demo.slug}/`,
+            url: demo.published_url ?? `https://edgelesslab.com/marimo/${demo.slug}/`,
           })),
         }}
       />
@@ -138,7 +138,7 @@ export default function MarimoPage() {
 function DemoCard({ demo }: { demo: MarimoDemo }) {
   return (
     <a
-      href={`https://edgelesslab.com/marimo/${demo.slug}/`}
+      href={demo.published_url ?? `https://edgelesslab.com/marimo/${demo.slug}/`}
       target="_blank"
       rel="noopener noreferrer"
       className="group block rounded-lg border p-4 transition-all hover:border-[var(--border-hover)]"

@@ -2,6 +2,7 @@ export interface MarimoDemo {
   slug: string;
   title: string;
   description: string;
+  published_url?: string | null;
   category: "Finance/GPU" | "Generative" | "Algorithms" | "Reactive" | "Research" | "AI evaluation";
   tags: string[];
 }
@@ -205,6 +206,7 @@ export const marimoDemos: MarimoDemo[] = [
   {
     slug: "borwein-falsifier",
     title: "Borwein Falsifier Demo",
+    published_url: "https://marimo.edgelesslab.com/borwein-falsifier/",
     description:
       "Interactive demonstration of Borwein-Borwein 2001 exact falsification — adjust n and tolerance to observe the precise n=7 deficit where the pattern breaks, with live validation and reactive controls.",
     category: "Research",
@@ -238,6 +240,7 @@ export const marimoDemos: MarimoDemo[] = [
   {
     slug: "2610.08936-clean-vs-robustness",
     title: "Clean accuracy is not adversarial robustness",
+    published_url: "https://marimo.edgelesslab.com/2610.08936-clean-vs-robustness/",
     description: "Explore why VCR-Bench's clean-accuracy leader is not its robust-accuracy leader, and stress-test the ranking under an explicitly hypothetical ASR multiplier.",
     category: "AI evaluation",
     tags: ["video classification", "adversarial robustness", "benchmarking", "published data"],
@@ -256,6 +259,14 @@ export const marimoDemos: MarimoDemo[] = [
     description: "Explore how entropy commitment and cumulative halting allocate recurrent depth across deterministic synthetic token positions, with paper-anchored layer accounting and explicit speed-claim boundaries.",
     category: "Research",
     tags: ["diffusion language models", "adaptive compute", "recurrence", "inference"],
+  },
+  {
+    slug: "2609.38201-speculative-tool-exec",
+    title: "When does speculative tool execution pay?",
+    description: "Break-even analysis for overlapping tool execution",
+    published_url: "https://marimo.edgelesslab.com/2609.38201-speculative-tool-exec/",
+    category: "Research",
+    tags: ["agents", "tool use", "speculative execution", "latency"],
   },
 ];
 

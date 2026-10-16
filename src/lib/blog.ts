@@ -3341,7 +3341,7 @@ The Effect-TS implementation makes the servers composable and type-safe. Error h
 
 The biggest challenge with AI agents isn't reasoning; it's memory. A conversation ends, and everything learned evaporates.
 
-I open-sourced the basic version as the [Claude Memory Kit](https://github.com/edgeless-ai/claude-memory-kit) and built a [Pro version](https://edgelessai.gumroad.com/l/claude-memory-kit) with stack-specific libraries and advanced patterns.
+I open-sourced the basic version as the [Claude Memory Kit](https://github.com/edgeless-ai/claude-memory-kit). The former Pro download is retired; the current [Edgeless Free Kit](https://edgelessai.gumroad.com/l/edgeless-free-kit?wanted=true&price=0) collects the available references and templates in one free download.
 
 The solution is a three-layer memory system:
 
@@ -3491,7 +3491,7 @@ I've open-sourced the base memory kit with templates for all four memory types, 
 
 The free version covers 90% of use cases. For production patterns including stack-specific libraries (React/Next.js, Python/FastAPI, Go, Rails, Rust), multi-project memory architectures, and CLAUDE.md templates:
 
-**Pro ($29):** [Claude Memory Kit Pro on Gumroad](https://edgelessai.gumroad.com/l/claude-memory-kit)
+**Update — free resources:** The Pro download is retired. [Get the Edgeless Free Kit](https://edgelessai.gumroad.com/l/edgeless-free-kit?wanted=true&price=0) for the available references and templates; the former Pro file is not included.
 
 The best time to set up memory is before your next session. Takes 15 minutes, saves hours every week.
     `.trim(),

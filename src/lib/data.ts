@@ -1,4 +1,5 @@
 import { PLOTTER } from "./plotter-stats";
+import { FREE_KIT_URL } from "./free-kit";
 
 export interface Product {
   name: string;
@@ -36,7 +37,18 @@ export const TAG_ADVANCED = { label: "Advanced", score: 3 as const };
 
 const UTM = "utm_source=edgelesslab&utm_medium=website&utm_campaign=products";
 
-export const products: Product[] = [
+// The public catalog has one offer. Legacy data below exists only to preserve inbound routes.
+export const products: Product[] = [{
+  name: "Edgeless Free Kit",
+  price: "Free",
+  description: "17 AI development references, templates and examples in one email-delivered kit. Assembled March–April 2026; check current documentation before use.",
+  features: ["17 resources", "START-HERE.pdf", "HTML contents and file manifest"],
+  href: FREE_KIT_URL,
+  badge: "Free kit",
+  category: "Resources",
+}];
+
+export const legacyProducts: Product[] = [
   {
     name: "CLAUDE.md Template Pack",
     price: "Free",

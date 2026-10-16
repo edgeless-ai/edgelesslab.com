@@ -257,6 +257,7 @@ export const marimoDemos: MarimoDemo[] = [
     slug: "2610.04198-alodlm-depth-allocation",
     title: "ALoDLM Token-Depth Allocator",
     description: "Explore how entropy commitment and cumulative halting allocate recurrent depth across deterministic synthetic token positions, with paper-anchored layer accounting and explicit speed-claim boundaries.",
+    published_url: "https://marimo.edgelesslab.com/2610.04198-alodlm-depth-allocation/",
     category: "Research",
     tags: ["diffusion language models", "adaptive compute", "recurrence", "inference"],
   },

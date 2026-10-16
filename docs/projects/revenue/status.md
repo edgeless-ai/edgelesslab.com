@@ -1,5 +1,63 @@
 # Revenue status
 
+## Free-kit migration — 2026-10-15 (incomplete)
+
+**Current decision:** Gumroad = lead capture, not revenue. Everything is free. Primary metric: **emails captured/week**, counted as unique email addresses on completed free Gumroad claims in the trailing seven days. Retain only aggregate counts here, never buyer emails. Consented `cta_clicked` with `cta_name=free_kit_checkout` is a separate intent metric, not a purchase or captured email. The earlier paid-Pro positioning and missing-token statements below are historical and superseded.
+
+### Verified progress
+
+- Complete pagination found **21 original products**, including all eight reportedly missing short codes in the same account.
+- All original base prices set to zero and individually read back; Prompt Engineering OS version surcharges also set to zero and read back.
+- **17 original listings remain published**, each base price zero. Four unusable products unpublished and individually read back.
+- Created **Edgeless Free Kit** as an **unpublished draft** at `https://edgelessai.gumroad.com/l/edgeless-free-kit`. Do not send traffic to it yet.
+- Consolidated 17 resources with a two-page START-HERE.pdf, browser contents page, and SHA-256 file manifest. Uploaded archive downloaded back: byte-for-byte match, CRC valid, **10,439,098 bytes**. Removed bundled dependencies, generated builds, bytecode, and sales-listing drafts; retained original licenses. Prompt OS includes its complete team edition once, rather than three duplicate tiers.
+- Archives checked for extraction integrity and Python syntax parsed. Materials date to March–April 2026: compatibility with current services is **not integration-tested**. Prepared package/page explicitly label these as references requiring review and current vendor documentation, not current production guarantees.
+- Prepared one-CTA /products page, cover, contents, consent-aware click tracking and link to the existing `/services/private-ai-systems` offer in an isolated worktree. **Not deployed.**
+
+### Blocker / decision
+
+Gumroad automatically enables pay-what-you-want for a zero base price. Documentation and API readbacks agree: `customizable_price=false` via form/JSON, empty values, and a zero-priced version all leave `customizable_price=true`. A native `$0` product without pay-what-you-want cannot be represented as requested.
+
+Real Chromium test on an existing resource with `?wanted=true&price=0`: direct checkout showed **Total US$0**, required email and **Get**, with no card fields or amount prompt. No claim/payment submitted. Prepared site uses this direct-checkout pattern. This is **not** verification of the unpublished bundle; its ordinary Gumroad product page would still expose pay-what-you-want.
+
+**Decision needed:** approve direct zero-price checkout as the no-nag customer path despite native product-page behavior, or choose a different email-gated delivery mechanism.
+
+Two subsequent compound mutation commands were refused before execution by the tool safety gate (`Potential credential file access`). Attempted original-listing consolidation and kit-description update **did not execute**. Do not assume success or bypass the gate.
+
+### Product disposition
+
+| Product | Status | Reason |
+| --- | --- | --- |
+| CLAUDE.md Template Pack | Included in draft kit; original free | Extractable templates; start-here resource |
+| Claude Code Cheat Sheet | Included in draft kit; original free | Extractable browser reference |
+| Quick Reference Cards | Included in draft kit; original free | Extractable reference material |
+| The Agent Cookbook | Included in draft kit; original free | Extractable examples and guide |
+| AI Code Review Playbook | Included in draft kit; original free | Extractable review references |
+| Hooks Library | Included in draft kit; original free | Extractable examples; review before running |
+| Claude Code Hooks Deep Dive | Included in draft kit; original free | Extractable documentation/examples |
+| Obsidian + Claude Code Setup Kit | Included in draft kit; original free | Extractable setup references |
+| MCP Server Starter Kit | Included in draft kit; original free | Extractable starter examples; API compatibility unverified |
+| Production MCP Server Kit | Included in draft kit; original free | Extractable templates; not a current production guarantee |
+| n8n AI Workflow Templates | Included in draft kit; original free | Extractable workflows; import into a test instance |
+| Prompt Testing Framework | Included in draft kit; original free | Extractable source examples |
+| The Prompt Engineering OS | Included in draft kit; original free | Complete team edition; smaller duplicates omitted |
+| Multi-Agent Orchestration Blueprint | Included in draft kit; original free | Extractable architecture references |
+| Autonomous Agent Safety Patterns | Included in draft kit; original free | Extractable safety references |
+| Generative Art Starter Kit | Included in draft kit; original free | Extractable browser sketches |
+| Digital Product Launch Toolkit | Included in draft kit; original free | Extractable planning templates |
+| Claude Memory Kit Pro | Retired / unpublished | Corrupt ZIP; invalid-distance zlib extraction failure |
+| Edgeless Agent Starter Kit | Retired / unpublished | No delivered files; empty paid tiers |
+| Email Inbox Triage — Gmail Classifier & Router | Retired / unpublished | No delivered files; unfinished draft |
+| AI Digital Product Factory | Retired / unpublished | No delivered files; unfinished draft / paid tiers |
+
+### Acceptance remaining
+
+Actual completed-claim/email baseline has not been calculated. Earlier PostHog baseline below remains historical, not evidence of captured emails. After release compare equivalent seven-day completed free claims, deduplicated emails, consented /products views, and free-kit CTA events separately.
+
+Targeted free-kit regression tests: **4 passed** (real Vitest run). `git diff --check` passed. Full build attempted but blocked by inherited shared node_modules executable wrappers resolving to a different worktree (missing TypeScript CLI path); design-system checks ran 69 tests successfully before that failure. No full static export or deployment claimed.
+
+Still required: resolve pricing constraint; finish kit copy/cover and publication; verify actual bundle checkout; repair isolated dependency installation, build and commit/push canonical main; require exact-head Frontend Tests, E2E Tests and Pages deployment; verify live desktop/mobile /products with zero CSP violations. Do not report this migration complete.
+
 ## CRO kickoff — 2026-10-15
 
 ### Baseline (before the featured-CTA change)

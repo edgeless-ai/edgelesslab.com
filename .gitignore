@@ -9,6 +9,7 @@ out/
 # Standalone directory stash (preserve-standalone.sh)
 .standalone-stash/
 public/pen-plotter/assets/
+public/pen-plotter/fonts/boska-*.woff2
 pen-plotter/assets/
 
 # Generated 3D assets — keep only PNGs in repo

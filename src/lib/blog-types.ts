@@ -32,3 +32,15 @@ export interface BlogPost {
  * historical type name without redeclaring the shape.
  */
 export type BlogPostMeta = BlogPost;
+
+/** Only fields rendered or searched by the interactive blog listing. */
+export type BlogPostSummary = Pick<
+  BlogPost,
+  "slug" | "title" | "description" | "date" | "tags"
+>;
+
+/** Project explicitly: future article fields must not leak into client props. */
+export function toBlogPostSummary(post: BlogPost): BlogPostSummary {
+  const { slug, title, description, date, tags } = post;
+  return { slug, title, description, date, tags };
+}

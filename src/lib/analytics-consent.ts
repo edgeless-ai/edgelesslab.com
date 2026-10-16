@@ -164,7 +164,6 @@ async function ensureAnalytics() {
       opt_out_persistence_by_default: true,
       request_batching: false,
       api_transport: "fetch",
-      disable_beacon: true,
       fetch_options: fetchOptions,
       before_send: (event) => hasAnalyticsConsent() ? event : null,
       cross_subdomain_cookie: true,

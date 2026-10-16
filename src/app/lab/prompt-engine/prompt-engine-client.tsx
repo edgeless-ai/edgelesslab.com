@@ -55,6 +55,14 @@ import {
 } from "@/lib/prompt-engine/dedupe";
 import { formatRoundBlock, nextRound } from "@/lib/prompt-engine/round";
 import {
+  emptyWideState,
+  normalizeWideState,
+  rollWide,
+  WIDE_GRAMMARS,
+  type WideData,
+  type WideState,
+} from "@/lib/prompt-engine/wide";
+import {
   CustomizeDrawer,
   loadCustomBanks,
   saveCustomBanks,
@@ -103,8 +111,11 @@ interface Corpus {
 
 type SrefPoolChoice = "default" | "single" | "varied";
 type GirlChoice = "off" | "on";
+/** wide = the wide.py port (default); classic = the blender.py themes. */
+type EngineChoice = "wide" | "classic";
 
 interface Settings {
+  engine: EngineChoice;
   theme: string;
   recipe: string; // "wide" or a recipe key
   count: number;
@@ -118,6 +129,15 @@ interface Settings {
   girl: GirlChoice;
   /** Engine contract (blender.py --girl-rate N): INTEGER "every Nth prompt". */
   girlRate: number;
+  /** wide.py --brand-rate: share of prompts carrying NOUS RESEARCH / HERMES. */
+  wideBrandRate: number;
+  /** Append --draft (wide.py default; --no-draft turns it off). */
+  wideDraft: boolean;
+  /** Pin every prompt to one register / grammar (site-only extension). */
+  wideRegister: string | null;
+  wideGrammar: string | null;
+  /** Save the advanced coverage state after a roll (wide.py without --dry). */
+  wideAdvance: boolean;
 }
 
 interface StoredPrompt {
@@ -154,6 +174,8 @@ const UNCHECKED_NOTICE =
   "and round export is disabled (a made-up round number would corrupt the log).";
 
 const LS_KEY = "el-prompt-engine-history-v1";
+/** wide.py's .wide_state.json, per browser: coverage cursors + last rounds. */
+const WIDE_STATE_LS_KEY = "el-prompt-engine-wide-state-v1";
 const HISTORY_MAX = 20;
 const DEFAULT_THEME = Object.keys(THEMES)[0] ?? "nous-branded";
 
@@ -161,6 +183,7 @@ const defaultSettings = (
   theme: string,
   themesMap: Banks["THEMES"] = THEMES,
 ): Settings => ({
+  engine: "wide",
   theme,
   recipe: "wide",
   count: 24,
@@ -173,6 +196,11 @@ const defaultSettings = (
   lockPalette: null,
   girl: "off",
   girlRate: 4, // every 4th prompt (~25%)
+  wideBrandRate: 0.45,
+  wideDraft: true,
+  wideRegister: null,
+  wideGrammar: null,
+  wideAdvance: true,
 });
 
 /**
@@ -192,8 +220,12 @@ function normalizeGirlRate(v: unknown): number {
  * (the engine's default girlRate is 0), so it maps to "off".
  */
 function normalizeSettings(s: Settings): Settings {
+  const wideDefaults = defaultSettings(s.theme);
   return {
+    ...wideDefaults,
     ...s,
+    // entries saved before the wide engine existed were classic rolls
+    engine: s.engine === "wide" ? "wide" : "classic",
     girl: s.girl === "on" ? "on" : "off",
     girlRate: normalizeGirlRate(s.girlRate),
     markStyle: s.markStyle === "none" ? "wordmark" : s.markStyle,
@@ -225,6 +257,28 @@ function ordinal(n: number): string {
       ? "th"
       : (["th", "st", "nd", "rd"][n % 10] ?? "th");
   return `${n}${suffix}`;
+}
+
+function loadWideState(): WideState {
+  try {
+    const raw = window.localStorage.getItem(WIDE_STATE_LS_KEY);
+    return raw ? normalizeWideState(JSON.parse(raw)) : emptyWideState();
+  } catch {
+    return emptyWideState();
+  }
+}
+
+function summarizeWideState(state: WideState): { walked: number; rounds: number } {
+  return { walked: state.offsets.grammar ?? 0, rounds: state.rounds.length };
+}
+
+function saveWideState(state: WideState): boolean {
+  try {
+    window.localStorage.setItem(WIDE_STATE_LS_KEY, JSON.stringify(state));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -328,14 +382,24 @@ export function PromptEngineClient() {
   );
   const srefIndexRef = useRef<SrefIndex | null>(null);
   const [srefReady, setSrefReady] = useState(false);
+  /** wide.json (banks + ~4k-entry corpora), code-split and loaded on demand. */
+  const wideDataRef = useRef<WideData | null>(null);
+  const [wideData, setWideData] = useState<WideData | null>(null);
+  /** Summary of this browser's persisted wide coverage state (display only). */
+  const [wideStateInfo, setWideStateInfo] = useState<{
+    walked: number;
+    rounds: number;
+  } | null>(null);
+  const isWide = settings.engine === "wide";
 
   const theme = RESOLVED_THEMES[settings.theme];
   const isBranded = theme?.markStyle === "wordmark";
   const needsSrefs = theme?.srefMode != null;
   // Roll-wide burns one derived seed per recipe slice (seed..seed+span-1);
   // burned-seed checks must cover the whole window, not just the base seed.
+  // The wide engine burns exactly one seed per batch.
   const seedSpan =
-    settings.recipe === "wide" ? (theme?.recipes.length ?? 1) : 1;
+    !isWide && settings.recipe === "wide" ? (theme?.recipes.length ?? 1) : 1;
 
   /* ------------------------- corpus (small, fetched once) ---------- */
 
@@ -471,6 +535,47 @@ export function PromptEngineClient() {
     return hits;
   }, [seed, seedSpan, burnedSet]);
 
+  /* ------------------------- wide engine data (lazy) -------------- */
+
+  const loadWideData = useCallback(async (): Promise<WideData> => {
+    if (wideDataRef.current) return wideDataRef.current;
+    const mod = await import("@/lib/prompt-engine/data/wide.json");
+    wideDataRef.current = mod.default as unknown as WideData;
+    setWideData(wideDataRef.current);
+    return wideDataRef.current;
+  }, []);
+
+  // Load the wide banks (for the register picker) and read the persisted
+  // coverage summary once the wide engine is active. Post-mount only.
+  useEffect(() => {
+    if (!isWide) return;
+    let cancelled = false;
+    (async () => {
+      await Promise.resolve();
+      if (cancelled) return;
+      setWideStateInfo(summarizeWideState(loadWideState()));
+      try {
+        await loadWideData();
+      } catch {
+        if (!cancelled) {
+          setGenError("Wide engine banks failed to load — reload the page to retry.");
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isWide, loadWideData]);
+
+  const resetWideCoverage = useCallback(() => {
+    try {
+      window.localStorage.removeItem(WIDE_STATE_LS_KEY);
+    } catch {
+      // storage unavailable: nothing persisted, nothing to clear
+    }
+    setWideStateInfo(summarizeWideState(emptyWideState()));
+  }, []);
+
   /* ------------------------- srefs (1.2MB, lazy) ------------------- */
 
   const loadSrefIndex = useCallback(async () => {
@@ -514,111 +619,158 @@ export function PromptEngineClient() {
     setSrefNotice(null);
     setDedupeNotice(null);
     try {
-      const th = RESOLVED_THEMES[settings.theme];
-      if (!th) {
-        // The selected theme vanished (e.g. a custom theme deleted from the
-        // Customize drawer while it was active). Fail soft, don't crash.
-        setGenError(
-          `Theme "${settings.theme}" is no longer defined — pick a theme above.`,
-        );
-        return;
-      }
-      const recipes =
-        settings.recipe === "wide" ? th.recipes : [settings.recipe];
-
-      // Museum/random-stacked themes need the sref index — lazy fetch now.
-      let srefIndex: SrefIndex | null = null;
-      if (th.srefMode != null) {
-        srefIndex = await loadSrefIndex();
-        if (!srefIndex) {
-          setSrefNotice(
-            "Museum reference pack unavailable — generating without --sref image refs. " +
-              "(Refs are best-effort anyway: AIC URLs are deprioritized due to 403s and safe-flags are approximate.)",
-          );
-        }
-      }
-
-      const srefCountPool =
-        settings.srefPool === "single"
-          ? [2]
-          : settings.srefPool === "varied"
-            ? [1, 2, 2, 3]
-            : undefined;
-
-      const lock: Record<string, string> = {};
-      if (settings.lockInfluence) lock.influence = settings.lockInfluence;
-      if (settings.lockPalette) lock.palette = settings.lockPalette;
-
-      // Roll-wide: spread the batch across every recipe in the theme, one
-      // engine roll per recipe with its own derived RNG seed. indexOffset +
-      // coverageSeed make the slices behave as ONE batch: the
-      // coverage-guaranteed picker walks a single shared permutation across
-      // all slices (batch-level "every entry before repeats", not just
-      // per-slice), and girl slots fire every Nth prompt of the BATCH rather
-      // than restarting at each slice's first prompt.
-      const per = Math.floor(settings.count / recipes.length);
-      const extra = settings.count % recipes.length;
-      // Palette restraint is a BATCH-shape control, like girl slots and
-      // coverage. One SHARED mutable budget object (share × requested count)
-      // goes to every slice, and the ENGINE debits it as pops are emitted —
-      // no per-slice bookkeeping here. Per-slice maxSaturatedShare instead
-      // floored each slice's cap (share 0.35 over six n=4 slices = a hard 1
-      // pop per slice, a 25% ceiling the slider never asked for).
-      const paletteBudget: SaturatedBudget | null =
-        settings.maxSaturatedShare < 1
-          ? { remaining: settings.maxSaturatedShare * settings.count }
-          : null;
       const rolled: GeneratedPrompt[] = [];
       const used: number[] = [];
-      const recipeErrors: string[] = [];
-      recipes.forEach((recipe, i) => {
-        const n = per + (i < extra ? 1 : 0);
-        if (n <= 0) return;
-        const s = seed + i;
-        used.push(s);
-        const opts: RollOptions = {
-          recipe,
-          n,
-          seed: s,
-          indexOffset: rolled.length,
-          coverageSeed: seed,
-          theme: settings.theme,
-          coverage: settings.coverage,
-          texture: settings.texture,
-          ...(Object.keys(lock).length ? { lock } : {}),
-          ...(paletteBudget ? { saturatedBudget: paletteBudget } : {}),
-          ...(srefCountPool ? { srefCountPool } : {}),
-          // "quiet" is NOT a mark style in the engine — it's the separate
-          // opts.quiet boolean (blender.py --quiet); markStyle only
-          // special-cases "sentence", everything else renders the wordmark.
-          ...(isBranded
-            ? settings.markStyle === "quiet"
-              ? { quiet: true }
-              : { markStyle: settings.markStyle }
-            : {}),
-          girlRate:
-            settings.girl === "on" ? normalizeGirlRate(settings.girlRate) : 0,
-          ...(th.srefMode != null ? { srefIndex } : {}),
-        };
-        // Pass the RESOLVED custom banks so real batches roll with the user's
-        // taste (added entries surface, disabled ones vanish). Absent custom
-        // config, resolveBanks returns the defaults untouched — byte-identical
-        // to the pre-BYO path.
-        // Degrade per recipe: if the user emptied an axis this recipe needs,
-        // the engine throws a clear message — collect it, keep the recipes
-        // that CAN roll (roll-wide should not die because one lane is starved).
-        try {
-          rolled.push(...roll(opts, resolved));
-        } catch (err) {
-          recipeErrors.push(err instanceof Error ? err.message : String(err));
-        }
-      });
-      if (recipeErrors.length > 0) {
-        setGenError(
-          rolled.length === 0
-            ? recipeErrors[0]
-            : `Some recipes were skipped: ${[...new Set(recipeErrors)].join(" · ")}`,
+      if (settings.engine === "wide") {
+        // wide.py port: one seed, persistent per-axis coverage read from (and,
+        // unless preview mode is on, written back to) this browser's storage.
+        const d = await loadWideData();
+        const res = rollWide(
+          {
+            n: settings.count,
+            seed,
+            brandRate: settings.wideBrandRate,
+            draft: settings.wideDraft,
+            lock: {
+              ...(settings.wideRegister != null ? { register: settings.wideRegister } : {}),
+              ...(settings.wideGrammar != null ? { grammar: settings.wideGrammar } : {}),
+            },
+          },
+          d,
+          loadWideState(),
         );
+        if (settings.wideAdvance) {
+          if (!saveWideState(res.state)) {
+            setStorageNotice(
+              "Could not save wide coverage state (quota?) — coverage restarts on the next visit.",
+            );
+          }
+          setWideStateInfo(summarizeWideState(res.state));
+        }
+        used.push(res.seed);
+        res.prompts.forEach((p, index) =>
+          rolled.push({
+            text: p.text,
+            meta: {
+              index,
+              seed: res.seed,
+              recipe: p.grammar,
+              ar: p.ar,
+              girl: false,
+              subject: p.subject,
+              register: p.register,
+              palette: p.palette,
+              mode: p.mode,
+              format: p.format,
+            },
+          }),
+        );
+      } else {
+        const th = RESOLVED_THEMES[settings.theme];
+        if (!th) {
+          // The selected theme vanished (e.g. a custom theme deleted from the
+          // Customize drawer while it was active). Fail soft, don't crash.
+          setGenError(
+            `Theme "${settings.theme}" is no longer defined — pick a theme above.`,
+          );
+          return;
+        }
+        const recipes =
+          settings.recipe === "wide" ? th.recipes : [settings.recipe];
+
+        // Museum/random-stacked themes need the sref index — lazy fetch now.
+        let srefIndex: SrefIndex | null = null;
+        if (th.srefMode != null) {
+          srefIndex = await loadSrefIndex();
+          if (!srefIndex) {
+            setSrefNotice(
+              "Museum reference pack unavailable — generating without --sref image refs. " +
+                "(Refs are best-effort anyway: AIC URLs are deprioritized due to 403s and safe-flags are approximate.)",
+            );
+          }
+        }
+
+        const srefCountPool =
+          settings.srefPool === "single"
+            ? [2]
+            : settings.srefPool === "varied"
+              ? [1, 2, 2, 3]
+              : undefined;
+
+        const lock: Record<string, string> = {};
+        if (settings.lockInfluence) lock.influence = settings.lockInfluence;
+        if (settings.lockPalette) lock.palette = settings.lockPalette;
+
+        // Roll-wide: spread the batch across every recipe in the theme, one
+        // engine roll per recipe with its own derived RNG seed. indexOffset +
+        // coverageSeed make the slices behave as ONE batch: the
+        // coverage-guaranteed picker walks a single shared permutation across
+        // all slices (batch-level "every entry before repeats", not just
+        // per-slice), and girl slots fire every Nth prompt of the BATCH rather
+        // than restarting at each slice's first prompt.
+        const per = Math.floor(settings.count / recipes.length);
+        const extra = settings.count % recipes.length;
+        // Palette restraint is a BATCH-shape control, like girl slots and
+        // coverage. One SHARED mutable budget object (share × requested count)
+        // goes to every slice, and the ENGINE debits it as pops are emitted —
+        // no per-slice bookkeeping here. Per-slice maxSaturatedShare instead
+        // floored each slice's cap (share 0.35 over six n=4 slices = a hard 1
+        // pop per slice, a 25% ceiling the slider never asked for).
+        const paletteBudget: SaturatedBudget | null =
+          settings.maxSaturatedShare < 1
+            ? { remaining: settings.maxSaturatedShare * settings.count }
+            : null;
+        const recipeErrors: string[] = [];
+        recipes.forEach((recipe, i) => {
+          const n = per + (i < extra ? 1 : 0);
+          if (n <= 0) return;
+          const s = seed + i;
+          used.push(s);
+          const opts: RollOptions = {
+            recipe,
+            n,
+            seed: s,
+            indexOffset: rolled.length,
+            coverageSeed: seed,
+            theme: settings.theme,
+            coverage: settings.coverage,
+            texture: settings.texture,
+            ...(Object.keys(lock).length ? { lock } : {}),
+            ...(paletteBudget ? { saturatedBudget: paletteBudget } : {}),
+            ...(srefCountPool ? { srefCountPool } : {}),
+            // "quiet" is NOT a mark style in the engine — it's the separate
+            // opts.quiet boolean (blender.py --quiet); markStyle only
+            // special-cases "sentence", everything else renders the wordmark.
+            ...(isBranded
+              ? settings.markStyle === "quiet"
+                ? { quiet: true }
+                : { markStyle: settings.markStyle }
+              : {}),
+            girlRate:
+              settings.girl === "on" ? normalizeGirlRate(settings.girlRate) : 0,
+            ...(th.srefMode != null ? { srefIndex } : {}),
+          };
+          // Pass the RESOLVED custom banks so real batches roll with the user's
+          // taste (added entries surface, disabled ones vanish). Absent custom
+          // config, resolveBanks returns the defaults untouched — byte-identical
+          // to the pre-BYO path.
+          // Degrade per recipe: if the user emptied an axis this recipe needs,
+          // the engine throws a clear message — collect it, keep the recipes
+          // that CAN roll (roll-wide should not die because one lane is starved).
+          try {
+            rolled.push(...roll(opts, resolved));
+          } catch (err) {
+            recipeErrors.push(err instanceof Error ? err.message : String(err));
+          }
+        });
+        if (recipeErrors.length > 0) {
+          setGenError(
+            rolled.length === 0
+              ? recipeErrors[0]
+              : `Some recipes were skipped: ${[...new Set(recipeErrors)].join(" · ")}`,
+          );
+        }
+
       }
 
       const c = await loadCorpus();
@@ -723,7 +875,7 @@ export function PromptEngineClient() {
         setSeed(
           randomSeed(
             new Set([...(c?.burnedSeeds ?? []), ...sessionBurned, ...used]),
-            recipes.length,
+            seedSpan,
           ),
         );
       } else {
@@ -744,9 +896,11 @@ export function PromptEngineClient() {
     sessionBurned,
     loadCorpus,
     loadSrefIndex,
+    loadWideData,
     persistHistory,
     resolved,
     RESOLVED_THEMES,
+    seedSpan,
   ]);
 
   /* ------------------------- derived ------------------------------- */
@@ -794,7 +948,14 @@ export function PromptEngineClient() {
       settings.recipe === "wide"
         ? `roll-wide across ${RESOLVED_THEMES[th].recipes.join("/")}`
         : `recipe=${settings.recipe}`;
-    const bits = [
+    const bits = settings.engine === "wide" ? [
+      `dashboard roll — engine=wide.py port${wideDataRef.current ? ` @${wideDataRef.current.sourceHash}` : ""}`,
+      `n=${includedPrompts.length}${flaggedCount && !includeDupes ? ` (${flaggedCount} dupes dropped)` : ""}`,
+      `brand-rate=${settings.wideBrandRate.toFixed(2)}`,
+      settings.wideRegister ? `register=${settings.wideRegister}` : null,
+      settings.wideGrammar ? `grammar=${settings.wideGrammar}` : null,
+      settings.wideAdvance ? null : "coverage preview (not advanced)",
+    ].filter(Boolean) : [
       `dashboard roll — theme=${th}`,
       recipeDesc,
       `n=${includedPrompts.length}${flaggedCount && !includeDupes ? ` (${flaggedCount} dupes dropped)` : ""}`,
@@ -909,7 +1070,13 @@ export function PromptEngineClient() {
     (key: string) => {
       setSettings((prev) => ({
         ...defaultSettings(key, RESOLVED_THEMES),
-        // keep batch-shape prefs across theme switches
+        // keep the engine + its prefs and batch-shape prefs across theme switches
+        engine: prev.engine,
+        wideBrandRate: prev.wideBrandRate,
+        wideDraft: prev.wideDraft,
+        wideRegister: prev.wideRegister,
+        wideGrammar: prev.wideGrammar,
+        wideAdvance: prev.wideAdvance,
         count: prev.count,
         maxSaturatedShare: prev.maxSaturatedShare,
         texture: prev.texture,
@@ -937,13 +1104,16 @@ export function PromptEngineClient() {
   return (
     <div>
       {/* ======================= Customize (BYO taste) =============== */}
-      <CustomizeDrawer
-        customBanks={customBanks}
-        setCustomBanks={setCustomBanks}
-        resolved={resolved}
-        theme={settings.theme}
-        recipe={settings.recipe}
-      />
+      {/* Taste packs customize the classic (blender.py) banks only. */}
+      {!isWide && (
+        <CustomizeDrawer
+          customBanks={customBanks}
+          setCustomBanks={setCustomBanks}
+          resolved={resolved}
+          theme={settings.theme}
+          recipe={settings.recipe}
+        />
+      )}
 
       {/* ============================ Controls ======================== */}
       <section
@@ -953,16 +1123,29 @@ export function PromptEngineClient() {
           borderColor: "var(--border-subtle)",
         }}
       >
-        {/* Theme cards */}
-        <FieldLabel>Theme</FieldLabel>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-          {Object.keys(RESOLVED_THEMES).map((key) => {
-            const active = settings.theme === key;
+        {/* Engine */}
+        <FieldLabel>Engine</FieldLabel>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+          {(
+            [
+              [
+                "wide",
+                "Wide",
+                "wide.py — 18 sentence shapes, 226 registers, ~2,200 subjects, museum srefs, per-axis coverage and repeat caps.",
+              ],
+              [
+                "classic",
+                "Classic themes",
+                "blender.py — themed recipe banks, palette restraint, influence locks, and your own taste packs.",
+              ],
+            ] as [EngineChoice, string, string][]
+          ).map(([key, label, blurb]) => {
+            const active = settings.engine === key;
             return (
               <button
                 key={key}
                 type="button"
-                onClick={() => setTheme(key)}
+                onClick={() => setSettings((s) => ({ ...s, engine: key }))}
                 className="text-left rounded-lg border p-3.5 transition-all"
                 style={{
                   background: active ? "var(--accent-muted)" : "var(--bg-elevated)",
@@ -974,43 +1157,89 @@ export function PromptEngineClient() {
                   className="text-sm font-medium mb-1"
                   style={{ color: active ? "var(--accent)" : "var(--text-primary)" }}
                 >
-                  {themeLabel(key)}
+                  {label}
                 </div>
                 <div
                   className="text-xs"
                   style={{ color: "var(--text-tertiary)", lineHeight: 1.45 }}
                 >
-                  {THEME_INFO[key]?.blurb ?? `${RESOLVED_THEMES[key].recipes.length} recipes — custom`}
+                  {blurb}
                 </div>
               </button>
             );
           })}
         </div>
 
-        {/* Recipe chips */}
-        <FieldLabel>Recipes</FieldLabel>
-        <div className="flex flex-wrap gap-2 mb-2">
-          <Chip
-            active={settings.recipe === "wide"}
-            onClick={() => setSettings((s) => ({ ...s, recipe: "wide" }))}
-          >
-            <Sparkles size={12} className="inline -mt-0.5 mr-1" />
-            Roll wide — all {theme?.recipes.length ?? 0} recipes
-          </Chip>
-          {(theme?.recipes ?? []).map((r) => (
-            <Chip
-              key={r}
-              active={settings.recipe === r}
-              onClick={() => setSettings((s) => ({ ...s, recipe: r }))}
-            >
-              {r}
-            </Chip>
-          ))}
-        </div>
-        <p className="text-xs mb-6" style={{ color: "var(--text-tertiary)" }}>
-          Wide is the point of this tool: spread the batch across every recipe, then filter —
-          don&apos;t hand-pick a narrow lane.
-        </p>
+        {isWide ? (
+          <WideControls
+            settings={settings}
+            setSettings={setSettings}
+            data={wideData}
+            stateInfo={wideStateInfo}
+            onResetCoverage={resetWideCoverage}
+          />
+        ) : (
+          <>
+            {/* Theme cards */}
+            <FieldLabel>Theme</FieldLabel>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+              {Object.keys(RESOLVED_THEMES).map((key) => {
+                const active = settings.theme === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setTheme(key)}
+                    className="text-left rounded-lg border p-3.5 transition-all"
+                    style={{
+                      background: active ? "var(--accent-muted)" : "var(--bg-elevated)",
+                      borderColor: active ? "var(--accent)" : "var(--border-subtle)",
+                    }}
+                    aria-pressed={active}
+                  >
+                    <div
+                      className="text-sm font-medium mb-1"
+                      style={{ color: active ? "var(--accent)" : "var(--text-primary)" }}
+                    >
+                      {themeLabel(key)}
+                    </div>
+                    <div
+                      className="text-xs"
+                      style={{ color: "var(--text-tertiary)", lineHeight: 1.45 }}
+                    >
+                      {THEME_INFO[key]?.blurb ?? `${RESOLVED_THEMES[key].recipes.length} recipes — custom`}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Recipe chips */}
+            <FieldLabel>Recipes</FieldLabel>
+            <div className="flex flex-wrap gap-2 mb-2">
+              <Chip
+                active={settings.recipe === "wide"}
+                onClick={() => setSettings((s) => ({ ...s, recipe: "wide" }))}
+              >
+                <Sparkles size={12} className="inline -mt-0.5 mr-1" />
+                Roll wide — all {theme?.recipes.length ?? 0} recipes
+              </Chip>
+              {(theme?.recipes ?? []).map((r) => (
+                <Chip
+                  key={r}
+                  active={settings.recipe === r}
+                  onClick={() => setSettings((s) => ({ ...s, recipe: r }))}
+                >
+                  {r}
+                </Chip>
+              ))}
+            </div>
+            <p className="text-xs mb-6" style={{ color: "var(--text-tertiary)" }}>
+              Wide is the point of this tool: spread the batch across every recipe, then filter —
+              don&apos;t hand-pick a narrow lane.
+            </p>
+          </>
+        )}
 
         {/* Count / seed row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
@@ -1098,271 +1327,280 @@ export function PromptEngineClient() {
             </p>
           </div>
 
-          <div>
-            <FieldLabel>
-              Palette restraint —{" "}
-              {settings.maxSaturatedShare >= 1
-                ? "no cap"
-                : `≤${Math.round(settings.maxSaturatedShare * 100)}% saturated`}
-            </FieldLabel>
-            <input
-              type="range"
-              min={0}
-              max={1}
-              step={0.05}
-              value={settings.maxSaturatedShare}
-              onChange={(e) =>
-                setSettings((s) => ({
-                  ...s,
-                  maxSaturatedShare: Number(e.target.value),
-                }))
-              }
-              className="w-full accent-[var(--accent)]"
-              aria-label="Palette restraint"
-            />
-            <div
-              className="flex justify-between text-[10px] font-mono"
-              style={{ color: "var(--text-tertiary)" }}
-            >
-              <span>restrained</span>
-              <span>saturated</span>
-            </div>
-          </div>
-
-          <div>
-            <FieldLabel>Style refs per prompt (--sref)</FieldLabel>
-            <div className="flex gap-2">
-              {(
-                [
-                  ["default", "theme default"],
-                  ["single", "2 refs"],
-                  ["varied", "1–3 refs"],
-                ] as [SrefPoolChoice, string][]
-              ).map(([val, label]) => (
-                <Chip
-                  key={val}
-                  active={settings.srefPool === val}
-                  disabled={!needsSrefs}
-                  onClick={() => setSettings((s) => ({ ...s, srefPool: val }))}
+          {!isWide && (
+            <>
+              <div>
+                <FieldLabel>
+                  Palette restraint —{" "}
+                  {settings.maxSaturatedShare >= 1
+                    ? "no cap"
+                    : `≤${Math.round(settings.maxSaturatedShare * 100)}% saturated`}
+                </FieldLabel>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={settings.maxSaturatedShare}
+                  onChange={(e) =>
+                    setSettings((s) => ({
+                      ...s,
+                      maxSaturatedShare: Number(e.target.value),
+                    }))
+                  }
+                  className="w-full accent-[var(--accent)]"
+                  aria-label="Palette restraint"
+                />
+                <div
+                  className="flex justify-between text-[10px] font-mono"
+                  style={{ color: "var(--text-tertiary)" }}
                 >
-                  {label}
-                </Chip>
-              ))}
-            </div>
-            {!needsSrefs && (
-              <p className="text-[10px] mt-1" style={{ color: "var(--text-tertiary)" }}>
-                this theme doesn&apos;t use image refs
-              </p>
-            )}
-          </div>
+                  <span>restrained</span>
+                  <span>saturated</span>
+                </div>
+              </div>
+
+              <div>
+                <FieldLabel>Style refs per prompt (--sref)</FieldLabel>
+                <div className="flex gap-2">
+                  {(
+                    [
+                      ["default", "theme default"],
+                      ["single", "2 refs"],
+                      ["varied", "1–3 refs"],
+                    ] as [SrefPoolChoice, string][]
+                  ).map(([val, label]) => (
+                    <Chip
+                      key={val}
+                      active={settings.srefPool === val}
+                      disabled={!needsSrefs}
+                      onClick={() => setSettings((s) => ({ ...s, srefPool: val }))}
+                    >
+                      {label}
+                    </Chip>
+                  ))}
+                </div>
+                {!needsSrefs && (
+                  <p className="text-[10px] mt-1" style={{ color: "var(--text-tertiary)" }}>
+                    this theme doesn&apos;t use image refs
+                  </p>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
-        {/* Toggles row */}
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mb-2">
-          <Toggle
-            label="Coverage-guaranteed picks"
-            checked={settings.coverage}
-            onChange={(v) => setSettings((s) => ({ ...s, coverage: v }))}
-            // Honest scope: on themes with the TAGGED subject bank (engine
-            // pickSubject) subjects stay resonance-weighted regardless of
-            // this flag — only untagged banks get the full guarantee.
-            hint={
-              theme?.subjects === "SUBJECTS_LARGE"
-                ? "every influence and subject surfaces evenly — no silent favorites"
-                : "influences surface evenly across the batch; subjects stay resonance-weighted on this theme"
-            }
-          />
-          <Toggle
-            label="Texture"
-            checked={settings.texture}
-            onChange={(v) => setSettings((s) => ({ ...s, texture: v }))}
-          />
-          {isBranded && (
-            <label
-              className="flex items-center gap-2 text-sm"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              Mark style
-              <select
-                value={settings.markStyle}
-                onChange={(e) =>
-                  setSettings((s) => ({ ...s, markStyle: e.target.value }))
+        {!isWide && (
+          <>
+            {/* Toggles row */}
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mb-2">
+              <Toggle
+                label="Coverage-guaranteed picks"
+                checked={settings.coverage}
+                onChange={(v) => setSettings((s) => ({ ...s, coverage: v }))}
+                // Honest scope: on themes with the TAGGED subject bank (engine
+                // pickSubject) subjects stay resonance-weighted regardless of
+                // this flag — only untagged banks get the full guarantee.
+                hint={
+                  theme?.subjects === "SUBJECTS_LARGE"
+                    ? "every influence and subject surfaces evenly — no silent favorites"
+                    : "influences surface evenly across the batch; subjects stay resonance-weighted on this theme"
                 }
-                className="rounded-md border px-2 py-1 text-sm"
+              />
+              <Toggle
+                label="Texture"
+                checked={settings.texture}
+                onChange={(v) => setSettings((s) => ({ ...s, texture: v }))}
+              />
+              {isBranded && (
+                <label
+                  className="flex items-center gap-2 text-sm"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Mark style
+                  <select
+                    value={settings.markStyle}
+                    onChange={(e) =>
+                      setSettings((s) => ({ ...s, markStyle: e.target.value }))
+                    }
+                    className="rounded-md border px-2 py-1 text-sm"
+                    style={{
+                      background: "var(--bg-elevated)",
+                      borderColor: "var(--border-subtle)",
+                      color: "var(--text-primary)",
+                    }}
+                  >
+                    {/* "none" is not offered: on a branded theme the engine has no
+                        mark-suppression path (it falls through to the wordmark),
+                        so offering it would be a silent no-op. "quiet" maps to the
+                        engine's opts.quiet boolean, not a mark style. */}
+                    {["wordmark", "sentence", "quiet"].map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              <button
+                type="button"
+                onClick={() => setShowAdvanced((v) => !v)}
+                aria-expanded={showAdvanced}
+                className="flex items-center gap-1 text-xs font-mono uppercase tracking-wider"
+                style={{ color: "var(--text-tertiary)" }}
+              >
+                Advanced
+                <ChevronDown
+                  size={14}
+                  style={{
+                    transform: showAdvanced ? "rotate(180deg)" : undefined,
+                    transition: "transform 0.15s",
+                  }}
+                />
+              </button>
+            </div>
+
+            {/* Advanced */}
+            {showAdvanced && (
+              <div
+                className="rounded-lg border p-4 mt-3 grid grid-cols-1 sm:grid-cols-3 gap-5"
                 style={{
                   background: "var(--bg-elevated)",
                   borderColor: "var(--border-subtle)",
-                  color: "var(--text-primary)",
                 }}
               >
-                {/* "none" is not offered: on a branded theme the engine has no
-                    mark-suppression path (it falls through to the wordmark),
-                    so offering it would be a silent no-op. "quiet" maps to the
-                    engine's opts.quiet boolean, not a mark style. */}
-                {["wordmark", "sentence", "quiet"].map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-          <button
-            type="button"
-            onClick={() => setShowAdvanced((v) => !v)}
-            aria-expanded={showAdvanced}
-            className="flex items-center gap-1 text-xs font-mono uppercase tracking-wider"
-            style={{ color: "var(--text-tertiary)" }}
-          >
-            Advanced
-            <ChevronDown
-              size={14}
-              style={{
-                transform: showAdvanced ? "rotate(180deg)" : undefined,
-                transition: "transform 0.15s",
-              }}
-            />
-          </button>
-        </div>
+                {/* Lock influence */}
+                <div>
+                  <FieldLabel>Lock influence</FieldLabel>
+                  {settings.lockInfluence ? (
+                    <span
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono"
+                      style={{ background: "var(--accent-muted)", color: "var(--accent)" }}
+                    >
+                      {resolved.INFLUENCE[settings.lockInfluence]?.name ?? settings.lockInfluence}
+                      <button
+                        type="button"
+                        aria-label="Clear influence lock"
+                        onClick={() =>
+                          setSettings((s) => ({ ...s, lockInfluence: null }))
+                        }
+                      >
+                        <X size={12} />
+                      </button>
+                    </span>
+                  ) : (
+                    <>
+                      <input
+                        type="text"
+                        value={influenceQuery}
+                        onChange={(e) => setInfluenceQuery(e.target.value)}
+                        placeholder={`search ${Object.keys(resolved.INFLUENCE).length} influences…`}
+                        className="w-full rounded-md border px-2.5 py-1.5 text-sm"
+                        style={{
+                          background: "var(--bg-surface)",
+                          borderColor: "var(--border-subtle)",
+                          color: "var(--text-primary)",
+                        }}
+                      />
+                      {influenceMatches.length > 0 && (
+                        <ul className="mt-1.5 space-y-1">
+                          {influenceMatches.map(([key, v]) => (
+                            <li key={key}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSettings((s) => ({ ...s, lockInfluence: key }));
+                                  setInfluenceQuery("");
+                                }}
+                                className="w-full text-left text-xs px-2 py-1 rounded hover:bg-[var(--bg-surface-hover)]"
+                                style={{ color: "var(--text-secondary)" }}
+                              >
+                                <span style={{ color: "var(--text-primary)" }}>{v.name}</span>{" "}
+                                <span className="font-mono">· {v.domain}</span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  )}
+                </div>
 
-        {/* Advanced */}
-        {showAdvanced && (
-          <div
-            className="rounded-lg border p-4 mt-3 grid grid-cols-1 sm:grid-cols-3 gap-5"
-            style={{
-              background: "var(--bg-elevated)",
-              borderColor: "var(--border-subtle)",
-            }}
-          >
-            {/* Lock influence */}
-            <div>
-              <FieldLabel>Lock influence</FieldLabel>
-              {settings.lockInfluence ? (
-                <span
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono"
-                  style={{ background: "var(--accent-muted)", color: "var(--accent)" }}
-                >
-                  {resolved.INFLUENCE[settings.lockInfluence]?.name ?? settings.lockInfluence}
-                  <button
-                    type="button"
-                    aria-label="Clear influence lock"
-                    onClick={() =>
-                      setSettings((s) => ({ ...s, lockInfluence: null }))
+                {/* Lock palette */}
+                <div>
+                  <FieldLabel>Lock palette</FieldLabel>
+                  <select
+                    value={settings.lockPalette ?? ""}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        lockPalette: e.target.value || null,
+                      }))
                     }
-                  >
-                    <X size={12} />
-                  </button>
-                </span>
-              ) : (
-                <>
-                  <input
-                    type="text"
-                    value={influenceQuery}
-                    onChange={(e) => setInfluenceQuery(e.target.value)}
-                    placeholder={`search ${Object.keys(resolved.INFLUENCE).length} influences…`}
-                    className="w-full rounded-md border px-2.5 py-1.5 text-sm"
+                    className="w-full rounded-md border px-2 py-1.5 text-sm"
                     style={{
                       background: "var(--bg-surface)",
                       borderColor: "var(--border-subtle)",
                       color: "var(--text-primary)",
                     }}
-                  />
-                  {influenceMatches.length > 0 && (
-                    <ul className="mt-1.5 space-y-1">
-                      {influenceMatches.map(([key, v]) => (
-                        <li key={key}>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSettings((s) => ({ ...s, lockInfluence: key }));
-                              setInfluenceQuery("");
-                            }}
-                            className="w-full text-left text-xs px-2 py-1 rounded hover:bg-[var(--bg-surface-hover)]"
-                            style={{ color: "var(--text-secondary)" }}
-                          >
-                            <span style={{ color: "var(--text-primary)" }}>{v.name}</span>{" "}
-                            <span className="font-mono">· {v.domain}</span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Lock palette */}
-            <div>
-              <FieldLabel>Lock palette</FieldLabel>
-              <select
-                value={settings.lockPalette ?? ""}
-                onChange={(e) =>
-                  setSettings((s) => ({
-                    ...s,
-                    lockPalette: e.target.value || null,
-                  }))
-                }
-                className="w-full rounded-md border px-2 py-1.5 text-sm"
-                style={{
-                  background: "var(--bg-surface)",
-                  borderColor: "var(--border-subtle)",
-                  color: "var(--text-primary)",
-                }}
-              >
-                <option value="">— any —</option>
-                {resolved.PALETTE.map((p) => (
-                  <option key={p.text} value={p.text}>
-                    [{p.category}] {p.text}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Girl mode */}
-            <div>
-              <FieldLabel>Girl mode</FieldLabel>
-              <p className="text-[10px] mb-1.5" style={{ color: "var(--text-tertiary)" }}>
-                weaves the recurring reference-image character into every Nth prompt of the batch
-              </p>
-              <div className="flex items-center gap-2 flex-wrap">
-                {(["off", "on"] as GirlChoice[]).map((g) => (
-                  <Chip
-                    key={g}
-                    active={settings.girl === g}
-                    onClick={() => setSettings((s) => ({ ...s, girl: g }))}
                   >
-                    {g}
-                  </Chip>
-                ))}
-                {settings.girl === "on" && (
-                  <span className="flex items-center gap-2 text-xs" style={{ color: "var(--text-tertiary)" }}>
-                    {/* Engine contract: integer "every Nth prompt", like
-                        blender.py --girl-rate N (NOT a percentage). */}
-                    every{" "}
-                    {settings.girlRate === 1
-                      ? "prompt"
-                      : `${ordinal(settings.girlRate)} prompt`}{" "}
-                    (~{Math.round(100 / settings.girlRate)}%)
-                    <input
-                      type="range"
-                      min={1}
-                      max={8}
-                      step={1}
-                      value={settings.girlRate}
-                      onChange={(e) =>
-                        setSettings((s) => ({
-                          ...s,
-                          girlRate: Math.max(1, Math.round(Number(e.target.value))),
-                        }))
-                      }
-                      className="w-24 accent-[var(--accent)]"
-                      aria-label="Girl rate (every Nth prompt)"
-                    />
-                  </span>
-                )}
+                    <option value="">— any —</option>
+                    {resolved.PALETTE.map((p) => (
+                      <option key={p.text} value={p.text}>
+                        [{p.category}] {p.text}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Girl mode */}
+                <div>
+                  <FieldLabel>Girl mode</FieldLabel>
+                  <p className="text-[10px] mb-1.5" style={{ color: "var(--text-tertiary)" }}>
+                    weaves the recurring reference-image character into every Nth prompt of the batch
+                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {(["off", "on"] as GirlChoice[]).map((g) => (
+                      <Chip
+                        key={g}
+                        active={settings.girl === g}
+                        onClick={() => setSettings((s) => ({ ...s, girl: g }))}
+                      >
+                        {g}
+                      </Chip>
+                    ))}
+                    {settings.girl === "on" && (
+                      <span className="flex items-center gap-2 text-xs" style={{ color: "var(--text-tertiary)" }}>
+                        {/* Engine contract: integer "every Nth prompt", like
+                            blender.py --girl-rate N (NOT a percentage). */}
+                        every{" "}
+                        {settings.girlRate === 1
+                          ? "prompt"
+                          : `${ordinal(settings.girlRate)} prompt`}{" "}
+                        (~{Math.round(100 / settings.girlRate)}%)
+                        <input
+                          type="range"
+                          min={1}
+                          max={8}
+                          step={1}
+                          value={settings.girlRate}
+                          onChange={(e) =>
+                            setSettings((s) => ({
+                              ...s,
+                              girlRate: Math.max(1, Math.round(Number(e.target.value))),
+                            }))
+                          }
+                          className="w-24 accent-[var(--accent)]"
+                          aria-label="Girl rate (every Nth prompt)"
+                        />
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            )}
+
+          </>
         )}
 
         {/* Generate */}
@@ -1380,7 +1618,7 @@ export function PromptEngineClient() {
                 <span role="status" aria-live="polite">
                   {checkProgress
                     ? `Checking dupes ${checkProgress.done}/${checkProgress.total}…`
-                    : needsSrefs && !srefReady
+                    : !isWide && needsSrefs && !srefReady
                       ? "Loading museum refs…"
                       : "Rolling…"}
                 </span>
@@ -1429,8 +1667,11 @@ export function PromptEngineClient() {
               // can find. Blaming the palette when no cap is set sends the
               // visitor to a slider that won't help.
               const paletteActive =
-                settings.maxSaturatedShare < 1 || settings.lockPalette != null;
-              const remedy = paletteActive
+                !isWide &&
+                (settings.maxSaturatedShare < 1 || settings.lockPalette != null);
+              const remedy = isWide
+                ? "wide.py's per-60 caps and the no-repeat window ran out of fresh candidates — unlock the register or grammar, shrink the batch, or reset coverage."
+                : paletteActive
                 ? "Loosen the palette-restraint slider or unlock the palette, then generate again."
                 : "Clear a locked influence, shrink the batch, or switch recipes to open up more combinations.";
               return prompts.length === 0
@@ -1537,10 +1778,26 @@ export function PromptEngineClient() {
             className="text-[11px] font-mono mb-3"
             style={{ color: "var(--text-tertiary)" }}
           >
-            house flags: every prompt carries <code>--s 150 --draft</code> —
-            draft renders fast at preview quality; delete{" "}
-            <code>--draft</code> after pasting when you want a final-quality
-            render
+            {isWide ? (
+              <>
+                wide flags: weighted <code>--ar</code> (21:9 rare), varied{" "}
+                <code>--s</code>, <code>--sref</code> as 2–3 stacked museum image
+                URLs, random, or none
+                {settings.wideDraft && (
+                  <>
+                    ; <code>--draft</code> renders fast at preview quality — delete it
+                    after pasting for a final-quality render
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                house flags: every prompt carries <code>--s 150 --draft</code> —
+                draft renders fast at preview quality; delete{" "}
+                <code>--draft</code> after pasting when you want a final-quality
+                render
+              </>
+            )}
           </p>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -1655,6 +1912,149 @@ export function PromptEngineClient() {
 /* Small building blocks                                              */
 /* ------------------------------------------------------------------ */
 
+function recentLabel(n: number): string {
+  return n === 1 ? "last batch" : `last ${n} batches`;
+}
+
+/** Controls for the wide.py engine: register/grammar pins, brand rate, coverage. */
+function WideControls({
+  settings,
+  setSettings,
+  data,
+  stateInfo,
+  onResetCoverage,
+}: {
+  settings: Settings;
+  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+  data: WideData | null;
+  stateInfo: { walked: number; rounds: number } | null;
+  onResetCoverage: () => void;
+}) {
+  const registers = useMemo(
+    () =>
+      (data?.registers ?? [])
+        .map(([phrase]) => phrase)
+        .sort((a, b) => a.localeCompare(b)),
+    [data],
+  );
+  const subjects = data
+    ? data.corpora.curated.length + data.corpora.museum.length
+    : null;
+  const selectStyle = {
+    background: "var(--bg-elevated)",
+    borderColor: "var(--border-subtle)",
+    color: "var(--text-primary)",
+  };
+  return (
+    <div className="mb-6">
+      <p className="text-xs mb-4 max-w-3xl" style={{ color: "var(--text-tertiary)", lineHeight: 1.5 }}>
+        Each prompt picks one of {WIDE_GRAMMARS.length} sentence shapes and walks every axis
+        it uses with a coverage cursor saved in this browser, so a bank is exhausted before
+        anything repeats — across batches, not just inside one.
+        {data &&
+          ` ${data.registers.length} registers, ${data.processes.length} print processes, ${data.modes.length} capture modes, ${data.formats.length} formats, ${subjects?.toLocaleString()} subjects, ${data.corpora.artists.length} artists blended 2–3 at a time, ${data.corpora.srefs.length.toLocaleString()} museum image refs.`}{" "}
+        Every 60 prompts are capped: one use per register, at most two per motif, three per
+        artist, five per opening word.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div>
+          <FieldLabel>Register</FieldLabel>
+          <select
+            value={settings.wideRegister ?? ""}
+            onChange={(e) =>
+              setSettings((s) => ({ ...s, wideRegister: e.target.value || null }))
+            }
+            className="w-full rounded-md border px-2 py-1.5 text-sm"
+            style={selectStyle}
+            aria-label="Register"
+            disabled={!data}
+          >
+            <option value="">— walk all {registers.length || ""} —</option>
+            {registers.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <FieldLabel>Grammar</FieldLabel>
+          <select
+            value={settings.wideGrammar ?? ""}
+            onChange={(e) =>
+              setSettings((s) => ({ ...s, wideGrammar: e.target.value || null }))
+            }
+            className="w-full rounded-md border px-2 py-1.5 text-sm"
+            style={selectStyle}
+            aria-label="Grammar"
+          >
+            <option value="">— walk all {WIDE_GRAMMARS.length} —</option>
+            {WIDE_GRAMMARS.map((g) => {
+              // With a register pinned, only grammars that render one apply.
+              const noRegister =
+                settings.wideRegister != null &&
+                data != null &&
+                !data.grammars[g]?.includes("register");
+              return (
+                <option key={g} value={g} disabled={noRegister}>
+                  {g.replace(/_/g, " ")}
+                  {noRegister ? " (no register)" : ""}
+                </option>
+              );
+            })}
+          </select>
+        </div>
+        <div>
+          <FieldLabel>Brand — {Math.round(settings.wideBrandRate * 100)}% of prompts</FieldLabel>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.05}
+            value={settings.wideBrandRate}
+            onChange={(e) =>
+              setSettings((s) => ({ ...s, wideBrandRate: Number(e.target.value) }))
+            }
+            className="w-full accent-[var(--accent)]"
+            aria-label="Brand rate"
+          />
+          <p className="text-[10px] mt-1" style={{ color: "var(--text-tertiary)" }}>
+            NOUS RESEARCH or HERMES, always quoted, as a physical text object native to the
+            register
+          </p>
+        </div>
+        <div className="flex flex-col gap-2">
+          <FieldLabel>Coverage</FieldLabel>
+          <Toggle
+            label="Advance coverage"
+            checked={settings.wideAdvance}
+            onChange={(v) => setSettings((s) => ({ ...s, wideAdvance: v }))}
+            hint="Off = preview: roll without saving the coverage cursor (wide.py --dry)"
+          />
+          <Toggle
+            label="--draft"
+            checked={settings.wideDraft}
+            onChange={(v) => setSettings((s) => ({ ...s, wideDraft: v }))}
+          />
+          <p className="text-[10px]" style={{ color: "var(--text-tertiary)" }}>
+            {stateInfo && stateInfo.walked > 0
+              ? `${stateInfo.walked.toLocaleString()} candidates walked · ${recentLabel(Math.min(stateInfo.rounds, data?.maxSubjectRounds ?? 3))} excluded from repeats · `
+              : "fresh coverage · "}
+            <button
+              type="button"
+              onClick={onResetCoverage}
+              className="underline"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              reset
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
     <div
@@ -1762,6 +2162,7 @@ function PromptCard({
 
   const chips: string[] = [
     prompt.meta.recipe,
+    prompt.meta.register,
     prompt.meta.influenceName ?? undefined,
     prompt.meta.paletteCategory ? `palette:${prompt.meta.paletteCategory}` : undefined,
     prompt.meta.ar ? `ar ${prompt.meta.ar}` : undefined,

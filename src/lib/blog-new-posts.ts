@@ -3474,4 +3474,141 @@ We registered edgeless.wei as the canonical on-chain identity for the swarm. Eve
 
 Your name, on-chain, without the hex.`.trim(),
   },
+  {
+    slug: "generation-left-the-screen",
+    editorial: true,
+    title: "Generation Left the Screen",
+    description:
+      "Two and a half years ago, AI video was the story. Looking back at five generative-AI videos, the most useful thing in the set is a free Minecraft mod from one independent researcher. Here's what that says about where generation went next.",
+    date: "2026-10-02",
+    tags: ["Generative AI", "AI Infrastructure", "Palworld", "Minecraft", "Research"],
+    readTime: "7 min",
+    processNote: "Human-directed research and writing, AI-assisted editing. Claims spot-checked against primary sources.",
+    content: `# Generation Left the Screen
+
+*A look back at five generative-AI videos, four from early 2024 and one from July 2026, read with what we know as of October 2026.*
+
+This isn't a news roundup. Four of the five videos here came out between January and May 2024: Wes Roth on [Palworld](https://www.youtube.com/watch?v=JozOhAPitms), on [OpenAI's Sora preview](https://www.youtube.com/watch?v=1Xo7CmkrSVQ), on [the Sora artist showcase and Hollywood demos](https://www.youtube.com/watch?v=nKlb1ygfYxk), and on [the Astribot S1 robot](https://www.youtube.com/watch?v=wjnPvD7MgTI). The fifth, Two Minute Papers on [infinite diffusion terrain in Minecraft](https://www.youtube.com/watch?v=Ae9q7KsRbuI), came out in July 2026. Watched together, with hindsight, they show where the hype pointed, where the work landed, and which fears were the right ones.
+
+## 1. The pattern: generation is moving from media into worlds and bodies
+
+Taken together, the five videos trace one arc. Generative models started with flat media and kept reaching for things that have structure, persistence, and physics.
+
+- **Video as a stand-in for a world.** When OpenAI previewed Sora in February 2024, it described the model as [a diffusion transformer working on "spacetime patches" of video](https://openai.com/index/video-generation-models-as-world-simulators/). The research page's title made a bigger claim: "Video generation models as world simulators." The body text is more careful. It says the results "suggest" that scaling video generation is "a promising path" toward general-purpose simulators of the physical world. That's a hypothesis, and researchers [have been arguing about it since](https://arxiv.org/abs/2405.03520).
+- **Worlds you can walk around in.** The Two Minute Papers video covers a SIGGRAPH 2026 paper by a single independent researcher, Alexander Goslin ([arXiv:2512.08309](https://arxiv.org/abs/2512.08309)). His method, InfiniteDiffusion, extends an earlier technique that blends overlapping diffusion windows so the windows aren't confined to a fixed canvas. Terrain can extend indefinitely, stays the same for a given seed, and can be looked up at any point in constant time. Constant time is per lookup. Total compute still grows as you explore more ground.
+- **Game worlds and what's in them.** Palworld became the lightning rod for "AI-made game" anxiety in early 2024. Section 2 covers what that accusation turned out to be worth.
+- **Bodies.** The Astribot S1 video is about where generation goes next: models that output motion instead of pixels.
+
+How the Sora story ended shows the arc most clearly. In March 2026 OpenAI [said it would discontinue Sora](https://www.pcmag.com/news/that-was-fast-openai-to-shut-down-sora-video-generator-app). It cited compute demand and said the Sora research team would keep working on world simulation "to advance robotics." The web and app versions closed on April 26, 2026 ([OpenAI Help Center](https://help.openai.com/en/articles/20001152-what-to-know-about-the-sora-discontinuation)). The API [shut down on September 24, 2026](https://developers.openai.com/api/reference/python/resources/videos/methods/list), and OpenAI says there is no one-to-one replacement. The product is gone. Its research thesis is now pointed at bodies.
+
+## 2. Two takes the videos set against each other
+
+### The optimistic take: tools in more hands
+
+The strongest case for generative AI in this set isn't the flashiest one. Goslin's terrain work shipped as [a free, MIT-licensed Minecraft mod](https://github.com/xandergos/terrain-diffusion-mc), also on [Modrinth](https://modrinth.com/mod/terrain-diffusion). The repo lists about 1.5 GB of VRAM and a one-time model download of roughly 2.5 GB. One person built a peer-reviewed method and released it in a form players can run at home. That's "tools empower individuals" in its most concrete form.
+
+The paper is candid about its limits, and they're worth repeating. Because it generates in windows, scattered lookups across uncached regions are inefficient. Minecraft features that depend on long-range biome searches, \`/locate biome\` and explorer maps, aren't supported. That candor is part of what makes the work credible.
+
+The Sora showcase makes the same argument with more spectacle. In March 2024, OpenAI [released short films that visual artists and directors made with Sora](https://arstechnica.com/ai/2024/03/openai-shows-off-sora-ai-video-generator-to-hollywood-execs), along with their first impressions. The usual optimistic reading compares it to the printing press: a tool lowers the cost of producing a medium, so more people get to make things in it. That's an interpretation, not a finding. The Hollywood angle needs precision too. The FT, as reported by Ars Technica, described Sam Altman's studio meetings as demos, not partnership talks. "There have been no meetings with OpenAI about partnerships," one studio executive said. "They've done demos."
+
+Two and a half years on, the two halves of the optimistic case look very different. The open, single-author tool is still downloadable today. The closed, compute-hungry platform that artists were invited to try is gone. If tools empower people, it matters whether the tool is one they get to keep.
+
+### The anxious take: labor, copyright, and autonomy
+
+The Palworld video's title calls it a "$100,000,000 AI game." Neither half of that holds up.
+
+- **The money.** We found no primary source for a $100 million figure. What's documented is [over 4 million copies in its first weekend](https://www.videogameschronicle.com/news/palworld-hits-more-concurrent-steam-players-than-any-paid-game-in-history), [5 million in three days](https://www.techradar.com/gaming/trigger-happy-pokemon-alike-palworld-passes-5-million-sales-and-12-million-concurrent-steam-users), and [6 million in four days](https://www.ign.com/articles/palworld-overtakes-counter-strike-to-become-the-second-most-played-game-ever-on-steam), all as reported by Pocketpair. That's an enormous launch. It isn't the number in the title.
+- **The "AI" part.** Artists accused developer Pocketpair of using generative AI. The evidence was circumstantial: the CEO's 2021–2022 posts about early AI image tools, and a 2022 party game built around AI art. At the time, Forbes reported that hard evidence [did not exist](https://www.forbes.com/sites/paultassi/2024/01/22/palworld-accused-of-using-genai-with-no-evidence-so-far). In 2026, Pocketpair's head of publishing said the studio [rejects generative AI](https://www.notebookcheck.net/Palworld-developer-Pocketpair-rejects-generative-AI.1325581.0.html) for its upcoming games.
+
+The artists' anxiety was real even though this particular accusation was never proven, and the difference matters. Training on unlicensed work, unclear provenance, and studios cutting illustration budgets are legitimate concerns. Palworld became the target because it was successful and looked derivative, not because anyone showed how it was made.
+
+The legal fight that did happen was about patents, not AI. In September 2024, Nintendo and The Pokémon Company [sued Pocketpair](https://www.nintendo.co.jp/corporate/release/en/2024/240919.html) in the Tokyo District Court for patent infringement. The patents cover mechanics such as capturing and riding creatures. Pocketpair [says the claim asks for an injunction plus 5 million yen in damages to each plaintiff](https://www.pocketpair.jp/en/news/report-on-patent-infringement-lawsuit/). By June 2026 the case [appeared to have narrowed to older versions of the game](https://www.nintendoreporters.com/en/news/general/nintendos-palworld-lawsuit-now-appears-limited-to-older-versions-as-palworld-10-moves-forward), and the court opinion is expected on November 9, 2026. Meanwhile Palworld [spun its IP into a joint venture with Sony Music and Aniplex](https://www.prnewswire.com/news-releases/sony-music-aniplex-and-pocketpair-announce-joint-venture-palworld-entertainment-inc-to-expand-the-breakout-game-palworld-302193445.html) and [left Early Access with its 1.0 release on July 10, 2026](https://www.pocketpair.jp/en/game-news/palworld-1-0-july-10-cinematic-trailer-revealed/).
+
+The robot video plays on a different fear: machines acting on their own. The details cut against the headline here too.
+
+- **Astribot S1.** Spec listings [describe](https://www.aparobot.com/robots/astribot-s1) the S1 as capable of fully autonomous operation without teleoperation. That claim traces back to the vendor; we found no independent test of it. Astribot's own product page also sells [VR teleoperation](https://www.astribot.com/en/product/) for training. The headline 10 m/s figure is arm-movement speed. The S1 is a stationary, upper-body manipulation platform with no current locomotion. The tablecloth pull and the calligraphy are impressive manipulation. They don't show a fast-moving autonomous humanoid.
+- **The flamethrower robot dog** covered alongside it, Throwflame's Thermonator, is sold with [remote operation over WiFi and Bluetooth](https://throwflame.com/products/thermonator-robodog/). It isn't autonomous.
+- **The AI-flown F-16.** DARPA's [ACE program](https://www.darpa.mil/node/3697) did fly an AI-controlled X-62A against a human-piloted F-16 in within-visual-range engagements. [Safety pilots were on board](https://defensescoop.com/2024/04/17/darpa-ace-ai-dogfighting-flight-tests-f16/) and could take over.
+
+For skeptics, the awkward part is that the autonomy trend has kept moving since the video. In July 2026, DARPA and the US Air Force [began test-flying an AI-controlled F-16](https://www.darpa.mil/news/2026/darpa-us-air-force-fly-ai-controlled-f-16) under a new program. In August, Lockheed Martin [reported 27 AI-controlled intercepts](https://news.lockheedmartin.com/2026-08-04-Skunk-Works-R-Advances-Sensor-Powered-AI-Fighter-Intercept) against a live target using real sensor data. In our reading, the 2024 video picked the wrong robot to worry about (the one doing calligraphy) but got the direction right.
+
+**Fair to both sides:** technologists are right that the copyright panic picked a weak test case and that the robot demos were oversold. Artists and skeptics are right that disclosure norms were thin and still are, and that autonomy in high-stakes systems is moving faster than the public debate about it. Both can be true.
+
+## 3. What it means for our stack, and for you
+
+Our takeaway from this set: **prefer generation you can run, inspect, and disclose.**
+
+- **Owning the tool beats renting it.** Sora's shutdown is a warning for anyone building a workflow on a closed generative API. Our own generative-art work runs on procedural generators we wrote and control. When we evaluated an image-to-video prototype, the post-processing pipeline we already own was the cheap part. The generation step is still a call to an external model, and that's the dependency Sora's shutdown says to plan for. The terrain mod points the other way: a method you can read in a paper and run on a consumer GPU.
+- **Windowed diffusion is a pattern, not just a Minecraft trick.** Blending overlapping windows with constant cost per lookup could apply to any large generated space, such as maps, textures, or long-form generative art. That's our inference. The paper demonstrates it on terrain.
+- **Disclose by default.** We keep a draft internal policy on generative-AI disclosure modeled on Steam's disclosure requirement. If an asset is AI-generated, say so, and don't ship derivatives of third-party copyrighted work. That makes an accusation like the one aimed at Pocketpair easy to answer, and it respects the artists, whose concern was legitimate even when their target was wrong.
+- **Read claims at the right resolution.** Two of these five videos led with claims that shrank under checking: a revenue number in one, and a speed figure plus an autonomy claim in the other. Our rule is that a capability claim names its source, its date, and its scope, or we don't repeat it.
+
+## 4. Watch this one, then build
+
+If you watch only one of the five, make it Two Minute Papers' ["Minecraft Was Missing One Brilliant Idea"](https://www.youtube.com/watch?v=Ae9q7KsRbuI). Then:
+
+1. Install the [free Terrain Diffusion mod](https://modrinth.com/mod/terrain-diffusion). It needs Fabric and about 1.5 GB of VRAM.
+2. Create two worlds with the same seed and check that the terrain matches. That's the seed-consistency claim, tested by you.
+3. Run \`/td-explore\` to open the mod's map, and find a mountain range nobody placed by hand.
+
+If you build something with it, or find where it breaks, reply and tell us what you found.`.trim(),
+  },
+  {
+    slug: "enterprise-ai-bottleneck-around-the-model",
+    editorial: true,
+    title: "Enterprise AI's Real Bottleneck Is Everything Around the Model",
+    description:
+      "Six videos, one shared conclusion: the models work. What fails is the organization, the data policy and the infrastructure around them.",
+    date: "2026-10-02",
+    tags: ["Enterprise AI", "Local Inference", "AI Infrastructure", "Multi-Agent Swarm"],
+    readTime: "7 min",
+    processNote: "Human-directed research and writing, AI-assisted editing. Claims spot-checked against primary sources.",
+    content: `# Enterprise AI's Real Bottleneck Is Everything Around the Model
+
+*Six videos, one shared conclusion: the models work. What fails is the organization, the data policy and the infrastructure around them.*
+
+We went through six videos on enterprise AI, five from Nate B. Jones and one from Kiraa, published between December 2025 and July 2026. They come at the subject from different directions and arrive at the same gap. Model quality is no longer what stops deployments.
+
+## 1. The pattern: the reckoning has arrived
+
+**Implementation is the wall.** In [Amazon Fired Their AI Chief](https://www.youtube.com/watch?v=EaMz3g1OYPA), Nate walks through a December 2025 Reuters report in which CEOs said they had built writing, coding and Q&A systems but were struggling with domain-specific work. The blockers were data pipelines, encoding business logic and tool integrations. His summary: "It turns out it's not magic guys. You actually have to work." The Kiraa video ([Apple Just Killed AI Data Centers](https://www.youtube.com/watch?v=UBArQl_KVzo)) puts a number on it: "Only 10% of an enterprise solution is AI." The speaker sells an orchestration product, so weigh that figure accordingly. The direction still matches every other video.
+
+**Amazon shows how fast the ground moves.** On December 17, 2025, Andy Jassy [told employees](https://www.aboutamazon.com/news/company-news/andy-jassy-peter-desantis-amazon-leadership-update) that Peter DeSantis would lead a new organization combining Amazon's largest models (Nova and the "AGI" team), its custom silicon (Graviton, Trainium, Nitro) and quantum computing. In the same memo, AGI head Rohit Prasad was described as having decided to leave at year-end. "Fired" is the video's word, not the record's. Nate reads the reorg as a company that needs to own more of the stack, from chips to models, and possibly partner more with frontier labs. That is an interpretation, and a reasonable one.
+
+**Block shows AI as a headcount story.** On February 26, 2026, Block's [Q4 shareholder letter](https://www.sec.gov/Archives/edgar/data/0001512673/000119312526076557/d108590dex991.htm) announced it was "reducing Block by nearly half, from over 10,000 people to just under 6,000." Jack Dorsey tied the cut directly to AI: "a significantly smaller team, using the tools we're building, can do more and do it better." He also called 2025 "a strong year," so this was a bet on an operating model, not a response to distress. The title of [Block Laid Off Half Its Company for AI. AI Can't Do the Job.](https://www.youtube.com/watch?v=fm6mYqFAM5c) gets the size right but overreaches on the second half. We found no public evidence that Block's AI has failed at its financial workflows, and the video never claims it has. Its real argument is subtler and better: "The most dangerous version of a world model is the one that works well enough that nobody questions it."
+
+**Sensitive data is the choke point.** [Private AI: How To Use AI On Files You Cannot Upload](https://www.youtube.com/watch?v=EuVvLwWZ5wc) cites Verizon telemetry showing employees using AI platforms on corporate devices rising from 15% to 45%, with two-thirds of them on non-company accounts and source code the most-submitted material. Those are the video's figures, and we haven't checked them independently. The mechanism is credible regardless. As Nate puts it, "We made intelligence almost frictionless, and then we handed all of us the job of deciding what can leave."
+
+**Inference economics pull in two directions.** In [Is OpenAI a Bubble? The 2026 Test](https://www.youtube.com/watch?v=2gt2Ugy1b6Q), OpenAI is an airline with scarce seats. Compute is the constraint, and enterprise tokens are the profitable business class. The financial figures behind that picture come from press reports, not audited statements. The Kiraa video argues the opposite direction: cheap high-memory local hardware moves the unit economics back on-premises. That claim rests on a hardware rumor, covered below.
+
+## 2. Two takes that don't fully agree
+
+**Take A: the constraint is people and judgment, not models.** The Amazon, OpenAI and Block videos all land here. Vendors oversold magic, and adoption lags. Nate on demand: "I don't see a shortage of demand from enterprises for high-quality inference tokens. I see a shortage of human capability in using those tokens." The Block video adds the sharper warning. Automating the flow of information is fine. Automating judgment silently is not: "High signal fidelity at the input layer creates an illusion of high judgment quality at the output layer."
+
+**Take B: the unlock is local, private inference.** [How To Run AI Locally On Files You Can Never Upload](https://www.youtube.com/watch?v=5slsNizN6MQ) runs gpt-oss-safeguard-20b in LM Studio on an offline laptop. It flags unreleased pricing and attorney-client notes, masks a fake API key, and declines to call an unreadable section "safe." The model is real: an open-weight safety classifier that LM Studio supports. The Airlock video pushes the idea further: "All of our data needs to be accessible to AI, but not all of our data should go over the wire."
+
+**The tension.** If Take A is right, better local hardware won't fix much, because the gap is organizational. If Take B is right, enterprise demand for cloud tokens should soften over time, which sits awkwardly against the compute-scarcity story. Our read is that both are right about different layers. Take A explains why pilots stall in general. Take B names the specific blocker, data that can't leave the building, behind many of the stalled pilots. One caveat from the local-AI video applies to both: open weights aren't automatically portable, and self-hosting can still create lock-in.
+
+## 3. What this means for our stack
+
+**Local, air-gapped inference is now a practical default for sensitive work.** A classifier small enough to run in LM Studio on a laptop can do triage, PII detection and masking before anything touches a cloud API. The video's principle is the right one: instructions aren't guardrails, air-gapping is. We would rather have a model that says "I can't tell" than one that is confidently wrong.
+
+**Task-scoped clean copies beat blanket redaction.** Airlock's core idea is job-first. You declare the task, extract only the slice that matters, and leave the original untouched. The same price can be essential to one question and irrelevant to another. The clean copy goes to whichever frontier model is best this month, and the original never moves. That fits Kiraa's point that "models are commodities right now and there'll be a better one next month." The durable value sits in the layer that decides what leaves, not in the model.
+
+**Orchestration is the gap nobody has filled.** Even the best local-hardware story stalls without job queues, batching, monitoring, auditing and failover. The Kiraa speaker says so himself, though he sells the fix. Running our own multi-agent swarm has taught us the same lesson: the failures are rarely the model. They are handoffs, missing verification steps and tasks that report "done" without proof. That is the Block video's quiet failure in miniature.
+
+**Label the boundary between "act on this" and "interpret this."** Anything a model touches in a decision path should carry an explicit marker saying which outputs are safe to act on and which need a human read. That is the practical takeaway from the world-model argument.
+
+**A note on the hardware rumor.** The Kiraa video's premise is a 1.5TB Mac Studio. That is a rumor. Bloomberg's Mark Gurman has reported Apple working on a future M7 Ultra-class chip, around 2028, that could support up to 1.5TB of memory. It is unconfirmed and not a current spec, so we wouldn't plan around it. The general direction, more unified memory and better local tooling like MLX, is real. Treat the dates and numbers as unknown.
+
+## 4. If you watch one thing
+
+Start with [Private AI: How To Use AI On Files You Cannot Upload](https://www.youtube.com/watch?v=EuVvLwWZ5wc). It is the most concrete, self-contained demo of private inference, and the only one that names the cause (shadow AI driven by data-exposure friction) with cited third-party data. For the other side, [Is OpenAI a Bubble?](https://www.youtube.com/watch?v=2gt2Ugy1b6Q) makes the best case for Take A.
+
+On our side, three pieces go deeper on the orchestration layer this post keeps coming back to:
+
+- [The Harness Is the Moat](https://edgelesslab.com/blog/harness-is-the-moat/), on why owning your agent orchestration matters more than which model sits inside it.
+- [What Anthropic's Enterprise Agent Playbook Teaches About Building Multi-Agent Systems](https://edgelesslab.com/blog/anthropic-enterprise-agent-playbook-multi-agent-systems/), the enterprise view of the same problem.
+- [The Verification Chain Crisis](https://edgelesslab.com/blog/verification-chain-crisis/), on the silent "done" that turns automation into a liability.`.trim(),
+  },
 ];

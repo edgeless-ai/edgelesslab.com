@@ -7,7 +7,7 @@ import { PromptEngineClient } from "./prompt-engine-client";
 export const metadata = createPageMetadata({
   title: "Prompt Engine",
   description:
-    "Combinatorial MidJourney prompt generator. Roll wide across themed recipe banks with museum-artwork style refs, coverage-guaranteed picks, and a dedup check against the logged round history. Bring your own taste: customize every axis and weight entries, all client-side.",
+    "Combinatorial MidJourney prompt generator. The wide engine walks 18 sentence shapes and 226 aesthetic registers with persistent coverage and per-batch repeat caps, pulling museum-artwork style refs; the classic themes let you bring your own taste. Every batch is dedup-checked against the logged round history, all client-side.",
   path: "/lab/prompt-engine",
   keywords: [
     "MidJourney prompts",
@@ -68,12 +68,14 @@ export default function PromptEnginePage() {
             className="text-base mb-12 max-w-2xl"
             style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
           >
-            A combinatorial MidJourney prompt generator. Pick a theme, roll a wide batch across
-            its recipes, and copy the results straight into the imagine bar. Every batch is
+            A combinatorial MidJourney prompt generator. The default wide engine writes each
+            prompt in one of 18 sentence shapes and 226 aesthetic registers, walking every bank
+            before anything repeats; or pick a classic theme and roll across its recipes. Copy
+            the results straight into the imagine bar. Every batch is
             dedup-checked against a snapshot of the historical round log — plus recent
             batches saved in your browser — so you don&apos;t resubmit a prompt that already
-            ran. Museum themes pull real artwork URLs as style references. Open Customize to
-            bring your own taste: add, disable, or weight entries on any axis, and export the
+            ran. Real museum artwork URLs ride along as style references. On the classic
+            engine, open Customize to bring your own taste: add, disable, or weight entries on any axis, and export the
             result as a taste pack.
           </p>
 

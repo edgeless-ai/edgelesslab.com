@@ -243,6 +243,14 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["agent safety", "statistical bounds", "tool agents", "verification"],
   },
+  {
+    slug: "2610.04198-alodlm-depth-allocation",
+    title: "ALoDLM Token-Depth Allocator",
+    description:
+      "Explore how entropy commitment and cumulative halting allocate recurrent depth across deterministic synthetic token positions, with paper-anchored layer accounting and explicit speed-claim boundaries.",
+    category: "Research",
+    tags: ["diffusion language models", "adaptive compute", "recurrence", "inference"],
+  },
 ];
 
 export const marimoCategories: MarimoDemo["category"][] = [

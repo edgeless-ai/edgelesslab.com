@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" data-critters-container>
+  <head>
+    <meta charset="utf-8">
+    <link rel="icon" href="./favicon.ico">
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image">
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image">
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="a marimo app">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <link rel="manifest" href="./manifest.json">
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2610.04198-alodlm-depth-allocation</title>
+    <script type="module" crossorigin src="./assets/index-DafnX1Xx.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-B0Z9INg1.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-CUdNIagt.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-BQ9S8nyo.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-Dc9HkKI2.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CKsE8sC1.js">
+    <link rel="modulepreload" crossorigin href="./assets/schemas-BL-NsLlF.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-BCaOs5rp.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-oX0TOjjx.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-Cmx0b_zA.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-aFmHgJZY.js">
+    <link rel="modulepreload" crossorigin href="./assets/isArrayLikeObject-DnwgSs_Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseMerge-CQpUq7ep.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-snlMn4yk.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-B74pBk57.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-BdZUApHd.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-Ci2dTZ72.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BxZgoFvi.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-B4K466FK.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-DXKMv4Bs.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-CrTnjj37.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-DpGPGznL.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-DB0hHKMi.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-ldLVeaqm.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-BmzAqMKq.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CyYN7zJg.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-BBdeXCvU.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-restore-focus-B98SEiGc.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-BoklZTGL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-rHn2EdoM.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-Wea4hZ6R.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFOBKCJB.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-C4-_TnkF.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BplWpfFo.js">
+    <link rel="modulepreload" crossorigin href="./assets/circle-CeQt3rdW.js">
+    <link rel="modulepreload" crossorigin href="./assets/toast-KNfsFUiB.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-DR2Z2N4w.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-CzfpItSz.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-DKSBdWUf.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-BbJ1_N2T.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CrkOvbyN.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-CeE3i3Qa.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-BqUx5USx.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-Haz_uxEL.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-DsgsDslU.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-DMbg9X18.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-BDakodZ2.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-CC89xOwH.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-yTHMxhVa.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-k9DpjH68.js">
+    <link rel="modulepreload" crossorigin href="./assets/write-secret-modal-BiG2tahJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-gbN72xHe.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-BJG-7Qob.js">
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-HclGiUj8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BczecT6V.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BTskHGpb.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-Bj3s1hGN.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-C49f7GXV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-BPvK7C_R.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Ccyblc8N.js">
+    <link rel="modulepreload" crossorigin href="./assets/marked.esm-B_3iMIUq.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings-BHZPE0Mc.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BN-7G8qZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-DFf033uX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiUBikfn.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-MRn68vX1.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Bviq_Dee.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DBqBVprh.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DueXZKz9.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-CJTNBbet.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-DcnXlv0_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-DucTwMkf.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CYRiAeUx.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CzugpTQu.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-DjNf4SIX.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-RyCOE8jo.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-BhJktFeI.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-DFhUGBjO.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-BeE1cdgM.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B4VJJibu.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-DOPs2jx8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-VuyoeQOD.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-B_IYTCX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-DVgK5i5l.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-BeYhVWvM.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-D9vyuMar.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-CNPGWpMu.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-Bq_nmf5u.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-D5bOh7g6.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-CLRkNgm7.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-PLkI_UfK.js">
+    <link rel="modulepreload" crossorigin href="./assets/filename-fxG7K_MU.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-D9Dr-k4J.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-YOKDWASO-CaoEAGJk.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-0PFKL3SH.css">
+    <link rel="stylesheet" crossorigin href="./assets/index--sT8xf-8.css">
+  <marimo-wasm hidden></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\"marimo==0.25.1\"]\n# ///\n\nimport marimo\n\n__generated_with = \"0.25.1\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    return (mo,)\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"# ALoDLM token-depth allocator\n\n    **Question.** How can token-wise recurrence spend extra passes on unresolved\n    positions without treating an author-reported speedup as a general result?\n\n    This is a **seeded synthetic mechanism illustration** of ALoDLM Algorithm 1,\n    not a model run, benchmark reproduction, or throughput estimate. Twenty toy\n    token positions receive fixed difficulty scores. At each pass, low-entropy\n    positions commit as discrete context; harder positions keep a latent state.\n    The paper's 8B partition and maximum depth are used only for layer-evaluation\n    accounting. No weights, prompts, private data, API, GPU, or network are used.\n    \"\"\")\n    halt_q = mo.ui.slider(\n        0.2, 0.9, value=0.5, step=0.1,\n        label=\"Cumulative halt threshold q\",\n    )\n    hard_share = mo.ui.slider(\n        10, 70, value=40, step=10,\n        label=\"Hard-token share (%)\",\n    )\n    mo.hstack([halt_q, hard_share], justify=\"start\", gap=2)\n    return halt_q, hard_share\n\n\n@app.cell\ndef _(halt_q, hard_share, mo):\n    _n = 20\n    _tau = 0.40\n    _max_depth = 4\n    _shift = (hard_share.value / 100 - 0.40) * 0.9\n    _difficulty = [\n        min(0.98, max(0.02, (((_i * 7) % _n) + 0.5) / _n + _shift))\n        for _i in range(_n)\n    ]\n    _active = list(range(_n))\n    _accum = { _i: 0.0 for _i in _active }\n    _committed = []\n    _rows = []\n    for _depth in range(1, _max_depth + 1):\n        _entropy = {\n            _i: 1.10 * _difficulty[_i] * (0.72 ** (_depth - 1)) + 0.05\n            for _i in _active\n        }\n        _new = [_i for _i in _active if _entropy[_i] \u003C= _tau]\n        for _i in _active:\n            _lam = min(0.85, 0.15 + 0.25 * (1 - _difficulty[_i]) + 0.12 * (_depth - 1))\n            _accum[_i] += (1 - _accum[_i]) * _lam\n        _active = [_i for _i in _active if _i not in _new]\n        _committed.extend((_i, _depth) for _i in _new)\n        _mean_halt = sum(_accum[_i] for _i in _active) / len(_active) if _active else 1.0\n        _rows.append((_depth, len(_new), len(_active), _mean_halt))\n        if not _active or _mean_halt \u003E= halt_q.value:\n            break\n    if not _committed:\n        _forced = min(_active, key=lambda _i: _difficulty[_i])\n        _active.remove(_forced)\n        _committed.append((_forced, len(_rows)))\n        _depth, _new_n, _left, _mean_halt = _rows[-1]\n        _rows[-1] = (_depth, _new_n + 1, _left - 1, _mean_halt)\n    _passes = len(_rows)\n    _layer_evals = 10 + 26 * _passes\n    _uniform_full_stack = 36 * _passes\n    _saved = 100 * (1 - _layer_evals / _uniform_full_stack) if _passes else 0\n    _bar_w = 430\n    _bars = []\n    for _depth, _new_n, _left, _mean_halt in _rows:\n        _y = 92 + 44 * (_depth - 1)\n        _commit_w = _bar_w * _new_n / _n\n        _left_w = _bar_w * _left / _n\n        _bars.append(\n            f'\u003Ctext x=\"28\" y=\"{_y + 18}\" font-size=\"13\"\u003EPass {_depth}\u003C/text\u003E'\n            f'\u003Crect x=\"92\" y=\"{_y}\" width=\"{_commit_w:.1f}\" height=\"24\" fill=\"#2b8a6e\"/\u003E'\n            f'\u003Crect x=\"{92 + _commit_w:.1f}\" y=\"{_y}\" width=\"{_left_w:.1f}\" height=\"24\" fill=\"#e5a84b\"/\u003E'\n            f'\u003Ctext x=\"{92 + _bar_w + 8}\" y=\"{_y + 17}\" font-size=\"12\"\u003E'\n            f'{_new_n} commit / {_left} latent\u003C/text\u003E'\n        )\n    _chart = f'''\u003Csvg data-chart=\"alodlm-depth-allocation\" data-marker=\"q-{halt_q.value:.1f}-hard-{hard_share.value}-passes-{_passes}\" viewBox=\"0 0 650 300\" role=\"img\" aria-label=\"Synthetic token commitments by recurrent pass\"\u003E\n    \u003Crect width=\"650\" height=\"300\" rx=\"12\" fill=\"#f5f7fb\"/\u003E\n    \u003Ctext x=\"28\" y=\"35\" font-size=\"18\" font-weight=\"700\"\u003EOne synthetic denoising step\u003C/text\u003E\n    \u003Ctext x=\"28\" y=\"59\" font-size=\"12\" fill=\"#526071\"\u003EGreen commits; amber retains latent state for another pass\u003C/text\u003E\n    {''.join(_bars)}\n    \u003Ccircle cx=\"32\" cy=\"277\" r=\"6\" fill=\"#2b8a6e\"/\u003E\u003Ctext x=\"44\" y=\"281\" font-size=\"12\"\u003Ecommitted\u003C/text\u003E\n    \u003Ccircle cx=\"132\" cy=\"277\" r=\"6\" fill=\"#e5a84b\"/\u003E\u003Ctext x=\"144\" y=\"281\" font-size=\"12\"\u003Eunresolved\u003C/text\u003E\u003C/svg\u003E'''\n    mo.md(rf\"\"\"### Operating point: q = {halt_q.value:.1f} / {hard_share.value}% hard tokens\n\n    **{len(_committed)} of {_n} positions commit in {_passes} recurrent pass(es);**\n    **{len(_active)} defer** to the next outer denoising step. The 8B middle-core\n    accounting is **{_layer_evals} layer evaluations** for this dense path versus\n    **{_uniform_full_stack}** for {_passes} complete 36-layer passes ({_saved:.1f}%\n    fewer layer evaluations). This is not a tokens/s prediction.\n\n    {_chart}\n\n    Entropy threshold is fixed at tau = {_tau:.2f}; q controls when the mean\n    cumulative halt probability of unresolved positions ends the inner loop.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    **Takeaway.** ALoDLM's transferable mechanism is selective depth,\n    not the headline speed ratio: easy positions can become context while hard\n    positions preserve latent work. Raising q permits more refinement; changing\n    the difficulty mix changes how much work and parallel commitment remain.\n\n    **Provenance and limits.** Fang et al., *ALoDLM: Adaptively Looped Diffusion\n    Language Models*, arXiv:2610.04198v1 (2026), Algorithm 1 and Appendix B:\n    https://arxiv.org/abs/2610.04198 . The paper reports an 8B split of 10 prelude,\n    16 recurrent-core, and 10 coda layers; K=4; 114 layer evaluations for a full\n    four-pass middle-core path versus 144 for four full-stack passes. It also\n    reports about 2.7x Qwen3-8B GSM8K throughput on one B200, but that is an\n    author-run, workload/backend-specific result and is **not reproduced here**.\n    The entropy trajectories, difficulty labels, commitment counts, and gate\n    probabilities in this demo are synthetic. Layer evaluations are not FLOPs,\n    latency, energy, accuracy, or generated-token cost. Paper/repository material\n    is CC BY-NC 4.0 unless otherwise indicated; this original demo code is\n    prepared for MIT release and does not copy project code, weights, or figures.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden>%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%22marimo%3D%3D0.25.1%22%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.25.1%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20return%20(mo%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%23%20ALoDLM%20token-depth%20allocator%0A%0A%20%20%20%20**Question.**%20How%20can%20token-wise%20recurrence%20spend%20extra%20passes%20on%20unresolved%0A%20%20%20%20positions%20without%20treating%20an%20author-reported%20speedup%20as%20a%20general%20result%3F%0A%0A%20%20%20%20This%20is%20a%20**seeded%20synthetic%20mechanism%20illustration**%20of%20ALoDLM%20Algorithm%201%2C%0A%20%20%20%20not%20a%20model%20run%2C%20benchmark%20reproduction%2C%20or%20throughput%20estimate.%20Twenty%20toy%0A%20%20%20%20token%20positions%20receive%20fixed%20difficulty%20scores.%20At%20each%20pass%2C%20low-entropy%0A%20%20%20%20positions%20commit%20as%20discrete%20context%3B%20harder%20positions%20keep%20a%20latent%20state.%0A%20%20%20%20The%20paper's%208B%20partition%20and%20maximum%20depth%20are%20used%20only%20for%20layer-evaluation%0A%20%20%20%20accounting.%20No%20weights%2C%20prompts%2C%20private%20data%2C%20API%2C%20GPU%2C%20or%20network%20are%20used.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20halt_q%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%200.2%2C%200.9%2C%20value%3D0.5%2C%20step%3D0.1%2C%0A%20%20%20%20%20%20%20%20label%3D%22Cumulative%20halt%20threshold%20q%22%2C%0A%20%20%20%20)%0A%20%20%20%20hard_share%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%2010%2C%2070%2C%20value%3D40%2C%20step%3D10%2C%0A%20%20%20%20%20%20%20%20label%3D%22Hard-token%20share%20(%25)%22%2C%0A%20%20%20%20)%0A%20%20%20%20mo.hstack(%5Bhalt_q%2C%20hard_share%5D%2C%20justify%3D%22start%22%2C%20gap%3D2)%0A%20%20%20%20return%20halt_q%2C%20hard_share%0A%0A%0A%40app.cell%0Adef%20_(halt_q%2C%20hard_share%2C%20mo)%3A%0A%20%20%20%20_n%20%3D%2020%0A%20%20%20%20_tau%20%3D%200.40%0A%20%20%20%20_max_depth%20%3D%204%0A%20%20%20%20_shift%20%3D%20(hard_share.value%20%2F%20100%20-%200.40)%20*%200.9%0A%20%20%20%20_difficulty%20%3D%20%5B%0A%20%20%20%20%20%20%20%20min(0.98%2C%20max(0.02%2C%20(((_i%20*%207)%20%25%20_n)%20%2B%200.5)%20%2F%20_n%20%2B%20_shift))%0A%20%20%20%20%20%20%20%20for%20_i%20in%20range(_n)%0A%20%20%20%20%5D%0A%20%20%20%20_active%20%3D%20list(range(_n))%0A%20%20%20%20_accum%20%3D%20%7B%20_i%3A%200.0%20for%20_i%20in%20_active%20%7D%0A%20%20%20%20_committed%20%3D%20%5B%5D%0A%20%20%20%20_rows%20%3D%20%5B%5D%0A%20%20%20%20for%20_depth%20in%20range(1%2C%20_max_depth%20%2B%201)%3A%0A%20%20%20%20%20%20%20%20_entropy%20%3D%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20_i%3A%201.10%20*%20_difficulty%5B_i%5D%20*%20(0.72%20**%20(_depth%20-%201))%20%2B%200.05%0A%20%20%20%20%20%20%20%20%20%20%20%20for%20_i%20in%20_active%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20_new%20%3D%20%5B_i%20for%20_i%20in%20_active%20if%20_entropy%5B_i%5D%20%3C%3D%20_tau%5D%0A%20%20%20%20%20%20%20%20for%20_i%20in%20_active%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_lam%20%3D%20min(0.85%2C%200.15%20%2B%200.25%20*%20(1%20-%20_difficulty%5B_i%5D)%20%2B%200.12%20*%20(_depth%20-%201))%0A%20%20%20%20%20%20%20%20%20%20%20%20_accum%5B_i%5D%20%2B%3D%20(1%20-%20_accum%5B_i%5D)%20*%20_lam%0A%20%20%20%20%20%20%20%20_active%20%3D%20%5B_i%20for%20_i%20in%20_active%20if%20_i%20not%20in%20_new%5D%0A%20%20%20%20%20%20%20%20_committed.extend((_i%2C%20_depth)%20for%20_i%20in%20_new)%0A%20%20%20%20%20%20%20%20_mean_halt%20%3D%20sum(_accum%5B_i%5D%20for%20_i%20in%20_active)%20%2F%20len(_active)%20if%20_active%20else%201.0%0A%20%20%20%20%20%20%20%20_rows.append((_depth%2C%20len(_new)%2C%20len(_active)%2C%20_mean_halt))%0A%20%20%20%20%20%20%20%20if%20not%20_active%20or%20_mean_halt%20%3E%3D%20halt_q.value%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20break%0A%20%20%20%20if%20not%20_committed%3A%0A%20%20%20%20%20%20%20%20_forced%20%3D%20min(_active%2C%20key%3Dlambda%20_i%3A%20_difficulty%5B_i%5D)%0A%20%20%20%20%20%20%20%20_active.remove(_forced)%0A%20%20%20%20%20%20%20%20_committed.append((_forced%2C%20len(_rows)))%0A%20%20%20%20%20%20%20%20_depth%2C%20_new_n%2C%20_left%2C%20_mean_halt%20%3D%20_rows%5B-1%5D%0A%20%20%20%20%20%20%20%20_rows%5B-1%5D%20%3D%20(_depth%2C%20_new_n%20%2B%201%2C%20_left%20-%201%2C%20_mean_halt)%0A%20%20%20%20_passes%20%3D%20len(_rows)%0A%20%20%20%20_layer_evals%20%3D%2010%20%2B%2026%20*%20_passes%0A%20%20%20%20_uniform_full_stack%20%3D%2036%20*%20_passes%0A%20%20%20%20_saved%20%3D%20100%20*%20(1%20-%20_layer_evals%20%2F%20_uniform_full_stack)%20if%20_passes%20else%200%0A%20%20%20%20_bar_w%20%3D%20430%0A%20%20%20%20_bars%20%3D%20%5B%5D%0A%20%20%20%20for%20_depth%2C%20_new_n%2C%20_left%2C%20_mean_halt%20in%20_rows%3A%0A%20%20%20%20%20%20%20%20_y%20%3D%2092%20%2B%2044%20*%20(_depth%20-%201)%0A%20%20%20%20%20%20%20%20_commit_w%20%3D%20_bar_w%20*%20_new_n%20%2F%20_n%0A%20%20%20%20%20%20%20%20_left_w%20%3D%20_bar_w%20*%20_left%20%2F%20_n%0A%20%20%20%20%20%20%20%20_bars.append(%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%2228%22%20y%3D%22%7B_y%20%2B%2018%7D%22%20font-size%3D%2213%22%3EPass%20%7B_depth%7D%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%2292%22%20y%3D%22%7B_y%7D%22%20width%3D%22%7B_commit_w%3A.1f%7D%22%20height%3D%2224%22%20fill%3D%22%232b8a6e%22%2F%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%22%7B92%20%2B%20_commit_w%3A.1f%7D%22%20y%3D%22%7B_y%7D%22%20width%3D%22%7B_left_w%3A.1f%7D%22%20height%3D%2224%22%20fill%3D%22%23e5a84b%22%2F%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7B92%20%2B%20_bar_w%20%2B%208%7D%22%20y%3D%22%7B_y%20%2B%2017%7D%22%20font-size%3D%2212%22%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%7B_new_n%7D%20commit%20%2F%20%7B_left%7D%20latent%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20_chart%20%3D%20f'''%3Csvg%20data-chart%3D%22alodlm-depth-allocation%22%20data-marker%3D%22q-%7Bhalt_q.value%3A.1f%7D-hard-%7Bhard_share.value%7D-passes-%7B_passes%7D%22%20viewBox%3D%220%200%20650%20300%22%20role%3D%22img%22%20aria-label%3D%22Synthetic%20token%20commitments%20by%20recurrent%20pass%22%3E%0A%20%20%20%20%3Crect%20width%3D%22650%22%20height%3D%22300%22%20rx%3D%2212%22%20fill%3D%22%23f5f7fb%22%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%2235%22%20font-size%3D%2218%22%20font-weight%3D%22700%22%3EOne%20synthetic%20denoising%20step%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%2259%22%20font-size%3D%2212%22%20fill%3D%22%23526071%22%3EGreen%20commits%3B%20amber%20retains%20latent%20state%20for%20another%20pass%3C%2Ftext%3E%0A%20%20%20%20%7B''.join(_bars)%7D%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%22277%22%20r%3D%226%22%20fill%3D%22%232b8a6e%22%2F%3E%3Ctext%20x%3D%2244%22%20y%3D%22281%22%20font-size%3D%2212%22%3Ecommitted%3C%2Ftext%3E%0A%20%20%20%20%3Ccircle%20cx%3D%22132%22%20cy%3D%22277%22%20r%3D%226%22%20fill%3D%22%23e5a84b%22%2F%3E%3Ctext%20x%3D%22144%22%20y%3D%22281%22%20font-size%3D%2212%22%3Eunresolved%3C%2Ftext%3E%3C%2Fsvg%3E'''%0A%20%20%20%20mo.md(rf%22%22%22%23%23%23%20Operating%20point%3A%20q%20%3D%20%7Bhalt_q.value%3A.1f%7D%20%2F%20%7Bhard_share.value%7D%25%20hard%20tokens%0A%0A%20%20%20%20**%7Blen(_committed)%7D%20of%20%7B_n%7D%20positions%20commit%20in%20%7B_passes%7D%20recurrent%20pass(es)%3B**%0A%20%20%20%20**%7Blen(_active)%7D%20defer**%20to%20the%20next%20outer%20denoising%20step.%20The%208B%20middle-core%0A%20%20%20%20accounting%20is%20**%7B_layer_evals%7D%20layer%20evaluations**%20for%20this%20dense%20path%20versus%0A%20%20%20%20**%7B_uniform_full_stack%7D**%20for%20%7B_passes%7D%20complete%2036-layer%20passes%20(%7B_saved%3A.1f%7D%25%0A%20%20%20%20fewer%20layer%20evaluations).%20This%20is%20not%20a%20tokens%2Fs%20prediction.%0A%0A%20%20%20%20%7B_chart%7D%0A%0A%20%20%20%20Entropy%20threshold%20is%20fixed%20at%20tau%20%3D%20%7B_tau%3A.2f%7D%3B%20q%20controls%20when%20the%20mean%0A%20%20%20%20cumulative%20halt%20probability%20of%20unresolved%20positions%20ends%20the%20inner%20loop.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20**Takeaway.**%20ALoDLM's%20transferable%20mechanism%20is%20selective%20depth%2C%0A%20%20%20%20not%20the%20headline%20speed%20ratio%3A%20easy%20positions%20can%20become%20context%20while%20hard%0A%20%20%20%20positions%20preserve%20latent%20work.%20Raising%20q%20permits%20more%20refinement%3B%20changing%0A%20%20%20%20the%20difficulty%20mix%20changes%20how%20much%20work%20and%20parallel%20commitment%20remain.%0A%0A%20%20%20%20**Provenance%20and%20limits.**%20Fang%20et%20al.%2C%20*ALoDLM%3A%20Adaptively%20Looped%20Diffusion%0A%20%20%20%20Language%20Models*%2C%20arXiv%3A2610.04198v1%20(2026)%2C%20Algorithm%201%20and%20Appendix%20B%3A%0A%20%20%20%20https%3A%2F%2Farxiv.org%2Fabs%2F2610.04198%20.%20The%20paper%20reports%20an%208B%20split%20of%2010%20prelude%2C%0A%20%20%20%2016%20recurrent-core%2C%20and%2010%20coda%20layers%3B%20K%3D4%3B%20114%20layer%20evaluations%20for%20a%20full%0A%20%20%20%20four-pass%20middle-core%20path%20versus%20144%20for%20four%20full-stack%20passes.%20It%20also%0A%20%20%20%20reports%20about%202.7x%20Qwen3-8B%20GSM8K%20throughput%20on%20one%20B200%2C%20but%20that%20is%20an%0A%20%20%20%20author-run%2C%20workload%2Fbackend-specific%20result%20and%20is%20**not%20reproduced%20here**.%0A%20%20%20%20The%20entropy%20trajectories%2C%20difficulty%20labels%2C%20commitment%20counts%2C%20and%20gate%0A%20%20%20%20probabilities%20in%20this%20demo%20are%20synthetic.%20Layer%20evaluations%20are%20not%20FLOPs%2C%0A%20%20%20%20latency%2C%20energy%2C%20accuracy%2C%20or%20generated-token%20cost.%20Paper%2Frepository%20material%0A%20%20%20%20is%20CC%20BY-NC%204.0%20unless%20otherwise%20indicated%3B%20this%20original%20demo%20code%20is%0A%20%20%20%20prepared%20for%20MIT%20release%20and%20does%20not%20copy%20project%20code%2C%20weights%2C%20or%20figures.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code><link rel="canonical" href="https://edgelesslab.com/marimo/2610.04198-alodlm-depth-allocation/">
+<meta property="og:title" content="2610.04198-alodlm-depth-allocation">
+<meta property="og:description" content="a marimo app">
+<meta property="og:url" content="https://edgelesslab.com/marimo/2610.04198-alodlm-depth-allocation/">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://edgelesslab.com/og-image.webp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="2610.04198-alodlm-depth-allocation">
+<meta name="twitter:description" content="a marimo app">
+<meta name="twitter:image" content="https://edgelesslab.com/og-image.webp">
+</head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.25.1",
+            "serverToken": "unused",
+            "config": {"ai": {"allow_provider_config": true, "custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "code_lens": true, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "layout": null,
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

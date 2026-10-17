@@ -130,6 +130,16 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["TSP", "Optimization", "Teaching"],
   },
 
+  // Research explainers (continued)
+  {
+    slug: "2610.20686-rolaq-cache-accounting",
+    title: "RoLaQ Cache Accounting",
+    published_url: "https://marimo.edgelesslab.com/2610.20686-rolaq-cache-accounting/",
+    description: "See how 2-bit content codes, FP32 group metadata, and a BF16 positional key combine into RoLaQ's whole-cache precision and capacity ratio.",
+    category: "Research",
+    tags: ["KV cache", "quantization", "MLA", "inference", "storage accounting"],
+  },
+
   // Research explainers (overnight expansion)
   {
     slug: "routerarena-scoring",
@@ -268,6 +278,14 @@ export const marimoDemos: MarimoDemo[] = [
     published_url: "https://marimo.edgelesslab.com/2609.38201-speculative-tool-exec/",
     category: "Research",
     tags: ["agents", "tool use", "speculative execution", "latency"],
+  },
+  {
+    slug: "2608.02123-pctree-budget",
+    title: "Parent-Conditioned Tree Budget Explorer",
+    description: "Compare one-chain, parent-blind tree, and parent-conditioned tree proposals under the same verification-node budget in a deterministic mechanism model.",
+    published_url: "https://marimo.edgelesslab.com/2608.02123-pctree-budget/",
+    category: "Research",
+    tags: ["speculative decoding", "tree search", "inference", "budgeting"],
   },
 ];
 

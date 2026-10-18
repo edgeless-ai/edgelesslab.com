@@ -293,7 +293,7 @@ export const marimoDemos: MarimoDemo[] = [
     description: "Explore how executed-trial count and trial/final quality determine the share of PGRR's slot-averaged SRQ that comes from repeated endpoint evidence.",
     category: "Research",
     tags: ["robotics", "recovery metrics", "sensitivity analysis", "benchmark design"],
-    published_url: null,
+    published_url: "https://marimo.edgelesslab.com/2610.20838-srq-endpoint-weight/",
   },
 ];
 

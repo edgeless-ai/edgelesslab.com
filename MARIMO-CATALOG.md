@@ -1,6 +1,6 @@
 # Marimo Notebook Catalog — Edgeless Lab
 
-Inventory 73 notebooks · 23 flagships (rank 4-5). Generated 2026-07-03.
+Inventory 74 notebooks · 24 flagships (rank 4-5). Generated 2026-10-17.
 
 | Rank | Title | Category | GPU | Published | File |
 |---|---|---|---|---|---|
@@ -8,6 +8,7 @@ Inventory 73 notebooks · 23 flagships (rank 4-5). Generated 2026-07-03.
 | 5 | GPU Option Pricing Monte Carlo — Edgeless Lab (v2) | finance/GPU | Y | unknown | `marimo-demos/option-pricing-gpu-v2.py` |
 | 5 | GPU Portfolio Optimizer — Markowitz at Scale (v2) | finance/GPU | Y | unknown | `marimo-demos/portfolio-optimizer-gpu-v2.py` |
 | 5 | Reactive Animation: Auto-Animated Slider | teaching |  | unknown | `marimo-demos/reactive-animation.py` |
+| 5 | RCA Component Ablation Explorer | AI safety |  | live | `marimo/2609.17536-rca-cst.py` |
 | 5 | Papers-as-Plots #1 — Gray-Scott, drawn by a robot | generative-art/research- |  | unpublished | `edgeless-research/papers-as-plots/gray_scott_explainer.py` |
 | 5 | Papers-as-Plots #2 — a labyrinth walk, drawn by a ro | generative-art/research- |  | unpublished | `edgeless-research/papers-as-plots/labyrinth_explainer.py` |
 | 5 | Pen Plotter Autoresearch — Combined Dashboard | generative-art / dashboa |  | unpublished | `pen-plotter-art/autoresearch/marimo/00_index.py` |
@@ -77,3 +78,4 @@ Inventory 73 notebooks · 23 flagships (rank 4-5). Generated 2026-07-03.
 | 1 | Why Router Scores Matter More Than Raw Model Accurac | research-explainer |  | unpublished | `claude-vault/03-Knowledge/Research-Snail/marimo-notebooks/routerarena-budget-vs-accuracy/routerarena-budget-vs-accuracy.py` |
 | 1 | RouterArena Scoring: Accuracy-Cost Trade-off on a Bu | research-explainer |  | unpublished | `claude-vault/03-Knowledge/Research-Snail/marimo-notebooks/routerarena-scoring-by-budget/routerarena-scoring-by-budget.py` |
 | 1 | End-to-End Notebook: Search Discipline Inversion Dem | research-explainer |  | unpublished | `claude-vault/03-Knowledge/Research-Snail/marimo-notebooks/search-discipline/search-discipline.py` |
+|| 4 | RoLaQ Cache Accounting | AI systems |  | live | `projects/marimo-notebooks/2610.20686-rolaq-cache-accounting/2610.20686-rolaq-cache-accounting.py` |

@@ -3,12 +3,15 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { AnalyticsConsentPanel } from "@/components/analytics-consent-panel";
-import { captureConsentedEvent, captureCookielessPageview, CONSENT_CHANGED_EVENT, CONSENT_STORAGE_KEY, getAnalyticsConsent, reconcileAnalyticsConsent } from "@/lib/analytics-consent";
+import { captureConsentedEvent, captureCookielessPageview, captureUtmParams, CONSENT_CHANGED_EVENT, CONSENT_STORAGE_KEY, getAnalyticsConsent, reconcileAnalyticsConsent } from "@/lib/analytics-consent";
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
+    // Capture UTM params on first page load (once per session)
+    captureUtmParams();
+
     async function sync() {
       if (reconcileAnalyticsConsent()) {
         window.location.reload();

@@ -398,4 +398,14 @@ export const creativeDemos: CreativeDemo[] = [
     date: "2026-01-05",
     hasControls: false,
   },
+  {
+    slug: "monte-carlo-builder",
+    title: "Monte Carlo Builder",
+    description:
+      "Input trade returns, equity curves, or parametric distributions. Run trade-order shuffle, block bootstrap, resampling with replacement, and parametric sims with transaction costs and slippage. Get a full battery: fan charts, terminal-wealth histogram, max-drawdown distribution, probability of ruin and of loss, Sharpe distribution with 95% CI, percentile table, buy-and-hold comparison after costs, and a verdict box that reports the number of variants tried and refuses to declare 'edge' unless the strategy beats the null at a stated threshold. Seedable RNG so every run is reproducible. Export results JSON. Simulation. Not trading advice.",
+    tags: ["Statistics", "Monte Carlo", "Risk", "Backtesting", "Interactive"],
+    date: "2026-09-29",
+    hasControls: true,
+    category: "Statistics",
+  },
 ];

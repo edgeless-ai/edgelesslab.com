@@ -154,10 +154,10 @@ export default function RootLayout({
           "url": "https://edgelesslab.com",
           "description": "A public research studio for autonomous software, generative systems, and physical artifacts.",
           "inLanguage": "en-US",
-          "publisher": {
-            "@type": "Organization",
-            "name": "Edgeless Lab",
-            "url": "https://edgelesslab.com"
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://edgelesslab.com/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
           }
         }} />
         <a

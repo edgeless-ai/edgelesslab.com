@@ -12,15 +12,50 @@ function read(path) {
   return readFileSync(resolve(ROOT, path), "utf8");
 }
 
-function collectSlugs(src, exportName) {
-  const marker = `export const ${exportName}`;
-  const start = src.indexOf(marker);
-  if (start === -1) return [];
-  const section = src.slice(start);
-  const slugs = [];
+function getVariableArrayContent(src, varName) {
+  // Look for: const varName or export const varName
+  let pos = src.indexOf(`const ${varName}`);
+  if (pos === -1) {
+    pos = src.indexOf(`export const ${varName}`);
+  }
+  if (pos === -1) {
+    // console.log(`Variable ${varName} not found`);
+    return null;
+  }
+  // Find the '=' after the variable declaration (skip type annotations)
+  let equalsPos = src.indexOf('=', pos);
+  if (equalsPos === -1) {
+    // console.log(`No '=' found for ${varName}`);
+    return null;
+  }
+  // Find the first '[' after the '='
+  let bracketStart = src.indexOf('[', equalsPos);
+  if (bracketStart === -1) {
+    // console.log(`No opening bracket found for ${varName}`);
+    return null;
+  }
+  // Now find the matching closing bracket
+  let depth = 0;
+  let i = bracketStart;
+  while (i < src.length) {
+    const ch = src[i];
+    if (ch === '[') depth++;
+    else if (ch === ']') depth--;
+    if (depth === 0) {
+      // Found matching closing bracket
+      return src.slice(bracketStart + 1, i); // exclude the brackets
+    }
+    i++;
+  }
+  // console.log(`Could not find matching closing bracket for ${varName}`);
+  return null;
+}
+function getSlugsFromVariableArray(arrayContent) {
+  if (arrayContent === null) return [];
   const slugRegex = /slug:\s*"([^"]+)"/g;
   let match;
-  while ((match = slugRegex.exec(section)) !== null) {
+  const slugs = [];
+  while ((match = slugRegex.exec(arrayContent)) !== null) {
     slugs.push(match[1]);
   }
   return slugs;
@@ -100,19 +135,27 @@ function addKnownRoutes() {
     appRoutes.add(route);
   }
 
-  for (const slug of collectSlugs(blogSrc, "posts")) {
+  // blog.ts: use allPosts
+  const blogArray = getVariableArrayContent(blogSrc, "allPosts");
+  for (const slug of getSlugsFromVariableArray(blogArray)) {
     appRoutes.add(`/blog/${slug}`);
   }
-  for (const slug of collectSlugs(blogNewPostsSrc, "newPosts")) {
+  // blog-new-posts.ts: use newPosts
+  const blogNewPostsArray = getVariableArrayContent(blogNewPostsSrc, "newPosts");
+  for (const slug of getSlugsFromVariableArray(blogNewPostsArray)) {
     appRoutes.add(`/blog/${slug}`);
   }
-  for (const slug of collectSlugs(dataSrc, "products")) {
+  // data.ts: use products, projects, experiments
+  const productsArray = getVariableArrayContent(dataSrc, "products");
+  for (const slug of getSlugsFromVariableArray(productsArray)) {
     appRoutes.add(`/products/${slug}`);
   }
-  for (const slug of collectSlugs(dataSrc, "projects")) {
+  const projectsArray = getVariableArrayContent(dataSrc, "projects");
+  for (const slug of getSlugsFromVariableArray(projectsArray)) {
     appRoutes.add(`/projects/${slug}`);
   }
-  for (const slug of collectSlugs(dataSrc, "experiments")) {
+  const experimentsArray = getVariableArrayContent(dataSrc, "experiments");
+  for (const slug of getSlugsFromVariableArray(experimentsArray)) {
     appRoutes.add(`/lab/${slug}`);
   }
 
@@ -124,6 +167,55 @@ function addKnownRoutes() {
 }
 
 const appRoutes = new Set();
+addKnownRoutes();
+
+console.log("=== Collected slugs from blog.ts allPosts ===");
+console.log(getSlugsFromVariableArray(getVariableArrayContent(read("src/lib/blog.ts"), "allPosts")));
+console.log("=== Collected slugs from blog-new-posts.ts newPosts ===");
+console.log(getSlugsFromVariableArray(getVariableArrayContent(read("src/lib/blog-new-posts.ts"), "newPosts")));
+console.log("=== Collected slugs from data.ts products ===");
+console.log(getSlugsFromVariableArray(getVariableArrayContent(read("src/lib/data.ts"), "products")));
+console.log("=== Collected slugs from data.ts projects ===");
+console.log(getSlugsFromVariableArray(getVariableArrayContent(read("src/lib/data.ts"), "projects")));
+console.log("=== Collected slugs from data.ts experiments ===");
+console.log(getSlugsFromVariableArray(getVariableArrayContent(read("src/lib/data.ts"), "experiments")));
+console.log("=== Number of appRoutes ===");
+console.log(appRoutes.size);
+console.log("=== First 20 appRoutes ===");
+console.log([...appRoutes].slice(0, 20));
+
+// Check specific routes
+const targetSlugs = [
+  "youtube-mining-ai-agents",
+  "self-healing-ai-infrastructure",
+  "how-claude-code-memory-works",
+  "the-hook-that-saved-my-codebase",
+  "12-dollar-ai-operations-team",
+  "agents-that-talk-to-each-other",
+  "building-ai-agent-infrastructure-solo"
+];
+console.log("=== Checking target slugs ===");
+for (const slug of targetSlugs) {
+  const route = `/blog/${slug}`;
+  console.log(`${route}: ${appRoutes.has(route)}`);
+}
+
+const linkRegex = /\\[[^\]]+]\((\/[^\s]+)\)|href:\s*["`]([^"`]*\/[^"`]*)["`]/g;
+const failures = [];
+
+for (const file of files) {
+  const src = read(file);
+  let match;
+  while ((match = linkRegex.exec(src)) !== null) {
+    const rawUrl = match[1] ?? match[2];
+    // console.log(`Found link: ${rawUrl}`);
+    const route = normalizeUrl(rawUrl);
+    if (!route || route.startsWith("/_next") || route.startsWith("/api")) continue;
+    if (!routeExists(route)) {
+      failures.push({ file, url: rawUrl, route });
+    }
+  }
+}
 
 function normalizeUrl(url) {
   if (!url.startsWith("/") || url.startsWith("//")) return null;
@@ -137,24 +229,6 @@ function routeExists(route) {
   const publicPath = resolve(ROOT, "public", route.slice(1), "index.html");
   const staticPath = resolve(ROOT, "public", route.slice(1));
   return existsSync(publicPath) || existsSync(staticPath);
-}
-
-addKnownRoutes();
-
-const linkRegex = /\[[^\]]+\]\((\/[^)\s]+)\)|href:\s*["`]([^"`]*\/[^"`]*)["`]/g;
-const failures = [];
-
-for (const file of files) {
-  const src = read(file);
-  let match;
-  while ((match = linkRegex.exec(src)) !== null) {
-    const rawUrl = match[1] ?? match[2];
-    const route = normalizeUrl(rawUrl);
-    if (!route || route.startsWith("/_next") || route.startsWith("/api")) continue;
-    if (!routeExists(route)) {
-      failures.push({ file, url: rawUrl, route });
-    }
-  }
 }
 
 if (failures.length > 0) {

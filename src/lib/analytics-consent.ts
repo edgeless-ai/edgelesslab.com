@@ -3,8 +3,52 @@ import type posthog from "posthog-js";
 export type AnalyticsConsent = "accepted" | "rejected" | null;
 export const CONSENT_STORAGE_KEY = "edgeless.analytics-consent.v1";
 export const ANALYTICS_ID_KEY = "edgeless.analytics-id.v1";
+export const UTM_STORAGE_KEY = "edgeless.analytics-utm.v1";
 export const CONSENT_CHANGED_EVENT = "edgeless:analytics-consent";
 export const CONSENT_SETTINGS_EVENT = "edgeless:analytics-settings";
+
+const UTM_PARAMS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"] as const;
+type UtmParams = Partial<Record<(typeof UTM_PARAMS)[number], string>>;
+
+/** Read UTM parameters from the current URL and persist them in sessionStorage. */
+export function captureUtmParams(): UtmParams {
+  if (typeof window === "undefined") return {};
+  try {
+    // Return cached value if already captured this session
+    const cached = window.sessionStorage.getItem(UTM_STORAGE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached) as UtmParams;
+      if (parsed && Object.keys(parsed).length > 0) return parsed;
+    }
+  } catch { /* session storage unavailable */ }
+
+  const params: UtmParams = {};
+  try {
+    const url = new URL(window.location.href);
+    for (const key of UTM_PARAMS) {
+      const val = url.searchParams.get(key);
+      if (val) params[key] = val;
+    }
+  } catch { /* invalid URL */ }
+
+  // Cache in sessionStorage so subsequent navigations retain the original referrer
+  if (Object.keys(params).length > 0) {
+    try {
+      window.sessionStorage.setItem(UTM_STORAGE_KEY, JSON.stringify(params));
+    } catch { /* session storage unavailable */ }
+  }
+  return params;
+}
+
+/** Return the cached UTM params for the current session (no re-read from URL). */
+export function getUtmParams(): UtmParams {
+  if (typeof window === "undefined") return {};
+  try {
+    const cached = window.sessionStorage.getItem(UTM_STORAGE_KEY);
+    if (cached) return JSON.parse(cached) as UtmParams;
+  } catch { /* session storage unavailable */ }
+  return {};
+}
 
 let sessionChoice: AnalyticsConsent = null;
 let observedChoice: AnalyticsConsent | undefined;
@@ -183,7 +227,11 @@ export async function captureConsentedEvent(event: string, properties?: Record<s
   if (!hasAnalyticsConsent()) return;
   const startedAt = generation;
   const ph = await ensureAnalytics();
-  if (ph && hasAnalyticsConsent() && startedAt === generation) ph.capture(event, properties);
+  if (ph && hasAnalyticsConsent() && startedAt === generation) {
+    const utm = getUtmParams();
+    const merged = Object.keys(utm).length > 0 ? { ...utm, ...properties } : properties;
+    ph.capture(event, merged);
+  }
 }
 
 export async function captureCookielessPageview(properties?: Record<string, unknown>) {

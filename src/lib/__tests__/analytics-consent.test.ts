@@ -259,3 +259,90 @@ describe("cookieless pageviews", () => {
     expect(sdk.set_config).not.toHaveBeenCalled();
   });
 });
+
+// UTM parameter capture and attachment to consented events
+describe("UTM parameter capture", () => {
+  test("captures UTM params from URL on first call", async () => {
+    vi.stubGlobal("window", {
+      localStorage: storage(), sessionStorage: storage(),
+      location: { href: "https://edgelesslab.com/?utm_source=google&utm_medium=organic&utm_campaign=brand", origin: "https://edgelesslab.com", pathname: "/", hostname: "edgelesslab.com", reload: vi.fn() },
+      addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: vi.fn(),
+    });
+    const consent = await import("../analytics-consent");
+    const utm = consent.captureUtmParams();
+    expect(utm).toEqual({
+      utm_source: "google",
+      utm_medium: "organic",
+      utm_campaign: "brand",
+    });
+    // Cached in sessionStorage
+    expect(window.sessionStorage.getItem(consent.UTM_STORAGE_KEY)).toBeTruthy();
+  });
+
+  test("returns cached UTM params on subsequent calls even after navigation", async () => {
+    const sharedSession = storage();
+    vi.stubGlobal("window", {
+      localStorage: storage(), sessionStorage: sharedSession,
+      location: { href: "https://edgelesslab.com/?utm_source=twitter&utm_medium=social", origin: "https://edgelesslab.com", pathname: "/", hostname: "edgelesslab.com", reload: vi.fn() },
+      addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: vi.fn(),
+    });
+    const consent = await import("../analytics-consent");
+    // First call captures from URL
+    const first = consent.captureUtmParams();
+    expect(first).toEqual({ utm_source: "twitter", utm_medium: "social" });
+
+    // Simulate navigation to a page without UTM params — same sessionStorage
+    vi.stubGlobal("window", {
+      localStorage: storage(), sessionStorage: sharedSession,
+      location: { href: "https://edgelesslab.com/products", origin: "https://edgelesslab.com", pathname: "/products", hostname: "edgelesslab.com", reload: vi.fn() },
+      addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: vi.fn(),
+    });
+    // getUtmParams returns cached value
+    const cached = consent.getUtmParams();
+    expect(cached).toEqual({ utm_source: "twitter", utm_medium: "social" });
+  });
+
+  test("returns empty object when no UTM params in URL", async () => {
+    vi.stubGlobal("window", {
+      localStorage: storage(), sessionStorage: storage(),
+      location: { href: "https://edgelesslab.com/", origin: "https://edgelesslab.com", pathname: "/", hostname: "edgelesslab.com", reload: vi.fn() },
+      addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: vi.fn(),
+    });
+    const consent = await import("../analytics-consent");
+    const utm = consent.captureUtmParams();
+    expect(utm).toEqual({});
+  });
+
+  test("attaches UTM params to consented events", async () => {
+    vi.stubGlobal("window", {
+      localStorage: storage(), sessionStorage: storage(),
+      location: { href: "https://edgelesslab.com/?utm_source=google&utm_medium=cpc&utm_campaign=launch", origin: "https://edgelesslab.com", pathname: "/", hostname: "edgelesslab.com", reload: vi.fn() },
+      addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: vi.fn(),
+    });
+    const consent = await import("../analytics-consent");
+    consent.captureUtmParams();
+    consent.setAnalyticsConsent("accepted");
+    await consent.captureConsentedEvent("cta_clicked", { cta_name: "hero_view_products" });
+    expect(sdk.capture).toHaveBeenCalledWith("cta_clicked", {
+      utm_source: "google",
+      utm_medium: "cpc",
+      utm_campaign: "launch",
+      cta_name: "hero_view_products",
+    });
+  });
+
+  test("does not attach UTM params to cookieless pageviews", async () => {
+    vi.stubGlobal("window", {
+      localStorage: storage(), sessionStorage: storage(),
+      location: { href: "https://edgelesslab.com/?utm_source=google", origin: "https://edgelesslab.com", pathname: "/", hostname: "edgelesslab.com", reload: vi.fn() },
+      addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: vi.fn(),
+    });
+    const consent = await import("../analytics-consent");
+    consent.captureUtmParams();
+    await consent.captureCookielessPageview();
+    // Cookieless events should NOT include UTM params (they are anonymous)
+    const call = sdk.capture.mock.calls[0][1];
+    expect(call).not.toHaveProperty("utm_source");
+    expect(call).toMatchObject({ site: "main" });
+  });
+});

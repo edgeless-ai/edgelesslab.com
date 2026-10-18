@@ -287,6 +287,14 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["speculative decoding", "tree search", "inference", "budgeting"],
   },
+  {
+    slug: "2610.20838-srq-endpoint-weight",
+    title: "SRQ Endpoint Weight",
+    description: "Explore how executed-trial count and trial/final quality determine the share of PGRR's slot-averaged SRQ that comes from repeated endpoint evidence.",
+    category: "Research",
+    tags: ["robotics", "recovery metrics", "sensitivity analysis", "benchmark design"],
+    published_url: null,
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

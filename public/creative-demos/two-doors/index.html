@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="canonical" href="https://edgelesslab.com/creative-demos/two-doors/">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Two Doors: a dispatcher game</title>
+<meta name="description" content="Route forty jobs into six busy lanes and race four bots on the same jobs. Being offered two random lanes and taking the shorter one beats round-robin. When the queue board goes stale, always taking the shortest lane falls apart.">
+<meta name="theme-color" content="#0b0c0f">
+<style>
+:root{--bg:#0b0c0f;--ink:#ecebe6;--mute:#8b8f98;--dim:#5a5e66;--line:rgba(255,255,255,.09);--card:rgba(16,17,21,.86);--acc:#c9ff3d;--warn:#ffb347;--bad:#ff5d5d;--serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+#stage{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:default}
+.masthead{position:fixed;left:28px;top:24px;max-width:min(560px,calc(100% - 360px));pointer-events:none;z-index:2}
+.eyebrow{font:600 10px/1.2 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
+.eyebrow b{color:var(--acc);font-weight:600}
+.masthead h1{font:italic 400 clamp(28px,3.9vw,50px)/1.02 var(--serif);letter-spacing:-.012em;margin:10px 0 8px;text-wrap:balance}
+.dek{font:400 14.5px/1.45 var(--serif);color:#b4b6bc;max-width:46ch}
+.card{position:fixed;right:20px;top:20px;width:304px;max-height:calc(100% - 40px);overflow:auto;overscroll-behavior:contain;background:var(--card);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:14px;padding:14px 16px 16px;font-size:12px;z-index:3;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .25s;scrollbar-width:thin}
+.card>header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:4px}
+.card h2{font:italic 400 18px/1.1 var(--serif)}
+.card .no{font:10px var(--mono);color:var(--mute);letter-spacing:.14em}
+.card .latin{display:block;font:italic 12px var(--serif);color:var(--mute);margin-top:3px}
+.lbl{display:flex;justify-content:space-between;align-items:baseline;font:600 9.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin:14px 0 7px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1px solid var(--line);border-radius:9px;padding:2px;gap:2px;background:rgba(0,0,0,.25)}
+.seg button,.btn{font:500 11.5px/1 var(--sans);color:var(--ink);background:transparent;border:0;border-radius:7px;padding:8px 4px;cursor:pointer;touch-action:manipulation;transition:background .15s,color .15s}
+.seg button:hover{background:rgba(255,255,255,.06)}
+.seg button[aria-pressed=true]{background:var(--acc);color:#0b0c0f;font-weight:600}
+.btn{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:9px 6px}
+.btn:hover{background:rgba(255,255,255,.08)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled,.seg button:disabled{opacity:.45;cursor:default}
+.btn.wide{width:100%;margin-top:14px;padding:11px 8px;font-weight:600;letter-spacing:.02em}
+.btn.go{border-color:rgba(201,255,61,.45);color:var(--acc)}
+.btn[aria-pressed=true]{background:rgba(255,179,71,.16);border-color:rgba(255,179,71,.5);color:var(--warn)}
+.btns{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:14px}
+.stat{background:#111216;padding:8px 10px 9px}
+.stat span{display:block;font:600 9px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--mute)}
+.stat strong{display:block;font:500 17px/1 var(--mono);font-variant-numeric:tabular-nums;margin-top:6px;white-space:nowrap}
+.stat strong.good{color:var(--acc)}.stat strong.bad{color:var(--bad)}.stat strong.warn{color:var(--warn)}
+.board{margin-top:12px;display:grid;gap:5px}
+.row{display:grid;grid-template-columns:96px 1fr 48px;align-items:center;gap:8px;font:500 11px/1 var(--mono);color:var(--mute)}
+.row .bar{height:8px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden}
+.row .bar i{display:block;height:100%;width:0;border-radius:4px;background:#6b6f77;transition:width .3s}
+.row b{font-weight:500;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.row.you{color:var(--ink)}.row.you .bar i{background:var(--acc)}
+.row.p2c .bar i{background:repeating-linear-gradient(90deg,#9fb6ff 0 6px,#7f95dd 6px 9px)}
+.row.jsq .bar i{background:var(--warn)}
+.row.lead span:first-child::before{content:"★ ";color:var(--acc)}
+.note{font:400 11.5px/1.45 var(--serif);color:var(--mute);margin-top:8px}
+details.inside{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+details.inside summary{cursor:pointer;list-style:none;font:italic 400 15px var(--serif);display:flex;justify-content:space-between;align-items:center}
+details.inside summary::-webkit-details-marker{display:none}
+details.inside summary::after{content:"+";font:400 16px var(--mono);color:var(--acc)}
+details.inside[open] summary::after{content:"\2013"}
+details.inside p{font:400 13px/1.55 var(--serif);color:#c3c5ca;margin-top:9px}
+details.inside p b{color:var(--ink);font-weight:600}
+table.m{width:100%;border-collapse:collapse;margin-top:9px;font:11px/1.3 var(--mono);font-variant-numeric:tabular-nums}
+table.m th,table.m td{padding:4px 3px;border-bottom:1px solid var(--line);text-align:right}
+table.m th:first-child,table.m td:first-child{text-align:left;color:var(--mute)}
+table.m th{font-weight:600;color:var(--mute);font-size:9.5px;letter-spacing:.06em}
+table.m td.hi{color:var(--acc)}table.m td.lo{color:var(--warn)}
+.toggle{position:fixed;right:20px;bottom:18px;z-index:4;font:600 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:9px 13px;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.foot{position:fixed;left:28px;bottom:18px;font:500 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);pointer-events:none;z-index:2;max-width:calc(100% - 380px)}
+.foot em{font-style:normal;color:var(--mute)}
+body.bare .card{transform:translateX(calc(100% + 40px));opacity:0;pointer-events:none}
+body.bare .foot{max-width:calc(100% - 160px)}
+body.bare .masthead{max-width:min(560px,calc(100% - 56px))}
+@media (max-width:760px){
+  .masthead{left:16px;top:14px;max-width:calc(100% - 110px)}
+  .masthead h1{font-size:27px;margin:7px 0 4px}
+  .dek{display:none}
+  .card{left:10px;right:10px;top:auto;bottom:10px;width:auto;max-height:46vh;border-radius:14px;padding:10px 12px 12px}
+  .card>header{display:none}
+  .card{display:flex;flex-direction:column}
+  .card>*{flex-shrink:0}
+  .card>.stats{order:-2;margin:0 0 2px}
+  .card>#start{order:-1;margin:8px 0 2px}
+  .eyebrow .sp{display:none}
+  .stat{padding:7px 9px}
+  .stat strong{font-size:15px;margin-top:4px}
+  .lbl{margin:10px 0 6px}
+  .row{grid-template-columns:84px 1fr 42px}
+  .toggle{top:14px;right:12px;bottom:auto}
+  .foot{display:none}
+  body.bare .card{transform:translateY(calc(100% + 30px))}
+}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<canvas id="stage" aria-label="Game board: one dispatcher on the left sends jobs into six lanes. Two lanes are offered for each job; choose one."></canvas>
+<p class="sr" id="live" aria-live="polite"></p>
+<div class="masthead">
+  <div class="eyebrow">Field note · <b>Systems</b><span class="sp"> · Game 01</span></div>
+  <h1>Two Doors</h1>
+  <p class="dek">You run the dispatch desk. Jobs keep arriving for six lanes. For each job you only get to look at two of them. Four bots get the same jobs. Can you beat them?</p>
+</div>
+<aside class="card" id="card">
+  <header><div><h2>Dispatch desk</h2><span class="latin">The power of two choices</span></div><span class="no">No. 01</span></header>
+  <div class="lbl">You see</div>
+  <div class="seg" data-key="mode"><button aria-pressed="true" data-v="two">Two doors</button><button aria-pressed="false" data-v="any">Every lane</button></div>
+  <div class="lbl">Job lengths</div>
+  <div class="seg" data-key="dist"><button aria-pressed="false" data-v="even">Steady</button><button aria-pressed="true" data-v="tail">Long-tail</button></div>
+  <div class="lbl">Queue board</div>
+  <div class="seg" data-key="lag"><button aria-pressed="true" data-v="0">Live</button><button aria-pressed="false" data-v="12">12 s stale</button></div>
+  <button class="btn wide go" id="start">Start round</button>
+  <div class="btns"><button class="btn" id="replay">Same jobs again</button><button class="btn" id="auto" aria-pressed="false">Let a bot play</button></div>
+  <div class="stats">
+    <div class="stat"><span>Your avg wait</span><strong id="sYou">—</strong></div>
+    <div class="stat"><span>Jobs left</span><strong id="sLeft">40</strong></div>
+    <div class="stat"><span>Your rank</span><strong id="sRank">—</strong></div>
+    <div class="stat"><span>Longest wait</span><strong id="sMax">—</strong></div>
+  </div>
+  <div class="lbl"><span>Same jobs · avg wait</span><output id="bN"></output></div>
+  <div class="board" id="board"></div>
+  <p class="note" id="note">Waits are measured over the same jobs each racer has handled so far. The clock stops while you choose, so your reaction time doesn't count.</p>
+  <details class="inside"><summary>Inside the experiment</summary>
+    <p>Each job has to go into one of six lanes, and the lanes clear at the same speed. You can't see how long a job will take until it's done, the same as an LLM call. You only see how many jobs are queued in each lane and how long the current one has been running.</p>
+    <p><b>Random</b> picks any lane. <b>Round-robin</b> takes turns. <b>Best of two</b> is offered two random lanes and takes the one with fewer jobs. <b>Shortest</b> checks all six and picks the shortest. In <b>Two doors</b> mode you're offered the same two lanes the best-of-two bot gets.</p>
+    <p>The surprise is how much the second look is worth. Random and round-robin spread the jobs evenly, but they ignore which lanes are stuck behind a long job. Comparing just two lanes avoids most of those. Checking every lane is better again, but only while the board is up to date.</p>
+    <p>Set the board to <b>12 s stale</b> (about two average jobs) and every dispatcher reads the same old snapshot. They all send work to whichever lane looked empty, so that lane fills up and the shortest-lane rule falls apart. Best of two holds up better, because each dispatcher is offered a different pair of lanes and they don't all pile into the same one.</p><p>One more twist: once the board is stale, plain <b>round-robin</b> wins with steady jobs and ties best of two with long-tail jobs. It reads no board at all, so out-of-date numbers can't mislead it. Stale information can be worse than none.</p>
+    <p>One round of 40 jobs is noisy, so here are averages over 600 rounds of this exact game (six lanes, average wait in seconds, lower is better):</p><table class="m"><tr><th></th><th>Turns</th><th>Best of 2</th><th>Shortest</th></tr><tr><td>Steady, live</td><td>3.9</td><td>3.5</td><td class="hi">1.8</td></tr><tr><td>Long-tail, live</td><td>6.0</td><td>3.8</td><td class="hi">1.6</td></tr><tr><td>Steady, 12 s stale</td><td class="hi">3.9</td><td>5.7</td><td class="lo">8.0</td></tr><tr><td>Long-tail, 12 s stale</td><td class="hi">6.0</td><td class="hi">6.0</td><td class="lo">6.7</td></tr></table><p>And a bigger run: twenty lanes, 60,000 jobs, five seeds, long-tail jobs at 90% load, mean time in the system in units of one average job:</p>
+    <table class="m">
+      <tr><th></th><th>Random</th><th>Turns</th><th>Best of 2</th><th>Shortest</th></tr>
+      <tr><td>Long-tail 90%</td><td>42.8</td><td>35.2</td><td>6.3</td><td class="hi">2.3</td></tr>
+      <tr><td>…board 2 jobs stale</td><td>42.8</td><td>35.2</td><td class="hi">7.1</td><td class="lo">9.1</td></tr>
+      <tr><td>…board 8 jobs stale</td><td>42.8</td><td>35.2</td><td class="hi">8.9</td><td class="lo">26.9</td></tr>
+    </table>
+    <p>With twenty lanes, round-robin stays far behind even when best of two is working from a stale board (35.2 against 8.9), so the round-robin twist depends on scale and job mix. Best of two stays usable throughout. The same idea shows up in hash tables (put each item in the emptier of two buckets) and in load balancers such as Envoy's least-request mode.</p>
+    <p>Measured: both tables (seeded simulations, this page's own engine for the first) and the per-round bot scores, which are computed exactly from the jobs you were dealt. Not measured: real LLM traffic. Jobs here are random, lengths are capped at 15 average jobs, and every lane runs at the same speed.</p>
+  </details>
+</aside>
+<button class="toggle" id="toggle">Hide panel</button>
+<div class="foot">Tap a lit lane or press <em>A</em> / <em>B</em> · in every-lane mode press <em>1–6</em> · H hides the panel</div>
+<script>
+const $=s=>document.querySelector(s);
+const cv=$('#stage');const g=cv.getContext('2d');let W=0,H=0,DPR=1,R={x:0,y:0,w:1,h:1};
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ACC='#c9ff3d',AMB='#ffb347',RED='#ff5d5d',BLUE='#9fb6ff',MUTE='#8b8f98';
+// ---------- model ----------
+const NL=6,MEAN=6,LOAD=.85,JOBS=40,LAM=NL*LOAD/MEAN,CAP=90;
+const BOTS=[{k:'random',n:'Random'},{k:'rr',n:'Round-robin'},{k:'p2c',n:'Best of two'},{k:'jsq',n:'Shortest'}];
+function rng(seed){let a=seed>>>0;return()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function makeJobs(seed,dist){const r=rng(seed);let t=1.2;const out=[];
+  for(let i=0;i<JOBS;i++){t+=-Math.log(1-r())/LAM;let s;
+    if(dist==='even')s=-Math.log(1-r())*MEAN;
+    else{const sg=1.5,u1=r()||1e-9,u2=r(),z=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);s=Math.exp(Math.log(MEAN)-sg*sg/2+sg*z)}
+    s=Math.max(.4,Math.min(CAP,s));
+    let a=Math.floor(r()*NL);let b=Math.floor(r()*(NL-1));if(b>=a)b++;if(a>b){const x=a;a=b;b=x}
+    out.push({i,t,s,a,b,tie:r()})}
+  return out}
+// counts of jobs in each lane at time `at`, from a list of placed jobs
+function countsAt(placed,at){const c=new Array(NL).fill(0);for(const p of placed)if(p.t<=at&&p.f>at)c[p.lane]++;return c}
+function snapTime(t,lag){return lag>0?Math.floor(t/lag)*lag:t}
+function simBot(k,jobs,lag){const free=new Array(NL).fill(0),placed=[],waits=[];let rr=0;
+  for(const j of jobs){const c=(k==='p2c'||k==='jsq')?countsAt(placed,snapTime(j.t,lag)):null;let L;
+    if(k==='random')L=j.a;else if(k==='rr'){L=rr;rr=(rr+1)%NL}
+    else if(k==='p2c')L=c[j.a]<c[j.b]?j.a:c[j.b]<c[j.a]?j.b:(j.tie<.5?j.a:j.b);
+    else{const m=Math.min(...c),cs=[];c.forEach((v,i)=>{if(v===m)cs.push(i)});L=cs[Math.floor(j.tie*cs.length)]}
+    const st=Math.max(j.t,free[L]),f=st+j.s;free[L]=f;placed.push({t:j.t,f,lane:L});waits.push(st-j.t)}
+  return waits}
+// ---------- state ----------
+const segs={};document.querySelectorAll('.seg').forEach(el=>{segs[el.dataset.key]=el.querySelector('[aria-pressed=true]').dataset.v;el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||S.phase==='play')return;el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));segs[el.dataset.key]=b.dataset.v;newRound(S.seed,false)})});
+const S={phase:'idle',seed:7,jobs:[],ghost:{},clock:0,next:0,free:[],placed:[],waits:[],lanes:[],snap:null,snapT:-1,auto:false,autoT:0,fly:[],pops:[],choices:{good:0,total:0},events:[]};
+function ev(type,o={}){S.events.push({type,clock:+S.clock.toFixed(3),...o});if(S.events.length>400)S.events.shift()}
+function lag(){return +segs.lag}
+function newRound(seed,start){S.seed=seed;S.jobs=makeJobs(seed,segs.dist);S.ghost={};for(const b of BOTS)S.ghost[b.k]=simBot(b.k,S.jobs,lag());
+  S.clock=0;S.next=0;S.free=new Array(NL).fill(0);S.placed=[];S.waits=[];S.lanes=Array.from({length:NL},()=>[]);S.snap=null;S.snapT=-1;S.fly=[];S.pops=[];S.choices={good:0,total:0};
+  S.phase=start?'play':'idle';ev('round',{seed,mode:segs.mode,dist:segs.dist,lag:lag(),start});
+  document.querySelectorAll('.seg button').forEach(b=>b.disabled=start);
+  $('#start').textContent=start?'Round running…':'Start round';$('#start').disabled=start;
+  takeSnap();stats();board()}
+function pending(){const j=S.jobs[S.next];return j&&S.phase==='play'&&S.clock>=j.t?j:null}
+function laneState(at){// live per-lane: [{t,f,s,start}] in system
+  return S.lanes.map(q=>q.filter(p=>p.f>at))}
+function takeSnap(){const at=S.clock;S.snapT=snapTime(at,lag());S.snap=countsAt(S.placed,S.snapT).map((c,i)=>{const run=S.placed.find(p=>p.lane===i&&p.st<=S.snapT&&p.f>S.snapT);return{c,el:run?S.snapT-run.st:0}})}
+function visible(){if(lag()===0){return S.lanes.map((q,i)=>{const live=q.filter(p=>p.f>S.clock);const run=live.find(p=>p.st<=S.clock);return{c:live.length,el:run?S.clock-run.st:0,live}})}
+  return S.snap.map(o=>({...o,live:null}))}
+function choose(L){const j=pending();if(!j)return false;
+  if(segs.mode==='two'&&L!==j.a&&L!==j.b){ev('locked',{lane:L});flashLock=.8;return false}
+  const vis=visible().map(v=>v.c);const best=segs.mode==='two'?Math.min(vis[j.a],vis[j.b]):Math.min(...vis);
+  S.choices.total++;if(vis[L]===best)S.choices.good++;
+  const st=Math.max(j.t,S.free[L]),f=st+j.s;S.free[L]=f;const p={i:j.i,t:j.t,st,f,s:j.s,lane:L};S.placed.push(p);S.lanes[L].push(p);S.waits.push(st-j.t);
+  ev('dispatch',{job:j.i,lane:L,wait:+(st-j.t).toFixed(3),offered:segs.mode==='two'?[j.a,j.b]:'all',auto:S.auto});
+  S.fly.push({lane:L,u:RM?1:0});S.next++;
+  $('#live').textContent=`Job ${j.i+1} to lane ${L+1}, wait ${(st-j.t).toFixed(1)} seconds`;
+  if(S.next>=JOBS)finish();stats();board();return true}
+let flashLock=0;
+function finish(){S.phase='done';document.querySelectorAll('.seg button').forEach(b=>b.disabled=false);$('#start').disabled=false;$('#start').textContent='New round';
+  const r=ranking();ev('finish',{you:+avg(S.waits).toFixed(3),rank:r.rank,bots:Object.fromEntries(BOTS.map(b=>[b.k,+avg(S.ghost[b.k]).toFixed(3)]))});
+  $('#live').textContent=`Round over. You placed ${r.rank} of 5.`}
+function avg(a){return a.length?a.reduce((x,y)=>x+y,0)/a.length:0}
+function ranking(){const n=S.waits.length;const rows=[{k:'you',n:'You',v:avg(S.waits)}].concat(BOTS.map(b=>({k:b.k,n:b.n,v:avg(S.ghost[b.k].slice(0,n))})));
+  const sorted=[...rows].sort((x,y)=>x.v-y.v||(x.k==='you'?-1:1));return{rows,rank:sorted.findIndex(r=>r.k==='you')+1,sorted}}
+// ---------- UI ----------
+function fmt(v){return v.toFixed(1)+' s'}
+function stats(){const n=S.waits.length;$('#sLeft').textContent=JOBS-n;
+  const y=$('#sYou'),rk=$('#sRank'),mx=$('#sMax');
+  if(!n){y.textContent='—';rk.textContent='—';mx.textContent='—';y.className=rk.className=mx.className='';return}
+  const r=ranking();y.textContent=fmt(avg(S.waits));rk.textContent=r.rank+' / 5';rk.className=r.rank<=2?'good':r.rank<=3?'warn':'bad';
+  y.className=r.rank<=2?'good':'';const m=Math.max(...S.waits);mx.textContent=fmt(m);mx.className=m>3*MEAN?'bad':m>MEAN?'warn':''}
+function board(){const n=S.waits.length;$('#bN').textContent=n?`${n} job${n>1?'s':''}`:'';
+  const r=ranking(),max=Math.max(1e-6,...r.rows.map(x=>x.v)),lead=n?r.sorted[0].k:null;
+  $('#board').innerHTML=r.rows.map(x=>`<div class="row ${x.k==='you'?'you':x.k}${x.k===lead?' lead':''}"><span>${x.n}</span><span class="bar"><i style="width:${n?Math.max(2,x.v/max*100):0}%"></i></span><b>${n?x.v.toFixed(1):'—'}</b></div>`).join('')}
+$('#start').onclick=()=>{if(S.phase==='play')return;newRound(S.phase==='done'||S.events.some(e=>e.type==='finish')?S.seed+1:S.seed,true)};
+$('#replay').onclick=()=>{newRound(S.seed,true)};
+$('#auto').onclick=()=>{S.auto=!S.auto;$('#auto').setAttribute('aria-pressed',S.auto);$('#auto').textContent=S.auto?'Bot is playing':'Let a bot play';ev('auto',{on:S.auto});if(S.auto&&S.phase!=='play')newRound(S.phase==='done'?S.seed+1:S.seed,true)};
+$('#toggle').onclick=()=>{const b=document.body.classList.toggle('bare');$('#toggle').textContent=b?'Show panel':'Hide panel';resize()};
+addEventListener('keydown',e=>{if(e.target.closest('input,button,summary'))return;const k=e.key.toLowerCase();
+  if(k==='h'){$('#toggle').click();return}
+  const j=pending();if(!j)return;
+  if(segs.mode==='two'&&(k==='a'||k==='b')){choose(k==='a'?j.a:j.b);return}
+  if(/^[1-6]$/.test(k))choose(+k-1)});
+function autoPick(){const j=pending();if(!j)return;const v=visible().map(o=>o.c);let L;
+  if(segs.mode==='two')L=v[j.a]<v[j.b]?j.a:v[j.b]<v[j.a]?j.b:(j.tie<.5?j.a:j.b);
+  else{const m=Math.min(...v),cs=[];v.forEach((x,i)=>{if(x===m)cs.push(i)});L=cs[Math.floor(j.tie*cs.length)]}
+  choose(L)}
+// ---------- layout + draw ----------
+let LY={desk:{x:0,y:0},lanes:[],x0:0,x1:0,lh:0};
+function stageRect(){const m=$('.masthead').getBoundingClientRect(),c=$('#card'),bare=document.body.classList.contains('bare'),mob=W<=760;const x=mob?14:28,y=m.bottom+(mob?10:22);let w=W-x-(mob?14:28),h=H-y-(mob?12:46);if(!bare){if(mob)h=c.offsetTop-10-y;else w=c.offsetLeft-28-x}return{x,y,w:Math.max(120,w),h:Math.max(120,h)}}
+function resize(){DPR=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);g.setTransform(DPR,0,0,DPR,0,0);R=stageRect();layout()}
+addEventListener('resize',resize);
+function layout(){const deskW=Math.min(110,Math.max(64,R.w*.16));const lh=Math.min(64,R.h/NL);const top=R.y+(R.h-lh*NL)/2;
+  LY.desk={x:R.x+Math.max(30,deskW*.45),y:R.y+R.h/2,w:deskW};LY.x0=R.x+deskW+28;LY.x1=Math.min(R.x+R.w,LY.x0+820);LY.lh=lh;
+  LY.lanes=Array.from({length:NL},(_,i)=>({y:top+lh*i+lh/2}))}
+function laneAt(x,y){if(x<LY.x0-40)return -1;for(let i=0;i<NL;i++)if(Math.abs(y-LY.lanes[i].y)<=LY.lh/2)return i;return -1}
+cv.addEventListener('pointerdown',e=>{const L=laneAt(e.clientX,e.clientY);if(L>=0&&!S.auto)choose(L)});
+cv.addEventListener('pointermove',e=>{const L=laneAt(e.clientX,e.clientY),j=pending();cv.style.cursor=(L>=0&&j&&!S.auto&&(segs.mode==='any'||L===j.a||L===j.b))?'pointer':'default'});
+function rr_(x,y,w,h,r){g.beginPath();g.roundRect?g.roundRect(x,y,w,h,r):g.rect(x,y,w,h)}
+function draw(now){g.fillStyle='#0b0c0f';g.fillRect(0,0,W,H);
+  g.fillStyle='rgba(255,255,255,.035)';for(let x=R.x;x<R.x+R.w;x+=22)for(let y=R.y;y<R.y+R.h;y+=22)g.fillRect(x,y,1,1);
+  const j=pending(),vis=visible(),stale=lag()>0,chip=Math.max(9,Math.min(16,LY.lh*.3)),gap=4;
+  const offered=j?(segs.mode==='two'?[j.a,j.b]:[0,1,2,3,4,5]):[];
+  // desk
+  const d=LY.desk;rr_(d.x-26,d.y-26,52,52,10);g.fillStyle='#14161b';g.fill();g.lineWidth=1.4;g.strokeStyle=j?AMB:'rgba(236,235,230,.4)';g.stroke();
+  g.textAlign='center';g.font='600 9px ui-monospace,Menlo,monospace';g.fillStyle=MUTE;g.fillText('DISPATCH',d.x,d.y+42);
+  if(j){g.fillStyle=AMB;g.font='600 15px ui-monospace,Menlo,monospace';g.fillText('#'+(j.i+1),d.x,d.y+5);
+    g.font='italic 13px "Iowan Old Style",Palatino,Georgia,serif';g.fillStyle='#c3c5ca';g.textAlign='left';const cap=S.auto?'bot choosing…':(segs.mode==='two'?'clock paused · pick A or B':'clock paused · pick a lane');g.fillText(cap,R.x,d.y+62,Math.max(60,LY.x0-R.x-10));g.textAlign='center'}
+  else{g.fillStyle=MUTE;g.font='500 11px ui-monospace,Menlo,monospace';g.fillText(S.phase==='play'?'…':S.phase==='done'?'done':'ready',d.x,d.y+4)}
+  // wires
+  LY.lanes.forEach((ln,i)=>{const on=offered.includes(i);g.strokeStyle=on?(segs.mode==='two'?'rgba(255,179,71,.55)':'rgba(255,179,71,.22)'):'rgba(255,255,255,.07)';g.lineWidth=on&&segs.mode==='two'?1.6:1;g.beginPath();g.moveTo(d.x+26,d.y);g.bezierCurveTo(d.x+60,d.y,LY.x0-50,ln.y,LY.x0-8,ln.y);g.stroke()});
+  // lanes
+  LY.lanes.forEach((ln,i)=>{const on=offered.includes(i),door=segs.mode==='two'&&j?(i===j.a?'A':i===j.b?'B':''):'';
+    const y=ln.y,h=LY.lh-8;rr_(LY.x0,y-h/2,LY.x1-LY.x0,h,8);g.fillStyle=on&&segs.mode==='two'?'rgba(255,179,71,.06)':'rgba(255,255,255,.02)';g.fill();
+    g.lineWidth=1;g.strokeStyle=on&&segs.mode==='two'?'rgba(255,179,71,.7)':'rgba(255,255,255,.08)';if(on&&segs.mode==='two'&&!RM){g.globalAlpha=.65+.35*Math.sin(now*5)}g.stroke();g.globalAlpha=1;
+    if(segs.mode==='two'&&j&&!on){g.fillStyle='rgba(11,12,15,.45)';g.fill()}
+    // server head
+    const hx=LY.x0+10;g.textAlign='left';g.font='600 10px ui-monospace,Menlo,monospace';g.fillStyle=door?AMB:'#b9bcc2';g.fillText(`L${i+1}`,hx,y-h/2+13);
+    const hidden=segs.mode==='two'&&j&&!on;
+    if(door){const bx=LY.x0-30,by=y;g.beginPath();g.arc(bx,by,13,0,7);g.fillStyle=AMB;g.fill();g.fillStyle='#0b0c0f';g.font='700 13px ui-monospace,Menlo,monospace';g.textAlign='center';g.fillText(door,bx,by+4.5);g.textAlign='left'}
+    if(hidden){g.fillStyle='#5a5e66';g.font='500 9px ui-monospace,Menlo,monospace';g.fillText('not offered',hx,y+8);g.textAlign='right';g.font='500 15px ui-monospace,Menlo,monospace';g.fillStyle='#5a5e66';g.fillText('?',LY.x1-12,y+5);return}
+    const v=vis[i];const runW=Math.min(150,(LY.x1-LY.x0)*.3),rx=hx,ry=y-2;
+    // running job: elapsed bar only (length unknown)
+    if(v.c>0){const el=v.el,frac=1-Math.exp(-el/MEAN);rr_(rx,ry,runW,chip*.7,4);g.fillStyle='rgba(255,255,255,.06)';g.fill();
+      rr_(rx,ry,Math.max(4,runW*frac),chip*.7,4);g.fillStyle=el>2*MEAN?RED:el>MEAN?AMB:'rgba(236,235,230,.55)';g.fill();
+      g.fillStyle='#b9bcc2';g.font='500 9.5px ui-monospace,Menlo,monospace';g.fillText(`running ${el.toFixed(0)}s · ${v.c-1} waiting`,rx,ry+chip*.7+11)}
+    else{g.fillStyle='rgba(201,255,61,.6)';g.font='500 9px ui-monospace,Menlo,monospace';g.fillText('idle',rx,ry+8)}
+    // queued chips
+    const qx=rx+runW+14;for(let k=1;k<v.c;k++){const x=qx+(k-1)*(chip+gap);if(x+chip>LY.x1-34)break;rr_(x,y-chip/2,chip,chip,3);g.fillStyle='#3a3d45';g.fill();g.strokeStyle='rgba(236,235,230,.6)';g.lineWidth=1;g.stroke()}
+    // count
+    g.textAlign='right';g.font='500 15px ui-monospace,Menlo,monospace';g.fillStyle=v.c===0?ACC:v.c>=4?RED:v.c>=2?AMB:'#ecebe6';g.fillText(v.c,LY.x1-12,y+5);
+  });
+  if(stale){const age=S.clock-S.snapT;g.textAlign='left';g.font='600 9px ui-monospace,Menlo,monospace';g.fillStyle=AMB;g.fillText(`STALE BOARD · SNAPSHOT ${age.toFixed(1)} s OLD · REFRESHES EVERY ${lag()} s`,LY.x0,LY.lanes[0].y-LY.lh/2-8,LY.x1-LY.x0)}
+  else{g.textAlign='left';g.font='600 9px ui-monospace,Menlo,monospace';g.fillStyle=MUTE;g.fillText('LIVE QUEUE BOARD · JOB LENGTHS UNKNOWN UNTIL DONE',LY.x0,LY.lanes[0].y-LY.lh/2-8,LY.x1-LY.x0)}
+  if(flashLock>.02){g.textAlign='center';g.globalAlpha=Math.min(1,flashLock);g.fillStyle=AMB;g.font='italic 14px "Iowan Old Style",Palatino,Georgia,serif';g.fillText('only the two lit lanes are open for this job',(LY.x0+LY.x1)/2,LY.lanes[NL-1].y+LY.lh/2+18);g.globalAlpha=1}
+  // flying tokens
+  S.fly.forEach(f=>{const u=Math.min(1,f.u),e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2,ty=LY.lanes[f.lane].y,x=d.x+(LY.x0+30-d.x)*e,y=d.y+(ty-d.y)*e;g.beginPath();g.arc(x,y,5,0,7);g.fillStyle=ACC;g.fill()});
+  // pops on completion
+  S.pops.forEach(p=>{g.beginPath();g.arc(p.x,p.y,p.r,0,7);g.strokeStyle=ACC;g.globalAlpha=Math.max(0,p.a);g.lineWidth=1.3;g.stroke();g.globalAlpha=1});
+  // end card
+  if(S.phase==='done'){const r=ranking(),cx=(LY.x0+LY.x1)/2,cy=R.y+R.h/2,bw=Math.min(420,LY.x1-LY.x0-20),bh=118;
+    rr_(cx-bw/2,cy-bh/2,bw,bh,12);g.fillStyle='rgba(11,12,15,.92)';g.fill();g.strokeStyle=r.rank===1?ACC:'rgba(255,255,255,.18)';g.lineWidth=1.2;g.stroke();
+    g.textAlign='center';g.fillStyle=r.rank===1?ACC:'#ecebe6';g.font='italic 30px "Iowan Old Style",Palatino,Georgia,serif';g.fillText(`#${r.rank} of 5`,cx,cy-14);
+    g.font='13px "Iowan Old Style",Palatino,Georgia,serif';g.fillStyle='#c3c5ca';g.fillText(verdict(r),cx,cy+14,bw-24);
+    g.font='600 9px ui-monospace,Menlo,monospace';g.fillStyle=MUTE;g.fillText('START A NEW ROUND, OR REPLAY THE SAME JOBS',cx,cy+40)}
+  else if(S.phase==='idle'){const cx=(LY.x0+LY.x1)/2;g.textAlign='center';g.font='italic 16px "Iowan Old Style",Palatino,Georgia,serif';g.fillStyle='#c3c5ca';g.fillText('Press Start round. Each job opens two lanes; send it down one.',cx,LY.lanes[NL-1].y+LY.lh/2+22,LY.x1-LY.x0-10)}
+}
+function verdict(r){const y=r.rows[0].v,p=r.rows.find(x=>x.k==='p2c').v,rr=r.rows.find(x=>x.k==='rr').v,q=r.rows.find(x=>x.k==='jsq').v;
+  if(r.rank===1)return `Fastest at the desk: ${fmt(y)} average wait. Shortest-lane bot ${fmt(q)}.`;
+  if(y<=rr)return `You beat round-robin (${fmt(rr)}) with ${fmt(y)}. Best of two got ${fmt(p)}.`;
+  return `${fmt(y)} average wait. Round-robin ${fmt(rr)}, best of two ${fmt(p)}.`}
+// ---------- loop ----------
+let last=performance.now(),st=0;
+function frame(nowMs){const dt=Math.min(1/30,(nowMs-last)/1000);last=nowMs;const now=nowMs/1000;
+  if(S.phase==='play'&&!pending()){let nt=S.clock+dt*1.6;const j=S.jobs[S.next];if(j&&nt>j.t)nt=j.t;S.clock=nt}
+  else if(S.phase==='done'){S.clock+=dt*1.6}
+  if(lag()>0&&snapTime(S.clock,lag())!==S.snapT){takeSnap();ev('snapshot',{at:S.snapT})}
+  if(S.auto&&pending()){S.autoT+=dt;if(S.autoT>(RM?.05:.28)){S.autoT=0;autoPick()}}
+  // completions -> pops
+  S.placed.forEach(p=>{if(!p.popped&&p.f<=S.clock){p.popped=1;if(!RM)S.pops.push({x:LY.x0+16,y:LY.lanes[p.lane].y,r:6,a:.8})}});
+  S.fly.forEach(f=>f.u+=dt/.32);S.fly=S.fly.filter(f=>f.u<1);
+  S.pops.forEach(p=>{p.r+=dt*40;p.a-=dt*1.8});S.pops=S.pops.filter(p=>p.a>0);
+  flashLock*=Math.exp(-dt*2.5);
+  draw(now);requestAnimationFrame(frame)}
+// ---------- inspection API (verification) ----------
+window.__twoDoors={state:()=>({phase:S.phase,seed:S.seed,clock:S.clock,next:S.next,mode:segs.mode,dist:segs.dist,lag:lag(),auto:S.auto,pending:pending()?{i:pending().i,a:pending().a,b:pending().b}:null,visible:visible().map(v=>v.c)}),
+  metrics:()=>{const r=ranking();return{n:S.waits.length,you:avg(S.waits),rank:r.rank,rows:r.rows,choices:S.choices,fullBots:Object.fromEntries(BOTS.map(b=>[b.k,avg(S.ghost[b.k])]))}},
+  events:S.events,choose,simBot,makeJobs,geom:()=>({lanes:LY.lanes.map(l=>l.y),x0:LY.x0,x1:LY.x1}),
+  // play the whole round instantly with a policy in the player's seat (for tests)
+  runInstant:(policy)=>{if(S.phase!=='play')newRound(S.seed,true);let guard=0;while(S.phase==='play'&&guard++<10000){const j=S.jobs[S.next];S.clock=Math.max(S.clock,j.t);if(lag()>0&&snapTime(S.clock,lag())!==S.snapT)takeSnap();
+      const v=visible().map(o=>o.c);let L;if(policy==='p2c')L=v[j.a]<v[j.b]?j.a:v[j.b]<v[j.a]?j.b:(j.tie<.5?j.a:j.b);else if(policy==='jsq'){const m=Math.min(...v),cs=[];v.forEach((x,i)=>{if(x===m)cs.push(i)});L=cs[Math.floor(j.tie*cs.length)]}else L=j.a;
+      const pm=segs.mode;segs.mode='any';choose(L);segs.mode=pm}return window.__twoDoors.metrics()}};
+resize();newRound(7,false);requestAnimationFrame(frame);
+</script>
+</body>
+</html>

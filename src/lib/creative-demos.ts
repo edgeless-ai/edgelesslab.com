@@ -16,6 +16,15 @@ export interface CreativeDemo {
 
 export const creativeDemos: CreativeDemo[] = [
   {
+    slug: "two-doors",
+    title: "Two Doors: a dispatcher game",
+    description: "Send forty jobs into six busy lanes and race four bots on the same jobs. Picking the shorter of two random lanes beats round-robin. When the queue board goes stale, always taking the shortest lane falls apart.",
+    tags: ["Systems", "Load balancing", "Queueing", "Game", "Interactive"],
+    date: "2026-10-21",
+    hasControls: true,
+    category: "Systems",
+  },
+  {
     slug: "router-failover-lab",
     title: "When everything fails at once",
     description: "A pool of twenty models behind one router and a health checker. Kill the router and a naive checker ejects every model; a smarter rule notices they all failed together and blames the router instead.",

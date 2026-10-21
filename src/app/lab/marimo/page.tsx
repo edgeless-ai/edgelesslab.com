@@ -2,13 +2,13 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
 import { createPageMetadata } from "@/lib/metadata";
-import { marimoDemos, marimoCategories, type MarimoDemo } from "@/lib/marimo-demos";
+import { publishedMarimoDemos, marimoCategories, type PublishedMarimoDemo } from "@/lib/marimo-demos";
 import { MarimoPreview } from "@/components/marimo-preview";
 
 export const metadata = createPageMetadata({
   title: "Marimo",
   description:
-    "Interactive reactive-Python notebooks running entirely in the browser — GPU compute, live widgets, algorithm explainers, WASM-exported marimo demos from Edgeless Lab.",
+    "Verified published interactive Python notebooks running in the browser — mathematics, AI evaluation, and research demos from Edgeless Lab.",
   path: "/lab/marimo",
   keywords: [
     "marimo",
@@ -16,12 +16,12 @@ export const metadata = createPageMetadata({
     "Python WASM",
     "Pyodide",
     "interactive demos",
-    "GPU compute",
+    "research demos",
   ],
 });
 
 export default function MarimoPage() {
-  const allTags = Array.from(new Set(marimoDemos.flatMap((d) => d.tags)));
+  const allTags = Array.from(new Set(publishedMarimoDemos.flatMap((d) => d.tags)));
 
   return (
     <div className="flex flex-col min-h-full" style={{ background: "var(--bg-base)" }}>
@@ -33,14 +33,14 @@ export default function MarimoPage() {
           "@type": "CollectionPage",
           name: "Edgeless Lab Marimo",
           description:
-            "Interactive reactive-Python notebooks — GPU compute, live widgets, WASM in your browser.",
+            "Verified published interactive Python notebooks running on Pyodide and WASM.",
           url: "https://edgelesslab.com/lab/marimo",
-          numberOfItems: marimoDemos.length,
-          itemListElement: marimoDemos.map((demo, i) => ({
+          numberOfItems: publishedMarimoDemos.length,
+          itemListElement: publishedMarimoDemos.map((demo, i) => ({
             "@type": "ListItem",
             position: i + 1,
             name: demo.title,
-            url: demo.published_url ?? `https://edgelesslab.com/marimo/${demo.slug}/`,
+            url: demo.published_url,
           })),
         }}
       />
@@ -69,7 +69,7 @@ export default function MarimoPage() {
               className="text-xs font-mono"
               style={{ color: "var(--text-tertiary)" }}
             >
-              {marimoDemos.length} notebooks &middot; Pyodide, WASM
+              {publishedMarimoDemos.length} published notebooks &middot; Pyodide, WASM
             </span>
           </div>
 
@@ -77,9 +77,9 @@ export default function MarimoPage() {
             className="text-base mb-12 max-w-xl"
             style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}
           >
-            Interactive reactive-Python notebooks — GPU compute, live widgets, WASM in your
-            browser. Each demo is a full marimo kernel exported to a standalone WASM app: no
-            server, no build step, edit a cell and the whole dataflow graph re-runs downstream.
+            Published interactive Python notebooks, verified live in your browser.
+            These standalone marimo apps run on Pyodide and WASM without a Python server.
+            Unpublished and legacy notebooks are omitted until their live URLs are verified.
           </p>
 
           {/* Tags */}
@@ -101,7 +101,7 @@ export default function MarimoPage() {
 
           {/* Grouped by category */}
           {marimoCategories.map((category) => {
-            const demos = marimoDemos.filter((d) => d.category === category);
+            const demos = publishedMarimoDemos.filter((d) => d.category === category);
             if (demos.length === 0) return null;
             return (
               <section key={category} className="mb-14">
@@ -135,10 +135,10 @@ export default function MarimoPage() {
   );
 }
 
-function DemoCard({ demo }: { demo: MarimoDemo }) {
+function DemoCard({ demo }: { demo: PublishedMarimoDemo }) {
   return (
     <a
-      href={demo.published_url ?? `https://edgelesslab.com/marimo/${demo.slug}/`}
+      href={demo.published_url}
       target="_blank"
       rel="noopener noreferrer"
       className="group block rounded-lg border p-4 transition-all hover:border-[var(--border-hover)]"

@@ -134,7 +134,6 @@ export const marimoDemos: MarimoDemo[] = [
   {
     slug: "2610.20686-rolaq-cache-accounting",
     title: "RoLaQ Cache Accounting",
-    published_url: "https://marimo.edgelesslab.com/2610.20686-rolaq-cache-accounting/",
     description: "See how 2-bit content codes, FP32 group metadata, and a BF16 positional key combine into RoLaQ's whole-cache precision and capacity ratio.",
     category: "Research",
     tags: ["KV cache", "quantization", "MLA", "inference", "storage accounting"],
@@ -267,7 +266,6 @@ export const marimoDemos: MarimoDemo[] = [
     slug: "2610.04198-alodlm-depth-allocation",
     title: "ALoDLM Token-Depth Allocator",
     description: "Explore how entropy commitment and cumulative halting allocate recurrent depth across deterministic synthetic token positions, with paper-anchored layer accounting and explicit speed-claim boundaries.",
-    published_url: "https://marimo.edgelesslab.com/2610.04198-alodlm-depth-allocation/",
     category: "Research",
     tags: ["diffusion language models", "adaptive compute", "recurrence", "inference"],
   },
@@ -283,7 +281,6 @@ export const marimoDemos: MarimoDemo[] = [
     slug: "2608.02123-pctree-budget",
     title: "Parent-Conditioned Tree Budget Explorer",
     description: "Compare one-chain, parent-blind tree, and parent-conditioned tree proposals under the same verification-node budget in a deterministic mechanism model.",
-    published_url: "https://marimo.edgelesslab.com/2608.02123-pctree-budget/",
     category: "Research",
     tags: ["speculative decoding", "tree search", "inference", "budgeting"],
   },
@@ -293,7 +290,6 @@ export const marimoDemos: MarimoDemo[] = [
     description: "Explore how executed-trial count and trial/final quality determine the share of PGRR's slot-averaged SRQ that comes from repeated endpoint evidence.",
     category: "Research",
     tags: ["robotics", "recovery metrics", "sensitivity analysis", "benchmark design"],
-    published_url: "https://marimo.edgelesslab.com/2610.20838-srq-endpoint-weight/",
   },
 ];
 

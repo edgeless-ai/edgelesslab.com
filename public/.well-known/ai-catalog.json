@@ -1,0 +1,52 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Edgeless Lab",
+    "identifier": "edgelesslab.com",
+    "url": "https://edgelesslab.com/"
+  },
+  "entries": [
+    {
+      "identifier": "urn:ai:edgelesslab.com:docs:llms-txt",
+      "displayName": "llms.txt",
+      "type": "text/markdown",
+      "url": "https://edgelesslab.com/llms.txt",
+      "description": "Curated, described index of the site: docs, Field Notes, marimo notebooks, posts, products and projects. Regenerated on every build."
+    },
+    {
+      "identifier": "urn:ai:edgelesslab.com:docs:sitemap",
+      "displayName": "Sitemap",
+      "type": "application/xml",
+      "url": "https://edgelesslab.com/sitemap.xml",
+      "description": "Every published page."
+    },
+    {
+      "identifier": "urn:ai:edgelesslab.com:feed:rss",
+      "displayName": "RSS feed",
+      "type": "application/rss+xml",
+      "url": "https://edgelesslab.com/feed.xml",
+      "description": "Blog and Field Notes posts, newest first."
+    },
+    {
+      "identifier": "urn:ai:edgelesslab.com:docs:field-notes",
+      "displayName": "Field Notes",
+      "type": "text/html",
+      "url": "https://edgelesslab.com/field-notes/",
+      "description": "Interactive studies, cited science plots and generative systems. Explanations are in the initial HTML."
+    },
+    {
+      "identifier": "urn:ai:edgelesslab.com:docs:marimo",
+      "displayName": "Marimo notebook gallery",
+      "type": "text/html",
+      "url": "https://edgelesslab.com/lab/marimo/",
+      "description": "Reactive research notebooks that run in the browser (WebAssembly)."
+    },
+    {
+      "identifier": "urn:ai:edgelesslab.com:docs:humans-txt",
+      "displayName": "humans.txt",
+      "type": "text/plain",
+      "url": "https://edgelesslab.com/humans.txt",
+      "description": "Who builds the lab."
+    }
+  ]
+}

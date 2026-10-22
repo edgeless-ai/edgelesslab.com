@@ -293,6 +293,14 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["robotics", "recovery metrics", "sensitivity analysis", "benchmark design"],
     published_url: "https://marimo.edgelesslab.com/2610.20838-srq-endpoint-weight/",
   },
+  {
+    slug: "build-a-chip-bench-multiscoring",
+    title: "Build-A-Chip-Bench: Multiplicative Scoring in Chip Design",
+    description: "Explore how Build-A-Chip-Bench's multiplicative scoring formula (Gate1 × Gate2 × PPA) makes PPA the decisive factor despite gate pass rates. Adjust Fable 5.1's PPA quality to see where it breaks even with Astra.",
+    category: "AI evaluation",
+    tags: ["benchmarks", "chip-design", "agent-evaluation", "hardware", "vendor-claim", "multiplicative-scoring"],
+    published_url: "https://marimo.edgelesslab.com/build-a-chip-bench-multiscoring/",
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

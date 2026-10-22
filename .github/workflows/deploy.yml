@@ -115,10 +115,32 @@ jobs:
           echo "Static export produced $FILE_COUNT files"
           echo "file_count=$FILE_COUNT" >> $GITHUB_OUTPUT
 
+      # upload-pages-artifact@v4 tars with --exclude=".[^/]*", which silently drops
+      # out/.well-known/ (ai-catalog.json, security.txt). Build the identical archive
+      # (same flags and excludes), then append only out/.well-known.
+      - name: Archive Pages artifact (keep .well-known)
+        run: |
+          tar \
+            --dereference --hard-dereference \
+            --directory out \
+            -cf "$RUNNER_TEMP/artifact.tar" \
+            --exclude=.git \
+            --exclude=.github \
+            --exclude=".[^/]*" \
+            .
+          if [ -d out/.well-known ]; then
+            tar --dereference --hard-dereference --directory out -rf "$RUNNER_TEMP/artifact.tar" ./.well-known
+          fi
+          tar -tf "$RUNNER_TEMP/artifact.tar" | grep -q '^\./\.well-known/ai-catalog\.json$' \
+            || { echo "ERROR: .well-known/ai-catalog.json missing from Pages artifact"; exit 1; }
+
       - name: Upload build artifact (for GitHub Pages deploy)
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2, as pinned by upload-pages-artifact@v4
         with:
-          path: out
+          name: github-pages
+          path: ${{ runner.temp }}/artifact.tar
+          retention-days: 1
+          if-no-files-found: error
 
   # ── Job 3: Deploy to GitHub Pages ───────────────────────────────
   # Only deploys from main branch (GitHub Pages environment protection).

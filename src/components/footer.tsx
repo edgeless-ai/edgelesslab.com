@@ -114,6 +114,7 @@ export function Footer() {
               {[
                 { label: "Blog", href: "/blog", external: false },
                 { label: "RSS", href: "/feed.xml", external: false },
+                { label: "llms.txt", href: "/llms.txt", external: false },
               ].map((item) => (
                 <li key={item.label}>
                   <Link

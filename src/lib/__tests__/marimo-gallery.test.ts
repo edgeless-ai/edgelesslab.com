@@ -8,6 +8,7 @@ const liveSlugs = [
   "2610.08936-clean-vs-robustness",
   "2609.38201-speculative-tool-exec",
   "2610.20838-srq-endpoint-weight",
+  "build-a-chip-bench-multiscoring",
 ];
 
 describe("published marimo gallery", () => {

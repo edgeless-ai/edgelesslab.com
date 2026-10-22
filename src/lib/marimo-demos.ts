@@ -137,6 +137,7 @@ export const marimoDemos: MarimoDemo[] = [
     description: "See how 2-bit content codes, FP32 group metadata, and a BF16 positional key combine into RoLaQ's whole-cache precision and capacity ratio.",
     category: "Research",
     tags: ["KV cache", "quantization", "MLA", "inference", "storage accounting"],
+    published_url: "https://marimo.edgelesslab.com/2610.20686-rolaq-cache-accounting/",
   },
 
   // Research explainers (overnight expansion)
@@ -290,6 +291,7 @@ export const marimoDemos: MarimoDemo[] = [
     description: "Explore how executed-trial count and trial/final quality determine the share of PGRR's slot-averaged SRQ that comes from repeated endpoint evidence.",
     category: "Research",
     tags: ["robotics", "recovery metrics", "sensitivity analysis", "benchmark design"],
+    published_url: "https://marimo.edgelesslab.com/2610.20838-srq-endpoint-weight/",
   },
 ];
 

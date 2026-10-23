@@ -301,6 +301,15 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["benchmarks", "chip-design", "agent-evaluation", "hardware", "vendor-claim", "multiplicative-scoring"],
     published_url: "https://marimo.edgelesslab.com/build-a-chip-bench-multiscoring/",
   },
+  {
+    slug: "embodied-playground-suite-gap",
+    title: "Embodied Playground: Where the Suite Gap Comes From",
+    description:
+      "Explore how Tower and Lock planning performance drives most of the equal-suite-weighted EP-100 gap, while Cube remains a shared fine-manipulation bottleneck.",
+    category: "AI evaluation",
+    tags: ["robotics", "benchmarks", "agent-evaluation", "long-horizon", "planning", "embodied-ai"],
+    published_url: "https://marimo.edgelesslab.com/embodied-playground-suite-gap/",
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

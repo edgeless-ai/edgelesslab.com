@@ -106,7 +106,7 @@ test.describe("static site smoke", () => {
     ];
     const cards = page.locator('main a[href^="https://marimo.edgelesslab.com/"]');
     await expect(cards).toHaveCount(7);
-    expect((await cards.evaluateAll((as) => as.map((a) => a.getAttribute("href"))).sort()).toEqual([...urls].sort());
+    expect((await cards.evaluateAll((as) => as.map((a) => a.getAttribute("href")))).sort()).toEqual([...urls].sort());
     await expect(page.getByText("7 published notebooks")).toBeVisible();
     await expect(page.locator('a[href^="/marimo/"], a[href^="https://edgelesslab.com/marimo/"]')).toHaveCount(0);
     await expect(page.getByRole("heading", { name: "V Portfolio Drawdown Envelope" })).toHaveCount(0);

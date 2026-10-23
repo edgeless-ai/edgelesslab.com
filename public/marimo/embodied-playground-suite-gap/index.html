@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>embodied-playground-suite-gap</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\"marimo==0.23.16\", \"numpy\", \"matplotlib\"]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as _mo\n    _mo.md(r\"\"\"# Embodied Playground: Planning vs. Fine Manipulation in Long-Horizon Robotics\n\n    [Embodied Playground](https://arxiv.org/abs/2610.27039) (arXiv:2610.27039, Oct 2026)\n    evaluates how foundation-model agents sustain coordinated perception, reasoning, tool use,\n    and physical action across **interdependent task stages** \u2014 where early actions constrain\n    later decisions. EP-100 selects 100 tasks across **5 suites** (Launch, Tower, Lock, Cube,\n    Home) evaluated on two models.\n\n    **Research question:** Why does **Opus-5.5-extra** (29.22% Pass@1) outperform\n    **GPT-6-Astra** (13.80%) \u2014 and where do *both* models fail?\n\n    The answer lies in **suite specialization**: Opus-5.5-extra trails on Launch but leads on\n    the other four suites, with its edge *concentrated* in the two sequence-planning suites\n    (Tower, Lock). The slider\n    scales the planning suites' scores to reveal how much of the overall gap comes from\n    planning vs. the non-planning suites (Launch, Cube, Home).\n\n    **Honest limits:** All values are **bundled published results** from the paper's\n    author-run evaluation (Oct 19, 2026 event date). No simulator, robot hardware, model\n    inference, or agent execution was performed. This is an analytical explorer of the\n    published scoring mechanism, not a reproduction of benchmark runs.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _():\n    import marimo as mo\n    import numpy as np\n    import matplotlib.pyplot as plt\n\n    # Bundled published results from Embodied Playground Tables 5-6 (EP-100, Pass@1)\n    # Source: arxiv.org/abs/2610.27039 (Oct 19, 2026 event; author-run, no replication)\n    SUITES = [\"Launch\", \"Tower\", \"Lock\", \"Cube\", \"Home\"]\n    ASTRA = np.array([19.12, 29.76, 6.25, 2.08, 11.76])\n    OPUS = np.array([15.51, 60.59, 39.81, 6.04, 24.17])\n    PLANNING = np.array([False, True, True, False, False])  # Tower + Lock\n    # EP-100 task counts per suite (Table 2): for annotation only.\n    EP100_TASKS = np.array([34, 21, 16, 12, 17])  # Launch, Tower, Lock, Cube, Home\n\n    # Planning-depth multiplier: scales the two sequence-planning suites (Tower, Lock)\n    planning_mult = mo.ui.slider(\n        start=0.0, stop=2.0, step=0.05, value=1.0, show_value=True,\n        label=\"Planning depth multiplier (Tower + Lock suites)\",\n    )\n    planning_mult\n    return (\n        ASTRA,\n        EP100_TASKS,\n        OPUS,\n        PLANNING,\n        SUITES,\n        mo,\n        np,\n        planning_mult,\n        plt,\n    )\n\n\n@app.cell\ndef _(ASTRA, EP100_TASKS, OPUS, PLANNING, SUITES, mo, np, planning_mult, plt):\n    m = planning_mult.value\n    _astra_adj = ASTRA.copy()\n    _opus_adj = OPUS.copy()\n    _astra_adj[PLANNING] *= m\n    _opus_adj[PLANNING] *= m\n    # EP-100 headline = unweighted mean of suite Pass@1 rates (matches published)\n    _astra_avg = np.mean(_astra_adj)\n    _opus_avg = np.mean(_opus_adj)\n    _gap = abs(_opus_avg - _astra_avg)\n    # Planning share: fraction of current gap attributable to non-zero planning suites\n    _astra_no_plan = ASTRA.copy(); _astra_no_plan[PLANNING] = 0\n    _opus_no_plan = OPUS.copy(); _opus_no_plan[PLANNING] = 0\n    _gap_at_0 = abs(np.mean(_opus_no_plan) - np.mean(_astra_no_plan))  # gap with planning zeroed\n    _planning_share = (_gap - _gap_at_0) / _gap * 100 if _gap \u003E 0.001 else 0\n    _winner = \"Opus-5.5-extra\" if _opus_avg \u003E= _astra_avg else \"GPT-6-Astra\"\n    _cube_astra, _cube_opus = ASTRA[3], OPUS[3]\n\n    _fig, _ax = plt.subplots(figsize=(10, 5.5))\n    _x = np.arange(len(SUITES))\n    _width = 0.35\n    _bar_a = _ax.bar(_x - _width/2, _astra_adj, _width,\n                     label=\"GPT-6-Astra\", color=\"#4285F4\", edgecolor=\"black\", linewidth=0.5)\n    _bar_b = _ax.bar(_x + _width/2, _opus_adj, _width,\n                     label=\"Opus-5.5-extra\", color=\"#DC2626\", edgecolor=\"black\", linewidth=0.5)\n    # Highlight planning suites\n    for _i, _is_plan in enumerate(PLANNING):\n        if _is_plan:\n            _ax.axvspan(_i - 0.5, _i + 0.5, alpha=0.08, color=\"gold\")\n    for _bar, _val in zip(_bar_a, _astra_adj):\n        _ax.text(_bar.get_x() + _bar.get_width()/2, _val + 0.5,\n                 f\"{_val:.1f}%\", ha=\"center\", va=\"bottom\", fontsize=8)\n    for _bar, _val in zip(_bar_b, _opus_adj):\n        _ax.text(_bar.get_x() + _bar.get_width()/2, _val + 0.5,\n                 f\"{_val:.1f}%\", ha=\"center\", va=\"bottom\", fontsize=8)\n    _ax.axhline(y=_astra_avg, color=\"#4285F4\", linestyle=\":\", alpha=0.6, linewidth=1)\n    _ax.axhline(y=_opus_avg, color=\"#DC2626\", linestyle=\":\", alpha=0.6, linewidth=1)\n    _ax.set_xticks(_x)\n    # Annotate suite labels with EP-100 task counts\n    _suite_labels = [f\"{_s}\\n({_n} tasks)\" for _s, _n in zip(SUITES, EP100_TASKS)]\n    _ax.set_xticklabels(_suite_labels, fontsize=8)\n    _ax.set_ylabel(\"Pass@1 (%)\")\n    _ax.set_title(\"Embodied Playground EP-100 \u2014 Suite-Level Pass@1\\n\"\n                  \"(planning suites scaled by multiplier; gold = planning)\")\n    _ax.legend(loc=\"upper left\", fontsize=8)\n    _ax.set_ylim(0, 75)\n    _ax.spines[\"top\"].set_visible(False)\n    _ax.spines[\"right\"].set_visible(False)\n    plt.subplots_adjust(bottom=0.15, left=0.10, right=0.95, top=0.88)\n\n    _op = mo.vstack([\n        mo.md(\n            f\"**Winner: {_winner}  |  Score gap: {_gap:.1f} pts**\"\n            f\"  |  Astra avg = {_astra_avg:.1f}%  |  Opus avg = {_opus_avg:.1f}%\"\n            f\"  |  Planning mult = {m:.2f}x  |  Planning share of gap: {_planning_share:.0f}%\"\n            f\"  |  Cube (shared weakness): Astra {_cube_astra:.1f}% vs Opus {_cube_opus:.1f}%\"\n        ),\n        _fig,\n    ])\n    _op\n    return\n\n\n@app.cell\ndef _():\n    import marimo as _mo\n    _mo.md(r\"\"\"### Takeaway\n\n    **Planning is the amplifier, fine manipulation is the floor.** Opus-5.5-extra's\n    overall win (29.22% vs 13.80% Pass@1) rests on **~83% of the score gap** coming from\n    the two sequence-planning suites \u2014 Tower (60.59% vs 29.76%) and Lock (39.81% vs 6.25%).\n    Even at 0x (planning removed), Opus-5.5-extra still edges ahead on the remaining suites\n    (9.14% vs 6.59%), because it is also better at Launch and Home \u2014 but the *amplification*\n    from planning is what creates the decisive margin.\n\n    Both models **collapse on Cube** (fine manipulation), scoring 2\u20136% \u2014 a shared\n    bottleneck that neither architecture solves, and a ceiling that limits both models\n    regardless of planning ability.\n\n    **Source:** [Embodied Playground](https://arxiv.org/abs/2610.27039) (arXiv:2610.27039,\n    Feng Chen et al., Oct 19, 2026). EP-100 headline and suite tables (Tables 5-6), Pass@1\n    scores. Author-run evaluation with no third-party corroboration yet; models GPT-6-Astra\n    and Opus-5.5-extra verified from prior ticks. No simulator, robot hardware, model\n    inference, or agent execution was performed \u2014 this is an analytical explorer of the\n    published scoring mechanism.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%22marimo%3D%3D0.23.16%22%2C%20%22numpy%22%2C%20%22matplotlib%22%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20_mo%0A%20%20%20%20_mo.md(r%22%22%22%23%20Embodied%20Playground%3A%20Planning%20vs.%20Fine%20Manipulation%20in%20Long-Horizon%20Robotics%0A%0A%20%20%20%20%5BEmbodied%20Playground%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2610.27039)%20(arXiv%3A2610.27039%2C%20Oct%202026)%0A%20%20%20%20evaluates%20how%20foundation-model%20agents%20sustain%20coordinated%20perception%2C%20reasoning%2C%20tool%20use%2C%0A%20%20%20%20and%20physical%20action%20across%20**interdependent%20task%20stages**%20%E2%80%94%20where%20early%20actions%20constrain%0A%20%20%20%20later%20decisions.%20EP-100%20selects%20100%20tasks%20across%20**5%20suites**%20(Launch%2C%20Tower%2C%20Lock%2C%20Cube%2C%0A%20%20%20%20Home)%20evaluated%20on%20two%20models.%0A%0A%20%20%20%20**Research%20question%3A**%20Why%20does%20**Opus-5.5-extra**%20(29.22%25%20Pass%401)%20outperform%0A%20%20%20%20**GPT-6-Astra**%20(13.80%25)%20%E2%80%94%20and%20where%20do%20*both*%20models%20fail%3F%0A%0A%20%20%20%20The%20answer%20lies%20in%20**suite%20specialization**%3A%20Opus-5.5-extra%20trails%20on%20Launch%20but%20leads%20on%0A%20%20%20%20the%20other%20four%20suites%2C%20with%20its%20edge%20*concentrated*%20in%20the%20two%20sequence-planning%20suites%0A%20%20%20%20(Tower%2C%20Lock).%20The%20slider%0A%20%20%20%20scales%20the%20planning%20suites'%20scores%20to%20reveal%20how%20much%20of%20the%20overall%20gap%20comes%20from%0A%20%20%20%20planning%20vs.%20the%20non-planning%20suites%20(Launch%2C%20Cube%2C%20Home).%0A%0A%20%20%20%20**Honest%20limits%3A**%20All%20values%20are%20**bundled%20published%20results**%20from%20the%20paper's%0A%20%20%20%20author-run%20evaluation%20(Oct%2019%2C%202026%20event%20date).%20No%20simulator%2C%20robot%20hardware%2C%20model%0A%20%20%20%20inference%2C%20or%20agent%20execution%20was%20performed.%20This%20is%20an%20analytical%20explorer%20of%20the%0A%20%20%20%20published%20scoring%20mechanism%2C%20not%20a%20reproduction%20of%20benchmark%20runs.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20import%20numpy%20as%20np%0A%20%20%20%20import%20matplotlib.pyplot%20as%20plt%0A%0A%20%20%20%20%23%20Bundled%20published%20results%20from%20Embodied%20Playground%20Tables%205-6%20(EP-100%2C%20Pass%401)%0A%20%20%20%20%23%20Source%3A%20arxiv.org%2Fabs%2F2610.27039%20(Oct%2019%2C%202026%20event%3B%20author-run%2C%20no%20replication)%0A%20%20%20%20SUITES%20%3D%20%5B%22Launch%22%2C%20%22Tower%22%2C%20%22Lock%22%2C%20%22Cube%22%2C%20%22Home%22%5D%0A%20%20%20%20ASTRA%20%3D%20np.array(%5B19.12%2C%2029.76%2C%206.25%2C%202.08%2C%2011.76%5D)%0A%20%20%20%20OPUS%20%3D%20np.array(%5B15.51%2C%2060.59%2C%2039.81%2C%206.04%2C%2024.17%5D)%0A%20%20%20%20PLANNING%20%3D%20np.array(%5BFalse%2C%20True%2C%20True%2C%20False%2C%20False%5D)%20%20%23%20Tower%20%2B%20Lock%0A%20%20%20%20%23%20EP-100%20task%20counts%20per%20suite%20(Table%202)%3A%20for%20annotation%20only.%0A%20%20%20%20EP100_TASKS%20%3D%20np.array(%5B34%2C%2021%2C%2016%2C%2012%2C%2017%5D)%20%20%23%20Launch%2C%20Tower%2C%20Lock%2C%20Cube%2C%20Home%0A%0A%20%20%20%20%23%20Planning-depth%20multiplier%3A%20scales%20the%20two%20sequence-planning%20suites%20(Tower%2C%20Lock)%0A%20%20%20%20planning_mult%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%20start%3D0.0%2C%20stop%3D2.0%2C%20step%3D0.05%2C%20value%3D1.0%2C%20show_value%3DTrue%2C%0A%20%20%20%20%20%20%20%20label%3D%22Planning%20depth%20multiplier%20(Tower%20%2B%20Lock%20suites)%22%2C%0A%20%20%20%20)%0A%20%20%20%20planning_mult%0A%20%20%20%20return%20(%0A%20%20%20%20%20%20%20%20ASTRA%2C%0A%20%20%20%20%20%20%20%20EP100_TASKS%2C%0A%20%20%20%20%20%20%20%20OPUS%2C%0A%20%20%20%20%20%20%20%20PLANNING%2C%0A%20%20%20%20%20%20%20%20SUITES%2C%0A%20%20%20%20%20%20%20%20mo%2C%0A%20%20%20%20%20%20%20%20np%2C%0A%20%20%20%20%20%20%20%20planning_mult%2C%0A%20%20%20%20%20%20%20%20plt%2C%0A%20%20%20%20)%0A%0A%0A%40app.cell%0Adef%20_(ASTRA%2C%20EP100_TASKS%2C%20OPUS%2C%20PLANNING%2C%20SUITES%2C%20mo%2C%20np%2C%20planning_mult%2C%20plt)%3A%0A%20%20%20%20m%20%3D%20planning_mult.value%0A%20%20%20%20_astra_adj%20%3D%20ASTRA.copy()%0A%20%20%20%20_opus_adj%20%3D%20OPUS.copy()%0A%20%20%20%20_astra_adj%5BPLANNING%5D%20*%3D%20m%0A%20%20%20%20_opus_adj%5BPLANNING%5D%20*%3D%20m%0A%20%20%20%20%23%20EP-100%20headline%20%3D%20unweighted%20mean%20of%20suite%20Pass%401%20rates%20(matches%20published)%0A%20%20%20%20_astra_avg%20%3D%20np.mean(_astra_adj)%0A%20%20%20%20_opus_avg%20%3D%20np.mean(_opus_adj)%0A%20%20%20%20_gap%20%3D%20abs(_opus_avg%20-%20_astra_avg)%0A%20%20%20%20%23%20Planning%20share%3A%20fraction%20of%20current%20gap%20attributable%20to%20non-zero%20planning%20suites%0A%20%20%20%20_astra_no_plan%20%3D%20ASTRA.copy()%3B%20_astra_no_plan%5BPLANNING%5D%20%3D%200%0A%20%20%20%20_opus_no_plan%20%3D%20OPUS.copy()%3B%20_opus_no_plan%5BPLANNING%5D%20%3D%200%0A%20%20%20%20_gap_at_0%20%3D%20abs(np.mean(_opus_no_plan)%20-%20np.mean(_astra_no_plan))%20%20%23%20gap%20with%20planning%20zeroed%0A%20%20%20%20_planning_share%20%3D%20(_gap%20-%20_gap_at_0)%20%2F%20_gap%20*%20100%20if%20_gap%20%3E%200.001%20else%200%0A%20%20%20%20_winner%20%3D%20%22Opus-5.5-extra%22%20if%20_opus_avg%20%3E%3D%20_astra_avg%20else%20%22GPT-6-Astra%22%0A%20%20%20%20_cube_astra%2C%20_cube_opus%20%3D%20ASTRA%5B3%5D%2C%20OPUS%5B3%5D%0A%0A%20%20%20%20_fig%2C%20_ax%20%3D%20plt.subplots(figsize%3D(10%2C%205.5))%0A%20%20%20%20_x%20%3D%20np.arange(len(SUITES))%0A%20%20%20%20_width%20%3D%200.35%0A%20%20%20%20_bar_a%20%3D%20_ax.bar(_x%20-%20_width%2F2%2C%20_astra_adj%2C%20_width%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20label%3D%22GPT-6-Astra%22%2C%20color%3D%22%234285F4%22%2C%20edgecolor%3D%22black%22%2C%20linewidth%3D0.5)%0A%20%20%20%20_bar_b%20%3D%20_ax.bar(_x%20%2B%20_width%2F2%2C%20_opus_adj%2C%20_width%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20label%3D%22Opus-5.5-extra%22%2C%20color%3D%22%23DC2626%22%2C%20edgecolor%3D%22black%22%2C%20linewidth%3D0.5)%0A%20%20%20%20%23%20Highlight%20planning%20suites%0A%20%20%20%20for%20_i%2C%20_is_plan%20in%20enumerate(PLANNING)%3A%0A%20%20%20%20%20%20%20%20if%20_is_plan%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_ax.axvspan(_i%20-%200.5%2C%20_i%20%2B%200.5%2C%20alpha%3D0.08%2C%20color%3D%22gold%22)%0A%20%20%20%20for%20_bar%2C%20_val%20in%20zip(_bar_a%2C%20_astra_adj)%3A%0A%20%20%20%20%20%20%20%20_ax.text(_bar.get_x()%20%2B%20_bar.get_width()%2F2%2C%20_val%20%2B%200.5%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f%22%7B_val%3A.1f%7D%25%22%2C%20ha%3D%22center%22%2C%20va%3D%22bottom%22%2C%20fontsize%3D8)%0A%20%20%20%20for%20_bar%2C%20_val%20in%20zip(_bar_b%2C%20_opus_adj)%3A%0A%20%20%20%20%20%20%20%20_ax.text(_bar.get_x()%20%2B%20_bar.get_width()%2F2%2C%20_val%20%2B%200.5%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f%22%7B_val%3A.1f%7D%25%22%2C%20ha%3D%22center%22%2C%20va%3D%22bottom%22%2C%20fontsize%3D8)%0A%20%20%20%20_ax.axhline(y%3D_astra_avg%2C%20color%3D%22%234285F4%22%2C%20linestyle%3D%22%3A%22%2C%20alpha%3D0.6%2C%20linewidth%3D1)%0A%20%20%20%20_ax.axhline(y%3D_opus_avg%2C%20color%3D%22%23DC2626%22%2C%20linestyle%3D%22%3A%22%2C%20alpha%3D0.6%2C%20linewidth%3D1)%0A%20%20%20%20_ax.set_xticks(_x)%0A%20%20%20%20%23%20Annotate%20suite%20labels%20with%20EP-100%20task%20counts%0A%20%20%20%20_suite_labels%20%3D%20%5Bf%22%7B_s%7D%5Cn(%7B_n%7D%20tasks)%22%20for%20_s%2C%20_n%20in%20zip(SUITES%2C%20EP100_TASKS)%5D%0A%20%20%20%20_ax.set_xticklabels(_suite_labels%2C%20fontsize%3D8)%0A%20%20%20%20_ax.set_ylabel(%22Pass%401%20(%25)%22)%0A%20%20%20%20_ax.set_title(%22Embodied%20Playground%20EP-100%20%E2%80%94%20Suite-Level%20Pass%401%5Cn%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22(planning%20suites%20scaled%20by%20multiplier%3B%20gold%20%3D%20planning)%22)%0A%20%20%20%20_ax.legend(loc%3D%22upper%20left%22%2C%20fontsize%3D8)%0A%20%20%20%20_ax.set_ylim(0%2C%2075)%0A%20%20%20%20_ax.spines%5B%22top%22%5D.set_visible(False)%0A%20%20%20%20_ax.spines%5B%22right%22%5D.set_visible(False)%0A%20%20%20%20plt.subplots_adjust(bottom%3D0.15%2C%20left%3D0.10%2C%20right%3D0.95%2C%20top%3D0.88)%0A%0A%20%20%20%20_op%20%3D%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mo.md(%0A%20%20%20%20%20%20%20%20%20%20%20%20f%22**Winner%3A%20%7B_winner%7D%20%20%7C%20%20Score%20gap%3A%20%7B_gap%3A.1f%7D%20pts**%22%0A%20%20%20%20%20%20%20%20%20%20%20%20f%22%20%20%7C%20%20Astra%20avg%20%3D%20%7B_astra_avg%3A.1f%7D%25%20%20%7C%20%20Opus%20avg%20%3D%20%7B_opus_avg%3A.1f%7D%25%22%0A%20%20%20%20%20%20%20%20%20%20%20%20f%22%20%20%7C%20%20Planning%20mult%20%3D%20%7Bm%3A.2f%7Dx%20%20%7C%20%20Planning%20share%20of%20gap%3A%20%7B_planning_share%3A.0f%7D%25%22%0A%20%20%20%20%20%20%20%20%20%20%20%20f%22%20%20%7C%20%20Cube%20(shared%20weakness)%3A%20Astra%20%7B_cube_astra%3A.1f%7D%25%20vs%20Opus%20%7B_cube_opus%3A.1f%7D%25%22%0A%20%20%20%20%20%20%20%20)%2C%0A%20%20%20%20%20%20%20%20_fig%2C%0A%20%20%20%20%5D)%0A%20%20%20%20_op%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20_mo%0A%20%20%20%20_mo.md(r%22%22%22%23%23%23%20Takeaway%0A%0A%20%20%20%20**Planning%20is%20the%20amplifier%2C%20fine%20manipulation%20is%20the%20floor.**%20Opus-5.5-extra's%0A%20%20%20%20overall%20win%20(29.22%25%20vs%2013.80%25%20Pass%401)%20rests%20on%20**~83%25%20of%20the%20score%20gap**%20coming%20from%0A%20%20%20%20the%20two%20sequence-planning%20suites%20%E2%80%94%20Tower%20(60.59%25%20vs%2029.76%25)%20and%20Lock%20(39.81%25%20vs%206.25%25).%0A%20%20%20%20Even%20at%200x%20(planning%20removed)%2C%20Opus-5.5-extra%20still%20edges%20ahead%20on%20the%20remaining%20suites%0A%20%20%20%20(9.14%25%20vs%206.59%25)%2C%20because%20it%20is%20also%20better%20at%20Launch%20and%20Home%20%E2%80%94%20but%20the%20*amplification*%0A%20%20%20%20from%20planning%20is%20what%20creates%20the%20decisive%20margin.%0A%0A%20%20%20%20Both%20models%20**collapse%20on%20Cube**%20(fine%20manipulation)%2C%20scoring%202%E2%80%936%25%20%E2%80%94%20a%20shared%0A%20%20%20%20bottleneck%20that%20neither%20architecture%20solves%2C%20and%20a%20ceiling%20that%20limits%20both%20models%0A%20%20%20%20regardless%20of%20planning%20ability.%0A%0A%20%20%20%20**Source%3A**%20%5BEmbodied%20Playground%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2610.27039)%20(arXiv%3A2610.27039%2C%0A%20%20%20%20Feng%20Chen%20et%20al.%2C%20Oct%2019%2C%202026).%20EP-100%20headline%20and%20suite%20tables%20(Tables%205-6)%2C%20Pass%401%0A%20%20%20%20scores.%20Author-run%20evaluation%20with%20no%20third-party%20corroboration%20yet%3B%20models%20GPT-6-Astra%0A%20%20%20%20and%20Opus-5.5-extra%20verified%20from%20prior%20ticks.%20No%20simulator%2C%20robot%20hardware%2C%20model%0A%20%20%20%20inference%2C%20or%20agent%20execution%20was%20performed%20%E2%80%94%20this%20is%20an%20analytical%20explorer%20of%20the%0A%20%20%20%20published%20scoring%20mechanism.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

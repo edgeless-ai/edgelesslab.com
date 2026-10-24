@@ -12,6 +12,7 @@ const liveSlugs = [
   "embodied-playground-suite-gap",
   "2609.05439-criticgen-risk-frontier",
   "2609.09458-contracteval-denominator",
+  "2609.38385-goldimask-context-weighting",
 ];
 
 describe("published marimo gallery", () => {

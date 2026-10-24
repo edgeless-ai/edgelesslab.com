@@ -3,7 +3,7 @@ export interface MarimoDemo {
   title: string;
   description: string;
   published_url?: string | null;
-  category: "Finance/GPU" | "Generative" | "Algorithms" | "Reactive" | "Research" | "AI evaluation";
+  category: "Finance/GPU" | "Generative" | "Algorithms" | "Reactive" | "Research" | "AI evaluation" | "AI training";
   tags: string[];
 }
 
@@ -328,6 +328,15 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["agent-evaluation", "procedural-conformance", "graph-matching", "calibration", "auditability"],
     published_url: "https://marimo.edgelesslab.com/2609.09458-contracteval-denominator/",
   },
+  {
+    slug: "2609.38385-goldimask-context-weighting",
+    title: "GoldiMask: Reveal Context Without Erasing Supervision",
+    description:
+      "Choose which tokens become context, then watch capped water-filling redistribute supervision across the targets that survive.",
+    category: "AI training",
+    tags: ["diffusion-language-models", "fine-tuning", "submodular-optimization", "context-selection", "target-weighting"],
+    published_url: "https://marimo.edgelesslab.com/2609.38385-goldimask-context-weighting/",
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished
@@ -344,4 +353,5 @@ export const publishedMarimoDemos = marimoDemos.filter(
      "Reactive",
      "Research",
      "AI evaluation",
+     "AI training",
    ];

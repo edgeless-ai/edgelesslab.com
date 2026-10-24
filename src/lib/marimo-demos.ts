@@ -241,6 +241,16 @@ export const marimoDemos: MarimoDemo[] = [
     state: "published",
     publishedUrl: "https://marimo.edgelesslab.com/2610.08936-clean-vs-robustness/",
   },
+  {
+    slug: "embodied-playground-suite-gap",
+    title: "Embodied Playground: Where the Suite Gap Comes From",
+    description:
+      "Explore how Tower and Lock planning performance drives most of the equal-suite-weighted EP-100 gap, while Cube remains a shared fine-manipulation bottleneck.",
+    category: "AI evaluation",
+    tags: ["robotics", "benchmarks", "agent-evaluation", "long-horizon", "planning", "embodied-ai"],
+    state: "published",
+    publishedUrl: "https://marimo.edgelesslab.com/embodied-playground-suite-gap/",
+  },
 ];
 
    export const marimoCategories: MarimoDemo["category"][] = [

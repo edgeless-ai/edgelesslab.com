@@ -319,6 +319,15 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["llm-evaluation", "refinement", "decision-analysis", "risk", "rubrics"],
     published_url: "https://marimo.edgelesslab.com/2609.05439-criticgen-risk-frontier/",
   },
+  {
+    slug: "2609.09458-contracteval-denominator",
+    title: "ContractEval: Expose the Procedural Denominator",
+    description:
+      "Inject a hidden procedural failure, tune semantic matching, and watch query-active obligations turn it into a diagnostic fingerprint.",
+    category: "AI evaluation",
+    tags: ["agent-evaluation", "procedural-conformance", "graph-matching", "calibration", "auditability"],
+    published_url: "https://marimo.edgelesslab.com/2609.09458-contracteval-denominator/",
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

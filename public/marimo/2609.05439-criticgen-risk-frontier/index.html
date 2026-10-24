@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2609.05439-criticgen-risk-frontier</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\n#   \"marimo==0.23.16\",\n#   \"matplotlib\u003E=3.9,\u003C4\",\n#   \"numpy\u003E=2.0,\u003C3\",\n# ]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n    import matplotlib.pyplot as plt\n    import numpy as np\n\n    return mo, np, plt\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    # CriticGen: price the risk of a bad rewrite\n\n    CriticGen turns a sample-specific rubric into a score, diagnosis, executable\n    suggestion, and rewrite ([arXiv:2609.05439](https://arxiv.org/abs/2609.05439)).\n    The paper reports **73.17% improved**, **20.11% unchanged**, and **6.72%\n    degraded** for CriticGen-Qwen2.5-7B on RefineData.\n\n    An operator still needs a cost model: a regression may cost more than a useful\n    edit is worth. Explore $U(\\\\lambda)=p_{improve}-\\\\lambda p_{degrade}$, where\n    $\\\\lambda$ is the loss of one degradation in improvement units. All eight\n    triplets are transcribed from Figure 3. This is decision analysis of\n    author-reported aggregate rates\u2014not an independent model or data reproduction.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _(mo):\n    harm_ratio = mo.ui.slider(\n        0.0, 4.0, value=1.0, step=0.05,\n        label=\"Cost of one degraded answer (lambda)\",\n    )\n    mo.vstack([\n        mo.md(\"### Set the application's asymmetric regression cost\"),\n        harm_ratio,\n    ])\n    return (harm_ratio,)\n\n\n@app.cell\ndef _(harm_ratio, mo, np, plt):\n    _names = (\n        \"Qwen2.5-7B\", \"Qwen2.5-14B\", \"Qwen2.5-32B\", \"Qwen3.5-4B\",\n        \"Qwen3.5-9B\", \"Mistral-7B\", \"Ministral-14B\", \"CriticGen-7B\",\n    )\n    _improved = np.array([.6949, .6973, .7197, .7086, .6945, .5671, .7379, .7317])\n    _unchanged = np.array([.1975, .2455, .2371, .2126, .2289, .1587, .1925, .2011])\n    _degraded = np.array([.1076, .0572, .0432, .0788, .0766, .2742, .0696, .0672])\n    _lam = float(harm_ratio.value)\n    _utility = _improved - _lam * _degraded\n    _winner_idx = int(np.argmax(_utility))\n    _critic_idx = 7\n    _cross = (_improved[6] - _improved[2]) / (_degraded[6] - _degraded[2])\n    _grid = np.linspace(0.0, 4.0, 241)\n    _curves = _improved[:, None] - _degraded[:, None] * _grid\n\n    _fig, (_ax0, _ax1) = plt.subplots(1, 2, figsize=(11.4, 4.6))\n    for _idx, _name in enumerate(_names):\n        _emphasis = _idx in (2, 6, 7)\n        _ax0.plot(\n            _grid, _curves[_idx],\n            lw=2.6 if _emphasis else 1.0,\n            alpha=1.0 if _emphasis else 0.25,\n            ls=\"--\" if _idx == _critic_idx else \"-\",\n            label=_name if _emphasis else None,\n        )\n    _ax0.axvline(_cross, color=\"#64748b\", ls=\":\", lw=1.5)\n    _ax0.scatter([_lam], [_utility[_winner_idx]], color=\"#dc2626\", s=65, zorder=4)\n    _ax0.annotate(\n        f\"selected: {_names[_winner_idx]}\",\n        (_lam, _utility[_winner_idx]), xytext=(7, 7),\n        textcoords=\"offset points\", fontsize=8,\n    )\n    _ax0.set(\n        xlabel=\"Degradation cost \u03bb\",\n        ylabel=\"Utility per refinement\",\n        title=\"Published rates under asymmetric loss\",\n    )\n    _ax0.grid(alpha=0.2)\n    _ax0.legend(frameon=False, fontsize=8)\n\n    _colors = [\"#94a3b8\"] * len(_names)\n    _colors[2], _colors[6], _colors[7] = \"#2563eb\", \"#16a34a\", \"#f97316\"\n    _ax1.scatter(_degraded * 100, _improved * 100, c=_colors, s=60)\n    for _idx in (2, 6, 7):\n        _ax1.annotate(\n            _names[_idx], (_degraded[_idx] * 100, _improved[_idx] * 100),\n            xytext=(5, 5), textcoords=\"offset points\", fontsize=8,\n        )\n    _ax1.set(\n        xlabel=\"Degraded answers (%) \u2014 lower is better\",\n        ylabel=\"Improved answers (%) \u2014 higher is better\",\n        title=\"Figure 3 risk-return plane\",\n        xlim=(3, 29), ylim=(55, 76),\n    )\n    _ax1.grid(alpha=0.2)\n    _fig.tight_layout()\n\n    _summary = mo.md(f\"\"\"\n    ## Operating point: \u03bb={_lam:.2f} \u00b7 selected {_names[_winner_idx]} \u00b7 utility {_utility[_winner_idx]:.4f}\n\n    CriticGen-7B utility is **{_utility[_critic_idx]:.4f}**. The upper envelope\n    switches from Ministral-14B to Qwen2.5-32B at **\u03bb={_cross:.3f}**. CriticGen's\n    **93.28% non-degradation** is the published 73.17% improved + 20.11% unchanged;\n    it is not an independently verified safety rate.\n    \"\"\")\n    mo.vstack([_summary, _fig])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ### Operator takeaway\n\n    1. **Improvement rate is not a deployment objective.** At \u03bb=0, Ministral-14B's\n       73.79% improvement rate wins; once \u03bb exceeds 0.689, Qwen2.5-32B's 4.32%\n       degradation rate wins.\n    2. **CriticGen's value is actionable structure, not frontier dominance.** Its\n       score\u2013reason\u2013suggestion\u2013rewrite interface may be useful even though it never\n       maximizes this one-step aggregate utility over \u03bb \u2208 [0,4].\n    3. **Do not overread the ranking.** Figure 3 uses GPT-5 judgments on unavailable\n       RefineData outputs. There are no raw records, confidence intervals, code,\n       checkpoints, or independent correctness tests in the v1 release.\n    4. **Production gate:** estimate \u03bb from real incident severity and accept a\n       rewrite only after deterministic or independent outcome checks.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%0A%23%20%20%20%22marimo%3D%3D0.23.16%22%2C%0A%23%20%20%20%22matplotlib%3E%3D3.9%2C%3C4%22%2C%0A%23%20%20%20%22numpy%3E%3D2.0%2C%3C3%22%2C%0A%23%20%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20import%20matplotlib.pyplot%20as%20plt%0A%20%20%20%20import%20numpy%20as%20np%0A%0A%20%20%20%20return%20mo%2C%20np%2C%20plt%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%20CriticGen%3A%20price%20the%20risk%20of%20a%20bad%20rewrite%0A%0A%20%20%20%20CriticGen%20turns%20a%20sample-specific%20rubric%20into%20a%20score%2C%20diagnosis%2C%20executable%0A%20%20%20%20suggestion%2C%20and%20rewrite%20(%5BarXiv%3A2609.05439%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2609.05439)).%0A%20%20%20%20The%20paper%20reports%20**73.17%25%20improved**%2C%20**20.11%25%20unchanged**%2C%20and%20**6.72%25%0A%20%20%20%20degraded**%20for%20CriticGen-Qwen2.5-7B%20on%20RefineData.%0A%0A%20%20%20%20An%20operator%20still%20needs%20a%20cost%20model%3A%20a%20regression%20may%20cost%20more%20than%20a%20useful%0A%20%20%20%20edit%20is%20worth.%20Explore%20%24U(%5C%5Clambda)%3Dp_%7Bimprove%7D-%5C%5Clambda%20p_%7Bdegrade%7D%24%2C%20where%0A%20%20%20%20%24%5C%5Clambda%24%20is%20the%20loss%20of%20one%20degradation%20in%20improvement%20units.%20All%20eight%0A%20%20%20%20triplets%20are%20transcribed%20from%20Figure%203.%20This%20is%20decision%20analysis%20of%0A%20%20%20%20author-reported%20aggregate%20rates%E2%80%94not%20an%20independent%20model%20or%20data%20reproduction.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20harm_ratio%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%200.0%2C%204.0%2C%20value%3D1.0%2C%20step%3D0.05%2C%0A%20%20%20%20%20%20%20%20label%3D%22Cost%20of%20one%20degraded%20answer%20(lambda)%22%2C%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mo.md(%22%23%23%23%20Set%20the%20application's%20asymmetric%20regression%20cost%22)%2C%0A%20%20%20%20%20%20%20%20harm_ratio%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%20(harm_ratio%2C)%0A%0A%0A%40app.cell%0Adef%20_(harm_ratio%2C%20mo%2C%20np%2C%20plt)%3A%0A%20%20%20%20_names%20%3D%20(%0A%20%20%20%20%20%20%20%20%22Qwen2.5-7B%22%2C%20%22Qwen2.5-14B%22%2C%20%22Qwen2.5-32B%22%2C%20%22Qwen3.5-4B%22%2C%0A%20%20%20%20%20%20%20%20%22Qwen3.5-9B%22%2C%20%22Mistral-7B%22%2C%20%22Ministral-14B%22%2C%20%22CriticGen-7B%22%2C%0A%20%20%20%20)%0A%20%20%20%20_improved%20%3D%20np.array(%5B.6949%2C%20.6973%2C%20.7197%2C%20.7086%2C%20.6945%2C%20.5671%2C%20.7379%2C%20.7317%5D)%0A%20%20%20%20_unchanged%20%3D%20np.array(%5B.1975%2C%20.2455%2C%20.2371%2C%20.2126%2C%20.2289%2C%20.1587%2C%20.1925%2C%20.2011%5D)%0A%20%20%20%20_degraded%20%3D%20np.array(%5B.1076%2C%20.0572%2C%20.0432%2C%20.0788%2C%20.0766%2C%20.2742%2C%20.0696%2C%20.0672%5D)%0A%20%20%20%20_lam%20%3D%20float(harm_ratio.value)%0A%20%20%20%20_utility%20%3D%20_improved%20-%20_lam%20*%20_degraded%0A%20%20%20%20_winner_idx%20%3D%20int(np.argmax(_utility))%0A%20%20%20%20_critic_idx%20%3D%207%0A%20%20%20%20_cross%20%3D%20(_improved%5B6%5D%20-%20_improved%5B2%5D)%20%2F%20(_degraded%5B6%5D%20-%20_degraded%5B2%5D)%0A%20%20%20%20_grid%20%3D%20np.linspace(0.0%2C%204.0%2C%20241)%0A%20%20%20%20_curves%20%3D%20_improved%5B%3A%2C%20None%5D%20-%20_degraded%5B%3A%2C%20None%5D%20*%20_grid%0A%0A%20%20%20%20_fig%2C%20(_ax0%2C%20_ax1)%20%3D%20plt.subplots(1%2C%202%2C%20figsize%3D(11.4%2C%204.6))%0A%20%20%20%20for%20_idx%2C%20_name%20in%20enumerate(_names)%3A%0A%20%20%20%20%20%20%20%20_emphasis%20%3D%20_idx%20in%20(2%2C%206%2C%207)%0A%20%20%20%20%20%20%20%20_ax0.plot(%0A%20%20%20%20%20%20%20%20%20%20%20%20_grid%2C%20_curves%5B_idx%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20lw%3D2.6%20if%20_emphasis%20else%201.0%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20alpha%3D1.0%20if%20_emphasis%20else%200.25%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20ls%3D%22--%22%20if%20_idx%20%3D%3D%20_critic_idx%20else%20%22-%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20label%3D_name%20if%20_emphasis%20else%20None%2C%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20_ax0.axvline(_cross%2C%20color%3D%22%2364748b%22%2C%20ls%3D%22%3A%22%2C%20lw%3D1.5)%0A%20%20%20%20_ax0.scatter(%5B_lam%5D%2C%20%5B_utility%5B_winner_idx%5D%5D%2C%20color%3D%22%23dc2626%22%2C%20s%3D65%2C%20zorder%3D4)%0A%20%20%20%20_ax0.annotate(%0A%20%20%20%20%20%20%20%20f%22selected%3A%20%7B_names%5B_winner_idx%5D%7D%22%2C%0A%20%20%20%20%20%20%20%20(_lam%2C%20_utility%5B_winner_idx%5D)%2C%20xytext%3D(7%2C%207)%2C%0A%20%20%20%20%20%20%20%20textcoords%3D%22offset%20points%22%2C%20fontsize%3D8%2C%0A%20%20%20%20)%0A%20%20%20%20_ax0.set(%0A%20%20%20%20%20%20%20%20xlabel%3D%22Degradation%20cost%20%CE%BB%22%2C%0A%20%20%20%20%20%20%20%20ylabel%3D%22Utility%20per%20refinement%22%2C%0A%20%20%20%20%20%20%20%20title%3D%22Published%20rates%20under%20asymmetric%20loss%22%2C%0A%20%20%20%20)%0A%20%20%20%20_ax0.grid(alpha%3D0.2)%0A%20%20%20%20_ax0.legend(frameon%3DFalse%2C%20fontsize%3D8)%0A%0A%20%20%20%20_colors%20%3D%20%5B%22%2394a3b8%22%5D%20*%20len(_names)%0A%20%20%20%20_colors%5B2%5D%2C%20_colors%5B6%5D%2C%20_colors%5B7%5D%20%3D%20%22%232563eb%22%2C%20%22%2316a34a%22%2C%20%22%23f97316%22%0A%20%20%20%20_ax1.scatter(_degraded%20*%20100%2C%20_improved%20*%20100%2C%20c%3D_colors%2C%20s%3D60)%0A%20%20%20%20for%20_idx%20in%20(2%2C%206%2C%207)%3A%0A%20%20%20%20%20%20%20%20_ax1.annotate(%0A%20%20%20%20%20%20%20%20%20%20%20%20_names%5B_idx%5D%2C%20(_degraded%5B_idx%5D%20*%20100%2C%20_improved%5B_idx%5D%20*%20100)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20xytext%3D(5%2C%205)%2C%20textcoords%3D%22offset%20points%22%2C%20fontsize%3D8%2C%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20_ax1.set(%0A%20%20%20%20%20%20%20%20xlabel%3D%22Degraded%20answers%20(%25)%20%E2%80%94%20lower%20is%20better%22%2C%0A%20%20%20%20%20%20%20%20ylabel%3D%22Improved%20answers%20(%25)%20%E2%80%94%20higher%20is%20better%22%2C%0A%20%20%20%20%20%20%20%20title%3D%22Figure%203%20risk-return%20plane%22%2C%0A%20%20%20%20%20%20%20%20xlim%3D(3%2C%2029)%2C%20ylim%3D(55%2C%2076)%2C%0A%20%20%20%20)%0A%20%20%20%20_ax1.grid(alpha%3D0.2)%0A%20%20%20%20_fig.tight_layout()%0A%0A%20%20%20%20_summary%20%3D%20mo.md(f%22%22%22%0A%20%20%20%20%23%23%20Operating%20point%3A%20%CE%BB%3D%7B_lam%3A.2f%7D%20%C2%B7%20selected%20%7B_names%5B_winner_idx%5D%7D%20%C2%B7%20utility%20%7B_utility%5B_winner_idx%5D%3A.4f%7D%0A%0A%20%20%20%20CriticGen-7B%20utility%20is%20**%7B_utility%5B_critic_idx%5D%3A.4f%7D**.%20The%20upper%20envelope%0A%20%20%20%20switches%20from%20Ministral-14B%20to%20Qwen2.5-32B%20at%20**%CE%BB%3D%7B_cross%3A.3f%7D**.%20CriticGen's%0A%20%20%20%20**93.28%25%20non-degradation**%20is%20the%20published%2073.17%25%20improved%20%2B%2020.11%25%20unchanged%3B%0A%20%20%20%20it%20is%20not%20an%20independently%20verified%20safety%20rate.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20mo.vstack(%5B_summary%2C%20_fig%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%23%20Operator%20takeaway%0A%0A%20%20%20%201.%20**Improvement%20rate%20is%20not%20a%20deployment%20objective.**%20At%20%CE%BB%3D0%2C%20Ministral-14B's%0A%20%20%20%20%20%20%2073.79%25%20improvement%20rate%20wins%3B%20once%20%CE%BB%20exceeds%200.689%2C%20Qwen2.5-32B's%204.32%25%0A%20%20%20%20%20%20%20degradation%20rate%20wins.%0A%20%20%20%202.%20**CriticGen's%20value%20is%20actionable%20structure%2C%20not%20frontier%20dominance.**%20Its%0A%20%20%20%20%20%20%20score%E2%80%93reason%E2%80%93suggestion%E2%80%93rewrite%20interface%20may%20be%20useful%20even%20though%20it%20never%0A%20%20%20%20%20%20%20maximizes%20this%20one-step%20aggregate%20utility%20over%20%CE%BB%20%E2%88%88%20%5B0%2C4%5D.%0A%20%20%20%203.%20**Do%20not%20overread%20the%20ranking.**%20Figure%203%20uses%20GPT-5%20judgments%20on%20unavailable%0A%20%20%20%20%20%20%20RefineData%20outputs.%20There%20are%20no%20raw%20records%2C%20confidence%20intervals%2C%20code%2C%0A%20%20%20%20%20%20%20checkpoints%2C%20or%20independent%20correctness%20tests%20in%20the%20v1%20release.%0A%20%20%20%204.%20**Production%20gate%3A**%20estimate%20%CE%BB%20from%20real%20incident%20severity%20and%20accept%20a%0A%20%20%20%20%20%20%20rewrite%20only%20after%20deterministic%20or%20independent%20outcome%20checks.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

@@ -223,6 +223,16 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["Dataflow", "Animation", "marimo"],
   },
   {
+    slug: "2610.20764-sc-eff-scaling",
+    title: "S_C^eff Scaling Principle: When Reality Outpaces Cognition",
+    description:
+      "Explore how environmental speed S_R erodes cognitive reliability, and how Co^4's O(N+k^2) attention extends the reliable operating regime by up to 10x over Transformer O(N^2). Two sliders control the reliability threshold tau and the context length N.",
+    category: "AI evaluation",
+    tags: ["arxiv-2610", "attention-efficiency", "co4", "sc-eff", "reliability", "complexity-scaling"],
+    state: "published",
+    publishedUrl: "https://marimo.edgelesslab.com/2610.20764-sc-eff-scaling/",
+  },
+  {
     slug: "2610.08936-clean-vs-robustness",
     title: "Clean accuracy is not adversarial robustness",
     description: "Explore why VCR-Bench's clean-accuracy leader is not its robust-accuracy leader, and stress-test the ranking under an explicitly hypothetical ASR multiplier.",

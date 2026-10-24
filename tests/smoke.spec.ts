@@ -120,7 +120,8 @@ test.describe("static site smoke", () => {
     expect(jsonLd.itemListElement.map((item: { url: string }) => item.url)).toEqual(urls);
     await expect(page.getByRole("heading", { name: "Research", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "AI evaluation", exact: true })).toBeVisible();
-    await expect(page.getByText("5 demos", { exact: true })).toHaveCount(2);
+    await expect(page.getByText("5 demos", { exact: true })).toHaveCount(1);
+    await expect(page.getByText("4 demos", { exact: true })).toHaveCount(1);
   });
 
   test("/field-notes/ renders the featured studies", async ({ page }) => {

@@ -10,6 +10,7 @@ const liveSlugs = [
   "2610.20838-srq-endpoint-weight",
   "build-a-chip-bench-multiscoring",
   "embodied-playground-suite-gap",
+  "2609.05439-criticgen-risk-frontier",
 ];
 
 describe("published marimo gallery", () => {

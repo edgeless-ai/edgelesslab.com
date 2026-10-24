@@ -310,6 +310,15 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["robotics", "benchmarks", "agent-evaluation", "long-horizon", "planning", "embodied-ai"],
     published_url: "https://marimo.edgelesslab.com/embodied-playground-suite-gap/",
   },
+  {
+    slug: "2609.05439-criticgen-risk-frontier",
+    title: "CriticGen: Price the Risk of a Bad Rewrite",
+    description:
+      "Price answer regressions explicitly and see why the highest improvement rate is not always the best refinement policy.",
+    category: "AI evaluation",
+    tags: ["llm-evaluation", "refinement", "decision-analysis", "risk", "rubrics"],
+    published_url: "https://marimo.edgelesslab.com/2609.05439-criticgen-risk-frontier/",
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

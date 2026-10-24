@@ -92,7 +92,7 @@ test.describe("static site smoke", () => {
     expect(fits).toBe(true);
   });
 
-  test("/lab/marimo/ only lists the eight verified live notebooks", async ({ page }) => {
+  test("/lab/marimo/ only lists the nine verified live notebooks", async ({ page }) => {
     const response = await page.goto("/lab/marimo/");
     expect(response?.status()).toBe(200);
     const urls = [
@@ -104,9 +104,10 @@ test.describe("static site smoke", () => {
       "https://marimo.edgelesslab.com/build-a-chip-bench-multiscoring/",
       "https://marimo.edgelesslab.com/embodied-playground-suite-gap/",
       "https://marimo.edgelesslab.com/2609.05439-criticgen-risk-frontier/",
+      "https://marimo.edgelesslab.com/2609.09458-contracteval-denominator/",
     ];
     const cards = page.locator('main a[href^="https://marimo.edgelesslab.com/"]');
-    await expect(cards).toHaveCount(8);
+    await expect(cards).toHaveCount(9);
     expect((await cards.evaluateAll((as) => as.map((a) => a.getAttribute("href")))).sort()).toEqual([...urls].sort());
     await expect(page.getByText("8 published notebooks")).toBeVisible();
     await expect(page.locator('a[href^="/marimo/"], a[href^="https://edgelesslab.com/marimo/"]')).toHaveCount(0);

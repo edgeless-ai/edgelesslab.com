@@ -11,6 +11,7 @@ const liveSlugs = [
   "build-a-chip-bench-multiscoring",
   "embodied-playground-suite-gap",
   "2609.05439-criticgen-risk-frontier",
+  "2609.09458-contracteval-denominator",
 ];
 
 describe("published marimo gallery", () => {

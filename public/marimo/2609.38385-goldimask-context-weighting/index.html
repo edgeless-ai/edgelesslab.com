@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2609.38385-goldimask-context-weighting</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\n#   \"marimo==0.23.16\",\n#   \"matplotlib==3.10.6\",\n#   \"numpy==2.3.3\",\n# ]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as _mo\n    _mo.md(r\"\"\"\n    # GoldiMask reveal-budget explorer\n\n    **Question:** when revealing a token removes it from supervision, which context tokens should a masked-diffusion fine-tune expose?\n\n    [GoldiMask (arXiv:2609.38385v1)](https://arxiv.org/abs/2609.38385) frames reveal selection as a non-monotone submodular objective: a reveal helps remaining targets through attention support but forfeits its own training signal. It then water-fills target weights toward tokens whose probabilities improve most.\n\n    This is a **seeded synthetic mechanism illustration**, not the paper's 8B-model experiment or a benchmark reproduction. Eight token positions, probabilities, and an attention-like support matrix are analyst-authored. No model, dataset, author code, credential, API, or private input is used.\n        \"\"\")\n    return\n\n\n@app.cell\ndef _():\n    import marimo as mo\n    import matplotlib.pyplot as plt\n    import numpy as np\n\n    reveal_budget = mo.ui.slider(1, 5, value=2, step=1, label=\"Revealed context tokens\", show_value=True)\n    weight_cap = mo.ui.slider(1.0, 4.0, value=2.5, step=0.5, label=\"Maximum target weight\", show_value=True)\n    tokens = [\"plan\", \"because\", \"step\", \"therefore\", \"check\", \"answer\", \"units\", \"eos\"]\n    probabilities = np.array([0.86, 0.52, 0.43, 0.58, 0.34, 0.72, 0.29, 0.91])\n    _distance = np.abs(np.arange(8)[:, None] - np.arange(8)[None, :])\n    support_matrix = 0.10 + 0.52 * np.exp(-_distance / 1.8)\n    support_matrix[:, 1] += np.array([0.03, 0.00, 0.26, 0.30, 0.18, 0.14, 0.06, 0.02])\n    support_matrix[:, 4] += np.array([0.01, 0.08, 0.15, 0.24, 0.00, 0.31, 0.27, 0.08])\n    np.fill_diagonal(support_matrix, 0.0)\n    mo.vstack([reveal_budget, weight_cap])\n    return (\n        mo,\n        np,\n        plt,\n        probabilities,\n        reveal_budget,\n        support_matrix,\n        tokens,\n        weight_cap,\n    )\n\n\n@app.cell\ndef _(\n    mo,\n    np,\n    plt,\n    probabilities,\n    reveal_budget,\n    support_matrix,\n    tokens,\n    weight_cap,\n):\n    import itertools as _itertools\n\n    _priority = probabilities * (1.0 - probabilities)\n\n    def _objective(_chosen):\n        _chosen = list(_chosen)\n        _target = np.array([_i not in _chosen for _i in range(len(tokens))])\n        _support = support_matrix[:, _chosen].sum(axis=1)\n        return float((_priority[_target] * np.log1p(_support[_target])).sum())\n\n    _budgets = np.arange(1, 6)\n    _greedy_sets, _greedy_curve, _uniform_curve = [], [], []\n    _chosen = []\n    for _budget in _budgets:\n        _candidates = [\n            (_objective(_chosen + [_candidate]), _candidate)\n            for _candidate in range(len(tokens)) if _candidate not in _chosen\n        ]\n        _chosen.append(max(_candidates)[1])\n        _greedy_sets.append(tuple(_chosen))\n        _greedy_curve.append(_objective(_chosen))\n        _uniform_curve.append(float(np.mean([\n            _objective(_combo) for _combo in _itertools.combinations(range(len(tokens)), int(_budget))\n        ])))\n\n    _k = int(reveal_budget.value)\n    _selected = _greedy_sets[_k - 1]\n    _target = np.array([_i not in _selected for _i in range(len(tokens))])\n    _context_support = support_matrix[:, list(_selected)].sum(axis=1)\n    _updated_p = np.clip(\n        probabilities + 0.42 * (1.0 - probabilities) * (1.0 - np.exp(-_context_support)),\n        1e-6, 1 - 1e-6,\n    )\n    _delta = np.maximum(np.log(_updated_p) - np.log(probabilities), 0.0)\n    _utility = _updated_p * (1.0 - _updated_p) * _delta\n    _weights = np.zeros(len(tokens))\n    _target_utility = np.maximum(_utility[_target], 1e-9)\n    _lo, _hi = 1e-9, float(_target_utility.max() + 1.0)\n    for _iteration in range(60):\n        _level = (_lo + _hi) / 2\n        if np.minimum(float(weight_cap.value), _target_utility / _level).sum() \u003E _target.sum():\n            _lo = _level\n        else:\n            _hi = _level\n    _weights[_target] = np.minimum(float(weight_cap.value), _target_utility / _hi)\n\n    _fig, (_ax1, _ax2) = plt.subplots(1, 2, figsize=(10.5, 4.2))\n    _ax1.plot(_budgets, _greedy_curve, \"o-\", color=\"#2563eb\", linewidth=2.4, label=\"Greedy reveal\")\n    _ax1.plot(_budgets, _uniform_curve, \"s--\", color=\"#9ca3af\", linewidth=1.8, label=\"Mean uniform set\")\n    _ax1.scatter([_k], [_greedy_curve[_k - 1]], s=90, color=\"#f59e0b\", zorder=4)\n    _ax1.set(xlabel=\"Reveal budget k\", ylabel=\"Synthetic support objective\", title=\"Context benefit vs. forfeited targets\")\n    _ax1.legend(frameon=False)\n    _colors = [\"#d1d5db\" if not _target[_i] else \"#16a34a\" for _i in range(len(tokens))]\n    _ax2.bar(np.arange(len(tokens)), _weights, color=_colors)\n    _ax2.set(xticks=np.arange(len(tokens)), xticklabels=tokens, ylabel=\"Normalized target weight\", title=\"Water-filled surviving targets\")\n    _ax2.tick_params(axis=\"x\", rotation=35)\n    for _ax in (_ax1, _ax2):\n        _ax.grid(axis=\"y\", alpha=0.2)\n        _ax.spines[[\"top\", \"right\"]].set_visible(False)\n    _fig.tight_layout()\n\n    _selected_names = \", \".join(tokens[_i] for _i in _selected)\n    _gain = 100 * (_greedy_curve[_k - 1] / _uniform_curve[_k - 1] - 1)\n    _summary = mo.md(f\"\"\"\n    ### Operating point: reveal budget k = {_k} of 8\n\n    **Greedy reveals:** `{_selected_names}`. Its synthetic support objective is **{_greedy_curve[_k - 1]:.3f}**, **{_gain:+.1f}%** versus the mean of all uniform size-{_k} reveal sets. The remaining {int(_target.sum())} targets receive weights summing to **{_weights.sum():.1f}**, capped at **{float(weight_cap.value):.1f}**.\n\n    Gray bars are revealed context and therefore receive no training loss. Green bars are targets; weighting redistributes loss mass but does not create information.\n        \"\"\")\n    mo.vstack([_summary, _fig])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ## Takeaway\n\n    GoldiMask's coupling is the point: choosing context also chooses what **not** to supervise. Greedy reveal selection can outperform an average uniform set in this toy geometry, while water-filling concentrates supervision on responsive targets without changing total loss mass.\n\n    **Do not overread the chart.** The probabilities and support matrix are synthetic, attention is only a proxy for causal usefulness, and a larger reveal budget leaves fewer targets. The paper reports average gains over Vanilla SFT of 4.3, 5.4, and 8.8 points across three diffusion-LM backbones, plus fewer parallel-decoding iterations; those published results are quoted context, not outputs of this app. The preprint is not peer-reviewed, and the app does not test training cost, seed stability, alternative support signals, or real-world transfer.\n\n    **Source:** Mualem et al., *Fine-Tuning Diffusion Language Models with Context Selection and Target Weighting*, arXiv:2609.38385v1 (submitted 2026-09-29). Demo code is original EdgelessLab material; dependencies retain their own licenses.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%0A%23%20%20%20%22marimo%3D%3D0.23.16%22%2C%0A%23%20%20%20%22matplotlib%3D%3D3.10.6%22%2C%0A%23%20%20%20%22numpy%3D%3D2.3.3%22%2C%0A%23%20%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20_mo%0A%20%20%20%20_mo.md(r%22%22%22%0A%20%20%20%20%23%20GoldiMask%20reveal-budget%20explorer%0A%0A%20%20%20%20**Question%3A**%20when%20revealing%20a%20token%20removes%20it%20from%20supervision%2C%20which%20context%20tokens%20should%20a%20masked-diffusion%20fine-tune%20expose%3F%0A%0A%20%20%20%20%5BGoldiMask%20(arXiv%3A2609.38385v1)%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2609.38385)%20frames%20reveal%20selection%20as%20a%20non-monotone%20submodular%20objective%3A%20a%20reveal%20helps%20remaining%20targets%20through%20attention%20support%20but%20forfeits%20its%20own%20training%20signal.%20It%20then%20water-fills%20target%20weights%20toward%20tokens%20whose%20probabilities%20improve%20most.%0A%0A%20%20%20%20This%20is%20a%20**seeded%20synthetic%20mechanism%20illustration**%2C%20not%20the%20paper's%208B-model%20experiment%20or%20a%20benchmark%20reproduction.%20Eight%20token%20positions%2C%20probabilities%2C%20and%20an%20attention-like%20support%20matrix%20are%20analyst-authored.%20No%20model%2C%20dataset%2C%20author%20code%2C%20credential%2C%20API%2C%20or%20private%20input%20is%20used.%0A%20%20%20%20%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20import%20matplotlib.pyplot%20as%20plt%0A%20%20%20%20import%20numpy%20as%20np%0A%0A%20%20%20%20reveal_budget%20%3D%20mo.ui.slider(1%2C%205%2C%20value%3D2%2C%20step%3D1%2C%20label%3D%22Revealed%20context%20tokens%22%2C%20show_value%3DTrue)%0A%20%20%20%20weight_cap%20%3D%20mo.ui.slider(1.0%2C%204.0%2C%20value%3D2.5%2C%20step%3D0.5%2C%20label%3D%22Maximum%20target%20weight%22%2C%20show_value%3DTrue)%0A%20%20%20%20tokens%20%3D%20%5B%22plan%22%2C%20%22because%22%2C%20%22step%22%2C%20%22therefore%22%2C%20%22check%22%2C%20%22answer%22%2C%20%22units%22%2C%20%22eos%22%5D%0A%20%20%20%20probabilities%20%3D%20np.array(%5B0.86%2C%200.52%2C%200.43%2C%200.58%2C%200.34%2C%200.72%2C%200.29%2C%200.91%5D)%0A%20%20%20%20_distance%20%3D%20np.abs(np.arange(8)%5B%3A%2C%20None%5D%20-%20np.arange(8)%5BNone%2C%20%3A%5D)%0A%20%20%20%20support_matrix%20%3D%200.10%20%2B%200.52%20*%20np.exp(-_distance%20%2F%201.8)%0A%20%20%20%20support_matrix%5B%3A%2C%201%5D%20%2B%3D%20np.array(%5B0.03%2C%200.00%2C%200.26%2C%200.30%2C%200.18%2C%200.14%2C%200.06%2C%200.02%5D)%0A%20%20%20%20support_matrix%5B%3A%2C%204%5D%20%2B%3D%20np.array(%5B0.01%2C%200.08%2C%200.15%2C%200.24%2C%200.00%2C%200.31%2C%200.27%2C%200.08%5D)%0A%20%20%20%20np.fill_diagonal(support_matrix%2C%200.0)%0A%20%20%20%20mo.vstack(%5Breveal_budget%2C%20weight_cap%5D)%0A%20%20%20%20return%20(%0A%20%20%20%20%20%20%20%20mo%2C%0A%20%20%20%20%20%20%20%20np%2C%0A%20%20%20%20%20%20%20%20plt%2C%0A%20%20%20%20%20%20%20%20probabilities%2C%0A%20%20%20%20%20%20%20%20reveal_budget%2C%0A%20%20%20%20%20%20%20%20support_matrix%2C%0A%20%20%20%20%20%20%20%20tokens%2C%0A%20%20%20%20%20%20%20%20weight_cap%2C%0A%20%20%20%20)%0A%0A%0A%40app.cell%0Adef%20_(%0A%20%20%20%20mo%2C%0A%20%20%20%20np%2C%0A%20%20%20%20plt%2C%0A%20%20%20%20probabilities%2C%0A%20%20%20%20reveal_budget%2C%0A%20%20%20%20support_matrix%2C%0A%20%20%20%20tokens%2C%0A%20%20%20%20weight_cap%2C%0A)%3A%0A%20%20%20%20import%20itertools%20as%20_itertools%0A%0A%20%20%20%20_priority%20%3D%20probabilities%20*%20(1.0%20-%20probabilities)%0A%0A%20%20%20%20def%20_objective(_chosen)%3A%0A%20%20%20%20%20%20%20%20_chosen%20%3D%20list(_chosen)%0A%20%20%20%20%20%20%20%20_target%20%3D%20np.array(%5B_i%20not%20in%20_chosen%20for%20_i%20in%20range(len(tokens))%5D)%0A%20%20%20%20%20%20%20%20_support%20%3D%20support_matrix%5B%3A%2C%20_chosen%5D.sum(axis%3D1)%0A%20%20%20%20%20%20%20%20return%20float((_priority%5B_target%5D%20*%20np.log1p(_support%5B_target%5D)).sum())%0A%0A%20%20%20%20_budgets%20%3D%20np.arange(1%2C%206)%0A%20%20%20%20_greedy_sets%2C%20_greedy_curve%2C%20_uniform_curve%20%3D%20%5B%5D%2C%20%5B%5D%2C%20%5B%5D%0A%20%20%20%20_chosen%20%3D%20%5B%5D%0A%20%20%20%20for%20_budget%20in%20_budgets%3A%0A%20%20%20%20%20%20%20%20_candidates%20%3D%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20(_objective(_chosen%20%2B%20%5B_candidate%5D)%2C%20_candidate)%0A%20%20%20%20%20%20%20%20%20%20%20%20for%20_candidate%20in%20range(len(tokens))%20if%20_candidate%20not%20in%20_chosen%0A%20%20%20%20%20%20%20%20%5D%0A%20%20%20%20%20%20%20%20_chosen.append(max(_candidates)%5B1%5D)%0A%20%20%20%20%20%20%20%20_greedy_sets.append(tuple(_chosen))%0A%20%20%20%20%20%20%20%20_greedy_curve.append(_objective(_chosen))%0A%20%20%20%20%20%20%20%20_uniform_curve.append(float(np.mean(%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20_objective(_combo)%20for%20_combo%20in%20_itertools.combinations(range(len(tokens))%2C%20int(_budget))%0A%20%20%20%20%20%20%20%20%5D)))%0A%0A%20%20%20%20_k%20%3D%20int(reveal_budget.value)%0A%20%20%20%20_selected%20%3D%20_greedy_sets%5B_k%20-%201%5D%0A%20%20%20%20_target%20%3D%20np.array(%5B_i%20not%20in%20_selected%20for%20_i%20in%20range(len(tokens))%5D)%0A%20%20%20%20_context_support%20%3D%20support_matrix%5B%3A%2C%20list(_selected)%5D.sum(axis%3D1)%0A%20%20%20%20_updated_p%20%3D%20np.clip(%0A%20%20%20%20%20%20%20%20probabilities%20%2B%200.42%20*%20(1.0%20-%20probabilities)%20*%20(1.0%20-%20np.exp(-_context_support))%2C%0A%20%20%20%20%20%20%20%201e-6%2C%201%20-%201e-6%2C%0A%20%20%20%20)%0A%20%20%20%20_delta%20%3D%20np.maximum(np.log(_updated_p)%20-%20np.log(probabilities)%2C%200.0)%0A%20%20%20%20_utility%20%3D%20_updated_p%20*%20(1.0%20-%20_updated_p)%20*%20_delta%0A%20%20%20%20_weights%20%3D%20np.zeros(len(tokens))%0A%20%20%20%20_target_utility%20%3D%20np.maximum(_utility%5B_target%5D%2C%201e-9)%0A%20%20%20%20_lo%2C%20_hi%20%3D%201e-9%2C%20float(_target_utility.max()%20%2B%201.0)%0A%20%20%20%20for%20_iteration%20in%20range(60)%3A%0A%20%20%20%20%20%20%20%20_level%20%3D%20(_lo%20%2B%20_hi)%20%2F%202%0A%20%20%20%20%20%20%20%20if%20np.minimum(float(weight_cap.value)%2C%20_target_utility%20%2F%20_level).sum()%20%3E%20_target.sum()%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_lo%20%3D%20_level%0A%20%20%20%20%20%20%20%20else%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_hi%20%3D%20_level%0A%20%20%20%20_weights%5B_target%5D%20%3D%20np.minimum(float(weight_cap.value)%2C%20_target_utility%20%2F%20_hi)%0A%0A%20%20%20%20_fig%2C%20(_ax1%2C%20_ax2)%20%3D%20plt.subplots(1%2C%202%2C%20figsize%3D(10.5%2C%204.2))%0A%20%20%20%20_ax1.plot(_budgets%2C%20_greedy_curve%2C%20%22o-%22%2C%20color%3D%22%232563eb%22%2C%20linewidth%3D2.4%2C%20label%3D%22Greedy%20reveal%22)%0A%20%20%20%20_ax1.plot(_budgets%2C%20_uniform_curve%2C%20%22s--%22%2C%20color%3D%22%239ca3af%22%2C%20linewidth%3D1.8%2C%20label%3D%22Mean%20uniform%20set%22)%0A%20%20%20%20_ax1.scatter(%5B_k%5D%2C%20%5B_greedy_curve%5B_k%20-%201%5D%5D%2C%20s%3D90%2C%20color%3D%22%23f59e0b%22%2C%20zorder%3D4)%0A%20%20%20%20_ax1.set(xlabel%3D%22Reveal%20budget%20k%22%2C%20ylabel%3D%22Synthetic%20support%20objective%22%2C%20title%3D%22Context%20benefit%20vs.%20forfeited%20targets%22)%0A%20%20%20%20_ax1.legend(frameon%3DFalse)%0A%20%20%20%20_colors%20%3D%20%5B%22%23d1d5db%22%20if%20not%20_target%5B_i%5D%20else%20%22%2316a34a%22%20for%20_i%20in%20range(len(tokens))%5D%0A%20%20%20%20_ax2.bar(np.arange(len(tokens))%2C%20_weights%2C%20color%3D_colors)%0A%20%20%20%20_ax2.set(xticks%3Dnp.arange(len(tokens))%2C%20xticklabels%3Dtokens%2C%20ylabel%3D%22Normalized%20target%20weight%22%2C%20title%3D%22Water-filled%20surviving%20targets%22)%0A%20%20%20%20_ax2.tick_params(axis%3D%22x%22%2C%20rotation%3D35)%0A%20%20%20%20for%20_ax%20in%20(_ax1%2C%20_ax2)%3A%0A%20%20%20%20%20%20%20%20_ax.grid(axis%3D%22y%22%2C%20alpha%3D0.2)%0A%20%20%20%20%20%20%20%20_ax.spines%5B%5B%22top%22%2C%20%22right%22%5D%5D.set_visible(False)%0A%20%20%20%20_fig.tight_layout()%0A%0A%20%20%20%20_selected_names%20%3D%20%22%2C%20%22.join(tokens%5B_i%5D%20for%20_i%20in%20_selected)%0A%20%20%20%20_gain%20%3D%20100%20*%20(_greedy_curve%5B_k%20-%201%5D%20%2F%20_uniform_curve%5B_k%20-%201%5D%20-%201)%0A%20%20%20%20_summary%20%3D%20mo.md(f%22%22%22%0A%20%20%20%20%23%23%23%20Operating%20point%3A%20reveal%20budget%20k%20%3D%20%7B_k%7D%20of%208%0A%0A%20%20%20%20**Greedy%20reveals%3A**%20%60%7B_selected_names%7D%60.%20Its%20synthetic%20support%20objective%20is%20**%7B_greedy_curve%5B_k%20-%201%5D%3A.3f%7D**%2C%20**%7B_gain%3A%2B.1f%7D%25**%20versus%20the%20mean%20of%20all%20uniform%20size-%7B_k%7D%20reveal%20sets.%20The%20remaining%20%7Bint(_target.sum())%7D%20targets%20receive%20weights%20summing%20to%20**%7B_weights.sum()%3A.1f%7D**%2C%20capped%20at%20**%7Bfloat(weight_cap.value)%3A.1f%7D**.%0A%0A%20%20%20%20Gray%20bars%20are%20revealed%20context%20and%20therefore%20receive%20no%20training%20loss.%20Green%20bars%20are%20targets%3B%20weighting%20redistributes%20loss%20mass%20but%20does%20not%20create%20information.%0A%20%20%20%20%20%20%20%20%22%22%22)%0A%20%20%20%20mo.vstack(%5B_summary%2C%20_fig%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20Takeaway%0A%0A%20%20%20%20GoldiMask's%20coupling%20is%20the%20point%3A%20choosing%20context%20also%20chooses%20what%20**not**%20to%20supervise.%20Greedy%20reveal%20selection%20can%20outperform%20an%20average%20uniform%20set%20in%20this%20toy%20geometry%2C%20while%20water-filling%20concentrates%20supervision%20on%20responsive%20targets%20without%20changing%20total%20loss%20mass.%0A%0A%20%20%20%20**Do%20not%20overread%20the%20chart.**%20The%20probabilities%20and%20support%20matrix%20are%20synthetic%2C%20attention%20is%20only%20a%20proxy%20for%20causal%20usefulness%2C%20and%20a%20larger%20reveal%20budget%20leaves%20fewer%20targets.%20The%20paper%20reports%20average%20gains%20over%20Vanilla%20SFT%20of%204.3%2C%205.4%2C%20and%208.8%20points%20across%20three%20diffusion-LM%20backbones%2C%20plus%20fewer%20parallel-decoding%20iterations%3B%20those%20published%20results%20are%20quoted%20context%2C%20not%20outputs%20of%20this%20app.%20The%20preprint%20is%20not%20peer-reviewed%2C%20and%20the%20app%20does%20not%20test%20training%20cost%2C%20seed%20stability%2C%20alternative%20support%20signals%2C%20or%20real-world%20transfer.%0A%0A%20%20%20%20**Source%3A**%20Mualem%20et%20al.%2C%20*Fine-Tuning%20Diffusion%20Language%20Models%20with%20Context%20Selection%20and%20Target%20Weighting*%2C%20arXiv%3A2609.38385v1%20(submitted%202026-09-29).%20Demo%20code%20is%20original%20EdgelessLab%20material%3B%20dependencies%20retain%20their%20own%20licenses.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

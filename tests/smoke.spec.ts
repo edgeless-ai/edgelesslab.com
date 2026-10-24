@@ -109,14 +109,14 @@ test.describe("static site smoke", () => {
     const cards = page.locator('main a[href^="https://marimo.edgelesslab.com/"]');
     await expect(cards).toHaveCount(9);
     expect((await cards.evaluateAll((as) => as.map((a) => a.getAttribute("href")))).sort()).toEqual([...urls].sort());
-    await expect(page.getByText("8 published notebooks")).toBeVisible();
+    await expect(page.getByText("9 published notebooks")).toBeVisible();
     await expect(page.locator('a[href^="/marimo/"], a[href^="https://edgelesslab.com/marimo/"]')).toHaveCount(0);
     await expect(page.getByRole("heading", { name: "V Portfolio Drawdown Envelope" })).toHaveCount(0);
     await expect(page.getByText("Finance/GPU", { exact: true })).toHaveCount(0);
     const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents())
       .map((text) => JSON.parse(text))
       .find((item) => item["@type"] === "CollectionPage");
-    expect(jsonLd.numberOfItems).toBe(8);
+    expect(jsonLd.numberOfItems).toBe(9);
     expect(jsonLd.itemListElement.map((item: { url: string }) => item.url)).toEqual(urls);
     await expect(page.getByRole("heading", { name: "Research", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "AI evaluation", exact: true })).toBeVisible();

@@ -5,6 +5,7 @@ import { marimoDemos, publishedMarimoDemos } from "../marimo-demos";
 const liveSlugs = [
   "2610.20686-rolaq-cache-accounting",
   "borwein-falsifier",
+  "2609.35815-calibrated-judge-inference",
   "2610.08936-clean-vs-robustness",
   "2609.38201-speculative-tool-exec",
   "2610.20838-srq-endpoint-weight",

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2609.35815-calibrated-judge-inference</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\n#   \"marimo==0.23.16\",\n#   \"matplotlib==3.10.6\",\n#   \"numpy==2.3.3\",\n# ]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as _mo\n\n    _mo.md(\n        r\"\"\"\n    # When more LLM-judge scores increase false confidence\n\n    **Question:** if an LLM judge has a run-level system preference that does not\n    average out across items, can adding more judge-scored items make a nominal 5%\n    test *less* trustworthy?\n\n    The paper reports that raw LLM-judge statistics can produce inflated false\n    positives even at high human-judge agreement; for binary ratings, Cohen's\n    kappa of **0.81** still accompanied about **37%** false positives. It recommends\n    prediction-powered inference (PPI) with a random human-labeled subset.\n\n    This app isolates the mechanism with a transparent Gaussian calculation. It is\n    an **analytical illustration**, not the paper's Monte Carlo study, `evalstats`,\n    PPI++, or a reproduction of its numbers. No LLM, human data, network call, or\n    external dataset is used.\n\n    Source: [Arawjo, arXiv:2609.35815v1](https://arxiv.org/abs/2609.35815)\n            \"\"\"\n    )\n    return\n\n\n@app.cell\ndef _():\n    import marimo as mo\n    import matplotlib.pyplot as plt\n    import numpy as np\n\n    item_count = mo.ui.slider(\n        start=20,\n        stop=200,\n        step=10,\n        value=50,\n        label=\"Judge-scored items (n)\",\n        show_value=True,\n    )\n    bias_sd = mo.ui.slider(\n        start=0.00,\n        stop=0.15,\n        step=0.01,\n        value=0.08,\n        label=\"Run-level judge bias SD\",\n        show_value=True,\n    )\n    human_labels = mo.ui.slider(\n        start=15,\n        stop=60,\n        step=5,\n        value=20,\n        label=\"Random human labels (m)\",\n        show_value=True,\n    )\n    mo.hstack([item_count, bias_sd, human_labels], justify=\"start\", widths=\"equal\")\n    return bias_sd, human_labels, item_count, mo, np, plt\n\n\n@app.cell\ndef _(bias_sd, human_labels, item_count, mo, np, plt):\n    import math as _math\n\n    _z = 1.959964\n    _item_sd = 0.30\n    _label_error_sd = 0.30\n    _n = int(item_count.value)\n    _m = int(human_labels.value)\n    _bias = float(bias_sd.value)\n    _grid = np.arange(20, 201, 2)\n\n    def _false_positive(_threshold, _total_sd):\n        _ratio = _threshold / _total_sd\n        return _math.erfc(_ratio / _math.sqrt(2.0))\n\n    _se_grid = _item_sd / np.sqrt(_grid)\n    _cal_sd = _label_error_sd / np.sqrt(_m)\n    _raw_fp = np.array([\n        _false_positive(_z * _se, _math.sqrt(_se**2 + _bias**2))\n        for _se in _se_grid\n    ])\n    _point_only_fp = np.array([\n        _false_positive(_z * _se, _math.sqrt(_se**2 + _cal_sd**2))\n        for _se in _se_grid\n    ])\n    _calibrated_fp = np.full_like(_grid, 0.05, dtype=float)\n\n    _se = _item_sd / _math.sqrt(_n)\n    _raw_now = _false_positive(_z * _se, _math.sqrt(_se**2 + _bias**2))\n    _point_now = _false_positive(_z * _se, _math.sqrt(_se**2 + _cal_sd**2))\n    _raw_half = _z * _se\n    _cal_half = _z * _math.sqrt(_se**2 + _cal_sd**2)\n\n    _fig, (_ax1, _ax2) = plt.subplots(1, 2, figsize=(10.4, 4.5))\n    _ax1.plot(_grid, 100 * _raw_fp, color=\"#d1495b\", lw=2.5, label=\"Raw judge-only test\")\n    _ax1.plot(\n        _grid,\n        100 * _point_only_fp,\n        color=\"#e09f3e\",\n        lw=2.2,\n        label=\"Bias corrected, label uncertainty omitted\",\n    )\n    _ax1.plot(_grid, 100 * _calibrated_fp, color=\"#16a394\", lw=2.5, label=\"Calibrated uncertainty included\")\n    _ax1.axvline(_n, color=\"#475569\", ls=\"--\", lw=1.5)\n    _ax1.set(xlabel=\"Judge-scored items (n)\", ylabel=\"False-positive rate (%)\", ylim=(0, 100))\n    _ax1.set_title(\"Under a true null\")\n    _ax1.grid(alpha=0.18)\n    _ax1.legend(fontsize=7.5, loc=\"upper left\")\n\n    _raw_width = _z * _se_grid\n    _cal_width = _z * np.sqrt(_se_grid**2 + _cal_sd**2)\n    _ax2.plot(_grid, _raw_width, color=\"#d1495b\", lw=2.5, label=\"Reported judge-only half-width\")\n    _ax2.plot(_grid, _cal_width, color=\"#16a394\", lw=2.5, label=f\"Calibrated half-width (m={_m})\")\n    _ax2.axvline(_n, color=\"#475569\", ls=\"--\", lw=1.5)\n    _ax2.set(xlabel=\"Judge-scored items (n)\", ylabel=\"95% CI half-width\")\n    _ax2.set_title(\"Honest uncertainty has a label floor\")\n    _ax2.grid(alpha=0.18)\n    _ax2.legend(fontsize=7.5)\n    _fig.tight_layout()\n\n    _summary = mo.md(\n        f\"\"\"\n    ## Operating point: n = {_n} items\n\n    **Raw judge-only test:** {_raw_now * 100:.1f}% false positives under the\n    illustrated null (nominal target: 5.0%). Its reported 95% half-width is\n    {_raw_half:.3f}, because it ignores the run-level preference SD of {_bias:.2f}.\n\n    **Human-calibrated test:** {_m} random labels produce an honest half-width of\n    {_cal_half:.3f}. If the point estimate were corrected but label-estimation\n    uncertainty were omitted, false positives would still be {_point_now * 100:.1f}%.\n    Including that uncertainty restores the analytical Gaussian target of 5.0%.\n            \"\"\"\n    )\n    mo.vstack([_summary, _fig])\n    return\n\n\n@app.cell\ndef _():\n    import marimo as _mo\n\n    _mo.md(\n        r\"\"\"\n    ## Read this as a failure-mode calculator, not a certification\n\n    The model assumes independent Gaussian item noise with SD **0.30**, a Gaussian\n    run-level A-vs-B judge preference, a true null, and a random calibration subset\n    whose per-label discrepancy also has SD **0.30**. The red curve follows directly\n    from those assumptions: the usual standard error shrinks as `1/sqrt(n)`, while\n    the omitted bias does not. The green curve is 5% by construction because its\n    interval includes calibration-estimation variance.\n\n    The paper is broader: it studies binary, Likert, and continuous outcomes,\n    nine PPI-corrected tests, bootstrap-adaptive PPI++ weighting, non-Gaussian\n    settings, multiple comparisons, and real judge-human alignment. It requires a\n    random (MCAR) human subset, reports no statistics below 15 samples, and notes\n    that its `compare()` PPI path needs at least 50 judge-scored items. MNAR labeling,\n    100% observed agreement, multi-run plus PPI, and between-subject pairwise CIs\n    remain limitations.\n\n    **Takeaway:** high agreement is not permission to treat judge scores as human\n    scores. Preserve pairing, randomize presentation order, randomly label a human\n    subset, and propagate the uncertainty of the bias correction itself.\n            \"\"\"\n    )\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%0A%23%20%20%20%22marimo%3D%3D0.23.16%22%2C%0A%23%20%20%20%22matplotlib%3D%3D3.10.6%22%2C%0A%23%20%20%20%22numpy%3D%3D2.3.3%22%2C%0A%23%20%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20_mo%0A%0A%20%20%20%20_mo.md(%0A%20%20%20%20%20%20%20%20r%22%22%22%0A%20%20%20%20%23%20When%20more%20LLM-judge%20scores%20increase%20false%20confidence%0A%0A%20%20%20%20**Question%3A**%20if%20an%20LLM%20judge%20has%20a%20run-level%20system%20preference%20that%20does%20not%0A%20%20%20%20average%20out%20across%20items%2C%20can%20adding%20more%20judge-scored%20items%20make%20a%20nominal%205%25%0A%20%20%20%20test%20*less*%20trustworthy%3F%0A%0A%20%20%20%20The%20paper%20reports%20that%20raw%20LLM-judge%20statistics%20can%20produce%20inflated%20false%0A%20%20%20%20positives%20even%20at%20high%20human-judge%20agreement%3B%20for%20binary%20ratings%2C%20Cohen's%0A%20%20%20%20kappa%20of%20**0.81**%20still%20accompanied%20about%20**37%25**%20false%20positives.%20It%20recommends%0A%20%20%20%20prediction-powered%20inference%20(PPI)%20with%20a%20random%20human-labeled%20subset.%0A%0A%20%20%20%20This%20app%20isolates%20the%20mechanism%20with%20a%20transparent%20Gaussian%20calculation.%20It%20is%0A%20%20%20%20an%20**analytical%20illustration**%2C%20not%20the%20paper's%20Monte%20Carlo%20study%2C%20%60evalstats%60%2C%0A%20%20%20%20PPI%2B%2B%2C%20or%20a%20reproduction%20of%20its%20numbers.%20No%20LLM%2C%20human%20data%2C%20network%20call%2C%20or%0A%20%20%20%20external%20dataset%20is%20used.%0A%0A%20%20%20%20Source%3A%20%5BArawjo%2C%20arXiv%3A2609.35815v1%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2609.35815)%0A%20%20%20%20%20%20%20%20%20%20%20%20%22%22%22%0A%20%20%20%20)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20import%20matplotlib.pyplot%20as%20plt%0A%20%20%20%20import%20numpy%20as%20np%0A%0A%20%20%20%20item_count%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%20start%3D20%2C%0A%20%20%20%20%20%20%20%20stop%3D200%2C%0A%20%20%20%20%20%20%20%20step%3D10%2C%0A%20%20%20%20%20%20%20%20value%3D50%2C%0A%20%20%20%20%20%20%20%20label%3D%22Judge-scored%20items%20(n)%22%2C%0A%20%20%20%20%20%20%20%20show_value%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20bias_sd%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%20start%3D0.00%2C%0A%20%20%20%20%20%20%20%20stop%3D0.15%2C%0A%20%20%20%20%20%20%20%20step%3D0.01%2C%0A%20%20%20%20%20%20%20%20value%3D0.08%2C%0A%20%20%20%20%20%20%20%20label%3D%22Run-level%20judge%20bias%20SD%22%2C%0A%20%20%20%20%20%20%20%20show_value%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20human_labels%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%20start%3D15%2C%0A%20%20%20%20%20%20%20%20stop%3D60%2C%0A%20%20%20%20%20%20%20%20step%3D5%2C%0A%20%20%20%20%20%20%20%20value%3D20%2C%0A%20%20%20%20%20%20%20%20label%3D%22Random%20human%20labels%20(m)%22%2C%0A%20%20%20%20%20%20%20%20show_value%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20mo.hstack(%5Bitem_count%2C%20bias_sd%2C%20human_labels%5D%2C%20justify%3D%22start%22%2C%20widths%3D%22equal%22)%0A%20%20%20%20return%20bias_sd%2C%20human_labels%2C%20item_count%2C%20mo%2C%20np%2C%20plt%0A%0A%0A%40app.cell%0Adef%20_(bias_sd%2C%20human_labels%2C%20item_count%2C%20mo%2C%20np%2C%20plt)%3A%0A%20%20%20%20import%20math%20as%20_math%0A%0A%20%20%20%20_z%20%3D%201.959964%0A%20%20%20%20_item_sd%20%3D%200.30%0A%20%20%20%20_label_error_sd%20%3D%200.30%0A%20%20%20%20_n%20%3D%20int(item_count.value)%0A%20%20%20%20_m%20%3D%20int(human_labels.value)%0A%20%20%20%20_bias%20%3D%20float(bias_sd.value)%0A%20%20%20%20_grid%20%3D%20np.arange(20%2C%20201%2C%202)%0A%0A%20%20%20%20def%20_false_positive(_threshold%2C%20_total_sd)%3A%0A%20%20%20%20%20%20%20%20_ratio%20%3D%20_threshold%20%2F%20_total_sd%0A%20%20%20%20%20%20%20%20return%20_math.erfc(_ratio%20%2F%20_math.sqrt(2.0))%0A%0A%20%20%20%20_se_grid%20%3D%20_item_sd%20%2F%20np.sqrt(_grid)%0A%20%20%20%20_cal_sd%20%3D%20_label_error_sd%20%2F%20np.sqrt(_m)%0A%20%20%20%20_raw_fp%20%3D%20np.array(%5B%0A%20%20%20%20%20%20%20%20_false_positive(_z%20*%20_se%2C%20_math.sqrt(_se**2%20%2B%20_bias**2))%0A%20%20%20%20%20%20%20%20for%20_se%20in%20_se_grid%0A%20%20%20%20%5D)%0A%20%20%20%20_point_only_fp%20%3D%20np.array(%5B%0A%20%20%20%20%20%20%20%20_false_positive(_z%20*%20_se%2C%20_math.sqrt(_se**2%20%2B%20_cal_sd**2))%0A%20%20%20%20%20%20%20%20for%20_se%20in%20_se_grid%0A%20%20%20%20%5D)%0A%20%20%20%20_calibrated_fp%20%3D%20np.full_like(_grid%2C%200.05%2C%20dtype%3Dfloat)%0A%0A%20%20%20%20_se%20%3D%20_item_sd%20%2F%20_math.sqrt(_n)%0A%20%20%20%20_raw_now%20%3D%20_false_positive(_z%20*%20_se%2C%20_math.sqrt(_se**2%20%2B%20_bias**2))%0A%20%20%20%20_point_now%20%3D%20_false_positive(_z%20*%20_se%2C%20_math.sqrt(_se**2%20%2B%20_cal_sd**2))%0A%20%20%20%20_raw_half%20%3D%20_z%20*%20_se%0A%20%20%20%20_cal_half%20%3D%20_z%20*%20_math.sqrt(_se**2%20%2B%20_cal_sd**2)%0A%0A%20%20%20%20_fig%2C%20(_ax1%2C%20_ax2)%20%3D%20plt.subplots(1%2C%202%2C%20figsize%3D(10.4%2C%204.5))%0A%20%20%20%20_ax1.plot(_grid%2C%20100%20*%20_raw_fp%2C%20color%3D%22%23d1495b%22%2C%20lw%3D2.5%2C%20label%3D%22Raw%20judge-only%20test%22)%0A%20%20%20%20_ax1.plot(%0A%20%20%20%20%20%20%20%20_grid%2C%0A%20%20%20%20%20%20%20%20100%20*%20_point_only_fp%2C%0A%20%20%20%20%20%20%20%20color%3D%22%23e09f3e%22%2C%0A%20%20%20%20%20%20%20%20lw%3D2.2%2C%0A%20%20%20%20%20%20%20%20label%3D%22Bias%20corrected%2C%20label%20uncertainty%20omitted%22%2C%0A%20%20%20%20)%0A%20%20%20%20_ax1.plot(_grid%2C%20100%20*%20_calibrated_fp%2C%20color%3D%22%2316a394%22%2C%20lw%3D2.5%2C%20label%3D%22Calibrated%20uncertainty%20included%22)%0A%20%20%20%20_ax1.axvline(_n%2C%20color%3D%22%23475569%22%2C%20ls%3D%22--%22%2C%20lw%3D1.5)%0A%20%20%20%20_ax1.set(xlabel%3D%22Judge-scored%20items%20(n)%22%2C%20ylabel%3D%22False-positive%20rate%20(%25)%22%2C%20ylim%3D(0%2C%20100))%0A%20%20%20%20_ax1.set_title(%22Under%20a%20true%20null%22)%0A%20%20%20%20_ax1.grid(alpha%3D0.18)%0A%20%20%20%20_ax1.legend(fontsize%3D7.5%2C%20loc%3D%22upper%20left%22)%0A%0A%20%20%20%20_raw_width%20%3D%20_z%20*%20_se_grid%0A%20%20%20%20_cal_width%20%3D%20_z%20*%20np.sqrt(_se_grid**2%20%2B%20_cal_sd**2)%0A%20%20%20%20_ax2.plot(_grid%2C%20_raw_width%2C%20color%3D%22%23d1495b%22%2C%20lw%3D2.5%2C%20label%3D%22Reported%20judge-only%20half-width%22)%0A%20%20%20%20_ax2.plot(_grid%2C%20_cal_width%2C%20color%3D%22%2316a394%22%2C%20lw%3D2.5%2C%20label%3Df%22Calibrated%20half-width%20(m%3D%7B_m%7D)%22)%0A%20%20%20%20_ax2.axvline(_n%2C%20color%3D%22%23475569%22%2C%20ls%3D%22--%22%2C%20lw%3D1.5)%0A%20%20%20%20_ax2.set(xlabel%3D%22Judge-scored%20items%20(n)%22%2C%20ylabel%3D%2295%25%20CI%20half-width%22)%0A%20%20%20%20_ax2.set_title(%22Honest%20uncertainty%20has%20a%20label%20floor%22)%0A%20%20%20%20_ax2.grid(alpha%3D0.18)%0A%20%20%20%20_ax2.legend(fontsize%3D7.5)%0A%20%20%20%20_fig.tight_layout()%0A%0A%20%20%20%20_summary%20%3D%20mo.md(%0A%20%20%20%20%20%20%20%20f%22%22%22%0A%20%20%20%20%23%23%20Operating%20point%3A%20n%20%3D%20%7B_n%7D%20items%0A%0A%20%20%20%20**Raw%20judge-only%20test%3A**%20%7B_raw_now%20*%20100%3A.1f%7D%25%20false%20positives%20under%20the%0A%20%20%20%20illustrated%20null%20(nominal%20target%3A%205.0%25).%20Its%20reported%2095%25%20half-width%20is%0A%20%20%20%20%7B_raw_half%3A.3f%7D%2C%20because%20it%20ignores%20the%20run-level%20preference%20SD%20of%20%7B_bias%3A.2f%7D.%0A%0A%20%20%20%20**Human-calibrated%20test%3A**%20%7B_m%7D%20random%20labels%20produce%20an%20honest%20half-width%20of%0A%20%20%20%20%7B_cal_half%3A.3f%7D.%20If%20the%20point%20estimate%20were%20corrected%20but%20label-estimation%0A%20%20%20%20uncertainty%20were%20omitted%2C%20false%20positives%20would%20still%20be%20%7B_point_now%20*%20100%3A.1f%7D%25.%0A%20%20%20%20Including%20that%20uncertainty%20restores%20the%20analytical%20Gaussian%20target%20of%205.0%25.%0A%20%20%20%20%20%20%20%20%20%20%20%20%22%22%22%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5B_summary%2C%20_fig%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20_mo%0A%0A%20%20%20%20_mo.md(%0A%20%20%20%20%20%20%20%20r%22%22%22%0A%20%20%20%20%23%23%20Read%20this%20as%20a%20failure-mode%20calculator%2C%20not%20a%20certification%0A%0A%20%20%20%20The%20model%20assumes%20independent%20Gaussian%20item%20noise%20with%20SD%20**0.30**%2C%20a%20Gaussian%0A%20%20%20%20run-level%20A-vs-B%20judge%20preference%2C%20a%20true%20null%2C%20and%20a%20random%20calibration%20subset%0A%20%20%20%20whose%20per-label%20discrepancy%20also%20has%20SD%20**0.30**.%20The%20red%20curve%20follows%20directly%0A%20%20%20%20from%20those%20assumptions%3A%20the%20usual%20standard%20error%20shrinks%20as%20%601%2Fsqrt(n)%60%2C%20while%0A%20%20%20%20the%20omitted%20bias%20does%20not.%20The%20green%20curve%20is%205%25%20by%20construction%20because%20its%0A%20%20%20%20interval%20includes%20calibration-estimation%20variance.%0A%0A%20%20%20%20The%20paper%20is%20broader%3A%20it%20studies%20binary%2C%20Likert%2C%20and%20continuous%20outcomes%2C%0A%20%20%20%20nine%20PPI-corrected%20tests%2C%20bootstrap-adaptive%20PPI%2B%2B%20weighting%2C%20non-Gaussian%0A%20%20%20%20settings%2C%20multiple%20comparisons%2C%20and%20real%20judge-human%20alignment.%20It%20requires%20a%0A%20%20%20%20random%20(MCAR)%20human%20subset%2C%20reports%20no%20statistics%20below%2015%20samples%2C%20and%20notes%0A%20%20%20%20that%20its%20%60compare()%60%20PPI%20path%20needs%20at%20least%2050%20judge-scored%20items.%20MNAR%20labeling%2C%0A%20%20%20%20100%25%20observed%20agreement%2C%20multi-run%20plus%20PPI%2C%20and%20between-subject%20pairwise%20CIs%0A%20%20%20%20remain%20limitations.%0A%0A%20%20%20%20**Takeaway%3A**%20high%20agreement%20is%20not%20permission%20to%20treat%20judge%20scores%20as%20human%0A%20%20%20%20scores.%20Preserve%20pairing%2C%20randomize%20presentation%20order%2C%20randomly%20label%20a%20human%0A%20%20%20%20subset%2C%20and%20propagate%20the%20uncertainty%20of%20the%20bias%20correction%20itself.%0A%20%20%20%20%20%20%20%20%20%20%20%20%22%22%22%0A%20%20%20%20)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

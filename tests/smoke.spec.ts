@@ -92,12 +92,13 @@ test.describe("static site smoke", () => {
     expect(fits).toBe(true);
   });
 
-  test("/lab/marimo/ only lists the eleven verified live notebooks", async ({ page }) => {
+  test("/lab/marimo/ only lists the twelve verified live notebooks", async ({ page }) => {
     const response = await page.goto("/lab/marimo/");
     expect(response?.status()).toBe(200);
     const urls = [
       "https://marimo.edgelesslab.com/2610.20686-rolaq-cache-accounting/",
       "https://marimo.edgelesslab.com/borwein-falsifier/",
+      "https://marimo.edgelesslab.com/2609.35815-calibrated-judge-inference/",
       "https://marimo.edgelesslab.com/2610.08936-clean-vs-robustness/",
       "https://marimo.edgelesslab.com/2609.38201-speculative-tool-exec/",
       "https://marimo.edgelesslab.com/2610.20838-srq-endpoint-weight/",
@@ -109,21 +110,21 @@ test.describe("static site smoke", () => {
       "https://marimo.edgelesslab.com/2609.35806-sfia-extraction-baselines/",
     ];
     const cards = page.locator('main a[href^="https://marimo.edgelesslab.com/"]');
-    await expect(cards).toHaveCount(11);
+    await expect(cards).toHaveCount(12);
     expect((await cards.evaluateAll((as) => as.map((a) => a.getAttribute("href")))).sort()).toEqual([...urls].sort());
-    await expect(page.getByText("11 published notebooks")).toBeVisible();
+    await expect(page.getByText("12 published notebooks")).toBeVisible();
     await expect(page.locator('a[href^="/marimo/"], a[href^="https://edgelesslab.com/marimo/"]')).toHaveCount(0);
     await expect(page.getByRole("heading", { name: "V Portfolio Drawdown Envelope" })).toHaveCount(0);
     await expect(page.getByText("Finance/GPU", { exact: true })).toHaveCount(0);
     const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents())
       .map((text) => JSON.parse(text))
       .find((item) => item["@type"] === "CollectionPage");
-    expect(jsonLd.numberOfItems).toBe(11);
+    expect(jsonLd.numberOfItems).toBe(12);
     expect(jsonLd.itemListElement.map((item: { url: string }) => item.url)).toEqual(urls);
     await expect(page.getByRole("heading", { name: "Research", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "AI evaluation", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "AI training", exact: true })).toBeVisible();
-    await expect(page.getByText("6 demos", { exact: true })).toHaveCount(1);
+    await expect(page.getByText("7 demos", { exact: true })).toHaveCount(1);
     await expect(page.getByText("4 demos", { exact: true })).toHaveCount(1);
   });
 

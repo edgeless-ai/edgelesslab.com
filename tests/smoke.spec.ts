@@ -92,7 +92,7 @@ test.describe("static site smoke", () => {
     expect(fits).toBe(true);
   });
 
-  test("/lab/marimo/ only lists the twelve verified live notebooks", async ({ page }) => {
+  test("/lab/marimo/ only lists the thirteen verified live notebooks", async ({ page }) => {
     const response = await page.goto("/lab/marimo/");
     expect(response?.status()).toBe(200);
     const urls = [
@@ -108,24 +108,25 @@ test.describe("static site smoke", () => {
       "https://marimo.edgelesslab.com/2609.09458-contracteval-denominator/",
       "https://marimo.edgelesslab.com/2609.38385-goldimask-context-weighting/",
       "https://marimo.edgelesslab.com/2609.35806-sfia-extraction-baselines/",
+      "https://marimo.edgelesslab.com/2608.05245-search2skill/",
     ];
     const cards = page.locator('main a[href^="https://marimo.edgelesslab.com/"]');
-    await expect(cards).toHaveCount(12);
+    await expect(cards).toHaveCount(13);
     expect((await cards.evaluateAll((as) => as.map((a) => a.getAttribute("href")))).sort()).toEqual([...urls].sort());
-    await expect(page.getByText("12 published notebooks")).toBeVisible();
+    await expect(page.getByText("13 published notebooks")).toBeVisible();
     await expect(page.locator('a[href^="/marimo/"], a[href^="https://edgelesslab.com/marimo/"]')).toHaveCount(0);
     await expect(page.getByRole("heading", { name: "V Portfolio Drawdown Envelope" })).toHaveCount(0);
     await expect(page.getByText("Finance/GPU", { exact: true })).toHaveCount(0);
     const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents())
       .map((text) => JSON.parse(text))
       .find((item) => item["@type"] === "CollectionPage");
-    expect(jsonLd.numberOfItems).toBe(12);
+    expect(jsonLd.numberOfItems).toBe(13);
     expect(jsonLd.itemListElement.map((item: { url: string }) => item.url)).toEqual(urls);
     await expect(page.getByRole("heading", { name: "Research", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "AI evaluation", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "AI training", exact: true })).toBeVisible();
     await expect(page.getByText("7 demos", { exact: true })).toHaveCount(1);
-    await expect(page.getByText("4 demos", { exact: true })).toHaveCount(1);
+    await expect(page.getByText("5 demos", { exact: true })).toHaveCount(1);
   });
 
   test("/field-notes/ renders the featured studies", async ({ page }) => {

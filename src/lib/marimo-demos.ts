@@ -337,6 +337,15 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["diffusion-language-models", "fine-tuning", "submodular-optimization", "context-selection", "target-weighting"],
     published_url: "https://marimo.edgelesslab.com/2609.38385-goldimask-context-weighting/",
   },
+  {
+    slug: "2609.35806-sfia-extraction-baselines",
+    title: "SFIA Extraction Decision Frontier",
+    description:
+      "Filter five published skill-extraction strategies by latency and level error to see when agentic RAG earns its cost.",
+    category: "AI evaluation",
+    tags: ["retrieval", "agentic-rag", "taxonomy-extraction", "decision-frontier"],
+    published_url: "https://marimo.edgelesslab.com/2609.35806-sfia-extraction-baselines/",
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

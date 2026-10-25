@@ -346,6 +346,17 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["retrieval", "agentic-rag", "taxonomy-extraction", "decision-frontier"],
     published_url: "https://marimo.edgelesslab.com/2609.35806-sfia-extraction-baselines/",
   },
+
+  // Research explainers (overnight expansion continued)
+  {
+    slug: "2608.05245-search2skill",
+    title: "Search2Skill Compounding Library",
+    description:
+      "Compare direct inference, one-task evidence caching, and reusable skill distillation on one shared synthetic task stream.",
+    category: "Research",
+    tags: ["skill-distillation", "agent-memory", "search", "reinforcement-learning"],
+    published_url: "https://marimo.edgelesslab.com/2608.05245-search2skill/",
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

@@ -230,6 +230,14 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["benchmark audit", "item quality", "Fisher exact test", "bioengineering"],
   },
+  {
+    slug: "2609.35815-calibrated-judge-inference",
+    title: "LLM-Judge False-Confidence Frontier",
+    description: "See why non-averaging judge bias can make false confidence grow with evaluation size, and why calibration uncertainty must be propagated.",
+    category: "AI evaluation",
+    tags: ["llm-as-judge", "statistics", "calibration", "prediction-powered-inference"],
+    published_url: "https://marimo.edgelesslab.com/2609.35815-calibrated-judge-inference/",
+  },
   // Reactive
   {
     slug: "curve-editor",

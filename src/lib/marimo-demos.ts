@@ -357,6 +357,16 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["skill-distillation", "agent-memory", "search", "reinforcement-learning"],
     published_url: "https://marimo.edgelesslab.com/2608.05245-search2skill/",
   },
+  // Vision unified generation
+  {
+    slug: "2607.06560-vision-unified-generation",
+    title: "Vision Unification Capacity Ledger",
+    description:
+      "Explore how duplicated backbone capacity grows when heterogeneous vision tasks use separate full stacks instead of one unified interface.",
+    category: "Research",
+    tags: ["multimodal", "computer-vision", "architecture", "capacity-accounting"],
+    published_url: "https://marimo.edgelesslab.com/2607.06560-vision-unified-generation/",
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

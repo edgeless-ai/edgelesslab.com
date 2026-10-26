@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2609.24343-bandwidth-thermal-envelope</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\"marimo==0.23.16\"]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    compute_ceiling = mo.ui.slider(\n        40.0, 120.0, value=60.0, step=2.0,\n        label=\"Workload bandwidth ceiling (TB/s)\", show_value=True,\n    )\n    thermal_weight = mo.ui.slider(\n        0.0, 2.0, value=1.0, step=0.1,\n        label=\"Thermal penalty weight\", show_value=True,\n    )\n    return compute_ceiling, mo, thermal_weight\n\n\n@app.cell\ndef _(compute_ceiling, mo, thermal_weight):\n    mo.vstack([\n        mo.md(r\"\"\"\n    # Volumetric DRAM: when more bandwidth stops helping\n\n    The paper reports a **simulated** 5 mm copper-cavity design sweep: denser\n    arrangements raise memory capacity, bandwidth, and peak temperature together.\n    It also reports that Qwen3-32B training-time gains flatten once execution becomes\n    compute-bound. This compact decision view asks one question: **which published\n    configuration reaches a workload's useful bandwidth at the lowest thermal cost?**\n\n    This is not hardware validation or a training-time reproduction. The points below\n    are author-reported Icepak outputs; the score is an analyst-authored sensitivity\n    model. No fabricated package, public simulation deck, or measured device exists.\n    \"\"\"),\n        mo.hstack([compute_ceiling, thermal_weight], widths=\"equal\", gap=2),\n    ])\n    return\n\n\n@app.cell\ndef _(compute_ceiling, mo, thermal_weight):\n    _names = [\"1D1CC\", \"2D1CC\", \"2ThinD1CC\"]\n    _capacity = [337.0, 506.0, 674.0]\n    _bandwidth = [58.8, 88.2, 117.6]\n    _temp = [100.2, 112.7, 118.7]\n    _ceiling = float(compute_ceiling.value)\n    _weight = float(thermal_weight.value)\n    _useful = [min(_b, _ceiling) for _b in _bandwidth]\n    _scores = [_u / (1.0 + _weight * max(_t - 100.0, 0.0) / 20.0)\n               for _u, _t in zip(_useful, _temp)]\n    _best = max(range(3), key=lambda _i: _scores[_i])\n    _waste = [max(_b - _ceiling, 0.0) for _b in _bandwidth]\n\n    _W, _H = 760, 310\n    _left, _right, _base = 72, 720, 240\n    _x = [_left + _i * 300 for _i in range(3)]\n    _bar_w = 90\n    _bars = []\n    for _i, (_n, _b, _u, _t) in enumerate(zip(_names, _bandwidth, _useful, _temp)):\n        _h = 145.0 * _u / 120.0\n        _raw_h = 145.0 * _b / 120.0\n        _fill = \"#25d0ab\" if _i == _best else \"#7896ff\"\n        _bars.append(\n            f'\u003Crect x=\"{_x[_i]}\" y=\"{_base-_raw_h:.1f}\" width=\"{_bar_w}\" height=\"{_raw_h:.1f}\" rx=\"7\" fill=\"#27334a\"/\u003E'\n            f'\u003Crect x=\"{_x[_i]}\" y=\"{_base-_h:.1f}\" width=\"{_bar_w}\" height=\"{_h:.1f}\" rx=\"7\" fill=\"{_fill}\"/\u003E'\n            f'\u003Ctext x=\"{_x[_i]+45}\" y=\"{_base+22}\" text-anchor=\"middle\" fill=\"#dce6ff\" font-size=\"13\"\u003E{_n}\u003C/text\u003E'\n            f'\u003Ctext x=\"{_x[_i]+45}\" y=\"{_base-_raw_h-10:.1f}\" text-anchor=\"middle\" fill=\"#f1f5ff\" font-size=\"13\"\u003E{_b:.1f} TB/s\u003C/text\u003E'\n            f'\u003Ctext x=\"{_x[_i]+45}\" y=\"{_base+42}\" text-anchor=\"middle\" fill=\"#f0a66b\" font-size=\"12\"\u003E{_t:.1f} C \u00b7 {_capacity[_i]:.0f} GB\u003C/text\u003E'\n        )\n    _svg = f'''\u003Csvg data-chart=\"volumetric-dram-envelope\" viewBox=\"0 0 {_W} {_H}\" style=\"width:100%;max-width:760px;background:#101725;border-radius:14px\"\u003E\n      \u003Ctext x=\"28\" y=\"30\" fill=\"#f1f5ff\" font-size=\"16\" font-weight=\"700\"\u003EUseful bandwidth (bright) vs installed bandwidth (dark)\u003C/text\u003E\n      \u003Cline x1=\"50\" y1=\"{_base}\" x2=\"{_right}\" y2=\"{_base}\" stroke=\"#60708e\"/\u003E\n      \u003Cline x1=\"50\" y1=\"{_base-145*_ceiling/120:.1f}\" x2=\"{_right}\" y2=\"{_base-145*_ceiling/120:.1f}\" stroke=\"#f6cf65\" stroke-dasharray=\"6 5\"/\u003E\n      \u003Ctext x=\"{_right-4}\" y=\"{_base-145*_ceiling/120-7:.1f}\" text-anchor=\"end\" fill=\"#f6cf65\" font-size=\"12\"\u003Eworkload ceiling {_ceiling:.0f} TB/s\u003C/text\u003E\n      {''.join(_bars)}\n      \u003Ctext x=\"28\" y=\"292\" fill=\"#8fa0bd\" font-size=\"12\"\u003EPublished 5 mm copper-cavity points \u00b7 score penalizes heat above 100 C\u003C/text\u003E\n    \u003C/svg\u003E'''\n    _extra = _waste[_best]\n    _status = mo.md(\n        f\"## Operating point: **{_names[_best]}**\\n\\n\"\n        f\"At a **{_ceiling:.0f} TB/s** workload ceiling and thermal weight **{_weight:.1f}**, \"\n        f\"the sensitivity score selects **{_names[_best]}**: {_useful[_best]:.1f} TB/s useful, \"\n        f\"{_temp[_best]:.1f} \u00b0C peak, {_capacity[_best]:.0f} GB. \"\n        f\"Its installed bandwidth beyond the ceiling is **{_extra:.1f} TB/s**.\"\n    )\n    mo.vstack([_status, mo.Html(_svg)])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ## Read the result narrowly\n\n    - **Published inputs:** at 5 mm with copper cavities, capacity is 337 / 506 / 674 GB,\n      peak temperature is 100.2 / 112.7 / 118.7 \u00b0C, and arrangement bandwidth is\n      58.8 / 88.2 / 117.6 TB/s for 1D1CC / 2D1CC / 2ThinnerD1CC.\n    - **Model assumption:** useful bandwidth is `min(installed bandwidth, workload ceiling)`;\n      heat above 100 \u00b0C is a tunable penalty. This score is illustrative, not from the paper.\n    - **Takeaway:** once the workload ceiling is reached, extra interfaces can add thermal\n      burden without useful throughput. The paper's own simulation likewise selects the\n      minimum configuration that reaches its compute-bound plateau.\n    - **Limits:** author-run package and training simulations; no public Icepak deck, raw\n      timing packet, fabricated package, signal-integrity result, reliability result, or\n      independent reproduction. Do not interpret this as a hardware-feasibility certificate.\n\n    **Source:** Chen et al., *Beyond HBM-on-GPU: Thermal Design Envelope for 3D\n    Volumetric DRAM-on-GPU Integration*, ESSERC 2026 / [arXiv:2609.24343](https://arxiv.org/abs/2609.24343).\n    Demo code is original and MIT-licensed; it uses no external data or network calls.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%22marimo%3D%3D0.23.16%22%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20compute_ceiling%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%2040.0%2C%20120.0%2C%20value%3D60.0%2C%20step%3D2.0%2C%0A%20%20%20%20%20%20%20%20label%3D%22Workload%20bandwidth%20ceiling%20(TB%2Fs)%22%2C%20show_value%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20thermal_weight%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%200.0%2C%202.0%2C%20value%3D1.0%2C%20step%3D0.1%2C%0A%20%20%20%20%20%20%20%20label%3D%22Thermal%20penalty%20weight%22%2C%20show_value%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20return%20compute_ceiling%2C%20mo%2C%20thermal_weight%0A%0A%0A%40app.cell%0Adef%20_(compute_ceiling%2C%20mo%2C%20thermal_weight)%3A%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%20Volumetric%20DRAM%3A%20when%20more%20bandwidth%20stops%20helping%0A%0A%20%20%20%20The%20paper%20reports%20a%20**simulated**%205%20mm%20copper-cavity%20design%20sweep%3A%20denser%0A%20%20%20%20arrangements%20raise%20memory%20capacity%2C%20bandwidth%2C%20and%20peak%20temperature%20together.%0A%20%20%20%20It%20also%20reports%20that%20Qwen3-32B%20training-time%20gains%20flatten%20once%20execution%20becomes%0A%20%20%20%20compute-bound.%20This%20compact%20decision%20view%20asks%20one%20question%3A%20**which%20published%0A%20%20%20%20configuration%20reaches%20a%20workload's%20useful%20bandwidth%20at%20the%20lowest%20thermal%20cost%3F**%0A%0A%20%20%20%20This%20is%20not%20hardware%20validation%20or%20a%20training-time%20reproduction.%20The%20points%20below%0A%20%20%20%20are%20author-reported%20Icepak%20outputs%3B%20the%20score%20is%20an%20analyst-authored%20sensitivity%0A%20%20%20%20model.%20No%20fabricated%20package%2C%20public%20simulation%20deck%2C%20or%20measured%20device%20exists.%0A%20%20%20%20%22%22%22)%2C%0A%20%20%20%20%20%20%20%20mo.hstack(%5Bcompute_ceiling%2C%20thermal_weight%5D%2C%20widths%3D%22equal%22%2C%20gap%3D2)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(compute_ceiling%2C%20mo%2C%20thermal_weight)%3A%0A%20%20%20%20_names%20%3D%20%5B%221D1CC%22%2C%20%222D1CC%22%2C%20%222ThinD1CC%22%5D%0A%20%20%20%20_capacity%20%3D%20%5B337.0%2C%20506.0%2C%20674.0%5D%0A%20%20%20%20_bandwidth%20%3D%20%5B58.8%2C%2088.2%2C%20117.6%5D%0A%20%20%20%20_temp%20%3D%20%5B100.2%2C%20112.7%2C%20118.7%5D%0A%20%20%20%20_ceiling%20%3D%20float(compute_ceiling.value)%0A%20%20%20%20_weight%20%3D%20float(thermal_weight.value)%0A%20%20%20%20_useful%20%3D%20%5Bmin(_b%2C%20_ceiling)%20for%20_b%20in%20_bandwidth%5D%0A%20%20%20%20_scores%20%3D%20%5B_u%20%2F%20(1.0%20%2B%20_weight%20*%20max(_t%20-%20100.0%2C%200.0)%20%2F%2020.0)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20for%20_u%2C%20_t%20in%20zip(_useful%2C%20_temp)%5D%0A%20%20%20%20_best%20%3D%20max(range(3)%2C%20key%3Dlambda%20_i%3A%20_scores%5B_i%5D)%0A%20%20%20%20_waste%20%3D%20%5Bmax(_b%20-%20_ceiling%2C%200.0)%20for%20_b%20in%20_bandwidth%5D%0A%0A%20%20%20%20_W%2C%20_H%20%3D%20760%2C%20310%0A%20%20%20%20_left%2C%20_right%2C%20_base%20%3D%2072%2C%20720%2C%20240%0A%20%20%20%20_x%20%3D%20%5B_left%20%2B%20_i%20*%20300%20for%20_i%20in%20range(3)%5D%0A%20%20%20%20_bar_w%20%3D%2090%0A%20%20%20%20_bars%20%3D%20%5B%5D%0A%20%20%20%20for%20_i%2C%20(_n%2C%20_b%2C%20_u%2C%20_t)%20in%20enumerate(zip(_names%2C%20_bandwidth%2C%20_useful%2C%20_temp))%3A%0A%20%20%20%20%20%20%20%20_h%20%3D%20145.0%20*%20_u%20%2F%20120.0%0A%20%20%20%20%20%20%20%20_raw_h%20%3D%20145.0%20*%20_b%20%2F%20120.0%0A%20%20%20%20%20%20%20%20_fill%20%3D%20%22%2325d0ab%22%20if%20_i%20%3D%3D%20_best%20else%20%22%237896ff%22%0A%20%20%20%20%20%20%20%20_bars.append(%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%22%7B_x%5B_i%5D%7D%22%20y%3D%22%7B_base-_raw_h%3A.1f%7D%22%20width%3D%22%7B_bar_w%7D%22%20height%3D%22%7B_raw_h%3A.1f%7D%22%20rx%3D%227%22%20fill%3D%22%2327334a%22%2F%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%22%7B_x%5B_i%5D%7D%22%20y%3D%22%7B_base-_h%3A.1f%7D%22%20width%3D%22%7B_bar_w%7D%22%20height%3D%22%7B_h%3A.1f%7D%22%20rx%3D%227%22%20fill%3D%22%7B_fill%7D%22%2F%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7B_x%5B_i%5D%2B45%7D%22%20y%3D%22%7B_base%2B22%7D%22%20text-anchor%3D%22middle%22%20fill%3D%22%23dce6ff%22%20font-size%3D%2213%22%3E%7B_n%7D%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7B_x%5B_i%5D%2B45%7D%22%20y%3D%22%7B_base-_raw_h-10%3A.1f%7D%22%20text-anchor%3D%22middle%22%20fill%3D%22%23f1f5ff%22%20font-size%3D%2213%22%3E%7B_b%3A.1f%7D%20TB%2Fs%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7B_x%5B_i%5D%2B45%7D%22%20y%3D%22%7B_base%2B42%7D%22%20text-anchor%3D%22middle%22%20fill%3D%22%23f0a66b%22%20font-size%3D%2212%22%3E%7B_t%3A.1f%7D%20C%20%C2%B7%20%7B_capacity%5B_i%5D%3A.0f%7D%20GB%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20_svg%20%3D%20f'''%3Csvg%20data-chart%3D%22volumetric-dram-envelope%22%20viewBox%3D%220%200%20%7B_W%7D%20%7B_H%7D%22%20style%3D%22width%3A100%25%3Bmax-width%3A760px%3Bbackground%3A%23101725%3Bborder-radius%3A14px%22%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%2230%22%20fill%3D%22%23f1f5ff%22%20font-size%3D%2216%22%20font-weight%3D%22700%22%3EUseful%20bandwidth%20(bright)%20vs%20installed%20bandwidth%20(dark)%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%2250%22%20y1%3D%22%7B_base%7D%22%20x2%3D%22%7B_right%7D%22%20y2%3D%22%7B_base%7D%22%20stroke%3D%22%2360708e%22%2F%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%2250%22%20y1%3D%22%7B_base-145*_ceiling%2F120%3A.1f%7D%22%20x2%3D%22%7B_right%7D%22%20y2%3D%22%7B_base-145*_ceiling%2F120%3A.1f%7D%22%20stroke%3D%22%23f6cf65%22%20stroke-dasharray%3D%226%205%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22%7B_right-4%7D%22%20y%3D%22%7B_base-145*_ceiling%2F120-7%3A.1f%7D%22%20text-anchor%3D%22end%22%20fill%3D%22%23f6cf65%22%20font-size%3D%2212%22%3Eworkload%20ceiling%20%7B_ceiling%3A.0f%7D%20TB%2Fs%3C%2Ftext%3E%0A%20%20%20%20%20%20%7B''.join(_bars)%7D%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%22292%22%20fill%3D%22%238fa0bd%22%20font-size%3D%2212%22%3EPublished%205%20mm%20copper-cavity%20points%20%C2%B7%20score%20penalizes%20heat%20above%20100%20C%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E'''%0A%20%20%20%20_extra%20%3D%20_waste%5B_best%5D%0A%20%20%20%20_status%20%3D%20mo.md(%0A%20%20%20%20%20%20%20%20f%22%23%23%20Operating%20point%3A%20**%7B_names%5B_best%5D%7D**%5Cn%5Cn%22%0A%20%20%20%20%20%20%20%20f%22At%20a%20**%7B_ceiling%3A.0f%7D%20TB%2Fs**%20workload%20ceiling%20and%20thermal%20weight%20**%7B_weight%3A.1f%7D**%2C%20%22%0A%20%20%20%20%20%20%20%20f%22the%20sensitivity%20score%20selects%20**%7B_names%5B_best%5D%7D**%3A%20%7B_useful%5B_best%5D%3A.1f%7D%20TB%2Fs%20useful%2C%20%22%0A%20%20%20%20%20%20%20%20f%22%7B_temp%5B_best%5D%3A.1f%7D%20%C2%B0C%20peak%2C%20%7B_capacity%5B_best%5D%3A.0f%7D%20GB.%20%22%0A%20%20%20%20%20%20%20%20f%22Its%20installed%20bandwidth%20beyond%20the%20ceiling%20is%20**%7B_extra%3A.1f%7D%20TB%2Fs**.%22%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5B_status%2C%20mo.Html(_svg)%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20Read%20the%20result%20narrowly%0A%0A%20%20%20%20-%20**Published%20inputs%3A**%20at%205%20mm%20with%20copper%20cavities%2C%20capacity%20is%20337%20%2F%20506%20%2F%20674%20GB%2C%0A%20%20%20%20%20%20peak%20temperature%20is%20100.2%20%2F%20112.7%20%2F%20118.7%20%C2%B0C%2C%20and%20arrangement%20bandwidth%20is%0A%20%20%20%20%20%2058.8%20%2F%2088.2%20%2F%20117.6%20TB%2Fs%20for%201D1CC%20%2F%202D1CC%20%2F%202ThinnerD1CC.%0A%20%20%20%20-%20**Model%20assumption%3A**%20useful%20bandwidth%20is%20%60min(installed%20bandwidth%2C%20workload%20ceiling)%60%3B%0A%20%20%20%20%20%20heat%20above%20100%20%C2%B0C%20is%20a%20tunable%20penalty.%20This%20score%20is%20illustrative%2C%20not%20from%20the%20paper.%0A%20%20%20%20-%20**Takeaway%3A**%20once%20the%20workload%20ceiling%20is%20reached%2C%20extra%20interfaces%20can%20add%20thermal%0A%20%20%20%20%20%20burden%20without%20useful%20throughput.%20The%20paper's%20own%20simulation%20likewise%20selects%20the%0A%20%20%20%20%20%20minimum%20configuration%20that%20reaches%20its%20compute-bound%20plateau.%0A%20%20%20%20-%20**Limits%3A**%20author-run%20package%20and%20training%20simulations%3B%20no%20public%20Icepak%20deck%2C%20raw%0A%20%20%20%20%20%20timing%20packet%2C%20fabricated%20package%2C%20signal-integrity%20result%2C%20reliability%20result%2C%20or%0A%20%20%20%20%20%20independent%20reproduction.%20Do%20not%20interpret%20this%20as%20a%20hardware-feasibility%20certificate.%0A%0A%20%20%20%20**Source%3A**%20Chen%20et%20al.%2C%20*Beyond%20HBM-on-GPU%3A%20Thermal%20Design%20Envelope%20for%203D%0A%20%20%20%20Volumetric%20DRAM-on-GPU%20Integration*%2C%20ESSERC%202026%20%2F%20%5BarXiv%3A2609.24343%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2609.24343).%0A%20%20%20%20Demo%20code%20is%20original%20and%20MIT-licensed%3B%20it%20uses%20no%20external%20data%20or%20network%20calls.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

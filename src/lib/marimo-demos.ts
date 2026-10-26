@@ -357,6 +357,15 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["skill-distillation", "agent-memory", "search", "reinforcement-learning"],
     published_url: "https://marimo.edgelesslab.com/2608.05245-search2skill/",
   },
+  {
+    slug: "2609.24343-bandwidth-thermal-envelope",
+    title: "Volumetric DRAM: Bandwidth vs Thermal Headroom",
+    description:
+      "Cap the useful bandwidth of three published volumetric-DRAM designs by a workload ceiling and see when extra interfaces add heat without useful throughput.",
+    category: "Research",
+    tags: ["dram", "hbm", "gpu-memory", "thermal-design", "bandwidth", "systems-co-design"],
+    published_url: "https://marimo.edgelesslab.com/2609.24343-bandwidth-thermal-envelope/",
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

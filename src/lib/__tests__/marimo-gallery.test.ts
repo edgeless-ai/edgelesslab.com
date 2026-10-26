@@ -15,6 +15,7 @@ const liveSlugs = [
   "2609.38385-goldimask-context-weighting",
   "2609.35806-sfia-extraction-baselines",
   "2608.05245-search2skill",
+  "2609.24343-bandwidth-thermal-envelope",
 ];
 
 describe("published marimo gallery", () => {

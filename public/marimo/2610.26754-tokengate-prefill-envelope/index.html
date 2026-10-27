@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2610.26754-tokengate-prefill-envelope</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\"marimo==0.23.16\"]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    kept_tokens = mo.ui.slider(\n        500, 8000, value=2000, step=500,\n        label=\"Retained document tokens (K)\", show_value=True,\n    )\n    gate_layer = mo.ui.slider(\n        1, 14, value=4, step=1,\n        label=\"Gate after layer\", show_value=True,\n    )\n    return gate_layer, kept_tokens, mo\n\n\n@app.cell\ndef _(gate_layer, kept_tokens, mo):\n    mo.vstack([\n        mo.md(r\"\"\"\n    # TokenGate: pruning is not free prefill\n\n    TokenGate scores document tokens at an early layer, keeps the top **K**, and\n    processes only those tokens in later layers. The paper reports **1.4-11.3x**\n    lower time-to-first-token and **1.5-3.4x** lower peak prefill memory at matched\n    task accuracy across author-run tasks.\n\n    This compact analytic sensitivity asks: **how much idealized transformer work\n    remains after paying for the full prefix below the gate?** It is not a timing\n    reproduction. The paper's speedups require a task-trained gate + LoRA adapter,\n    custom kernels, and workload-specific validation.\n    \"\"\"),\n        mo.hstack([kept_tokens, gate_layer], widths=\"equal\", gap=2),\n    ])\n    return\n\n\n@app.cell\ndef _(gate_layer, kept_tokens, mo):\n    _document = 16000\n    _protected = 256\n    _layers = 28\n    _k = int(kept_tokens.value)\n    _gate = int(gate_layer.value)\n    _full = _document + _protected\n    _kept = _k + _protected\n    _retention = _kept / _full\n\n    # An explicit sensitivity model: 55% quadratic attention, 45% linear MLP.\n    _attention = (_gate * _full**2 + (_layers - _gate) * _kept**2) / (_layers * _full**2)\n    _mlp = (_gate * _full + (_layers - _gate) * _kept) / (_layers * _full)\n    _work = 0.55 * _attention + 0.45 * _mlp\n    _ideal = 1.0 / _work\n    _memory = _mlp\n\n    _labels = [\"Attention\", \"MLP\", \"Blended work\", \"KV memory\"]\n    _values = [_attention, _mlp, _work, _memory]\n    _colors = [\"#7896ff\", \"#f0a66b\", \"#25d0ab\", \"#c084fc\"]\n    _bars = []\n    for _i, (_label, _value, _color) in enumerate(zip(_labels, _values, _colors)):\n        _y = 64 + _i * 52\n        _width = 560 * _value\n        _bars.append(\n            f'\u003Ctext x=\"18\" y=\"{_y+18}\" fill=\"#dce6ff\" font-size=\"13\"\u003E{_label}\u003C/text\u003E'\n            f'\u003Crect x=\"125\" y=\"{_y}\" width=\"560\" height=\"26\" rx=\"6\" fill=\"#27334a\"/\u003E'\n            f'\u003Crect x=\"125\" y=\"{_y}\" width=\"{_width:.1f}\" height=\"26\" rx=\"6\" fill=\"{_color}\"/\u003E'\n            f'\u003Ctext x=\"{min(135 + _width, 690):.1f}\" y=\"{_y+18}\" fill=\"#f1f5ff\" font-size=\"12\"\u003E{100*_value:.1f}%\u003C/text\u003E'\n        )\n    _svg = f'''\u003Csvg data-chart=\"tokengate-prefill-envelope\" data-k=\"{_k}\" viewBox=\"0 0 720 305\" style=\"width:100%;max-width:760px;background:#101725;border-radius:14px\"\u003E\n      \u003Ctext x=\"18\" y=\"31\" fill=\"#f1f5ff\" font-size=\"16\" font-weight=\"700\"\u003EIdealized work remaining vs full-context prefill\u003C/text\u003E\n      {''.join(_bars)}\n      \u003Ctext x=\"18\" y=\"286\" fill=\"#8fa0bd\" font-size=\"12\"\u003E16k document + 256 protected tokens \u00b7 28 layers \u00b7 no hardware timing claim\u003C/text\u003E\n    \u003C/svg\u003E'''\n    _status = mo.md(\n        f\"## Operating point: K={_k:,} retains {_retention:.1%}; estimated work {_work:.1%}\\n\\n\"\n        f\"Gating after layer **{_gate}** leaves **{_attention:.1%}** of quadratic attention work \"\n        f\"and **{_mlp:.1%}** of linear MLP/KV work in this analytic model. The blended \"\n        f\"ceiling is **{_ideal:.2f}x**, before gate overhead, kernel efficiency, quality loss, \"\n        f\"or adaptation cost.\"\n    )\n    mo.vstack([_status, mo.Html(_svg)])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ## Read the result narrowly\n\n    - **Mechanism reproduced:** full-context work is paid below the gate; only selected\n      document tokens continue above it. Instructions/questions remain protected.\n    - **Analyst assumptions:** 16,000 document tokens, 256 protected tokens, 28 layers,\n      and a 55% attention / 45% MLP blend. This is a transparent complexity model,\n      not a latency predictor or a fit to the authors' hardware.\n    - **Published anchors:** author-run results span 1.4-11.3x TTFT and 1.5-3.4x\n      peak-memory reduction at matched task accuracy across five tasks. The 11.3x\n      maximum is synthetic needle retrieval, not typical end-to-end agent speed.\n    - **Decision rule:** validate `adapted checkpoint + task distribution + K + kernel`\n      together. Compare pruning against the same adapted no-pruning checkpoint, and\n      include gate-training cost before calling the method a drop-in saving.\n\n    **Source:** Patel et al., *TokenGate: Adapting LLMs for Fast and Memory-Efficient\n    Prefill with Learned Token Pruning*, [arXiv:2610.26754](https://arxiv.org/abs/2610.26754).\n    Demo code is original and MIT-licensed; it uses no model, external data, or network call.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%22marimo%3D%3D0.23.16%22%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20kept_tokens%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%20500%2C%208000%2C%20value%3D2000%2C%20step%3D500%2C%0A%20%20%20%20%20%20%20%20label%3D%22Retained%20document%20tokens%20(K)%22%2C%20show_value%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20gate_layer%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%201%2C%2014%2C%20value%3D4%2C%20step%3D1%2C%0A%20%20%20%20%20%20%20%20label%3D%22Gate%20after%20layer%22%2C%20show_value%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20return%20gate_layer%2C%20kept_tokens%2C%20mo%0A%0A%0A%40app.cell%0Adef%20_(gate_layer%2C%20kept_tokens%2C%20mo)%3A%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%20TokenGate%3A%20pruning%20is%20not%20free%20prefill%0A%0A%20%20%20%20TokenGate%20scores%20document%20tokens%20at%20an%20early%20layer%2C%20keeps%20the%20top%20**K**%2C%20and%0A%20%20%20%20processes%20only%20those%20tokens%20in%20later%20layers.%20The%20paper%20reports%20**1.4-11.3x**%0A%20%20%20%20lower%20time-to-first-token%20and%20**1.5-3.4x**%20lower%20peak%20prefill%20memory%20at%20matched%0A%20%20%20%20task%20accuracy%20across%20author-run%20tasks.%0A%0A%20%20%20%20This%20compact%20analytic%20sensitivity%20asks%3A%20**how%20much%20idealized%20transformer%20work%0A%20%20%20%20remains%20after%20paying%20for%20the%20full%20prefix%20below%20the%20gate%3F**%20It%20is%20not%20a%20timing%0A%20%20%20%20reproduction.%20The%20paper's%20speedups%20require%20a%20task-trained%20gate%20%2B%20LoRA%20adapter%2C%0A%20%20%20%20custom%20kernels%2C%20and%20workload-specific%20validation.%0A%20%20%20%20%22%22%22)%2C%0A%20%20%20%20%20%20%20%20mo.hstack(%5Bkept_tokens%2C%20gate_layer%5D%2C%20widths%3D%22equal%22%2C%20gap%3D2)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(gate_layer%2C%20kept_tokens%2C%20mo)%3A%0A%20%20%20%20_document%20%3D%2016000%0A%20%20%20%20_protected%20%3D%20256%0A%20%20%20%20_layers%20%3D%2028%0A%20%20%20%20_k%20%3D%20int(kept_tokens.value)%0A%20%20%20%20_gate%20%3D%20int(gate_layer.value)%0A%20%20%20%20_full%20%3D%20_document%20%2B%20_protected%0A%20%20%20%20_kept%20%3D%20_k%20%2B%20_protected%0A%20%20%20%20_retention%20%3D%20_kept%20%2F%20_full%0A%0A%20%20%20%20%23%20An%20explicit%20sensitivity%20model%3A%2055%25%20quadratic%20attention%2C%2045%25%20linear%20MLP.%0A%20%20%20%20_attention%20%3D%20(_gate%20*%20_full**2%20%2B%20(_layers%20-%20_gate)%20*%20_kept**2)%20%2F%20(_layers%20*%20_full**2)%0A%20%20%20%20_mlp%20%3D%20(_gate%20*%20_full%20%2B%20(_layers%20-%20_gate)%20*%20_kept)%20%2F%20(_layers%20*%20_full)%0A%20%20%20%20_work%20%3D%200.55%20*%20_attention%20%2B%200.45%20*%20_mlp%0A%20%20%20%20_ideal%20%3D%201.0%20%2F%20_work%0A%20%20%20%20_memory%20%3D%20_mlp%0A%0A%20%20%20%20_labels%20%3D%20%5B%22Attention%22%2C%20%22MLP%22%2C%20%22Blended%20work%22%2C%20%22KV%20memory%22%5D%0A%20%20%20%20_values%20%3D%20%5B_attention%2C%20_mlp%2C%20_work%2C%20_memory%5D%0A%20%20%20%20_colors%20%3D%20%5B%22%237896ff%22%2C%20%22%23f0a66b%22%2C%20%22%2325d0ab%22%2C%20%22%23c084fc%22%5D%0A%20%20%20%20_bars%20%3D%20%5B%5D%0A%20%20%20%20for%20_i%2C%20(_label%2C%20_value%2C%20_color)%20in%20enumerate(zip(_labels%2C%20_values%2C%20_colors))%3A%0A%20%20%20%20%20%20%20%20_y%20%3D%2064%20%2B%20_i%20*%2052%0A%20%20%20%20%20%20%20%20_width%20%3D%20560%20*%20_value%0A%20%20%20%20%20%20%20%20_bars.append(%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%2218%22%20y%3D%22%7B_y%2B18%7D%22%20fill%3D%22%23dce6ff%22%20font-size%3D%2213%22%3E%7B_label%7D%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%22125%22%20y%3D%22%7B_y%7D%22%20width%3D%22560%22%20height%3D%2226%22%20rx%3D%226%22%20fill%3D%22%2327334a%22%2F%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%22125%22%20y%3D%22%7B_y%7D%22%20width%3D%22%7B_width%3A.1f%7D%22%20height%3D%2226%22%20rx%3D%226%22%20fill%3D%22%7B_color%7D%22%2F%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7Bmin(135%20%2B%20_width%2C%20690)%3A.1f%7D%22%20y%3D%22%7B_y%2B18%7D%22%20fill%3D%22%23f1f5ff%22%20font-size%3D%2212%22%3E%7B100*_value%3A.1f%7D%25%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20_svg%20%3D%20f'''%3Csvg%20data-chart%3D%22tokengate-prefill-envelope%22%20data-k%3D%22%7B_k%7D%22%20viewBox%3D%220%200%20720%20305%22%20style%3D%22width%3A100%25%3Bmax-width%3A760px%3Bbackground%3A%23101725%3Bborder-radius%3A14px%22%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2218%22%20y%3D%2231%22%20fill%3D%22%23f1f5ff%22%20font-size%3D%2216%22%20font-weight%3D%22700%22%3EIdealized%20work%20remaining%20vs%20full-context%20prefill%3C%2Ftext%3E%0A%20%20%20%20%20%20%7B''.join(_bars)%7D%0A%20%20%20%20%20%20%3Ctext%20x%3D%2218%22%20y%3D%22286%22%20fill%3D%22%238fa0bd%22%20font-size%3D%2212%22%3E16k%20document%20%2B%20256%20protected%20tokens%20%C2%B7%2028%20layers%20%C2%B7%20no%20hardware%20timing%20claim%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E'''%0A%20%20%20%20_status%20%3D%20mo.md(%0A%20%20%20%20%20%20%20%20f%22%23%23%20Operating%20point%3A%20K%3D%7B_k%3A%2C%7D%20retains%20%7B_retention%3A.1%25%7D%3B%20estimated%20work%20%7B_work%3A.1%25%7D%5Cn%5Cn%22%0A%20%20%20%20%20%20%20%20f%22Gating%20after%20layer%20**%7B_gate%7D**%20leaves%20**%7B_attention%3A.1%25%7D**%20of%20quadratic%20attention%20work%20%22%0A%20%20%20%20%20%20%20%20f%22and%20**%7B_mlp%3A.1%25%7D**%20of%20linear%20MLP%2FKV%20work%20in%20this%20analytic%20model.%20The%20blended%20%22%0A%20%20%20%20%20%20%20%20f%22ceiling%20is%20**%7B_ideal%3A.2f%7Dx**%2C%20before%20gate%20overhead%2C%20kernel%20efficiency%2C%20quality%20loss%2C%20%22%0A%20%20%20%20%20%20%20%20f%22or%20adaptation%20cost.%22%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5B_status%2C%20mo.Html(_svg)%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20Read%20the%20result%20narrowly%0A%0A%20%20%20%20-%20**Mechanism%20reproduced%3A**%20full-context%20work%20is%20paid%20below%20the%20gate%3B%20only%20selected%0A%20%20%20%20%20%20document%20tokens%20continue%20above%20it.%20Instructions%2Fquestions%20remain%20protected.%0A%20%20%20%20-%20**Analyst%20assumptions%3A**%2016%2C000%20document%20tokens%2C%20256%20protected%20tokens%2C%2028%20layers%2C%0A%20%20%20%20%20%20and%20a%2055%25%20attention%20%2F%2045%25%20MLP%20blend.%20This%20is%20a%20transparent%20complexity%20model%2C%0A%20%20%20%20%20%20not%20a%20latency%20predictor%20or%20a%20fit%20to%20the%20authors'%20hardware.%0A%20%20%20%20-%20**Published%20anchors%3A**%20author-run%20results%20span%201.4-11.3x%20TTFT%20and%201.5-3.4x%0A%20%20%20%20%20%20peak-memory%20reduction%20at%20matched%20task%20accuracy%20across%20five%20tasks.%20The%2011.3x%0A%20%20%20%20%20%20maximum%20is%20synthetic%20needle%20retrieval%2C%20not%20typical%20end-to-end%20agent%20speed.%0A%20%20%20%20-%20**Decision%20rule%3A**%20validate%20%60adapted%20checkpoint%20%2B%20task%20distribution%20%2B%20K%20%2B%20kernel%60%0A%20%20%20%20%20%20together.%20Compare%20pruning%20against%20the%20same%20adapted%20no-pruning%20checkpoint%2C%20and%0A%20%20%20%20%20%20include%20gate-training%20cost%20before%20calling%20the%20method%20a%20drop-in%20saving.%0A%0A%20%20%20%20**Source%3A**%20Patel%20et%20al.%2C%20*TokenGate%3A%20Adapting%20LLMs%20for%20Fast%20and%20Memory-Efficient%0A%20%20%20%20Prefill%20with%20Learned%20Token%20Pruning*%2C%20%5BarXiv%3A2610.26754%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2610.26754).%0A%20%20%20%20Demo%20code%20is%20original%20and%20MIT-licensed%3B%20it%20uses%20no%20model%2C%20external%20data%2C%20or%20network%20call.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

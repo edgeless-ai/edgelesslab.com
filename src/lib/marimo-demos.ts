@@ -374,6 +374,14 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["llm-inference", "long-context", "token-pruning", "prefill", "performance-modeling"],
   },
+  {
+    slug: "2609.10724-escalation-denominator",
+    title: "When Escalation Transfers Ownership",
+    description:
+      "Move a release threshold to see when escalating agents still own completion—and when human work becomes the hidden denominator.",
+    category: "AI evaluation",
+    tags: ["agents", "resilience", "handoffs", "human-dependence", "evaluation"],
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

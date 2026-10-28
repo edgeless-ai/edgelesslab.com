@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2609.27105-completeness-scope</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\"marimo==0.23.16\"]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    return (mo,)\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    # The plan passed. The completeness claim did not.\n\n    A compact mechanism demo for Stein et al., **\u201cProvably Complete Generalized\n    Planning with LLMs\u201d** ([arXiv:2609.27105](https://arxiv.org/abs/2609.27105)).\n\n    A generalized plan is a program meant to solve every valid instance of a domain.\n    The paper reports Lean-kernel-accepted completeness proofs for **12 of 13** domains:\n    7 with whole-proof generation, then 5 more with declaration-level repair.\n\n    This browser demo asks one narrower question: **why can a plan pass a finite debug\n    suite and still fail as soon as the instance specification widens?** Move the bound\n    from one nut to four. The \u201cfirst-only\u201d candidate passes every one-nut case, but its\n    hidden assumption is exposed when two nuts occupy the same pickup location.\n\n    **Scope:** deterministic, bounded mechanism illustration; not Lean, not PDDL-to-Lean,\n    not an LLM evaluation, and not a reproduction of the paper\u2019s universal proof.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _(mo):\n    max_nuts = mo.ui.slider(\n        1, 4, value=1, step=1, label=\"Maximum nuts admitted by the bounded specification\"\n    )\n    mo.hstack([max_nuts], justify=\"start\")\n    return (max_nuts,)\n\n\n@app.cell\ndef _(max_nuts, mo):\n    _bound = int(max_nuts.value)\n    _instances = []\n    for _n in range(1, _bound + 1):\n        for _mask in range(2**_n):\n            _places = tuple((_mask \u003E\u003E _i) \u0026 1 for _i in range(_n))\n            _instances.append((_n, _places))\n\n    def _first_only_fails(_places):\n        return len(set(_places)) \u003C len(_places)\n\n    _bug_failures = sum(_first_only_fails(_places) for _, _places in _instances)\n    _total = len(_instances)\n    _bug_passes = _total - _bug_failures\n    _verdict = (\n        \"test-only verdict: both plans pass.\"\n        if _bug_failures == 0\n        else f\"hidden bug fails {_bug_failures}.\"\n    )\n    _headline = (\n        f\"Scope: up to {_bound} {'nut' if _bound == 1 else 'nuts'}; \"\n        f\"{_total} bounded instances; {_verdict}\"\n    )\n\n    _width = 560\n    _scale = 420 / max(_total, 1)\n    _bug_w = round(_bug_failures * _scale, 1)\n    _pass_w = round(_bug_passes * _scale, 1)\n    _svg = f\"\"\"\n    \u003Csvg data-chart=\"completeness-scope\" data-bound=\"{_bound}\"\n         viewBox=\"0 0 {_width} 210\" role=\"img\"\n         aria-label=\"Bounded checker outcomes at scope {_bound}\"\u003E\n      \u003Cstyle\u003E\n        .label {{ font: 15px system-ui; fill: #172033; }}\n        .small {{ font: 13px system-ui; fill: #536078; }}\n      \u003C/style\u003E\n      \u003Ctext class=\"label\" x=\"8\" y=\"28\"\u003ECorrect generalized plan\u003C/text\u003E\n      \u003Crect x=\"8\" y=\"42\" width=\"420\" height=\"28\" rx=\"5\" fill=\"#31b58b\"/\u003E\n      \u003Ctext class=\"small\" x=\"440\" y=\"62\"\u003E0 failures\u003C/text\u003E\n      \u003Ctext class=\"label\" x=\"8\" y=\"105\"\u003E\u201cFirst-only\u201d candidate\u003C/text\u003E\n      \u003Crect x=\"8\" y=\"119\" width=\"{_pass_w}\" height=\"28\" rx=\"5\" fill=\"#31b58b\"/\u003E\n      \u003Crect x=\"{8 + _pass_w}\" y=\"119\" width=\"{_bug_w}\" height=\"28\" rx=\"5\" fill=\"#ef6a67\"/\u003E\n      \u003Ctext class=\"small\" x=\"440\" y=\"139\"\u003E{_bug_failures} failures\u003C/text\u003E\n      \u003Ctext class=\"small\" x=\"8\" y=\"181\"\u003Egreen = passes bounded checker\u003C/text\u003E\n      \u003Ctext class=\"small\" x=\"282\" y=\"181\"\u003Ered = counterexample found\u003C/text\u003E\n    \u003C/svg\u003E\n    \"\"\"\n\n    mo.vstack(\n        [\n            mo.md(f\"## {_headline}\"),\n            mo.Html(_svg),\n            mo.md(\n                f\"\"\"\n                The bounded checker enumerated every placement of 1\u2013{_bound} nuts across two\n                pickup locations. The correct loop handles all {_total}. The defective loop\n                handles only one nut per location, so it passes {_bug_passes} and fails\n                {_bug_failures}. A green bar at bound 1 is evidence about **two tests**, not a\n                universal claim.\n                \"\"\"\n            ),\n        ]\n    )\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ## Takeaway\n\n    **Testing can find a counterexample; it cannot certify an unbounded instance family.**\n    The paper closes that gap with a deterministic PDDL-to-Lean translation and a proof\n    accepted by Lean\u2019s kernel, conditional on human-written `ValidInit` and `ValidGoal`\n    constraints. Those constraints define the claim\u2019s real denominator.\n\n    **Provenance and limits:** paper v1 and this research digest are CC BY 4.0. No paper\n    code or accepted proofs were released. This demo uses analyst-authored toy instances\n    and original code under MIT; it reproduces only the finite-test-versus-completeness\n    distinction. The paper\u2019s 12/13 result is author-reported, not recomputed here.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%22marimo%3D%3D0.23.16%22%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20return%20(mo%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%20The%20plan%20passed.%20The%20completeness%20claim%20did%20not.%0A%0A%20%20%20%20A%20compact%20mechanism%20demo%20for%20Stein%20et%20al.%2C%20**%E2%80%9CProvably%20Complete%20Generalized%0A%20%20%20%20Planning%20with%20LLMs%E2%80%9D**%20(%5BarXiv%3A2609.27105%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2609.27105)).%0A%0A%20%20%20%20A%20generalized%20plan%20is%20a%20program%20meant%20to%20solve%20every%20valid%20instance%20of%20a%20domain.%0A%20%20%20%20The%20paper%20reports%20Lean-kernel-accepted%20completeness%20proofs%20for%20**12%20of%2013**%20domains%3A%0A%20%20%20%207%20with%20whole-proof%20generation%2C%20then%205%20more%20with%20declaration-level%20repair.%0A%0A%20%20%20%20This%20browser%20demo%20asks%20one%20narrower%20question%3A%20**why%20can%20a%20plan%20pass%20a%20finite%20debug%0A%20%20%20%20suite%20and%20still%20fail%20as%20soon%20as%20the%20instance%20specification%20widens%3F**%20Move%20the%20bound%0A%20%20%20%20from%20one%20nut%20to%20four.%20The%20%E2%80%9Cfirst-only%E2%80%9D%20candidate%20passes%20every%20one-nut%20case%2C%20but%20its%0A%20%20%20%20hidden%20assumption%20is%20exposed%20when%20two%20nuts%20occupy%20the%20same%20pickup%20location.%0A%0A%20%20%20%20**Scope%3A**%20deterministic%2C%20bounded%20mechanism%20illustration%3B%20not%20Lean%2C%20not%20PDDL-to-Lean%2C%0A%20%20%20%20not%20an%20LLM%20evaluation%2C%20and%20not%20a%20reproduction%20of%20the%20paper%E2%80%99s%20universal%20proof.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20max_nuts%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%201%2C%204%2C%20value%3D1%2C%20step%3D1%2C%20label%3D%22Maximum%20nuts%20admitted%20by%20the%20bounded%20specification%22%0A%20%20%20%20)%0A%20%20%20%20mo.hstack(%5Bmax_nuts%5D%2C%20justify%3D%22start%22)%0A%20%20%20%20return%20(max_nuts%2C)%0A%0A%0A%40app.cell%0Adef%20_(max_nuts%2C%20mo)%3A%0A%20%20%20%20_bound%20%3D%20int(max_nuts.value)%0A%20%20%20%20_instances%20%3D%20%5B%5D%0A%20%20%20%20for%20_n%20in%20range(1%2C%20_bound%20%2B%201)%3A%0A%20%20%20%20%20%20%20%20for%20_mask%20in%20range(2**_n)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_places%20%3D%20tuple((_mask%20%3E%3E%20_i)%20%26%201%20for%20_i%20in%20range(_n))%0A%20%20%20%20%20%20%20%20%20%20%20%20_instances.append((_n%2C%20_places))%0A%0A%20%20%20%20def%20_first_only_fails(_places)%3A%0A%20%20%20%20%20%20%20%20return%20len(set(_places))%20%3C%20len(_places)%0A%0A%20%20%20%20_bug_failures%20%3D%20sum(_first_only_fails(_places)%20for%20_%2C%20_places%20in%20_instances)%0A%20%20%20%20_total%20%3D%20len(_instances)%0A%20%20%20%20_bug_passes%20%3D%20_total%20-%20_bug_failures%0A%20%20%20%20_verdict%20%3D%20(%0A%20%20%20%20%20%20%20%20%22test-only%20verdict%3A%20both%20plans%20pass.%22%0A%20%20%20%20%20%20%20%20if%20_bug_failures%20%3D%3D%200%0A%20%20%20%20%20%20%20%20else%20f%22hidden%20bug%20fails%20%7B_bug_failures%7D.%22%0A%20%20%20%20)%0A%20%20%20%20_headline%20%3D%20(%0A%20%20%20%20%20%20%20%20f%22Scope%3A%20up%20to%20%7B_bound%7D%20%7B'nut'%20if%20_bound%20%3D%3D%201%20else%20'nuts'%7D%3B%20%22%0A%20%20%20%20%20%20%20%20f%22%7B_total%7D%20bounded%20instances%3B%20%7B_verdict%7D%22%0A%20%20%20%20)%0A%0A%20%20%20%20_width%20%3D%20560%0A%20%20%20%20_scale%20%3D%20420%20%2F%20max(_total%2C%201)%0A%20%20%20%20_bug_w%20%3D%20round(_bug_failures%20*%20_scale%2C%201)%0A%20%20%20%20_pass_w%20%3D%20round(_bug_passes%20*%20_scale%2C%201)%0A%20%20%20%20_svg%20%3D%20f%22%22%22%0A%20%20%20%20%3Csvg%20data-chart%3D%22completeness-scope%22%20data-bound%3D%22%7B_bound%7D%22%0A%20%20%20%20%20%20%20%20%20viewBox%3D%220%200%20%7B_width%7D%20210%22%20role%3D%22img%22%0A%20%20%20%20%20%20%20%20%20aria-label%3D%22Bounded%20checker%20outcomes%20at%20scope%20%7B_bound%7D%22%3E%0A%20%20%20%20%20%20%3Cstyle%3E%0A%20%20%20%20%20%20%20%20.label%20%7B%7B%20font%3A%2015px%20system-ui%3B%20fill%3A%20%23172033%3B%20%7D%7D%0A%20%20%20%20%20%20%20%20.small%20%7B%7B%20font%3A%2013px%20system-ui%3B%20fill%3A%20%23536078%3B%20%7D%7D%0A%20%20%20%20%20%20%3C%2Fstyle%3E%0A%20%20%20%20%20%20%3Ctext%20class%3D%22label%22%20x%3D%228%22%20y%3D%2228%22%3ECorrect%20generalized%20plan%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%228%22%20y%3D%2242%22%20width%3D%22420%22%20height%3D%2228%22%20rx%3D%225%22%20fill%3D%22%2331b58b%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20class%3D%22small%22%20x%3D%22440%22%20y%3D%2262%22%3E0%20failures%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20class%3D%22label%22%20x%3D%228%22%20y%3D%22105%22%3E%E2%80%9CFirst-only%E2%80%9D%20candidate%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%228%22%20y%3D%22119%22%20width%3D%22%7B_pass_w%7D%22%20height%3D%2228%22%20rx%3D%225%22%20fill%3D%22%2331b58b%22%2F%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22%7B8%20%2B%20_pass_w%7D%22%20y%3D%22119%22%20width%3D%22%7B_bug_w%7D%22%20height%3D%2228%22%20rx%3D%225%22%20fill%3D%22%23ef6a67%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20class%3D%22small%22%20x%3D%22440%22%20y%3D%22139%22%3E%7B_bug_failures%7D%20failures%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20class%3D%22small%22%20x%3D%228%22%20y%3D%22181%22%3Egreen%20%3D%20passes%20bounded%20checker%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20class%3D%22small%22%20x%3D%22282%22%20y%3D%22181%22%3Ered%20%3D%20counterexample%20found%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%22%22%22%0A%0A%20%20%20%20mo.vstack(%0A%20%20%20%20%20%20%20%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20mo.md(f%22%23%23%20%7B_headline%7D%22)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20mo.Html(_svg)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20mo.md(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f%22%22%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20The%20bounded%20checker%20enumerated%20every%20placement%20of%201%E2%80%93%7B_bound%7D%20nuts%20across%20two%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20pickup%20locations.%20The%20correct%20loop%20handles%20all%20%7B_total%7D.%20The%20defective%20loop%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20handles%20only%20one%20nut%20per%20location%2C%20so%20it%20passes%20%7B_bug_passes%7D%20and%20fails%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7B_bug_failures%7D.%20A%20green%20bar%20at%20bound%201%20is%20evidence%20about%20**two%20tests**%2C%20not%20a%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20universal%20claim.%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22%22%22%0A%20%20%20%20%20%20%20%20%20%20%20%20)%2C%0A%20%20%20%20%20%20%20%20%5D%0A%20%20%20%20)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20Takeaway%0A%0A%20%20%20%20**Testing%20can%20find%20a%20counterexample%3B%20it%20cannot%20certify%20an%20unbounded%20instance%20family.**%0A%20%20%20%20The%20paper%20closes%20that%20gap%20with%20a%20deterministic%20PDDL-to-Lean%20translation%20and%20a%20proof%0A%20%20%20%20accepted%20by%20Lean%E2%80%99s%20kernel%2C%20conditional%20on%20human-written%20%60ValidInit%60%20and%20%60ValidGoal%60%0A%20%20%20%20constraints.%20Those%20constraints%20define%20the%20claim%E2%80%99s%20real%20denominator.%0A%0A%20%20%20%20**Provenance%20and%20limits%3A**%20paper%20v1%20and%20this%20research%20digest%20are%20CC%20BY%204.0.%20No%20paper%0A%20%20%20%20code%20or%20accepted%20proofs%20were%20released.%20This%20demo%20uses%20analyst-authored%20toy%20instances%0A%20%20%20%20and%20original%20code%20under%20MIT%3B%20it%20reproduces%20only%20the%20finite-test-versus-completeness%0A%20%20%20%20distinction.%20The%20paper%E2%80%99s%2012%2F13%20result%20is%20author-reported%2C%20not%20recomputed%20here.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

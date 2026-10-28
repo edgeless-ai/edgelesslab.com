@@ -329,6 +329,15 @@ export const marimoDemos: MarimoDemo[] = [
     published_url: "https://marimo.edgelesslab.com/2609.09458-contracteval-denominator/",
   },
   {
+    slug: "2310.12931-eureka-outer-metric",
+    title: "Eureka: Keep the Judge Outside the Reward",
+    description:
+      "Explore why reward resemblance and downstream policy fitness are different axes, using a compact synthetic illustration of Eureka's external-fitness contract.",
+    category: "AI evaluation",
+    tags: ["reward-design", "reinforcement-learning", "evaluation", "reward-hacking", "robotics"],
+    published_url: "https://marimo.edgelesslab.com/2310.12931-eureka-outer-metric/",
+  },
+  {
     slug: "2609.38385-goldimask-context-weighting",
     title: "GoldiMask: Reveal Context Without Erasing Supervision",
     description:
@@ -373,6 +382,23 @@ export const marimoDemos: MarimoDemo[] = [
       "Sweep retained-token budget K from 2,000 to 8,000 and watch the tokengate prefill envelope shift. An analytic sensitivity model for token-pruning work cost; author-run speed claims are synthetic and kept separate from this estimate.",
     category: "Research",
     tags: ["llm-inference", "long-context", "token-pruning", "prefill", "performance-modeling"],
+  },
+  // Research explainers (october expansion continued)
+  {
+    slug: "2609.05441-merit-memory-economics",
+    title: "MERIT: Price the Action, Not the Memory",
+    description:
+      "Explore which memory policy has the highest derived net value as updated facts and successful-action value change, using MERIT's published D1 success and cost rows.",
+    category: "Research",
+    tags: ["agent-memory", "tool-use", "cost-modeling", "updated-facts", "evaluation"],
+  },
+  {
+    slug: "2609.27105-completeness-scope",
+    title: "The Plan Passed. The Completeness Claim Did Not.",
+    description:
+      "Expand a bounded Spanner-style instance family and watch a plan that passes every one-nut debug case reveal 26 counterexamples, clarifying why tests are not a universal completeness proof.",
+    category: "Research",
+    tags: ["generalized planning", "formal verification", "LLM evaluation", "counterexamples"],
   },
 ];
 

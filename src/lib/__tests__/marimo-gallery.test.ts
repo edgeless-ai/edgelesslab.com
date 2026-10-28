@@ -16,7 +16,8 @@ const liveSlugs = [
   "2609.35806-sfia-extraction-baselines",
   "2608.05245-search2skill",
   "2609.24343-bandwidth-thermal-envelope",
-];
+  "2310.12931-eureka-outer-metric",
+  ];
 
 describe("published marimo gallery", () => {
   it("only includes demos with verified publication URLs", () => {

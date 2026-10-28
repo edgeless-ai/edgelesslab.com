@@ -392,6 +392,14 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["agent-memory", "tool-use", "cost-modeling", "updated-facts", "evaluation"],
   },
+  {
+    slug: "2609.27105-completeness-scope",
+    title: "The Plan Passed. The Completeness Claim Did Not.",
+    description:
+      "Expand a bounded Spanner-style instance family and watch a plan that passes every one-nut debug case reveal 26 counterexamples, clarifying why tests are not a universal completeness proof.",
+    category: "Research",
+    tags: ["generalized planning", "formal verification", "LLM evaluation", "counterexamples"],
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

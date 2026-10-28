@@ -329,6 +329,14 @@ export const marimoDemos: MarimoDemo[] = [
     published_url: "https://marimo.edgelesslab.com/2609.09458-contracteval-denominator/",
   },
   {
+    slug: "2310.12931-eureka-outer-metric",
+    title: "Eureka: Keep the Judge Outside the Reward",
+    description:
+      "Explore why reward resemblance and downstream policy fitness are different axes, using a compact synthetic illustration of Eureka's external-fitness contract.",
+    category: "AI evaluation",
+    tags: ["reward-design", "reinforcement-learning", "evaluation", "reward-hacking", "robotics"],
+  },
+  {
     slug: "2609.38385-goldimask-context-weighting",
     title: "GoldiMask: Reveal Context Without Erasing Supervision",
     description:

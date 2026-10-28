@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2609.10724-escalation-denominator</title>
+    <script type="module" crossorigin src="./assets/index-DafnX1Xx.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-B0Z9INg1.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-CUdNIagt.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-BQ9S8nyo.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-Dc9HkKI2.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CKsE8sC1.js">
+    <link rel="modulepreload" crossorigin href="./assets/schemas-BL-NsLlF.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-BCaOs5rp.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-oX0TOjjx.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-Cmx0b_zA.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-aFmHgJZY.js">
+    <link rel="modulepreload" crossorigin href="./assets/isArrayLikeObject-DnwgSs_Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseMerge-CQpUq7ep.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-snlMn4yk.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-B74pBk57.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-BdZUApHd.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-Ci2dTZ72.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BxZgoFvi.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-B4K466FK.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-DXKMv4Bs.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-CrTnjj37.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-DpGPGznL.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-DB0hHKMi.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-ldLVeaqm.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-BmzAqMKq.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CyYN7zJg.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-BBdeXCvU.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-restore-focus-B98SEiGc.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-BoklZTGL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-rHn2EdoM.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-Wea4hZ6R.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFOBKCJB.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-C4-_TnkF.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BplWpfFo.js">
+    <link rel="modulepreload" crossorigin href="./assets/circle-CeQt3rdW.js">
+    <link rel="modulepreload" crossorigin href="./assets/toast-KNfsFUiB.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-DR2Z2N4w.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-CzfpItSz.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-DKSBdWUf.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-BbJ1_N2T.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CrkOvbyN.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-CeE3i3Qa.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-BqUx5USx.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-Haz_uxEL.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-DsgsDslU.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-DMbg9X18.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-BDakodZ2.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-CC89xOwH.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-yTHMxhVa.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-k9DpjH68.js">
+    <link rel="modulepreload" crossorigin href="./assets/write-secret-modal-BiG2tahJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-gbN72xHe.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-BJG-7Qob.js">
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-HclGiUj8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BczecT6V.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BTskHGpb.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-Bj3s1hGN.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-C49f7GXV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-BPvK7C_R.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Ccyblc8N.js">
+    <link rel="modulepreload" crossorigin href="./assets/marked.esm-B_3iMIUq.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings-BHZPE0Mc.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BN-7G8qZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-DFf033uX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiUBikfn.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-MRn68vX1.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Bviq_Dee.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DBqBVprh.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DueXZKz9.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-CJTNBbet.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-DcnXlv0_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-DucTwMkf.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CYRiAeUx.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CzugpTQu.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-DjNf4SIX.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-RyCOE8jo.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-BhJktFeI.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-DFhUGBjO.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-BeE1cdgM.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B4VJJibu.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-DOPs2jx8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-VuyoeQOD.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-B_IYTCX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-DVgK5i5l.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-BeYhVWvM.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-D9vyuMar.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-CNPGWpMu.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-Bq_nmf5u.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-D5bOh7g6.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-CLRkNgm7.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-PLkI_UfK.js">
+    <link rel="modulepreload" crossorigin href="./assets/filename-fxG7K_MU.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-D9Dr-k4J.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-YOKDWASO-CaoEAGJk.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-0PFKL3SH.css">
+    <link rel="stylesheet" crossorigin href="./assets/index--sT8xf-8.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\n#   \"marimo==0.25.1\",\n# ]\n# ///\n\nimport marimo\n\n__generated_with = \"0.25.1\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    return (mo,)\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    # When an agent escalates, who still owns completion?\n\n    **Source:** Bai, Ding \u0026 Taylor, [*Finishing the Task Is Not Enough*](https://arxiv.org/abs/2609.10724) (2026).\n\n    The paper codes **120 simulated, language-only healthcare trajectories** under light, medium, and heavy challenge. This demo reconstructs its ownership counts and asks one operational question: **when does human-dependent completion exceed your release threshold?**\n\n    The values below are published aggregate counts, not synthetic data. The threshold gate and confidence intervals are analyst-authored. This is not a healthcare deployment study, an executable-agent benchmark, or evidence of subjective experience.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _(mo):\n    max_dependency = mo.ui.slider(\n        10, 80, value=30, step=5,\n        label=\"Maximum acceptable human-dependent completion (%)\",\n    )\n    mo.hstack([max_dependency], justify=\"start\")\n    return (max_dependency,)\n\n\n@app.cell\ndef _(max_dependency, mo):\n    import math\n\n    _phases = [\"Light\", \"Medium\", \"Heavy\"]\n    _dependent = [0, 54, 88]\n    _supported = [10, 57, 32]\n    _independent = [110, 9, 0]\n    _threshold = int(max_dependency.value)\n\n    def _wilson(_count):\n        _n, _z = 120, 1.959963984540054\n        _p = _count / _n\n        _denom = 1 + _z * _z / _n\n        _center = (_p + _z * _z / (2 * _n)) / _denom\n        _half = _z * math.sqrt(_p * (1 - _p) / _n + _z * _z / (4 * _n * _n)) / _denom\n        return 100 * (_center - _half), 100 * (_center + _half)\n\n    _outcomes = []\n    for _count in _dependent:\n        _lo, _hi = _wilson(_count)\n        _outcomes.append(\"FAIL\" if _lo \u003E _threshold else (\"PASS\" if _hi \u003C= _threshold else \"UNCERTAIN\"))\n\n    _x_positions = [120, 330, 540]\n    _bars = []\n    for _idx, _x in enumerate(_x_positions):\n        _cursor = 300\n        for _count, _color, _name in [\n            (_dependent[_idx], \"#ef6f6c\", \"human-dependent\"),\n            (_supported[_idx], \"#f2cc8f\", \"supported\"),\n            (_independent[_idx], \"#81b29a\", \"independent\"),\n        ]:\n            _height = 210 * _count / 120\n            _cursor -= _height\n            _bars.append(\n                f'\u003Crect x=\"{_x}\" y=\"{_cursor:.1f}\" width=\"110\" height=\"{_height:.1f}\" fill=\"{_color}\"\u003E'\n                f'\u003Ctitle\u003E{_phases[_idx]}: {_name} {_count}/120\u003C/title\u003E\u003C/rect\u003E'\n            )\n        _bars.append(f'\u003Ctext x=\"{_x + 55}\" y=\"326\" text-anchor=\"middle\"\u003E{_phases[_idx]}\u003C/text\u003E')\n        _bars.append(f'\u003Ctext x=\"{_x + 55}\" y=\"350\" text-anchor=\"middle\" font-weight=\"700\"\u003E{_outcomes[_idx]}\u003C/text\u003E')\n\n    _gate_y = 300 - 2.1 * _threshold\n    _svg = f'''\u003Csvg data-chart=\"escalation-denominator\" data-threshold=\"{_threshold}\" viewBox=\"0 0 760 390\" role=\"img\" aria-label=\"Ownership state by challenge phase\"\u003E\n      \u003Cstyle\u003Etext {{ font: 15px system-ui; fill: #263238; }} .small {{ font-size: 13px; }}\u003C/style\u003E\n      \u003Crect width=\"760\" height=\"390\" rx=\"16\" fill=\"#faf8f3\"/\u003E\n      \u003Ctext x=\"28\" y=\"34\" font-size=\"19\" font-weight=\"700\"\u003EPublished ownership states (n = 120 per phase)\u003C/text\u003E\n      \u003Cline x1=\"82\" y1=\"90\" x2=\"82\" y2=\"300\" stroke=\"#455a64\"/\u003E\u003Cline x1=\"82\" y1=\"300\" x2=\"690\" y2=\"300\" stroke=\"#455a64\"/\u003E\n      \u003Cline x1=\"82\" y1=\"{_gate_y:.1f}\" x2=\"690\" y2=\"{_gate_y:.1f}\" stroke=\"#6c5ce7\" stroke-width=\"3\" stroke-dasharray=\"8 6\"/\u003E\n      \u003Ctext x=\"685\" y=\"{_gate_y - 8:.1f}\" text-anchor=\"end\" fill=\"#6c5ce7\" class=\"small\"\u003Eoperator limit: {_threshold}%\u003C/text\u003E\n      {''.join(_bars)}\n      \u003Crect x=\"95\" y=\"368\" width=\"14\" height=\"14\" fill=\"#81b29a\"/\u003E\u003Ctext x=\"116\" y=\"380\" class=\"small\"\u003Eindependent\u003C/text\u003E\n      \u003Crect x=\"260\" y=\"368\" width=\"14\" height=\"14\" fill=\"#f2cc8f\"/\u003E\u003Ctext x=\"281\" y=\"380\" class=\"small\"\u003Esupported\u003C/text\u003E\n      \u003Crect x=\"405\" y=\"368\" width=\"14\" height=\"14\" fill=\"#ef6f6c\"/\u003E\u003Ctext x=\"426\" y=\"380\" class=\"small\"\u003Ehuman-dependent\u003C/text\u003E\n    \u003C/svg\u003E'''\n\n    _heading = (\n        f\"Operating point: {_threshold}% limit; Light {_outcomes[0]}, \"\n        f\"Medium {_outcomes[1]}, Heavy {_outcomes[2]}\"\n    )\n    _summary = mo.md(\n        f\"## {_heading}\\n\\n\"\n        \"A phase **fails** only when the 95% Wilson lower bound on human-dependent completion exceeds the limit. \"\n        f\"Published action-plan counts are **0/120**, **54/120**, and **88/120** from light to heavy challenge. \"\n        \"At heavy challenge the interval is **64.8\u201380.4%**: changing a policy threshold cannot change the underlying evidence, only the release decision.\"\n    )\n    mo.vstack([_summary, mo.Html(_svg)])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ## What this changes operationally\n\n    1. **Do not credit escalation as autonomous completion.** At medium challenge, 111/120 action plans seek human support and 54/120 make core completion human-dependent; at heavy challenge those counts become 120/120 and 88/120.\n    2. **Keep three denominators.** Report independent progress, supported progress, and transferred completion separately so hidden human labor remains visible.\n    3. **Treat prose as an incomplete sensor.** The paper reports raw TLX rising from 29.4 to 65.9 while agent-referential strain appears in only 7 of 720 coded cells.\n\n    **Limitations:** the paper uses researcher-authored scenarios, model-generated reports, and researcher-coded language. The aggregate table is reproduced exactly; no patient data or synthetic replacement is bundled. The demo adds a transparent release gate, not a causal claim or healthcare recommendation.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%0A%23%20%20%20%22marimo%3D%3D0.25.1%22%2C%0A%23%20%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.25.1%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20return%20(mo%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%20When%20an%20agent%20escalates%2C%20who%20still%20owns%20completion%3F%0A%0A%20%20%20%20**Source%3A**%20Bai%2C%20Ding%20%26%20Taylor%2C%20%5B*Finishing%20the%20Task%20Is%20Not%20Enough*%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2609.10724)%20(2026).%0A%0A%20%20%20%20The%20paper%20codes%20**120%20simulated%2C%20language-only%20healthcare%20trajectories**%20under%20light%2C%20medium%2C%20and%20heavy%20challenge.%20This%20demo%20reconstructs%20its%20ownership%20counts%20and%20asks%20one%20operational%20question%3A%20**when%20does%20human-dependent%20completion%20exceed%20your%20release%20threshold%3F**%0A%0A%20%20%20%20The%20values%20below%20are%20published%20aggregate%20counts%2C%20not%20synthetic%20data.%20The%20threshold%20gate%20and%20confidence%20intervals%20are%20analyst-authored.%20This%20is%20not%20a%20healthcare%20deployment%20study%2C%20an%20executable-agent%20benchmark%2C%20or%20evidence%20of%20subjective%20experience.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20max_dependency%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%2010%2C%2080%2C%20value%3D30%2C%20step%3D5%2C%0A%20%20%20%20%20%20%20%20label%3D%22Maximum%20acceptable%20human-dependent%20completion%20(%25)%22%2C%0A%20%20%20%20)%0A%20%20%20%20mo.hstack(%5Bmax_dependency%5D%2C%20justify%3D%22start%22)%0A%20%20%20%20return%20(max_dependency%2C)%0A%0A%0A%40app.cell%0Adef%20_(max_dependency%2C%20mo)%3A%0A%20%20%20%20import%20math%0A%0A%20%20%20%20_phases%20%3D%20%5B%22Light%22%2C%20%22Medium%22%2C%20%22Heavy%22%5D%0A%20%20%20%20_dependent%20%3D%20%5B0%2C%2054%2C%2088%5D%0A%20%20%20%20_supported%20%3D%20%5B10%2C%2057%2C%2032%5D%0A%20%20%20%20_independent%20%3D%20%5B110%2C%209%2C%200%5D%0A%20%20%20%20_threshold%20%3D%20int(max_dependency.value)%0A%0A%20%20%20%20def%20_wilson(_count)%3A%0A%20%20%20%20%20%20%20%20_n%2C%20_z%20%3D%20120%2C%201.959963984540054%0A%20%20%20%20%20%20%20%20_p%20%3D%20_count%20%2F%20_n%0A%20%20%20%20%20%20%20%20_denom%20%3D%201%20%2B%20_z%20*%20_z%20%2F%20_n%0A%20%20%20%20%20%20%20%20_center%20%3D%20(_p%20%2B%20_z%20*%20_z%20%2F%20(2%20*%20_n))%20%2F%20_denom%0A%20%20%20%20%20%20%20%20_half%20%3D%20_z%20*%20math.sqrt(_p%20*%20(1%20-%20_p)%20%2F%20_n%20%2B%20_z%20*%20_z%20%2F%20(4%20*%20_n%20*%20_n))%20%2F%20_denom%0A%20%20%20%20%20%20%20%20return%20100%20*%20(_center%20-%20_half)%2C%20100%20*%20(_center%20%2B%20_half)%0A%0A%20%20%20%20_outcomes%20%3D%20%5B%5D%0A%20%20%20%20for%20_count%20in%20_dependent%3A%0A%20%20%20%20%20%20%20%20_lo%2C%20_hi%20%3D%20_wilson(_count)%0A%20%20%20%20%20%20%20%20_outcomes.append(%22FAIL%22%20if%20_lo%20%3E%20_threshold%20else%20(%22PASS%22%20if%20_hi%20%3C%3D%20_threshold%20else%20%22UNCERTAIN%22))%0A%0A%20%20%20%20_x_positions%20%3D%20%5B120%2C%20330%2C%20540%5D%0A%20%20%20%20_bars%20%3D%20%5B%5D%0A%20%20%20%20for%20_idx%2C%20_x%20in%20enumerate(_x_positions)%3A%0A%20%20%20%20%20%20%20%20_cursor%20%3D%20300%0A%20%20%20%20%20%20%20%20for%20_count%2C%20_color%2C%20_name%20in%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20(_dependent%5B_idx%5D%2C%20%22%23ef6f6c%22%2C%20%22human-dependent%22)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20(_supported%5B_idx%5D%2C%20%22%23f2cc8f%22%2C%20%22supported%22)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20(_independent%5B_idx%5D%2C%20%22%2381b29a%22%2C%20%22independent%22)%2C%0A%20%20%20%20%20%20%20%20%5D%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_height%20%3D%20210%20*%20_count%20%2F%20120%0A%20%20%20%20%20%20%20%20%20%20%20%20_cursor%20-%3D%20_height%0A%20%20%20%20%20%20%20%20%20%20%20%20_bars.append(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%22%7B_x%7D%22%20y%3D%22%7B_cursor%3A.1f%7D%22%20width%3D%22110%22%20height%3D%22%7B_height%3A.1f%7D%22%20fill%3D%22%7B_color%7D%22%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctitle%3E%7B_phases%5B_idx%5D%7D%3A%20%7B_name%7D%20%7B_count%7D%2F120%3C%2Ftitle%3E%3C%2Frect%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20)%0A%20%20%20%20%20%20%20%20_bars.append(f'%3Ctext%20x%3D%22%7B_x%20%2B%2055%7D%22%20y%3D%22326%22%20text-anchor%3D%22middle%22%3E%7B_phases%5B_idx%5D%7D%3C%2Ftext%3E')%0A%20%20%20%20%20%20%20%20_bars.append(f'%3Ctext%20x%3D%22%7B_x%20%2B%2055%7D%22%20y%3D%22350%22%20text-anchor%3D%22middle%22%20font-weight%3D%22700%22%3E%7B_outcomes%5B_idx%5D%7D%3C%2Ftext%3E')%0A%0A%20%20%20%20_gate_y%20%3D%20300%20-%202.1%20*%20_threshold%0A%20%20%20%20_svg%20%3D%20f'''%3Csvg%20data-chart%3D%22escalation-denominator%22%20data-threshold%3D%22%7B_threshold%7D%22%20viewBox%3D%220%200%20760%20390%22%20role%3D%22img%22%20aria-label%3D%22Ownership%20state%20by%20challenge%20phase%22%3E%0A%20%20%20%20%20%20%3Cstyle%3Etext%20%7B%7B%20font%3A%2015px%20system-ui%3B%20fill%3A%20%23263238%3B%20%7D%7D%20.small%20%7B%7B%20font-size%3A%2013px%3B%20%7D%7D%3C%2Fstyle%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22760%22%20height%3D%22390%22%20rx%3D%2216%22%20fill%3D%22%23faf8f3%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%2234%22%20font-size%3D%2219%22%20font-weight%3D%22700%22%3EPublished%20ownership%20states%20(n%20%3D%20120%20per%20phase)%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%2282%22%20y1%3D%2290%22%20x2%3D%2282%22%20y2%3D%22300%22%20stroke%3D%22%23455a64%22%2F%3E%3Cline%20x1%3D%2282%22%20y1%3D%22300%22%20x2%3D%22690%22%20y2%3D%22300%22%20stroke%3D%22%23455a64%22%2F%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%2282%22%20y1%3D%22%7B_gate_y%3A.1f%7D%22%20x2%3D%22690%22%20y2%3D%22%7B_gate_y%3A.1f%7D%22%20stroke%3D%22%236c5ce7%22%20stroke-width%3D%223%22%20stroke-dasharray%3D%228%206%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22685%22%20y%3D%22%7B_gate_y%20-%208%3A.1f%7D%22%20text-anchor%3D%22end%22%20fill%3D%22%236c5ce7%22%20class%3D%22small%22%3Eoperator%20limit%3A%20%7B_threshold%7D%25%3C%2Ftext%3E%0A%20%20%20%20%20%20%7B''.join(_bars)%7D%0A%20%20%20%20%20%20%3Crect%20x%3D%2295%22%20y%3D%22368%22%20width%3D%2214%22%20height%3D%2214%22%20fill%3D%22%2381b29a%22%2F%3E%3Ctext%20x%3D%22116%22%20y%3D%22380%22%20class%3D%22small%22%3Eindependent%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22260%22%20y%3D%22368%22%20width%3D%2214%22%20height%3D%2214%22%20fill%3D%22%23f2cc8f%22%2F%3E%3Ctext%20x%3D%22281%22%20y%3D%22380%22%20class%3D%22small%22%3Esupported%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22405%22%20y%3D%22368%22%20width%3D%2214%22%20height%3D%2214%22%20fill%3D%22%23ef6f6c%22%2F%3E%3Ctext%20x%3D%22426%22%20y%3D%22380%22%20class%3D%22small%22%3Ehuman-dependent%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E'''%0A%0A%20%20%20%20_heading%20%3D%20(%0A%20%20%20%20%20%20%20%20f%22Operating%20point%3A%20%7B_threshold%7D%25%20limit%3B%20Light%20%7B_outcomes%5B0%5D%7D%2C%20%22%0A%20%20%20%20%20%20%20%20f%22Medium%20%7B_outcomes%5B1%5D%7D%2C%20Heavy%20%7B_outcomes%5B2%5D%7D%22%0A%20%20%20%20)%0A%20%20%20%20_summary%20%3D%20mo.md(%0A%20%20%20%20%20%20%20%20f%22%23%23%20%7B_heading%7D%5Cn%5Cn%22%0A%20%20%20%20%20%20%20%20%22A%20phase%20**fails**%20only%20when%20the%2095%25%20Wilson%20lower%20bound%20on%20human-dependent%20completion%20exceeds%20the%20limit.%20%22%0A%20%20%20%20%20%20%20%20f%22Published%20action-plan%20counts%20are%20**0%2F120**%2C%20**54%2F120**%2C%20and%20**88%2F120**%20from%20light%20to%20heavy%20challenge.%20%22%0A%20%20%20%20%20%20%20%20%22At%20heavy%20challenge%20the%20interval%20is%20**64.8%E2%80%9380.4%25**%3A%20changing%20a%20policy%20threshold%20cannot%20change%20the%20underlying%20evidence%2C%20only%20the%20release%20decision.%22%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5B_summary%2C%20mo.Html(_svg)%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20What%20this%20changes%20operationally%0A%0A%20%20%20%201.%20**Do%20not%20credit%20escalation%20as%20autonomous%20completion.**%20At%20medium%20challenge%2C%20111%2F120%20action%20plans%20seek%20human%20support%20and%2054%2F120%20make%20core%20completion%20human-dependent%3B%20at%20heavy%20challenge%20those%20counts%20become%20120%2F120%20and%2088%2F120.%0A%20%20%20%202.%20**Keep%20three%20denominators.**%20Report%20independent%20progress%2C%20supported%20progress%2C%20and%20transferred%20completion%20separately%20so%20hidden%20human%20labor%20remains%20visible.%0A%20%20%20%203.%20**Treat%20prose%20as%20an%20incomplete%20sensor.**%20The%20paper%20reports%20raw%20TLX%20rising%20from%2029.4%20to%2065.9%20while%20agent-referential%20strain%20appears%20in%20only%207%20of%20720%20coded%20cells.%0A%0A%20%20%20%20**Limitations%3A**%20the%20paper%20uses%20researcher-authored%20scenarios%2C%20model-generated%20reports%2C%20and%20researcher-coded%20language.%20The%20aggregate%20table%20is%20reproduced%20exactly%3B%20no%20patient%20data%20or%20synthetic%20replacement%20is%20bundled.%20The%20demo%20adds%20a%20transparent%20release%20gate%2C%20not%20a%20causal%20claim%20or%20healthcare%20recommendation.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.25.1",
+            "serverToken": "unused",
+            "config": {"ai": {"allow_provider_config": true, "custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "code_lens": true, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "layout": null,
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

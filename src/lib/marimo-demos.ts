@@ -366,6 +366,14 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["dram", "hbm", "gpu-memory", "thermal-design", "bandwidth", "systems-co-design"],
     published_url: "https://marimo.edgelesslab.com/2609.24343-bandwidth-thermal-envelope/",
   },
+  {
+    slug: "2610.26754-tokengate-prefill-envelope",
+    title: "TokenGate Prefill: Retained-Token Budget vs. Work Cost",
+    description:
+      "Sweep retained-token budget K from 2,000 to 8,000 and watch the tokengate prefill envelope shift. An analytic sensitivity model for token-pruning work cost; author-run speed claims are synthetic and kept separate from this estimate.",
+    category: "Research",
+    tags: ["llm-inference", "long-context", "token-pruning", "prefill", "performance-modeling"],
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

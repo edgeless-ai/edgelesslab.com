@@ -126,7 +126,8 @@ test.describe("static site smoke", () => {
     await expect(page.getByRole("heading", { name: "Research", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "AI evaluation", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "AI training", exact: true })).toBeVisible();
-    await expect(page.getByText("6 demos", { exact: true })).toHaveCount(2);
+    await expect(page.getByText("6 demos", { exact: true })).toHaveCount(1);
+    await expect(page.getByText("7 demos", { exact: true })).toHaveCount(1);
     await expect(page.getByText("5 demos", { exact: true })).toHaveCount(0);
   });
 

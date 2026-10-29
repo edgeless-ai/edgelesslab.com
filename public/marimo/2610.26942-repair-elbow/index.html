@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2610.26942-repair-elbow</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.12\"\n# dependencies = [\n#   \"marimo==0.23.16\",\n# ]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    return (mo,)\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    # The repair elbow\n\n    **Question:** How many compiler-guided retries are worth buying after a Lean tactic fails?\n\n    This demo recomputes the fleet-level cost of the **author-reported LeanDojo `K=8` sweep** in Deng et al. ([arXiv:2610.26942v1](https://arxiv.org/abs/2610.26942)). It is a table-derived sensitivity view, not an independent rerun of Lean, ReProver, or gAPRIL. Counts and mean runtimes come from Tables 1 and 3 over the common 1,990-theorem set; V100-hours and minutes per net proof are derived here.\n\n    The paper reports a deterministic, bounded search with `K` fresh tactics and at most `R` repairs per failed tactic. The public records conflict on whether the named repair checkpoint is 4B or 8B parameters, and evaluation code was not linked when the source note was written, so absolute cost transfer remains uncertain.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _(mo):\n    repair_rounds = mo.ui.slider(\n        start=0,\n        stop=3,\n        step=1,\n        value=1,\n        label=\"Maximum repairs per failed tactic (R)\",\n        show_value=True,\n    )\n    mo.vstack(\n        [\n            repair_rounds,\n            mo.md(\"Move from the recommended one-repair elbow to zero, two, or three rounds.\"),\n        ],\n        gap=0.5,\n    )\n    return (repair_rounds,)\n\n\n@app.cell\ndef _(mo, repair_rounds):\n    _r = int(repair_rounds.value)\n    _net = [0, 77, 79, 80]\n    _mean_s = [200.5, 367.3, 450.0, 485.7]\n    _added_mean_s = [0.0, 166.8, 249.4, 285.1]\n    _fleet_hours = [_seconds * 1990 / 3600 for _seconds in _added_mean_s]\n    _minutes_per_net = [0.0] + [\n        _added_mean_s[_idx] * 1990 / (_net[_idx] * 60)\n        for _idx in range(1, 4)\n    ]\n    _round_label = \"round\" if _r == 1 else \"rounds\"\n    _heading = (\n        f\"Operating point: {_r} repair {_round_label}; +{_net[_r]} net theorems vs R=0; \"\n        f\"mean {_mean_s[_r]:.1f} s/theorem; {_minutes_per_net[_r]:.1f} V100-min per net proof\"\n        if _r\n        else \"Operating point: 0 repair rounds; sampling-only baseline; mean 200.5 s/theorem\"\n    )\n    _colors = [\"#93a4b8\" if _idx != _r else \"#ef7d57\" for _idx in range(4)]\n    _bars_gain = \"\".join(\n        f'\u003Crect x=\"{80 + _idx * 92}\" y=\"{250 - _net[_idx] * 1.75:.1f}\" width=\"54\" '\n        f'height=\"{_net[_idx] * 1.75:.1f}\" rx=\"5\" fill=\"{_colors[_idx]}\"/\u003E'\n        f'\u003Ctext x=\"{107 + _idx * 92}\" y=\"{242 - _net[_idx] * 1.75:.1f}\" text-anchor=\"middle\" '\n        f'font-size=\"14\" fill=\"#dbe7f3\"\u003E+{_net[_idx]}\u003C/text\u003E'\n        for _idx in range(4)\n    )\n    _bars_cost = \"\".join(\n        f'\u003Crect x=\"{520 + _idx * 92}\" y=\"{250 - _fleet_hours[_idx] * 0.87:.1f}\" width=\"54\" '\n        f'height=\"{_fleet_hours[_idx] * 0.87:.1f}\" rx=\"5\" fill=\"{_colors[_idx]}\"/\u003E'\n        f'\u003Ctext x=\"{547 + _idx * 92}\" y=\"{242 - _fleet_hours[_idx] * 0.87:.1f}\" text-anchor=\"middle\" '\n        f'font-size=\"14\" fill=\"#dbe7f3\"\u003E{_fleet_hours[_idx]:.1f}h\u003C/text\u003E'\n        for _idx in range(4)\n    )\n    _labels = \"\".join(\n        f'\u003Ctext x=\"{107 + _idx * 92}\" y=\"274\" text-anchor=\"middle\" font-size=\"13\" fill=\"#9fb1c5\"\u003ER={_idx}\u003C/text\u003E'\n        f'\u003Ctext x=\"{547 + _idx * 92}\" y=\"274\" text-anchor=\"middle\" font-size=\"13\" fill=\"#9fb1c5\"\u003ER={_idx}\u003C/text\u003E'\n        for _idx in range(4)\n    )\n    _svg = f\"\"\"\n    \u003Csvg data-chart=\"repair-elbow\" data-round=\"{_r}\" viewBox=\"0 0 940 330\"\n         style=\"width:100%;height:auto;background:#111a24;border-radius:14px\" role=\"img\"\n         aria-label=\"Net proof gain and cumulative V100 cost by repair round\"\u003E\n      \u003Ctext x=\"48\" y=\"38\" font-size=\"18\" font-weight=\"700\" fill=\"#f4f8fc\"\u003ENet theorem gain\u003C/text\u003E\n      \u003Ctext x=\"488\" y=\"38\" font-size=\"18\" font-weight=\"700\" fill=\"#f4f8fc\"\u003EAdded fleet compute\u003C/text\u003E\n      \u003Ctext x=\"48\" y=\"60\" font-size=\"13\" fill=\"#9fb1c5\"\u003Epaired net delta versus R=0\u003C/text\u003E\n      \u003Ctext x=\"488\" y=\"60\" font-size=\"13\" fill=\"#9fb1c5\"\u003E1,990 \u00d7 added mean time, V100-hours\u003C/text\u003E\n      \u003Cline x1=\"48\" y1=\"250\" x2=\"430\" y2=\"250\" stroke=\"#506174\"/\u003E\n      \u003Cline x1=\"488\" y1=\"250\" x2=\"870\" y2=\"250\" stroke=\"#506174\"/\u003E\n      {_bars_gain}{_bars_cost}{_labels}\n      \u003Ctext x=\"470\" y=\"311\" text-anchor=\"middle\" font-size=\"14\" fill=\"#efb366\"\u003E\n        First repair: 77/80 = 96.3% of the R=3 net gain\n      \u003C/text\u003E\n    \u003C/svg\u003E\n    \"\"\"\n    mo.vstack(\n        [\n            mo.md(f\"## {_heading}\"),\n            mo.Html(_svg),\n            mo.md(\n                f\"**Fleet normalization.** At `R={_r}`, added compute is \"\n                f\"**{_fleet_hours[_r]:.1f} V100-hours** over the benchmark. \"\n                + (\n                    f\"That is **{_minutes_per_net[_r]:.1f} V100-min per net proof**.\"\n                    if _r\n                    else \"No repair cost is charged at the baseline.\"\n                )\n            ),\n        ],\n        gap=0.8,\n    )\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ## Takeaway\n\n    One repair is the elbow: at `K=8`, it captures **77 of the eventual 80 net proofs (96.3%)**. Going from one to three repairs adds only three more net proofs while cumulative added compute rises from **92.2 to 157.6 V100-hours** over the 1,990 items.\n\n    **Operational rule:** let a deterministic checker gate acceptance, try one diagnostic-conditioned repair by default, and require an explicit value threshold for deeper retries. These are author-run V100 measurements, not universal constants; model identity, batching, hardware, and diagnostic class can move the crossover.\n\n    Source: Deng et al., *Fix, Not Just Resample* (arXiv:2610.26942v1), especially Tables 1 and 3. Demo code is MIT-licensed; the paper remains under its arXiv license.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.12%22%0A%23%20dependencies%20%3D%20%5B%0A%23%20%20%20%22marimo%3D%3D0.23.16%22%2C%0A%23%20%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20return%20(mo%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%20The%20repair%20elbow%0A%0A%20%20%20%20**Question%3A**%20How%20many%20compiler-guided%20retries%20are%20worth%20buying%20after%20a%20Lean%20tactic%20fails%3F%0A%0A%20%20%20%20This%20demo%20recomputes%20the%20fleet-level%20cost%20of%20the%20**author-reported%20LeanDojo%20%60K%3D8%60%20sweep**%20in%20Deng%20et%20al.%20(%5BarXiv%3A2610.26942v1%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2610.26942)).%20It%20is%20a%20table-derived%20sensitivity%20view%2C%20not%20an%20independent%20rerun%20of%20Lean%2C%20ReProver%2C%20or%20gAPRIL.%20Counts%20and%20mean%20runtimes%20come%20from%20Tables%201%20and%203%20over%20the%20common%201%2C990-theorem%20set%3B%20V100-hours%20and%20minutes%20per%20net%20proof%20are%20derived%20here.%0A%0A%20%20%20%20The%20paper%20reports%20a%20deterministic%2C%20bounded%20search%20with%20%60K%60%20fresh%20tactics%20and%20at%20most%20%60R%60%20repairs%20per%20failed%20tactic.%20The%20public%20records%20conflict%20on%20whether%20the%20named%20repair%20checkpoint%20is%204B%20or%208B%20parameters%2C%20and%20evaluation%20code%20was%20not%20linked%20when%20the%20source%20note%20was%20written%2C%20so%20absolute%20cost%20transfer%20remains%20uncertain.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20repair_rounds%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%20start%3D0%2C%0A%20%20%20%20%20%20%20%20stop%3D3%2C%0A%20%20%20%20%20%20%20%20step%3D1%2C%0A%20%20%20%20%20%20%20%20value%3D1%2C%0A%20%20%20%20%20%20%20%20label%3D%22Maximum%20repairs%20per%20failed%20tactic%20(R)%22%2C%0A%20%20%20%20%20%20%20%20show_value%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%0A%20%20%20%20%20%20%20%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20repair_rounds%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20mo.md(%22Move%20from%20the%20recommended%20one-repair%20elbow%20to%20zero%2C%20two%2C%20or%20three%20rounds.%22)%2C%0A%20%20%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%20%20gap%3D0.5%2C%0A%20%20%20%20)%0A%20%20%20%20return%20(repair_rounds%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo%2C%20repair_rounds)%3A%0A%20%20%20%20_r%20%3D%20int(repair_rounds.value)%0A%20%20%20%20_net%20%3D%20%5B0%2C%2077%2C%2079%2C%2080%5D%0A%20%20%20%20_mean_s%20%3D%20%5B200.5%2C%20367.3%2C%20450.0%2C%20485.7%5D%0A%20%20%20%20_added_mean_s%20%3D%20%5B0.0%2C%20166.8%2C%20249.4%2C%20285.1%5D%0A%20%20%20%20_fleet_hours%20%3D%20%5B_seconds%20*%201990%20%2F%203600%20for%20_seconds%20in%20_added_mean_s%5D%0A%20%20%20%20_minutes_per_net%20%3D%20%5B0.0%5D%20%2B%20%5B%0A%20%20%20%20%20%20%20%20_added_mean_s%5B_idx%5D%20*%201990%20%2F%20(_net%5B_idx%5D%20*%2060)%0A%20%20%20%20%20%20%20%20for%20_idx%20in%20range(1%2C%204)%0A%20%20%20%20%5D%0A%20%20%20%20_round_label%20%3D%20%22round%22%20if%20_r%20%3D%3D%201%20else%20%22rounds%22%0A%20%20%20%20_heading%20%3D%20(%0A%20%20%20%20%20%20%20%20f%22Operating%20point%3A%20%7B_r%7D%20repair%20%7B_round_label%7D%3B%20%2B%7B_net%5B_r%5D%7D%20net%20theorems%20vs%20R%3D0%3B%20%22%0A%20%20%20%20%20%20%20%20f%22mean%20%7B_mean_s%5B_r%5D%3A.1f%7D%20s%2Ftheorem%3B%20%7B_minutes_per_net%5B_r%5D%3A.1f%7D%20V100-min%20per%20net%20proof%22%0A%20%20%20%20%20%20%20%20if%20_r%0A%20%20%20%20%20%20%20%20else%20%22Operating%20point%3A%200%20repair%20rounds%3B%20sampling-only%20baseline%3B%20mean%20200.5%20s%2Ftheorem%22%0A%20%20%20%20)%0A%20%20%20%20_colors%20%3D%20%5B%22%2393a4b8%22%20if%20_idx%20!%3D%20_r%20else%20%22%23ef7d57%22%20for%20_idx%20in%20range(4)%5D%0A%20%20%20%20_bars_gain%20%3D%20%22%22.join(%0A%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%22%7B80%20%2B%20_idx%20*%2092%7D%22%20y%3D%22%7B250%20-%20_net%5B_idx%5D%20*%201.75%3A.1f%7D%22%20width%3D%2254%22%20'%0A%20%20%20%20%20%20%20%20f'height%3D%22%7B_net%5B_idx%5D%20*%201.75%3A.1f%7D%22%20rx%3D%225%22%20fill%3D%22%7B_colors%5B_idx%5D%7D%22%2F%3E'%0A%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7B107%20%2B%20_idx%20*%2092%7D%22%20y%3D%22%7B242%20-%20_net%5B_idx%5D%20*%201.75%3A.1f%7D%22%20text-anchor%3D%22middle%22%20'%0A%20%20%20%20%20%20%20%20f'font-size%3D%2214%22%20fill%3D%22%23dbe7f3%22%3E%2B%7B_net%5B_idx%5D%7D%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20for%20_idx%20in%20range(4)%0A%20%20%20%20)%0A%20%20%20%20_bars_cost%20%3D%20%22%22.join(%0A%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%22%7B520%20%2B%20_idx%20*%2092%7D%22%20y%3D%22%7B250%20-%20_fleet_hours%5B_idx%5D%20*%200.87%3A.1f%7D%22%20width%3D%2254%22%20'%0A%20%20%20%20%20%20%20%20f'height%3D%22%7B_fleet_hours%5B_idx%5D%20*%200.87%3A.1f%7D%22%20rx%3D%225%22%20fill%3D%22%7B_colors%5B_idx%5D%7D%22%2F%3E'%0A%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7B547%20%2B%20_idx%20*%2092%7D%22%20y%3D%22%7B242%20-%20_fleet_hours%5B_idx%5D%20*%200.87%3A.1f%7D%22%20text-anchor%3D%22middle%22%20'%0A%20%20%20%20%20%20%20%20f'font-size%3D%2214%22%20fill%3D%22%23dbe7f3%22%3E%7B_fleet_hours%5B_idx%5D%3A.1f%7Dh%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20for%20_idx%20in%20range(4)%0A%20%20%20%20)%0A%20%20%20%20_labels%20%3D%20%22%22.join(%0A%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7B107%20%2B%20_idx%20*%2092%7D%22%20y%3D%22274%22%20text-anchor%3D%22middle%22%20font-size%3D%2213%22%20fill%3D%22%239fb1c5%22%3ER%3D%7B_idx%7D%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7B547%20%2B%20_idx%20*%2092%7D%22%20y%3D%22274%22%20text-anchor%3D%22middle%22%20font-size%3D%2213%22%20fill%3D%22%239fb1c5%22%3ER%3D%7B_idx%7D%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20for%20_idx%20in%20range(4)%0A%20%20%20%20)%0A%20%20%20%20_svg%20%3D%20f%22%22%22%0A%20%20%20%20%3Csvg%20data-chart%3D%22repair-elbow%22%20data-round%3D%22%7B_r%7D%22%20viewBox%3D%220%200%20940%20330%22%0A%20%20%20%20%20%20%20%20%20style%3D%22width%3A100%25%3Bheight%3Aauto%3Bbackground%3A%23111a24%3Bborder-radius%3A14px%22%20role%3D%22img%22%0A%20%20%20%20%20%20%20%20%20aria-label%3D%22Net%20proof%20gain%20and%20cumulative%20V100%20cost%20by%20repair%20round%22%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2248%22%20y%3D%2238%22%20font-size%3D%2218%22%20font-weight%3D%22700%22%20fill%3D%22%23f4f8fc%22%3ENet%20theorem%20gain%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22488%22%20y%3D%2238%22%20font-size%3D%2218%22%20font-weight%3D%22700%22%20fill%3D%22%23f4f8fc%22%3EAdded%20fleet%20compute%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2248%22%20y%3D%2260%22%20font-size%3D%2213%22%20fill%3D%22%239fb1c5%22%3Epaired%20net%20delta%20versus%20R%3D0%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22488%22%20y%3D%2260%22%20font-size%3D%2213%22%20fill%3D%22%239fb1c5%22%3E1%2C990%20%C3%97%20added%20mean%20time%2C%20V100-hours%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%2248%22%20y1%3D%22250%22%20x2%3D%22430%22%20y2%3D%22250%22%20stroke%3D%22%23506174%22%2F%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%22488%22%20y1%3D%22250%22%20x2%3D%22870%22%20y2%3D%22250%22%20stroke%3D%22%23506174%22%2F%3E%0A%20%20%20%20%20%20%7B_bars_gain%7D%7B_bars_cost%7D%7B_labels%7D%0A%20%20%20%20%20%20%3Ctext%20x%3D%22470%22%20y%3D%22311%22%20text-anchor%3D%22middle%22%20font-size%3D%2214%22%20fill%3D%22%23efb366%22%3E%0A%20%20%20%20%20%20%20%20First%20repair%3A%2077%2F80%20%3D%2096.3%25%20of%20the%20R%3D3%20net%20gain%0A%20%20%20%20%20%20%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%22%22%22%0A%20%20%20%20mo.vstack(%0A%20%20%20%20%20%20%20%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20mo.md(f%22%23%23%20%7B_heading%7D%22)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20mo.Html(_svg)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20mo.md(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f%22**Fleet%20normalization.**%20At%20%60R%3D%7B_r%7D%60%2C%20added%20compute%20is%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f%22**%7B_fleet_hours%5B_r%5D%3A.1f%7D%20V100-hours**%20over%20the%20benchmark.%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2B%20(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f%22That%20is%20**%7B_minutes_per_net%5B_r%5D%3A.1f%7D%20V100-min%20per%20net%20proof**.%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20_r%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20else%20%22No%20repair%20cost%20is%20charged%20at%20the%20baseline.%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20)%0A%20%20%20%20%20%20%20%20%20%20%20%20)%2C%0A%20%20%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%20%20gap%3D0.8%2C%0A%20%20%20%20)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20Takeaway%0A%0A%20%20%20%20One%20repair%20is%20the%20elbow%3A%20at%20%60K%3D8%60%2C%20it%20captures%20**77%20of%20the%20eventual%2080%20net%20proofs%20(96.3%25)**.%20Going%20from%20one%20to%20three%20repairs%20adds%20only%20three%20more%20net%20proofs%20while%20cumulative%20added%20compute%20rises%20from%20**92.2%20to%20157.6%20V100-hours**%20over%20the%201%2C990%20items.%0A%0A%20%20%20%20**Operational%20rule%3A**%20let%20a%20deterministic%20checker%20gate%20acceptance%2C%20try%20one%20diagnostic-conditioned%20repair%20by%20default%2C%20and%20require%20an%20explicit%20value%20threshold%20for%20deeper%20retries.%20These%20are%20author-run%20V100%20measurements%2C%20not%20universal%20constants%3B%20model%20identity%2C%20batching%2C%20hardware%2C%20and%20diagnostic%20class%20can%20move%20the%20crossover.%0A%0A%20%20%20%20Source%3A%20Deng%20et%20al.%2C%20*Fix%2C%20Not%20Just%20Resample*%20(arXiv%3A2610.26942v1)%2C%20especially%20Tables%201%20and%203.%20Demo%20code%20is%20MIT-licensed%3B%20the%20paper%20remains%20under%20its%20arXiv%20license.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

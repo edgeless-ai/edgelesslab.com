@@ -383,6 +383,16 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["graph-networks", "physics-simulation", "generalization", "distribution-shift"],
     published_url: "https://marimo.edgelesslab.com/2203.07895-ghost-floor-shortcut/",
   },
+
+  // Analytical reproduction (arXiv:2609.10873). published_url added only after live verification.
+  {
+    slug: "2609.10873-update-admission-power",
+    title: "Update Gates Need Power, Not Just Safety",
+    description:
+      "See how tolerance, repeated testing, protected tasks, and episode budget determine whether a statistically valid update gate can still learn.",
+    category: "AI training",
+    tags: ["continual-learning", "confidence-bounds", "evaluation", "robotics", "admission-control"],
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

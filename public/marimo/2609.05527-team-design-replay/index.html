@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2609.05527-team-design-replay</title>
+    <script type="module" crossorigin src="./assets/index-DafnX1Xx.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-B0Z9INg1.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-CUdNIagt.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-BQ9S8nyo.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-Dc9HkKI2.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CKsE8sC1.js">
+    <link rel="modulepreload" crossorigin href="./assets/schemas-BL-NsLlF.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-BCaOs5rp.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-oX0TOjjx.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-Cmx0b_zA.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-aFmHgJZY.js">
+    <link rel="modulepreload" crossorigin href="./assets/isArrayLikeObject-DnwgSs_Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseMerge-CQpUq7ep.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-snlMn4yk.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-B74pBk57.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-BdZUApHd.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-Ci2dTZ72.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BxZgoFvi.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-B4K466FK.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-DXKMv4Bs.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-CrTnjj37.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-DpGPGznL.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-DB0hHKMi.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-ldLVeaqm.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-BmzAqMKq.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CyYN7zJg.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-BBdeXCvU.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-restore-focus-B98SEiGc.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-BoklZTGL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-rHn2EdoM.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-Wea4hZ6R.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFOBKCJB.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-C4-_TnkF.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BplWpfFo.js">
+    <link rel="modulepreload" crossorigin href="./assets/circle-CeQt3rdW.js">
+    <link rel="modulepreload" crossorigin href="./assets/toast-KNfsFUiB.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-DR2Z2N4w.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-CzfpItSz.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-DKSBdWUf.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-BbJ1_N2T.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CrkOvbyN.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-CeE3i3Qa.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-BqUx5USx.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-Haz_uxEL.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-DsgsDslU.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-DMbg9X18.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-BDakodZ2.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-CC89xOwH.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-yTHMxhVa.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-k9DpjH68.js">
+    <link rel="modulepreload" crossorigin href="./assets/write-secret-modal-BiG2tahJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-gbN72xHe.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-BJG-7Qob.js">
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-HclGiUj8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BczecT6V.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BTskHGpb.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-Bj3s1hGN.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-C49f7GXV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-BPvK7C_R.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Ccyblc8N.js">
+    <link rel="modulepreload" crossorigin href="./assets/marked.esm-B_3iMIUq.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings-BHZPE0Mc.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BN-7G8qZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-DFf033uX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiUBikfn.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-MRn68vX1.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Bviq_Dee.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DBqBVprh.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DueXZKz9.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-CJTNBbet.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-DcnXlv0_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-DucTwMkf.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CYRiAeUx.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CzugpTQu.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-DjNf4SIX.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-RyCOE8jo.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-BhJktFeI.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-DFhUGBjO.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-BeE1cdgM.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B4VJJibu.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-DOPs2jx8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-VuyoeQOD.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-B_IYTCX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-DVgK5i5l.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-BeYhVWvM.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-D9vyuMar.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-CNPGWpMu.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-Bq_nmf5u.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-D5bOh7g6.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-CLRkNgm7.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-PLkI_UfK.js">
+    <link rel="modulepreload" crossorigin href="./assets/filename-fxG7K_MU.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-D9Dr-k4J.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-YOKDWASO-CaoEAGJk.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-0PFKL3SH.css">
+    <link rel="stylesheet" crossorigin href="./assets/index--sT8xf-8.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\"marimo==0.23.16\"]\n# ///\n\nimport marimo\n\n__generated_with = \"0.25.1\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    return (mo,)\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    # Buy the Replay That Can Change the Decision\n\n    A human-agent workflow is worth keeping only if it beats **both** the human-only\n    and agent-only alternatives. TEAM-Design ([Khosravi \u0026 Huo, arXiv:2609.05527](https://arxiv.org/abs/2609.05527))\n    asks which missing counterfactual to replay under a fixed budget.\n\n    **Question:** as human replay becomes more expensive, does a decision-targeted\n    allocation still buy evidence for the harder comparison? Move the cost slider.\n\n    This is a deterministic **mechanism reproduction** of Equation 10 on the paper's\n    published two-stratum synthetic generator. It is not a rerun of the clinical or\n    coding studies, and the quoted decision rates below are author-reported results.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _(mo):\n    human_cost = mo.ui.slider(\n        1, 10, value=5, step=1,\n        label=\"Human-only replay cost relative to agent-only\",\n    )\n    mo.vstack([\n        mo.md(\"### Cost-aware replay policy\"),\n        human_cost,\n        mo.md(\"Budget stays at one-sixth of full replay cost; floor = 2%, stabilizer = 0.03.\"),\n    ])\n    return (human_cost,)\n\n\n@app.cell\ndef _(human_cost, mo):\n    import math\n\n    _p_t = [0.70, 0.78]\n    _prob = {\"H\": [0.55, 0.85], \"A\": [0.60, 0.56]}\n    _cost = {\"H\": [float(human_cost.value)] * 2, \"A\": [1.0, 1.0]}\n    _q_min, _tau = 0.02, 0.03\n    _budget = (float(human_cost.value) + 1.0) / 6.0\n    _delta, _s, _kappa, _d2 = {}, {}, {}, {}\n    for _j in (\"H\", \"A\"):\n        _pj = _prob[_j]\n        _delta[_j] = sum(_p_t[_i] - _pj[_i] for _i in range(2)) / 2\n        _s[_j] = [_x * (1 - _x) for _x in _pj]\n        _diff_sq = [_p_t[_i] * (1 - _pj[_i]) + (1 - _p_t[_i]) * _pj[_i] for _i in range(2)]\n        _var_diff = sum(_diff_sq) / 2 - _delta[_j] ** 2\n        _kappa[_j] = _var_diff - sum(_s[_j]) / 2\n        _d2[_j] = max(_delta[_j], 0.0) ** 2 + _tau**2\n\n    def _allocate(_weights, _use_gap):\n        _lo, _hi = 1e-12, 1e12\n        _q = {\"H\": [_q_min, _q_min], \"A\": [_q_min, _q_min]}\n        for _ in range(90):\n            _eta = math.sqrt(_lo * _hi)\n            _q = {}\n            for _j in (\"H\", \"A\"):\n                _gap = _d2[_j] if _use_gap else 1.0\n                _q[_j] = [min(1.0, max(_q_min, math.sqrt(\n                    _weights[_j] * _s[_j][_i] / (_eta * _gap * _cost[_j][_i])\n                ))) for _i in range(2)]\n            _spend = sum(sum(_cost[_j][_i] * _q[_j][_i] for _i in range(2)) / 2 for _j in (\"H\", \"A\"))\n            if _spend \u003E _budget:\n                _lo = _eta\n            else:\n                _hi = _eta\n        return _q\n\n    _best = (float(\"inf\"), 0.0, {\"H\": [_q_min] * 2, \"A\": [_q_min] * 2}, {\"H\": float(\"inf\"), \"A\": float(\"inf\")})\n    for _step in range(401):\n        _lam_h = _step / 400\n        _q = _allocate({\"H\": _lam_h, \"A\": 1 - _lam_h}, True)\n        _difficulty = {\n            _j: (_kappa[_j] + sum(_s[_j][_i] / _q[_j][_i] for _i in range(2)) / 2) / _d2[_j]\n            for _j in (\"H\", \"A\")\n        }\n        _record = (max(_difficulty.values()), _lam_h, _q, _difficulty)\n        if _record[0] \u003C _best[0]:\n            _best = _record\n    _team_obj, _lam, _q_team, _team_diff = _best\n    _q_neyman = _allocate({\"H\": 1.0, \"A\": 1.0}, False)\n    _neyman_diff = {\n        _j: (_kappa[_j] + sum(_s[_j][_i] / _q_neyman[_j][_i] for _i in range(2)) / 2) / _d2[_j]\n        for _j in (\"H\", \"A\")\n    }\n    _gain = 100 * (1 - _team_obj / max(_neyman_diff.values()))\n    _bottleneck = \"human-only\" if _team_diff[\"H\"] \u003E= _team_diff[\"A\"] else \"agent-only\"\n\n    _labels = [\"H / W0\", \"H / W1\", \"A / W0\", \"A / W1\"]\n    _team = _q_team[\"H\"] + _q_team[\"A\"]\n    _neyman = _q_neyman[\"H\"] + _q_neyman[\"A\"]\n    _bars = []\n    for _i, _label in enumerate(_labels):\n        _x = 45 + 105 * _i\n        _th = round(210 * _team[_i])\n        _nh = round(210 * _neyman[_i])\n        _bars.append(\n            f'\u003Crect x=\"{_x}\" y=\"{250-_th}\" width=\"32\" height=\"{_th}\" fill=\"#2563eb\"/\u003E'\n            f'\u003Crect x=\"{_x+34}\" y=\"{250-_nh}\" width=\"32\" height=\"{_nh}\" fill=\"#94a3b8\"/\u003E'\n            f'\u003Ctext x=\"{_x+33}\" y=\"274\" text-anchor=\"middle\" font-size=\"12\"\u003E{_label}\u003C/text\u003E'\n        )\n    _svg = f'''\u003Csvg data-chart=\"team-design-replay\" data-cost=\"{int(human_cost.value)}\"\n      viewBox=\"0 0 500 315\" style=\"width:100%;max-width:760px\" role=\"img\"\n      aria-label=\"Replay probabilities for TEAM-Design and cost-aware Neyman allocation\"\u003E\n      \u003Crect width=\"500\" height=\"315\" rx=\"14\" fill=\"#f8fafc\"/\u003E\n      \u003Cline x1=\"35\" y1=\"250\" x2=\"475\" y2=\"250\" stroke=\"#64748b\"/\u003E\n      \u003Cline x1=\"35\" y1=\"40\" x2=\"35\" y2=\"250\" stroke=\"#64748b\"/\u003E\n      \u003Ctext x=\"35\" y=\"25\" font-size=\"14\" font-weight=\"700\"\u003EReplay probability\u003C/text\u003E\n      {''.join(_bars)}\n      \u003Crect x=\"55\" y=\"292\" width=\"14\" height=\"14\" fill=\"#2563eb\"/\u003E\u003Ctext x=\"75\" y=\"304\" font-size=\"12\"\u003ETEAM-Design\u003C/text\u003E\n      \u003Crect x=\"185\" y=\"292\" width=\"14\" height=\"14\" fill=\"#94a3b8\"/\u003E\u003Ctext x=\"205\" y=\"304\" font-size=\"12\"\u003ECost-aware Neyman\u003C/text\u003E\n    \u003C/svg\u003E'''\n    _heading = f\"Operating point: {int(human_cost.value)}x human cost; {_bottleneck} bottleneck; TEAM lowers worst difficulty by {_gain:.1f}%\"\n    mo.vstack([mo.md(f\"## {_heading}\"), mo.Html(_svg), mo.md(\n        f\"**Computed allocation:** lambda_H = {_lam:.3f}; expected spend = {_budget:.2f} per task. \"\n        \"Blue shifts replay toward the claim closest to failing; gray buys uncertainty without decision geometry.\"\n    )])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ### Takeaway and limits\n\n    The paper's square-root rule spends on **prediction error / cost / squared margin**,\n    so expensive evidence is still purchased when it governs the beats-both decision.\n    The paper reports the strongest advantage in the one-bottleneck setting: 77.1%\n    versus 65.1% decision rate for TEAM versus Neyman. It also reports a reversal when\n    comparisons are balanced: 39.1% versus 44.4%. Those rates are quoted, not recomputed.\n\n    Valid use requires a disjoint fully observed pilot, replay probabilities fixed before\n    baseline outcomes are revealed, and a positive probability floor. This demo is an\n    allocation explainer, not evidence that a particular human-agent system should deploy.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%22marimo%3D%3D0.23.16%22%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.25.1%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20return%20(mo%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%20Buy%20the%20Replay%20That%20Can%20Change%20the%20Decision%0A%0A%20%20%20%20A%20human-agent%20workflow%20is%20worth%20keeping%20only%20if%20it%20beats%20**both**%20the%20human-only%0A%20%20%20%20and%20agent-only%20alternatives.%20TEAM-Design%20(%5BKhosravi%20%26%20Huo%2C%20arXiv%3A2609.05527%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2609.05527))%0A%20%20%20%20asks%20which%20missing%20counterfactual%20to%20replay%20under%20a%20fixed%20budget.%0A%0A%20%20%20%20**Question%3A**%20as%20human%20replay%20becomes%20more%20expensive%2C%20does%20a%20decision-targeted%0A%20%20%20%20allocation%20still%20buy%20evidence%20for%20the%20harder%20comparison%3F%20Move%20the%20cost%20slider.%0A%0A%20%20%20%20This%20is%20a%20deterministic%20**mechanism%20reproduction**%20of%20Equation%2010%20on%20the%20paper's%0A%20%20%20%20published%20two-stratum%20synthetic%20generator.%20It%20is%20not%20a%20rerun%20of%20the%20clinical%20or%0A%20%20%20%20coding%20studies%2C%20and%20the%20quoted%20decision%20rates%20below%20are%20author-reported%20results.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20human_cost%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%201%2C%2010%2C%20value%3D5%2C%20step%3D1%2C%0A%20%20%20%20%20%20%20%20label%3D%22Human-only%20replay%20cost%20relative%20to%20agent-only%22%2C%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mo.md(%22%23%23%23%20Cost-aware%20replay%20policy%22)%2C%0A%20%20%20%20%20%20%20%20human_cost%2C%0A%20%20%20%20%20%20%20%20mo.md(%22Budget%20stays%20at%20one-sixth%20of%20full%20replay%20cost%3B%20floor%20%3D%202%25%2C%20stabilizer%20%3D%200.03.%22)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%20(human_cost%2C)%0A%0A%0A%40app.cell%0Adef%20_(human_cost%2C%20mo)%3A%0A%20%20%20%20import%20math%0A%0A%20%20%20%20_p_t%20%3D%20%5B0.70%2C%200.78%5D%0A%20%20%20%20_prob%20%3D%20%7B%22H%22%3A%20%5B0.55%2C%200.85%5D%2C%20%22A%22%3A%20%5B0.60%2C%200.56%5D%7D%0A%20%20%20%20_cost%20%3D%20%7B%22H%22%3A%20%5Bfloat(human_cost.value)%5D%20*%202%2C%20%22A%22%3A%20%5B1.0%2C%201.0%5D%7D%0A%20%20%20%20_q_min%2C%20_tau%20%3D%200.02%2C%200.03%0A%20%20%20%20_budget%20%3D%20(float(human_cost.value)%20%2B%201.0)%20%2F%206.0%0A%20%20%20%20_delta%2C%20_s%2C%20_kappa%2C%20_d2%20%3D%20%7B%7D%2C%20%7B%7D%2C%20%7B%7D%2C%20%7B%7D%0A%20%20%20%20for%20_j%20in%20(%22H%22%2C%20%22A%22)%3A%0A%20%20%20%20%20%20%20%20_pj%20%3D%20_prob%5B_j%5D%0A%20%20%20%20%20%20%20%20_delta%5B_j%5D%20%3D%20sum(_p_t%5B_i%5D%20-%20_pj%5B_i%5D%20for%20_i%20in%20range(2))%20%2F%202%0A%20%20%20%20%20%20%20%20_s%5B_j%5D%20%3D%20%5B_x%20*%20(1%20-%20_x)%20for%20_x%20in%20_pj%5D%0A%20%20%20%20%20%20%20%20_diff_sq%20%3D%20%5B_p_t%5B_i%5D%20*%20(1%20-%20_pj%5B_i%5D)%20%2B%20(1%20-%20_p_t%5B_i%5D)%20*%20_pj%5B_i%5D%20for%20_i%20in%20range(2)%5D%0A%20%20%20%20%20%20%20%20_var_diff%20%3D%20sum(_diff_sq)%20%2F%202%20-%20_delta%5B_j%5D%20**%202%0A%20%20%20%20%20%20%20%20_kappa%5B_j%5D%20%3D%20_var_diff%20-%20sum(_s%5B_j%5D)%20%2F%202%0A%20%20%20%20%20%20%20%20_d2%5B_j%5D%20%3D%20max(_delta%5B_j%5D%2C%200.0)%20**%202%20%2B%20_tau**2%0A%0A%20%20%20%20def%20_allocate(_weights%2C%20_use_gap)%3A%0A%20%20%20%20%20%20%20%20_lo%2C%20_hi%20%3D%201e-12%2C%201e12%0A%20%20%20%20%20%20%20%20_q%20%3D%20%7B%22H%22%3A%20%5B_q_min%2C%20_q_min%5D%2C%20%22A%22%3A%20%5B_q_min%2C%20_q_min%5D%7D%0A%20%20%20%20%20%20%20%20for%20_%20in%20range(90)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_eta%20%3D%20math.sqrt(_lo%20*%20_hi)%0A%20%20%20%20%20%20%20%20%20%20%20%20_q%20%3D%20%7B%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20for%20_j%20in%20(%22H%22%2C%20%22A%22)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_gap%20%3D%20_d2%5B_j%5D%20if%20_use_gap%20else%201.0%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_q%5B_j%5D%20%3D%20%5Bmin(1.0%2C%20max(_q_min%2C%20math.sqrt(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_weights%5B_j%5D%20*%20_s%5B_j%5D%5B_i%5D%20%2F%20(_eta%20*%20_gap%20*%20_cost%5B_j%5D%5B_i%5D)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20)))%20for%20_i%20in%20range(2)%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20_spend%20%3D%20sum(sum(_cost%5B_j%5D%5B_i%5D%20*%20_q%5B_j%5D%5B_i%5D%20for%20_i%20in%20range(2))%20%2F%202%20for%20_j%20in%20(%22H%22%2C%20%22A%22))%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20_spend%20%3E%20_budget%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_lo%20%3D%20_eta%0A%20%20%20%20%20%20%20%20%20%20%20%20else%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_hi%20%3D%20_eta%0A%20%20%20%20%20%20%20%20return%20_q%0A%0A%20%20%20%20_best%20%3D%20(float(%22inf%22)%2C%200.0%2C%20%7B%22H%22%3A%20%5B_q_min%5D%20*%202%2C%20%22A%22%3A%20%5B_q_min%5D%20*%202%7D%2C%20%7B%22H%22%3A%20float(%22inf%22)%2C%20%22A%22%3A%20float(%22inf%22)%7D)%0A%20%20%20%20for%20_step%20in%20range(401)%3A%0A%20%20%20%20%20%20%20%20_lam_h%20%3D%20_step%20%2F%20400%0A%20%20%20%20%20%20%20%20_q%20%3D%20_allocate(%7B%22H%22%3A%20_lam_h%2C%20%22A%22%3A%201%20-%20_lam_h%7D%2C%20True)%0A%20%20%20%20%20%20%20%20_difficulty%20%3D%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20_j%3A%20(_kappa%5B_j%5D%20%2B%20sum(_s%5B_j%5D%5B_i%5D%20%2F%20_q%5B_j%5D%5B_i%5D%20for%20_i%20in%20range(2))%20%2F%202)%20%2F%20_d2%5B_j%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20for%20_j%20in%20(%22H%22%2C%20%22A%22)%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20_record%20%3D%20(max(_difficulty.values())%2C%20_lam_h%2C%20_q%2C%20_difficulty)%0A%20%20%20%20%20%20%20%20if%20_record%5B0%5D%20%3C%20_best%5B0%5D%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_best%20%3D%20_record%0A%20%20%20%20_team_obj%2C%20_lam%2C%20_q_team%2C%20_team_diff%20%3D%20_best%0A%20%20%20%20_q_neyman%20%3D%20_allocate(%7B%22H%22%3A%201.0%2C%20%22A%22%3A%201.0%7D%2C%20False)%0A%20%20%20%20_neyman_diff%20%3D%20%7B%0A%20%20%20%20%20%20%20%20_j%3A%20(_kappa%5B_j%5D%20%2B%20sum(_s%5B_j%5D%5B_i%5D%20%2F%20_q_neyman%5B_j%5D%5B_i%5D%20for%20_i%20in%20range(2))%20%2F%202)%20%2F%20_d2%5B_j%5D%0A%20%20%20%20%20%20%20%20for%20_j%20in%20(%22H%22%2C%20%22A%22)%0A%20%20%20%20%7D%0A%20%20%20%20_gain%20%3D%20100%20*%20(1%20-%20_team_obj%20%2F%20max(_neyman_diff.values()))%0A%20%20%20%20_bottleneck%20%3D%20%22human-only%22%20if%20_team_diff%5B%22H%22%5D%20%3E%3D%20_team_diff%5B%22A%22%5D%20else%20%22agent-only%22%0A%0A%20%20%20%20_labels%20%3D%20%5B%22H%20%2F%20W0%22%2C%20%22H%20%2F%20W1%22%2C%20%22A%20%2F%20W0%22%2C%20%22A%20%2F%20W1%22%5D%0A%20%20%20%20_team%20%3D%20_q_team%5B%22H%22%5D%20%2B%20_q_team%5B%22A%22%5D%0A%20%20%20%20_neyman%20%3D%20_q_neyman%5B%22H%22%5D%20%2B%20_q_neyman%5B%22A%22%5D%0A%20%20%20%20_bars%20%3D%20%5B%5D%0A%20%20%20%20for%20_i%2C%20_label%20in%20enumerate(_labels)%3A%0A%20%20%20%20%20%20%20%20_x%20%3D%2045%20%2B%20105%20*%20_i%0A%20%20%20%20%20%20%20%20_th%20%3D%20round(210%20*%20_team%5B_i%5D)%0A%20%20%20%20%20%20%20%20_nh%20%3D%20round(210%20*%20_neyman%5B_i%5D)%0A%20%20%20%20%20%20%20%20_bars.append(%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%22%7B_x%7D%22%20y%3D%22%7B250-_th%7D%22%20width%3D%2232%22%20height%3D%22%7B_th%7D%22%20fill%3D%22%232563eb%22%2F%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%22%7B_x%2B34%7D%22%20y%3D%22%7B250-_nh%7D%22%20width%3D%2232%22%20height%3D%22%7B_nh%7D%22%20fill%3D%22%2394a3b8%22%2F%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7B_x%2B33%7D%22%20y%3D%22274%22%20text-anchor%3D%22middle%22%20font-size%3D%2212%22%3E%7B_label%7D%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20_svg%20%3D%20f'''%3Csvg%20data-chart%3D%22team-design-replay%22%20data-cost%3D%22%7Bint(human_cost.value)%7D%22%0A%20%20%20%20%20%20viewBox%3D%220%200%20500%20315%22%20style%3D%22width%3A100%25%3Bmax-width%3A760px%22%20role%3D%22img%22%0A%20%20%20%20%20%20aria-label%3D%22Replay%20probabilities%20for%20TEAM-Design%20and%20cost-aware%20Neyman%20allocation%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22500%22%20height%3D%22315%22%20rx%3D%2214%22%20fill%3D%22%23f8fafc%22%2F%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%2235%22%20y1%3D%22250%22%20x2%3D%22475%22%20y2%3D%22250%22%20stroke%3D%22%2364748b%22%2F%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%2235%22%20y1%3D%2240%22%20x2%3D%2235%22%20y2%3D%22250%22%20stroke%3D%22%2364748b%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2235%22%20y%3D%2225%22%20font-size%3D%2214%22%20font-weight%3D%22700%22%3EReplay%20probability%3C%2Ftext%3E%0A%20%20%20%20%20%20%7B''.join(_bars)%7D%0A%20%20%20%20%20%20%3Crect%20x%3D%2255%22%20y%3D%22292%22%20width%3D%2214%22%20height%3D%2214%22%20fill%3D%22%232563eb%22%2F%3E%3Ctext%20x%3D%2275%22%20y%3D%22304%22%20font-size%3D%2212%22%3ETEAM-Design%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22185%22%20y%3D%22292%22%20width%3D%2214%22%20height%3D%2214%22%20fill%3D%22%2394a3b8%22%2F%3E%3Ctext%20x%3D%22205%22%20y%3D%22304%22%20font-size%3D%2212%22%3ECost-aware%20Neyman%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E'''%0A%20%20%20%20_heading%20%3D%20f%22Operating%20point%3A%20%7Bint(human_cost.value)%7Dx%20human%20cost%3B%20%7B_bottleneck%7D%20bottleneck%3B%20TEAM%20lowers%20worst%20difficulty%20by%20%7B_gain%3A.1f%7D%25%22%0A%20%20%20%20mo.vstack(%5Bmo.md(f%22%23%23%20%7B_heading%7D%22)%2C%20mo.Html(_svg)%2C%20mo.md(%0A%20%20%20%20%20%20%20%20f%22**Computed%20allocation%3A**%20lambda_H%20%3D%20%7B_lam%3A.3f%7D%3B%20expected%20spend%20%3D%20%7B_budget%3A.2f%7D%20per%20task.%20%22%0A%20%20%20%20%20%20%20%20%22Blue%20shifts%20replay%20toward%20the%20claim%20closest%20to%20failing%3B%20gray%20buys%20uncertainty%20without%20decision%20geometry.%22%0A%20%20%20%20)%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%23%20Takeaway%20and%20limits%0A%0A%20%20%20%20The%20paper's%20square-root%20rule%20spends%20on%20**prediction%20error%20%2F%20cost%20%2F%20squared%20margin**%2C%0A%20%20%20%20so%20expensive%20evidence%20is%20still%20purchased%20when%20it%20governs%20the%20beats-both%20decision.%0A%20%20%20%20The%20paper%20reports%20the%20strongest%20advantage%20in%20the%20one-bottleneck%20setting%3A%2077.1%25%0A%20%20%20%20versus%2065.1%25%20decision%20rate%20for%20TEAM%20versus%20Neyman.%20It%20also%20reports%20a%20reversal%20when%0A%20%20%20%20comparisons%20are%20balanced%3A%2039.1%25%20versus%2044.4%25.%20Those%20rates%20are%20quoted%2C%20not%20recomputed.%0A%0A%20%20%20%20Valid%20use%20requires%20a%20disjoint%20fully%20observed%20pilot%2C%20replay%20probabilities%20fixed%20before%0A%20%20%20%20baseline%20outcomes%20are%20revealed%2C%20and%20a%20positive%20probability%20floor.%20This%20demo%20is%20an%0A%20%20%20%20allocation%20explainer%2C%20not%20evidence%20that%20a%20particular%20human-agent%20system%20should%20deploy.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.25.1",
+            "serverToken": "unused",
+            "config": {"ai": {"allow_provider_config": true, "custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "code_lens": true, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "layout": null,
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

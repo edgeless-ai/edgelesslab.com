@@ -393,6 +393,16 @@ export const marimoDemos: MarimoDemo[] = [
     category: "AI training",
     tags: ["continual-learning", "confidence-bounds", "evaluation", "robotics", "admission-control"],
   },
+
+  // Pre-verify: published_url will be added after live verification
+  {
+    slug: "2609.05527-team-design-replay",
+    title: "Buy the Replay That Can Change the Decision",
+    description:
+      "Raise the cost of human replay and see whether a decision-targeted design still buys evidence for the comparison closest to failing.",
+    category: "AI evaluation",
+    tags: ["human-agent-teams", "evaluation-design", "counterfactual-replay", "cost-aware-allocation"],
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

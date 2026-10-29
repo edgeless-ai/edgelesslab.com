@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2609.10873-update-admission-power</title>
+    <script type="module" crossorigin src="./assets/index-DafnX1Xx.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-B0Z9INg1.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-CUdNIagt.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-BQ9S8nyo.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-Dc9HkKI2.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CKsE8sC1.js">
+    <link rel="modulepreload" crossorigin href="./assets/schemas-BL-NsLlF.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-BCaOs5rp.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-oX0TOjjx.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-Cmx0b_zA.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-aFmHgJZY.js">
+    <link rel="modulepreload" crossorigin href="./assets/isArrayLikeObject-DnwgSs_Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseMerge-CQpUq7ep.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-snlMn4yk.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-B74pBk57.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-BdZUApHd.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-Ci2dTZ72.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BxZgoFvi.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-B4K466FK.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-DXKMv4Bs.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-CrTnjj37.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-DpGPGznL.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-DB0hHKMi.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-ldLVeaqm.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-BmzAqMKq.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CyYN7zJg.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-BBdeXCvU.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-restore-focus-B98SEiGc.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-BoklZTGL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-rHn2EdoM.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-Wea4hZ6R.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFOBKCJB.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-C4-_TnkF.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BplWpfFo.js">
+    <link rel="modulepreload" crossorigin href="./assets/circle-CeQt3rdW.js">
+    <link rel="modulepreload" crossorigin href="./assets/toast-KNfsFUiB.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-DR2Z2N4w.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-CzfpItSz.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-DKSBdWUf.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-BbJ1_N2T.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CrkOvbyN.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-CeE3i3Qa.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-BqUx5USx.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-Haz_uxEL.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-DsgsDslU.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-DMbg9X18.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-BDakodZ2.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-CC89xOwH.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-yTHMxhVa.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-k9DpjH68.js">
+    <link rel="modulepreload" crossorigin href="./assets/write-secret-modal-BiG2tahJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-gbN72xHe.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-BJG-7Qob.js">
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-HclGiUj8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BczecT6V.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BTskHGpb.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-Bj3s1hGN.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-C49f7GXV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-BPvK7C_R.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Ccyblc8N.js">
+    <link rel="modulepreload" crossorigin href="./assets/marked.esm-B_3iMIUq.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings-BHZPE0Mc.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BN-7G8qZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-DFf033uX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiUBikfn.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-MRn68vX1.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Bviq_Dee.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DBqBVprh.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DueXZKz9.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-CJTNBbet.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-DcnXlv0_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-DucTwMkf.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CYRiAeUx.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CzugpTQu.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-DjNf4SIX.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-RyCOE8jo.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-BhJktFeI.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-DFhUGBjO.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-BeE1cdgM.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B4VJJibu.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-DOPs2jx8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-VuyoeQOD.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-B_IYTCX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-DVgK5i5l.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-BeYhVWvM.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-D9vyuMar.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-CNPGWpMu.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-Bq_nmf5u.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-D5bOh7g6.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-CLRkNgm7.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-PLkI_UfK.js">
+    <link rel="modulepreload" crossorigin href="./assets/filename-fxG7K_MU.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-D9Dr-k4J.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-YOKDWASO-CaoEAGJk.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-0PFKL3SH.css">
+    <link rel="stylesheet" crossorigin href="./assets/index--sT8xf-8.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\"marimo==0.25.1\"]\n# ///\n\nimport marimo\n\n__generated_with = \"0.25.1\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    return (mo,)\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    # Update gates need power, not just safety\n\n    **Research question:** when unchanged old-task behavior produces zero paired\n    disagreements, how much fresh evidence does an admission gate need before it\n    can certify retention?\n\n    Ma and Wu's [paper](https://arxiv.org/abs/2609.10873) gives two analytical\n    requirements: a range-only Hoeffding gate and an exact paired-binomial gate.\n    This demo recomputes those formulas; it is an **analytical mechanism\n    reproduction**, not the paper's simulator, robot evidence, or a safety claim.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _(mo):\n    tolerance = mo.ui.slider(0.01, 0.15, value=0.05, step=0.01, label=\"Retention tolerance\")\n    comparisons = mo.ui.slider(1, 12, value=3, step=1, label=\"Protected comparisons\")\n    attempt = mo.ui.slider(1, 8, value=1, step=1, label=\"Committed attempt\")\n    budget = mo.ui.slider(200, 30000, value=2000, step=200, label=\"Episode budget\")\n    mo.md(f\"\"\"\n    ## Contract controls\n    {tolerance}\n    {comparisons}\n    {attempt}\n    {budget}\n    \"\"\")\n    return attempt, budget, comparisons, tolerance\n\n\n@app.cell\ndef _(attempt, budget, comparisons, mo, tolerance):\n    import math as _math\n\n    _eps = float(tolerance.value)\n    _m = int(comparisons.value)\n    _t = int(attempt.value)\n    _budget = int(budget.value)\n    _alpha = 6.0 * 0.05 / (_math.pi**2 * _t**2)\n    _tail = _alpha / (4.0 * _m)\n    _paired_n = _math.ceil(_math.log(_tail) / _math.log(1.0 - _eps))\n    _range_n = _math.ceil(2.0 * _math.log(2.0 * _m / _alpha) / _eps**2)\n    _paired_cost = 2 * _m * _paired_n\n    _range_cost = 2 * _m * _range_n\n    _paired_state = \"passes\" if _paired_cost \u003C= _budget else \"freezes\"\n    _range_state = \"passes\" if _range_cost \u003C= _budget else \"freezes\"\n    _headline = (\n        f\"Operating point: tolerance {_eps:.2f}; paired {_paired_cost:,} episodes; \"\n        f\"range {_range_cost:,}; paired {_paired_state} / range {_range_state}\"\n    )\n\n    _scale_max = max(_paired_cost, _range_cost, _budget) * 1.12\n    _x0, _plot_w = 175.0, 650.0\n    _log_max = _math.log10(_scale_max + 1)\n    _paired_w = _plot_w * _math.log10(_paired_cost + 1) / _log_max\n    _range_w = _plot_w * _math.log10(_range_cost + 1) / _log_max\n    _budget_x = _x0 + _plot_w * _math.log10(_budget + 1) / _log_max\n    _svg = f\"\"\"\n    \u003Csvg data-chart=\"update-admission-power\" data-tolerance=\"{_eps:.2f}\"\n         viewBox=\"0 0 900 265\" role=\"img\"\n         aria-label=\"Log-scale episode requirements and selected budget\"\n         style=\"width:100%;height:auto;max-width:900px;background:#111827;border-radius:14px\"\u003E\n      \u003Ctext x=\"28\" y=\"35\" fill=\"#f9fafb\" font-size=\"19\" font-weight=\"700\"\u003EEvidence cost under zero disagreements\u003C/text\u003E\n      \u003Ctext x=\"28\" y=\"59\" fill=\"#9ca3af\" font-size=\"13\"\u003ELog-scaled length; the vertical line is the selected budget.\u003C/text\u003E\n      \u003Ctext x=\"28\" y=\"112\" fill=\"#d1d5db\" font-size=\"14\"\u003EPaired exact\u003C/text\u003E\n      \u003Crect x=\"{_x0}\" y=\"91\" width=\"{_paired_w:.1f}\" height=\"31\" rx=\"6\" fill=\"#22c55e\"/\u003E\n      \u003Ctext x=\"{min(_x0 + _paired_w + 10, 820):.1f}\" y=\"112\" fill=\"#f9fafb\" font-size=\"14\"\u003E{_paired_cost:,}\u003C/text\u003E\n      \u003Ctext x=\"28\" y=\"174\" fill=\"#d1d5db\" font-size=\"14\"\u003ERange bound\u003C/text\u003E\n      \u003Crect x=\"{_x0}\" y=\"153\" width=\"{_range_w:.1f}\" height=\"31\" rx=\"6\" fill=\"#f97316\"/\u003E\n      \u003Ctext x=\"{min(_x0 + _range_w + 10, 820):.1f}\" y=\"174\" fill=\"#f9fafb\" font-size=\"14\"\u003E{_range_cost:,}\u003C/text\u003E\n      \u003Cline x1=\"{_budget_x:.1f}\" y1=\"77\" x2=\"{_budget_x:.1f}\" y2=\"204\" stroke=\"#60a5fa\" stroke-width=\"4\"/\u003E\n      \u003Ctext x=\"{min(_budget_x + 7, 790):.1f}\" y=\"224\" fill=\"#93c5fd\" font-size=\"13\"\u003Ebudget {_budget:,}\u003C/text\u003E\n      \u003Ctext x=\"28\" y=\"249\" fill=\"#9ca3af\" font-size=\"12\"\u003ECosts include both policies across {_m} comparison(s); delta=0.05.\u003C/text\u003E\n    \u003C/svg\u003E\n    \"\"\"\n    _summary = mo.md(f\"\"\"\n    ### {_headline}\n\n    | gate | pairs / comparison | total episodes | budget decision |\n    |---|---:|---:|---|\n    | Paired exact | **{_paired_n:,}** | **{_paired_cost:,}** | **{_paired_state}** |\n    | Range-only Hoeffding | **{_range_n:,}** | **{_range_cost:,}** | **{_range_state}** |\n\n    **Takeaway.** A valid gate can still halt learning when its interval is too\n    conservative for the declared budget. Paired evidence is powerful here only\n    because disagreements are rare. Zero observed disagreements are not proof of\n    zero population risk.\n    \"\"\")\n    mo.vstack([_summary, mo.Html(_svg)])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ## Provenance and limits\n\n    The formulas and canonical default (`m=3`, `t=1`, `delta=epsilon=0.05`)\n    reproduce Appendix A: **117 vs 4,229 pairs per comparison**, or **702 vs\n    25,374 episodes**. The paper separately reports author-run synthetic results:\n    31.6% common-stream admission at a 2,000-episode cap for paired checks versus\n    zero for Hoeffding, while replay wins its closed-loop diagnostic.\n\n    Assumptions: binary outcomes, frozen policies and scoring, i.i.d. fresh pairs,\n    fixed-size batches, committed comparisons, and no optional stopping. No paper\n    code, private data, model weights, robot environment, or external service is\n    used. This does not establish physical-robot, VLA, software-agent, or\n    production-system safety.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%22marimo%3D%3D0.25.1%22%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.25.1%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20return%20(mo%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%20Update%20gates%20need%20power%2C%20not%20just%20safety%0A%0A%20%20%20%20**Research%20question%3A**%20when%20unchanged%20old-task%20behavior%20produces%20zero%20paired%0A%20%20%20%20disagreements%2C%20how%20much%20fresh%20evidence%20does%20an%20admission%20gate%20need%20before%20it%0A%20%20%20%20can%20certify%20retention%3F%0A%0A%20%20%20%20Ma%20and%20Wu's%20%5Bpaper%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2609.10873)%20gives%20two%20analytical%0A%20%20%20%20requirements%3A%20a%20range-only%20Hoeffding%20gate%20and%20an%20exact%20paired-binomial%20gate.%0A%20%20%20%20This%20demo%20recomputes%20those%20formulas%3B%20it%20is%20an%20**analytical%20mechanism%0A%20%20%20%20reproduction**%2C%20not%20the%20paper's%20simulator%2C%20robot%20evidence%2C%20or%20a%20safety%20claim.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20tolerance%20%3D%20mo.ui.slider(0.01%2C%200.15%2C%20value%3D0.05%2C%20step%3D0.01%2C%20label%3D%22Retention%20tolerance%22)%0A%20%20%20%20comparisons%20%3D%20mo.ui.slider(1%2C%2012%2C%20value%3D3%2C%20step%3D1%2C%20label%3D%22Protected%20comparisons%22)%0A%20%20%20%20attempt%20%3D%20mo.ui.slider(1%2C%208%2C%20value%3D1%2C%20step%3D1%2C%20label%3D%22Committed%20attempt%22)%0A%20%20%20%20budget%20%3D%20mo.ui.slider(200%2C%2030000%2C%20value%3D2000%2C%20step%3D200%2C%20label%3D%22Episode%20budget%22)%0A%20%20%20%20mo.md(f%22%22%22%0A%20%20%20%20%23%23%20Contract%20controls%0A%20%20%20%20%7Btolerance%7D%0A%20%20%20%20%7Bcomparisons%7D%0A%20%20%20%20%7Battempt%7D%0A%20%20%20%20%7Bbudget%7D%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%20attempt%2C%20budget%2C%20comparisons%2C%20tolerance%0A%0A%0A%40app.cell%0Adef%20_(attempt%2C%20budget%2C%20comparisons%2C%20mo%2C%20tolerance)%3A%0A%20%20%20%20import%20math%20as%20_math%0A%0A%20%20%20%20_eps%20%3D%20float(tolerance.value)%0A%20%20%20%20_m%20%3D%20int(comparisons.value)%0A%20%20%20%20_t%20%3D%20int(attempt.value)%0A%20%20%20%20_budget%20%3D%20int(budget.value)%0A%20%20%20%20_alpha%20%3D%206.0%20*%200.05%20%2F%20(_math.pi**2%20*%20_t**2)%0A%20%20%20%20_tail%20%3D%20_alpha%20%2F%20(4.0%20*%20_m)%0A%20%20%20%20_paired_n%20%3D%20_math.ceil(_math.log(_tail)%20%2F%20_math.log(1.0%20-%20_eps))%0A%20%20%20%20_range_n%20%3D%20_math.ceil(2.0%20*%20_math.log(2.0%20*%20_m%20%2F%20_alpha)%20%2F%20_eps**2)%0A%20%20%20%20_paired_cost%20%3D%202%20*%20_m%20*%20_paired_n%0A%20%20%20%20_range_cost%20%3D%202%20*%20_m%20*%20_range_n%0A%20%20%20%20_paired_state%20%3D%20%22passes%22%20if%20_paired_cost%20%3C%3D%20_budget%20else%20%22freezes%22%0A%20%20%20%20_range_state%20%3D%20%22passes%22%20if%20_range_cost%20%3C%3D%20_budget%20else%20%22freezes%22%0A%20%20%20%20_headline%20%3D%20(%0A%20%20%20%20%20%20%20%20f%22Operating%20point%3A%20tolerance%20%7B_eps%3A.2f%7D%3B%20paired%20%7B_paired_cost%3A%2C%7D%20episodes%3B%20%22%0A%20%20%20%20%20%20%20%20f%22range%20%7B_range_cost%3A%2C%7D%3B%20paired%20%7B_paired_state%7D%20%2F%20range%20%7B_range_state%7D%22%0A%20%20%20%20)%0A%0A%20%20%20%20_scale_max%20%3D%20max(_paired_cost%2C%20_range_cost%2C%20_budget)%20*%201.12%0A%20%20%20%20_x0%2C%20_plot_w%20%3D%20175.0%2C%20650.0%0A%20%20%20%20_log_max%20%3D%20_math.log10(_scale_max%20%2B%201)%0A%20%20%20%20_paired_w%20%3D%20_plot_w%20*%20_math.log10(_paired_cost%20%2B%201)%20%2F%20_log_max%0A%20%20%20%20_range_w%20%3D%20_plot_w%20*%20_math.log10(_range_cost%20%2B%201)%20%2F%20_log_max%0A%20%20%20%20_budget_x%20%3D%20_x0%20%2B%20_plot_w%20*%20_math.log10(_budget%20%2B%201)%20%2F%20_log_max%0A%20%20%20%20_svg%20%3D%20f%22%22%22%0A%20%20%20%20%3Csvg%20data-chart%3D%22update-admission-power%22%20data-tolerance%3D%22%7B_eps%3A.2f%7D%22%0A%20%20%20%20%20%20%20%20%20viewBox%3D%220%200%20900%20265%22%20role%3D%22img%22%0A%20%20%20%20%20%20%20%20%20aria-label%3D%22Log-scale%20episode%20requirements%20and%20selected%20budget%22%0A%20%20%20%20%20%20%20%20%20style%3D%22width%3A100%25%3Bheight%3Aauto%3Bmax-width%3A900px%3Bbackground%3A%23111827%3Bborder-radius%3A14px%22%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%2235%22%20fill%3D%22%23f9fafb%22%20font-size%3D%2219%22%20font-weight%3D%22700%22%3EEvidence%20cost%20under%20zero%20disagreements%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%2259%22%20fill%3D%22%239ca3af%22%20font-size%3D%2213%22%3ELog-scaled%20length%3B%20the%20vertical%20line%20is%20the%20selected%20budget.%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%22112%22%20fill%3D%22%23d1d5db%22%20font-size%3D%2214%22%3EPaired%20exact%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22%7B_x0%7D%22%20y%3D%2291%22%20width%3D%22%7B_paired_w%3A.1f%7D%22%20height%3D%2231%22%20rx%3D%226%22%20fill%3D%22%2322c55e%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22%7Bmin(_x0%20%2B%20_paired_w%20%2B%2010%2C%20820)%3A.1f%7D%22%20y%3D%22112%22%20fill%3D%22%23f9fafb%22%20font-size%3D%2214%22%3E%7B_paired_cost%3A%2C%7D%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%22174%22%20fill%3D%22%23d1d5db%22%20font-size%3D%2214%22%3ERange%20bound%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22%7B_x0%7D%22%20y%3D%22153%22%20width%3D%22%7B_range_w%3A.1f%7D%22%20height%3D%2231%22%20rx%3D%226%22%20fill%3D%22%23f97316%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22%7Bmin(_x0%20%2B%20_range_w%20%2B%2010%2C%20820)%3A.1f%7D%22%20y%3D%22174%22%20fill%3D%22%23f9fafb%22%20font-size%3D%2214%22%3E%7B_range_cost%3A%2C%7D%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%22%7B_budget_x%3A.1f%7D%22%20y1%3D%2277%22%20x2%3D%22%7B_budget_x%3A.1f%7D%22%20y2%3D%22204%22%20stroke%3D%22%2360a5fa%22%20stroke-width%3D%224%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22%7Bmin(_budget_x%20%2B%207%2C%20790)%3A.1f%7D%22%20y%3D%22224%22%20fill%3D%22%2393c5fd%22%20font-size%3D%2213%22%3Ebudget%20%7B_budget%3A%2C%7D%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%22249%22%20fill%3D%22%239ca3af%22%20font-size%3D%2212%22%3ECosts%20include%20both%20policies%20across%20%7B_m%7D%20comparison(s)%3B%20delta%3D0.05.%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%22%22%22%0A%20%20%20%20_summary%20%3D%20mo.md(f%22%22%22%0A%20%20%20%20%23%23%23%20%7B_headline%7D%0A%0A%20%20%20%20%7C%20gate%20%7C%20pairs%20%2F%20comparison%20%7C%20total%20episodes%20%7C%20budget%20decision%20%7C%0A%20%20%20%20%7C---%7C---%3A%7C---%3A%7C---%7C%0A%20%20%20%20%7C%20Paired%20exact%20%7C%20**%7B_paired_n%3A%2C%7D**%20%7C%20**%7B_paired_cost%3A%2C%7D**%20%7C%20**%7B_paired_state%7D**%20%7C%0A%20%20%20%20%7C%20Range-only%20Hoeffding%20%7C%20**%7B_range_n%3A%2C%7D**%20%7C%20**%7B_range_cost%3A%2C%7D**%20%7C%20**%7B_range_state%7D**%20%7C%0A%0A%20%20%20%20**Takeaway.**%20A%20valid%20gate%20can%20still%20halt%20learning%20when%20its%20interval%20is%20too%0A%20%20%20%20conservative%20for%20the%20declared%20budget.%20Paired%20evidence%20is%20powerful%20here%20only%0A%20%20%20%20because%20disagreements%20are%20rare.%20Zero%20observed%20disagreements%20are%20not%20proof%20of%0A%20%20%20%20zero%20population%20risk.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20mo.vstack(%5B_summary%2C%20mo.Html(_svg)%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20Provenance%20and%20limits%0A%0A%20%20%20%20The%20formulas%20and%20canonical%20default%20(%60m%3D3%60%2C%20%60t%3D1%60%2C%20%60delta%3Depsilon%3D0.05%60)%0A%20%20%20%20reproduce%20Appendix%20A%3A%20**117%20vs%204%2C229%20pairs%20per%20comparison**%2C%20or%20**702%20vs%0A%20%20%20%2025%2C374%20episodes**.%20The%20paper%20separately%20reports%20author-run%20synthetic%20results%3A%0A%20%20%20%2031.6%25%20common-stream%20admission%20at%20a%202%2C000-episode%20cap%20for%20paired%20checks%20versus%0A%20%20%20%20zero%20for%20Hoeffding%2C%20while%20replay%20wins%20its%20closed-loop%20diagnostic.%0A%0A%20%20%20%20Assumptions%3A%20binary%20outcomes%2C%20frozen%20policies%20and%20scoring%2C%20i.i.d.%20fresh%20pairs%2C%0A%20%20%20%20fixed-size%20batches%2C%20committed%20comparisons%2C%20and%20no%20optional%20stopping.%20No%20paper%0A%20%20%20%20code%2C%20private%20data%2C%20model%20weights%2C%20robot%20environment%2C%20or%20external%20service%20is%0A%20%20%20%20used.%20This%20does%20not%20establish%20physical-robot%2C%20VLA%2C%20software-agent%2C%20or%0A%20%20%20%20production-system%20safety.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.25.1",
+            "serverToken": "unused",
+            "config": {"ai": {"allow_provider_config": true, "custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "code_lens": true, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "layout": null,
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

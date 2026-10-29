@@ -384,7 +384,7 @@ export const marimoDemos: MarimoDemo[] = [
     published_url: "https://marimo.edgelesslab.com/2203.07895-ghost-floor-shortcut/",
   },
 
-  // Analytical reproduction (arXiv:2609.10873). published_url added only after live verification.
+  // Analytical reproduction (arXiv:2609.10873). Published after live verification (see VERIFICATION-RECEIPT.md).
   {
     slug: "2609.10873-update-admission-power",
     title: "Update Gates Need Power, Not Just Safety",
@@ -392,6 +392,7 @@ export const marimoDemos: MarimoDemo[] = [
       "See how tolerance, repeated testing, protected tasks, and episode budget determine whether a statistically valid update gate can still learn.",
     category: "AI training",
     tags: ["continual-learning", "confidence-bounds", "evaluation", "robotics", "admission-control"],
+    published_url: "https://marimo.edgelesslab.com/2609.10873-update-admission-power/",
   },
 
   // Pre-verify: published_url will be added after live verification

@@ -374,6 +374,14 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["llm-inference", "long-context", "token-pruning", "prefill", "performance-modeling"],
   },
+  {
+    slug: "2203.07895-ghost-floor-shortcut",
+    title: "The Ghost Floor",
+    description:
+      "Grow a synthetic test domain and watch a coordinate-based learned-simulator shortcut create a ghost floor while a local obstacle representation transfers more cleanly.",
+    category: "Research",
+    tags: ["graph-networks", "physics-simulation", "generalization", "distribution-shift"],
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

@@ -395,7 +395,8 @@ export const marimoDemos: MarimoDemo[] = [
     published_url: "https://marimo.edgelesslab.com/2609.10873-update-admission-power/",
   },
 
-  // Pre-verify: published_url will be added after live verification
+  // Published (arXiv:2609.05527). Live verified: 200, 1 slider,
+  // heading 28.5%→22.6%, SVG data-cost 5→10, 0 console/request errors.
   {
     slug: "2609.05527-team-design-replay",
     title: "Buy the Replay That Can Change the Decision",
@@ -403,6 +404,7 @@ export const marimoDemos: MarimoDemo[] = [
       "Raise the cost of human replay and see whether a decision-targeted design still buys evidence for the comparison closest to failing.",
     category: "AI evaluation",
     tags: ["human-agent-teams", "evaluation-design", "counterfactual-replay", "cost-aware-allocation"],
+    published_url: "https://marimo.edgelesslab.com/2609.05527-team-design-replay/",
   },
 
   // Pre-verify (arXiv:2610.26942). published_url will be added after live verification.

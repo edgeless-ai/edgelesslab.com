@@ -381,6 +381,7 @@ export const marimoDemos: MarimoDemo[] = [
       "Grow a synthetic test domain and watch a coordinate-based learned-simulator shortcut create a ghost floor while a local obstacle representation transfers more cleanly.",
     category: "Research",
     tags: ["graph-networks", "physics-simulation", "generalization", "distribution-shift"],
+    published_url: "https://marimo.edgelesslab.com/2203.07895-ghost-floor-shortcut/",
   },
 ];
 

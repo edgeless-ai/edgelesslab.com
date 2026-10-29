@@ -16,6 +16,7 @@ const liveSlugs = [
   "2609.35806-sfia-extraction-baselines",
   "2608.05245-search2skill",
   "2609.24343-bandwidth-thermal-envelope",
+  "2203.07895-ghost-floor-shortcut",
 ];
 
 describe("published marimo gallery", () => {

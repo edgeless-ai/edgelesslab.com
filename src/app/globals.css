@@ -91,7 +91,8 @@ html[data-theme="light"] {
   --accent-contrast: #FAFFF2;
   --accent-ghost: rgba(77, 124, 15, 0.08);
 
-  --green: #10B981;
+  --green: var(--malachite);
+  --oxide: #A34829;
   --green-muted: rgba(16, 185, 129, 0.10);
   --relay: #315DAB;
   --relay-muted: rgba(49, 93, 171, 0.10);

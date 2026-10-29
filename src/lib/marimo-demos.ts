@@ -403,6 +403,16 @@ export const marimoDemos: MarimoDemo[] = [
     category: "AI evaluation",
     tags: ["human-agent-teams", "evaluation-design", "counterfactual-replay", "cost-aware-allocation"],
   },
+
+  // Pre-verify (arXiv:2610.26942). published_url will be added after live verification.
+  {
+    slug: "2610.26942-repair-elbow",
+    title: "The Repair Elbow",
+    description:
+      "Move the compiler-guided repair budget and see why one diagnostic-conditioned retry captures almost all of the reported Lean proof gain before fleet compute steepens.",
+    category: "Research",
+    tags: ["formal-methods", "lean4", "proof-repair", "inference-economics"],
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

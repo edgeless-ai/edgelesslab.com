@@ -105,13 +105,13 @@ test.describe("static site smoke", () => {
       "https://marimo.edgelesslab.com/embodied-playground-suite-gap/",
       "https://marimo.edgelesslab.com/2609.05439-criticgen-risk-frontier/",
       "https://marimo.edgelesslab.com/2609.09458-contracteval-denominator/",
-      "https://marimo.edgelesslab.com/2609.05527-team-design-replay/",
       "https://marimo.edgelesslab.com/2609.38385-goldimask-context-weighting/",
       "https://marimo.edgelesslab.com/2609.35806-sfia-extraction-baselines/",
       "https://marimo.edgelesslab.com/2608.05245-search2skill/",
       "https://marimo.edgelesslab.com/2609.24343-bandwidth-thermal-envelope/",
       "https://marimo.edgelesslab.com/2203.07895-ghost-floor-shortcut/",
       "https://marimo.edgelesslab.com/2609.10873-update-admission-power/",
+      "https://marimo.edgelesslab.com/2609.05527-team-design-replay/",
     ];
     const cards = page.locator('main a[href^="https://marimo.edgelesslab.com/"]');
     await expect(cards).toHaveCount(16);

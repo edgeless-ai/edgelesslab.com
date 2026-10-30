@@ -18,6 +18,7 @@ const liveSlugs = [
   "2609.24343-bandwidth-thermal-envelope",
   "2203.07895-ghost-floor-shortcut",
   "2609.10873-update-admission-power",
+  "2610.26942-repair-elbow",
 ];
 
 describe("published marimo gallery", () => {

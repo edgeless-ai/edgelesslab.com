@@ -405,7 +405,7 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["human-agent-teams", "evaluation-design", "counterfactual-replay", "cost-aware-allocation"],
   },
 
-  // Pre-verify (arXiv:2610.26942). published_url will be added after live verification.
+  // Analytical reproduction (arXiv:2610.26942). Published after live verification (see scripts/verify-elbow-slider-live.mjs).
   {
     slug: "2610.26942-repair-elbow",
     title: "The Repair Elbow",
@@ -413,6 +413,7 @@ export const marimoDemos: MarimoDemo[] = [
       "Move the compiler-guided repair budget and see why one diagnostic-conditioned retry captures almost all of the reported Lean proof gain before fleet compute steepens.",
     category: "Research",
     tags: ["formal-methods", "lean4", "proof-repair", "inference-economics"],
+    published_url: "https://marimo.edgelesslab.com/2610.26942-repair-elbow/",
   },
 ];
 

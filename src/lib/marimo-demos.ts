@@ -433,8 +433,9 @@ export const marimoDemos: MarimoDemo[] = [
     ],
   },
 
-  // Pre-verify (arXiv:2608.15127). published_url will be added after live
-  // verification and interactive control testing.
+  // Published after live verification (arXiv:2608.15127). Synthetic mechanism
+  // illustration; default 40,000-block/300s point is capacity-bound, 180,000-block
+  // endpoint is TTL-bound.
   {
     slug: "2608.15127-cache-binding-regimes",
     title: "What Actually Binds This Cache?",
@@ -442,6 +443,7 @@ export const marimoDemos: MarimoDemo[] = [
       "Vary cache capacity and TTL to see whether synthetic agent-session recomputation is capacity-bound, TTL-bound, or mixed.",
     category: "Research",
     tags: ["agentic-systems", "kv-cache", "serving", "reproducibility"],
+    published_url: "https://marimo.edgelesslab.com/2608.15127-cache-binding-regimes/",
   },
 ];
 

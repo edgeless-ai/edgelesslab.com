@@ -1,33 +1,61 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { marimoDemos, publishedMarimoDemos } from "../marimo-demos";
+import { marimoDemos, publishedMarimoDemos, type MarimoDemo } from "../marimo-demos";
+import { validateMarimoCatalog } from "../marimo-gallery-contract";
 
-const liveSlugs = [
-  "2610.20686-rolaq-cache-accounting",
-  "borwein-falsifier",
-  "2610.08936-clean-vs-robustness",
-  "2609.38201-speculative-tool-exec",
-  "2610.20838-srq-endpoint-weight",
-  "build-a-chip-bench-multiscoring",
-  "embodied-playground-suite-gap",
-  "2609.05439-criticgen-risk-frontier",
-  "2609.09458-contracteval-denominator",
-  "2609.38385-goldimask-context-weighting",
-  "2609.35806-sfia-extraction-baselines",
-  "2608.05245-search2skill",
-  "2609.24343-bandwidth-thermal-envelope",
-  "2203.07895-ghost-floor-shortcut",
-  "2609.10873-update-admission-power",
-  "2609.05527-team-design-replay",
-];
+const fixture = (slug = "test-notebook"): MarimoDemo => ({
+  slug, title: "Test notebook", description: "Fixture only, never published.",
+  category: "Research", tags: ["test"],
+  published_url: `https://marimo.edgelesslab.com/${slug}/`,
+});
 
 describe("published marimo gallery", () => {
-  it("only includes demos with verified publication URLs", () => {
-    expect(publishedMarimoDemos.map((demo) => demo.slug)).toEqual(liveSlugs);
-    for (const demo of publishedMarimoDemos) {
-      expect(demo.published_url).toBe(`https://marimo.edgelesslab.com/${demo.slug}/`);
-    }
-    expect(marimoDemos.some((demo) => !demo.published_url)).toBe(true);
+  it("matches an independently validated raw catalog without a second hand-maintained list", () => {
+    expect(publishedMarimoDemos).toEqual(validateMarimoCatalog(marimoDemos));
+    expect(marimoDemos.some((demo) => demo.published_url == null)).toBe(true);
+  });
+
+  it("accepts another legitimate publication, any category and source order without updating totals", () => {
+    const before = validateMarimoCatalog(marimoDemos);
+    const added = { ...fixture("regression-addition"), category: "Finance/GPU" as const };
+    const after = validateMarimoCatalog([added, ...marimoDemos]);
+    expect(after).toEqual([added, ...before]);
+    expect(after).toHaveLength(before.length + 1);
+  });
+
+  it("does not infer URLs for missing/null unverified entries or leak them into publication expectations", () => {
+    const verified = fixture();
+    const draft = { ...fixture("unverified"), published_url: undefined };
+    const legacy = { ...fixture("legacy"), published_url: null };
+    expect(validateMarimoCatalog([verified, draft, legacy])).toEqual([verified]);
+    expect(() => validateMarimoCatalog([draft, legacy])).toThrow(/must not be empty/);
+    expect(() => validateMarimoCatalog([])).toThrow(/must not be empty/);
+  });
+
+  it.each([
+    "", " ", "not-a-url", "javascript:alert(1)",
+    "http://marimo.edgelesslab.com/test-notebook/",
+    "https://evil.example/test-notebook/",
+    "https://marimo.edgelesslab.com/other-notebook/",
+    "https://marimo.edgelesslab.com/test-notebook",
+    "https://marimo.edgelesslab.com/test-notebook/?draft=true",
+    "https://marimo.edgelesslab.com/test-notebook/#draft",
+    "https://marimo.edgelesslab.com@evil.example/test-notebook/",
+    "https://edgelesslab.com/marimo/test-notebook/",
+  ])("rejects invalid or noncanonical publication URL %j", (published_url) => {
+    expect(() => validateMarimoCatalog([{ ...fixture(), published_url }])).toThrow(/Invalid publication URL/);
+  });
+
+  it("rejects duplicate slugs and duplicate URLs rather than counting them twice", () => {
+    expect(() => validateMarimoCatalog([fixture(), fixture()])).toThrow(/Duplicate notebook slug/);
+    expect(() => validateMarimoCatalog([fixture(), { ...fixture("other"), published_url: fixture().published_url }])).toThrow(/Duplicate publication URL/);
+  });
+
+  it.each([
+    { slug: "../escape" }, { title: " " }, { description: "" },
+    { tags: [] }, { tags: [" "] }, { category: "Unknown" },
+  ])("rejects malformed catalog metadata %j", (bad) => {
+    expect(() => validateMarimoCatalog([{ ...fixture(), ...bad } as MarimoDemo])).toThrow(/Invalid notebook/);
   });
 
   it("uses the published collection for cards, count, tags and structured data", () => {

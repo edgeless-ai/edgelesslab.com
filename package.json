@@ -5,7 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "prebuild": "node scripts/prepare-pen-plotter-fonts.mjs && ./scripts/preserve-standalone.sh save",
-    "build": "npm run check:design-system && npm run test:font-preloads && npm run test:launch && npm run test:plotter && next build",
+    "build": "npm run test:marimo && npm run check:design-system && npm run test:font-preloads && npm run test:launch && npm run test:plotter && next build",
+    "test:marimo": "npm run test:publication-push && vitest run src/lib/__tests__/marimo-gallery.test.ts src/lib/__tests__/marimo-publication.test.ts",
+    "verify:publication": "npm run build && vitest run && playwright test && playwright test --config tests/consent.config.ts && playwright test --config tests/publication.config.ts",
+    "publish:checked": "node scripts/push-verified-publication.mjs",
+    "test:publication-push": "node --test scripts/push-verified-publication.test.mjs scripts/marimo-publication-diff.test.mjs",
+    "audit:publication-live": "PUBLICATION_AUDIT_ALL=1 playwright test --config tests/publication.config.ts",
     "test:plotter": "node --test scripts/pen-plotter-performance.test.mjs scripts/pen-plotter-accessibility.test.mjs",
     "test:plotter:export": "PLOTTER_TEST_EXPORT=1 node --test scripts/pen-plotter-performance.test.mjs scripts/pen-plotter-accessibility.test.mjs",
     "postbuild": "node scripts/run-critters.mjs && find out -name '*.js.map' -delete && find out -name '*.css.map' -delete && ./scripts/preserve-standalone.sh restore && mkdir -p out/pen-plotter/assets && rsync -a --exclude=medium --exclude=mediums-all pen-plotter/assets/ out/pen-plotter/assets/ && ([ -d pen-plotter/fxhash ] && cp -r pen-plotter/fxhash out/pen-plotter/ || true) && ([ -d pen-plotter/kandinsky-to-canvas ] && cp -r pen-plotter/kandinsky-to-canvas out/pen-plotter/ || true) && npm run repair:launch && npm run check:launch && npm run check:agent-readiness && npx pagefind --site out && npm run test:plotter:export",

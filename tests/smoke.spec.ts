@@ -1,4 +1,6 @@
 import { test, expect, type ConsoleMessage } from "@playwright/test";
+import { marimoDemos, marimoCategories } from "../src/lib/marimo-demos";
+import { validateMarimoCatalog } from "../src/lib/marimo-gallery-contract";
 
 /**
  * Smoke tests against the static export (out/), served by a plain file server.
@@ -92,45 +94,54 @@ test.describe("static site smoke", () => {
     expect(fits).toBe(true);
   });
 
-  test("/lab/marimo/ only lists the sixteen verified live notebooks", async ({ page }) => {
+  test("/lab/marimo/ lists exactly the verified publication catalog", async ({ page }) => {
+    // Raw catalog is independently validated, not the same filtered export as the UI.
+    const published = validateMarimoCatalog(marimoDemos);
+    const urls = published.map((demo) => demo.published_url);
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
     const response = await page.goto("/lab/marimo/");
     expect(response?.status()).toBe(200);
-    const urls = [
-      "https://marimo.edgelesslab.com/2610.20686-rolaq-cache-accounting/",
-      "https://marimo.edgelesslab.com/borwein-falsifier/",
-      "https://marimo.edgelesslab.com/2610.08936-clean-vs-robustness/",
-      "https://marimo.edgelesslab.com/2609.38201-speculative-tool-exec/",
-      "https://marimo.edgelesslab.com/2610.20838-srq-endpoint-weight/",
-      "https://marimo.edgelesslab.com/build-a-chip-bench-multiscoring/",
-      "https://marimo.edgelesslab.com/embodied-playground-suite-gap/",
-      "https://marimo.edgelesslab.com/2609.05439-criticgen-risk-frontier/",
-      "https://marimo.edgelesslab.com/2609.09458-contracteval-denominator/",
-      "https://marimo.edgelesslab.com/2609.38385-goldimask-context-weighting/",
-      "https://marimo.edgelesslab.com/2609.35806-sfia-extraction-baselines/",
-      "https://marimo.edgelesslab.com/2608.05245-search2skill/",
-      "https://marimo.edgelesslab.com/2609.24343-bandwidth-thermal-envelope/",
-      "https://marimo.edgelesslab.com/2203.07895-ghost-floor-shortcut/",
-      "https://marimo.edgelesslab.com/2609.10873-update-admission-power/",
-      "https://marimo.edgelesslab.com/2609.05527-team-design-replay/",
-    ];
-    const cards = page.locator('main a[href^="https://marimo.edgelesslab.com/"]');
-    await expect(cards).toHaveCount(16);
+    const cards = page.locator("main a:has(h3)");
+    await expect(cards).toHaveCount(published.length);
     expect((await cards.evaluateAll((els) => els.map((a) => a.getAttribute("href")))).sort()).toEqual([...urls].sort());
-    await expect(page.getByText("16 published notebooks")).toBeVisible();
+    await expect(page.getByText(`${published.length} published notebooks`, { exact: false })).toBeVisible();
     await expect(page.locator('a[href^="/marimo/"], a[href^="https://edgelesslab.com/marimo/"]')).toHaveCount(0);
-    await expect(page.getByRole("heading", { name: "V Portfolio Drawdown Envelope" })).toHaveCount(0);
-    await expect(page.getByText("Finance/GPU", { exact: true })).toHaveCount(0);
+    for (const demo of published) {
+      const card = cards.filter({ has: page.getByRole("heading", { name: demo.title, exact: true }) });
+      await expect(card).toHaveCount(1);
+      await expect(card).toHaveAttribute("href", demo.published_url);
+      await expect(card).toHaveAttribute("target", "_blank");
+      await expect(card).toHaveAttribute("rel", /noopener/);
+      await expect(card).toContainText(demo.description);
+      for (const tag of demo.tags.slice(0, 3)) await expect(card).toContainText(tag);
+    }
+    for (const draft of marimoDemos.filter((demo) => demo.published_url == null)) {
+      await expect(cards.getByRole("heading", { name: draft.title, exact: true })).toHaveCount(0);
+    }
     const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents())
       .map((text) => JSON.parse(text))
       .find((item) => item["@type"] === "CollectionPage");
-    expect(jsonLd.numberOfItems).toBe(16);
-    expect(jsonLd.itemListElement.map((item: { url: string }) => item.url)).toEqual(urls);
-    await expect(page.getByRole("heading", { name: "Research", exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "AI evaluation", exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "AI training", exact: true })).toBeVisible();
-    await expect(page.getByText("6 demos", { exact: true })).toHaveCount(0);
-    await expect(page.getByText("7 demos", { exact: true })).toHaveCount(2);
-    await expect(page.getByText("5 demos", { exact: true })).toHaveCount(0);
+    expect(jsonLd).toBeDefined();
+    expect(jsonLd.numberOfItems).toBe(published.length);
+    expect(jsonLd.itemListElement).toEqual(published.map((demo, i) => ({
+      "@type": "ListItem", position: i + 1, name: demo.title, url: demo.published_url,
+    })));
+    const populatedCategories = marimoCategories.filter((category) => published.some((demo) => demo.category === category));
+    await expect(page.locator("main section")).toHaveCount(populatedCategories.length);
+    for (const category of marimoCategories) {
+      const demos = published.filter((demo) => demo.category === category);
+      const section = page.locator("main section").filter({ has: page.getByRole("heading", { name: category, exact: true }) });
+      if (!demos.length) {
+        await expect(section).toHaveCount(0);
+        continue;
+      }
+      await expect(section).toBeVisible();
+      await expect(section.getByText(`${demos.length} ${demos.length === 1 ? "demo" : "demos"}`, { exact: true })).toBeVisible();
+      await expect(section.locator("a:has(h3)")).toHaveCount(demos.length);
+      expect(await section.locator("h3").allTextContents()).toEqual(demos.map((demo) => demo.title));
+    }
+    expect(errors).toEqual([]);
   });
 
   test("/field-notes/ renders the featured studies", async ({ page }) => {

@@ -431,7 +431,6 @@ export const marimoDemos: MarimoDemo[] = [
       "resource-allocation",
       "sensitivity-analysis",
     ],
-    published_url: "https://marimo.edgelesslab.com/2609.05513-budgeted-teaching-slo/",
   },
 ];
 

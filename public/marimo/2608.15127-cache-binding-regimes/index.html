@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2608.15127-cache-binding-regimes</title>
+    <script type="module" crossorigin src="./assets/index-DafnX1Xx.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-B0Z9INg1.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-CUdNIagt.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-BQ9S8nyo.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-Dc9HkKI2.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CKsE8sC1.js">
+    <link rel="modulepreload" crossorigin href="./assets/schemas-BL-NsLlF.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-BCaOs5rp.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-oX0TOjjx.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-Cmx0b_zA.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-aFmHgJZY.js">
+    <link rel="modulepreload" crossorigin href="./assets/isArrayLikeObject-DnwgSs_Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseMerge-CQpUq7ep.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-snlMn4yk.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-B74pBk57.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-BdZUApHd.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-Ci2dTZ72.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BxZgoFvi.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-B4K466FK.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-DXKMv4Bs.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-CrTnjj37.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-DpGPGznL.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-DB0hHKMi.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-ldLVeaqm.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-BmzAqMKq.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CyYN7zJg.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-BBdeXCvU.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-restore-focus-B98SEiGc.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-BoklZTGL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-rHn2EdoM.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-Wea4hZ6R.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFOBKCJB.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-C4-_TnkF.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BplWpfFo.js">
+    <link rel="modulepreload" crossorigin href="./assets/circle-CeQt3rdW.js">
+    <link rel="modulepreload" crossorigin href="./assets/toast-KNfsFUiB.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-DR2Z2N4w.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-CzfpItSz.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-DKSBdWUf.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-BbJ1_N2T.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CrkOvbyN.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-CeE3i3Qa.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-BqUx5USx.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-Haz_uxEL.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-DsgsDslU.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-DMbg9X18.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-BDakodZ2.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-CC89xOwH.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-yTHMxhVa.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-k9DpjH68.js">
+    <link rel="modulepreload" crossorigin href="./assets/write-secret-modal-BiG2tahJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-gbN72xHe.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-BJG-7Qob.js">
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-HclGiUj8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BczecT6V.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BTskHGpb.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-Bj3s1hGN.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-C49f7GXV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-BPvK7C_R.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Ccyblc8N.js">
+    <link rel="modulepreload" crossorigin href="./assets/marked.esm-B_3iMIUq.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings-BHZPE0Mc.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BN-7G8qZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-DFf033uX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiUBikfn.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-MRn68vX1.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Bviq_Dee.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DBqBVprh.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DueXZKz9.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-CJTNBbet.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-DcnXlv0_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-DucTwMkf.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CYRiAeUx.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CzugpTQu.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-DjNf4SIX.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-RyCOE8jo.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-BhJktFeI.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-DFhUGBjO.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-BeE1cdgM.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B4VJJibu.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-DOPs2jx8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-VuyoeQOD.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-B_IYTCX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-DVgK5i5l.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-BeYhVWvM.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-D9vyuMar.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-CNPGWpMu.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-Bq_nmf5u.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-D5bOh7g6.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-CLRkNgm7.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-PLkI_UfK.js">
+    <link rel="modulepreload" crossorigin href="./assets/filename-fxG7K_MU.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-D9Dr-k4J.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-YOKDWASO-CaoEAGJk.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-0PFKL3SH.css">
+    <link rel="stylesheet" crossorigin href="./assets/index--sT8xf-8.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\n#   \"marimo==0.25.1\",\n# ]\n# ///\n\nimport marimo\n\n__generated_with = \"0.25.1\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as _mo\n\n    _mo.md(r\"\"\"\n    # What actually binds this cache?\n\n    **Research question:** for a long-lived agent-session trace, is prefix-cache\n    recomputation driven by **capacity eviction** or **TTL expiry**?\n\n    This is a seeded mechanism illustration informed by *From LLM Inference to\n    Agentic Workloads* ([arXiv:2608.15127](https://arxiv.org/abs/2608.15127)) and\n    a source-note audit of a separate AgentX cache simulator. The paper reports\n    idle-but-live sessions and 4.6x lower memory from state offloading. The\n    **40,000-block capacity, 64-token blocks, 10.7M-token working set, and 300s\n    TTL are analysis anchors** - not a replay of the paper's private traces.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    capacity = mo.ui.slider(\n        8_000, 180_000, value=40_000, step=4_000,\n        label=\"Capacity (64-token blocks)\",\n    )\n    ttl = mo.ui.slider(\n        30, 1_200, value=300, step=30, label=\"TTL (seconds)\",\n    )\n    mo.hstack([capacity, ttl], justify=\"space-around\")\n    return capacity, mo, ttl\n\n\n@app.cell\ndef _(capacity, mo, ttl):\n    import random as _random\n    from collections import OrderedDict as _OrderedDict\n\n    _rng = _random.Random(15127)\n    _n_sessions = 220\n    _raw = [_rng.lognormvariate(6.5, 0.65) for _ in range(_n_sessions)]\n    _sizes = [max(32, round(_x / sum(_raw) * 167_188)) for _x in _raw]\n    _sizes[0] += 167_188 - sum(_sizes)\n    _events = []\n    for _sid in range(_n_sessions):\n        _time = _rng.uniform(0, 600)\n        for _step in range(_rng.randrange(4, 9)):\n            _events.append((_time, _sid))\n            _short = _rng.random() \u003C 0.72\n            _time += _rng.expovariate(1 / (18 if _short else 620))\n    _events.sort()\n\n    def _replay(_cap, _life):\n        _cache = _OrderedDict()\n        _reasons = {}\n        _seen = set()\n        _miss = {\"compulsory\": 0, \"capacity\": 0, \"ttl\": 0}\n        _resident = 0\n        for _now, _sid in _events:\n            for _old, (_blocks, _last) in list(_cache.items()):\n                if _now - _last \u003E _life:\n                    _cache.pop(_old)\n                    _resident -= _blocks\n                    _reasons[_old] = \"ttl\"\n            if _sid in _cache:\n                _blocks, _ = _cache.pop(_sid)\n                _cache[_sid] = (_blocks, _now)\n                continue\n            _why = \"compulsory\" if _sid not in _seen else _reasons.get(_sid, \"capacity\")\n            _miss[_why] += _sizes[_sid]\n            _seen.add(_sid)\n            _cache[_sid] = (_sizes[_sid], _now)\n            _resident += _sizes[_sid]\n            while _resident \u003E _cap:\n                _evicted, (_blocks, _) = _cache.popitem(last=False)\n                _resident -= _blocks\n                _reasons[_evicted] = \"capacity\"\n        return _miss\n\n    _cap = int(capacity.value)\n    _life = int(ttl.value)\n    _miss = _replay(_cap, _life)\n    _cap_miss = _miss[\"capacity\"]\n    _ttl_miss = _miss[\"ttl\"]\n    _total = max(1, _cap_miss + _ttl_miss)\n    _regime = (\n        \"TTL-bound\" if _ttl_miss \u003E 2 * _cap_miss else\n        \"capacity-bound\" if _cap_miss \u003E 2 * _ttl_miss else \"mixed\"\n    )\n    _cap_width = round(520 * _cap_miss / _total)\n    _ttl_width = round(520 * _ttl_miss / _total)\n    _svg = f\"\"\"\n    \u003Csvg data-chart=\"cache-binding-regimes\" data-capacity=\"{_cap}\"\n      data-ttl=\"{_life}\" viewBox=\"0 0 680 205\" width=\"100%\"\n      role=\"img\" aria-label=\"Revisit miss attribution at selected cache settings\"\u003E\n      \u003Crect width=\"680\" height=\"205\" rx=\"16\" fill=\"#0f172a\"/\u003E\n      \u003Ctext x=\"28\" y=\"35\" fill=\"#e2e8f0\" font-size=\"18\" font-weight=\"700\"\u003ERecomputed blocks by cause\u003C/text\u003E\n      \u003Ctext x=\"28\" y=\"75\" fill=\"#cbd5e1\" font-size=\"14\"\u003Ecapacity\u003C/text\u003E\n      \u003Crect x=\"130\" y=\"56\" width=\"520\" height=\"26\" rx=\"6\" fill=\"#1e293b\"/\u003E\n      \u003Crect x=\"130\" y=\"56\" width=\"{_cap_width}\" height=\"26\" rx=\"6\" fill=\"#38bdf8\"/\u003E\n      \u003Ctext x=\"135\" y=\"75\" fill=\"#f8fafc\" font-size=\"13\"\u003E{_cap_miss:,}\u003C/text\u003E\n      \u003Ctext x=\"28\" y=\"125\" fill=\"#cbd5e1\" font-size=\"14\"\u003ETTL\u003C/text\u003E\n      \u003Crect x=\"130\" y=\"106\" width=\"520\" height=\"26\" rx=\"6\" fill=\"#1e293b\"/\u003E\n      \u003Crect x=\"130\" y=\"106\" width=\"{_ttl_width}\" height=\"26\" rx=\"6\" fill=\"#fb923c\"/\u003E\n      \u003Ctext x=\"135\" y=\"125\" fill=\"#f8fafc\" font-size=\"13\"\u003E{_ttl_miss:,}\u003C/text\u003E\n      \u003Ctext x=\"28\" y=\"174\" fill=\"#94a3b8\" font-size=\"13\"\u003ECompulsory first touches excluded: {_miss['compulsory']:,} blocks\u003C/text\u003E\n    \u003C/svg\u003E\n    \"\"\"\n    _summary = mo.md(f\"\"\"\n    ## Operating point: capacity {_cap:,} blocks; TTL {_life}s - {_regime}\n\n    The seeded 10.70M-token working set produces **{_cap_miss:,}**\n    capacity-attributed and **{_ttl_miss:,}** TTL-attributed recomputed blocks.\n    Change either control to test whether the binding regime flips.\n    \"\"\")\n    mo.vstack([_summary, mo.Html(_svg)])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ## Operator takeaway\n\n    1. **Classify before tuning.** A tighter TTL cannot rescue a working set that\n       capacity already evicts first; more capacity does not help if expiry binds.\n    2. **Keep the denominator honest.** The chart attributes block-weighted revisit\n       misses and displays compulsory first touches separately.\n    3. **Do not mistake this for production evidence.** The trace is synthetic and\n       excludes latency, dollars, distributed cache coherence, model quality, and SLOs.\n       The paper's measured design result is **4.6x lower memory via state offloading**;\n       this cache-regime simulator is an analyst-authored extension, not that experiment.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%0A%23%20%20%20%22marimo%3D%3D0.25.1%22%2C%0A%23%20%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.25.1%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20_mo%0A%0A%20%20%20%20_mo.md(r%22%22%22%0A%20%20%20%20%23%20What%20actually%20binds%20this%20cache%3F%0A%0A%20%20%20%20**Research%20question%3A**%20for%20a%20long-lived%20agent-session%20trace%2C%20is%20prefix-cache%0A%20%20%20%20recomputation%20driven%20by%20**capacity%20eviction**%20or%20**TTL%20expiry**%3F%0A%0A%20%20%20%20This%20is%20a%20seeded%20mechanism%20illustration%20informed%20by%20*From%20LLM%20Inference%20to%0A%20%20%20%20Agentic%20Workloads*%20(%5BarXiv%3A2608.15127%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2608.15127))%20and%0A%20%20%20%20a%20source-note%20audit%20of%20a%20separate%20AgentX%20cache%20simulator.%20The%20paper%20reports%0A%20%20%20%20idle-but-live%20sessions%20and%204.6x%20lower%20memory%20from%20state%20offloading.%20The%0A%20%20%20%20**40%2C000-block%20capacity%2C%2064-token%20blocks%2C%2010.7M-token%20working%20set%2C%20and%20300s%0A%20%20%20%20TTL%20are%20analysis%20anchors**%20-%20not%20a%20replay%20of%20the%20paper's%20private%20traces.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20capacity%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%208_000%2C%20180_000%2C%20value%3D40_000%2C%20step%3D4_000%2C%0A%20%20%20%20%20%20%20%20label%3D%22Capacity%20(64-token%20blocks)%22%2C%0A%20%20%20%20)%0A%20%20%20%20ttl%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%2030%2C%201_200%2C%20value%3D300%2C%20step%3D30%2C%20label%3D%22TTL%20(seconds)%22%2C%0A%20%20%20%20)%0A%20%20%20%20mo.hstack(%5Bcapacity%2C%20ttl%5D%2C%20justify%3D%22space-around%22)%0A%20%20%20%20return%20capacity%2C%20mo%2C%20ttl%0A%0A%0A%40app.cell%0Adef%20_(capacity%2C%20mo%2C%20ttl)%3A%0A%20%20%20%20import%20random%20as%20_random%0A%20%20%20%20from%20collections%20import%20OrderedDict%20as%20_OrderedDict%0A%0A%20%20%20%20_rng%20%3D%20_random.Random(15127)%0A%20%20%20%20_n_sessions%20%3D%20220%0A%20%20%20%20_raw%20%3D%20%5B_rng.lognormvariate(6.5%2C%200.65)%20for%20_%20in%20range(_n_sessions)%5D%0A%20%20%20%20_sizes%20%3D%20%5Bmax(32%2C%20round(_x%20%2F%20sum(_raw)%20*%20167_188))%20for%20_x%20in%20_raw%5D%0A%20%20%20%20_sizes%5B0%5D%20%2B%3D%20167_188%20-%20sum(_sizes)%0A%20%20%20%20_events%20%3D%20%5B%5D%0A%20%20%20%20for%20_sid%20in%20range(_n_sessions)%3A%0A%20%20%20%20%20%20%20%20_time%20%3D%20_rng.uniform(0%2C%20600)%0A%20%20%20%20%20%20%20%20for%20_step%20in%20range(_rng.randrange(4%2C%209))%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_events.append((_time%2C%20_sid))%0A%20%20%20%20%20%20%20%20%20%20%20%20_short%20%3D%20_rng.random()%20%3C%200.72%0A%20%20%20%20%20%20%20%20%20%20%20%20_time%20%2B%3D%20_rng.expovariate(1%20%2F%20(18%20if%20_short%20else%20620))%0A%20%20%20%20_events.sort()%0A%0A%20%20%20%20def%20_replay(_cap%2C%20_life)%3A%0A%20%20%20%20%20%20%20%20_cache%20%3D%20_OrderedDict()%0A%20%20%20%20%20%20%20%20_reasons%20%3D%20%7B%7D%0A%20%20%20%20%20%20%20%20_seen%20%3D%20set()%0A%20%20%20%20%20%20%20%20_miss%20%3D%20%7B%22compulsory%22%3A%200%2C%20%22capacity%22%3A%200%2C%20%22ttl%22%3A%200%7D%0A%20%20%20%20%20%20%20%20_resident%20%3D%200%0A%20%20%20%20%20%20%20%20for%20_now%2C%20_sid%20in%20_events%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20for%20_old%2C%20(_blocks%2C%20_last)%20in%20list(_cache.items())%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20_now%20-%20_last%20%3E%20_life%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_cache.pop(_old)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_resident%20-%3D%20_blocks%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_reasons%5B_old%5D%20%3D%20%22ttl%22%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20_sid%20in%20_cache%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_blocks%2C%20_%20%3D%20_cache.pop(_sid)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_cache%5B_sid%5D%20%3D%20(_blocks%2C%20_now)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20continue%0A%20%20%20%20%20%20%20%20%20%20%20%20_why%20%3D%20%22compulsory%22%20if%20_sid%20not%20in%20_seen%20else%20_reasons.get(_sid%2C%20%22capacity%22)%0A%20%20%20%20%20%20%20%20%20%20%20%20_miss%5B_why%5D%20%2B%3D%20_sizes%5B_sid%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20_seen.add(_sid)%0A%20%20%20%20%20%20%20%20%20%20%20%20_cache%5B_sid%5D%20%3D%20(_sizes%5B_sid%5D%2C%20_now)%0A%20%20%20%20%20%20%20%20%20%20%20%20_resident%20%2B%3D%20_sizes%5B_sid%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20while%20_resident%20%3E%20_cap%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_evicted%2C%20(_blocks%2C%20_)%20%3D%20_cache.popitem(last%3DFalse)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_resident%20-%3D%20_blocks%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_reasons%5B_evicted%5D%20%3D%20%22capacity%22%0A%20%20%20%20%20%20%20%20return%20_miss%0A%0A%20%20%20%20_cap%20%3D%20int(capacity.value)%0A%20%20%20%20_life%20%3D%20int(ttl.value)%0A%20%20%20%20_miss%20%3D%20_replay(_cap%2C%20_life)%0A%20%20%20%20_cap_miss%20%3D%20_miss%5B%22capacity%22%5D%0A%20%20%20%20_ttl_miss%20%3D%20_miss%5B%22ttl%22%5D%0A%20%20%20%20_total%20%3D%20max(1%2C%20_cap_miss%20%2B%20_ttl_miss)%0A%20%20%20%20_regime%20%3D%20(%0A%20%20%20%20%20%20%20%20%22TTL-bound%22%20if%20_ttl_miss%20%3E%202%20*%20_cap_miss%20else%0A%20%20%20%20%20%20%20%20%22capacity-bound%22%20if%20_cap_miss%20%3E%202%20*%20_ttl_miss%20else%20%22mixed%22%0A%20%20%20%20)%0A%20%20%20%20_cap_width%20%3D%20round(520%20*%20_cap_miss%20%2F%20_total)%0A%20%20%20%20_ttl_width%20%3D%20round(520%20*%20_ttl_miss%20%2F%20_total)%0A%20%20%20%20_svg%20%3D%20f%22%22%22%0A%20%20%20%20%3Csvg%20data-chart%3D%22cache-binding-regimes%22%20data-capacity%3D%22%7B_cap%7D%22%0A%20%20%20%20%20%20data-ttl%3D%22%7B_life%7D%22%20viewBox%3D%220%200%20680%20205%22%20width%3D%22100%25%22%0A%20%20%20%20%20%20role%3D%22img%22%20aria-label%3D%22Revisit%20miss%20attribution%20at%20selected%20cache%20settings%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22680%22%20height%3D%22205%22%20rx%3D%2216%22%20fill%3D%22%230f172a%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%2235%22%20fill%3D%22%23e2e8f0%22%20font-size%3D%2218%22%20font-weight%3D%22700%22%3ERecomputed%20blocks%20by%20cause%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%2275%22%20fill%3D%22%23cbd5e1%22%20font-size%3D%2214%22%3Ecapacity%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22130%22%20y%3D%2256%22%20width%3D%22520%22%20height%3D%2226%22%20rx%3D%226%22%20fill%3D%22%231e293b%22%2F%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22130%22%20y%3D%2256%22%20width%3D%22%7B_cap_width%7D%22%20height%3D%2226%22%20rx%3D%226%22%20fill%3D%22%2338bdf8%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22135%22%20y%3D%2275%22%20fill%3D%22%23f8fafc%22%20font-size%3D%2213%22%3E%7B_cap_miss%3A%2C%7D%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%22125%22%20fill%3D%22%23cbd5e1%22%20font-size%3D%2214%22%3ETTL%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22130%22%20y%3D%22106%22%20width%3D%22520%22%20height%3D%2226%22%20rx%3D%226%22%20fill%3D%22%231e293b%22%2F%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22130%22%20y%3D%22106%22%20width%3D%22%7B_ttl_width%7D%22%20height%3D%2226%22%20rx%3D%226%22%20fill%3D%22%23fb923c%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22135%22%20y%3D%22125%22%20fill%3D%22%23f8fafc%22%20font-size%3D%2213%22%3E%7B_ttl_miss%3A%2C%7D%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%22174%22%20fill%3D%22%2394a3b8%22%20font-size%3D%2213%22%3ECompulsory%20first%20touches%20excluded%3A%20%7B_miss%5B'compulsory'%5D%3A%2C%7D%20blocks%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%22%22%22%0A%20%20%20%20_summary%20%3D%20mo.md(f%22%22%22%0A%20%20%20%20%23%23%20Operating%20point%3A%20capacity%20%7B_cap%3A%2C%7D%20blocks%3B%20TTL%20%7B_life%7Ds%20-%20%7B_regime%7D%0A%0A%20%20%20%20The%20seeded%2010.70M-token%20working%20set%20produces%20**%7B_cap_miss%3A%2C%7D**%0A%20%20%20%20capacity-attributed%20and%20**%7B_ttl_miss%3A%2C%7D**%20TTL-attributed%20recomputed%20blocks.%0A%20%20%20%20Change%20either%20control%20to%20test%20whether%20the%20binding%20regime%20flips.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20mo.vstack(%5B_summary%2C%20mo.Html(_svg)%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20Operator%20takeaway%0A%0A%20%20%20%201.%20**Classify%20before%20tuning.**%20A%20tighter%20TTL%20cannot%20rescue%20a%20working%20set%20that%0A%20%20%20%20%20%20%20capacity%20already%20evicts%20first%3B%20more%20capacity%20does%20not%20help%20if%20expiry%20binds.%0A%20%20%20%202.%20**Keep%20the%20denominator%20honest.**%20The%20chart%20attributes%20block-weighted%20revisit%0A%20%20%20%20%20%20%20misses%20and%20displays%20compulsory%20first%20touches%20separately.%0A%20%20%20%203.%20**Do%20not%20mistake%20this%20for%20production%20evidence.**%20The%20trace%20is%20synthetic%20and%0A%20%20%20%20%20%20%20excludes%20latency%2C%20dollars%2C%20distributed%20cache%20coherence%2C%20model%20quality%2C%20and%20SLOs.%0A%20%20%20%20%20%20%20The%20paper's%20measured%20design%20result%20is%20**4.6x%20lower%20memory%20via%20state%20offloading**%3B%0A%20%20%20%20%20%20%20this%20cache-regime%20simulator%20is%20an%20analyst-authored%20extension%2C%20not%20that%20experiment.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.25.1",
+            "serverToken": "unused",
+            "config": {"ai": {"allow_provider_config": true, "custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "code_lens": true, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "layout": null,
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

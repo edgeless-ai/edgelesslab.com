@@ -432,6 +432,17 @@ export const marimoDemos: MarimoDemo[] = [
       "sensitivity-analysis",
     ],
   },
+
+  // Pre-verify (arXiv:2608.15127). published_url will be added after live
+  // verification and interactive control testing.
+  {
+    slug: "2608.15127-cache-binding-regimes",
+    title: "What Actually Binds This Cache?",
+    description:
+      "Vary cache capacity and TTL to see whether synthetic agent-session recomputation is capacity-bound, TTL-bound, or mixed.",
+    category: "Research",
+    tags: ["agentic-systems", "kv-cache", "serving", "reproducibility"],
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

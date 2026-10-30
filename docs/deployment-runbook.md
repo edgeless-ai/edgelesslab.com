@@ -74,6 +74,12 @@ pnpm exec playwright test
 The build must report a successful static export. Test navigation, Field Notes,
 and command-palette search when those surfaces change.
 
+For notebook publication use the [checked publication gate](notebook-publication.md):
+commit on a scoped PR branch and run `npm run publish:checked`. It builds and runs
+the real suites plus publisher-only live notebook/entry-bundle checks, then pushes
+only that clean, unchanged, verified SHA. Do not patch fixed notebook totals or
+push repeatedly to discover locally reproducible test failures via email.
+
 ## Publish
 
 When the local branch is not verified as tracking the canonical repository,

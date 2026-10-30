@@ -7,6 +7,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Superseded commits on the same PR/ref cannot produce redundant failure runs.
+# Other PRs/refs remain independent; no path-based test skips.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   frontend-tests:
     runs-on: ubuntu-latest

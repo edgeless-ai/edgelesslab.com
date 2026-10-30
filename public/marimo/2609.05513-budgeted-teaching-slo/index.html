@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2609.05513-budgeted-teaching-slo</title>
+    <script type="module" crossorigin src="./assets/index-DafnX1Xx.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-B0Z9INg1.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-CUdNIagt.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-BQ9S8nyo.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-Dc9HkKI2.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CKsE8sC1.js">
+    <link rel="modulepreload" crossorigin href="./assets/schemas-BL-NsLlF.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-BCaOs5rp.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-oX0TOjjx.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-Cmx0b_zA.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-aFmHgJZY.js">
+    <link rel="modulepreload" crossorigin href="./assets/isArrayLikeObject-DnwgSs_Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseMerge-CQpUq7ep.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-snlMn4yk.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-B74pBk57.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-BdZUApHd.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-Ci2dTZ72.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BxZgoFvi.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-B4K466FK.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-DXKMv4Bs.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-CrTnjj37.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-DpGPGznL.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-DB0hHKMi.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-ldLVeaqm.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-BmzAqMKq.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CyYN7zJg.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-BBdeXCvU.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-restore-focus-B98SEiGc.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-BoklZTGL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-rHn2EdoM.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-Wea4hZ6R.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFOBKCJB.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-C4-_TnkF.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BplWpfFo.js">
+    <link rel="modulepreload" crossorigin href="./assets/circle-CeQt3rdW.js">
+    <link rel="modulepreload" crossorigin href="./assets/toast-KNfsFUiB.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-DR2Z2N4w.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-CzfpItSz.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-DKSBdWUf.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-BbJ1_N2T.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CrkOvbyN.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-CeE3i3Qa.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-BqUx5USx.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-Haz_uxEL.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-DsgsDslU.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-DMbg9X18.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-BDakodZ2.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-CC89xOwH.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-yTHMxhVa.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-k9DpjH68.js">
+    <link rel="modulepreload" crossorigin href="./assets/write-secret-modal-BiG2tahJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-gbN72xHe.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-BJG-7Qob.js">
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-HclGiUj8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BczecT6V.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BTskHGpb.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-Bj3s1hGN.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-C49f7GXV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-BPvK7C_R.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Ccyblc8N.js">
+    <link rel="modulepreload" crossorigin href="./assets/marked.esm-B_3iMIUq.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings-BHZPE0Mc.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BN-7G8qZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-DFf033uX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiUBikfn.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-MRn68vX1.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Bviq_Dee.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DBqBVprh.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DueXZKz9.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-CJTNBbet.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-DcnXlv0_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-DucTwMkf.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CYRiAeUx.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CzugpTQu.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-DjNf4SIX.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-RyCOE8jo.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-BhJktFeI.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-DFhUGBjO.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-BeE1cdgM.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B4VJJibu.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-DOPs2jx8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-VuyoeQOD.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-B_IYTCX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-DVgK5i5l.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-BeYhVWvM.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-D9vyuMar.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-CNPGWpMu.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-Bq_nmf5u.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-D5bOh7g6.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-CLRkNgm7.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-PLkI_UfK.js">
+    <link rel="modulepreload" crossorigin href="./assets/filename-fxG7K_MU.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-D9Dr-k4J.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-YOKDWASO-CaoEAGJk.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-0PFKL3SH.css">
+    <link rel="stylesheet" crossorigin href="./assets/index--sT8xf-8.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\"marimo==0.23.16\"]\n# ///\n\nimport marimo\n\n__generated_with = \"0.25.1\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    return (mo,)\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    # When is cheaper teaching still good enough?\n\n    Zhang, Cao, and Zheng's **Budget-Aware Online Adaptation for Web Agents**\n    ([arXiv:2609.05513v1](https://arxiv.org/abs/2609.05513v1)) separates\n    **when to query** a teacher from **what turns to retain** for training.\n\n    This demo asks one deployment question: **which published policy minimizes a\n    weighted resource index while meeting a first-pass-success SLO?** It recomputes\n    the paper's Table 1 operating points; it does **not** rerun web-agent training.\n    Results remain author-reported means from fixed MiniWoB and TimeWarp streams.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _(mo):\n    success_floor = mo.ui.slider(\n        80, 100, value=95, step=1, label=\"Required share of best observed success (%)\"\n    )\n    teacher_weight = mo.ui.slider(\n        0, 100, value=50, step=5, label=\"Teacher-call weight in resource index (%)\"\n    )\n    mo.vstack([\n        mo.md(\"### Set the service-level objective and scarce resource\"),\n        success_floor,\n        teacher_weight,\n        mo.md(\"At 100% weight, optimize teacher calls only; at 0%, optimize student PFLOPs only.\"),\n    ])\n    return success_floor, teacher_weight\n\n\n@app.cell\ndef _(mo, success_floor, teacher_weight):\n    _groups = [\"MiniWoB DPO\", \"MiniWoB SimPO\", \"TimeWarp DPO\", \"TimeWarp SimPO\"]\n    _policies = [\"Full\", \"Gate\", \"Gate + trim\"]\n    _success = [[37.5, 38.0, 40.5], [44.5, 42.0, 40.5], [41.0, 39.5, 39.0], [50.0, 46.0, 46.0]]\n    _calls = [[87.0, 70.5, 65.0], [76.5, 55.5, 63.5], [105.0, 82.0, 76.5], [97.5, 73.0, 77.0]]\n    _pflops = [[16.66, 14.37, 8.45], [10.85, 8.86, 5.94], [60.26, 59.04, 20.42], [37.96, 38.17, 19.86]]\n    _floor = int(success_floor.value)\n    _weight = int(teacher_weight.value)\n    _w = _weight / 100\n    _ratios, _resources, _chosen = [], [], []\n    for _s, _c, _p in zip(_success, _calls, _pflops):\n        _ratio = [100 * _v / max(_s) for _v in _s]\n        _resource = [_w * _c[_i] / _c[0] + (1 - _w) * _p[_i] / _p[0] for _i in range(3)]\n        _eligible = [_i for _i in range(3) if _ratio[_i] + 1e-9 \u003E= _floor]\n        _pick = min(_eligible, key=lambda _i: _resource[_i])\n        _ratios.append(_ratio)\n        _resources.append(_resource)\n        _chosen.append(_pick)\n    _decision = \" | \".join(f\"{_groups[_i]}: {_policies[_chosen[_i]]}\" for _i in range(4))\n    _colors = [\"#2563eb\", \"#7c3aed\", \"#059669\", \"#dc2626\"]\n    _svg = [f'\u003Csvg data-chart=\"budgeted-teaching-slo\" data-floor=\"{_floor}\" viewBox=\"0 0 900 470\" style=\"width:100%;height:auto\" role=\"img\" aria-label=\"Published resource and success operating points\"\u003E']\n    _svg += ['\u003Crect width=\"900\" height=\"470\" rx=\"16\" fill=\"#f8fafc\"/\u003E',\n             '\u003Ctext x=\"55\" y=\"35\" font-size=\"20\" font-weight=\"700\"\u003EResource frontier under a first-pass SLO\u003C/text\u003E',\n             '\u003Cline x1=\"70\" y1=\"370\" x2=\"850\" y2=\"370\" stroke=\"#64748b\"/\u003E',\n             '\u003Cline x1=\"70\" y1=\"65\" x2=\"70\" y2=\"370\" stroke=\"#64748b\"/\u003E']\n    _y_floor = 370 - (_floor - 78) / 24 * 305\n    _svg.append(f'\u003Cline x1=\"70\" y1=\"{_y_floor:.1f}\" x2=\"850\" y2=\"{_y_floor:.1f}\" stroke=\"#0f172a\" stroke-dasharray=\"7 5\"/\u003E\u003Ctext x=\"735\" y=\"{_y_floor-7:.1f}\" font-size=\"12\"\u003ESLO {_floor}%\u003C/text\u003E')\n    for _g in range(4):\n        _points = []\n        for _i in range(3):\n            _x = 70 + (_resources[_g][_i] - 0.25) / 0.85 * 780\n            _y = 370 - (_ratios[_g][_i] - 78) / 24 * 305\n            _points.append(f\"{_x:.1f},{_y:.1f}\")\n            _svg.append(f'\u003Ccircle cx=\"{_x:.1f}\" cy=\"{_y:.1f}\" r=\"7\" fill=\"{_colors[_g]}\"/\u003E')\n            if _i == _chosen[_g]:\n                _svg.append(f'\u003Ccircle cx=\"{_x:.1f}\" cy=\"{_y:.1f}\" r=\"13\" fill=\"none\" stroke=\"#0f172a\" stroke-width=\"3\"/\u003E')\n        _svg.append(f'\u003Cpolyline points=\"{\" \".join(_points)}\" fill=\"none\" stroke=\"{_colors[_g]}\" stroke-width=\"2\" opacity=\"0.55\"/\u003E')\n        _svg.append(f'\u003Crect x=\"{75 + 195*_g}\" y=\"410\" width=\"12\" height=\"12\" fill=\"{_colors[_g]}\"/\u003E\u003Ctext x=\"{92 + 195*_g}\" y=\"421\" font-size=\"12\"\u003E{_groups[_g]}\u003C/text\u003E')\n    _svg += ['\u003Ctext x=\"365\" y=\"400\" font-size=\"13\"\u003EWeighted resource index (full trajectory = 1)\u003C/text\u003E',\n             '\u003Ctext x=\"18\" y=\"250\" font-size=\"13\" transform=\"rotate(-90 18 250)\"\u003ESuccess / best observed success (%)\u003C/text\u003E', '\u003C/svg\u003E']\n    _chart = mo.Html(\"\".join(_svg))\n    _heading = mo.md(f\"## Operating point: SLO {_floor}%; teacher weight {_weight}%\")\n    _result = mo.md(f\"**Minimum-resource feasible policies:** {_decision}. Rings mark the selected points; moving either control recomputes feasibility and the weighted resource ranking.\")\n    mo.vstack([_heading, _result, _chart])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ### What the paper's table actually supports\n\n    The matched **Gate + trim** rows recompute to **22.6% fewer teacher calls** and\n    **52.1% less student PFLOPs** on average versus full trajectories. But efficiency\n    is not automatically service preservation: three of four matched comparisons lose\n    2\u20134 successes, while MiniWoB DPO improves from 37.5 to 40.5.\n\n    **Limits:** these are author-reported means, not an independent replication. The\n    paper uses one Qwen2.5-3B student, GPT-4o teacher, OpenAI embeddings, simulated\n    browser benchmarks, and PFLOP accounting that excludes dollars, wall time,\n    recovery, governance, and distribution shift. This demo adds only SLO sensitivity.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%22marimo%3D%3D0.23.16%22%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.25.1%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20return%20(mo%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%20When%20is%20cheaper%20teaching%20still%20good%20enough%3F%0A%0A%20%20%20%20Zhang%2C%20Cao%2C%20and%20Zheng's%20**Budget-Aware%20Online%20Adaptation%20for%20Web%20Agents**%0A%20%20%20%20(%5BarXiv%3A2609.05513v1%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2609.05513v1))%20separates%0A%20%20%20%20**when%20to%20query**%20a%20teacher%20from%20**what%20turns%20to%20retain**%20for%20training.%0A%0A%20%20%20%20This%20demo%20asks%20one%20deployment%20question%3A%20**which%20published%20policy%20minimizes%20a%0A%20%20%20%20weighted%20resource%20index%20while%20meeting%20a%20first-pass-success%20SLO%3F**%20It%20recomputes%0A%20%20%20%20the%20paper's%20Table%201%20operating%20points%3B%20it%20does%20**not**%20rerun%20web-agent%20training.%0A%20%20%20%20Results%20remain%20author-reported%20means%20from%20fixed%20MiniWoB%20and%20TimeWarp%20streams.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20success_floor%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%2080%2C%20100%2C%20value%3D95%2C%20step%3D1%2C%20label%3D%22Required%20share%20of%20best%20observed%20success%20(%25)%22%0A%20%20%20%20)%0A%20%20%20%20teacher_weight%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%200%2C%20100%2C%20value%3D50%2C%20step%3D5%2C%20label%3D%22Teacher-call%20weight%20in%20resource%20index%20(%25)%22%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mo.md(%22%23%23%23%20Set%20the%20service-level%20objective%20and%20scarce%20resource%22)%2C%0A%20%20%20%20%20%20%20%20success_floor%2C%0A%20%20%20%20%20%20%20%20teacher_weight%2C%0A%20%20%20%20%20%20%20%20mo.md(%22At%20100%25%20weight%2C%20optimize%20teacher%20calls%20only%3B%20at%200%25%2C%20optimize%20student%20PFLOPs%20only.%22)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%20success_floor%2C%20teacher_weight%0A%0A%0A%40app.cell%0Adef%20_(mo%2C%20success_floor%2C%20teacher_weight)%3A%0A%20%20%20%20_groups%20%3D%20%5B%22MiniWoB%20DPO%22%2C%20%22MiniWoB%20SimPO%22%2C%20%22TimeWarp%20DPO%22%2C%20%22TimeWarp%20SimPO%22%5D%0A%20%20%20%20_policies%20%3D%20%5B%22Full%22%2C%20%22Gate%22%2C%20%22Gate%20%2B%20trim%22%5D%0A%20%20%20%20_success%20%3D%20%5B%5B37.5%2C%2038.0%2C%2040.5%5D%2C%20%5B44.5%2C%2042.0%2C%2040.5%5D%2C%20%5B41.0%2C%2039.5%2C%2039.0%5D%2C%20%5B50.0%2C%2046.0%2C%2046.0%5D%5D%0A%20%20%20%20_calls%20%3D%20%5B%5B87.0%2C%2070.5%2C%2065.0%5D%2C%20%5B76.5%2C%2055.5%2C%2063.5%5D%2C%20%5B105.0%2C%2082.0%2C%2076.5%5D%2C%20%5B97.5%2C%2073.0%2C%2077.0%5D%5D%0A%20%20%20%20_pflops%20%3D%20%5B%5B16.66%2C%2014.37%2C%208.45%5D%2C%20%5B10.85%2C%208.86%2C%205.94%5D%2C%20%5B60.26%2C%2059.04%2C%2020.42%5D%2C%20%5B37.96%2C%2038.17%2C%2019.86%5D%5D%0A%20%20%20%20_floor%20%3D%20int(success_floor.value)%0A%20%20%20%20_weight%20%3D%20int(teacher_weight.value)%0A%20%20%20%20_w%20%3D%20_weight%20%2F%20100%0A%20%20%20%20_ratios%2C%20_resources%2C%20_chosen%20%3D%20%5B%5D%2C%20%5B%5D%2C%20%5B%5D%0A%20%20%20%20for%20_s%2C%20_c%2C%20_p%20in%20zip(_success%2C%20_calls%2C%20_pflops)%3A%0A%20%20%20%20%20%20%20%20_ratio%20%3D%20%5B100%20*%20_v%20%2F%20max(_s)%20for%20_v%20in%20_s%5D%0A%20%20%20%20%20%20%20%20_resource%20%3D%20%5B_w%20*%20_c%5B_i%5D%20%2F%20_c%5B0%5D%20%2B%20(1%20-%20_w)%20*%20_p%5B_i%5D%20%2F%20_p%5B0%5D%20for%20_i%20in%20range(3)%5D%0A%20%20%20%20%20%20%20%20_eligible%20%3D%20%5B_i%20for%20_i%20in%20range(3)%20if%20_ratio%5B_i%5D%20%2B%201e-9%20%3E%3D%20_floor%5D%0A%20%20%20%20%20%20%20%20_pick%20%3D%20min(_eligible%2C%20key%3Dlambda%20_i%3A%20_resource%5B_i%5D)%0A%20%20%20%20%20%20%20%20_ratios.append(_ratio)%0A%20%20%20%20%20%20%20%20_resources.append(_resource)%0A%20%20%20%20%20%20%20%20_chosen.append(_pick)%0A%20%20%20%20_decision%20%3D%20%22%20%7C%20%22.join(f%22%7B_groups%5B_i%5D%7D%3A%20%7B_policies%5B_chosen%5B_i%5D%5D%7D%22%20for%20_i%20in%20range(4))%0A%20%20%20%20_colors%20%3D%20%5B%22%232563eb%22%2C%20%22%237c3aed%22%2C%20%22%23059669%22%2C%20%22%23dc2626%22%5D%0A%20%20%20%20_svg%20%3D%20%5Bf'%3Csvg%20data-chart%3D%22budgeted-teaching-slo%22%20data-floor%3D%22%7B_floor%7D%22%20viewBox%3D%220%200%20900%20470%22%20style%3D%22width%3A100%25%3Bheight%3Aauto%22%20role%3D%22img%22%20aria-label%3D%22Published%20resource%20and%20success%20operating%20points%22%3E'%5D%0A%20%20%20%20_svg%20%2B%3D%20%5B'%3Crect%20width%3D%22900%22%20height%3D%22470%22%20rx%3D%2216%22%20fill%3D%22%23f8fafc%22%2F%3E'%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20'%3Ctext%20x%3D%2255%22%20y%3D%2235%22%20font-size%3D%2220%22%20font-weight%3D%22700%22%3EResource%20frontier%20under%20a%20first-pass%20SLO%3C%2Ftext%3E'%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20'%3Cline%20x1%3D%2270%22%20y1%3D%22370%22%20x2%3D%22850%22%20y2%3D%22370%22%20stroke%3D%22%2364748b%22%2F%3E'%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20'%3Cline%20x1%3D%2270%22%20y1%3D%2265%22%20x2%3D%2270%22%20y2%3D%22370%22%20stroke%3D%22%2364748b%22%2F%3E'%5D%0A%20%20%20%20_y_floor%20%3D%20370%20-%20(_floor%20-%2078)%20%2F%2024%20*%20305%0A%20%20%20%20_svg.append(f'%3Cline%20x1%3D%2270%22%20y1%3D%22%7B_y_floor%3A.1f%7D%22%20x2%3D%22850%22%20y2%3D%22%7B_y_floor%3A.1f%7D%22%20stroke%3D%22%230f172a%22%20stroke-dasharray%3D%227%205%22%2F%3E%3Ctext%20x%3D%22735%22%20y%3D%22%7B_y_floor-7%3A.1f%7D%22%20font-size%3D%2212%22%3ESLO%20%7B_floor%7D%25%3C%2Ftext%3E')%0A%20%20%20%20for%20_g%20in%20range(4)%3A%0A%20%20%20%20%20%20%20%20_points%20%3D%20%5B%5D%0A%20%20%20%20%20%20%20%20for%20_i%20in%20range(3)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_x%20%3D%2070%20%2B%20(_resources%5B_g%5D%5B_i%5D%20-%200.25)%20%2F%200.85%20*%20780%0A%20%20%20%20%20%20%20%20%20%20%20%20_y%20%3D%20370%20-%20(_ratios%5B_g%5D%5B_i%5D%20-%2078)%20%2F%2024%20*%20305%0A%20%20%20%20%20%20%20%20%20%20%20%20_points.append(f%22%7B_x%3A.1f%7D%2C%7B_y%3A.1f%7D%22)%0A%20%20%20%20%20%20%20%20%20%20%20%20_svg.append(f'%3Ccircle%20cx%3D%22%7B_x%3A.1f%7D%22%20cy%3D%22%7B_y%3A.1f%7D%22%20r%3D%227%22%20fill%3D%22%7B_colors%5B_g%5D%7D%22%2F%3E')%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20_i%20%3D%3D%20_chosen%5B_g%5D%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_svg.append(f'%3Ccircle%20cx%3D%22%7B_x%3A.1f%7D%22%20cy%3D%22%7B_y%3A.1f%7D%22%20r%3D%2213%22%20fill%3D%22none%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%223%22%2F%3E')%0A%20%20%20%20%20%20%20%20_svg.append(f'%3Cpolyline%20points%3D%22%7B%22%20%22.join(_points)%7D%22%20fill%3D%22none%22%20stroke%3D%22%7B_colors%5B_g%5D%7D%22%20stroke-width%3D%222%22%20opacity%3D%220.55%22%2F%3E')%0A%20%20%20%20%20%20%20%20_svg.append(f'%3Crect%20x%3D%22%7B75%20%2B%20195*_g%7D%22%20y%3D%22410%22%20width%3D%2212%22%20height%3D%2212%22%20fill%3D%22%7B_colors%5B_g%5D%7D%22%2F%3E%3Ctext%20x%3D%22%7B92%20%2B%20195*_g%7D%22%20y%3D%22421%22%20font-size%3D%2212%22%3E%7B_groups%5B_g%5D%7D%3C%2Ftext%3E')%0A%20%20%20%20_svg%20%2B%3D%20%5B'%3Ctext%20x%3D%22365%22%20y%3D%22400%22%20font-size%3D%2213%22%3EWeighted%20resource%20index%20(full%20trajectory%20%3D%201)%3C%2Ftext%3E'%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20'%3Ctext%20x%3D%2218%22%20y%3D%22250%22%20font-size%3D%2213%22%20transform%3D%22rotate(-90%2018%20250)%22%3ESuccess%20%2F%20best%20observed%20success%20(%25)%3C%2Ftext%3E'%2C%20'%3C%2Fsvg%3E'%5D%0A%20%20%20%20_chart%20%3D%20mo.Html(%22%22.join(_svg))%0A%20%20%20%20_heading%20%3D%20mo.md(f%22%23%23%20Operating%20point%3A%20SLO%20%7B_floor%7D%25%3B%20teacher%20weight%20%7B_weight%7D%25%22)%0A%20%20%20%20_result%20%3D%20mo.md(f%22**Minimum-resource%20feasible%20policies%3A**%20%7B_decision%7D.%20Rings%20mark%20the%20selected%20points%3B%20moving%20either%20control%20recomputes%20feasibility%20and%20the%20weighted%20resource%20ranking.%22)%0A%20%20%20%20mo.vstack(%5B_heading%2C%20_result%2C%20_chart%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%23%20What%20the%20paper's%20table%20actually%20supports%0A%0A%20%20%20%20The%20matched%20**Gate%20%2B%20trim**%20rows%20recompute%20to%20**22.6%25%20fewer%20teacher%20calls**%20and%0A%20%20%20%20**52.1%25%20less%20student%20PFLOPs**%20on%20average%20versus%20full%20trajectories.%20But%20efficiency%0A%20%20%20%20is%20not%20automatically%20service%20preservation%3A%20three%20of%20four%20matched%20comparisons%20lose%0A%20%20%20%202%E2%80%934%20successes%2C%20while%20MiniWoB%20DPO%20improves%20from%2037.5%20to%2040.5.%0A%0A%20%20%20%20**Limits%3A**%20these%20are%20author-reported%20means%2C%20not%20an%20independent%20replication.%20The%0A%20%20%20%20paper%20uses%20one%20Qwen2.5-3B%20student%2C%20GPT-4o%20teacher%2C%20OpenAI%20embeddings%2C%20simulated%0A%20%20%20%20browser%20benchmarks%2C%20and%20PFLOP%20accounting%20that%20excludes%20dollars%2C%20wall%20time%2C%0A%20%20%20%20recovery%2C%20governance%2C%20and%20distribution%20shift.%20This%20demo%20adds%20only%20SLO%20sensitivity.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.25.1",
+            "serverToken": "unused",
+            "config": {"ai": {"allow_provider_config": true, "custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "code_lens": true, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "layout": null,
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

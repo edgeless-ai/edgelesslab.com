@@ -415,6 +415,23 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["formal-methods", "lean4", "proof-repair", "inference-economics"],
   },
+
+  // Pre-verify (arXiv:2609.05513). published_url will be added after live
+  // verification and interactive control testing.
+  {
+    slug: "2609.05513-budgeted-teaching-slo",
+    title: "When Is Cheaper Teaching Still Good Enough?",
+    description:
+      "Slide the first-pass-success SLO and teacher-call weight to find which of three training policies minimizes a weighted resource index. Reproduces Table 1's Gate + trim reductions (22.6% fewer teacher calls, 52.1% less PFLOPs) on MiniWoB and TimeWarp from author-reported means.",
+    category: "AI training",
+    tags: [
+      "online-teaching",
+      "web-agents",
+      "budgeting",
+      "resource-allocation",
+      "sensitivity-analysis",
+    ],
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

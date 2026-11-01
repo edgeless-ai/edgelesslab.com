@@ -360,6 +360,14 @@ export const marimoDemos: MarimoDemo[] = [
   {
     slug: "2609.24343-bandwidth-thermal-envelope",
     title: "Volumetric DRAM: Bandwidth vs Thermal Headroom",
+  {
+    slug: "2609.03582-marginal-crps-joint-risk",
+    title: "Equal Marginals, Different Trajectory Risk",
+    description:
+      "See how equal hourly marginals and equal expected pointwise CRPS can hide different accumulated-tail risk and six-hour boundary jumps.",
+    category: "Research",
+    tags: ["probabilistic-forecasting", "CRPS", "joint-structure", "risk", "WeatherNext-3"],
+  },
     description:
       "Cap the useful bandwidth of three published volumetric-DRAM designs by a workload ceiling and see when extra interfaces add heat without useful throughput.",
     category: "Research",

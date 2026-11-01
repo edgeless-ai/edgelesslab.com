@@ -1,4 +1,5 @@
 import { test, expect, type ConsoleMessage } from "@playwright/test";
+import { writeFile } from "node:fs/promises";
 import { marimoDemos, marimoCategories } from "../src/lib/marimo-demos";
 import { validateMarimoCatalog } from "../src/lib/marimo-gallery-contract";
 
@@ -8,6 +9,42 @@ import { validateMarimoCatalog } from "../src/lib/marimo-gallery-contract";
  */
 
 test.describe("static site smoke", () => {
+  test("Studio Notes renders all seven source links and fits desktop/mobile without browser errors", async ({ page }, testInfo) => {
+    const url = "/blog/studio-notes-correctness-before-speed/";
+    const sources = [
+      "http://naotokui.net/projects/brian-eno-the-ship/",
+      "https://spacetypegenerator.com/",
+      "https://twitter.com/_danlever/status/1617853361822498816",
+      "https://www.instagram.com/p/CNO016hJuut/",
+      "https://x.com/mattdesl/status/2070470499772080512?s=46&t=RVhjef0w0e9lRruybcGtTg",
+      "https://x.com/mccoyspace/status/2038835924059271354?s=20",
+      "https://blog.glyphdrawing.club/how-to-clean-up-your-glyph-drawing-in-adobe-illustrator/",
+    ];
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
+    page.on("console", (message) => {
+      if (message.type() === "error") errors.push(`console: ${message.text()}`);
+    });
+    const viewports = [{ name: "desktop", width: 1440, height: 900 }, { name: "mobile", width: 375, height: 812 }];
+    const results: { viewport: string; scrollWidth: number; innerWidth: number; links: string[] }[] = [];
+    for (const viewport of viewports) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      const response = await page.goto(url);
+      expect(response?.status()).toBe(200);
+      await expect(page.getByRole("heading", { level: 1, name: "Studio Notes: Correctness Before Speed" })).toBeVisible();
+      await expect(page.getByText("Proposed experiment, not physically tested.", { exact: false })).toBeVisible();
+      const links = await page.locator(".prose-custom a").evaluateAll((anchors) => anchors.map((anchor) => anchor.getAttribute("href") || ""));
+      expect(links).toEqual(sources);
+      await page.locator(".prose-custom h2").last().scrollIntoViewIfNeeded();
+      await expect(page.getByText("What counts as a failed output when the coordinates are correct", { exact: false })).toBeVisible();
+      const dimensions = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, innerWidth: window.innerWidth }));
+      results.push({ viewport: viewport.name, ...dimensions, links });
+      expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.innerWidth);
+      await page.screenshot({ path: testInfo.outputPath(`studio-notes-${viewport.name}.png`), fullPage: true });
+    }
+    await writeFile(testInfo.outputPath("studio-notes-browser.json"), JSON.stringify({ url, results, errors }, null, 2));
+    expect(errors).toEqual([]);
+  });
   test("creative-loop study is discoverable without implying a built demo", async ({ page }) => {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));

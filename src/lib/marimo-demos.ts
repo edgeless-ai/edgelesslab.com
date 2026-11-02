@@ -367,6 +367,14 @@ export const marimoDemos: MarimoDemo[] = [
     published_url: "https://marimo.edgelesslab.com/2609.24343-bandwidth-thermal-envelope/",
   },
   {
+    slug: "2609.03582-marginal-crps-joint-risk",
+    title: "Equal Marginals, Different Trajectory Risk",
+    description:
+      "See how equal hourly marginals and equal expected pointwise CRPS can hide different accumulated-tail risk and six-hour boundary jumps.",
+    category: "Research",
+    tags: ["probabilistic-forecasting", "CRPS", "joint-structure", "risk", "WeatherNext-3"],
+  },
+  {
     slug: "2610.26754-tokengate-prefill-envelope",
     title: "TokenGate Prefill: Retained-Token Budget vs. Work Cost",
     description:
@@ -443,6 +451,28 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["agentic-systems", "kv-cache", "serving", "reproducibility"],
   },
+
+  // Research explainers (overnight expansion)
+  {
+    slug: "2610.40221-dissipation-plateau",
+    title: "Dissipation Plateau in Neural Scaling",
+    description:
+      "Investigate the dissipation plateau phenomenon in neural scaling laws — track how the effective degrees of freedom evolve across scale with live control of the Fisher-information spectrum and variance-gap diagnostics.",
+    category: "Research",
+    tags: ["neural scaling", "dissipation", "Fisher information", "variance gap", "parameter count"],
+    published_url: "https://marimo.edgelesslab.com/2610.40221-dissipation-plateau/"
+  },
+
+  // Pre-verify (arXiv:2609.04404). published_url will be added after live
+  // verification and interactive control testing.
+  {
+    slug: "2609.04404-asr-hallucination-taxonomy",
+    title: "ASR Grounding Failure Audit",
+    description:
+      "Explore how a zero-event intervention audit constrains, but does not eliminate, semantic-hallucination risk.",
+    category: "Research",
+    tags: ["ASR", "evaluation", "hallucination", "uncertainty"],
+  }
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

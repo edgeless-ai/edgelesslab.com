@@ -70,4 +70,12 @@ describe("published marimo gallery", () => {
     expect(source).toContain("href={demo.published_url}");
     expect(source).toContain("url: demo.published_url");
   });
+
+  it("registers the 2609.04404 ASR hallucination taxonomy notebook after live verification", () => {
+    const entry = marimoDemos.find(d => d.slug === "2609.04404-asr-hallucination-taxonomy");
+    expect(entry).toBeDefined();
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2609.04404-asr-hallucination-taxonomy/");
+    expect(entry?.title).toBe("ASR Grounding Failure Audit");
+    expect(entry?.tags).toContain("hallucination");
+  });
 });

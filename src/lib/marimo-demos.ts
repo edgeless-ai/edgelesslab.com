@@ -463,8 +463,6 @@ export const marimoDemos: MarimoDemo[] = [
     published_url: "https://marimo.edgelesslab.com/2610.40221-dissipation-plateau/"
   },
 
-  // Pre-verify (arXiv:2609.04404). published_url will be added after live
-  // verification and interactive control testing.
   {
     slug: "2609.04404-asr-hallucination-taxonomy",
     title: "ASR Grounding Failure Audit",
@@ -472,6 +470,7 @@ export const marimoDemos: MarimoDemo[] = [
       "Explore how a zero-event intervention audit constrains, but does not eliminate, semantic-hallucination risk.",
     category: "Research",
     tags: ["ASR", "evaluation", "hallucination", "uncertainty"],
+    published_url: "https://marimo.edgelesslab.com/2609.04404-asr-hallucination-taxonomy/",
   }
 ];
 

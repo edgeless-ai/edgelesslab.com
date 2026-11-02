@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2609.04404-asr-hallucination-taxonomy</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\n#   \"marimo==0.23.16\",\n# ]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as _mo\n\n    _mo.md(r\"\"\"\n    # Grounding failure is not semantic hallucination\n\n    **Research question:** what does the paper's `0 / 354` intervention audit\n    establish, and how quickly would that evidence change if fluent fabrications\n    had been observed?\n\n    This demo reproduces the reported audit denominator and applies a Wilson 95%\n    binomial interval. The slider is an explicitly **hypothetical sensitivity\n    analysis**. It does not rerun either ASR model or alter the paper's result.\n    Source: [arXiv:2609.04404v1](https://arxiv.org/abs/2609.04404v1).\n    \"\"\")\n    return\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    hypothetical = mo.ui.slider(\n        0, 20, value=0, step=1,\n        label=\"Hypothetical fluent fabrications among 354 judged outputs\",\n    )\n    hypothetical\n    return hypothetical, mo\n\n\n@app.cell\ndef _(hypothetical, mo):\n    import math\n\n    _n = 354\n    _x = int(hypothetical.value)\n    _p = _x / _n\n    _z = 1.96\n    _den = 1 + _z * _z / _n\n    _center = (_p + _z * _z / (2 * _n)) / _den\n    _half = _z * math.sqrt(_p * (1 - _p) / _n + _z * _z / (4 * _n * _n)) / _den\n    _lo = max(0.0, _center - _half)\n    _hi = min(1.0, _center + _half)\n    _bar_x = 80\n    _bar_w = 520\n    _point_x = _bar_x + _bar_w * min(_p / 0.10, 1)\n    _lo_x = _bar_x + _bar_w * min(_lo / 0.10, 1)\n    _hi_x = _bar_x + _bar_w * min(_hi / 0.10, 1)\n    _marker = \"paper result\" if _x == 0 else \"hypothetical - not observed\"\n    _svg = f\"\"\"\n    \u003Csvg data-chart=\"asr-audit-sensitivity\" data-count=\"{_x}\"\n      viewBox=\"0 0 680 285\" width=\"100%\" role=\"img\"\n      aria-label=\"Sensitivity of fluent-fabrication rate and Wilson interval\"\u003E\n      \u003Crect width=\"680\" height=\"285\" rx=\"16\" fill=\"#0f172a\"/\u003E\n      \u003Ctext x=\"28\" y=\"36\" fill=\"#e2e8f0\" font-size=\"18\" font-weight=\"700\"\u003EIntervention audit sensitivity\u003C/text\u003E\n      \u003Ctext x=\"28\" y=\"60\" fill=\"#94a3b8\" font-size=\"13\"\u003E{_marker}\u003C/text\u003E\n      \u003Cline x1=\"{_bar_x}\" y1=\"155\" x2=\"{_bar_x + _bar_w}\" y2=\"155\" stroke=\"#64748b\" stroke-width=\"8\" stroke-linecap=\"round\"/\u003E\n      \u003Cline x1=\"{_lo_x:.1f}\" y1=\"155\" x2=\"{_hi_x:.1f}\" y2=\"155\" stroke=\"#38bdf8\" stroke-width=\"12\" stroke-linecap=\"round\"/\u003E\n      \u003Ccircle cx=\"{_point_x:.1f}\" cy=\"155\" r=\"10\" fill=\"#f59e0b\" stroke=\"#fef3c7\" stroke-width=\"3\"/\u003E\n      \u003Ctext x=\"{_bar_x}\" y=\"190\" fill=\"#cbd5e1\" font-size=\"12\"\u003E0%\u003C/text\u003E\n      \u003Ctext x=\"{_bar_x + _bar_w}\" y=\"190\" fill=\"#cbd5e1\" font-size=\"12\" text-anchor=\"end\"\u003E10%\u003C/text\u003E\n      \u003Ctext x=\"28\" y=\"230\" fill=\"#38bdf8\" font-size=\"14\"\u003E95% Wilson interval: {100*_lo:.2f}% to {100*_hi:.2f}%\u003C/text\u003E\n      \u003Ctext x=\"28\" y=\"255\" fill=\"#f59e0b\" font-size=\"14\"\u003Epoint estimate: {100*_p:.2f}%\u003C/text\u003E\n    \u003C/svg\u003E\n    \"\"\"\n    _summary = mo.md(f\"\"\"\n    ## Sensitivity: {_x} / {_n} fluent fabrications - rate {100*_p:.2f}%; upper 95% bound {100*_hi:.2f}%\n\n    At the paper's observed value (`0 / 354`), the audit supports **no detected\n    fluent fabrication under these interventions**, not a universal zero-risk\n    claim. Even with zero observed events, sampling uncertainty leaves an upper\n    Wilson bound of {100*_hi:.2f}% for this audited intervention population.\n    \"\"\")\n    mo.vstack([_summary, mo.Html(_svg)])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ## What the experiment does and does not show\n\n    1. **Causal boundary:** skipping each model's final encoder block caused large\n       divergence and WER increases; middle-block skips were much smaller.\n    2. **Observed phenotype:** among 354 judged intervention outputs, the paper\n       found zero fluent off-topic fabrications; failures were mostly garbling,\n       repetition/collapse, or on-topic errors.\n    3. **Category discipline:** complete 4-gram divergence is a reproducible flag\n       for lexical mismatch, not a semantic-hallucination label. In baseline\n       audits its precision was 1/185 for CTC and 8/116 for RNN-T.\n\n    **Scope:** published-count sensitivity, not model inference, a clinical tool,\n    or a reproduction of NeMo/H200 experiments. The semantic labels came from the\n    paper's Gemini 2.5 Pro judge and were not independently human-validated.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%0A%23%20%20%20%22marimo%3D%3D0.23.16%22%2C%0A%23%20%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20_mo%0A%0A%20%20%20%20_mo.md(r%22%22%22%0A%20%20%20%20%23%20Grounding%20failure%20is%20not%20semantic%20hallucination%0A%0A%20%20%20%20**Research%20question%3A**%20what%20does%20the%20paper's%20%600%20%2F%20354%60%20intervention%20audit%0A%20%20%20%20establish%2C%20and%20how%20quickly%20would%20that%20evidence%20change%20if%20fluent%20fabrications%0A%20%20%20%20had%20been%20observed%3F%0A%0A%20%20%20%20This%20demo%20reproduces%20the%20reported%20audit%20denominator%20and%20applies%20a%20Wilson%2095%25%0A%20%20%20%20binomial%20interval.%20The%20slider%20is%20an%20explicitly%20**hypothetical%20sensitivity%0A%20%20%20%20analysis**.%20It%20does%20not%20rerun%20either%20ASR%20model%20or%20alter%20the%20paper's%20result.%0A%20%20%20%20Source%3A%20%5BarXiv%3A2609.04404v1%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2609.04404v1).%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20hypothetical%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%200%2C%2020%2C%20value%3D0%2C%20step%3D1%2C%0A%20%20%20%20%20%20%20%20label%3D%22Hypothetical%20fluent%20fabrications%20among%20354%20judged%20outputs%22%2C%0A%20%20%20%20)%0A%20%20%20%20hypothetical%0A%20%20%20%20return%20hypothetical%2C%20mo%0A%0A%0A%40app.cell%0Adef%20_(hypothetical%2C%20mo)%3A%0A%20%20%20%20import%20math%0A%0A%20%20%20%20_n%20%3D%20354%0A%20%20%20%20_x%20%3D%20int(hypothetical.value)%0A%20%20%20%20_p%20%3D%20_x%20%2F%20_n%0A%20%20%20%20_z%20%3D%201.96%0A%20%20%20%20_den%20%3D%201%20%2B%20_z%20*%20_z%20%2F%20_n%0A%20%20%20%20_center%20%3D%20(_p%20%2B%20_z%20*%20_z%20%2F%20(2%20*%20_n))%20%2F%20_den%0A%20%20%20%20_half%20%3D%20_z%20*%20math.sqrt(_p%20*%20(1%20-%20_p)%20%2F%20_n%20%2B%20_z%20*%20_z%20%2F%20(4%20*%20_n%20*%20_n))%20%2F%20_den%0A%20%20%20%20_lo%20%3D%20max(0.0%2C%20_center%20-%20_half)%0A%20%20%20%20_hi%20%3D%20min(1.0%2C%20_center%20%2B%20_half)%0A%20%20%20%20_bar_x%20%3D%2080%0A%20%20%20%20_bar_w%20%3D%20520%0A%20%20%20%20_point_x%20%3D%20_bar_x%20%2B%20_bar_w%20*%20min(_p%20%2F%200.10%2C%201)%0A%20%20%20%20_lo_x%20%3D%20_bar_x%20%2B%20_bar_w%20*%20min(_lo%20%2F%200.10%2C%201)%0A%20%20%20%20_hi_x%20%3D%20_bar_x%20%2B%20_bar_w%20*%20min(_hi%20%2F%200.10%2C%201)%0A%20%20%20%20_marker%20%3D%20%22paper%20result%22%20if%20_x%20%3D%3D%200%20else%20%22hypothetical%20-%20not%20observed%22%0A%20%20%20%20_svg%20%3D%20f%22%22%22%0A%20%20%20%20%3Csvg%20data-chart%3D%22asr-audit-sensitivity%22%20data-count%3D%22%7B_x%7D%22%0A%20%20%20%20%20%20viewBox%3D%220%200%20680%20285%22%20width%3D%22100%25%22%20role%3D%22img%22%0A%20%20%20%20%20%20aria-label%3D%22Sensitivity%20of%20fluent-fabrication%20rate%20and%20Wilson%20interval%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22680%22%20height%3D%22285%22%20rx%3D%2216%22%20fill%3D%22%230f172a%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%2236%22%20fill%3D%22%23e2e8f0%22%20font-size%3D%2218%22%20font-weight%3D%22700%22%3EIntervention%20audit%20sensitivity%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%2260%22%20fill%3D%22%2394a3b8%22%20font-size%3D%2213%22%3E%7B_marker%7D%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%22%7B_bar_x%7D%22%20y1%3D%22155%22%20x2%3D%22%7B_bar_x%20%2B%20_bar_w%7D%22%20y2%3D%22155%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%228%22%20stroke-linecap%3D%22round%22%2F%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%22%7B_lo_x%3A.1f%7D%22%20y1%3D%22155%22%20x2%3D%22%7B_hi_x%3A.1f%7D%22%20y2%3D%22155%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%2212%22%20stroke-linecap%3D%22round%22%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22%7B_point_x%3A.1f%7D%22%20cy%3D%22155%22%20r%3D%2210%22%20fill%3D%22%23f59e0b%22%20stroke%3D%22%23fef3c7%22%20stroke-width%3D%223%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22%7B_bar_x%7D%22%20y%3D%22190%22%20fill%3D%22%23cbd5e1%22%20font-size%3D%2212%22%3E0%25%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22%7B_bar_x%20%2B%20_bar_w%7D%22%20y%3D%22190%22%20fill%3D%22%23cbd5e1%22%20font-size%3D%2212%22%20text-anchor%3D%22end%22%3E10%25%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%22230%22%20fill%3D%22%2338bdf8%22%20font-size%3D%2214%22%3E95%25%20Wilson%20interval%3A%20%7B100*_lo%3A.2f%7D%25%20to%20%7B100*_hi%3A.2f%7D%25%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2228%22%20y%3D%22255%22%20fill%3D%22%23f59e0b%22%20font-size%3D%2214%22%3Epoint%20estimate%3A%20%7B100*_p%3A.2f%7D%25%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%22%22%22%0A%20%20%20%20_summary%20%3D%20mo.md(f%22%22%22%0A%20%20%20%20%23%23%20Sensitivity%3A%20%7B_x%7D%20%2F%20%7B_n%7D%20fluent%20fabrications%20-%20rate%20%7B100*_p%3A.2f%7D%25%3B%20upper%2095%25%20bound%20%7B100*_hi%3A.2f%7D%25%0A%0A%20%20%20%20At%20the%20paper's%20observed%20value%20(%600%20%2F%20354%60)%2C%20the%20audit%20supports%20**no%20detected%0A%20%20%20%20fluent%20fabrication%20under%20these%20interventions**%2C%20not%20a%20universal%20zero-risk%0A%20%20%20%20claim.%20Even%20with%20zero%20observed%20events%2C%20sampling%20uncertainty%20leaves%20an%20upper%0A%20%20%20%20Wilson%20bound%20of%20%7B100*_hi%3A.2f%7D%25%20for%20this%20audited%20intervention%20population.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20mo.vstack(%5B_summary%2C%20mo.Html(_svg)%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20What%20the%20experiment%20does%20and%20does%20not%20show%0A%0A%20%20%20%201.%20**Causal%20boundary%3A**%20skipping%20each%20model's%20final%20encoder%20block%20caused%20large%0A%20%20%20%20%20%20%20divergence%20and%20WER%20increases%3B%20middle-block%20skips%20were%20much%20smaller.%0A%20%20%20%202.%20**Observed%20phenotype%3A**%20among%20354%20judged%20intervention%20outputs%2C%20the%20paper%0A%20%20%20%20%20%20%20found%20zero%20fluent%20off-topic%20fabrications%3B%20failures%20were%20mostly%20garbling%2C%0A%20%20%20%20%20%20%20repetition%2Fcollapse%2C%20or%20on-topic%20errors.%0A%20%20%20%203.%20**Category%20discipline%3A**%20complete%204-gram%20divergence%20is%20a%20reproducible%20flag%0A%20%20%20%20%20%20%20for%20lexical%20mismatch%2C%20not%20a%20semantic-hallucination%20label.%20In%20baseline%0A%20%20%20%20%20%20%20audits%20its%20precision%20was%201%2F185%20for%20CTC%20and%208%2F116%20for%20RNN-T.%0A%0A%20%20%20%20**Scope%3A**%20published-count%20sensitivity%2C%20not%20model%20inference%2C%20a%20clinical%20tool%2C%0A%20%20%20%20or%20a%20reproduction%20of%20NeMo%2FH200%20experiments.%20The%20semantic%20labels%20came%20from%20the%0A%20%20%20%20paper's%20Gemini%202.5%20Pro%20judge%20and%20were%20not%20independently%20human-validated.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

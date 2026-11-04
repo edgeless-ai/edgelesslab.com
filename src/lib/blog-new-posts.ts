@@ -3433,7 +3433,7 @@ Taken together, the five videos trace one arc. Generative models started with fl
 - **Game worlds and what's in them.** Palworld became the lightning rod for "AI-made game" anxiety in early 2024. Section 2 covers what that accusation turned out to be worth.
 - **Bodies.** The Astribot S1 video is about where generation goes next: models that output motion instead of pixels.
 
-How the Sora story ended shows the arc most clearly. In March 2026 OpenAI [said it would discontinue Sora](https://www.pcmag.com/news/that-was-fast-openai-to-shut-down-sora-video-generator-app). It cited compute demand and said the Sora research team would keep working on world simulation "to advance robotics." The web and app versions closed on April 26, 2026 ([OpenAI Help Center](https://help.openai.com/en/articles/20001152-what-to-know-about-the-sora-discontinuation)). The API [shut down on September 24, 2026](https://developers.openai.com/api/reference/python/resources/videos/methods/list), and OpenAI says there is no one-to-one replacement. The product is gone. Its research thesis is now pointed at bodies.
+How the Sora story ended shows the arc most clearly. In March 2026 OpenAI [said it would discontinue Sora](https://www.pcmag.com/news/that-was-fast-openai-to-shut-down-sora-video-generator-app). It cited compute demand and said the Sora research team would keep working on world simulation "to advance robotics." The web and app versions closed on April 26, 2026 ([OpenAI Help Center](https://help.openai.com/en/articles/20001152-what-to-know-about-the-sora-discontinuation)). The API [shut down on September 24, 2026](https://developers.openai.com/api/reference/python/resources/videos/methods/list), and OpenAI says there is no one-to-one replacement. The consumer product and API have closed. OpenAI has said its world-simulation research will continue, including work intended to advance robotics.
 
 ## 2. Two takes the videos set against each other
 
@@ -3468,13 +3468,13 @@ For skeptics, the awkward part is that the autonomy trend has kept moving since 
 
 **Fair to both sides:** technologists are right that the copyright panic picked a weak test case and that the robot demos were oversold. Artists and skeptics are right that disclosure norms were thin and still are, and that autonomy in high-stakes systems is moving faster than the public debate about it. Both can be true.
 
-## 3. What it means for our stack, and for you
+## 3. What builders can take from it
 
 Our takeaway from this set: **prefer generation you can run, inspect, and disclose.**
 
 - **Owning the tool beats renting it.** Sora's shutdown is a warning for anyone building a workflow on a closed generative API. Our own generative-art work runs on procedural generators we wrote and control. When we evaluated an image-to-video prototype, the post-processing pipeline we already own was the cheap part. The generation step is still a call to an external model, and that's the dependency Sora's shutdown says to plan for. The terrain mod points the other way: a method you can read in a paper and run on a consumer GPU.
 - **Windowed diffusion is a pattern, not just a Minecraft trick.** Blending overlapping windows with constant cost per lookup could apply to any large generated space, such as maps, textures, or long-form generative art. That's our inference. The paper demonstrates it on terrain.
-- **Disclose by default.** We keep a draft internal policy on generative-AI disclosure modeled on Steam's disclosure requirement. If an asset is AI-generated, say so, and don't ship derivatives of third-party copyrighted work. That makes an accusation like the one aimed at Pocketpair easy to answer, and it respects the artists, whose concern was legitimate even when their target was wrong.
+- **Disclose by default.** If an asset is AI-generated, disclose it, and check the rights to the material used. Disclosure does not settle every copyright question, but it gives audiences a clearer account of how a work was made.
 - **Read claims at the right resolution.** Two of these five videos led with claims that shrank under checking: a revenue number in one, and a speed figure plus an autonomy claim in the other. Our rule is that a capability claim names its source, its date, and its scope, or we don't repeat it.
 
 ## 4. Watch this one, then build
@@ -3492,16 +3492,16 @@ If you build something with it, or find where it breaks, reply and tell us what 
     editorial: true,
     title: "Enterprise AI's Real Bottleneck Is Everything Around the Model",
     description:
-      "Six videos, one shared conclusion: the models work. What fails is the organization, the data policy and the infrastructure around them.",
+      "Six videos examine how organizational choices, data protection, infrastructure and model limitations shape enterprise AI deployments.",
     date: "2026-10-02",
     tags: ["Enterprise AI", "Local Inference", "AI Infrastructure", "Multi-Agent Swarm"],
     readTime: "7 min",
     processNote: "Human-directed research and writing, AI-assisted editing. Claims spot-checked against primary sources.",
     content: `# Enterprise AI's Real Bottleneck Is Everything Around the Model
 
-*Six videos, one shared conclusion: the models work. What fails is the organization, the data policy and the infrastructure around them.*
+*Six videos examine how organizational choices, data protection, infrastructure and model limitations shape enterprise AI deployments.*
 
-We went through six videos on enterprise AI, five from Nate B. Jones and one from Kiraa, published between December 2025 and July 2026. They come at the subject from different directions and arrive at the same gap. Model quality is no longer what stops deployments.
+We went through six videos on enterprise AI, five from Nate B. Jones and one from Kiraa, published between December 2025 and July 2026. They approach the subject from different directions, but each highlights constraints beyond model quality. Models can also fail at the work itself; better infrastructure does not make their answers reliable.
 
 ## 1. The pattern: the reckoning has arrived
 
@@ -3521,15 +3521,15 @@ We went through six videos on enterprise AI, five from Nate B. Jones and one fro
 
 **Take B: the unlock is local, private inference.** [How To Run AI Locally On Files You Can Never Upload](https://www.youtube.com/watch?v=5slsNizN6MQ) runs gpt-oss-safeguard-20b in LM Studio on an offline laptop. It flags unreleased pricing and attorney-client notes, masks a fake API key, and declines to call an unreadable section "safe." The model is real: an open-weight safety classifier that LM Studio supports. The Airlock video pushes the idea further: "All of our data needs to be accessible to AI, but not all of our data should go over the wire."
 
-**The tension.** If Take A is right, better local hardware won't fix much, because the gap is organizational. If Take B is right, enterprise demand for cloud tokens should soften over time, which sits awkwardly against the compute-scarcity story. Our read is that both are right about different layers. Take A explains why pilots stall in general. Take B names the specific blocker, data that can't leave the building, behind many of the stalled pilots. One caveat from the local-AI video applies to both: open weights aren't automatically portable, and self-hosting can still create lock-in.
+**The tension.** Local hardware may help with data residency without resolving organizational or model-quality problems. Local and cloud inference can also coexist, so these videos do not establish what will happen to demand for cloud tokens. The two perspectives emphasize different constraints. One caveat from the local-AI video applies to both: open weights aren't automatically portable, and self-hosting can still create lock-in.
 
-## 3. What this means for our stack
+## 3. What builders can put into practice
 
-**Local, air-gapped inference is now a practical default for sensitive work.** A classifier small enough to run in LM Studio on a laptop can do triage, PII detection and masking before anything touches a cloud API. The video's principle is the right one: instructions aren't guardrails, air-gapping is. We would rather have a model that says "I can't tell" than one that is confidently wrong.
+**Local inference is one option for sensitive work.** The demonstration uses a laptop-based classifier to flag and mask examples before a cloud request. A classifier can miss sensitive material, and running locally does not by itself establish that a machine is air-gapped. Test the full data path, use access controls, and treat uncertain results as requiring review.
 
-**Task-scoped clean copies beat blanket redaction.** Airlock's core idea is job-first. You declare the task, extract only the slice that matters, and leave the original untouched. The same price can be essential to one question and irrelevant to another. The clean copy goes to whichever frontier model is best this month, and the original never moves. That fits Kiraa's point that "models are commodities right now and there'll be a better one next month." The durable value sits in the layer that decides what leaves, not in the model.
+**Task-scoped clean copies beat blanket redaction.** Airlock's core idea is job-first. You declare the task, extract only the slice that matters, and leave the original untouched. The same price can be essential to one question and irrelevant to another. The intended clean copy can then be sent to a model while the original remains in place. That depends on correct extraction and controls: a mistaken or incomplete redaction can still expose sensitive data.
 
-**Orchestration is the gap nobody has filled.** Even the best local-hardware story stalls without job queues, batching, monitoring, auditing and failover. The Kiraa speaker says so himself, though he sells the fix. Running our own multi-agent swarm has taught us the same lesson: the failures are rarely the model. They are handoffs, missing verification steps and tasks that report "done" without proof. That is the Block video's quiet failure in miniature.
+**Orchestration deserves its own evaluation.** Job queues, batching, monitoring, audit trails and failover can all matter alongside model quality. Existing tools address parts of this work; the challenge is choosing and testing a combination that fits the task. In our own agent experiments, handoffs and completion claims have also required verification.
 
 **Label the boundary between "act on this" and "interpret this."** Anything a model touches in a decision path should carry an explicit marker saying which outputs are safe to act on and which need a human read. That is the practical takeaway from the world-model argument.
 

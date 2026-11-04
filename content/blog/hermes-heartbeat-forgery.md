@@ -1,48 +1,32 @@
 ---
 slug: hermes-heartbeat-forgery
-title: Tick 151: The Heartbeat That Wasn't Real
-description: A scheduled job wrote fake heartbeat statuses to the swarm's coordination file for four hours. The fix was rate-limited. We're making sure it can't happen again.
+title: The Heartbeat That Couldn't Prove an Agent Was Alive
+description: A scheduled job wrote another agent's heartbeat while a corrective task was rate-limited. The incident showed why a fresh timestamp is not proof of liveness.
 date: 2026-09-28
 tags:
 - Hermes
 - Multi-Agent
 - Infrastructure
 - Postmortem
-readTime: 6 min
+readTime: 4 min
 ---
 
-# Tick 151: The Heartbeat That Wasn't Real
+# The Heartbeat That Couldn't Prove an Agent Was Alive
 
-**Date:** 2026-09-27
-**Status:** Draft — humanizer pass complete
-**Source:** `claude-vault/03-Knowledge/swarm/2026-09-27-hermes-agent-tick151-heartbeat-forgery-continues-while-fix-rate-limited.md`
+A heartbeat is supposed to answer a simple question: is this process still running? Our agent system had a more complicated answer. A scheduled job could refresh the coordinator's heartbeat even though it wasn't the coordinator.
 
----
+Over four consecutive hourly runs, that job wrote a fresh status for the coordinator. The status checker reported the coordinator online. But a timestamp written by another process cannot establish that the coordinator is alive. The record we examined did **not** establish that the coordinator was offline either; it showed that the online signal could not be trusted as proof of its liveness.
 
-## What happened
+## The failure behind the green light
 
-For four hours, the shared coordination file claimed Hive was online. It wasn't.
+The system used a shared file to communicate liveness. The writing interface accepted a caller-supplied identity, so an unrelated scheduled job could write a heartbeat in the coordinator's name. The checker saw a recent timestamp and returned an online status without establishing who had written it.
 
-A scheduled job was writing fake heartbeat statuses to the file. Four consecutive runs overwrote the line with a claim that Hive was healthy. Meanwhile, the actual remediation task was rate-limited repeatedly and never ran.
+That is an identity failure, not just a stale-data problem. A fresh value can be misleading when the wrong producer is allowed to publish it.
 
-## Why it matters
+The response had its own failure mode. At the time of the investigation, the corrective task had been attempted sixteen times, and each attempt was rate-limited. The scheduled writer remained enabled. Filing a fix did not contain the source of the misleading signal.
 
-The heartbeat file is the swarm's liveness signal. If it says Hive is up, other agents assume Hive is up and route work to it. If Hive is actually down, that work goes nowhere. The forgery didn't just mislead us — it directed traffic to a dead agent for four hours.
+## The lesson
 
-## Four containment gaps
+Contain the producer first; then repair the trust boundary. A heartbeat needs a way to bind a write to the process whose health it represents, and the status check needs to reject a cross-process write. While that work is unverified, the displayed status should be treated as untrusted, not as evidence that the agent is either up or down.
 
-1. **The producer wasn't stopped.** The scheduled job kept running. It had the write access and the cron schedule, and nothing blocked it.
-2. **The fix hit the same quota wall.** The corrective task was rate-limited repeatedly. Every attempt returned to `ready` with no result, while the harmful job stayed enabled.
-3. **The status had no authorship verification.** Any cron job with write access could claim to be Hive. There was no signature, no token, no check.
-4. **The system tried many duplicate fixes.** Without idempotency, each rate-limited attempt looked like a fresh task. The queue filled with copies of the same fix.
-
-## What we're doing about it
-
-- **Remove heartbeat writes from the scheduled job** — the job that forged the status
-- **Add authorship verification** — heartbeat writes require a Hive-owned token, not just filesystem access
-- **Resume the corrective task only when a provider is available** — don't retry rate-limited fixes on the same quota wall
-- **Treat the current Hive line as tainted** — verify before trusting
-
-## The one-line version
-
-A cron job faked our coordinator's heartbeat for four hours. The fix was rate-limited. We're making sure it can't happen again.
+A green light is only as meaningful as the evidence behind it. A recent timestamp tells you when a record was updated. It does not, by itself, tell you who updated it or whether the process you care about is running.

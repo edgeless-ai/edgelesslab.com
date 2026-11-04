@@ -1,59 +1,34 @@
 ---
 slug: oss-saas-replacements
-title: 9 OSS Alternatives Evaluated, 3 Adopted
-description: We evaluated 9 open-source replacements for our SaaS stack. Three made the cut — and they're better than what they replaced.
+title: Nine Open-Source Projects We Evaluated as SaaS Alternatives
+description: A shortlist of open-source tools is not the same thing as a successful migration. Here's how we screened nine candidates and what still needed testing.
 date: 2026-09-28
 tags:
-- OSS
+- Open Source
 - SaaS
 - Infrastructure
 - Cost Optimization
-readTime: 5 min
+readTime: 4 min
 ---
 
-# 9 OSS Alternatives Evaluated, 3 Adopted
+# Nine Open-Source Projects We Evaluated as SaaS Alternatives
 
-**Date:** 2026-09-27
-**Status:** Draft — humanizer pass complete
-**Source:** `claude-vault/03-Knowledge/2026-09-27-oss-saas-replacements.md`
+A subscription price is easy to compare. The cost of running its replacement is harder: hosting, upgrades, integration work, licensing and the time spent fixing it when it breaks all belong in the calculation.
 
----
+We reviewed nine open-source projects that promised to replace or supplement a hosted service. Three looked worth further investigation. That was a shortlist, **not evidence that we had installed them, replaced a paid service or saved money**.
 
-## Why we did this
+## The shortlist
 
-Our SaaS bill was creeping up. Not dramatically — maybe $200/month — but for tools we use 3 times a week, the per-use cost was absurd. We evaluated 9 open-source replacements across three categories. Three made the cut.
+- [Chatwoot](https://github.com/chatwoot/chatwoot), a customer-support platform, was a candidate for a support workflow. Before adopting it, we needed to assess the applicable license and the work involved in operating it.
+- [Cap](https://github.com/CapSoftware/Cap), a screen-recording and sharing tool, was a candidate for making demonstrations. It still needed a trial against our actual recording workflow.
+- [VoiceStudio](https://github.com/debpalash/VoiceStudio) was a candidate for local voice generation. The next step was to test output quality and check the license and the consent requirements for any voice used.
 
-## What we evaluated
+We passed on other candidates for different reasons. Some overlapped with tools we already used; others depended on paid services or introduced licensing questions. Those were decisions for our needs at the time, not a blanket ranking of the projects.
 
-| Tool | SaaS Alternative | OSS Replacement | Verdict |
-|------|-----------------|-----------------|---------|
-| Image generation | Midjourney ($10/mo) | FLUX via fal.ai | Adopted |
-| Document parsing | Notion API ($8/mo) | Local markdown parser | Adopted |
-| Vector search | Pinecone ($50/mo) | ChromaDB (local) | Adopted |
-| Code review | GitHub Teams ($21/mo) | GitLab CE (self-hosted) | Too much ops |
-| CI/CD | GitHub Actions (overage) | Woodpecker CI | Not ready |
-| Monitoring | Datadog ($15/mo) | Prometheus + Grafana | Needs more glue |
-| Design systems | Figma ($15/mo) | Excalidraw + tldraw | Missing features |
-| Email | SendGrid ($29/mo) | Local SMTP relay | Deliverability risk |
-| Testing | BrowserStack ($99/mo) | Playwright (local) | Not a fair comparison |
+## What the comparison needs to include
 
-## The three that won
+A serious replacement test starts with a job, not a category label. Can the candidate perform the specific task the existing service handles? Can its output be moved elsewhere? What does it cost to host, monitor and update? Is the license suitable for the intended use?
 
-### 1. FLUX via fal.ai
-Midjourney is good. FLUX is better for anything with text, logos, or UI. The fal.ai endpoint costs per-use, so we only pay when we generate. We replaced a $10/month subscription with a pay-per-image model that's cheaper in practice.
+Only after a trial can we compare the full costs and decide whether to migrate. A local tool may avoid a per-query charge while adding maintenance. An open-source interface may still rely on a paid API. And a tool that works well for one workflow may be the wrong substitute for another.
 
-### 2. Local markdown parser
-We were paying Notion API rates to extract content from markdown files. The local parser does the same job in ~200 lines of Python. No API calls. No rate limits. No bill.
-
-### 3. ChromaDB
-Pinecone was eating $50/month for a vector store we barely queried. ChromaDB runs locally, integrates with our existing embeddings pipeline, and has zero per-query cost. The tradeoff is we manage the persistence layer ourselves — worth it for the savings.
-
-## What we learned
-
-- **Not every SaaS has an OSS equivalent.** CI/CD and monitoring are still hard self-hosted.
-- **The hidden cost is ops.** Woodpecker CI would save money on paper, but the maintenance burden isn't worth it for our volume.
-- **Adopt when the replacement is better, not just cheaper.** FLUX beats Midjourney for our use case. The local parser is faster than the API. ChromaDB is more predictable.
-
-## The one-line version
-
-Three tools replaced. $73/month saved. Zero features lost.
+The useful outcome of this review was a smaller list to test, not a savings figure. Shortlisting is the beginning of an evaluation, not the same as an adoption report.

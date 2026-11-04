@@ -1,0 +1,16 @@
+{
+  "comment": "Existing rendered posts with no top-level content/blog/<slug>.md, inventoried on t_3983eedc. Remove a slug once its Markdown copy exists; unknown missing copies fail.",
+  "withoutMarkdown": [
+    "poetry-packaging-week",
+    "cli-tools-week",
+    "agentic-engineering-resource-collision",
+    "verification-chain-crisis",
+    "agentic-engineering-week",
+    "multi-agent-orchestration-week",
+    "the-gateway-that-broke-and-the-expensive-models-we-didnt-need",
+    "rescuing-an-ai-product-from-a-dying-platform",
+    "kimi-k3-post",
+    "the-bottleneck-that-wasnt",
+    "the-monitor-that-cried-wolf"
+  ]
+}

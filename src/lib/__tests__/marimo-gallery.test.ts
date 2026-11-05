@@ -78,4 +78,12 @@ describe("published marimo gallery", () => {
     expect(entry?.title).toBe("ASR Grounding Failure Audit");
     expect(entry?.tags).toContain("hallucination");
   });
+
+  it("registers the google-routing-failure-price notebook after live verification", () => {
+    const entry = marimoDemos.find(d => d.slug === "google-routing-failure-price");
+    expect(entry).toBeDefined();
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/google-routing-failure-price/");
+    expect(entry?.title).toBe("The Hidden Price of Unresolved Failures");
+    expect(entry?.tags).toContain("model-routing");
+  });
 });

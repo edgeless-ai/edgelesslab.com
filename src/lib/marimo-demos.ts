@@ -471,6 +471,16 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["ASR", "evaluation", "hallucination", "uncertainty"],
     published_url: "https://marimo.edgelesslab.com/2609.04404-asr-hallucination-taxonomy/",
+  },
+
+  {
+    slug: "google-routing-failure-price",
+    title: "The Hidden Price of Unresolved Failures",
+    description:
+      "Charge unresolved tasks an explicit price and see when a cheap-but-imperfect model stops winning on cost per observed success.",
+    category: "Research",
+    tags: ["model-routing", "agent-economics", "evaluation", "sensitivity-analysis"],
+    published_url: "https://marimo.edgelesslab.com/google-routing-failure-price/",
   }
 ];
 

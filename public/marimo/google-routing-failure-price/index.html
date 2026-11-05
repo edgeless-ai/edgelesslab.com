@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>google-routing-failure-price</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\n#   \"marimo==0.23.16\",\n# ]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as _mo\n\n    _mo.md(r\"\"\"\n    # When does the cheapest route stop being cheapest?\n\n    **Research question:** what declared price for each unresolved failure is enough\n    to reverse a ranking based only on billed cost per observed success?\n\n    This is an exact arithmetic audit of four aggregate rows reported in the\n    [Google Developers Blog experiment](https://developers.googleblog.com/cost-per-task-using-cheap-classifiers-to-route-across-gemini-models-and-thinking-levels/),\n    published 2026-11-03. The source reports one author-run pass over 50 hand-built,\n    auto-graded prompts. This demo is **not** an independent model benchmark, agent\n    evaluation, or estimate of production failure costs.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    failure_price = mo.ui.slider(\n        start=0.0,\n        stop=0.005,\n        step=0.00025,\n        value=0.0,\n        label=\"Declared cost per unresolved failure (USD)\",\n    )\n    mo.vstack([\n        failure_price,\n        mo.md(\"Move right to charge the six unresolved Flash-Lite tasks instead of dropping them from the denominator.\"),\n    ])\n    return failure_price, mo\n\n\n@app.cell\ndef _(failure_price, mo):\n    _penalty = float(failure_price.value)\n    _rows = [\n        (\"Flash-Lite\", 44, 50, 0.00648, 0.61),\n        (\"Flash low\", 50, 50, 0.02632, 3.55),\n        (\"Jev route\", 50, 50, 0.02287, 1.90),\n        (\"Oracle route\", 50, 50, 0.02210, 1.79),\n    ]\n    _scores = []\n    for _name, _ok, _total, _spend, _latency in _rows:\n        _fail = _total - _ok\n        _closed = (_spend + _fail * _penalty) / _ok\n        _scores.append((_name, _closed, _ok, _fail, _spend, _latency))\n    _winner = min(_scores, key=lambda _row: _row[1])\n    _lite = _scores[0][1]\n    _jev = _scores[2][1]\n    _cross = (44 * (0.02287 / 50) - 0.00648) / 6\n    _scale = 510 / max(_score[1] for _score in _scores)\n    _bars = []\n    for _i, (_name, _closed, _ok, _fail, _spend, _latency) in enumerate(_scores):\n        _y = 98 + 52 * _i\n        _width = _closed * _scale\n        _color = \"#2dd4bf\" if _name == _winner[0] else \"#64748b\"\n        _bars.append(\n            f'\u003Ctext x=\"24\" y=\"{_y + 21}\" fill=\"#cbd5e1\" font-size=\"14\"\u003E{_name}\u003C/text\u003E'\n            f'\u003Crect x=\"140\" y=\"{_y}\" width=\"{_width:.1f}\" height=\"30\" rx=\"7\" fill=\"{_color}\"/\u003E'\n            f'\u003Ctext x=\"150\" y=\"{_y + 21}\" fill=\"#f8fafc\" font-size=\"13\"\u003E${_closed:.6f} / accepted task\u003C/text\u003E'\n        )\n    _svg = f\"\"\"\n    \u003Csvg data-chart=\"routing-failure-price\" data-failure-price=\"{_penalty:.5f}\"\n      viewBox=\"0 0 700 360\" width=\"100%\" role=\"img\"\n      aria-label=\"Closed-loop cost per accepted task for four routing strategies\"\u003E\n      \u003Crect width=\"700\" height=\"360\" rx=\"18\" fill=\"#0f172a\"/\u003E\n      \u003Ctext x=\"24\" y=\"36\" fill=\"#e2e8f0\" font-size=\"19\" font-weight=\"700\"\u003EFailure price changes the ranking\u003C/text\u003E\n      \u003Ctext x=\"24\" y=\"61\" fill=\"#94a3b8\" font-size=\"13\"\u003EExact source aggregates; analyst-declared failure penalty\u003C/text\u003E\n      {''.join(_bars)}\n      \u003Cline x1=\"24\" y1=\"318\" x2=\"676\" y2=\"318\" stroke=\"#334155\"/\u003E\n      \u003Ctext x=\"24\" y=\"342\" fill=\"#94a3b8\" font-size=\"12\"\u003EFormula: (billed spend + failures \u00d7 declared price) / observed successes\u003C/text\u003E\n    \u003C/svg\u003E\n    \"\"\"\n    _direction = \"below\" if _penalty \u003C _cross else \"at or above\"\n    _summary = mo.md(f\"\"\"\n    ## Operating point: ${_penalty:.5f} per failure - {_winner[0]} is cheapest\n\n    Flash-Lite costs **${_lite:.6f}** per accepted task after the declared penalty;\n    the perfect Jev route remains **${_jev:.6f}**. The ranking flips at\n    **${_cross:.6f} per unresolved failure**. This operating point is {_direction}\n    that crossover.\n    \"\"\")\n    mo.vstack([_summary, mo.Html(_svg)])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ## Evidence boundary and takeaway\n\n    1. Source rows: Flash-Lite 44/50 at $0.00648 and 0.61 s; low-thinking\n       Flash 50/50 at $0.02632 and 3.55 s; Jev route 50/50 at $0.02287 and\n       1.90 s; oracle route 50/50 at $0.02210 and 1.79 s.\n    2. The blog explicitly labels these single-run measurements over a sample\n       suite; prompts, raw outputs, grader, and benchmark code were not public\n       when the source note was written.\n    3. The slider's failure price is analyst-authored. It can represent retry,\n       verification, human remediation, or an unresolved-service penalty, but\n       this demo does not claim any one value is measured or generally correct.\n    4. A robust routing objective should minimize closed-loop spend subject to\n       an acceptance floor and verifier contract. Cost per observed success alone\n       lets unresolved hard tasks disappear from the denominator.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%0A%23%20%20%20%22marimo%3D%3D0.23.16%22%2C%0A%23%20%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20_mo%0A%0A%20%20%20%20_mo.md(r%22%22%22%0A%20%20%20%20%23%20When%20does%20the%20cheapest%20route%20stop%20being%20cheapest%3F%0A%0A%20%20%20%20**Research%20question%3A**%20what%20declared%20price%20for%20each%20unresolved%20failure%20is%20enough%0A%20%20%20%20to%20reverse%20a%20ranking%20based%20only%20on%20billed%20cost%20per%20observed%20success%3F%0A%0A%20%20%20%20This%20is%20an%20exact%20arithmetic%20audit%20of%20four%20aggregate%20rows%20reported%20in%20the%0A%20%20%20%20%5BGoogle%20Developers%20Blog%20experiment%5D(https%3A%2F%2Fdevelopers.googleblog.com%2Fcost-per-task-using-cheap-classifiers-to-route-across-gemini-models-and-thinking-levels%2F)%2C%0A%20%20%20%20published%202026-11-03.%20The%20source%20reports%20one%20author-run%20pass%20over%2050%20hand-built%2C%0A%20%20%20%20auto-graded%20prompts.%20This%20demo%20is%20**not**%20an%20independent%20model%20benchmark%2C%20agent%0A%20%20%20%20evaluation%2C%20or%20estimate%20of%20production%20failure%20costs.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20failure_price%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%20start%3D0.0%2C%0A%20%20%20%20%20%20%20%20stop%3D0.005%2C%0A%20%20%20%20%20%20%20%20step%3D0.00025%2C%0A%20%20%20%20%20%20%20%20value%3D0.0%2C%0A%20%20%20%20%20%20%20%20label%3D%22Declared%20cost%20per%20unresolved%20failure%20(USD)%22%2C%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20failure_price%2C%0A%20%20%20%20%20%20%20%20mo.md(%22Move%20right%20to%20charge%20the%20six%20unresolved%20Flash-Lite%20tasks%20instead%20of%20dropping%20them%20from%20the%20denominator.%22)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%20failure_price%2C%20mo%0A%0A%0A%40app.cell%0Adef%20_(failure_price%2C%20mo)%3A%0A%20%20%20%20_penalty%20%3D%20float(failure_price.value)%0A%20%20%20%20_rows%20%3D%20%5B%0A%20%20%20%20%20%20%20%20(%22Flash-Lite%22%2C%2044%2C%2050%2C%200.00648%2C%200.61)%2C%0A%20%20%20%20%20%20%20%20(%22Flash%20low%22%2C%2050%2C%2050%2C%200.02632%2C%203.55)%2C%0A%20%20%20%20%20%20%20%20(%22Jev%20route%22%2C%2050%2C%2050%2C%200.02287%2C%201.90)%2C%0A%20%20%20%20%20%20%20%20(%22Oracle%20route%22%2C%2050%2C%2050%2C%200.02210%2C%201.79)%2C%0A%20%20%20%20%5D%0A%20%20%20%20_scores%20%3D%20%5B%5D%0A%20%20%20%20for%20_name%2C%20_ok%2C%20_total%2C%20_spend%2C%20_latency%20in%20_rows%3A%0A%20%20%20%20%20%20%20%20_fail%20%3D%20_total%20-%20_ok%0A%20%20%20%20%20%20%20%20_closed%20%3D%20(_spend%20%2B%20_fail%20*%20_penalty)%20%2F%20_ok%0A%20%20%20%20%20%20%20%20_scores.append((_name%2C%20_closed%2C%20_ok%2C%20_fail%2C%20_spend%2C%20_latency))%0A%20%20%20%20_winner%20%3D%20min(_scores%2C%20key%3Dlambda%20_row%3A%20_row%5B1%5D)%0A%20%20%20%20_lite%20%3D%20_scores%5B0%5D%5B1%5D%0A%20%20%20%20_jev%20%3D%20_scores%5B2%5D%5B1%5D%0A%20%20%20%20_cross%20%3D%20(44%20*%20(0.02287%20%2F%2050)%20-%200.00648)%20%2F%206%0A%20%20%20%20_scale%20%3D%20510%20%2F%20max(_score%5B1%5D%20for%20_score%20in%20_scores)%0A%20%20%20%20_bars%20%3D%20%5B%5D%0A%20%20%20%20for%20_i%2C%20(_name%2C%20_closed%2C%20_ok%2C%20_fail%2C%20_spend%2C%20_latency)%20in%20enumerate(_scores)%3A%0A%20%20%20%20%20%20%20%20_y%20%3D%2098%20%2B%2052%20*%20_i%0A%20%20%20%20%20%20%20%20_width%20%3D%20_closed%20*%20_scale%0A%20%20%20%20%20%20%20%20_color%20%3D%20%22%232dd4bf%22%20if%20_name%20%3D%3D%20_winner%5B0%5D%20else%20%22%2364748b%22%0A%20%20%20%20%20%20%20%20_bars.append(%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%2224%22%20y%3D%22%7B_y%20%2B%2021%7D%22%20fill%3D%22%23cbd5e1%22%20font-size%3D%2214%22%3E%7B_name%7D%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%22140%22%20y%3D%22%7B_y%7D%22%20width%3D%22%7B_width%3A.1f%7D%22%20height%3D%2230%22%20rx%3D%227%22%20fill%3D%22%7B_color%7D%22%2F%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22150%22%20y%3D%22%7B_y%20%2B%2021%7D%22%20fill%3D%22%23f8fafc%22%20font-size%3D%2213%22%3E%24%7B_closed%3A.6f%7D%20%2F%20accepted%20task%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20_svg%20%3D%20f%22%22%22%0A%20%20%20%20%3Csvg%20data-chart%3D%22routing-failure-price%22%20data-failure-price%3D%22%7B_penalty%3A.5f%7D%22%0A%20%20%20%20%20%20viewBox%3D%220%200%20700%20360%22%20width%3D%22100%25%22%20role%3D%22img%22%0A%20%20%20%20%20%20aria-label%3D%22Closed-loop%20cost%20per%20accepted%20task%20for%20four%20routing%20strategies%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22700%22%20height%3D%22360%22%20rx%3D%2218%22%20fill%3D%22%230f172a%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2236%22%20fill%3D%22%23e2e8f0%22%20font-size%3D%2219%22%20font-weight%3D%22700%22%3EFailure%20price%20changes%20the%20ranking%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2261%22%20fill%3D%22%2394a3b8%22%20font-size%3D%2213%22%3EExact%20source%20aggregates%3B%20analyst-declared%20failure%20penalty%3C%2Ftext%3E%0A%20%20%20%20%20%20%7B''.join(_bars)%7D%0A%20%20%20%20%20%20%3Cline%20x1%3D%2224%22%20y1%3D%22318%22%20x2%3D%22676%22%20y2%3D%22318%22%20stroke%3D%22%23334155%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22342%22%20fill%3D%22%2394a3b8%22%20font-size%3D%2212%22%3EFormula%3A%20(billed%20spend%20%2B%20failures%20%C3%97%20declared%20price)%20%2F%20observed%20successes%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%22%22%22%0A%20%20%20%20_direction%20%3D%20%22below%22%20if%20_penalty%20%3C%20_cross%20else%20%22at%20or%20above%22%0A%20%20%20%20_summary%20%3D%20mo.md(f%22%22%22%0A%20%20%20%20%23%23%20Operating%20point%3A%20%24%7B_penalty%3A.5f%7D%20per%20failure%20-%20%7B_winner%5B0%5D%7D%20is%20cheapest%0A%0A%20%20%20%20Flash-Lite%20costs%20**%24%7B_lite%3A.6f%7D**%20per%20accepted%20task%20after%20the%20declared%20penalty%3B%0A%20%20%20%20the%20perfect%20Jev%20route%20remains%20**%24%7B_jev%3A.6f%7D**.%20The%20ranking%20flips%20at%0A%20%20%20%20**%24%7B_cross%3A.6f%7D%20per%20unresolved%20failure**.%20This%20operating%20point%20is%20%7B_direction%7D%0A%20%20%20%20that%20crossover.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20mo.vstack(%5B_summary%2C%20mo.Html(_svg)%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20Evidence%20boundary%20and%20takeaway%0A%0A%20%20%20%201.%20Source%20rows%3A%20Flash-Lite%2044%2F50%20at%20%240.00648%20and%200.61%20s%3B%20low-thinking%0A%20%20%20%20%20%20%20Flash%2050%2F50%20at%20%240.02632%20and%203.55%20s%3B%20Jev%20route%2050%2F50%20at%20%240.02287%20and%0A%20%20%20%20%20%20%201.90%20s%3B%20oracle%20route%2050%2F50%20at%20%240.02210%20and%201.79%20s.%0A%20%20%20%202.%20The%20blog%20explicitly%20labels%20these%20single-run%20measurements%20over%20a%20sample%0A%20%20%20%20%20%20%20suite%3B%20prompts%2C%20raw%20outputs%2C%20grader%2C%20and%20benchmark%20code%20were%20not%20public%0A%20%20%20%20%20%20%20when%20the%20source%20note%20was%20written.%0A%20%20%20%203.%20The%20slider's%20failure%20price%20is%20analyst-authored.%20It%20can%20represent%20retry%2C%0A%20%20%20%20%20%20%20verification%2C%20human%20remediation%2C%20or%20an%20unresolved-service%20penalty%2C%20but%0A%20%20%20%20%20%20%20this%20demo%20does%20not%20claim%20any%20one%20value%20is%20measured%20or%20generally%20correct.%0A%20%20%20%204.%20A%20robust%20routing%20objective%20should%20minimize%20closed-loop%20spend%20subject%20to%0A%20%20%20%20%20%20%20an%20acceptance%20floor%20and%20verifier%20contract.%20Cost%20per%20observed%20success%20alone%0A%20%20%20%20%20%20%20lets%20unresolved%20hard%20tasks%20disappear%20from%20the%20denominator.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

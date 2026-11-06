@@ -481,6 +481,17 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["model-routing", "agent-economics", "evaluation", "sensitivity-analysis"],
     published_url: "https://marimo.edgelesslab.com/google-routing-failure-price/",
+  },
+
+  // arXiv:2606.04781v2. Published after live verification.
+  {
+    slug: "2606.04781-pass-semantics",
+    title: "One Benchmark Packet, Two Pass Rates",
+    description:
+      "Credit or reject three reward-one/error rows to see how pass semantics move the human baseline while the AIP count stays fixed.",
+    category: "Research",
+    tags: ["agent-evaluation", "benchmarking", "denominators", "reproducibility"],
+    published_url: "https://marimo.edgelesslab.com/2606.04781-pass-semantics/",
   }
 ];
 

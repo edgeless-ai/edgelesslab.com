@@ -86,4 +86,12 @@ describe("published marimo gallery", () => {
     expect(entry?.title).toBe("The Hidden Price of Unresolved Failures");
     expect(entry?.tags).toContain("model-routing");
   });
+
+  it("registers the 2606.04781-pass-semantics notebook after live verification", () => {
+    const entry = marimoDemos.find(d => d.slug === "2606.04781-pass-semantics");
+    expect(entry).toBeDefined();
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2606.04781-pass-semantics/");
+    expect(entry?.title).toBe("One Benchmark Packet, Two Pass Rates");
+    expect(entry?.tags).toContain("denominators");
+  });
 });

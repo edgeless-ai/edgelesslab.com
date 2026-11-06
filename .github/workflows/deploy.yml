@@ -60,6 +60,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check blog integrity regressions
+        run: npm run test:blog-integrity
+
+      - name: Check blog registry, Markdown, dates and voice
+        run: npm run check:blog-integrity
+
       - name: Run unit tests (vitest)
         run: pnpm vitest run
 

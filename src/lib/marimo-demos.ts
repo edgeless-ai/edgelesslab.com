@@ -360,6 +360,14 @@ export const marimoDemos: MarimoDemo[] = [
   {
     slug: "2609.24343-bandwidth-thermal-envelope",
     title: "Volumetric DRAM: Bandwidth vs Thermal Headroom",
+  {
+    slug: "2609.03582-marginal-crps-joint-risk",
+    title: "Equal Marginals, Different Trajectory Risk",
+    description:
+      "See how equal hourly marginals and equal expected pointwise CRPS can hide different accumulated-tail risk and six-hour boundary jumps.",
+    category: "Research",
+    tags: ["probabilistic-forecasting", "CRPS", "joint-structure", "risk", "WeatherNext-3"],
+  },
     description:
       "Cap the useful bandwidth of three published volumetric-DRAM designs by a workload ceiling and see when extra interfaces add heat without useful throughput.",
     category: "Research",
@@ -441,8 +449,9 @@ export const marimoDemos: MarimoDemo[] = [
     ],
   },
 
-  // Pre-verify (arXiv:2608.15127). published_url will be added after live
-  // verification and interactive control testing.
+  // Published after live verification (arXiv:2608.15127). Synthetic mechanism
+  // illustration; default 40,000-block/300s point is capacity-bound, 180,000-block
+  // endpoint is TTL-bound.
   {
     slug: "2608.15127-cache-binding-regimes",
     title: "What Actually Binds This Cache?",
@@ -450,6 +459,7 @@ export const marimoDemos: MarimoDemo[] = [
       "Vary cache capacity and TTL to see whether synthetic agent-session recomputation is capacity-bound, TTL-bound, or mixed.",
     category: "Research",
     tags: ["agentic-systems", "kv-cache", "serving", "reproducibility"],
+    published_url: "https://marimo.edgelesslab.com/2608.15127-cache-binding-regimes/",
   },
 
   // Research explainers (overnight expansion)

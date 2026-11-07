@@ -500,7 +500,15 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["agent-evaluation", "benchmarking", "denominators", "reproducibility"],
     published_url: "https://marimo.edgelesslab.com/2606.04781-pass-semantics/",
-  }
+  },
+  {
+    slug: "2611.07042-scorer-rank-reversal",
+    title: "When the Scorer Reverses the Leaderboard",
+    description: "Switch among three scorer versions to see fixed LegalBench SARA outputs move from a Luna lead to a Haiku-Gemma-Luna order without any new model calls.",
+    category: "Research",
+    tags: ["evaluation", "benchmark-integrity", "reproducibility", "scoring"],
+    published_url: "https://marimo.edgelesslab.com/2611.07042-scorer-rank-reversal/",
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

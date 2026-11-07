@@ -103,4 +103,13 @@ describe("published marimo gallery", () => {
     expect(entry?.title).toBe("One Benchmark Packet, Two Pass Rates");
     expect(entry?.tags).toContain("denominators");
   });
+
+  it("registers the 2609.38372-self-optimizing-harness notebook after live verification", () => {
+    const entry = marimoDemos.find(d => d.slug === "2609.38372-self-optimizing-harness");
+    expect(entry).toBeDefined();
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2609.38372-self-optimizing-harness/");
+    expect(entry?.title).toBe("A Runnable Edit Is Not a Promotable Harness");
+    expect(entry?.tags).toContain("harness-evolution");
+    expect(entry?.tags).toContain("governance");
+  });
 });

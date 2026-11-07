@@ -139,6 +139,14 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["KV cache", "quantization", "MLA", "inference", "storage accounting"],
     published_url: "https://marimo.edgelesslab.com/2610.20686-rolaq-cache-accounting/",
   },
+  {
+    slug: "2610.14244-hbm-power-underbound",
+    title: "HBM Power Envelope Gap",
+    description: "See how a measured high-toggle HBM2 pattern exceeded the strongest JEDEC current-measurement loop.",
+    category: "Research",
+    tags: ["HBM", "hardware", "power", "reproducibility"],
+    published_url: "https://marimo.edgelesslab.com/2610.14244-hbm-power-underbound/",
+  },
 
   // Research explainers (overnight expansion)
   {

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2609.38372-self-optimizing-harness</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\n#   \"marimo==0.23.16\",\n# ]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as _mo\n\n    _mo.md(r\"\"\"\n    # A runnable edit is not a promotable harness\n\n    **Research question:** how does an external evidence threshold change which\n    self-authored harness edits may be promoted?\n\n    [Xu (2026), arXiv:2609.38372](https://arxiv.org/abs/2609.38372) reports a\n    same-model solver/proposer loop whose 49-line seed grew to 430 lines and improved\n    held-out averages by 4.48 points in-distribution and 12.64 points out-of-distribution.\n    Its update gate checked engineering validity and one mock run, not parent-versus-child\n    performance. This demo is an **analyst-authored policy stress test**, not a rerun,\n    benchmark reproduction, causal estimate, or safe-self-modification system.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    min_gain = mo.ui.slider(\n        start=0,\n        stop=8,\n        step=1,\n        value=0,\n        label=\"Minimum paired dev-set gain (points)\",\n    )\n    mo.vstack([\n        min_gain,\n        mo.md(\"All eight synthetic edits pass a run-only gate. The external gate also requires the selected dev gain and no domain regression worse than 2 points.\"),\n    ])\n    return min_gain, mo\n\n\n@app.cell\ndef _(min_gain, mo):\n    _edits = [\n        (\"timeouts\", 1.0, -0.2),\n        (\"bounded output\", 2.2, -0.1),\n        (\"state notes\", 3.1, -0.6),\n        (\"visual budget\", 4.0, -0.4),\n        (\"termination check\", 5.0, -0.8),\n        (\"history compaction\", 6.1, -1.8),\n        (\"tool exposure\", 7.0, -1.9),\n        (\"fresh review\", 8.2, 0.0),\n    ]\n    _threshold = float(min_gain.value)\n    _promoted = [_row for _row in _edits if _row[1] \u003E= _threshold and _row[2] \u003E= -2.0]\n    _count = len(_promoted)\n    _bars = []\n    for _index, (_name, _gain, _regression) in enumerate(_edits):\n        _y = 78 + _index * 34\n        _accepted = _gain \u003E= _threshold and _regression \u003E= -2.0\n        _color = \"#2dd4bf\" if _accepted else \"#475569\"\n        _width = 44 * _gain\n        _bars.append(\n            f'\u003Ctext x=\"18\" y=\"{_y + 15}\" fill=\"#cbd5e1\" font-size=\"12\"\u003E{_name}\u003C/text\u003E'\n            f'\u003Crect x=\"150\" y=\"{_y}\" width=\"{_width:.1f}\" height=\"21\" rx=\"5\" fill=\"{_color}\"/\u003E'\n            f'\u003Ctext x=\"{158 + _width:.1f}\" y=\"{_y + 15}\" fill=\"#e2e8f0\" font-size=\"11\"\u003E+{_gain:.1f}; worst {_regression:.1f}\u003C/text\u003E'\n        )\n    _svg = f\"\"\"\n    \u003Csvg data-chart=\"self-optimizing-harness\" data-promoted=\"{_count}\"\n      data-threshold=\"{int(_threshold)}\" viewBox=\"0 0 650 390\" width=\"100%\"\n      role=\"img\" aria-label=\"Synthetic harness edit promotion outcomes\"\u003E\n      \u003Crect width=\"650\" height=\"390\" rx=\"18\" fill=\"#0f172a\"/\u003E\n      \u003Ctext x=\"18\" y=\"34\" fill=\"#f8fafc\" font-size=\"18\" font-weight=\"700\"\u003EExternal promotion gate\u003C/text\u003E\n      \u003Ctext x=\"18\" y=\"56\" fill=\"#94a3b8\" font-size=\"12\"\u003Ebar = paired dev gain; teal = admitted; label includes worst-domain change\u003C/text\u003E\n      {''.join(_bars)}\n      \u003Ctext x=\"18\" y=\"370\" fill=\"#94a3b8\" font-size=\"11\"\u003ESynthetic effects for policy exploration - not observations from the paper\u003C/text\u003E\n    \u003C/svg\u003E\n    \"\"\"\n    _summary = mo.md(f\"\"\"\n    ## Operating point: gain threshold {int(_threshold)} - {_count} of 8 promoted\n\n    The paper's run-only engineering check would admit **8 of 8** of these illustrative\n    candidates. Requiring at least **{int(_threshold)} points** on a paired frozen dev set,\n    while rejecting a worst-domain loss below -2 points, admits **{_count}**. The chart\n    makes the authority split visible: generation can stay self-directed; promotion cannot.\n    \"\"\")\n    mo.vstack([_summary, mo.Html(_svg)])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ## Evidence boundary\n\n    1. **Paper-reported anchors:** 49 to 430 lines; +4.48 held-out in-distribution\n       points; +12.64 out-of-distribution points; one frozen model and one evolution chain.\n    2. **Paper mechanism:** the same harness runs solver and proposer, but a candidate is\n       accepted after scope, edit, line-budget, and mock-run checks - not a paired score test.\n    3. **Synthetic layer:** edit names, gains, regressions, the eight-candidate batch, the\n       threshold, and the -2 point regression limit are analyst-authored policy examples.\n    4. **Takeaway:** source-line budget is a search regularizer, not authorization. Use\n       immutable manifests, evaluator digests, rollback, and a promoter outside the proposer.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%0A%23%20%20%20%22marimo%3D%3D0.23.16%22%2C%0A%23%20%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20_mo%0A%0A%20%20%20%20_mo.md(r%22%22%22%0A%20%20%20%20%23%20A%20runnable%20edit%20is%20not%20a%20promotable%20harness%0A%0A%20%20%20%20**Research%20question%3A**%20how%20does%20an%20external%20evidence%20threshold%20change%20which%0A%20%20%20%20self-authored%20harness%20edits%20may%20be%20promoted%3F%0A%0A%20%20%20%20%5BXu%20(2026)%2C%20arXiv%3A2609.38372%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2609.38372)%20reports%20a%0A%20%20%20%20same-model%20solver%2Fproposer%20loop%20whose%2049-line%20seed%20grew%20to%20430%20lines%20and%20improved%0A%20%20%20%20held-out%20averages%20by%204.48%20points%20in-distribution%20and%2012.64%20points%20out-of-distribution.%0A%20%20%20%20Its%20update%20gate%20checked%20engineering%20validity%20and%20one%20mock%20run%2C%20not%20parent-versus-child%0A%20%20%20%20performance.%20This%20demo%20is%20an%20**analyst-authored%20policy%20stress%20test**%2C%20not%20a%20rerun%2C%0A%20%20%20%20benchmark%20reproduction%2C%20causal%20estimate%2C%20or%20safe-self-modification%20system.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20min_gain%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%20start%3D0%2C%0A%20%20%20%20%20%20%20%20stop%3D8%2C%0A%20%20%20%20%20%20%20%20step%3D1%2C%0A%20%20%20%20%20%20%20%20value%3D0%2C%0A%20%20%20%20%20%20%20%20label%3D%22Minimum%20paired%20dev-set%20gain%20(points)%22%2C%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20min_gain%2C%0A%20%20%20%20%20%20%20%20mo.md(%22All%20eight%20synthetic%20edits%20pass%20a%20run-only%20gate.%20The%20external%20gate%20also%20requires%20the%20selected%20dev%20gain%20and%20no%20domain%20regression%20worse%20than%202%20points.%22)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%20min_gain%2C%20mo%0A%0A%0A%40app.cell%0Adef%20_(min_gain%2C%20mo)%3A%0A%20%20%20%20_edits%20%3D%20%5B%0A%20%20%20%20%20%20%20%20(%22timeouts%22%2C%201.0%2C%20-0.2)%2C%0A%20%20%20%20%20%20%20%20(%22bounded%20output%22%2C%202.2%2C%20-0.1)%2C%0A%20%20%20%20%20%20%20%20(%22state%20notes%22%2C%203.1%2C%20-0.6)%2C%0A%20%20%20%20%20%20%20%20(%22visual%20budget%22%2C%204.0%2C%20-0.4)%2C%0A%20%20%20%20%20%20%20%20(%22termination%20check%22%2C%205.0%2C%20-0.8)%2C%0A%20%20%20%20%20%20%20%20(%22history%20compaction%22%2C%206.1%2C%20-1.8)%2C%0A%20%20%20%20%20%20%20%20(%22tool%20exposure%22%2C%207.0%2C%20-1.9)%2C%0A%20%20%20%20%20%20%20%20(%22fresh%20review%22%2C%208.2%2C%200.0)%2C%0A%20%20%20%20%5D%0A%20%20%20%20_threshold%20%3D%20float(min_gain.value)%0A%20%20%20%20_promoted%20%3D%20%5B_row%20for%20_row%20in%20_edits%20if%20_row%5B1%5D%20%3E%3D%20_threshold%20and%20_row%5B2%5D%20%3E%3D%20-2.0%5D%0A%20%20%20%20_count%20%3D%20len(_promoted)%0A%20%20%20%20_bars%20%3D%20%5B%5D%0A%20%20%20%20for%20_index%2C%20(_name%2C%20_gain%2C%20_regression)%20in%20enumerate(_edits)%3A%0A%20%20%20%20%20%20%20%20_y%20%3D%2078%20%2B%20_index%20*%2034%0A%20%20%20%20%20%20%20%20_accepted%20%3D%20_gain%20%3E%3D%20_threshold%20and%20_regression%20%3E%3D%20-2.0%0A%20%20%20%20%20%20%20%20_color%20%3D%20%22%232dd4bf%22%20if%20_accepted%20else%20%22%23475569%22%0A%20%20%20%20%20%20%20%20_width%20%3D%2044%20*%20_gain%0A%20%20%20%20%20%20%20%20_bars.append(%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%2218%22%20y%3D%22%7B_y%20%2B%2015%7D%22%20fill%3D%22%23cbd5e1%22%20font-size%3D%2212%22%3E%7B_name%7D%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%22150%22%20y%3D%22%7B_y%7D%22%20width%3D%22%7B_width%3A.1f%7D%22%20height%3D%2221%22%20rx%3D%225%22%20fill%3D%22%7B_color%7D%22%2F%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7B158%20%2B%20_width%3A.1f%7D%22%20y%3D%22%7B_y%20%2B%2015%7D%22%20fill%3D%22%23e2e8f0%22%20font-size%3D%2211%22%3E%2B%7B_gain%3A.1f%7D%3B%20worst%20%7B_regression%3A.1f%7D%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20_svg%20%3D%20f%22%22%22%0A%20%20%20%20%3Csvg%20data-chart%3D%22self-optimizing-harness%22%20data-promoted%3D%22%7B_count%7D%22%0A%20%20%20%20%20%20data-threshold%3D%22%7Bint(_threshold)%7D%22%20viewBox%3D%220%200%20650%20390%22%20width%3D%22100%25%22%0A%20%20%20%20%20%20role%3D%22img%22%20aria-label%3D%22Synthetic%20harness%20edit%20promotion%20outcomes%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22650%22%20height%3D%22390%22%20rx%3D%2218%22%20fill%3D%22%230f172a%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2218%22%20y%3D%2234%22%20fill%3D%22%23f8fafc%22%20font-size%3D%2218%22%20font-weight%3D%22700%22%3EExternal%20promotion%20gate%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2218%22%20y%3D%2256%22%20fill%3D%22%2394a3b8%22%20font-size%3D%2212%22%3Ebar%20%3D%20paired%20dev%20gain%3B%20teal%20%3D%20admitted%3B%20label%20includes%20worst-domain%20change%3C%2Ftext%3E%0A%20%20%20%20%20%20%7B''.join(_bars)%7D%0A%20%20%20%20%20%20%3Ctext%20x%3D%2218%22%20y%3D%22370%22%20fill%3D%22%2394a3b8%22%20font-size%3D%2211%22%3ESynthetic%20effects%20for%20policy%20exploration%20-%20not%20observations%20from%20the%20paper%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%22%22%22%0A%20%20%20%20_summary%20%3D%20mo.md(f%22%22%22%0A%20%20%20%20%23%23%20Operating%20point%3A%20gain%20threshold%20%7Bint(_threshold)%7D%20-%20%7B_count%7D%20of%208%20promoted%0A%0A%20%20%20%20The%20paper's%20run-only%20engineering%20check%20would%20admit%20**8%20of%208**%20of%20these%20illustrative%0A%20%20%20%20candidates.%20Requiring%20at%20least%20**%7Bint(_threshold)%7D%20points**%20on%20a%20paired%20frozen%20dev%20set%2C%0A%20%20%20%20while%20rejecting%20a%20worst-domain%20loss%20below%20-2%20points%2C%20admits%20**%7B_count%7D**.%20The%20chart%0A%20%20%20%20makes%20the%20authority%20split%20visible%3A%20generation%20can%20stay%20self-directed%3B%20promotion%20cannot.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20mo.vstack(%5B_summary%2C%20mo.Html(_svg)%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20Evidence%20boundary%0A%0A%20%20%20%201.%20**Paper-reported%20anchors%3A**%2049%20to%20430%20lines%3B%20%2B4.48%20held-out%20in-distribution%0A%20%20%20%20%20%20%20points%3B%20%2B12.64%20out-of-distribution%20points%3B%20one%20frozen%20model%20and%20one%20evolution%20chain.%0A%20%20%20%202.%20**Paper%20mechanism%3A**%20the%20same%20harness%20runs%20solver%20and%20proposer%2C%20but%20a%20candidate%20is%0A%20%20%20%20%20%20%20accepted%20after%20scope%2C%20edit%2C%20line-budget%2C%20and%20mock-run%20checks%20-%20not%20a%20paired%20score%20test.%0A%20%20%20%203.%20**Synthetic%20layer%3A**%20edit%20names%2C%20gains%2C%20regressions%2C%20the%20eight-candidate%20batch%2C%20the%0A%20%20%20%20%20%20%20threshold%2C%20and%20the%20-2%20point%20regression%20limit%20are%20analyst-authored%20policy%20examples.%0A%20%20%20%204.%20**Takeaway%3A**%20source-line%20budget%20is%20a%20search%20regularizer%2C%20not%20authorization.%20Use%0A%20%20%20%20%20%20%20immutable%20manifests%2C%20evaluator%20digests%2C%20rollback%2C%20and%20a%20promoter%20outside%20the%20proposer.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

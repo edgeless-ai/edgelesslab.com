@@ -474,6 +474,14 @@ export const marimoDemos: MarimoDemo[] = [
   },
 
   {
+    slug: "2609.38372-self-optimizing-harness",
+    title: "A Runnable Edit Is Not a Promotable Harness",
+    description: "Tighten an external evidence threshold and watch a synthetic batch of runnable harness edits shrink from eight promotion candidates to one.",
+    category: "Research",
+    tags: ["agents", "harness-evolution", "evaluation", "governance", "synthetic-demo"],
+  },
+
+  {
     slug: "google-routing-failure-price",
     title: "The Hidden Price of Unresolved Failures",
     description:

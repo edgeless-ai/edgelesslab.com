@@ -520,6 +520,17 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["agent-evaluation", "benchmarking", "denominators", "reproducibility"],
     published_url: "https://marimo.edgelesslab.com/2606.04781-pass-semantics/",
+  },
+
+  // arXiv:2610.14244v1. Published after live verification (critic approved, verifier gate passed).
+  {
+    slug: "2610.14244-hbm-power-underbound",
+    title: "HBM Power Envelope Gap",
+    description:
+      "See how a measured high-toggle HBM2 pattern exceeded the strongest JEDEC current-measurement loop.",
+    category: "Research",
+    tags: ["HBM", "hardware", "power", "reproducibility"],
+    published_url: "https://marimo.edgelesslab.com/2610.14244-hbm-power-underbound/",
   }
 ];
 

@@ -500,7 +500,7 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["agent-evaluation", "benchmarking", "denominators", "reproducibility"],
     published_url: "https://marimo.edgelesslab.com/2606.04781-pass-semantics/",
-  }
+  },
   {
     slug: "2611.07042-scorer-rank-reversal",
     title: "When the Scorer Reverses the Leaderboard",

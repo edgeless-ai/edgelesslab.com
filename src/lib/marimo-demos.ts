@@ -540,6 +540,16 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["evaluation", "benchmark-integrity", "reproducibility", "scoring"],
     published_url: "https://marimo.edgelesslab.com/2611.07042-scorer-rank-reversal/",
   },
+
+  // arXiv:2609.04379. Published after critic approval and live verification.
+  {
+    slug: "2609.04379-tsne-symmetry-sectors",
+    title: "One Circle, Six Incompatible Stationary Maps",
+    description: "Move among cyclic symmetry sectors and watch the same connected circle become stationary maps with incompatible topology.",
+    category: "Research",
+    tags: ["t-SNE", "dimensionality reduction", "symmetry", "optimization", "visualization audit"],
+    published_url: "https://marimo.edgelesslab.com/2609.04379-tsne-symmetry-sectors/",
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

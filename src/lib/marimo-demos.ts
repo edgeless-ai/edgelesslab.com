@@ -473,6 +473,25 @@ export const marimoDemos: MarimoDemo[] = [
     published_url: "https://marimo.edgelesslab.com/2609.04404-asr-hallucination-taxonomy/",
   },
 
+  // Published after live verification (arXiv:2609.27051). Critic approved, verifier gate passed.
+  {
+    slug: "2609.27051-anytime-valid-referee",
+    title: "The Evidence Wait Behind an Anytime-Valid Referee",
+    description:
+      "Vary expected edge and frozen candidate slots to see how an anytime-valid admission bar turns statistical governance into a multi-year evidence wait.",
+    category: "Research",
+    tags: ["anytime-valid-inference", "e-values", "online-fdr", "agent-governance", "sensitivity-analysis"],
+    published_url: "https://marimo.edgelesslab.com/2609.27051-anytime-valid-referee/",
+  },
+
+  {
+    slug: "2609.38372-self-optimizing-harness",
+    title: "A Runnable Edit Is Not a Promotable Harness",
+    description: "Tighten an external evidence threshold and watch a synthetic batch of runnable harness edits shrink from eight promotion candidates to one.",
+    category: "Research",
+    tags: ["agents", "harness-evolution", "evaluation", "governance", "synthetic-demo"],
+  },
+
   {
     slug: "2609.38372-self-optimizing-harness",
     title: "A Runnable Edit Is Not a Promotable Harness",

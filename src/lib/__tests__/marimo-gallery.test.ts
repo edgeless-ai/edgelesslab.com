@@ -79,6 +79,15 @@ describe("published marimo gallery", () => {
     expect(entry?.tags).toContain("hallucination");
   });
 
+  it("registers the 2609.27051 anytime-valid-referee notebook after live verification", () => {
+    const entry = marimoDemos.find(d => d.slug === "2609.27051-anytime-valid-referee");
+    expect(entry).toBeDefined();
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2609.27051-anytime-valid-referee/");
+    expect(entry?.title).toBe("The Evidence Wait Behind an Anytime-Valid Referee");
+    expect(entry?.tags).toContain("anytime-valid-inference");
+    expect(entry?.tags).toContain("sensitivity-analysis");
+  });
+
   it("registers the google-routing-failure-price notebook after live verification", () => {
     const entry = marimoDemos.find(d => d.slug === "google-routing-failure-price");
     expect(entry).toBeDefined();
@@ -93,5 +102,14 @@ describe("published marimo gallery", () => {
     expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2606.04781-pass-semantics/");
     expect(entry?.title).toBe("One Benchmark Packet, Two Pass Rates");
     expect(entry?.tags).toContain("denominators");
+  });
+
+  it("registers the 2609.38372-self-optimizing-harness notebook after live verification", () => {
+    const entry = marimoDemos.find(d => d.slug === "2609.38372-self-optimizing-harness");
+    expect(entry).toBeDefined();
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2609.38372-self-optimizing-harness/");
+    expect(entry?.title).toBe("A Runnable Edit Is Not a Promotable Harness");
+    expect(entry?.tags).toContain("harness-evolution");
+    expect(entry?.tags).toContain("governance");
   });
 });

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>borwein-falsifier</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\"marimo==0.23.16\", \"mpmath\u003E=1.3,\u003C2\"]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n    from fractions import Fraction\n    from math import factorial, prod, sin, pi\n    import mpmath as mp\n\n    return Fraction, factorial, mo, mp, pi, prod, sin\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"# Borwein integrals: a falsifier for easy patterns\n\n    $I_n=\\int_0^\\infty\\prod_{k=0}^{n}\\operatorname{sinc}(x/(2k+1))\\,dx$, with\n    $\\operatorname{sinc}(0)=1$ and $\\operatorname{sinc}(x)=\\sin(x)/x$.\n    Seven terms ($n=0,\\ldots,6$) equal $\\pi/2$ **exactly**; $n=7$ (the\n    $x/15$ factor) is the first counterexample. The full-line integral is\n    twice this value, so its first seven values equal $\\pi$, not fourteen\n    independent equalities. Do not conflate this with the $2\\cos(x)$ variant:\n    its first break is at $n=56$ ($x/113$), not $n=7$ [2].\n\n    **Method.** Borwein \u0026 Borwein's Theorem 1 and Corollary 1 [1] give\n    equality when $\\sum_{k=1}^n1/(2k+1)\\leq1$ and the exact first-bite\n    correction at $n=7$. These rational identities, not a finite-interval\n    quadrature result, are the reference oracle. $n=0$ is the conditionally\n    convergent Dirichlet integral; all subsequent products are absolutely\n    integrable. Choose a term and an absolute tolerance below.\n    \"\"\")\n    n_control = mo.ui.slider(0, 7, value=7, label=\"Last factor index n\")\n    tol_control = mo.ui.dropdown({\"1e-8 (loose)\": \"1e-8\", \"1e-12 (strict)\": \"1e-12\", \"1e-14 (very strict)\": \"1e-14\"}, value=\"1e-8 (loose)\", label=\"Absolute tolerance\")\n    mo.hstack([n_control, tol_control], justify=\"start\", gap=2)\n    return n_control, tol_control\n\n\n@app.cell\ndef _(Fraction, factorial, mp, prod):\n    def exact_ratio(n):\n        \"\"\"Return exact rational 2*I_n/pi for n=0..7 (Borwein 2001).\"\"\"\n        if not isinstance(n, int) or isinstance(n, bool) or not 0 \u003C= n \u003C= 7:\n            raise ValueError(\"reference covers integer n from 0 through 7\")\n        if n \u003C= 6:\n            return Fraction(1)\n        _a = [Fraction(1, 2 * _k + 1) for _k in range(1, 8)]\n        _excess = sum(_a) - 1\n        _bite = _excess**7 / (2**6 * factorial(7) * prod(_a))\n        return 1 - _bite\n\n    def check_borwein(n, tolerance=\"1e-12\", dps=50):\n        \"\"\"Check I_n against pi/2, using an exact rational oracle.\n\n        Args: n is an integer 0..7; tolerance is a nonnegative, finite\n        decimal absolute tolerance (string recommended); dps \u003E= 30.\n        Returns a dict: expected, computed and absolute_error are mpmath\n        numbers, passed is a bool; ratio is an exact Fraction. 'computed'\n        is pi/2 times the proved rational ratio, NOT numerical quadrature.\n        No floating-point closeness test establishes exact equality.\n        \"\"\"\n        if not isinstance(dps, int) or isinstance(dps, bool) or dps \u003C 30:\n            raise ValueError(\"dps must be an integer \u003E= 30\")\n        _ratio = exact_ratio(n)\n        with mp.workdps(dps):\n            _tol = mp.mpf(tolerance)\n            if not mp.isfinite(_tol) or _tol \u003C 0:\n                raise ValueError(\"tolerance must be finite and nonnegative\")\n            _expected = mp.pi / 2\n            _computed = _expected * mp.mpf(_ratio.numerator) / _ratio.denominator\n            _error = abs(_computed - _expected)\n            return {\"expected\": +_expected, \"computed\": +_computed,\n                    \"absolute_error\": +_error, \"passed\": bool(_error \u003C= _tol),\n                    \"ratio\": _ratio}\n\n    return (check_borwein,)\n\n\n@app.cell\ndef _(check_borwein, mo, mp, n_control, pi, prod, sin, tol_control):\n    _n = n_control.value\n    _tol = tol_control.value\n    _result = check_borwein(_n, _tol)\n    _break = check_borwein(7, _tol)\n    # Intentionally naive: truncate the improper integral at 64 and use\n    # ordinary binary64 Simpson quadrature. Do not treat this as an oracle.\n    def _integrand(x):\n        return prod(sin(x / (2 * k + 1)) / (x / (2 * k + 1)) for k in range(8)) if x else 1.0\n    _panels = 1024\n    _step = 64.0 / _panels\n    _naive = _step / 3 * (_integrand(0) + _integrand(64) + sum(\n        (4 if _j % 2 else 2) * _integrand(_j * _step) for _j in range(1, _panels)))\n    _naive_error = abs(_naive - pi / 2)\n    _naive_pass = _naive_error \u003C= float(_tol)\n    _rat = _result[\"ratio\"]\n    _status = \"PASS\" if _result[\"passed\"] else \"FAIL\"\n    # Inline SVG: no server or heavy plotting dependency in Pyodide.\n    _threshold = max(0, min(340, round(340 * max(0, (16 + mp.log10(mp.mpf(_tol))) / 16))))\n    _bar = max(0, min(340, round(340 * max(0, (16 + mp.log10(max(_result[\"absolute_error\"], mp.mpf(\"1e-16\")))) / 16))))\n    _chart = f'''\u003Csvg data-chart=\"borwein-falsifier\" data-marker=\"n-{_n}-{_status.lower()}\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 540 135\" role=\"img\" aria-label=\"Logarithmic absolute error and tolerance bars\"\u003E\n    \u003Crect width=\"540\" height=\"135\" fill=\"#f6f7fb\"/\u003E\u003Ctext x=\"14\" y=\"29\" font-size=\"15\" fill=\"#152b3d\"\u003ELog10 scale: 1e-16 to 1\u003C/text\u003E\n    \u003Ctext x=\"14\" y=\"65\" font-size=\"14\"\u003Eerror\u003C/text\u003E\u003Crect x=\"150\" y=\"48\" width=\"{_bar}\" height=\"20\" fill=\"#db694f\"/\u003E\n    \u003Ctext x=\"14\" y=\"107\" font-size=\"14\"\u003Etolerance\u003C/text\u003E\u003Crect x=\"150\" y=\"90\" width=\"{_threshold}\" height=\"20\" fill=\"#327fa8\"/\u003E\u003C/svg\u003E'''\n    mo.md(rf\"\"\"### Operating point: n={_n} / last factor x/{2*_n+1} / tolerance={_tol}\n\n    Exact ratio $2I_n/\\pi$: `{_rat}`. Reference expected $\\pi/2$:\n    `{mp.nstr(_result['expected'], 35)}`. Computed from exact rational ratio:\n    `{mp.nstr(_result['computed'], 35)}`. Absolute difference:\n    `{mp.nstr(_result['absolute_error'], 12)}`. **{_status}** at the chosen tolerance.\n\n    At first break $n=7$: exact deficit `$\\pi/2-I_7$ = {mp.nstr(_break['absolute_error'], 12)}`;\n    it **{'PASSES' if _break['passed'] else 'FAILS'}** this tolerance. A loose pass is\n    a *missed falsifier*, not evidence for the equality.\n\n    Illustrative binary64 Simpson on $[0,64]$ with 1024 panels at $n=7$:\n    `{_naive:.16f}`, apparent error `{_naive_error:.3g}`;\n    it **{'PASSES' if _naive_pass else 'FAILS'}** at this tolerance. The finite cutoff\n    changes the integral; this number is not a reliable estimate of the true deficit.\n\n    {_chart}\n    \"\"\")\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(\"\"\"\n    **Science-lane recommendation.** Include `check_borwein(7, '1e-12')` as a\n    negative fixture and `check_borwein(6, '1e-12')` as a positive fixture in\n    numerical-verification pipelines. A system that infers equality from early\n    terms, or uses a tolerance larger than the first deficit, should be caught.\n    The exact oracle is limited to n=0..7; do not extrapolate it to other n.\n\n    Sources: [1] David Borwein \u0026 Jonathan M. Borwein, *Some Remarkable Properties\n    of Sinc and Related Integrals*, Ramanujan Journal 5 (2001), 73-89,\n    DOI [10.1023/A:1011497229317](https://doi.org/10.1023/A:1011497229317),\n    Theorem 1, Corollary 1, Remarks 2, Eq. (10),\n    https://carmamaths.org/resources/db90/pdfs/db90-119.00.pdf .\n    [2] Gert Almkvist \u0026 Jan Gustavsson, *More remarkable sinc integrals and sums* (2014),\n    Eqs. (1)-(2), https://arxiv.org/pdf/1405.1265 .\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%22marimo%3D%3D0.23.16%22%2C%20%22mpmath%3E%3D1.3%2C%3C2%22%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20from%20fractions%20import%20Fraction%0A%20%20%20%20from%20math%20import%20factorial%2C%20prod%2C%20sin%2C%20pi%0A%20%20%20%20import%20mpmath%20as%20mp%0A%0A%20%20%20%20return%20Fraction%2C%20factorial%2C%20mo%2C%20mp%2C%20pi%2C%20prod%2C%20sin%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%23%20Borwein%20integrals%3A%20a%20falsifier%20for%20easy%20patterns%0A%0A%20%20%20%20%24I_n%3D%5Cint_0%5E%5Cinfty%5Cprod_%7Bk%3D0%7D%5E%7Bn%7D%5Coperatorname%7Bsinc%7D(x%2F(2k%2B1))%5C%2Cdx%24%2C%20with%0A%20%20%20%20%24%5Coperatorname%7Bsinc%7D(0)%3D1%24%20and%20%24%5Coperatorname%7Bsinc%7D(x)%3D%5Csin(x)%2Fx%24.%0A%20%20%20%20Seven%20terms%20(%24n%3D0%2C%5Cldots%2C6%24)%20equal%20%24%5Cpi%2F2%24%20**exactly**%3B%20%24n%3D7%24%20(the%0A%20%20%20%20%24x%2F15%24%20factor)%20is%20the%20first%20counterexample.%20The%20full-line%20integral%20is%0A%20%20%20%20twice%20this%20value%2C%20so%20its%20first%20seven%20values%20equal%20%24%5Cpi%24%2C%20not%20fourteen%0A%20%20%20%20independent%20equalities.%20Do%20not%20conflate%20this%20with%20the%20%242%5Ccos(x)%24%20variant%3A%0A%20%20%20%20its%20first%20break%20is%20at%20%24n%3D56%24%20(%24x%2F113%24)%2C%20not%20%24n%3D7%24%20%5B2%5D.%0A%0A%20%20%20%20**Method.**%20Borwein%20%26%20Borwein's%20Theorem%201%20and%20Corollary%201%20%5B1%5D%20give%0A%20%20%20%20equality%20when%20%24%5Csum_%7Bk%3D1%7D%5En1%2F(2k%2B1)%5Cleq1%24%20and%20the%20exact%20first-bite%0A%20%20%20%20correction%20at%20%24n%3D7%24.%20These%20rational%20identities%2C%20not%20a%20finite-interval%0A%20%20%20%20quadrature%20result%2C%20are%20the%20reference%20oracle.%20%24n%3D0%24%20is%20the%20conditionally%0A%20%20%20%20convergent%20Dirichlet%20integral%3B%20all%20subsequent%20products%20are%20absolutely%0A%20%20%20%20integrable.%20Choose%20a%20term%20and%20an%20absolute%20tolerance%20below.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20n_control%20%3D%20mo.ui.slider(0%2C%207%2C%20value%3D7%2C%20label%3D%22Last%20factor%20index%20n%22)%0A%20%20%20%20tol_control%20%3D%20mo.ui.dropdown(%7B%221e-8%20(loose)%22%3A%20%221e-8%22%2C%20%221e-12%20(strict)%22%3A%20%221e-12%22%2C%20%221e-14%20(very%20strict)%22%3A%20%221e-14%22%7D%2C%20value%3D%221e-8%20(loose)%22%2C%20label%3D%22Absolute%20tolerance%22)%0A%20%20%20%20mo.hstack(%5Bn_control%2C%20tol_control%5D%2C%20justify%3D%22start%22%2C%20gap%3D2)%0A%20%20%20%20return%20n_control%2C%20tol_control%0A%0A%0A%40app.cell%0Adef%20_(Fraction%2C%20factorial%2C%20mp%2C%20prod)%3A%0A%20%20%20%20def%20exact_ratio(n)%3A%0A%20%20%20%20%20%20%20%20%22%22%22Return%20exact%20rational%202*I_n%2Fpi%20for%20n%3D0..7%20(Borwein%202001).%22%22%22%0A%20%20%20%20%20%20%20%20if%20not%20isinstance(n%2C%20int)%20or%20isinstance(n%2C%20bool)%20or%20not%200%20%3C%3D%20n%20%3C%3D%207%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20raise%20ValueError(%22reference%20covers%20integer%20n%20from%200%20through%207%22)%0A%20%20%20%20%20%20%20%20if%20n%20%3C%3D%206%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20return%20Fraction(1)%0A%20%20%20%20%20%20%20%20_a%20%3D%20%5BFraction(1%2C%202%20*%20_k%20%2B%201)%20for%20_k%20in%20range(1%2C%208)%5D%0A%20%20%20%20%20%20%20%20_excess%20%3D%20sum(_a)%20-%201%0A%20%20%20%20%20%20%20%20_bite%20%3D%20_excess**7%20%2F%20(2**6%20*%20factorial(7)%20*%20prod(_a))%0A%20%20%20%20%20%20%20%20return%201%20-%20_bite%0A%0A%20%20%20%20def%20check_borwein(n%2C%20tolerance%3D%221e-12%22%2C%20dps%3D50)%3A%0A%20%20%20%20%20%20%20%20%22%22%22Check%20I_n%20against%20pi%2F2%2C%20using%20an%20exact%20rational%20oracle.%0A%0A%20%20%20%20%20%20%20%20Args%3A%20n%20is%20an%20integer%200..7%3B%20tolerance%20is%20a%20nonnegative%2C%20finite%0A%20%20%20%20%20%20%20%20decimal%20absolute%20tolerance%20(string%20recommended)%3B%20dps%20%3E%3D%2030.%0A%20%20%20%20%20%20%20%20Returns%20a%20dict%3A%20expected%2C%20computed%20and%20absolute_error%20are%20mpmath%0A%20%20%20%20%20%20%20%20numbers%2C%20passed%20is%20a%20bool%3B%20ratio%20is%20an%20exact%20Fraction.%20'computed'%0A%20%20%20%20%20%20%20%20is%20pi%2F2%20times%20the%20proved%20rational%20ratio%2C%20NOT%20numerical%20quadrature.%0A%20%20%20%20%20%20%20%20No%20floating-point%20closeness%20test%20establishes%20exact%20equality.%0A%20%20%20%20%20%20%20%20%22%22%22%0A%20%20%20%20%20%20%20%20if%20not%20isinstance(dps%2C%20int)%20or%20isinstance(dps%2C%20bool)%20or%20dps%20%3C%2030%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20raise%20ValueError(%22dps%20must%20be%20an%20integer%20%3E%3D%2030%22)%0A%20%20%20%20%20%20%20%20_ratio%20%3D%20exact_ratio(n)%0A%20%20%20%20%20%20%20%20with%20mp.workdps(dps)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_tol%20%3D%20mp.mpf(tolerance)%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20not%20mp.isfinite(_tol)%20or%20_tol%20%3C%200%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20raise%20ValueError(%22tolerance%20must%20be%20finite%20and%20nonnegative%22)%0A%20%20%20%20%20%20%20%20%20%20%20%20_expected%20%3D%20mp.pi%20%2F%202%0A%20%20%20%20%20%20%20%20%20%20%20%20_computed%20%3D%20_expected%20*%20mp.mpf(_ratio.numerator)%20%2F%20_ratio.denominator%0A%20%20%20%20%20%20%20%20%20%20%20%20_error%20%3D%20abs(_computed%20-%20_expected)%0A%20%20%20%20%20%20%20%20%20%20%20%20return%20%7B%22expected%22%3A%20%2B_expected%2C%20%22computed%22%3A%20%2B_computed%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22absolute_error%22%3A%20%2B_error%2C%20%22passed%22%3A%20bool(_error%20%3C%3D%20_tol)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22ratio%22%3A%20_ratio%7D%0A%0A%20%20%20%20return%20(check_borwein%2C)%0A%0A%0A%40app.cell%0Adef%20_(check_borwein%2C%20mo%2C%20mp%2C%20n_control%2C%20pi%2C%20prod%2C%20sin%2C%20tol_control)%3A%0A%20%20%20%20_n%20%3D%20n_control.value%0A%20%20%20%20_tol%20%3D%20tol_control.value%0A%20%20%20%20_result%20%3D%20check_borwein(_n%2C%20_tol)%0A%20%20%20%20_break%20%3D%20check_borwein(7%2C%20_tol)%0A%20%20%20%20%23%20Intentionally%20naive%3A%20truncate%20the%20improper%20integral%20at%2064%20and%20use%0A%20%20%20%20%23%20ordinary%20binary64%20Simpson%20quadrature.%20Do%20not%20treat%20this%20as%20an%20oracle.%0A%20%20%20%20def%20_integrand(x)%3A%0A%20%20%20%20%20%20%20%20return%20prod(sin(x%20%2F%20(2%20*%20k%20%2B%201))%20%2F%20(x%20%2F%20(2%20*%20k%20%2B%201))%20for%20k%20in%20range(8))%20if%20x%20else%201.0%0A%20%20%20%20_panels%20%3D%201024%0A%20%20%20%20_step%20%3D%2064.0%20%2F%20_panels%0A%20%20%20%20_naive%20%3D%20_step%20%2F%203%20*%20(_integrand(0)%20%2B%20_integrand(64)%20%2B%20sum(%0A%20%20%20%20%20%20%20%20(4%20if%20_j%20%25%202%20else%202)%20*%20_integrand(_j%20*%20_step)%20for%20_j%20in%20range(1%2C%20_panels)))%0A%20%20%20%20_naive_error%20%3D%20abs(_naive%20-%20pi%20%2F%202)%0A%20%20%20%20_naive_pass%20%3D%20_naive_error%20%3C%3D%20float(_tol)%0A%20%20%20%20_rat%20%3D%20_result%5B%22ratio%22%5D%0A%20%20%20%20_status%20%3D%20%22PASS%22%20if%20_result%5B%22passed%22%5D%20else%20%22FAIL%22%0A%20%20%20%20%23%20Inline%20SVG%3A%20no%20server%20or%20heavy%20plotting%20dependency%20in%20Pyodide.%0A%20%20%20%20_threshold%20%3D%20max(0%2C%20min(340%2C%20round(340%20*%20max(0%2C%20(16%20%2B%20mp.log10(mp.mpf(_tol)))%20%2F%2016))))%0A%20%20%20%20_bar%20%3D%20max(0%2C%20min(340%2C%20round(340%20*%20max(0%2C%20(16%20%2B%20mp.log10(max(_result%5B%22absolute_error%22%5D%2C%20mp.mpf(%221e-16%22))))%20%2F%2016))))%0A%20%20%20%20_chart%20%3D%20f'''%3Csvg%20data-chart%3D%22borwein-falsifier%22%20data-marker%3D%22n-%7B_n%7D-%7B_status.lower()%7D%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20540%20135%22%20role%3D%22img%22%20aria-label%3D%22Logarithmic%20absolute%20error%20and%20tolerance%20bars%22%3E%0A%20%20%20%20%3Crect%20width%3D%22540%22%20height%3D%22135%22%20fill%3D%22%23f6f7fb%22%2F%3E%3Ctext%20x%3D%2214%22%20y%3D%2229%22%20font-size%3D%2215%22%20fill%3D%22%23152b3d%22%3ELog10%20scale%3A%201e-16%20to%201%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%2214%22%20y%3D%2265%22%20font-size%3D%2214%22%3Eerror%3C%2Ftext%3E%3Crect%20x%3D%22150%22%20y%3D%2248%22%20width%3D%22%7B_bar%7D%22%20height%3D%2220%22%20fill%3D%22%23db694f%22%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2214%22%20y%3D%22107%22%20font-size%3D%2214%22%3Etolerance%3C%2Ftext%3E%3Crect%20x%3D%22150%22%20y%3D%2290%22%20width%3D%22%7B_threshold%7D%22%20height%3D%2220%22%20fill%3D%22%23327fa8%22%2F%3E%3C%2Fsvg%3E'''%0A%20%20%20%20mo.md(rf%22%22%22%23%23%23%20Operating%20point%3A%20n%3D%7B_n%7D%20%2F%20last%20factor%20x%2F%7B2*_n%2B1%7D%20%2F%20tolerance%3D%7B_tol%7D%0A%0A%20%20%20%20Exact%20ratio%20%242I_n%2F%5Cpi%24%3A%20%60%7B_rat%7D%60.%20Reference%20expected%20%24%5Cpi%2F2%24%3A%0A%20%20%20%20%60%7Bmp.nstr(_result%5B'expected'%5D%2C%2035)%7D%60.%20Computed%20from%20exact%20rational%20ratio%3A%0A%20%20%20%20%60%7Bmp.nstr(_result%5B'computed'%5D%2C%2035)%7D%60.%20Absolute%20difference%3A%0A%20%20%20%20%60%7Bmp.nstr(_result%5B'absolute_error'%5D%2C%2012)%7D%60.%20**%7B_status%7D**%20at%20the%20chosen%20tolerance.%0A%0A%20%20%20%20At%20first%20break%20%24n%3D7%24%3A%20exact%20deficit%20%60%24%5Cpi%2F2-I_7%24%20%3D%20%7Bmp.nstr(_break%5B'absolute_error'%5D%2C%2012)%7D%60%3B%0A%20%20%20%20it%20**%7B'PASSES'%20if%20_break%5B'passed'%5D%20else%20'FAILS'%7D**%20this%20tolerance.%20A%20loose%20pass%20is%0A%20%20%20%20a%20*missed%20falsifier*%2C%20not%20evidence%20for%20the%20equality.%0A%0A%20%20%20%20Illustrative%20binary64%20Simpson%20on%20%24%5B0%2C64%5D%24%20with%201024%20panels%20at%20%24n%3D7%24%3A%0A%20%20%20%20%60%7B_naive%3A.16f%7D%60%2C%20apparent%20error%20%60%7B_naive_error%3A.3g%7D%60%3B%0A%20%20%20%20it%20**%7B'PASSES'%20if%20_naive_pass%20else%20'FAILS'%7D**%20at%20this%20tolerance.%20The%20finite%20cutoff%0A%20%20%20%20changes%20the%20integral%3B%20this%20number%20is%20not%20a%20reliable%20estimate%20of%20the%20true%20deficit.%0A%0A%20%20%20%20%7B_chart%7D%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(%22%22%22%0A%20%20%20%20**Science-lane%20recommendation.**%20Include%20%60check_borwein(7%2C%20'1e-12')%60%20as%20a%0A%20%20%20%20negative%20fixture%20and%20%60check_borwein(6%2C%20'1e-12')%60%20as%20a%20positive%20fixture%20in%0A%20%20%20%20numerical-verification%20pipelines.%20A%20system%20that%20infers%20equality%20from%20early%0A%20%20%20%20terms%2C%20or%20uses%20a%20tolerance%20larger%20than%20the%20first%20deficit%2C%20should%20be%20caught.%0A%20%20%20%20The%20exact%20oracle%20is%20limited%20to%20n%3D0..7%3B%20do%20not%20extrapolate%20it%20to%20other%20n.%0A%0A%20%20%20%20Sources%3A%20%5B1%5D%20David%20Borwein%20%26%20Jonathan%20M.%20Borwein%2C%20*Some%20Remarkable%20Properties%0A%20%20%20%20of%20Sinc%20and%20Related%20Integrals*%2C%20Ramanujan%20Journal%205%20(2001)%2C%2073-89%2C%0A%20%20%20%20DOI%20%5B10.1023%2FA%3A1011497229317%5D(https%3A%2F%2Fdoi.org%2F10.1023%2FA%3A1011497229317)%2C%0A%20%20%20%20Theorem%201%2C%20Corollary%201%2C%20Remarks%202%2C%20Eq.%20(10)%2C%0A%20%20%20%20https%3A%2F%2Fcarmamaths.org%2Fresources%2Fdb90%2Fpdfs%2Fdb90-119.00.pdf%20.%0A%20%20%20%20%5B2%5D%20Gert%20Almkvist%20%26%20Jan%20Gustavsson%2C%20*More%20remarkable%20sinc%20integrals%20and%20sums*%20(2014)%2C%0A%20%20%20%20Eqs.%20(1)-(2)%2C%20https%3A%2F%2Farxiv.org%2Fpdf%2F1405.1265%20.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

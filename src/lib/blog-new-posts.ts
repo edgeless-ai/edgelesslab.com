@@ -1,6 +1,8 @@
 import type { BlogPost } from "./blog-types";
+import { superdarkFactoryPost } from "./blog-superdark-factory";
 
 export const newPosts: BlogPost[] = [
+  superdarkFactoryPost,
   {
     slug: "studio-notes-correctness-before-speed",
     editorial: true,

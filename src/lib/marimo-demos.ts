@@ -530,6 +530,16 @@ export const marimoDemos: MarimoDemo[] = [
     published_url: "https://marimo.edgelesslab.com/2611.07042-scorer-rank-reversal/",
   },
 
+  // arXiv:2609.04344. Published after critic approval and live verification.
+  {
+    slug: "2609.04344-sharedsae-vote-normalization",
+    title: "SharedSAE: Normalize the Ballot, Not the Representation",
+    description: "Vary encoder-scale mismatch and see why normalized TopK voting preserves a shared feature selector when raw scores become one-model dominated.",
+    category: "Research",
+    tags: ["sparse autoencoders", "representation alignment", "feature dictionaries", "vote normalization", "model fleets"],
+    published_url: "https://marimo.edgelesslab.com/2609.04344-sharedsae-vote-normalization/",
+  },
+
   // arXiv:2609.04379. Published after critic approval and live verification.
   {
     slug: "2609.04379-tsne-symmetry-sectors",
@@ -538,6 +548,16 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["t-SNE", "dimensionality reduction", "symmetry", "optimization", "visualization audit"],
     published_url: "https://marimo.edgelesslab.com/2609.04379-tsne-symmetry-sectors/",
+  },
+
+  // arXiv:2608.11227. Published after critic approval and live verification.
+  {
+    slug: "2608.11227-directional-side-effects",
+    title: "Direction Has an Arrow: Why Cosine Misses Steering Side Effects",
+    description: "Increase directional structure and watch opposite-sign steering effects create an unavoidable error floor for symmetric similarity rules.",
+    category: "Research",
+    tags: ["activation steering", "side effects", "representation geometry", "forecasting", "AI safety"],
+    published_url: "https://marimo.edgelesslab.com/2608.11227-directional-side-effects/",
   },
 ];
 

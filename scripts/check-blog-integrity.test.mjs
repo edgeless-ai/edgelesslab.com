@@ -1,7 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { checkLive, loadRegistries, parseMarkdown, validate } from './check-blog-integrity.mjs';
-import { resolve } from 'node:path';
+import { resolve, join, dirname } from 'node:path';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+
+function registryFixture(t) {
+  const root = mkdtempSync(join(tmpdir(), 'blog-integrity-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const files = {
+    'src/lib/blog.ts': 'import { newPosts } from "./blog-new-posts";\nconst allPosts: unknown[] = [...newPosts];\nexport const posts = allPosts;',
+    'src/lib/blog-new-posts.ts': 'export const newPosts = [{slug: "one", content: "Hello", date: "2026-01-01"}];',
+    'src/app/blog/page.tsx': 'import { posts } from "@/lib/blog";',
+    'src/app/blog/[slug]/page.tsx': 'import { posts } from "@/lib/blog";',
+  };
+  for (const [file, content] of Object.entries(files)) {
+    mkdirSync(dirname(join(root, file)), { recursive: true });
+    writeFileSync(join(root, file), content);
+  }
+  return root;
+}
 
 const ROOT = resolve(import.meta.dirname, '..');
 const post = (slug, content = '# Hello') => ({ slug, content, title: 'Title', description: 'Description', date: '2026-01-01' });
@@ -18,7 +36,29 @@ test('real route inventory is evaluated, including hidden/deduplicated entries',
   assert.equal(new Set(posts.map((p) => p.slug)).size, posts.length);
 });
 
-test('parity is exact inside body; edge newlines are ignored only', () => {
+test('additional renderer registries cannot silently bypass inventory', (t) => {
+  const root = registryFixture(t);
+  assert.equal(loadRegistries(root).posts.length, 1);
+  const route = join(root, 'src/app/blog/page.tsx');
+  writeFileSync(route, readFileSync(route, 'utf8') + '\nimport { extraPosts } from "@/lib/extra-posts";');
+  assert.throws(() => loadRegistries(root), /uninspected.*import/i);
+});
+
+test('commented imports cannot impersonate the rendered source', (t) => {
+  const root = registryFixture(t);
+  writeFileSync(join(root, 'src/app/blog/page.tsx'), '// import { posts } from "@/lib/blog";');
+  assert.throws(() => loadRegistries(root), /no longer reads/);
+});
+
+test('rendered body/date changes with unchanged slugs fail closed', (t) => {
+  const root = registryFixture(t);
+  const registry = join(root, 'src/lib/blog.ts');
+  writeFileSync(registry, readFileSync(registry, 'utf8').replace('export const posts = allPosts;',
+    'export const posts = allPosts.map(p => ({...p, content: "changed", date: "2099-01-01"}));'));
+  assert.throws(() => loadRegistries(root), /Rendered posts differ/);
+});
+
+test('parity is exact inside body; edge whitespace is ignored only', () => {
   assert.deepEqual(validate(config()), []);
   assert.match(validate(config([post('one', '#  Hello')]))[0], /bodies differ/);
   assert.match(validate(config([post('one')], { one: md('one', '# hello') }))[0], /bodies differ/);
@@ -44,12 +84,39 @@ test('agent byline in registry and Markdown, author field, and voice ban fail', 
   assert.match(validate(config([post('one')], { one: md('one', '# Hello', 'author: Hive\n') })).join(' '), /agent authorship/);
   assert.match(validate(config([{ ...post('one'), author: 'Virgil' }])).join(' '), /agent authorship/);
   assert.match(validate(config([post('one', 'Task t_deadbeef')])).join(' '), /banned voice pattern/);
+  assert.match(validate(config([{ ...post('one'), ctaHook: 'Task t_deadbeef' }])).join(' '), /banned voice pattern/);
+  assert.match(validate(config([{ ...post('one'), tags: ['Task t_deadbeef'] }])).join(' '), /banned voice pattern/);
+});
+
+test('formatted agent attribution and nested author fields fail', () => {
+  for (const body of ['**Written by:** Scribe', 'By **Kilo**', 'Written by [Hive](/team)', '<p>Written by <strong>Virgil</strong></p>']) {
+    assert.match(validate(config([post('one', body)])).join(' '), /agent authorship/, body);
+  }
+  assert.match(validate(config([{ ...post('one'), author: { name: 'Scribe' } }])).join(' '), /agent authorship/);
+  assert.match(validate(config([post('one')], { one: md('one', '# Hello', 'author:\n  name: Hive\n') })).join(' '), /agent authorship/);
 });
 
 test('calendar dates reject invalid, non-ISO and future', () => {
   for (const date of ['2026-02-30', '2026-11-05', '2026-1-1', 'tomorrow']) {
     assert.match(validate(config([{ ...post('one'), date }])).join(' '), /date/, date);
   }
+});
+
+test('live index ignores script/comment lookalikes, accepts real anchors, and probes after index failure', async () => {
+  for (const html of ['<script>const x = \'href="/blog/one/"\';</script>', '<!-- <a href="/blog/one/">One</a> -->', '<div data-href="/blog/one/">One</div>']) {
+    const errors = await checkLive([post('one')], { fetcher: async () => ({ status: 200, text: async () => html }) });
+    assert.match(errors.join(' '), /absent from/, html);
+  }
+  for (const html of ["<a class='card' href='/blog/one/'>One</a>", '<a href="https://edgelesslab.com/blog/one">One</a>']) {
+    assert.deepEqual(await checkLive([post('one')], { fetcher: async () => ({ status: 200, text: async () => html }) }), []);
+  }
+  const calls = [];
+  const errors = await checkLive([post('one')], { fetcher: async (url) => {
+    calls.push(url);
+    return { status: 503, text: async () => '' };
+  } });
+  assert.equal(calls.length, 2);
+  assert.deepEqual(errors, ['/blog/: HTTP 503', 'one: live GET failed (HTTP 503)']);
 });
 
 test('live mode GETs every slug, checks actual index anchors and status', async () => {
@@ -64,5 +131,5 @@ test('live mode GETs every slug, checks actual index anchors and status', async 
     'https://edgelesslab.com/blog/', 'https://edgelesslab.com/blog/one/', 'https://edgelesslab.com/blog/bad/',
   ]);
   assert.ok(calls.every(([, method]) => method === 'GET'));
-  assert.deepEqual(await checkLive([post('one')], { fetcher: async () => { throw new Error('offline'); } }), ['/blog/: offline']);
+  assert.deepEqual(await checkLive([post('one')], { fetcher: async () => { throw new Error('offline'); } }), ['/blog/: offline', 'one: live GET failed (offline)']);
 });

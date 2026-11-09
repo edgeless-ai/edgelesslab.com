@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
@@ -33,21 +33,50 @@ export function evaluateRegistry(root, relativePath) {
   return module.exports;
 }
 
-export function loadRegistries(root = ROOT) {
-  // Fail closed if the actual blog index or detail route switches its content source.
-  for (const route of ['src/app/blog/page.tsx', 'src/app/blog/[slug]/page.tsx']) {
-    if (!/import\s*\{\s*posts\s*\}\s*from\s*['"]@\/lib\/blog['"]/.test(readFileSync(join(root, route), 'utf8'))) {
-      throw new Error(`${route} no longer reads @/lib/blog posts; update this checker to cover the new renderer`);
+function assertRouteSources(root, route) {
+  const ts = require('typescript');
+  const tree = ts.createSourceFile(route, readFileSync(join(root, route), 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  // A new route dependency must be inspected before it can introduce another registry.
+  const helpers = new Set([
+    '@/lib/blog-types', '@/lib/metadata', '@/lib/data',
+    '@/components/nav', '@/components/footer', '@/components/blog-client',
+    '@/components/json-ld', '@/components/blog-article', '@/components/related-posts',
+    '@/components/etsy-callout', 'next/image', 'next/navigation', 'next/link',
+  ]);
+  let readsPosts = false;
+  function visit(node) {
+    if (ts.isImportDeclaration(node) && !node.importClause?.isTypeOnly) {
+      const name = node.moduleSpecifier.text;
+      const bindings = node.importClause?.namedBindings;
+      if (name === '@/lib/blog' && bindings && ts.isNamedImports(bindings) &&
+          bindings.elements.some((e) => !e.isTypeOnly && e.name.text === 'posts' && (e.propertyName?.text ?? e.name.text) === 'posts')) {
+        readsPosts = true;
+      } else if (!helpers.has(name)) {
+        throw new Error(`${route}: uninspected renderer import ${name}; update registry coverage`);
+      }
     }
+    if (ts.isCallExpression(node) && (node.expression.kind === ts.SyntaxKind.ImportKeyword || node.expression.getText(tree) === 'require')) {
+      throw new Error(`${route}: uninspected dynamic renderer import; update registry coverage`);
+    }
+    ts.forEachChild(node, visit);
   }
+  visit(tree);
+  if (!readsPosts) throw new Error(`${route} no longer reads @/lib/blog posts; update this checker to cover the new renderer`);
+}
+
+export function loadRegistries(root = ROOT) {
+  // Fail closed if the actual blog index or detail route changes its content sources.
+  for (const route of ['src/app/blog/page.tsx', 'src/app/blog/[slug]/page.tsx']) assertRouteSources(root, route);
   const { posts, __allPosts: allPosts } = evaluateRegistry(root, 'src/lib/blog.ts');
   const { newPosts } = evaluateRegistry(root, 'src/lib/blog-new-posts.ts');
   if (!Array.isArray(posts) || !Array.isArray(allPosts) || !Array.isArray(newPosts)) throw new Error('Blog registry shape changed');
   if (!newPosts.every((p) => allPosts.some((entry) => entry.slug === p.slug && entry.content === p.content))) {
     throw new Error('newPosts is not included in the rendered blog registry');
   }
-  const unique = [...new Map(allPosts.map((p) => [p.slug, p])).keys()];
-  if (posts.length !== unique.length || posts.some((p, i) => p.slug !== unique[i])) {
+  const firstBySlug = new Map();
+  for (const post of allPosts) if (!firstBySlug.has(post.slug)) firstBySlug.set(post.slug, post);
+  const unique = [...firstBySlug.keys()];
+  if (posts.length !== unique.length || posts.some((p, i) => p.slug !== unique[i] || JSON.stringify(p) !== JSON.stringify(firstBySlug.get(p.slug)))) {
     throw new Error('Rendered posts differ from raw registry inventory');
   }
   return { posts, allPosts };
@@ -64,8 +93,18 @@ export function parseMarkdown(raw) {
 }
 
 const AGENTS = 'Scribe|Hive|Kilo|Virgil|Beau|Atlas|Critic|Verifier|Hermes';
-const AGENT_BYLINE = new RegExp(`\\b(?:written|authored|drafted|edited)\\s+by\\s+(?:@?(?:${AGENTS}))\\b|^\\s*(?:by|author|written by)\\s*[:—-]?\\s*@?(?:${AGENTS})\\b`, 'im');
-const AUTHOR_FIELD = /^\s*(?:author|byline|writtenBy)\s*:\s*.*\b(?:Scribe|Hive|Kilo|Virgil|Beau|Atlas|Critic|Verifier|Hermes)\b/im;
+const AGENT_NAME = new RegExp(`\\b(?:${AGENTS})\\b`, 'i');
+const AGENT_BYLINE = new RegExp(`\\b(?:written|authored|drafted|edited)\\s+by\\s*[:—-]?\\s*@?(?:${AGENTS})\\b|^\\s*(?:by|author|written by)\\s*[:—-]?\\s*@?(?:${AGENTS})\\b`, 'im');
+
+function hasAgentByline(text) {
+  const plain = text.replace(/<[^>]*>/g, ' ').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[*_`~]/g, '');
+  return AGENT_BYLINE.test(plain);
+}
+
+function hasMarkdownAuthor(frontmatter) {
+  const fields = frontmatter.matchAll(/^(?:author|authors|byline|writtenBy)\s*:[^\n]*(?:\n[ \t]+[^\n]*)*/gim);
+  return [...fields].some(([field]) => AGENT_NAME.test(field));
+}
 
 function checkDate(post, now, errors) {
   const date = post.date;
@@ -98,8 +137,8 @@ export function validate({ posts, allPosts, markdownFiles, exceptions, patterns,
     seen.add(post.slug);
     checkDate(post, now, errors);
     if (typeof post.content !== 'string' || !post.content.trim()) errors.push(`${post.slug}: empty/non-string registry body`);
-    const text = [post.title, post.description, post.content, post.processNote].filter((v) => typeof v === 'string').join('\n');
-    if (AGENT_BYLINE.test(text) || Object.entries(post).some(([key, value]) => /^(author|byline|writtenBy)$/i.test(key) && typeof value === 'string' && new RegExp(`\\b(?:${AGENTS})\\b`, 'i').test(value))) {
+    const text = Object.values(post).flat().filter((v) => typeof v === 'string').join('\n');
+    if (hasAgentByline(text) || Object.entries(post).some(([key, value]) => /^(author|authors|byline|writtenBy)$/i.test(key) && AGENT_NAME.test(JSON.stringify(value) ?? ''))) {
       errors.push(`${post.slug}: agent authorship/byline`);
     }
     for (const [name, rule] of rules) if (rule.test(text)) errors.push(`${post.slug}: banned voice pattern (${name})`);
@@ -110,7 +149,7 @@ export function validate({ posts, allPosts, markdownFiles, exceptions, patterns,
       const { frontmatter, body, slug } = files.get(post.slug);
       if (slug !== post.slug) errors.push(`${post.slug}: Markdown frontmatter slug differs (${String(slug)})`);
       if (body !== post.content.trim()) errors.push(`${post.slug}: registry/Markdown bodies differ`);
-      if (AUTHOR_FIELD.test(frontmatter) || AGENT_BYLINE.test(body)) errors.push(`${post.slug}: Markdown agent authorship/byline`);
+      if (hasMarkdownAuthor(frontmatter) || hasAgentByline(body)) errors.push(`${post.slug}: Markdown agent authorship/byline`);
       for (const [name, rule] of rules) if (rule.test(body)) errors.push(`${post.slug}: Markdown banned voice pattern (${name})`);
     }
   }
@@ -120,6 +159,25 @@ export function validate({ posts, allPosts, markdownFiles, exceptions, patterns,
   return errors;
 }
 
+function indexLinks(html, baseUrl) {
+  const links = new Set();
+  const visible = html.replace(/<!--[\s\S]*?-->/g, '').replace(/<(script|style|textarea|title|template|noscript)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '');
+  // Tokenize entire tags (including quoted attributes), so text in another
+  // element's attribute cannot impersonate an anchor.
+  for (const [tag, name] of visible.matchAll(/<([a-z][\w:-]*)\b(?:[^"'<>]|"[^"]*"|'[^']*')*>/gi)) {
+    if (name.toLowerCase() !== 'a') continue;
+    const attrs = tag.slice(name.length + 1, -1);
+    for (const attr of attrs.matchAll(/([^\s=/>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g)) {
+      if (attr[1].toLowerCase() !== 'href') continue;
+      try {
+        const url = new URL(attr[2] ?? attr[3] ?? attr[4] ?? '', baseUrl);
+        if (url.origin === new URL(baseUrl).origin) links.add(url.pathname.replace(/\/$/, ''));
+      } catch { /* malformed href is not publication evidence */ }
+    }
+  }
+  return links;
+}
+
 export async function checkLive(posts, { baseUrl = 'https://edgelesslab.com', fetcher = fetch } = {}) {
   const errors = [];
   async function get(url) {
@@ -127,13 +185,12 @@ export async function checkLive(posts, { baseUrl = 'https://edgelesslab.com', fe
     if (response.status !== 200) throw new Error(`HTTP ${response.status}`);
     return response.text();
   }
-  let index;
-  try { index = await get(`${baseUrl}/blog/`); }
-  catch (error) { return [`/blog/: ${error.message}`]; }
+  let links;
+  try { links = indexLinks(await get(`${baseUrl}/blog/`), baseUrl); }
+  catch (error) { errors.push(`/blog/: ${error.message}`); }
   for (const post of posts) {
     const path = `/blog/${encodeURIComponent(post.slug)}/`;
-    // Require a real anchor, not an incidental slug in a script/JSON-LD blob.
-    if (!index.includes(`href="${path}"`)) errors.push(`${post.slug}: absent from /blog/ index links`);
+    if (links && !links.has(path.slice(0, -1))) errors.push(`${post.slug}: absent from /blog/ index links`);
     try { await get(`${baseUrl}${path}`); }
     catch (error) { errors.push(`${post.slug}: live GET failed (${error.message})`); }
   }

@@ -139,6 +139,14 @@ export const marimoDemos: MarimoDemo[] = [
     tags: ["KV cache", "quantization", "MLA", "inference", "storage accounting"],
     published_url: "https://marimo.edgelesslab.com/2610.20686-rolaq-cache-accounting/",
   },
+  {
+    slug: "2610.14244-hbm-power-underbound",
+    title: "HBM Power Envelope Gap",
+    description: "See how a measured high-toggle HBM2 pattern exceeded the strongest JEDEC current-measurement loop.",
+    category: "Research",
+    tags: ["HBM", "hardware", "power", "reproducibility"],
+    published_url: "https://marimo.edgelesslab.com/2610.14244-hbm-power-underbound/",
+  },
 
   // Research explainers (overnight expansion)
   {
@@ -471,7 +479,86 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["ASR", "evaluation", "hallucination", "uncertainty"],
     published_url: "https://marimo.edgelesslab.com/2609.04404-asr-hallucination-taxonomy/",
-  }
+  },
+
+  // Published after live verification (arXiv:2609.27051). Critic approved, verifier gate passed.
+  {
+    slug: "2609.27051-anytime-valid-referee",
+    title: "The Evidence Wait Behind an Anytime-Valid Referee",
+    description:
+      "Vary expected edge and frozen candidate slots to see how an anytime-valid admission bar turns statistical governance into a multi-year evidence wait.",
+    category: "Research",
+    tags: ["anytime-valid-inference", "e-values", "online-fdr", "agent-governance", "sensitivity-analysis"],
+    published_url: "https://marimo.edgelesslab.com/2609.27051-anytime-valid-referee/",
+  },
+
+  {
+    slug: "2609.38372-self-optimizing-harness",
+    title: "A Runnable Edit Is Not a Promotable Harness",
+    description: "Tighten an external evidence threshold and watch a synthetic batch of runnable harness edits shrink from eight promotion candidates to one.",
+    category: "Research",
+    tags: ["agents", "harness-evolution", "evaluation", "governance", "synthetic-demo"],
+    published_url: "https://marimo.edgelesslab.com/2609.38372-self-optimizing-harness/",
+  },
+
+  {
+    slug: "google-routing-failure-price",
+    title: "The Hidden Price of Unresolved Failures",
+    description:
+      "Charge unresolved tasks an explicit price and see when a cheap-but-imperfect model stops winning on cost per observed success.",
+    category: "Research",
+    tags: ["model-routing", "agent-economics", "evaluation", "sensitivity-analysis"],
+    published_url: "https://marimo.edgelesslab.com/google-routing-failure-price/",
+  },
+
+  // arXiv:2606.04781v2. Published after live verification.
+  {
+    slug: "2606.04781-pass-semantics",
+    title: "One Benchmark Packet, Two Pass Rates",
+    description:
+      "Credit or reject three reward-one/error rows to see how pass semantics move the human baseline while the AIP count stays fixed.",
+    category: "Research",
+    tags: ["agent-evaluation", "benchmarking", "denominators", "reproducibility"],
+    published_url: "https://marimo.edgelesslab.com/2606.04781-pass-semantics/",
+  },
+  {
+    slug: "2611.07042-scorer-rank-reversal",
+    title: "When the Scorer Reverses the Leaderboard",
+    description: "Switch among three scorer versions to see fixed LegalBench SARA outputs move from a Luna lead to a Haiku-Gemma-Luna order without any new model calls.",
+    category: "Research",
+    tags: ["evaluation", "benchmark-integrity", "reproducibility", "scoring"],
+    published_url: "https://marimo.edgelesslab.com/2611.07042-scorer-rank-reversal/",
+  },
+
+  // arXiv:2609.04344. Published after critic approval and live verification.
+  {
+    slug: "2609.04344-sharedsae-vote-normalization",
+    title: "SharedSAE: Normalize the Ballot, Not the Representation",
+    description: "Vary encoder-scale mismatch and see why normalized TopK voting preserves a shared feature selector when raw scores become one-model dominated.",
+    category: "Research",
+    tags: ["sparse autoencoders", "representation alignment", "feature dictionaries", "vote normalization", "model fleets"],
+    published_url: "https://marimo.edgelesslab.com/2609.04344-sharedsae-vote-normalization/",
+  },
+
+  // arXiv:2609.04379. Published after critic approval and live verification.
+  {
+    slug: "2609.04379-tsne-symmetry-sectors",
+    title: "One Circle, Six Incompatible Stationary Maps",
+    description: "Move among cyclic symmetry sectors and watch the same connected circle become stationary maps with incompatible topology.",
+    category: "Research",
+    tags: ["t-SNE", "dimensionality reduction", "symmetry", "optimization", "visualization audit"],
+    published_url: "https://marimo.edgelesslab.com/2609.04379-tsne-symmetry-sectors/",
+  },
+
+  // arXiv:2608.11227. Published after critic approval and live verification.
+  {
+    slug: "2608.11227-directional-side-effects",
+    title: "Direction Has an Arrow: Why Cosine Misses Steering Side Effects",
+    description: "Increase directional structure and watch opposite-sign steering effects create an unavoidable error floor for symmetric similarity rules.",
+    category: "Research",
+    tags: ["activation steering", "side effects", "representation geometry", "forecasting", "AI safety"],
+    published_url: "https://marimo.edgelesslab.com/2608.11227-directional-side-effects/",
+  },
 ];
 
 // A published URL is added only after live verification. Keep legacy/unpublished

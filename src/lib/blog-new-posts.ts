@@ -3370,178 +3370,112 @@ The answer is Poetry. Two commands. Minutes. Done.
   },
   {
     slug: "crt-shader-webgl-crt",
-    title: "crt-shader: An Open-Source CRT Shader for WebGL 2",
-    description:
-      "A self-contained WebGL 2 fragment shader that renders CRT monitor effects in-browser. No dependencies, no plugins, no post-processing stack.",
+    title: "A Multi-Pass CRT Effect for the Browser",
+    description: "A look at crt-shader's WebGL rendering pipeline, its adapters, and the tradeoffs of adding a simulated tube display to a web project.",
     date: "2026-09-28",
     tags: ["WebGL", "Shaders", "Creative Coding", "Generative Art"],
     readTime: "5 min",
     processNote:
       "Human-directed research and writing, AI-assisted editing, reviewed against the upstream project README.",
-    content: `crt-shader is a WebGL 2 fragment shader that renders CRT monitor effects in-browser. No dependencies. No plugin. Drop it in and your flat panel starts looking like a 1998 Sony Trinitron.
+    content: `# A Multi-Pass CRT Effect for the Browser
 
-## What it actually does
+A convincing cathode-ray tube (CRT) effect is more than a set of dark stripes. The display's apparent character comes from several effects acting together: the treatment of the signal, scanlines, the pixel mask and the way light spreads across the screen.
 
-The shader simulates five things that make CRTs feel like CRTs:
+[crt-shader](https://github.com/OutThisLife/crt-shader), by Brooklyn, is an open-source project for bringing that look to WebGL 2. Rather than a single fragment shader, it uses multiple rendering passes. Its documented effects include signal filtering, brightness-dependent scanlines and display optics; the \`reference\` preset includes bloom and curvature. There's also a [live demonstration](https://crt-shader.vercel.app/).
 
-- **Scanlines** the dark horizontal bands between phosphor rows
-- **Mask** the shadow mask pattern, aperture grille vs. slot mask
-- **Curvature** the glass bulge at the edges
-- **Chromatic aberration** color fringing where red, green and blue don't quite line up
-- **Flicker** the subtle vertical refresh artifact
+## Where it fits
 
-All of it runs in a single fragment shader pass. No post-processing stack. No framebuffers to juggle.
+The project offers adapters for plain JavaScript, React and Three.js, including a pass for an existing post-processing chain. That makes it a useful candidate when you already have an image or a rendered scene and want the screen itself to become part of the composition. Check the repository's current documentation and version before integrating it: a rendering dependency is an API you will need to maintain.
 
-## Why it's worth looking at
+In a local trial of version 1.0.1, we found the reference preset more promising on bold generative images and simple 3D forms than on text-heavy pages. The simulated grille made small type harder to read, while dark detail and motion could need extra attention. The effect is a visual choice with an accessibility cost, not a default treatment for every surface.
 
-Most CRT shader projects are one of two things. Either a handful of uniforms wrapped around a noise texture, which looks fake, or a full Three.js post-processing chain, which is overkill for a website.
+## A useful constraint
 
-crt-shader is neither. It's a self-contained shader with real physical modeling of the mask and curvature. The scanline phase offset is computed per-row, not per-pixel, and that is what makes it look like a real tube instead of a filtered image.
-
-## How to use it
-
-\`\`\`glsl
-uniform float u_time;
-uniform vec2 u_resolution;
-varying vec2 v_uv;
-
-void main() {
-  vec2 uv = v_uv;
-  uv.y *= u_resolution.y / u_resolution.x;
-
-  // Scanlines
-  float scanline = sin(uv.y * u_resolution.y * 1.4) * 0.5 + 0.5;
-
-  // Curvature
-  float r = length(uv - 0.5);
-  float curve = 1.0 - r * 0.15;
-
-  vec3 color = vec3(1.0);
-  color *= scanline * curve;
-
-  gl_FragColor = vec4(color, 1.0);
-}
-\`\`\`
-
-The full shader has roughly 20 uniforms for mask type, curvature amount, brightness, contrast and flicker rate. All documented in the upstream README.
-
-## The short version
-
-It's the CRT effect you would actually put on a production site. Not a demo, not a toy.`.trim(),
+Keep the original content readable and test the effect at the size and resolution at which people will actually see it. If a visitor needs to read a control or a paragraph, the CRT treatment should not make that task harder. Use the effect to support the work, not to turn the work into evidence that an effect was used.`.trim(),
   },
   {
     slug: "hermes-heartbeat-forgery",
-    title: "Tick 151: The Heartbeat That Wasn't Real",
-    description:
-      "A scheduled job wrote fake heartbeat statuses to the swarm's coordination file for four hours. The fix was rate-limited. Here is how we make sure it cannot happen again.",
+    title: "The Heartbeat That Couldn't Prove an Agent Was Alive",
+    description: "A scheduled job wrote another agent's heartbeat while a corrective task was rate-limited. The incident showed why a fresh timestamp is not proof of liveness.",
     date: "2026-09-28",
     tags: ["Hermes", "Multi-Agent", "Infrastructure", "Postmortem"],
     readTime: "4 min",
     processNote: "Human-directed postmortem, AI-assisted editing.",
-    content: `For four hours, the shared coordination file claimed Hive was online. It wasn't.
+    content: `# The Heartbeat That Couldn't Prove an Agent Was Alive
 
-A scheduled job was writing fake heartbeat statuses to the file. Four consecutive runs overwrote the line with a claim that Hive was healthy. Meanwhile, the actual remediation task was rate-limited repeatedly and never ran.
+A heartbeat is supposed to answer a simple question: is this process still running? Our agent system had a more complicated answer. A scheduled job could refresh the coordinator's heartbeat even though it wasn't the coordinator.
 
-## Why it matters
+Over four consecutive hourly runs, that job wrote a fresh status for the coordinator. The status checker reported the coordinator online. But a timestamp written by another process cannot establish that the coordinator is alive. The record we examined did **not** establish that the coordinator was offline either; it showed that the online signal could not be trusted as proof of its liveness.
 
-The heartbeat file is the swarm's liveness signal. If it says Hive is up, other agents assume Hive is up and route work to it. If Hive is actually down, that work goes nowhere. The forgery did not just mislead us. It directed traffic to a dead agent for four hours.
+## The failure behind the green light
 
-## Four containment gaps
+The system used a shared file to communicate liveness. The writing interface accepted a caller-supplied identity, so an unrelated scheduled job could write a heartbeat in the coordinator's name. The checker saw a recent timestamp and returned an online status without establishing who had written it.
 
-1. **The producer wasn't stopped.** The scheduled job kept running. It had the write access and the cron schedule, and nothing blocked it.
-2. **The fix hit the same quota wall.** The corrective task was rate-limited repeatedly. Every attempt returned to the queue with no result, while the harmful job stayed enabled.
-3. **The status had no authorship verification.** Any cron job with write access could claim to be Hive. There was no signature, no token, no check.
-4. **The system tried many duplicate fixes.** Without idempotency, each rate-limited attempt looked like a fresh task. The queue filled with copies of the same fix.
+That is an identity failure, not just a stale-data problem. A fresh value can be misleading when the wrong producer is allowed to publish it.
 
-## What we changed
+The response had its own failure mode. At the time of the investigation, the corrective task had been attempted sixteen times, and each attempt was rate-limited. The scheduled writer remained enabled. Filing a fix did not contain the source of the misleading signal.
 
-- **Removed heartbeat writes from the scheduled job** the one that forged the status
-- **Added authorship verification** heartbeat writes require a Hive-owned token, not just filesystem access
-- **Resumed the corrective task only when a provider is available** so a rate-limited fix does not hammer the same quota wall
-- **Marked the current Hive line as tainted** verify before trusting
+## The lesson
 
-## The short version
+Contain the producer first; then repair the trust boundary. A heartbeat needs a way to bind a write to the process whose health it represents, and the status check needs to reject a cross-process write. While that work is unverified, the displayed status should be treated as untrusted, not as evidence that the agent is either up or down.
 
-A cron job faked our coordinator's heartbeat for four hours, and the fix that should have stopped it was rate-limited the entire time. Both halves of that story needed a guard.`.trim(),
+A green light is only as meaningful as the evidence behind it. A recent timestamp tells you when a record was updated. It does not, by itself, tell you who updated it or whether the process you care about is running.`.trim(),
   },
   {
     slug: "oss-saas-replacements",
-    title: "9 OSS Alternatives Evaluated, 3 Adopted",
-    description:
-      "We evaluated 9 open-source replacements for our SaaS stack. Three made the cut, and each one is better than what it replaced, not just cheaper.",
+    title: "Nine Open-Source Projects We Evaluated as SaaS Alternatives",
+    description: "A shortlist of open-source tools is not the same thing as a successful migration. Here's how we screened nine candidates and what still needed testing.",
     date: "2026-09-28",
     tags: ["OSS", "SaaS", "Infrastructure", "Cost Optimization"],
     readTime: "5 min",
     processNote: "Human-directed evaluation and writing, AI-assisted editing.",
-    content: `Our SaaS bill was creeping up. Not dramatically, maybe $200 a month, but for tools we use three times a week the per-use cost was absurd. So we evaluated 9 open-source replacements across three categories. Three made the cut.
+    content: `# Nine Open-Source Projects We Evaluated as SaaS Alternatives
 
-## What we evaluated
+A subscription price is easy to compare. The cost of running its replacement is harder: hosting, upgrades, integration work, licensing and the time spent fixing it when it breaks all belong in the calculation.
 
-| Tool | SaaS alternative | OSS replacement | Verdict |
-|------|------------------|------------------|---------|
-| Image generation | Midjourney ($10/mo) | FLUX via fal.ai | Adopted |
-| Document parsing | Notion API ($8/mo) | Local markdown parser | Adopted |
-| Vector search | Pinecone ($50/mo) | ChromaDB (local) | Adopted |
-| Code review | GitHub Teams ($21/mo) | GitLab CE (self-hosted) | Too much ops |
-| CI/CD | GitHub Actions (overage) | Woodpecker CI | Not ready |
-| Monitoring | Datadog ($15/mo) | Prometheus + Grafana | Needs more glue |
-| Design systems | Figma ($15/mo) | Excalidraw + tldraw | Missing features |
-| Email | SendGrid ($29/mo) | Local SMTP relay | Deliverability risk |
-| Testing | BrowserStack ($99/mo) | Playwright (local) | Not a fair comparison |
+We reviewed nine open-source projects that promised to replace or supplement a hosted service. Three looked worth further investigation. That was a shortlist, **not evidence that we had installed them, replaced a paid service or saved money**.
 
-## The three that won
+## The shortlist
 
-### 1. FLUX via fal.ai
+- [Chatwoot](https://github.com/chatwoot/chatwoot), a customer-support platform, was a candidate for a support workflow. Before adopting it, we needed to assess the applicable license and the work involved in operating it.
+- [Cap](https://github.com/CapSoftware/Cap), a screen-recording and sharing tool, was a candidate for making demonstrations. It still needed a trial against our actual recording workflow.
+- [VoiceStudio](https://github.com/debpalash/VoiceStudio) was a candidate for local voice generation. The next step was to test output quality and check the license and the consent requirements for any voice used.
 
-Midjourney is good. FLUX is better for anything with text, logos or UI. The fal.ai endpoint costs per use, so we only pay when we generate. We replaced a $10 a month subscription with a pay-per-image model that is cheaper in practice.
+We passed on other candidates for different reasons. Some overlapped with tools we already used; others depended on paid services or introduced licensing questions. Those were decisions for our needs at the time, not a blanket ranking of the projects.
 
-### 2. Local markdown parser
+## What the comparison needs to include
 
-We were paying Notion API rates to extract content from markdown files. The local parser does the same job in about 200 lines of Python. No API calls, no rate limits, no bill.
+A serious replacement test starts with a job, not a category label. Can the candidate perform the specific task the existing service handles? Can its output be moved elsewhere? What does it cost to host, monitor and update? Is the license suitable for the intended use?
 
-### 3. ChromaDB
+Only after a trial can we compare the full costs and decide whether to migrate. A local tool may avoid a per-query charge while adding maintenance. An open-source interface may still rely on a paid API. And a tool that works well for one workflow may be the wrong substitute for another.
 
-Pinecone was eating $50 a month for a vector store we barely queried. ChromaDB runs locally, integrates with our existing embeddings pipeline, and has zero per-query cost. The tradeoff is that we manage the persistence layer ourselves, which is worth it at our size.
-
-## What we learned
-
-- **Not every SaaS has an OSS equivalent.** CI/CD and monitoring are still hard self-hosted.
-- **The hidden cost is ops.** Woodpecker CI would save money on paper, but the maintenance burden is not worth it at our volume.
-- **Adopt when the replacement is better, not just cheaper.** FLUX beats Midjourney for our use case. The local parser is faster than the API. ChromaDB is more predictable.
-
-## The short version
-
-Three tools replaced, about $73 a month saved, and nothing we cared about was lost in the swap.`.trim(),
+The useful outcome of this review was a smaller list to test, not a savings figure. Shortlisting is the beginning of an evaluation, not the same as an adoption report.`.trim(),
   },
   {
     slug: "wei-name-service-edgeless-wei",
-    title: "edgeless.wei: On-Chain Identity, One Domain at a Time",
-    description:
-      "We registered edgeless.wei as the canonical on-chain identity for the swarm. One domain, one identity, no namespace sprawl.",
+    title: "What an On-Chain Name Can—and Can't—Do",
+    description: "A look at Wei Name Service, the records a name can hold, and the distinction between registering a name and deploying an identity system.",
     date: "2026-09-28",
     tags: ["Web3", "ENS", "Identity", "On-Chain"],
     readTime: "4 min",
     processNote: "Human-directed research and writing, AI-assisted editing.",
-    content: `edgeless.wei is a name service on the ENS ecosystem that registers .wei domains and links them to on-chain identities. Think ENS, but for a smaller TLD and a sharper focus: one domain, one identity, no namespace sprawl.
+    content: `# What an On-Chain Name Can—and Can't—Do
 
-## Why it matters
+A name is easier to share than a long wallet address. That is the appeal of on-chain naming: publish a human-readable identifier and let software look up the record behind it. But registration alone doesn't guarantee that every application can resolve the name, that a website is configured, or that an organization has implemented a complete identity system.
 
-ENS owns the .eth namespace. It is the obvious choice, but it is also crowded, expensive and increasingly commercialized. .wei is a parallel that is cheaper to register and renew, focused on a single name per identity rather than namespace speculation, and verifiable because every .wei resolves to one public on-chain record.
+[Wei Name Service](https://wei.domains/) is an Ethereum naming project for \`.wei\` names. Like the Ethereum Name Service (ENS), it associates names with records that compatible software can look up. A name can hold an address and other records, including text and website content references. Those records must be configured; their existence should not be assumed from the name alone.
 
-## What you can do with it
+## What we found
 
-1. **Replace your handle** put your .wei in your bio instead of a hex address
-2. **Receive funds** send to yourname.wei instead of a 42-character address
-3. **Prove ownership** the resolver record is publicly queryable, no screenshot required
-4. **Link projects** register project.wei and point it at a repository, a subdomain or an IPFS hash
+In a September 2026 check, \`edgeless.wei\` was registered and had an address record. It did not have a website content record configured at the time. That's a snapshot, not a guarantee about its current configuration.
 
-## The edgeless angle
+A name can be a useful starting point for linking an address, a project and public information. But software support matters: a wallet or application needs an appropriate resolver or bridge to understand the name. Before sending funds, check that the application resolves the intended address and verify it independently. A recognizable name is not a substitute for transaction review.
 
-We registered edgeless.wei as the canonical on-chain identity for the swarm. Every agent, every project and every artifact now has a single resolvable name. No more copying long addresses into chat, and no more "which wallet was it again?"
+## Registration is not deployment
 
-## The short version
+Our initial exploration considered using subdomains or website records for projects. Those were possibilities to investigate, not proof that every project or agent already had a working identity. Setting records requires authorized transactions; hosting content also introduces availability and gateway considerations.
 
-Your name, on-chain, without the hex.`.trim(),
+The lesson is simple: treat a name as an addressable record, not a magic guarantee of identity, permanence or universal compatibility. Inspect the actual records and the software resolving them before building a workflow around it.`.trim(),
   },
   {
     slug: "generation-left-the-screen",
@@ -3568,7 +3502,7 @@ Taken together, the five videos trace one arc. Generative models started with fl
 - **Game worlds and what's in them.** Palworld became the lightning rod for "AI-made game" anxiety in early 2024. Section 2 covers what that accusation turned out to be worth.
 - **Bodies.** The Astribot S1 video is about where generation goes next: models that output motion instead of pixels.
 
-How the Sora story ended shows the arc most clearly. In March 2026 OpenAI [said it would discontinue Sora](https://www.pcmag.com/news/that-was-fast-openai-to-shut-down-sora-video-generator-app). It cited compute demand and said the Sora research team would keep working on world simulation "to advance robotics." The web and app versions closed on April 26, 2026 ([OpenAI Help Center](https://help.openai.com/en/articles/20001152-what-to-know-about-the-sora-discontinuation)). The API [shut down on September 24, 2026](https://developers.openai.com/api/reference/python/resources/videos/methods/list), and OpenAI says there is no one-to-one replacement. The product is gone. Its research thesis is now pointed at bodies.
+How the Sora story ended shows the arc most clearly. In March 2026 OpenAI [said it would discontinue Sora](https://www.pcmag.com/news/that-was-fast-openai-to-shut-down-sora-video-generator-app). It cited compute demand and said the Sora research team would keep working on world simulation "to advance robotics." The web and app versions closed on April 26, 2026 ([OpenAI Help Center](https://help.openai.com/en/articles/20001152-what-to-know-about-the-sora-discontinuation)). The API [shut down on September 24, 2026](https://developers.openai.com/api/reference/python/resources/videos/methods/list), and OpenAI says there is no one-to-one replacement. The consumer product and API have closed. OpenAI has said its world-simulation research will continue, including work intended to advance robotics.
 
 ## 2. Two takes the videos set against each other
 
@@ -3603,13 +3537,13 @@ For skeptics, the awkward part is that the autonomy trend has kept moving since 
 
 **Fair to both sides:** technologists are right that the copyright panic picked a weak test case and that the robot demos were oversold. Artists and skeptics are right that disclosure norms were thin and still are, and that autonomy in high-stakes systems is moving faster than the public debate about it. Both can be true.
 
-## 3. What it means for our stack, and for you
+## 3. What builders can take from it
 
 Our takeaway from this set: **prefer generation you can run, inspect, and disclose.**
 
 - **Owning the tool beats renting it.** Sora's shutdown is a warning for anyone building a workflow on a closed generative API. Our own generative-art work runs on procedural generators we wrote and control. When we evaluated an image-to-video prototype, the post-processing pipeline we already own was the cheap part. The generation step is still a call to an external model, and that's the dependency Sora's shutdown says to plan for. The terrain mod points the other way: a method you can read in a paper and run on a consumer GPU.
 - **Windowed diffusion is a pattern, not just a Minecraft trick.** Blending overlapping windows with constant cost per lookup could apply to any large generated space, such as maps, textures, or long-form generative art. That's our inference. The paper demonstrates it on terrain.
-- **Disclose by default.** We keep a draft internal policy on generative-AI disclosure modeled on Steam's disclosure requirement. If an asset is AI-generated, say so, and don't ship derivatives of third-party copyrighted work. That makes an accusation like the one aimed at Pocketpair easy to answer, and it respects the artists, whose concern was legitimate even when their target was wrong.
+- **Disclose by default.** If an asset is AI-generated, disclose it, and check the rights to the material used. Disclosure does not settle every copyright question, but it gives audiences a clearer account of how a work was made.
 - **Read claims at the right resolution.** Two of these five videos led with claims that shrank under checking: a revenue number in one, and a speed figure plus an autonomy claim in the other. Our rule is that a capability claim names its source, its date, and its scope, or we don't repeat it.
 
 ## 4. Watch this one, then build
@@ -3627,16 +3561,16 @@ If you build something with it, or find where it breaks, reply and tell us what 
     editorial: true,
     title: "Enterprise AI's Real Bottleneck Is Everything Around the Model",
     description:
-      "Six videos, one shared conclusion: the models work. What fails is the organization, the data policy and the infrastructure around them.",
+      "Six videos examine how organizational choices, data protection, infrastructure and model limitations shape enterprise AI deployments.",
     date: "2026-10-02",
     tags: ["Enterprise AI", "Local Inference", "AI Infrastructure", "Multi-Agent Swarm"],
     readTime: "7 min",
     processNote: "Human-directed research and writing, AI-assisted editing. Claims spot-checked against primary sources.",
     content: `# Enterprise AI's Real Bottleneck Is Everything Around the Model
 
-*Six videos, one shared conclusion: the models work. What fails is the organization, the data policy and the infrastructure around them.*
+*Six videos examine how organizational choices, data protection, infrastructure and model limitations shape enterprise AI deployments.*
 
-We went through six videos on enterprise AI, five from Nate B. Jones and one from Kiraa, published between December 2025 and July 2026. They come at the subject from different directions and arrive at the same gap. Model quality is no longer what stops deployments.
+We went through six videos on enterprise AI, five from Nate B. Jones and one from Kiraa, published between December 2025 and July 2026. They approach the subject from different directions, but each highlights constraints beyond model quality. Models can also fail at the work itself; better infrastructure does not make their answers reliable.
 
 ## 1. The pattern: the reckoning has arrived
 
@@ -3656,15 +3590,15 @@ We went through six videos on enterprise AI, five from Nate B. Jones and one fro
 
 **Take B: the unlock is local, private inference.** [How To Run AI Locally On Files You Can Never Upload](https://www.youtube.com/watch?v=5slsNizN6MQ) runs gpt-oss-safeguard-20b in LM Studio on an offline laptop. It flags unreleased pricing and attorney-client notes, masks a fake API key, and declines to call an unreadable section "safe." The model is real: an open-weight safety classifier that LM Studio supports. The Airlock video pushes the idea further: "All of our data needs to be accessible to AI, but not all of our data should go over the wire."
 
-**The tension.** If Take A is right, better local hardware won't fix much, because the gap is organizational. If Take B is right, enterprise demand for cloud tokens should soften over time, which sits awkwardly against the compute-scarcity story. Our read is that both are right about different layers. Take A explains why pilots stall in general. Take B names the specific blocker, data that can't leave the building, behind many of the stalled pilots. One caveat from the local-AI video applies to both: open weights aren't automatically portable, and self-hosting can still create lock-in.
+**The tension.** Local hardware may help with data residency without resolving organizational or model-quality problems. Local and cloud inference can also coexist, so these videos do not establish what will happen to demand for cloud tokens. The two perspectives emphasize different constraints. One caveat from the local-AI video applies to both: open weights aren't automatically portable, and self-hosting can still create lock-in.
 
-## 3. What this means for our stack
+## 3. What builders can put into practice
 
-**Local, air-gapped inference is now a practical default for sensitive work.** A classifier small enough to run in LM Studio on a laptop can do triage, PII detection and masking before anything touches a cloud API. The video's principle is the right one: instructions aren't guardrails, air-gapping is. We would rather have a model that says "I can't tell" than one that is confidently wrong.
+**Local inference is one option for sensitive work.** The demonstration uses a laptop-based classifier to flag and mask examples before a cloud request. A classifier can miss sensitive material, and running locally does not by itself establish that a machine is air-gapped. Test the full data path, use access controls, and treat uncertain results as requiring review.
 
-**Task-scoped clean copies beat blanket redaction.** Airlock's core idea is job-first. You declare the task, extract only the slice that matters, and leave the original untouched. The same price can be essential to one question and irrelevant to another. The clean copy goes to whichever frontier model is best this month, and the original never moves. That fits Kiraa's point that "models are commodities right now and there'll be a better one next month." The durable value sits in the layer that decides what leaves, not in the model.
+**Task-scoped clean copies beat blanket redaction.** Airlock's core idea is job-first. You declare the task, extract only the slice that matters, and leave the original untouched. The same price can be essential to one question and irrelevant to another. The intended clean copy can then be sent to a model while the original remains in place. That depends on correct extraction and controls: a mistaken or incomplete redaction can still expose sensitive data.
 
-**Orchestration is the gap nobody has filled.** Even the best local-hardware story stalls without job queues, batching, monitoring, auditing and failover. The Kiraa speaker says so himself, though he sells the fix. Running our own multi-agent swarm has taught us the same lesson: the failures are rarely the model. They are handoffs, missing verification steps and tasks that report "done" without proof. That is the Block video's quiet failure in miniature.
+**Orchestration deserves its own evaluation.** Job queues, batching, monitoring, audit trails and failover can all matter alongside model quality. Existing tools address parts of this work; the challenge is choosing and testing a combination that fits the task. In our own agent experiments, handoffs and completion claims have also required verification.
 
 **Label the boundary between "act on this" and "interpret this."** Anything a model touches in a decision path should carry an explicit marker saying which outputs are safe to act on and which need a human read. That is the practical takeaway from the world-model argument.
 

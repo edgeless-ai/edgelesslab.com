@@ -14,9 +14,6 @@ productSlug: lixicg
 editorial: true
 ctaHook: Production MCP server templates with auth, rate limiting, and Docker deployment.
 ---
-
-# Why MCP Servers Are the Unix Pipes of AI
-
 In 1978, Doug McIlroy wrote the Unix philosophy in three sentences. The one that matters: "Write programs that do one thing and do it well. Write programs to work together."
 
 Forty-eight years later, we're rediscovering this idea for AI agents, and calling it MCP.
@@ -63,7 +60,7 @@ This is exactly what made Unix pipes powerful: `grep` doesn't know it's receivin
 
 ## Tools as Services, Not Libraries
 
-The shift MCP enables is treating tools as services rather than library calls. This changes the operational model:
+The shift MCP enables is treating tools as services rather than library calls. This changes the operational model significantly:
 
 You can **deploy tools independently**. The Obsidian server runs on your Mac (it needs local filesystem access). The ChromaDB server runs wherever ChromaDB is. The trading data server runs on the VPS. Each deployed where it makes sense.
 
@@ -79,8 +76,8 @@ The deeper implication is that MCP creates a tool ecosystem that outlives any pa
 
 This is how Unix tools from the 1970s still run on your Mac today. The protocol survived everything else changing.
 
-MCP is early. The tooling is rough in places. Server discovery is manual. Error handling is inconsistent. There are [real ways MCP servers fail in production](/blog/mcp-servers-break-in-production). But the protocol is right, and the ecosystem will follow.
+MCP is early. The tooling is rough in places. Server discovery is manual. Error handling is inconsistent. But the protocol is right, and the ecosystem will follow.
 
-For anyone building agent infrastructure: start treating your tools as MCP servers, not library functions. The composition benefits compound quickly, and it's the right abstraction for the next decade of AI development.
+For anyone building agent infrastructure: start treating your tools as MCP servers, not library functions. The composition benefits compound quickly, and you're building on the right abstraction for the next decade of AI development.
 
 See the [lab experiments page](/lab) for the MCP servers running in this system, or read the [infrastructure deep-dive](/blog/building-ai-agent-infrastructure-solo) for the full architecture.

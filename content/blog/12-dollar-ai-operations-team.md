@@ -16,9 +16,6 @@ editorial: true
 ctaHook: 'The complete Paperclip OS blueprint: configs, routing logic, and the cost
   calculator behind this post.'
 ---
-
-# I Run a $12/Week AI Operations Team. This is the Cost Breakdown.
-
 Enterprise AI operations run $50,000 per month for a modest setup. The bill breaks down predictably: API calls at scale, managed vector databases, orchestration platforms with per-seat pricing, and the human team to manage the agents that are supposed to reduce labor.
 
 I run five AI agents 24/7 for $12 per week. They handle code review, research synthesis, content triage, knowledge base maintenance, and production monitoring. The architecture isn't a demo. It's been running for three months, survived a corrupted session recovery, and processed 8,000+ tasks without a manual restart.
@@ -44,13 +41,13 @@ File sync | $0.00
 Telegram | $0.00
 :::
 
-The $50K enterprise equivalent runs managed vector DB (Pinecone Pro: $2,400/mo), orchestration platform (LangSmith Teams: $1,500/mo), API costs at volume (OpenAI Enterprise: ~$3,000/mo), and the engineering time to wire it together (0.5 FTE: $8,000/mo). I've written separately about [what production agents cost at enterprise scale](/blog/real-cost-ai-agents-production-2026/) if you want that side of the ledger.
+The $50K enterprise equivalent runs managed vector DB (Pinecone Pro: $2,400/mo), orchestration platform (LangSmith Teams: $1,500/mo), API costs at volume (OpenAI Enterprise: ~$3,000/mo), and the engineering time to wire it together (0.5 FTE: $8,000/mo).
 
-The difference isn't provider choice. It's architecture decisions that eliminate managed-service dependencies.
+The difference isn't just provider choice. It's architecture decisions that eliminate managed-service dependencies.
 
 ## The Agent Topology
 
-Five agents run in [the dispatch/worker topology](/blog/agents-that-talk-to-each-other/) I've written about before. This isn't decorative. It's the simplest structure that solves the actual production problems.
+Five agents run in a dispatch/worker topology. This isn't decorative. It's the simplest structure that solves the actual production problems.
 
 :::flow Agent Topology
 Human -> Hermes (CoS) -> Dispatch (COO) -> Builder
@@ -58,15 +55,15 @@ Dispatch (COO) -> Researcher
 Dispatch (COO) -> Verifier
 :::
 
-**Hermes (Chief of Staff)**: My primary session agent. Receives all human requests, decides whether to execute directly or delegate. Runs on Kimi K2.5 via Fireworks. [Hermes runs 24/7 on a $5 VPS](/blog/ai-agent-never-sleeps-hermes-vps/), so it's always reachable. Context window management is the constraint: it sees the full project state and delegates to specialists when the task requires specific tools or extended processing.
+**Hermes (Chief of Staff)** ,  My primary session agent. Receives all human requests, decides whether to execute directly or delegate. Runs on Kimi K2.5 via Fireworks. Context window management is the constraint: it sees the full project state and delegates to specialists when the task requires specific tools or extended processing.
 
-**Dispatch (COO)**: A Paperclip-managed agent that never executes tasks directly. Its only job is routing: receive task requests from Hermes, assign to appropriate workers, track state machine transitions, escalate stuck tasks. It runs on a lighter model (DeepSeek V3.2) because its cognitive load is lower, it's matching patterns, not reasoning about code.
+**Dispatch (COO)** ,  A Paperclip-managed agent that never executes tasks directly. Its only job is routing: receive task requests from Hermes, assign to appropriate workers, track state machine transitions, escalate stuck tasks. It runs on a lighter model (DeepSeek V3.2) because its cognitive load is lower, it's matching patterns, not reasoning about code.
 
-**Builder**: Claude Code agent on a VPS. Handles all code changes: feature implementation, bug fixes, refactoring. Runs on Anthropic Claude via standard API. The VPS isolates it from my local machine state, which means it can run overnight without my laptop being open.
+**Builder** ,  Claude Code agent on a VPS. Handles all code changes: feature implementation, bug fixes, refactoring. Runs on Anthropic Claude via standard API. The VPS isolates it from my local machine state, which means it can run overnight without my laptop being open.
 
-**Researcher**: Deep research agent. Consumes RSS feeds, YouTube transcripts, arXiv papers, synthesizes findings into structured reports. Runs Kimi K2.5 with extended context. Its output feeds directly into the knowledge base.
+**Researcher** ,  Deep research agent. Consumes RSS feeds, YouTube transcripts, arXiv papers, synthesizes findings into structured reports. Runs Kimi K2.5 with extended context. Its output feeds directly into the knowledge base.
 
-**Verifier**: Quality control agent. Reviews Builder's output, runs tests, checks for security issues, validates against acceptance criteria. Acts as a gate before deployment.
+**Verifier** ,  Quality control agent. Reviews Builder's output, runs tests, checks for security issues, validates against acceptance criteria. Acts as a gate before deployment.
 
 The topology solves three specific failure modes I've hit with single-agent approaches:
 
@@ -94,7 +91,7 @@ Kimi K2.5 | $2.00
 DeepSeek V3.2 | $1.10
 :::
 
-Kimi K2.5 handles 70% of tasks because it's the cheapest generalist that doesn't hallucinate tools. DeepSeek takes the high-volume, low-cognitive-load work (formatting, simple transformations, status checks). Claude Opus is reserved for security-sensitive reviews; it's expensive but catches issues the cheaper models miss. Codex handles bulk code generation where context length matters more than nuance.
+Kimi K2.5 handles 70% of tasks because it's the cheapest generalist that doesn't hallucinate tools. DeepSeek takes the high-volume, low-cognitive-load work (formatting, simple transformations, status checks). Claude Opus is reserved for security-sensitive reviews, it's expensive but catches issues the cheaper models miss. Codex handles bulk code generation where context length matters more than nuance.
 
 The routing decision happens at the dispatch layer. Tasks include a complexity tag (low/medium/high) and a security flag. Low complexity + no security flag → DeepSeek. High complexity or security flag → Kimi or Opus depending on domain.
 
@@ -118,7 +115,7 @@ The loop works like this:
 
 4. **Inject**: The verified synthesis becomes retrievable context for all agents.
 
-The loop means agents have more than tools: they have memory of what the system has learned. When Builder encounters an error, it can query: "how did we solve similar errors before?" The answer comes from actual previous sessions, not generic training data.
+The loop means agents don't just have tools, they have memory of what the system has learned. When Builder encounters an error, it can query: "how did we solve similar errors before?" The answer comes from actual previous sessions, not generic training data.
 
 The KB infrastructure costs $2.80/week (self-hosted ChromaDB on a €6.50 Hetzner instance). The managed equivalent (Pinecone, Weaviate Cloud) runs $200-400/month.
 
@@ -142,7 +139,7 @@ The latency is higher (60s sync cycle) but the reliability is perfect. For tasks
 
 ## The Failure Modes
 
-Cheap infrastructure has specific failure modes. I've hit them, including [agents that die silently](/blog/self-healing-ai-infrastructure/) and stay dead until something notices.
+Cheap infrastructure has specific failure modes. I've hit them.
 
 **Session poisoning**: An agent corrupted its own skill definitions through repeated partial updates. The corruption spread to other agents that read the shared skill file. Detection took 6 hours. Recovery required restoring from backup and adding versioned skill files.
 
@@ -154,7 +151,7 @@ The fix: health checks on model endpoints, automatic failover, circuit breaker p
 
 **Resource exhaustion**: ChromaDB hit its memory limit during a large embedding batch. The indexer kept retrying, filling logs, failing silently. The KB synthesizer agent detected the backlog growth and alerted before the disk filled.
 
-The fix: resource-aware batch sizing, explicit memory limits, and monitoring on queue depth, not only error rates.
+The fix: resource-aware batch sizing, explicit memory limits, monitoring on queue depth also not only error rates.
 
 ## What This Architecture Can't Do
 

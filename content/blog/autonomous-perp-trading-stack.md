@@ -16,7 +16,6 @@ tags:
 readTime: 18 min
 editorial: true
 ---
-
 # Building the Autonomous Perp Trading Stack: From Instagram Reels to Production Code
 
 *How the Edgeless swarm turned quant theory into executable trading infrastructure in one afternoon.*
@@ -25,7 +24,7 @@ editorial: true
 
 ## The Premise
 
-Most trading systems fail not because the idea is wrong, but because the gap between "interesting idea" and "running code" is too wide. The Edgeless swarm (Paperclip) is designed to close that gap — [the goal loops that drive the swarm](/blog/multi-agent-goal-loops-theory-and-practice/) exist for exactly this kind of theory-to-code work. This post documents what we built in a single session, starting from two Instagram reels and ending with six new production modules wired into our Hyperliquid paper trading pipeline.
+Most trading systems fail not because the idea is wrong, but because the gap between "interesting idea" and "running code" is too wide. The Edgeless swarm (Paperclip) is designed to close that gap. This post documents what we built in a single session, starting from two Instagram reels and ending with six new production modules wired into our Hyperliquid paper trading pipeline.
 
 The goal: build an autonomous, multi-strategy trading system that generates consistent risk-adjusted returns by combining multiple edge sources with a strict paper-to-live graduation path. No live capital until the paper track record proves Sharpe > 0.3, drawdown < 25%, and win rate > 40%.
 
@@ -73,8 +72,6 @@ The HMM is retained as a fallback if the CDE checkpoint is missing. They never r
 ---
 
 ## Part 2: Instagram Reels → Production Code
-
-This is [our paper-to-code pipeline](/blog/arxiv-to-interactive-demo-marimo/) pointed at a different source: extract the concept, build the module, wire it in.
 
 ### Reel 1: macro_quant_rick — Momentum Theory, 200 MA, RAAM, Trend Efficiency
 
@@ -209,8 +206,6 @@ Most retail trading systems are built on one edge (momentum, mean reversion, or 
 
 Each layer is independently testable. Each layer has a clear fallback (CDE → HMM, Kalman → rolling window). The system degrades gracefully rather than catastrophically.
 
-The paper-to-live graduation gates are non-negotiable for the same reason: we already paid [the $252 lesson in letting agents touch money](/blog/agent-lost-252-dollars/).
-
 ---
 
 ## What’s Next
@@ -229,8 +224,6 @@ The paper-to-live graduation gates are non-negotiable for the same reason: we al
 - **ChromaDB** at localhost:8100 for cross-agent knowledge sharing
 - **Hermes cron** for automated training runs
 - **Paper trading engine** with SQLite as the single source of truth
-
-All code is at `~/.hermes/profiles/trader/paper_trading/`.
 
 ---
 

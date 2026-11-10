@@ -15,9 +15,6 @@ editorial: true
 ctaHook: The exact templates, pricing model, and launch checklist from this 7-day
   sprint.
 ---
-
-# I Shipped 7 Digital Products in 7 Days. The Exact Process.
-
 One week ago, Edgeless Lab had 11 products on Gumroad. Today it has 18. Each product has a companion blog post. Each was built from existing infrastructure, not invented from scratch. This is the process.
 
 ## The Pipeline
@@ -49,7 +46,7 @@ Evening: update the website, deploy, push to Gumroad. The website is a Next.js s
 
 ## What Worked
 
-**Building from existing infrastructure.** Every product builds on something that already runs in production. The agent safety guide exists because [an agent actually lost $252](/blog/agent-lost-252-dollars/). The MCP server kit exists because [we actually run 4+ MCP servers](/blog/mcp-servers-unix-pipes-of-ai/). The generative art kit exists because [we've actually run 105+ experiments](/blog/generative-art-pen-plotters/). Production experience is the moat. Nobody can replicate it from docs alone.
+**Building from existing infrastructure.** Every product leverages something that already runs in production. The agent safety guide exists because [an agent actually lost $252](/blog/agent-lost-252-dollars/). The MCP server kit exists because [we actually run 4+ MCP servers](/blog/mcp-servers-unix-pipes-of-ai/). The generative art kit exists because [we've actually run 105+ experiments](/blog/generative-art-pen-plotters/). Production experience is the moat. Nobody can replicate it from docs alone.
 
 **One product per day, no exceptions.** Scope expands to fill time. A week per product would produce a marginally better product. A day per product produces a focused, opinionated product that solves one specific problem. The constraint is the feature.
 

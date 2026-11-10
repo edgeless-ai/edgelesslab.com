@@ -16,16 +16,13 @@ editorial: true
 ctaHook: The dispatch pattern, skill architecture, and reference implementations for
   building your own self-maintaining agent system.
 ---
-
-# Hermes Curator: The Agent That Cleans Up After Your Agents
-
 Nous Research just shipped Hermes Agent v0.12.0, and the headline feature solves a problem every multi-agent operator hits eventually: skill rot.
 
 ## The Problem
 
 Hermes agents learn by creating skills. Every time an agent figures out how to do something new, it writes a skill file. Over weeks of operation, the skill library grows. And grows. And never shrinks.
 
-We run [Hermes 24/7 on a VPS](/blog/ai-agent-never-sleeps-hermes-vps/) as part of our agent swarm at Edgeless. Before this release, our primary Hermes instance had accumulated 91 skills. Some were redundant. Some referenced patterns we'd deprecated months ago. Some existed because two agents independently learned the same thing and wrote separate skills for it. The skill metadata alone was consuming thousands of tokens per conversation, eating into useful context window for actual work.
+We run Hermes as part of our agent swarm at Edgeless. Before this release, our primary Hermes instance had accumulated 91 skills. Some were redundant. Some referenced patterns we'd deprecated months ago. Some existed because two agents independently learned the same thing and wrote separate skills for it. The skill metadata alone was consuming thousands of tokens per conversation, eating into useful context window for actual work.
 
 There was no cleanup mechanism. Skills were write-only.
 
@@ -84,7 +81,7 @@ The Curator was the headline, but v0.12.0 also included:
 
 ## Our Take
 
-We've been running Hermes since v0.6.0. The skill accumulation problem was real — we'd periodically do [manual audits of the skill directory](/blog/kb-audit-circulation/), which is exactly the kind of toil agents should handle. Curator formalizes what we were doing by hand.
+We've been running Hermes since v0.6.0. The skill accumulation problem was real — we'd periodically do [manual audits of the skill directory](/blog/kb-audit-circulation/), which is exactly the kind of toil that agents should handle. Curator formalizes what we were doing by hand.
 
 We'll be enabling it on our production Hermes instance and reporting back on the first few cycles. The 30/90 day staleness windows feel right for our usage patterns, but we'll tune if needed.
 

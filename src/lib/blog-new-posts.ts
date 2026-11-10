@@ -428,7 +428,7 @@ The "new Kimmy moment" isn't just a benchmark story. It's a cost story, a toolin
     readTime: "9 min",
     content: `# The Night Our Swarm Tried to Bankrupt Itself
 
-We run an AI agent swarm — a couple dozen specialized agents that read, research, write, and ship, coordinated on a shared task board. Most nights it hums. One night it didn't, and the failure was educational enough to write down.
+We run an AI agent swarm — a couple dozen specialized agents that read, research, write, and ship, [coordinated on a shared task board](/blog/agents-that-talk-to-each-other/). Most nights it hums. One night it didn't, and the failure was educational enough to write down.
 
 The short version: over a few hours, our own system burned $50 on a model it should never have touched, triggered a dispatch storm that corrupted its task database, and — the best part — kept re-creating every task we deleted, as if the to-do list were fighting to stay full. None of it was exotic. Every failure came from the same small family of mistakes, and that is the useful part.
 
@@ -476,7 +476,7 @@ The fix was not finding the trigger. It was accepting that in an autonomous syst
 Pull back and the whole night has four root themes, not forty bugs:
 
 1. **Names carry unenforced meaning.** A \`:free\` suffix, a colliding provider name, a string where a list belonged — a one-character mistake becomes a bill or a breakage. *Fix: one validated door for config changes, so the bad shapes cannot be typed in.*
-2. **Systems fail open and silent.** The paid fallback, the malformed database, the re-flood — none of them announced themselves. *Fix: a cost watchdog that scans every agent's config and alerts on any paid regression before it bills.*
+2. **Systems fail open and silent.** The paid fallback, the malformed database, the re-flood — none of them announced themselves. *Fix: [a cost watchdog](/blog/self-healing-ai-infrastructure/) that scans every agent's config and alerts on any paid regression before it bills.*
 3. **Unbounded concurrency is a load bomb.** *Fix: a hard, board-wide ceiling on running work.*
 4. **Autonomous systems re-run whatever you leave runnable.** *Fix: when a migration is done, disable the tool — do not just stop calling it.*
 
@@ -730,9 +730,9 @@ If you're investing in AI infrastructure in 2026, invest in:
 
 - Orchestration layers that outlive tooling
 - Skill systems that compose without coupling
-- Verification gates that catch errors before they ship
+- [Verification gates that catch errors before they ship](/blog/claude-code-hooks-harness-engineering/)
 - Token budgets that map to value, not activity
-- Institutional memory that survives sessions
+- [Institutional memory that survives sessions](/blog/how-claude-code-memory-works/)
 
 The engineers who build these systems now will be the ones who define the standard by 2027. Everyone else will be renting harnesses that charge a tax on every token.
 
@@ -801,7 +801,7 @@ The second path is harder to build but more durable. It requires both human memo
 
 The same logic applies to people. Hiring managers are literally trading prompts to find top candidates. The candidate with a polished LinkedIn profile and no provable skills gets flattened. The candidate with a live demo, a published pipeline, and a measurable result gets surfaced.
 
-This is why we publish our agent infrastructure. The cron jobs, the triage pipelines, the knowledge base architecture — they're not just tools. They're a **truth layer** that proves what we can build.
+This is why we publish our [agent infrastructure](/blog/building-ai-agent-infrastructure-solo/). The cron jobs, the triage pipelines, the [knowledge base architecture](/blog/kb-audit-circulation/) — they're not just tools. They're a **truth layer** that proves what we can build.
 
 ---
 
@@ -963,7 +963,7 @@ OpenAI's data platform team turned its manual release pipeline over to an agent 
 
 - Runs promotions autonomously (staging → canaries → prod)
 - Pings status in Slack
-- Self-triages failures
+- [Self-triages failures](/blog/self-healing-ai-infrastructure/)
 - Traverses 4–5 internal systems to find and patch bugs at midnight
 
 **"Probably better than humans can."**
@@ -1410,8 +1410,6 @@ Each layer is independently testable. Each layer has a clear fallback (CDE \u219
 - **Hermes cron** for automated training runs
 - **Paper trading engine** with SQLite as the single source of truth
 
-All code is at \`~/.hermes/profiles/trader/paper_trading/\`.
-
 ---
 
 *Built by the Edgeless swarm. Errors, omissions, and bad trades are the swarm\u2019s fault, not yours.*
@@ -1558,7 +1556,7 @@ This is a useful pattern for any scroll-driven animation: measure velocity, not 
     content: `
 # Percussive Archaeology
 
-This is the sibling to Scroll-Chromatic Excavation. Where that demo uses scroll velocity as the excavation force, this one uses rhythm.
+This is the sibling to [Scroll-Chromatic Excavation](/blog/scroll-chromatic-excavation/). Where that demo uses scroll velocity as the excavation force, this one uses rhythm.
 
 The live artifact: [Open Percussive Archaeology](/creative-demos/percussive-archaeology/)
 
@@ -1723,7 +1721,7 @@ This pattern applies to any audio-driven geometry: detect events, apply localize
     content: `
 # Tartan Weave Synth
 
-Tartanism is a systematic exploration of generative plaid. The field notes document loom structures, 48 textile colors, traditional reference setts, and a formal grammar for Scottish tartan. This synth exposes the actual system instead of reducing it to a stripe randomizer.
+Tartanism is a systematic exploration of generative plaid. [The field notes](/blog/when-plaid-becomes-tartan/) document loom structures, 48 textile colors, traditional reference setts, and a formal grammar for Scottish tartan. This synth exposes the actual system instead of reducing it to a stripe randomizer.
 
 The live artifact: [Open Tartan Weave Synth](/creative-demos/tartan-weave-synth/)
 
@@ -1838,12 +1836,12 @@ This is the bridge between algorithmic art and music theory: take a formal struc
     productSlug: 'multi-agent-blueprint',
     ctaHook: 'The dispatch architecture, recovery protocol, and monitoring scripts that keep a swarm debuggable instead of restartable.',
     content: `
-The symptom looked simple: an automated website goal loop had been running for days with no visible progress. A naive fix is to restart the loop, flip the status flag, and hope it picks up where it left off. That usually just restarts the same stuck state.
+The symptom looked simple: an [automated website goal loop](/blog/multi-agent-goal-loops-theory-and-practice/) had been running for days with no visible progress. A naive fix is to restart the loop, flip the status flag, and hope it picks up where it left off. That usually just restarts the same stuck state.
 
 Here is how we actually unstuck it.
 
 ## 1. Read the ticket, not just the status
-The issue was marked \`in_progress\`. A related recovery ticket showed the original loop had failed and Paperclip had already auto-recovered it. That meant someone had already inspected the run and the blocker state was known. The recovery was done. The problem was not a missing restart.
+The issue was marked \`in_progress\`. A related recovery ticket showed the original loop had failed and Paperclip had already [auto-recovered it](/blog/self-healing-ai-infrastructure/). That meant someone had already inspected the run and the blocker state was known. The recovery was done. The problem was not a missing restart.
 
 ## 2. Look at the dependency graph
 The recovery ticket listed blocked-by relationships and showed those were resolved. The next question was whether any downstream reviews were still open. A productivity review was in flight, but that is not an execution blocker; it is a process checkpoint.
@@ -1943,7 +1941,7 @@ It is iterative by default. There is no failure state, only a missing cycle.
 
 ## Why this matters for shipping
 
-Self-evaluating goal loops prevent the comment section pattern: lots of discussion, missing artifacts. If you are not adding files, you are not executing.
+[Self-evaluating goal loops](/blog/multi-agent-goal-loops-theory-and-practice/) prevent the comment section pattern: lots of discussion, missing artifacts. If you are not adding files, you are not executing.
 
 The branch between planning and execution is small. The branch between a shipped plan and an academic plan is huge.
 
@@ -2521,162 +2519,6 @@ it belongs. A targeted denylist says exactly what I mean: *this channel is not y
 The bot's online now — the real kind, where online means it answers.`.trim(),
   },
   {
-    slug: "the-bottleneck-that-wasnt",
-    editorial: true,
-    title: "710 Tasks and the Bottleneck That Wasn't",
-    description: "My task board had 710 open items and I was sure the holdup was me — the human reviewer. Then I actually counted. My real decision queue was 69. Measure before you believe.",
-    date: "2026-07-16",
-    tags: [],
-    readTime: "5 min",
-    ctaHook: "Why \"the human is the bottleneck\" is the most expensive assumption in an agent system, and the five-minute query that disproves it.",
-    content: `# 710 Tasks and the Bottleneck That Wasn't
-
-My agent swarm shares a task board. Agents pick up work, do it, mark it done. Simple. Except
-one morning the board showed **710 open items**, and I had a story ready for why: the bots
-generate faster than I can review, so everything piles up behind me. The human is the
-bottleneck. Obviously.
-
-I was about to go build a fancier review queue to fix my supposed slowness when I did the
-thing I should have done first. I counted.
-
-## The five-minute query that killed my assumption
-
-"Open" is a single word hiding several different situations. So I cohorted the 710 by the
-actual reason each item was still sitting there:
-
-| Cohort | Roughly | Whose problem |
-|---|---|---|
-| Worker failed (crashed, or exited without reporting done) | ~55% | Reliability |
-| Stale cruft from an old migration, never triaged | ~25% | Nobody's — delete it |
-| Genuinely waiting on me to decide something | **69** | Mine |
-| Blocked on another task | the rest | Sequencing |
-
-Sixty-nine. My real decision queue, the set of things that actually could not move without a
-human, was **69 items out of 710**. The other ninety-plus percent had nothing to do with me.
-The biggest single slice was workers dying mid-task, and the next was landfill from a
-migration months earlier that no one had ever swept. Not a queue. Sediment.
-
-## What the failures actually were
-
-Two signatures accounted for most of the dead workers:
-
-- **"Exited cleanly without reporting done."** The agent finished its work and then just...
-  stopped, without calling the one function that marks the task complete. The system correctly
-  counted that as a failure. The work may even have happened, but nothing recorded it. One
-  protocol bug, dozens of stuck tasks.
-- **"Iteration budget exhausted."** Tasks too big for one worker to finish in its turn budget.
-  The fix here is not bigger budgets, which just burns more tokens hitting the same wall. It's
-  decomposition: break the task down so each piece fits.
-
-Neither of those is a review problem. Both were invisible because "open" looked like one
-undifferentiated pile, and the pile *felt* like it was my fault.
-
-## The lesson worth stealing
-
-The most expensive assumption in an autonomous system is the one you never check because it
-flatters your mental model. "The human is the bottleneck" felt true, so I almost spent a day
-building the wrong fix for it.
-
-Three habits that came out of it:
-
-1. **Cohort before you conclude.** A single status like "open" or "blocked" is a category, not
-   a cause. The five-minute query that splits it by *why* is worth more than the dashboard that
-   shows you the total.
-2. **The real queue is smaller than the scary number.** Mine was 69, not 710. Find the number
-   that's genuinely yours before you redesign your life around the one that isn't.
-3. **Silent worker death is the default failure mode.** Agents don't usually crash loudly. They
-   finish-and-forget, or hit a wall and sit. If you're not measuring completion as a distinct
-   thing from "didn't error," you're not measuring it at all.
-
-I still owe my board a real reliability fix: the report-on-completion bug, the decomposition
-routing, a broom for the migration sediment. But at least now I'm building the fix for the
-problem I *have*, not the one that happened to make me the hero of the story.`.trim(),
-  },
-  {
-    slug: "the-monitor-that-cried-wolf",
-    editorial: true,
-    title: "The Monitor That Cried Wolf",
-    description: "My health monitor paged me about three dead services. All three were fine. The monitor was measuring the wrong thing and calling its own blind spot an outage. Verify the measurement before you chase the symptom.",
-    date: "2026-07-12",
-    tags: [],
-    readTime: "5 min",
-    ctaHook: "The most dangerous failure in a monitoring system isn't a missed alert — it's a confident one that's wrong.",
-    content: `# The Monitor That Cried Wolf
-
-I built a health monitor for my agent swarm so I'd stop finding out about outages from the
-silence. It worked. One morning it paged me: three model providers **down**, red across the
-board. I rolled up my sleeves to go fix an infrastructure fire.
-
-There was no fire. All three providers were up and serving. The monitor was the thing that
-was broken — and it had been broken in the most expensive way a monitor can be: not silent,
-but *confidently wrong*.
-
-## How a monitor lies with a straight face
-
-The check was simple, which was the problem. It fetched each provider's model list and
-counted a non-empty response as "healthy." Reasonable, until you look at *how* it fetched.
-
-One provider blocks requests that don't send a browser-like user agent. My monitor sent a
-bare scripting user agent, got a \`403\`, and dutifully recorded "down." The provider was
-answering every real request from my agents perfectly the whole time. The only thing that
-couldn't reach it was the monitor.
-
-Another was "down" because its health endpoint was tiered behind a plan the monitor's key
-didn't have — a \`402\`, not an outage. A third was rate-limiting the *monitor's* aggressive
-polling specifically, which the monitor scored as the service failing.
-
-Three different measurement bugs, all rendered identically: a red box that said DOWN when the
-truth was "my probe couldn't see." A monitor that can't distinguish "the service is failing"
-from "I failed to measure the service" isn't observability. It's a random number generator
-with strong opinions.
-
-## The category error underneath it
-
-The bug wasn't any one of those user agents or keys. It was a missing third state.
-
-My monitor had two outcomes: **UP** and **DOWN**. Reality has three. The one it was missing is
-**UNKNOWN** — "I could not obtain a valid measurement." A \`403\` from a user-agent block, a
-\`402\` from a plan gate, a timeout on my own overloaded prober: none of those are evidence the
-service is down. They're evidence *I don't know*. Collapsing "I don't know" into "it's down"
-is what turned a measurement gap into a 6am false alarm.
-
-And the inverse is just as dangerous. A monitor that collapses UNKNOWN into UP — "no error, so
-it's fine" — is the one that stays quiet while something burns. The absence of a successful
-measurement is not a passing grade. It's a question mark, and it has to render as one.
-
-## The fix: make the probe prove itself first
-
-I didn't start by fixing the providers. I fixed the probe's honesty:
-
-1. **Three states, always.** Every check returns UP, DOWN, or UNKNOWN. UNKNOWN never counts as
-   either a pass or a failure — it counts as "go verify the probe."
-2. **Distinguish transport from service.** A \`403\`/\`402\`/timeout on the *probe's* connection is
-   an UNKNOWN, not a DOWN. Only a valid response that shows the service misbehaving is a DOWN.
-3. **Probe the way the real client does.** If my agents reach a provider with a browser user
-   agent, the monitor uses the same one. A health check that takes a different road than
-   production traffic is measuring a road nobody drives.
-
-The red boxes went away because the services were never down. What had been down, the whole
-time, was my ability to see them — and the monitor was too sure of itself to admit it.
-
-## The lesson worth stealing
-
-Before you chase the symptom a monitor reports, verify the *measurement*. A surprising number
-of "outages" are the observer tripping over its own feet.
-
-- **A monitor needs an "I don't know."** Two-state health (up/down) forces every blind spot
-  into a lie. The third state is what keeps it honest.
-- **Confident and wrong beats silent and wrong — for finding the bug, and for wasting your
-  morning.** A false DOWN costs you a scramble; a false UP costs you an outage. Design against
-  both by refusing to guess.
-- **Measure along the production path.** If the probe authenticates differently, routes
-  differently, or throttles differently than real traffic, it's testing a system you don't
-  run.
-
-My monitor still watches the swarm. It just earned the right to page me by first proving it
-can tell the difference between a dead service and a blind probe.`.trim(),
-  },
-  {
     slug: "rescuing-an-ai-product-from-a-dying-platform",
     editorial: true,
     title: "Rescuing an AI Product From a Dying Platform in Four Weeks",
@@ -2809,26 +2651,6 @@ Here is that allowlist doing its job, on invented data:
 Platform risk is not an argument against building on platforms. It's an argument for knowing, on day one, what the rebuild would take. In this case the answer turned out to be four weeks. The founder now owns his stack, ships his own prompt changes, and the next version of the product is being built on rails he can see into.
 
 That's the trade worth making: from renting to owning.`.trim(),
-  },
-  {
-    slug: "multi-model-routing",
-    editorial: true,
-    title: "Multi-Model Routing: Why I Run 4 Different AI Brains Instead of One",
-    description: "My agent system routes requests across 4 models based on task type. Full cost breakdown, routing logic, and configuration. 10x cost reduction vs. single-model approach.",
-    date: "2026-04-19",
-    tags: ["AI Agents", "Model Routing", "Cost Optimization", "Multi-Agent"],
-    readTime: "10 min",
-    content: `...content in blog.ts...`.trim(),
-  },
-  {
-    slug: "knowledge-base-loop",
-    editorial: true,
-    title: "The Knowledge Base Loop: Why Your Agents Need a Memory System",
-    description: "How I built a KB Loop based on the Karpathy pattern — ChromaDB, triage scoring, synthesizer agents, and a 0-25 health score. Results: 4.2x context restatements down to 0.3x.",
-    date: "2026-04-19",
-    tags: ["AI Agents", "Knowledge Base", "ChromaDB", "Vector Search", "Agent Memory"],
-    readTime: "8 min",
-    content: `...content in blog.ts...`.trim(),
   },
   {
     slug: "multi-agent-orchestration-week",
@@ -3133,7 +2955,7 @@ The creators are documenting the problem without naming it.
 
 ## What It Means for Our Stack
 
-The Edgeless swarm runs 24 gateway agents across specialist roles. The Kanban board dispatches work to the right agent, but there's no resource allocator between the dispatcher and the workers. The analysis from the prior synthesis (t_88160a7b) identified this as the single most impactful gap:
+The Edgeless swarm runs 24 gateway agents across specialist roles. The Kanban board dispatches work to the right agent, but there's no resource allocator between the dispatcher and the workers. The analysis from the prior synthesis identified this as the single most impactful gap:
 
 1. **Port registry** — dynamic ports (3000+N) per agent, release on completion
 2. **Worktree isolation** — \`git worktree add\` per task, cleanup on completion
@@ -3154,7 +2976,7 @@ If you watch one thing from this batch, make it ColeMedin's *Parallel Claude Cod
 
 ## What to Build Next
 
-1. **Parallel Agent Resource Allocator** — a CLI daemon that manages ports, worktrees, token budgets, and database namespaces. The dispatcher asks for a slot, the allocator assigns one, the worker runs, the allocator releases on completion. (This is now on the board as a Kilo task, t_503b6e14.)
+1. **Parallel Agent Resource Allocator** — a CLI daemon that manages ports, worktrees, token budgets, and database namespaces. The dispatcher asks for a slot, the allocator assigns one, the worker runs, the allocator releases on completion. (This is now tracked as an internal engineering task.)
 2. **Resource collision detection** — a health check that detects when two agents are sharing a port or database namespace, and raises an alert before corruption occurs.
 3. **Token budget visibility** — real-time dashboard showing per-agent token consumption, with per-agent caps and automatic free-tier fallback.
 4. **Worktree auto-cleanup** — a cron job that detects stale worktrees and releases their resources, preventing the long-tail accumulation that drives the collision problem.

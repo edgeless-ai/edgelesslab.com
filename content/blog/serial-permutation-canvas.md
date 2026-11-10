@@ -11,14 +11,13 @@ tags:
 - Algorithmic
 readTime: 3 min
 ---
-
 # Serial Permutation Canvas
 
 Total serialism is the systematic application of serial technique to all musical parameters: pitch, duration, dynamics, timbre. The technique is most commonly associated with Pierre Boulez and the post-Webern serialists. The core idea is that a series (a permutation of the 12 chromatic pitches) is not just a melody. It is a structure that can be transformed in four ways: prime, retrograde, inversion, and retrograde inversion.
 
 This demo visualizes those transformations as particle geometry.
 
-The live artifact: [Open Serial Permutation Canvas](/creative-demos/serial-permutation-canvas/). It's a sibling of the [Total Serialism generators](/total-serialism/app/) — 98 of them, with SVG export — which apply the same serial thinking at full scale.
+The live artifact: [Open Serial Permutation Canvas](/creative-demos/serial-permutation-canvas/)
 
 ## The Series
 
@@ -57,4 +56,4 @@ The consistency is what matters. If the value 0 is always at angle 0, hue 0, and
 
 The lesson is about making abstract structure visible. A 12-tone series is an abstract mathematical object. The permutation transformations are abstract operations. The demo makes them concrete by mapping them to space and color. The audience can see the inversion. They can see the retrograde. The abstract becomes sensory.
 
-This is the bridge between algorithmic art and music theory: take a formal structure, map it to visual parameters, and let the audience explore. The structure is no longer theoretical. It is visible. The same instinct — constrain hard, then permute — produced [the 98-algorithm taxonomy](/blog/ninety-six-algorithms-one-constraint/).
+This is the bridge between algorithmic art and music theory: take a formal structure, map it to visual parameters, and let the audience explore. The structure is no longer theoretical. It is visible.

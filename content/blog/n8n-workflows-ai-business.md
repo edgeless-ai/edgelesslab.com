@@ -15,9 +15,6 @@ isLaunch: true
 editorial: true
 ctaHook: Importable JSON workflows, env configs, and setup guides for all 5 automations.
 ---
-
-# 5 n8n Workflows That Run My AI Business
-
 I run an AI tool business solo. That means every recurring task either gets automated or doesn't happen. Cron jobs work for simple scripts, but anything that involves multiple services, conditional logic, and error handling becomes a maintenance burden as raw bash.
 
 n8n fills the gap. It's a self-hosted visual workflow builder. You connect nodes, wire data between them, and deploy. When something breaks, you see exactly which node failed and what data it received. No log archaeology.
@@ -45,8 +42,6 @@ The key node: a Claude API call that receives the video title and description, r
 Substack newsletters, tech blogs, and research feeds. The workflow fetches all feeds, deduplicates against a seen-URLs list stored in a database node, sends new articles to Claude in batches of 5 for analysis, and pushes a formatted digest to Telegram.
 
 The analysis prompt asks for three things: a one-line summary, the key takeaway, and whether this relates to any of my products. That last part is where it pays for itself: "This article about MCP server security gaps is directly relevant to your Production MCP Server Kit."
-
-This is the pipeline that assembles the daily digest, and getting the output to sound human was its own battle: [my AI newsletter read like a database dump](/blog/ai-newsletter-reads-like-database-dump) until I fixed the prompts.
 
 ## 3. AI-Assisted Code Review
 

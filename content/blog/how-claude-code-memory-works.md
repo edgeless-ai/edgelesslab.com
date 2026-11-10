@@ -13,9 +13,6 @@ productSlug: claude-memory-kit
 editorial: true
 ctaHook: CLAUDE.md template, 4-type memory taxonomy, and the session initializer script.
 ---
-
-# How Claude Code Memory Actually Works
-
 Every Claude Code session starts the same way: a blank slate. No memory of yesterday's architecture decisions. No recall of your coding conventions. No idea that you spent three hours debugging that OAuth flow last week.
 
 This is the single biggest friction point in AI-assisted development. Not model capability. Not context windows. Memory.
@@ -30,7 +27,7 @@ This isn't a minor annoyance. It's a compounding tax on every interaction.
 
 ## File-Based Memory Fixes This
 
-The fix is structured markdown files that Claude reads automatically at session start — the same idea behind [the one-file memory system](/blog/one-file-memory-system/), scaled up.
+The solution is surprisingly simple: structured markdown files that Claude reads automatically at session start.
 
 No databases. No vector stores. No infrastructure. Just files in your repo that Claude already knows how to read.
 
@@ -38,7 +35,7 @@ The memory system layers on top of Claude Code's built-in `CLAUDE.md` hierarchy.
 
 ## The 4 Memory Types
 
-Running this pattern in production across multiple projects, I've landed on four memory types that cover everything I've needed.
+After running this pattern in production across multiple projects, I've found four distinct memory types that cover every use case.
 
 ### 1. User Memory
 
@@ -102,7 +99,7 @@ After a month of accumulated feedback memory, Claude makes roughly 60% fewer mis
 
 Raw memory files work, but they accumulate cruft. Outdated entries. Contradictory instructions. Files that grow past useful size.
 
-The discipline: review monthly, archive aggressively, keep each file under 200 lines. Memory that's too long defeats the purpose; Claude spends context window on stale instructions instead of your actual task. At swarm scale the same neglect compounds into [a knowledge base your agents can't even see](/blog/kb-audit-circulation/).
+The discipline: review monthly, archive aggressively, keep each file under 200 lines. Memory that's too long defeats the purpose; Claude spends context window on stale instructions instead of your actual task.
 
 ## Get Started
 
@@ -112,6 +109,6 @@ I've open-sourced the base memory kit with templates for all four memory types, 
 
 The free version covers 90% of use cases. For production patterns including stack-specific libraries (React/Next.js, Python/FastAPI, Go, Rails, Rust), multi-project memory architectures, and CLAUDE.md templates:
 
-**Pro ($29):** [Claude Memory Kit Pro on Gumroad](https://edgelessai.gumroad.com/l/claude-memory-kit)
+**Update — free resources:** The Pro download is retired. [Get the Edgeless Free Kit](https://edgelessai.gumroad.com/l/edgeless-free-kit?wanted=true&price=0) for the available references and templates; the former Pro file is not included.
 
 The best time to set up memory is before your next session. Takes 15 minutes, saves hours every week.

@@ -11,12 +11,10 @@ tags:
 readTime: 10 min
 editorial: true
 ---
-
 # Multi-Model Routing: Why I Run 4 Different AI Brains Instead of One
 
 **Published:** April 2026  
 **Reading time:** 10 minutes  
-**Author:** Scribe (Edgeless Labs)
 
 ---
 
@@ -181,7 +179,7 @@ Here are actual routing choices from my system this week:
 
 ## The Configuration File
 
-Here's my complete production model routing config:
+My complete production model routing config:
 
 ```yaml
 # model-routing.yaml - Production configuration
@@ -327,9 +325,9 @@ The overhead of routing (latency, complexity) only pays off at scale. For 10+ ag
 
 ## Next: Post 3
 
-Routing saves money. But how do you prevent agents from losing context across sessions?
+Routing saves money. But how do you prevent agents from losing context across sessions? 
 
-[The Knowledge Base Loop →](./post-3-knowledge-base-loop)
+[The Knowledge Base Loop →](/blog/knowledge-base-loop/)
 
 ---
 
@@ -337,8 +335,8 @@ Routing saves money. But how do you prevent agents from losing context across se
 
 Want the complete model routing configuration? It's included in:
 
-- **Paperclip OS ($49)** — Full orchestration blueprint
-- **Hermes Deployment Guide ($19)** — Router setup, API server, cron templates
-- **Bundle ($79)** — All 3 products
+- **Paperclip OS ($49):** Full orchestration blueprint
+- **Hermes Deployment Guide ($19):** Router setup, API server, cron templates
+- **Bundle ($79):** All 3 products
 
 [gumroad.com/l/paperclip-os]

@@ -449,6 +449,17 @@ export const marimoDemos: MarimoDemo[] = [
     ],
   },
 
+  // arXiv:2610.20678v2. Published after live verification.
+  {
+    slug: "2610.20678-intervention-exponents",
+    title: "Intervention Beats Passive Volume",
+    description:
+      "Explore how a hidden compositional cycle turns weak passive contrast into an epsilon^(-2r) query burden while a bounded intervention remains epsilon^(-2).",
+    category: "Research",
+    tags: ["identifiability", "interventions", "sample complexity", "quadratic networks"],
+    published_url: "https://marimo.edgelesslab.com/2610.20678-intervention-exponents/",
+  },
+
   // Pre-verify (arXiv:2608.15127). published_url will be added after live
   // verification and interactive control testing.
   {

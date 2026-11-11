@@ -1,0 +1,14 @@
+{
+  "slug": "2609.04344-sharedsae-vote-normalization",
+  "title": "SharedSAE: Normalize the Ballot, Not the Representation",
+  "description": "Vary encoder-scale mismatch and see why normalized TopK voting preserves a shared feature selector when raw scores become one-model dominated.",
+  "category": "Research",
+  "tags": [
+    "sparse autoencoders",
+    "representation alignment",
+    "feature dictionaries",
+    "vote normalization",
+    "model fleets"
+  ],
+  "published_url": "https://marimo.edgelesslab.com/2609.04344-sharedsae-vote-normalization/"
+}

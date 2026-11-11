@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { marimoDemos, publishedMarimoDemos, type MarimoDemo } from "../marimo-demos";
+import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { loadMarimoDemos, marimoDemos, publishedMarimoDemos, MARIMO_ENTRIES_DIR, type MarimoDemo } from "../marimo-demos";
 import { validateMarimoCatalog } from "../marimo-gallery-contract";
 
 const fixture = (slug = "test-notebook"): MarimoDemo => ({
@@ -111,5 +113,36 @@ describe("published marimo gallery", () => {
     expect(entry?.title).toBe("A Runnable Edit Is Not a Promotable Harness");
     expect(entry?.tags).toContain("harness-evolution");
     expect(entry?.tags).toContain("governance");
+  });
+});
+
+describe("per-notebook registry files", () => {
+  const write = (dir: string, slug: string, extra: Partial<MarimoDemo> = {}) =>
+    writeFileSync(join(dir, `${slug}.json`), JSON.stringify({ ...fixture(slug), ...extra }));
+  const scratch = () => mkdtempSync(join(tmpdir(), "marimo-entries-"));
+
+  it("collects one file per notebook so parallel publishes never edit the same path", () => {
+    const dir = scratch();
+    write(dir, "beta");
+    write(dir, "alpha");
+    expect(loadMarimoDemos(dir).map((demo) => demo.slug)).toEqual(["alpha", "beta"]);
+    // A second lane adding its own notebook file only adds a path: nothing shared, no conflict.
+    write(dir, "aardvark");
+    expect(loadMarimoDemos(dir).map((demo) => demo.slug)).toEqual(["aardvark", "alpha", "beta"]);
+  });
+
+  it("refuses an entry whose filename disagrees with its slug, or that is not JSON", () => {
+    const dir = scratch();
+    writeFileSync(join(dir, "wrong-name.json"), JSON.stringify(fixture("real-slug")));
+    expect(() => loadMarimoDemos(dir)).toThrow(/must be named after its slug/);
+    rmSync(join(dir, "wrong-name.json"));
+    writeFileSync(join(dir, "broken.json"), "{ not json }");
+    expect(() => loadMarimoDemos(dir)).toThrow();
+  });
+
+  it("ships exactly one registry file per collected entry, named after its slug", () => {
+    const files = readdirSync(MARIMO_ENTRIES_DIR).filter((name) => name.endsWith(".json")).sort();
+    expect(files.length).toBeGreaterThan(0);
+    expect(files).toEqual(marimoDemos.map((demo) => `${demo.slug}.json`).sort());
   });
 });

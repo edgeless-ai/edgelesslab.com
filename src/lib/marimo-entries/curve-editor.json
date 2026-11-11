@@ -1,0 +1,11 @@
+{
+  "slug": "curve-editor",
+  "title": "Curve Editor Lab",
+  "description": "A reactive Bezier curve editor — drag control points and every downstream cell (arc length, curvature, tangents) recomputes instantly.",
+  "category": "Reactive",
+  "tags": [
+    "Bezier",
+    "Curves",
+    "Reactive Widgets"
+  ]
+}

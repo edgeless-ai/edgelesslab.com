@@ -1,0 +1,14 @@
+{
+  "slug": "2609.38385-goldimask-context-weighting",
+  "title": "GoldiMask: Reveal Context Without Erasing Supervision",
+  "description": "Choose which tokens become context, then watch capped water-filling redistribute supervision across the targets that survive.",
+  "category": "AI training",
+  "tags": [
+    "diffusion-language-models",
+    "fine-tuning",
+    "submodular-optimization",
+    "context-selection",
+    "target-weighting"
+  ],
+  "published_url": "https://marimo.edgelesslab.com/2609.38385-goldimask-context-weighting/"
+}

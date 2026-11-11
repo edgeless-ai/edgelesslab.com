@@ -1,16 +1,33 @@
 import { test, expect } from "@playwright/test";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import path from "node:path";
 import { marimoDemos } from "../src/lib/marimo-demos";
 import { validateMarimoCatalog } from "../src/lib/marimo-gallery-contract";
-import { changedPublications } from "../scripts/marimo-publication-diff.mjs";
+import { changedPublications, legacyPublicationEntries, publicationEntries } from "../scripts/marimo-publication-diff.mjs";
 import { verifyMarimoLive } from "./helpers/verify-marimo-live";
 
 const published = validateMarimoCatalog(marimoDemos);
-const sourcePath = "src/lib/marimo-demos.ts";
+const entriesDir = "src/lib/marimo-entries";
+const legacyPath = "src/lib/marimo-demos.ts";
 const base = execFileSync("git", ["merge-base", "HEAD", "origin/main"], { encoding: "utf8" }).trim();
-const before = execFileSync("git", ["show", `${base}:${sourcePath}`], { encoding: "utf8" });
-const slugs = changedPublications(before, readFileSync(sourcePath, "utf8"));
+
+function git(args: string[]): string {
+  return execFileSync("git", args, { encoding: "utf8" });
+}
+
+/** Read the notebook catalog at a revision: per-file registry, or the legacy array. */
+function catalogAt(rev: string) {
+  const listed = git(["ls-tree", "-r", "--name-only", "-z", rev, "--", entriesDir]).split("\0").filter(Boolean);
+  if (listed.length) {
+    return publicationEntries(new Map(listed.map((file) => [
+      path.basename(file),
+      git(["show", `${rev}:${file}`]),
+    ])));
+  }
+  return legacyPublicationEntries(git(["show", `${rev}:${legacyPath}`]));
+}
+
+const slugs = changedPublications(catalogAt(base), catalogAt("HEAD"));
 const changed = published.filter((demo) => slugs.includes(demo.slug));
 const selected = process.env.PUBLICATION_AUDIT_ALL === "1" ? published : changed;
 

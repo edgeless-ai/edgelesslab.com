@@ -1,0 +1,10 @@
+{
+  "slug": "ci-broken-gate",
+  "title": "CI gate probe (intentionally broken)",
+  "description": "Deliberately invalid publication URL; the registry must refuse to ship this entry.",
+  "category": "Research",
+  "tags": [
+    "ci-probe"
+  ],
+  "published_url": "https://marimo.edgelesslab.com/not-this-slug/"
+}

@@ -16,6 +16,15 @@ export interface CreativeDemo {
 
 export const creativeDemos: CreativeDemo[] = [
   {
+    slug: "kanban-dispatcher",
+    title: "Kanban dependency sorter",
+    description: "Drop a card, finish its parents, and watch a mechanical sorter route it into a worker tray. A local model of dependencies, not a live board.",
+    tags: ["Anatomy", "Systems", "Dependencies", "SVG", "Interactive"],
+    date: "2026-11-09",
+    hasControls: true,
+    category: "Anatomy",
+  },
+  {
     slug: "two-doors",
     title: "Two Doors: a dispatcher game",
     description: "Send forty jobs into six busy lanes and race four bots on the same jobs. Picking the shorter of two random lanes beats round-robin. When the queue board goes stale, always taking the shortest lane falls apart.",

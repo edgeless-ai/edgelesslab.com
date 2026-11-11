@@ -1,0 +1,19 @@
+{
+  "sourceRepository": "claude-projects",
+  "sourceRevision": "3df638f0abbe49dd914b5240db9571145d474b6c",
+  "sourceDirectory": "reports/anatomy-figures-2026-10/kanban-dispatcher",
+  "integrationReview": "t_08a9ad3c",
+  "prepared": "2026-11-09",
+  "publicationStatus": "draft-held-for-visual-review",
+  "files": {
+    "kanban-dispatcher.html": {
+      "sha256": "bbc35e221fd757887b085989817c2b464fa1439f9a1bc0ca398f7593ff8a1fdb"
+    },
+    "kanban-dispatcher-light.html": {
+      "sha256": "284b53442e912791e5e937ece4d3f069f469c36e07641684f889c021f67ddf89"
+    }
+  },
+  "publicationFixes": [
+    "Raise dark/light text and edge contrast; enlarge explanatory labels. Add site navigation, source/license credit and measurement caveats. Geometry and timing unchanged."
+  ]
+}

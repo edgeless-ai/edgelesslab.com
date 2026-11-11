@@ -65,10 +65,14 @@ never ran, re-reads the head, and only then runs
 `npm run publish:merge -- --pr <number> --dry-run` to assert the gate without
 merging. A lane that merges by hand with `gh pr merge` bypasses all of it.
 
-`publish:checked` already refuses dirty trees and `main`, and the repo's
-`pre-push` hook refuses direct pushes to `main` (emergency override:
-`EDGELESS_ALLOW_MAIN_PUSH=1`). Those two stop the push; `publish:merge` stops
-the merge.
+`publish:checked` refuses dirty trees and `main`, so a lane that uses the
+documented entry point cannot push to `main` even from a fresh clone. On this
+machine the shared git dir also carries a local `pre-push` hook (installed
+out-of-band by Hive; **not version-controlled**) that refuses direct pushes to
+`main` unless `EDGELESS_ALLOW_MAIN_PUSH=1`; every worktree of this checkout
+shares it, but a fresh clone does not inherit it. Those guards stop the push and
+`publish:merge` stops the merge — but only required status checks on `main` make
+either one mandatory for a lane that ignores them.
 
 ## Branch protection (not yet enabled)
 

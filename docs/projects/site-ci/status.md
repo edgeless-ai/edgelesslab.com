@@ -1,5 +1,35 @@
 # Site CI session handoff
 
+## 2026-11-10 — publish lanes can no longer land red on main (edgeless/t_9f85a4da)
+
+Registry: one JSON file per notebook, `src/lib/marimo-entries/<slug>.json`, collected
+by `loadMarimoDemos()`. The filename is the slug and collection order is sorted
+filename order, so it is deterministic and independent of merge order. Two concurrent
+publish lanes now change disjoint paths: a real `git merge-tree` of two concurrent
+registry additions exits0 with both entries present, and each branch's diff vs main
+touches exactly one file. The PR #92 failure mode (hand conflict resolution dropping
+two entries in one shared array) has nothing left to collide.
+
+Merge gate: `npm run publish:merge -- --pr <n>` (scripts/merge-publish-pr.mjs) refuses
+a closed/draft/main-headed PR, watches checks on the exact head commit, refuses
+anything not pass/skipping or missing frontend-tests/e2e-tests, re-reads the head,
+then merges that commit with `--match-head-commit`. 13 negative cases cover it.
+`publish:checked` already refuses dirty trees and main; the pre-push hook already
+refuses direct pushes to main.
+
+Branch protection (frontend-tests + e2e-tests as required checks) is NOT enabled and
+cannot be from an agent session: `.../branches/main/protection` returns404 and the
+available token reports `admin:false` on edgeless-ai/edgelesslab.com. Enable and
+rollback commands are in ../../notebook-publication.md; current settings were
+captured as "none" for rollback.
+
+Evidence: migration fidelity 61/61 entries, 0 drift, 27 published on both sides;
+`tsc --noEmit` exit0; 221 Vitest tests in20 files; 22 node --test publication cases;
+PR #103 `frontend-tests` green on the real CI job; probe PR #104 (deliberately broken
+entry) refused while its checks were red; probe PRs #105/#106 both MERGEABLE.
+
+### Previous handoff (edgeless/t_0eccf265)
+
 Implemented source fix: remove hand-maintained notebook URL/count/category
 expectations, independently validate the raw publication catalog and compare
 rendered cards/metadata/draft exclusion/categories/ordered JSON-LD. Negative

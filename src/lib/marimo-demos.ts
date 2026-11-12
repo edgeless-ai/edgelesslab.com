@@ -479,6 +479,7 @@ export const marimoDemos: MarimoDemo[] = [
     description: "Tighten an external evidence threshold and watch a synthetic batch of runnable harness edits shrink from eight promotion candidates to one.",
     category: "Research",
     tags: ["agents", "harness-evolution", "evaluation", "governance", "synthetic-demo"],
+    published_url: "https://marimo.edgelesslab.com/2609.38372-self-optimizing-harness/",
   },
 
   {
@@ -500,6 +501,17 @@ export const marimoDemos: MarimoDemo[] = [
     category: "Research",
     tags: ["agent-evaluation", "benchmarking", "denominators", "reproducibility"],
     published_url: "https://marimo.edgelesslab.com/2606.04781-pass-semantics/",
+  },
+
+  // arXiv:2610.20637. Published after live verification.
+  {
+    slug: "2610.20637-taylor-attention-state-economy",
+    title: "Taylor Attention: Where Fixed State Stops Being Small",
+    description:
+      "Vary Taylor truncation order and context length to see the approximation-error versus recurrent-state-memory tradeoff.",
+    category: "Research",
+    tags: ["efficient-attention", "linear-transformers", "memory", "scaling", "equation-demo"],
+    published_url: "https://marimo.edgelesslab.com/2610.20637-taylor-attention-state-economy/",
   }
 ];
 

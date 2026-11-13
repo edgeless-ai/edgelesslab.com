@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import Script from "next/script";
 import "./globals.css";
 import { JsonLd } from "@/components/json-ld";
 import { PostHogProvider } from "@/components/posthog-provider";
@@ -171,6 +172,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         <PostHogProvider>
+          <Script src="/ask-edgeless-loader.js" strategy="afterInteractive" />
           <ThemeProvider>
             {children}
           </ThemeProvider>

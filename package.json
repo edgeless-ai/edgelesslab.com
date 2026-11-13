@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/prepare-pen-plotter-fonts.mjs && ./scripts/preserve-standalone.sh save",
+    "prebuild": "node scripts/build-ask-edgeless.mjs && node scripts/prepare-pen-plotter-fonts.mjs && ./scripts/preserve-standalone.sh save",
     "build": "npm run test:marimo && npm run check:design-system && npm run test:font-preloads && npm run test:launch && npm run test:plotter && next build",
     "test:marimo": "npm run test:publication-push && vitest run src/lib/__tests__/marimo-gallery.test.ts src/lib/__tests__/marimo-publication.test.ts",
     "verify:publication": "npm run build && vitest run && playwright test && playwright test --config tests/consent.config.ts && playwright test --config tests/publication.config.ts",
@@ -15,6 +15,7 @@
     "test:plotter": "node --test scripts/pen-plotter-performance.test.mjs scripts/pen-plotter-accessibility.test.mjs",
     "test:plotter:export": "PLOTTER_TEST_EXPORT=1 node --test scripts/pen-plotter-performance.test.mjs scripts/pen-plotter-accessibility.test.mjs",
     "postbuild": "node scripts/run-critters.mjs && find out -name '*.js.map' -delete && find out -name '*.css.map' -delete && ./scripts/preserve-standalone.sh restore && mkdir -p out/pen-plotter/assets && rsync -a --exclude=medium --exclude=mediums-all pen-plotter/assets/ out/pen-plotter/assets/ && ([ -d pen-plotter/fxhash ] && cp -r pen-plotter/fxhash out/pen-plotter/ || true) && ([ -d pen-plotter/kandinsky-to-canvas ] && cp -r pen-plotter/kandinsky-to-canvas out/pen-plotter/ || true) && npm run repair:launch && npm run check:launch && npm run check:agent-readiness && npx pagefind --site out && npm run test:plotter:export",
+    "test:ask-edgeless": "node --test workers/ask-edgeless/*.test.mjs",
     "start": "next start",
     "lint": "npm run check:design-system && eslint && node scripts/lint-experiments.mjs && npm run lint:voice",
     "lint:blog-links": "node scripts/lint-blog-links.mjs",
@@ -33,6 +34,9 @@
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.8",
+    "@page-agent/core": "1.12.4",
+    "@page-agent/llms": "1.12.4",
+    "@page-agent/page-controller": "1.12.4",
     "@paper-design/shaders-react": "^0.0.76",
     "lucide-react": "^0.577.0",
     "motion": "^12.42.2",
@@ -41,7 +45,8 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "tldraw": "^3.15.6",
-    "tslib": "^2.4.0"
+    "tslib": "^2.4.0",
+    "zod": "4.3.6"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
@@ -50,6 +55,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "critters": "^0.0.25",
+    "esbuild": "0.27.4",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
     "pagefind": "^1.5.2",

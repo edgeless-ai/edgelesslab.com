@@ -1,0 +1,36 @@
+// Configure staged assets and origins; provision secrets via Wrangler, never here.
+{
+  "name": "ask-edgeless-preview",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-06-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "ASK_ENABLED": "disabled",
+    "PREVIEW_ORIGINS": "https://YOUR_SITE_PREVIEW.workers.dev,https://YOUR_SHOP_PREVIEW.workers.dev"
+  },
+  "assets": {
+    "directory": "REPLACE_WITH_ABSOLUTE_STAGED_SITE_DIRECTORY",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "observability": {
+    "enabled": false
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "BUDGET",
+        "class_name": "Budget"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "Budget"
+      ]
+    }
+  ]
+}

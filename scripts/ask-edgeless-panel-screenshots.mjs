@@ -18,7 +18,7 @@ try {
     if(await decline.isVisible())await decline.click();
     await page.locator('#ask-edgeless #toggle').click();
     await page.locator('#ask-edgeless #panel').waitFor({state:'visible'});
-    await page.screenshot({path:out+'/ask-edgeless-'+name+'-panel.png'});
+    await page.screenshot({path:out+'/ask-edgeless-'+name+'-panel.png',animations:'disabled'});
     assert.equal(inferenceRequests,0,'layout capture must not invoke the model');
     console.log(JSON.stringify({surface:name,url:page.url(),panelVisible:await page.locator('#ask-edgeless #panel').isVisible(),inferenceRequests,verification:'layout-only'}));
     await context.close();

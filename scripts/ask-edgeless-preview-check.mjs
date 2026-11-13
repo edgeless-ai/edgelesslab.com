@@ -22,7 +22,7 @@ async function run(name,base,path,prompt,check,screenshot){
  await page.locator('#ask-edgeless').getByRole('textbox',{name:'Ask a question'}).fill(prompt);
  await page.locator('#ask-edgeless').getByRole('button',{name:'Ask',exact:true}).click();
  try { await check(page,blog,note); } catch(e) { console.error('FAILED CASE',name,'URL',page.url(),'THREAD',await page.locator('#ask-edgeless #thread').innerText().catch(()=>''),'SOURCES',await page.locator('#ask-edgeless #sources').innerText().catch(()=>'')); await page.screenshot({path:out+'/failed-'+name.replaceAll(' ','-')+'.png'}); throw e; }
- if(screenshot){await page.locator('#ask-edgeless #toggle').waitFor();if(await page.locator('#ask-edgeless #panel').isHidden())await page.locator('#ask-edgeless #toggle').click();await page.locator('#ask-edgeless #panel').waitFor({state:'visible'});await page.screenshot({path:out+'/'+screenshot});}
+ if(screenshot){await page.locator('#ask-edgeless #toggle').waitFor();if(await page.locator('#ask-edgeless #panel').isHidden())await page.locator('#ask-edgeless #toggle').click();await page.locator('#ask-edgeless #panel').waitFor({state:'visible'});await page.screenshot({path:out+'/'+screenshot,animations:'disabled'});}
  const answer=await page.locator('#ask-edgeless #thread').innerText().catch(()=>'(navigated)');
  results.push({name,prompt,url:page.url(),proxyCalls,usage,answer});
  await context.close();

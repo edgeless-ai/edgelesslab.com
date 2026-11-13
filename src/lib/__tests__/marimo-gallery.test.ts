@@ -73,6 +73,17 @@ describe("published marimo gallery", () => {
     expect(source).toContain("url: demo.published_url");
   });
 
+  it("registers the TRILOGUE known-source ceiling after live control verification", () => {
+    const entry = marimoDemos.find(d => d.slug === "2609.04452-trilogue-pipeline-ceiling");
+    expect(entry).toBeDefined();
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2609.04452-trilogue-pipeline-ceiling/");
+    expect(entry?.title).toBe("TRILOGUE: The Known-Source Ceiling");
+    expect(entry?.category).toBe("Research");
+    expect(entry?.tags).toContain("evaluation-boundary");
+    expect(entry?.description).toContain("supplied article");
+    expect(publishedMarimoDemos).toContainEqual(entry);
+  });
+
   it("registers the 2609.04404 ASR hallucination taxonomy notebook after live verification", () => {
     const entry = marimoDemos.find(d => d.slug === "2609.04404-asr-hallucination-taxonomy");
     expect(entry).toBeDefined();

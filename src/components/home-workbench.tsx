@@ -24,7 +24,7 @@ const WORK_CARDS: WorkCard[] = [
     caseStudy: "/projects/safety-hooks",
     artifact: "/blog/the-hook-that-saved-my-codebase",
     artifactLabel: "Read the field report",
-    source: "https://github.com/edgeless-ai/edgeless-stack",
+    source: "https://github.com/edgeless-ai/edgeless-stack?utm_source=edgelesslab&utm_medium=site",
   },
   {
     title: "Plotter research loop",

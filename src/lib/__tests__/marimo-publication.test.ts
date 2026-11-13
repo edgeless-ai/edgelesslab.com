@@ -16,10 +16,14 @@ const mock = (...responses: Response[]) => vi.fn<typeof fetch>().mockImplementat
 });
 
 describe("publisher live delivery gate", () => {
-  it("checks the canonical notebook AND its same-directory entry bundle", async () => {
+  it.each([
+    "https://marimo.edgelesslab.com/fixture/",
+    "https://edgelesslab.com/marimo/fixture/",
+  ])("checks the canonical notebook %s AND its same-directory entry bundle", async (published_url) => {
+    const publication = { ...demo, published_url };
     const fetcher = mock(html(), asset());
-    await verifyMarimoLive(demo, fetcher);
-    expect(fetcher.mock.calls.map(([url]) => url)).toEqual([demo.published_url, `${demo.published_url}assets/index.js`]);
+    await verifyMarimoLive(publication, fetcher);
+    expect(fetcher.mock.calls.map(([url]) => url)).toEqual([published_url, `${published_url}assets/index.js`]);
     expect(fetcher.mock.calls.every(([, options]) => options?.redirect === "error")).toBe(true);
   });
   it("rejects 404 and soft-404/unverified pages", async () => {
@@ -32,6 +36,26 @@ describe("publisher live delivery gate", () => {
       const body = notebook.replace(/<script.*<\/script>/, entry);
       await expect(verifyMarimoLive(demo, mock(html(body)))).rejects.toThrow(/Missing notebook entry|Unexpected notebook entry/);
     }
+  });
+  it.each([
+    "https://marimo.edgelesslab.com/fixture/",
+    "https://edgelesslab.com/marimo/fixture/",
+  ])("keeps entry bundles within the exact notebook directory for %s", async (published_url) => {
+    for (const entry of [
+      "https://evil.example/marimo/fixture/assets/index.js",
+      "/fixture/assets/index.js", "/marimo/other/assets/index.js",
+      "/marimo/fixture-other/assets/index.js", "../assets/index.js",
+      "./%2e%2e/assets/index.js",
+    ]) {
+      if (entry.startsWith(new URL(published_url).pathname)) continue;
+      const fetcher = mock(html(notebook.replace("./assets/index.js", entry)));
+      await expect(verifyMarimoLive({ ...demo, published_url }, fetcher)).rejects.toThrow(/Unexpected notebook entry/);
+      expect(fetcher).toHaveBeenCalledTimes(1);
+    }
+  });
+  it("rejects HTML and bundle redirects without following them", async () => {
+    await expect(verifyMarimoLive(demo, mock(html("redirect", 302)))).rejects.toThrow(/delivery failed/);
+    await expect(verifyMarimoLive(demo, mock(html(), asset("redirect", 302)))).rejects.toThrow(/Broken notebook entry/);
   });
   it("rejects broken/missing/soft-404/empty JavaScript even when the HTML returns 200", async () => {
     for (const response of [asset("missing", 404), asset("<html>Not found</html>", 200, "text/html"), asset("")]) {

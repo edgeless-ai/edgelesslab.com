@@ -17,8 +17,9 @@ export async function verifyMarimoLive(demo: PublishedMarimoDemo, fetcher: typeo
   }
   const entry = html.match(/<script\b[^>]*\btype=["']module["'][^>]*\bsrc=["']([^"']+)["']/)?.[1];
   if (!entry) throw new Error(`Missing notebook entry bundle: ${demo.slug}`);
-  const url = new URL(entry, demo.published_url);
-  if (url.origin !== new URL(demo.published_url).origin || !url.pathname.startsWith(`/${demo.slug}/`)) {
+  const notebookUrl = new URL(demo.published_url);
+  const url = new URL(entry, notebookUrl);
+  if (url.origin !== notebookUrl.origin || !url.pathname.startsWith(notebookUrl.pathname)) {
     throw new Error(`Unexpected notebook entry URL: ${demo.slug}`);
   }
   const asset = await fetcher(url.href, { redirect: "error", signal: AbortSignal.timeout(20_000) });

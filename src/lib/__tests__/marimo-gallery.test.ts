@@ -43,9 +43,42 @@ describe("published marimo gallery", () => {
     "https://marimo.edgelesslab.com/test-notebook/?draft=true",
     "https://marimo.edgelesslab.com/test-notebook/#draft",
     "https://marimo.edgelesslab.com@evil.example/test-notebook/",
-    "https://edgelesslab.com/marimo/test-notebook/",
+    "http://edgelesslab.com/marimo/test-notebook/",
+    "https://edgelesslab.com/test-notebook/",
+    "https://edgelesslab.com/marimo/other-notebook/",
+    "https://edgelesslab.com/marimo/test-notebook",
+    "https://edgelesslab.com/marimo/test-notebook/?draft=true",
+    "https://edgelesslab.com/marimo/test-notebook/#draft",
+    "https://user:pass@edgelesslab.com/marimo/test-notebook/",
+    "https://edgelesslab.com.evil.example/marimo/test-notebook/",
+    "https://edgelesslab.com:443/marimo/test-notebook/",
+    "https://edgelesslab.com/marimo/../marimo/test-notebook/",
+    "https://edgelesslab.com/marimo/%74est-notebook/",
+    "https://edgelesslab.com/marimo/test-notebook/extra/",
   ])("rejects invalid or noncanonical publication URL %j", (published_url) => {
     expect(() => validateMarimoCatalog([{ ...fixture(), published_url }])).toThrow(/Invalid publication URL/);
+  });
+
+  it.each([
+    "https://marimo.edgelesslab.com/test-notebook/",
+    "https://edgelesslab.com/marimo/test-notebook/",
+  ])("accepts the exact canonical publication URL %j", (published_url) => {
+    const demo = { ...fixture(), published_url };
+    expect(validateMarimoCatalog([demo])).toEqual([demo]);
+  });
+
+  it("registers SpecOpt on the live primary-domain bundle without private metadata", () => {
+    const entry = marimoDemos.find(d => d.slug === "2609.21165-specopt-admission-noise");
+    expect(entry?.published_url).toBe("https://edgelesslab.com/marimo/2609.21165-specopt-admission-noise/");
+    expect(entry?.title).toBe("SpecOpt: Noise at the Admission Gate");
+    expect(entry?.category).toBe("Research");
+    expect(entry?.tags).toContain("selection-bias");
+    expect(entry?.description).toContain("synthetic");
+    expect(entry?.description).toContain("clinical claim");
+    expect(Object.keys(entry ?? {}).sort()).toEqual([
+      "title", "slug", "description", "category", "tags", "published_url",
+    ].sort());
+    expect(publishedMarimoDemos).toContainEqual(entry);
   });
 
   it("rejects duplicate slugs and duplicate URLs rather than counting them twice", () => {

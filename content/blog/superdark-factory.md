@@ -1,0 +1,145 @@
+---
+title: "The Superdark Factory: Keep the Stop Switch"
+slug: superdark-factory
+description: "What an autonomous factory can teach a running agent swarm—and why we kept independent review, bounded lanes, and the right to stop."
+date: "2026-11-07"
+tags: ["Agent Systems", "Autonomy", "Governance", "Field Notes"]
+readTime: "10 min"
+editorial: true
+image: /images/blog/superdark-factory/hero.webp
+processNote: "Agent-written source synthesis with AI-generated conceptual art and original explanatory diagrams. Edgeless adoption statements describe a design record, not a completed autonomy rollout."
+---
+
+The dangerous moment in an agent workflow is not always when the machine makes a mistake. It is when the machine says “done,” the dashboard turns green, and everyone moves on without opening the thing it made.
+
+A readable log is not the same as useful oversight. An approval button is not proof that anyone checked. Run enough agents, fast enough, and a perfectly visible system can become practically impossible to follow.
+
+That is the most useful provocation in [The Superdark Factory](https://superdark.antikythera.org/), by Marek Poliks, Roberto Alonso Trillo, Ty Dunn, Hugh Scott-Douglas, and Jay Springett. Published through Antikythera, the essay asks what happens when automation stops merely executing our plans and starts participating in making its own.
+
+We read it from an awkwardly relevant position: Edgeless runs an agent swarm. We use a task board, specialist workers, reusable skills, and separate review roles. We do not run the self-governing organization the paper imagines. But we recognize the gap between what a system says about itself and what it actually delivers.
+
+Our takeaway was not “remove the humans.” It was: make the outputs checkable, keep autonomy narrow, and keep the stop switch.
+
+## Dark does not mean secret
+
+A conventional lights-out factory can keep making the same parts after the workers leave. The instructions remain ours. Darkness describes the absence of people on the floor, not necessarily a change in who decides what the factory is for.
+
+The essay pushes beyond that familiar picture. In [Chapter I](https://superdark.antikythera.org/chapter-i-darkness), a superdark factory participates in producing its own objectives. The target is no longer simply handed down from outside. The system changes, learns, and becomes part of the process that decides what should happen next.
+
+The authors also give darkness a more unsettling meaning. Information can be available without being useful in time. Their formulation is sharp:
+
+> “any description of this factory stops being useful before anyone can act on it.”
+
+That sentence is from [Chapter I](https://superdark.antikythera.org/chapter-i-darkness). It does not mean every autonomous system is unknowable, or that logs are pointless. It means visibility alone cannot carry the whole burden of control. A thousand understandable updates can still exceed your capacity to make a timely decision.
+
+Think of a delivery service that can explain every route adjustment, but changes the plan again before a dispatcher finishes reading. The explanation exists. The intervention window has gone.
+
+The authors make a broader philosophical argument, including darkness for the system's own internal participants. Our engineering translation is narrower: when narration outruns attention, examine effects and constrain actions. Do not mistake access to the transcript for command of the operation.
+
+![Light, dark, and superdark compared: prescribed work, optimization of an assigned goal, and participation in forming goals. The diagram is a conceptual comparison, not a maturity score.](/images/blog/superdark-factory/autonomy-ladder.svg)
+
+## The dark stack, without the fog
+
+[Chapter II](https://superdark.antikythera.org/chapter-ii-the-dark-stack) proposes four principles: primitives, behavioral versioning, evaluations, and a charter. Under them sits a constitutional kernel: foundational commitments that delimit what the factory can become.
+
+We made the stack into a machine bench. The illustration is a metaphor, not an implementation blueprint. Four modules do different jobs; a fixed foundation constrains the whole machine; adjustable controls represent rules that can change. Select a component to inspect the distinction.
+
+:::interactive-superdark
+
+The static companion below names the same parts. The paper's hard and soft “casts” concern commitments and their enforceability, not literal bolts and knobs. Its kernel is intended to be immutable; our own safety policy preserves operator intervention. That difference matters.
+
+![The dark stack: learning primitives, behavioral versions, consequence-sensitive evaluations, and a negotiated charter, above a constitutional kernel. Hard commitments constrain; soft commitments can change.](/images/blog/superdark-factory/dark-stack.svg)
+
+### 1. Build useful parts, not magical personalities
+
+The paper's [primitive](https://superdark.antikythera.org/chapter-ii-the-dark-stack#i-the-primitive) is a composable unit that takes input, acts, remembers, and receives feedback. The important design question is what it promises at its boundary. Other parts should not need its entire internal story to use its output.
+
+For an agent workflow, that suggests a mundane improvement: write a real task contract. What comes in? What must come out? Which effects are permitted? What would count as failure? Who independently checks it?
+
+“Research this topic” is a wish. “Produce a source-linked comparison, distinguish observations from forecasts, and do not publish it” is closer to a usable interface. The worker still needs context. A thin contract is not an excuse to starve it of instructions.
+
+The paper goes further into learning theory. It proposes recording the decision-time selection probabilities and linking later rewards to the decisions that earned them. We have not demonstrated that machinery in our swarm. A model's confidence score is not a substitute for the probability that a routing policy actually used.
+
+### 2. Version behavior, not just files
+
+A commit tells you which code you checked out. It does not tell you whether an agent is as reliable as it was yesterday.
+
+A provider can change behind a stable model label. A skill can improve one task class while harming another. A system can settle into a very consistent habit of being wrong.
+
+The paper's [behavioral versioning](https://superdark.antikythera.org/chapter-ii-the-dark-stack#ii-versioning) treats persistent input–output behavior as the thing to identify. Its proposed mathematics is more ambitious than our current practice. The practical lesson is simple enough: keep provenance, then measure outcomes too.
+
+For us, a useful comparison would separate coding from knowledge work, record the test-suite revision, show the sample size, and track independently verified first-pass results and rework. Without that context, a rising average can mean easier tasks rather than better agents. We are describing a measurement plan, not announcing an improvement.
+
+### 3. Give the factory senses that can disagree
+
+The [evaluation section](https://superdark.antikythera.org/chapter-ii-the-dark-stack#iii-evaluations) treats evaluators as an ongoing way to perceive consequences, rather than a test you pass once before launch. It also proposes adversarial populations: participants trying to find what the ordinary judges miss.
+
+That is useful. A producer grading its own success has an obvious conflict. Two judges sharing the same assumptions can share the same blind spot. A convincing pass message can outlive the artifact it supposedly describes.
+
+Our adaptation is to test evidence as well as answers. Does the file exist? Does the claimed commit exist? Can another worker rerun the check? Does an approval still refer to this exact artifact, or to something that changed afterward?
+
+We also draw a hard line. The paper argues for real, rather than merely staged, catastrophic evaluation events. We reject that operational prescription. Deliberately causing a real catastrophe to improve a judge is not our testing strategy. Replays, isolated seeded faults, sealed tests, and separately authorized reversible canaries provide safer ways to challenge a system. Production is not a sacrificial training set.
+
+### 4. Write the rules before the machine negotiates
+
+The [charter](https://superdark.antikythera.org/chapter-ii-the-dark-stack#iv-the-charter-and-the-loop) is a governing relationship, not a decorative mission statement. The authors imagine it developing through negotiation with the factory. Their constitutional kernel holds a privileged set of foundational commitments outside ordinary revision.
+
+There is a valuable question here: which constraints must survive the system's attempts to improve itself?
+
+Our answer includes boundaries around money, credentials, external publication, and irreversible deletion. A task becoming more autonomous does not itself grant new authority in any of those areas. Explicit, scoped standing authorization can matter; so can expiration, revocation, and changes to the proposed effect.
+
+But we do not adopt an operational kernel that nobody can correct. If a foundational rule is wrong, an owner must retain a way to intervene. We borrow the distinction between firmer constraints and revisable preferences without claiming our design is identical to the paper's.
+
+## What we took into Edgeless
+
+Our internal adoption record translated the essay into seven pattern decisions. The record establishes design practice and queues implementation work. It explicitly says that its author changed no production routing, permissions, runtime configuration, or scheduling. This is not a launch report for a superdark swarm.
+
+What already exists is less glamorous and more useful: a task board for delegation, role boundaries, reusable procedures, and independent risk gates. What the new record adds is a disciplined way to ask whether a particular lane deserves more autonomy.
+
+A lane is a bounded class of work, not an agent's personality. Checking local knowledge-note quality is one possible lane. Publishing those notes is another authority. Giving a worker freedom inside the first does not silently grant the second.
+
+The proposed starting point is a reversible local quality-check lane. It would produce findings and candidate edits, not publish or change other workers' configuration. The plan calls for baseline evidence, offline decision logs, separate acceptance tests, and pilot staging before any activation decision. Those are prerequisites, not results we can already claim.
+
+The strongest constraint may be review capacity. If independent checking cannot keep up, autonomous production should slow down. A queue full of unchecked work is not productivity waiting to be celebrated. It is uncertainty waiting to be resolved.
+
+![Edgeless's bounded loop: a task contract goes to an eligible worker, then an exact artifact, independent review, and an outcome record. Missing evidence pauses the lane; more autonomy never bypasses authorization.](/images/blog/superdark-factory/bounded-loop.svg)
+
+The accompanying decision-log proposal also keeps an important distinction intact: what actually happened is not the same as what a hypothetical alternative might have done. You cannot assign the real worker's outcome to an unexecuted shadow choice and call that a learning result.
+
+There is no honest shortcut from “we logged some scores” to “our router learned to make better choices.” That claim would need actual decision-time probabilities where applicable, supported outcomes, comparable tasks, and an evaluation design that survives scrutiny. We are not making it here.
+
+## What we refused
+
+We refused blanket autonomy by profile. A capable worker is not authorized to perform every action it can technically reach.
+
+We refused to turn an impressive scorecard into independent evidence. Reports still need locators, retained artifacts, and checks by someone other than the producer.
+
+We refused manufactured real catastrophes as a learning technique. Adversarial testing is not permission to create uncontrolled harm.
+
+We refused the idea that rare intervention proves review is unnecessary. Perhaps the system is excellent. Perhaps the reviewer has become a rubber stamp. You need a test that can distinguish those explanations.
+
+And we refused to turn a speculative dashboard into telemetry. The companion [superdark.ai](https://superdark.ai/) spans a timeline extending into future years. A chart containing the future is not a record of things that have already happened. We have not reproduced its projections as measurements, nor published an unverified historical percentage from our own internal discussions.
+
+These refusals are not a dismissal of the essay. They are what taking it seriously looked like in a working environment. A useful provocation should survive selective adoption.
+
+![A dense stream of machine traces behind glass contrasts with one physical output on an inspection bench: descriptions are abundant, checked consequences are scarce.](/images/blog/superdark-factory/consequences.webp)
+
+## A better question than “how dark can we go?”
+
+[Chapter III](https://superdark.antikythera.org/chapter-iii-the-anything-factory) expands the argument beyond software toward an “anything factory.” It is a speculative horizon, not a report that someone has safely built an autonomous economy. The stakes grow because the consequences need not stay on a screen.
+
+For a small team operating agents today, the useful question is not whether the factory deserves a more dramatic label. It is whether the next increment of autonomy has an observable benefit, a bounded downside, and a credible way back.
+
+Before widening a lane, we would want to answer: what exact action becomes unattended? Which evidence would reveal a failure? Who can challenge the evaluator? What happens when review falls behind? Can the owner stop the system without asking the system to agree?
+
+If those answers are vague, adding agents only makes the vagueness faster.
+
+The Superdark Factory helped us see governance as part of the machinery rather than commentary attached afterward. Our response is deliberately smaller than its vision: explicit contracts, consequence-sensitive checks, reversible experiments, and authority that does not expand just because output does.
+
+Let the machines work. Open what they made. Keep the stop switch.
+
+## Sources and illustration notes
+
+[The Superdark Factory](https://superdark.antikythera.org/), by Marek Poliks, Roberto Alonso Trillo, Ty Dunn, Hugh Scott-Douglas, and Jay Springett: [Chapter I: Darkness](https://superdark.antikythera.org/chapter-i-darkness), [Chapter II: The Dark Stack](https://superdark.antikythera.org/chapter-ii-the-dark-stack), and [Chapter III: The Anything Factory](https://superdark.antikythera.org/chapter-iii-the-anything-factory). The companion dashboard is [superdark.ai](https://superdark.ai/).
+
+Edgeless statements come from our November 7, 2026 adoption decision record, which separates retained controls, proposed implementation, and explicit refusals. No performance uplift or completed pilot is claimed. The light–dark–superdark diagram is an explanatory comparison, not a literal mapping onto the paper's classes or a maturity certification. The interactive anatomy figure and blueprint diagrams are original Edgeless illustrations inspired by the source; the bench is a mechanical metaphor. Hero and conceptual artwork were AI-generated and are not photographs of a deployed factory.

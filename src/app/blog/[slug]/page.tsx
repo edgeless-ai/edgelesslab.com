@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { posts } from "@/lib/blog";
+import { renderBlogFigureBlock } from "@/lib/blog-figures";
 import { products } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -343,6 +344,13 @@ function renderMarkdown(content: string): string {
 
   while (i < lines.length) {
     const line = lines[i];
+
+    const figure = renderBlogFigureBlock(line);
+    if (figure) {
+      blocks.push(figure);
+      i++;
+      continue;
+    }
 
     // Data viz blocks: :::bar-chart, :::flow, :::metric
     const vizMatch = line.trimStart().match(/^:::(bar-chart|flow|metric)\s*(.*)?$/);

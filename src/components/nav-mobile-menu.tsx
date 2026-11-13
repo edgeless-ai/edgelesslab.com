@@ -52,7 +52,7 @@ export function MobileMenu({ links }: { links: { label: string; href: string }[]
               </Link>
             ))}
             <a
-              href="https://github.com/edgeless-ai"
+              href="https://github.com/edgeless-ai?utm_source=edgelesslab&utm_medium=site"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 rounded-2xl px-4 py-3 text-sm transition-colors hover:text-white"

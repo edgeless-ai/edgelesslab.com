@@ -268,7 +268,7 @@ describe("UTM parameter capture", () => {
     });
   });
 
-  test("does not attach UTM params to cookieless pageviews", async () => {
+  test("cached UTM params never authorize a pageview without consent", async () => {
     vi.stubGlobal("window", {
       localStorage: storage(), sessionStorage: storage(),
       location: { href: "https://edgelesslab.com/?utm_source=google", origin: "https://edgelesslab.com", pathname: "/", hostname: "edgelesslab.com", reload: vi.fn() },
@@ -276,10 +276,10 @@ describe("UTM parameter capture", () => {
     });
     const consent = await import("../analytics-consent");
     consent.captureUtmParams();
-    await consent.captureCookielessPageview();
-    // Cookieless events should NOT include UTM params (they are anonymous)
-    const call = sdk.capture.mock.calls[0][1];
-    expect(call).not.toHaveProperty("utm_source");
-    expect(call).toMatchObject({ site: "main" });
+    await consent.captureConsentedEvent("$pageview", { site: "main" });
+    expectNoTransport();
+    consent.setAnalyticsConsent("rejected");
+    await consent.captureConsentedEvent("$pageview", { site: "main" });
+    expectNoTransport();
   });
 });

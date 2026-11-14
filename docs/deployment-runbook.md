@@ -202,3 +202,27 @@ node scripts/verify-gumroad-csp.mjs https://edgelesslab.com /path/to/live-eviden
 It checks `/products/`, `/`, and `/about/`, clicks a catalog purchase/download
 link without buying anything, and writes `browser-report.json` and an overlay
 screenshot. A local screenshot is not evidence of production deployment.
+
+## Marimo gallery iframe CSP
+
+The gallery parent permits only `https://marimo.edgelesslab.com` in addition to
+its existing frame sources; Pyodide scripts, workers and network requests inside
+that iframe do not require widening the parent's script/connect policy. Preview
+URLs come from each admitted catalog `published_url`, never a reconstructed
+legacy-host slug. Primary-domain publications use same-origin paths.
+
+`npm run test:smoke` includes desktop/narrow offline fixtures for every registered
+preview and actual browser CSP denials for unrelated/lookalike/HTTP hosts. Those
+fixtures do not establish notebook runtime health. After serving `out/` locally,
+then again after reviewed deployment, run the real-network witness:
+
+```bash
+node scripts/verify-marimo-preview-csp.mjs https://edgelesslab.com /path/to/live-evidence
+```
+
+It records rendered headings for legacy and primary-domain notebooks at both
+widths, parent CSP violations, overflow and full console diagnostics. Its pass
+scope is explicit: unrelated external bundle errors are retained, not a claim
+that all registered notebook runtimes are healthy. Investigate HTML returned for
+JS assets separately from parent `frame-src` denials; HTTP 200 alone is not proof
+of a valid published notebook bundle.

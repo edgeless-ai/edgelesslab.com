@@ -1,10 +1,14 @@
 // Real browser + real model on preview; never installs mocks or routes provider calls.
-import {chromium} from '@playwright/test';
+import {chromium,expect} from '@playwright/test';
 import assert from 'node:assert/strict';
+import {assertTerminal} from '../workers/ask-edgeless/acceptance.mjs';
+import {validateCompletion,validateAdmission} from '../workers/ask-edgeless/protocol.mjs';
 import {mkdir,writeFile} from 'node:fs/promises';
 const [site,shop,out]=process.argv.slice(2);
 if(!site||!shop||!out)throw Error('usage: node scripts/ask-edgeless-preview-check.mjs SITE_PREVIEW SHOP_PREVIEW ARTIFACT_DIR');
 await mkdir(out,{recursive:true});
+// Invalidate stale green evidence before browser startup or source retrieval can fail.
+await writeFile(out+'/preview-results.json',JSON.stringify({pass:false,error:'acceptance_not_finished',results:[]}));
 const browser=await chromium.launch({headless:true});
 const results=[];const direct=[];const mutations=[];const errors=[];
 const index=await fetch(site+'/ask-edgeless-index.json').then(r=>r.json());
@@ -13,18 +17,21 @@ assert(blog,'source blog about stop switches exists');
 const note=index.find(s=>s.type==='field-note');assert(note);
 async function run(name,base,path,prompt,check,screenshot){
  const context=await browser.newContext({viewport:{width:1440,height:1000}});const page=await context.newPage();
+ const terminals=[],proxyFailures=[],responseWork=[];
+ await page.exposeFunction('__recordAskTerminal',detail=>terminals.push(detail));
+ await page.addInitScript(()=>window.addEventListener('ask-edgeless:terminal',e=>window.__recordAskTerminal(e.detail)));
  let proxyCalls=0;let usage={prompt_tokens:0,completion_tokens:0,total_tokens:0};
  page.on('request',r=>{const u=new URL(r.url());if(/openai|openrouter|nousresearch|cerebras|groq|together|trycloudflare|localhost|127\.0\.0\.1/.test(u.hostname))direct.push(u.origin);if(/checkout|payment-intents|\/cart\b/.test(u.pathname)&&r.method()==='POST')mutations.push(u.pathname);if(u.pathname==='/api/ask-edgeless/v1/chat/completions'&&r.method()==='POST')proxyCalls++;});
- page.on('response',async r=>{if(r.url().includes('/api/ask-edgeless/')&&r.request().method()==='POST'){try{const d=await r.json();for(const k of Object.keys(usage))usage[k]+=d.usage?.[k]??0;}catch{}}});
+ page.on('response',r=>{if(r.url().includes('/api/ask-edgeless/')&&r.request().method()==='POST')responseWork.push((async()=>{try{assert.equal(r.status(),200);const d=await r.json();assert.equal(d.terminal_status,'validated');validateCompletion(d,Number.MAX_SAFE_INTEGER);validateAdmission(d,Number.MAX_SAFE_INTEGER);for(const k of Object.keys(usage))usage[k]+=d.usage[k];}catch(e){proxyFailures.push(e.message);}})());});
  page.on('pageerror',e=>errors.push({name,error:e.message}));
  await page.goto(base+path,{waitUntil:'domcontentloaded'});
  await page.locator('#ask-edgeless').getByRole('button',{name:'Ask Edgeless ↗',exact:true}).click();
  await page.locator('#ask-edgeless').getByRole('textbox',{name:'Ask a question'}).fill(prompt);
  await page.locator('#ask-edgeless').getByRole('button',{name:'Ask',exact:true}).click();
- try { await check(page,blog,note); } catch(e) { console.error('FAILED CASE',name,'URL',page.url(),'THREAD',await page.locator('#ask-edgeless #thread').innerText().catch(()=>''),'SOURCES',await page.locator('#ask-edgeless #sources').innerText().catch(()=>'')); await page.screenshot({path:out+'/failed-'+name.replaceAll(' ','-')+'.png'}); throw e; }
+ try { await check(page,blog,note);await expect.poll(()=>terminals.length,{timeout:150000}).toBeGreaterThan(0);await Promise.all(responseWork);const expected=['off topic','purchase refusal'].includes(name)?'refused':'complete';assertTerminal(terminals.at(-1),expected);assert.equal(proxyFailures.length,0,JSON.stringify(proxyFailures));assert.deepEqual(terminals.at(-1).usage,usage,'terminal usage must match validated proxy response counts'); } catch(e) { console.error('FAILED CASE',name,'URL',page.url(),'THREAD',await page.locator('#ask-edgeless #thread').innerText().catch(()=>''),'SOURCES',await page.locator('#ask-edgeless #sources').innerText().catch(()=>'')); await page.screenshot({path:out+'/failed-'+name.replaceAll(' ','-')+'.png'}); throw e; }
  if(screenshot){await page.locator('#ask-edgeless #toggle').waitFor();if(await page.locator('#ask-edgeless #panel').isHidden())await page.locator('#ask-edgeless #toggle').click();await page.locator('#ask-edgeless #panel').waitFor({state:'visible'});await page.screenshot({path:out+'/'+screenshot,animations:'disabled'});}
  const answer=await page.locator('#ask-edgeless #thread').innerText().catch(()=>'(navigated)');
- results.push({name,prompt,url:page.url(),proxyCalls,usage,answer});
+ results.push({name,prompt,url:page.url(),proxyCalls,usage,terminal:terminals.at(-1),proxyFailures,answer});
  await context.close();
 }
 try{

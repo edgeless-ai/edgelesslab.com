@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import worker,{Budget,upstreamURL,limitedJSON} from './worker.mjs';
+import {TOOLS,TOOL_CHOICE} from './protocol.mjs';
 import {refusal,findSources,filterProducts,allowedURL,productSources,OFF_SITE,sourceExcerpt} from './policy.mjs';
 function memoryBudget() {
   const values=new Map(); let queue=Promise.resolve();
@@ -10,7 +11,7 @@ function memoryBudget() {
   return {object,values,call:d=>object.fetch(new Request('https://budget/',{method:'POST',body:JSON.stringify(d)}))};
 }
 const source={type:'blog',title:'Stop switches',description:'A safety pattern',content:'Stops halt an agent',url:'https://edgelesslab.com/blog/stop-switches/',path:'/blog/stop-switches/'};
-const request=(body={},origin='https://preview.workers.dev',url='https://preview.workers.dev/api/ask-edgeless/v1/chat/completions')=>new Request(url,{method:'POST',headers:{Origin:origin,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1'},body:JSON.stringify({question:'find stop switches',pagePath:'/blog/',messages:[{role:'user',content:'find stop switches'}],...body})});
+const request=(body={},origin='https://preview.workers.dev',url='https://preview.workers.dev/api/ask-edgeless/v1/chat/completions')=>new Request(url,{method:'POST',headers:{Origin:origin,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1'},body:JSON.stringify({question:'find stop switches',pagePath:'/blog/',messages:[{role:'system',content:'guide'},{role:'user',content:'find stop switches'}],tools:TOOLS,tool_choice:TOOL_CHOICE,...body})});
 function env() {const b=memoryBudget();return {ASK_ENABLED:'preview',PREVIEW_ORIGINS:'https://preview.workers.dev',IP_SALT:'unit-test-only-salt',RELAY_KEY:'unit-test-only-key',RELAY_URL:'https://relay.trycloudflare.com/v1/chat/completions',ASSETS:{fetch:async()=>Response.json([source])},BUDGET:{idFromName:n=>n,get:()=>b.object},b};}
 test('rolling per-IP rate: 30 allowed, 31st returns 429; another IP independent',async()=>{
  const b=memoryBudget();for(let i=0;i<30;i++)assert.equal((await b.call({ip:'a',reserve:1})).status,200);
@@ -37,12 +38,12 @@ test('stop-switch synonyms rank and excerpt real deep content instead of irrelev
 });
 test('personal data, cart and purchase refusals',()=>{for(const p of ['buy this for me','add this to cart','submit checkout','fill this form with my shipping address'])assert.match(refusal(p),/can.t buy/);assert.equal(refusal('find stop switches'),null);});
 test('only admitted https relay endpoint is possible, no metered/public provider substitution',()=>{assert.match(upstreamURL('https://x.trycloudflare.com/v1/chat/completions'),/trycloudflare/);for(const s of ['http://x.trycloudflare.com/v1/chat/completions','https://api.openai.com/v1/chat/completions','https://x.trycloudflare.com/other','https://x.trycloudflare.com.evil.test/v1/chat/completions'])assert.throws(()=>upstreamURL(s));});
-test('request streaming byte cap is enforced even with no Content-Length',async()=>{await assert.rejects(limitedJSON(new Request('https://x',{method:'POST',body:'x'.repeat(50)}),49),/large/);});
+test('request streaming byte cap is enforced even with no Content-Length',async()=>{await assert.rejects(limitedJSON(new Request('https://x',{method:'POST',body:'x'.repeat(50)}),49),/body_too_large/);});
 test('prod, default-off and wrong origins fail closed without provider fetch',async()=>{const e=env();assert.equal((await worker.fetch(request(),{...e,ASK_ENABLED:undefined})).status,404);assert.equal((await worker.fetch(request({},'https://preview.workers.dev','https://edgelesslab.com/api/ask-edgeless/v1/chat/completions'),e)).status,404);assert.equal((await worker.fetch(request({},'https://evil.test'),e)).status,403);});
 test('CORS preflight accepts only exact preview origins',async()=>{const r=await worker.fetch(new Request('https://preview.workers.dev/api/ask-edgeless/v1/chat/completions',{method:'OPTIONS',headers:{Origin:'https://preview.workers.dev'}}),env());assert.equal(r.status,204);assert.equal(r.headers.get('Access-Control-Allow-Origin'),'https://preview.workers.dev');});
 test('model/max_tokens/url from browser are ignored; no prompts stored',async(t)=>{
  const e=env();let called;
- t.mock.method(globalThis,'fetch',async(url,init)=>{if(String(url).includes('catalog.json'))return Response.json({designs:[]});called={url,body:JSON.parse(init.body)};return Response.json({choices:[{message:{role:'assistant',content:'OK'}}],usage:{prompt_tokens:10,completion_tokens:2,total_tokens:12}});});
+ t.mock.method(globalThis,'fetch',async(url,init)=>{if(String(url).includes('catalog.json'))return Response.json({designs:[]});called={url,body:JSON.parse(init.body)};return Response.json({choices:[{index:0,message:{role:'assistant',content:null,tool_calls:[{id:'call_1',type:'function',function:{name:'AgentOutput',arguments:JSON.stringify({action:{done:{success:true,text:'Indexed answer'}}})}}]},finish_reason:'tool_calls'}],usage:{prompt_tokens:10,completion_tokens:2,total_tokens:12},ask_admission:{policy_version:1,attempts:1,reserved_tokens:100,measured_tokens:12,free_only:true,counts_only:true}});});
  const r=await worker.fetch(request({model:'paid',max_tokens:999999,url:'https://evil.test'}),e);assert.equal(r.status,200);assert.equal(called.body.model,'auto');assert.equal(called.body.max_tokens,1024);assert.equal(called.body.stream,false);assert.match(called.url,/relay.trycloudflare.com/);assert.doesNotMatch(JSON.stringify(e.b.values.get('counts')),/stop switches/);
 });
 test('missing usage or failed upstream fails closed; no alternate route call',async(t)=>{let calls=0;t.mock.method(globalThis,'fetch',async url=>{if(String(url).includes('catalog.json'))return Response.json({designs:[]});calls++;return Response.json({choices:[]});});assert.equal((await worker.fetch(request(),env())).status,502);assert.equal(calls,1);});

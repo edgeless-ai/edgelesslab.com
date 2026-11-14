@@ -1,27 +1,48 @@
-# Ask Edgeless — preview only
+# Ask Edgeless — quarantined draft previews
 
-Uses `@page-agent/core` 1.12.4, not a custom agent loop. The browser gets only navigate/search/filter/scroll/open-product plus the library's terminal `done` action; built-in click/type/JavaScript tools are removed. DOM text is untrusted. Navigation is restricted to known source URLs; cart, checkout and personal-data requests are refused. Answers use the generated blog/Field Notes index and the shop's real `/catalog.json`.
+Uses pinned `@page-agent/core` 1.12.4, not a custom agent loop. Browser actions are navigate/search/filter/scroll/open-product plus terminal `done`; built-in click/type/JavaScript tools are removed. DOM/source text is untrusted. Navigation requires exact index membership, and cart/checkout/personal-data requests are refused. Grounding comes from the generated Blog/Field Notes/Lab index and the real shop `/catalog.json`.
 
-Production JSON flags remain **false**. The checked-in loader only mounts on `*.workers.dev` with an explicitly enabled config; enabling production requires a separate reviewed change. Do not merge or deploy production for this draft.
+Production flags remain **false**, with an additional production-hostname guard. Drafts: site [#120](https://github.com/edgeless-ai/edgelesslab.com/pull/120), shop [#14](https://github.com/thedavidmurray/edgeless-store-api/pull/14). No production merge, deploy, or activation is authorized by these drafts.
 
-## Server and privacy boundary
+## Current hold: runtime prerequisite t_ef9b8888
 
-`worker.mjs` exposes same-origin `/api/ask-edgeless/v1/chat/completions`. It holds credentials server-side and uses `model:auto` through the task-authorized free local runtime. A secret-authenticated transient preview relay reaches that loopback runtime; it is NOT a production hosting design. The local process/tunnel must remain available during interactive preview tests. Relay credentials and generated deployment configs belong outside git. No metered fallback is admitted. The literal Nous model requested was unavailable during probing; do not silently replace it with a paid similarly named model.
+`t_ef9b8888` is the spec-complete replacement for orientation-only `t_be6c22c2`. Its implementation and independent review are still pending; no runtime activation or account/token-bound attestation is implied.
 
-A singleton SQLite-backed Durable Object atomically enforces 30 requests per rolling minute/IP, at most 1,024 output tokens/request and 1,000,000 conservative reserved tokens/day, resetting at UTC midnight. Reservations use serialized UTF-8 request bytes plus framing/output allowances and are never refunded, so the cap can be reached well before measured returned-token totals. Internal upstream retries are not independently accounted for; the 1M reservation gate is verified, but end-to-end token accounting still requires review. Never reset its namespace/object, redeploy a fresh budget, or raise the cap to make a failing test pass. Counts survive deployment. `observability.enabled` must be false; Worker/relay do not log conversations. The panel has `ph-no-capture` to exclude replay and autocapture. **Upstream-runtime error logging still needs independent review: malformed tool-call errors can contain completion excerpts. This is a production blocker until corrected, not a counts-only guarantee across all layers.**
+The existing deployed preview endpoint remains `ASK_ENABLED=disabled` (HTTP404 `disabled`). Preview HTML is available, but this prevents the UTC budget reset silently reopening unsafe inference. **Do not re-enable until scoped runtime privacy, per-attempt reservation and pre-call zero-cost admission have independently passed review.**
 
-## Current safety hold
+This revision fixes the site-owned R4–R6 findings from review t_c0e42f0e and adds a fail-closed integration contract for R1–R3. It does NOT claim those shared-runtime findings are fixed. The relay defaults OFF unless `ASK_RUNTIME_POLICY=ask-edgeless-v1`; it calls only `http://127.0.0.1:3001/v1/ask-edgeless/chat/completions`, never the unsafe shared completion route. That endpoint is a **pending prerequisite**, not a fallback implemented here. A numeric `ask_admission` receipt must prove policy v1, exactly one reserved attempt, free-only/counts-only admission and consistent measured/reserved tokens. A receipt check is not itself proof that the runtime implements that policy; independent adapter-spy and sink tests are mandatory before activation.
 
-Preview HTML and the panel remain available, but the deployed proxy now has `ASK_ENABLED=disabled` (HTTP404 `disabled`). This reversible quarantine prevents the UTC reset from silently reopening inference before upstream logging and retry-accounting review. The existing budget object/namespace is preserved; no cap reset or bypass occurred. Re-enable only this scoped preview after those gaps are corrected and independently verified, then rerun all five prompts. Production stays OFF regardless.
+## Site boundary
 
-## Reproduce
+- `protocol.mjs` owns the exact positive `AgentOutput` schema and forced tool choice, shared by browser/Worker/relay. Missing, changed or additional tools are rejected before networking. Browser-provided model/limits/URL never select the upstream route.
+- Upstream bodies are incrementally capped at 16,384 bytes (without trusting Content-Length). Exactly one typed function call with one permitted bounded action is accepted. Extra action fields, wrong types, unsafe URLs, malformed arguments, empty/multiple choices and finish reasons other than `tool_calls` fail closed. Output usage components must be nonnegative integers, add up, remain within reservation and respect the 1,024-output-token ceiling.
+- PageAgentCore packs task/history in one user message. That packed string is preserved exactly (including prior-action results). Unsupported standalone assistant/tool-history clients and state >24,000 characters are rejected explicitly, never silently sliced. The intentionally bounded 2,000-character DOM excerpt is separate from packed control state.
+- A singleton SQLite-backed Durable Object atomically enforces 30 requests/rolling minute/IP and 1,000,000 conservative reserved tokens/UTC day across both previews. Reservations are serialized UTF-8 request bytes +1,024 framing +1,024 output. No refund on errors or uncertain outcomes. Schema-valid usage is counted even when a completion subsequently fails validation; unknown usage remains conservatively reserved. **This outer bound alone does not prove hidden runtime attempts are covered.** Never reset/change the namespace/object/cap to make tests pass.
+- Applied action and model completion are independent. A successful filter followed by truncation/error has terminal `truncated`/`failed`, never `complete`. Navigation is deferred until a valid successful `done` response. Max-step exhaustion, cancellation and packed-state overflow cannot report completion. Browser retries are disabled. The terminal event contains only status/action/numeric usage, no conversation text.
+- Worker/relay never log request/response bodies or provider error text. Observability stays disabled. Widget has `ph-no-capture`, `ph-mask`, `rr-block` and private markers; bundling strips upstream console calls. These local controls are NOT an end-to-end runtime/privacy or analytics-exfiltration certification.
 
-1. `npm ci && npm run build && npm run test:ask-edgeless && npx vitest run`.
-2. Build the separate shop from its frozen `pnpm-lock.yaml`: `pnpm install --frozen-lockfile && pnpm run build` in `merch-demo/`.
-3. `node scripts/prepare-ask-edgeless-preview.mjs "$SITE_PREVIEW" "$SHOP_PREVIEW" "$SHOP_CHECKOUT" "$STAGING"`. This creates isolated site/shop asset trees, injects the flag ON only there, preserves standalone creative artifacts and applies free Workers asset-size exclusions. The script prints asset counts; the excluded Marimo archives remain intact in the full local export. Production output remains untouched.
-4. Use a Cloudflare Worker config modeled on `wrangler.preview.example.jsonc`, pointing `assets.directory` at the staged site directory. Set `RELAY_URL`, `RELAY_KEY`, `IP_SALT` via Wrangler secrets. Start `preview-relay.mjs` with `FREELLMAPI_KEY`, `RELAY_KEY` and a loopback `PORT` (its upstream is fixed to the local free runtime); expose only this authenticated relay with an ephemeral tunnel. Do not publish its URL/credentials in git or logs.
-5. Publish the two **preview-only** Workers, with `ASK_ENABLED=preview` on the site Worker only; the shop Worker serves staged shop assets with `ASK_ENABLED=disabled` (the widget's proxy endpoint is on the site preview). Both Workers need observability disabled. Confirm enabled preview configs and default-OFF repo configs separately.
-6. `node scripts/ask-edgeless-preview-check.mjs "$SITE_PREVIEW" "$SHOP_PREVIEW" "$EVIDENCE"` exercises five prompts with real inference and writes blog/shop PNGs plus scripted-test JSON (fixed test prompts, answers and token counts, not visitor session logs). No fixtures or mocked model replies. The script rejects errors/truncation, checks exact blog URL, field-note response, catalog-backed shop DOM filtering, refusals, browser errors and direct-to-model traffic/cart mutations.
-7. After a full quiet minute: `node scripts/ask-edgeless-rate-probe.mjs "$SITE_PREVIEW"` uses zero-inference off-site requests and asserts 30 successes then HTTP429 on request31. Use `SMOKE_PORT=19087 npx playwright test` for existing static smoke tests. Consent tests require the real existing public PostHog project key at build time, as CI does; absence is a setup failure, not an agent logic regression.
+## Verification without inference
 
-The cap-exhausted preview is deliberately unavailable for inference until the next UTC day. A prior shop action really filtered the grid but its narrative truncated; a tightened rerun must pass before asking David **“enable on prod?”**. Draft PRs are not a deployment approval. Do not claim a green acceptance run from PNGs or earlier partial usage alone.
+```sh
+npm ci
+npm run test:ask-edgeless
+node scripts/build-ask-edgeless.mjs
+node scripts/ask-edgeless-terminal-regression.mjs
+npm run build
+npx vitest run
+SMOKE_PORT=19087 npx playwright test
+```
+
+The terminal regression runs the actual rebuilt browser bundle with explicitly synthetic local fixtures. It checks filter→length, typed truncation error, empty choices, wrong tool, malformed args, oversized packed state and valid completion. Only the valid completion may pass the same terminal predicate used by live acceptance. **These fixtures are not source catalog facts, inference measurements or live-preview acceptance.**
+
+Build the separate shop using its frozen `merch-demo/pnpm-lock.yaml`: `pnpm install --frozen-lockfile && pnpm run build`. Copy the regenerated public bundle into the shop draft before committing its matching asset.
+
+## Later real-preview gate (blocked until prerequisite + review)
+
+1. Preserve original Worker name, budget namespace/object, cap and quarantine. Follow `wrangler.preview.example.jsonc` using isolated staging from `node scripts/prepare-ask-edgeless-preview.mjs "$SITE_PREVIEW" "$SHOP_PREVIEW" "$SHOP_CHECKOUT" "$STAGING"`. Never alter production export flags.
+2. After independent runtime/site re-review, use server-side scoped credentials, the fixed scoped runtime endpoint and the explicit policy flag. No metered or unknown-cost fallback. No shared profile routing changes. Preview-only deployment is not production permission.
+3. Run `node scripts/ask-edgeless-preview-check.mjs "$SITE_PREVIEW" "$SHOP_PREVIEW" "$EVIDENCE"`. It exercises five real prompts, requires typed successful terminal status and validated proxy outputs for the first three, zero-inference refusals for the last two, real source URL/DOM state, measured token counts, and no browser LLM/cart calls. Blog/shop PNGs and JSON are written. Any error writes `pass:false`.
+4. After a full quiet minute, run `node scripts/ask-edgeless-rate-probe.mjs "$SITE_PREVIEW"` (zero-inference refusals; request31 must be HTTP429).
+5. Only after ALL acceptance + independent review pass, ask David the single production question: **Enable on prod?** Keep this card blocked until that point rather than representing drafts/screenshots or an applied filter as completion.
+
+Old five-prompt `pass:true` evidence from before terminal-status validation is invalid: the shop filter applied but the narrative truncated. Prior real token counts are historical, not fresh acceptance evidence. No new inference is authorized solely to bypass this hold.

@@ -1,0 +1,11 @@
+{
+  "comment": "Mechanical voice bans drawn from docs/blog-voice.md on the editorial branch. Virgil may edit patterns here without changing checker code. regex patterns use JavaScript flags i and m.",
+  "bannedPatterns": [
+    { "name": "Kanban task ID", "regex": "\\bt_[0-9a-f]{8}\\b" },
+    { "name": "private user path", "regex": "\\/Users\\/[^\\s)\\]`]+" },
+    { "name": "private Hermes path", "regex": "~\\/\\.hermes\\b" },
+    { "name": "internal retro shorthand", "regex": "\\bper the retro\\b" },
+    { "name": "internal routing shorthand", "regex": "\\b(?:Hive|Scribe|Kilo|Virgil|Beau|Atlas) (?:routed|assigned|dispatched)\\b" },
+    { "name": "internal status report", "regex": "\\b(?:kanban card|board task|status: (?:todo|running|blocked|done))\\b" }
+  ]
+}

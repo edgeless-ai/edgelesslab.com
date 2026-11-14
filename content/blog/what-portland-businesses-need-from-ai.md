@@ -14,9 +14,6 @@ tags:
 readTime: 6 min
 editorial: true
 ---
-
-# I Read 500 Google Reviews in Portland. What Small Businesses Actually Need from AI.
-
 I spent a weekend reading Google and Yelp reviews for small businesses across the Portland metro area. Not for fun. I was looking for patterns. Recurring complaints that an AI system could actually solve.
 
 The patterns were obvious within the first hour.
@@ -41,7 +38,7 @@ They don't need a custom GPT. They need their intake form to not require a PDF d
 
 **Voice AI for missed calls.** A system that picks up when staff can't, captures the caller's name and need, books the appointment or sends a quote request to the owner's phone. The technology exists today. Setup cost is under $500. Monthly cost is under $100. The ROI is one patient who didn't leave for a competitor.
 
-**Automated quote response.** For service businesses, [a simple workflow](/blog/n8n-workflows-ai-business/) that takes an inbound request (email, form, or voicemail) and sends a templated response within fifteen minutes. Not a final quote. An acknowledgment with a time window. "We received your request for electrical panel work. A team member will have your quote within 4 business hours." That alone stops the bleed.
+**Automated quote response.** For service businesses, a system that takes an inbound request (email, form, or voicemail) and sends a templated response within fifteen minutes. Not a final quote. An acknowledgment with a time window. "We received your request for electrical panel work. A team member will have your quote within 4 business hours." That alone stops the bleed.
 
 **Simple scheduling integration.** Not building a custom booking system. Connecting the tools they already half-use (Google Calendar, Square Appointments, Calendly) to their website and phone system so a customer can book without calling.
 

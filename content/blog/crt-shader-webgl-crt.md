@@ -1,75 +1,28 @@
 ---
 slug: crt-shader-webgl-crt
-title: crt-shader: An Open-Source CRT Shader for WebGL 2
-description: A self-contained WebGL 2 fragment shader that renders CRT monitor effects in-browser. No dependencies, no plugins, no post-processing stack.
+title: A Multi-Pass CRT Effect for the Browser
+description: A look at crt-shader's WebGL rendering pipeline, its adapters, and the tradeoffs of adding a simulated tube display to a web project.
 date: 2026-09-28
 tags:
 - WebGL
 - Shaders
 - Creative Coding
 - Generative Art
-readTime: 6 min
+readTime: 4 min
 ---
 
-# crt-shader: An Open-Source CRT Shader for WebGL 2
+# A Multi-Pass CRT Effect for the Browser
 
-**Date:** 2026-09-27
-**Status:** Draft — humanizer pass complete
-**Source:** `claude-vault/03-Knowledge/2026-09-27-crt-shader-webgl-crt-effect.md`
+A convincing cathode-ray tube (CRT) effect is more than a set of dark stripes. The display's apparent character comes from several effects acting together: the treatment of the signal, scanlines, the pixel mask and the way light spreads across the screen.
 
----
+[crt-shader](https://github.com/OutThisLife/crt-shader), by Brooklyn, is an open-source project for bringing that look to WebGL 2. Rather than a single fragment shader, it uses multiple rendering passes. Its documented effects include signal filtering, brightness-dependent scanlines and display optics; the `reference` preset includes bloom and curvature. There's also a [live demonstration](https://crt-shader.vercel.app/).
 
-## What it is
+## Where it fits
 
-crt-shader is a WebGL 2 fragment shader that renders CRT monitor effects in-browser. No dependencies. No plugin. Drop it in and your flat panel starts looking like a 1998 Sony Trinitron.
+The project offers adapters for plain JavaScript, React and Three.js, including a pass for an existing post-processing chain. That makes it a useful candidate when you already have an image or a rendered scene and want the screen itself to become part of the composition. Check the repository's current documentation and version before integrating it: a rendering dependency is an API you will need to maintain.
 
-## What it actually does
+In a local trial of version 1.0.1, we found the reference preset more promising on bold generative images and simple 3D forms than on text-heavy pages. The simulated grille made small type harder to read, while dark detail and motion could need extra attention. The effect is a visual choice with an accessibility cost, not a default treatment for every surface.
 
-The shader simulates five things that make CRTs feel like CRTs:
+## A useful constraint
 
-- **Scanlines** — the dark horizontal bands between phosphor rows
-- **Mask** — the shadow mask pattern (aperture grille vs. slot mask)
-- **Curvature** — the glass bulge at the edges
-- **Chromatic aberration** — color fringing where red/green/blue don't quite line up
-- **Flicker** — the subtle vertical refresh artifact
-
-All of it runs in a single fragment shader pass. No post-processing stack. No framebuffers to juggle.
-
-## Why it's worth looking at
-
-Most "CRT shader" projects are either:
-1. A handful of uniforms wrapped around a noise texture (looks fake)
-2. A full Three.js/post-processing chain (overkill for a website)
-
-crt-shader is neither. It's a self-contained shader with real physical modeling of the mask and curvature. The scanline phase offset is computed per-row, not per-pixel, which is what makes it look like a real tube instead of a filtered image.
-
-## How to use it
-
-```glsl
-uniform float u_time;
-uniform vec2 u_resolution;
-varying vec2 v_uv;
-
-void main() {
-  vec2 uv = v_uv;
-  uv.y *= u_resolution.y / u_resolution.x;
-
-  // Scanlines
-  float scanline = sin(uv.y * u_resolution.y * 1.4) * 0.5 + 0.5;
-
-  // Curvature
-  float r = length(uv - 0.5);
-  float curve = 1.0 - r * 0.15;
-
-  vec3 color = vec3(1.0);
-  color *= scanline * curve;
-
-  gl_FragColor = vec4(color, 1.0);
-}
-```
-
-The full shader has ~20 uniforms for mask type, curvature amount, brightness, contrast, and flicker rate. All documented in the README.
-
-## The one-line version
-
-It's the CRT effect you'd actually put on a production site — not a demo, not a toy.
+Keep the original content readable and test the effect at the size and resolution at which people will actually see it. If a visitor needs to read a control or a paragraph, the CRT treatment should not make that task harder. Use the effect to support the work, not to turn the work into evidence that an effect was used.

@@ -11,7 +11,6 @@ tags:
 - Scroll
 readTime: 3 min
 ---
-
 # Scroll-Isometric Dissolution
 
 Isometric typography exists in a curious space between 2D and 3D. It reads as depth without actually having it. The illusion is cheap — a 30-degree angle, a shadow, a second face — but the brain buys it immediately.
@@ -43,5 +42,3 @@ The color palette is monochrome: black faces on white, with a single accent colo
 Scroll is not just navigation. It is a force. The demo treats scroll velocity as a physical input, not a positional one. The word is not at a scroll position. It is in a scroll field.
 
 This is a useful pattern for any scroll-driven animation: measure velocity, not position. Velocity carries energy. Position is just a coordinate.
-
-It's the same instinct as [Kinetic Type Physics](/blog/kinetic-type-physics/) — treat letters as bodies, not coordinates. More typography experiments live in [the creative demos collection](/blog/creative-demos-collection/).

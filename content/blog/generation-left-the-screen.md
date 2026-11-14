@@ -28,7 +28,7 @@ Taken together, the five videos trace one arc. Generative models started with fl
 - **Game worlds and what's in them.** Palworld became the lightning rod for "AI-made game" anxiety in early 2024. Section 2 covers what that accusation turned out to be worth.
 - **Bodies.** The Astribot S1 video is about where generation goes next: models that output motion instead of pixels.
 
-How the Sora story ended shows the arc most clearly. In March 2026 OpenAI [said it would discontinue Sora](https://www.pcmag.com/news/that-was-fast-openai-to-shut-down-sora-video-generator-app). It cited compute demand and said the Sora research team would keep working on world simulation "to advance robotics." The web and app versions closed on April 26, 2026 ([OpenAI Help Center](https://help.openai.com/en/articles/20001152-what-to-know-about-the-sora-discontinuation)). The API [shut down on September 24, 2026](https://developers.openai.com/api/reference/python/resources/videos/methods/list), and OpenAI says there is no one-to-one replacement. The product is gone. Its research thesis is now pointed at bodies.
+How the Sora story ended shows the arc most clearly. In March 2026 OpenAI [said it would discontinue Sora](https://www.pcmag.com/news/that-was-fast-openai-to-shut-down-sora-video-generator-app). It cited compute demand and said the Sora research team would keep working on world simulation "to advance robotics." The web and app versions closed on April 26, 2026 ([OpenAI Help Center](https://help.openai.com/en/articles/20001152-what-to-know-about-the-sora-discontinuation)). The API [shut down on September 24, 2026](https://developers.openai.com/api/reference/python/resources/videos/methods/list), and OpenAI says there is no one-to-one replacement. The consumer product and API have closed. OpenAI has said its world-simulation research will continue, including work intended to advance robotics.
 
 ## 2. Two takes the videos set against each other
 
@@ -63,13 +63,13 @@ For skeptics, the awkward part is that the autonomy trend has kept moving since 
 
 **Fair to both sides:** technologists are right that the copyright panic picked a weak test case and that the robot demos were oversold. Artists and skeptics are right that disclosure norms were thin and still are, and that autonomy in high-stakes systems is moving faster than the public debate about it. Both can be true.
 
-## 3. What it means for our stack, and for you
+## 3. What builders can take from it
 
 Our takeaway from this set: **prefer generation you can run, inspect, and disclose.**
 
 - **Owning the tool beats renting it.** Sora's shutdown is a warning for anyone building a workflow on a closed generative API. Our own generative-art work runs on procedural generators we wrote and control. When we evaluated an image-to-video prototype, the post-processing pipeline we already own was the cheap part. The generation step is still a call to an external model, and that's the dependency Sora's shutdown says to plan for. The terrain mod points the other way: a method you can read in a paper and run on a consumer GPU.
 - **Windowed diffusion is a pattern, not just a Minecraft trick.** Blending overlapping windows with constant cost per lookup could apply to any large generated space, such as maps, textures, or long-form generative art. That's our inference. The paper demonstrates it on terrain.
-- **Disclose by default.** We keep a draft internal policy on generative-AI disclosure modeled on Steam's disclosure requirement. If an asset is AI-generated, say so, and don't ship derivatives of third-party copyrighted work. That makes an accusation like the one aimed at Pocketpair easy to answer, and it respects the artists, whose concern was legitimate even when their target was wrong.
+- **Disclose by default.** If an asset is AI-generated, disclose it, and check the rights to the material used. Disclosure does not settle every copyright question, but it gives audiences a clearer account of how a work was made.
 - **Read claims at the right resolution.** Two of these five videos led with claims that shrank under checking: a revenue number in one, and a speed figure plus an autonomy claim in the other. Our rule is that a capability claim names its source, its date, and its scope, or we don't repeat it.
 
 ## 4. Watch this one, then build

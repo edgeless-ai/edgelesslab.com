@@ -12,12 +12,10 @@ tags:
 readTime: 8 min
 editorial: true
 ---
-
 # The Knowledge Base Loop: Why Your Agents Need a Memory System
 
 **Published:** April 2026  
 **Reading time:** 8 minutes  
-**Author:** Scribe (Edgeless Labs)
 
 ---
 
@@ -27,7 +25,7 @@ For months, my agents were trapped in a nightmare:
 
 > Every session started cold. No memory of yesterday's decisions. No context from last week's research. Each agent woke up like it was day one, repeating conversations, re-explaining constraints, re-learning what "on brand" means for this project.
 
-I was paying for the same context over and over. Worse, the system felt brittle — agents made inconsistent decisions because they lacked shared grounding.
+I was paying for the same context over and over. Worse, the system felt brittle; agents made inconsistent decisions because they lacked shared grounding.
 
 Sound familiar? You're not alone. Most agent systems are stateless by default. ChatGPT doesn't remember your project between sessions. Neither do most coding agents.
 
@@ -251,8 +249,8 @@ Running this system for 4 months:
 | Inconsistent agent decisions | ~30% | ~5% |
 | Duplicate research effort | High | Minimal |
 | Time to onboard new agent | 2 hours | 15 minutes |
-| ChromaDB storage | — | 2.1 GB |
-| Monthly sync cost | — | $0 (local) |
+| ChromaDB storage | n/a | 2.1 GB |
+| Monthly sync cost | n/a | $0 (local) |
 
 ---
 
@@ -280,7 +278,7 @@ Want to build your own KB Loop?
 
 ## The Real Value
 
-The KB Loop isn't about storage. It's about **compound knowledge** — insights that get better as they circulate through agents.
+The KB Loop isn't about storage. It's about **compound knowledge**: insights that get better as they circulate through agents.
 
 My agents now:
 - Reference decisions from last month
@@ -291,6 +289,12 @@ My agents now:
 The system feels less like 10 separate agents and more like one team with shared memory.
 
 That's the Karpathy Pattern. And it works.
+
+---
+
+## Next in Series
+
+**Post 4:** File-Based Agent Communication: why I use rsync + markdown instead of gRPC (and when to upgrade)
 
 ---
 

@@ -12,9 +12,6 @@ editorial: true
 ctaHook: The coordinator, execution, and verification split from this post, implemented
   as a working dispatch/worker blueprint with reference configs.
 ---
-
-# Multi-Agent Goal Loops: Theory and Practice
-
 If you want to make an AI system that actually ships work, not just talks about it, you need goal loops.
 
 ## What a goal loop is
@@ -35,7 +32,7 @@ Multi-agent systems survive this by specialization.
 - Execution agent: writes the code or produces the artifact.
 - Verification agent: checks whether the output matches the goal.
 
-Without this split, every agent tries to do everything, which is slow and noisy. The mechanics of [how the agents actually talk to each other](/blog/agents-that-talk-to-each-other) matter as much as the split itself.
+Without this split, every agent tries to do everything, which is slow and noisy.
 
 ## Operational rules we use
 
@@ -46,6 +43,6 @@ Without this split, every agent tries to do everything, which is slow and noisy.
 
 ## The result
 
-Goal loops turn open-ended goals into measurable progress. The score is not *"did I think about this a lot"* but *"what did this cycle ship?"*. For a worked example of these loops driving real code, see the [autonomous perp trading stack](/blog/autonomous-perp-trading-stack).
+Goal loops turn open-ended goals into measurable progress. The score is not *"did I think about this a lot"* but *"what did this cycle ship?"*.
 
 That is how the site gets better without asking.

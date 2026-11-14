@@ -11,7 +11,6 @@ tags:
 - Agents
 readTime: 3 min
 ---
-
 # Percussive Archaeology
 
 This is the sibling to [Scroll-Chromatic Excavation](/blog/scroll-chromatic-excavation/). Where that demo uses scroll velocity as the excavation force, this one uses rhythm.
@@ -26,7 +25,7 @@ The agents are the same species as in Scroll-Chromatic Excavation: builders (rev
 
 ## The Audio Pipeline
 
-The Web Audio API creates an AnalyserNode with 2048 frequency bins. A simple onset detector looks for sudden energy increases across the full spectrum. This is not a sophisticated beat tracker. It misses some beats and catches some false positives. But the misses and false positives are part of the aesthetic.
+The Web Audio API creates an AnalyserNode with 2048 frequency bins. A simple onset detector looks for sudden energy increases across the full spectrum. This is not a sophisticated beat tracker — it misses some beats, catches some false positives. But the misses and false positives are part of the aesthetic.
 
 The agent count is capped at 2000. When a beat spawns agents beyond the cap, the oldest agents die. This creates a visual rhythm: the manuscript fills with revealed text, then the rebels catch up and erase it, then the next beat reveals more.
 

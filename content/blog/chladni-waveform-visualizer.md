@@ -13,7 +13,6 @@ tags:
 readTime: 6 min
 editorial: true
 ---
-
 # Turning Audio Into a Resonant Plate
 
 A Chladni plate is a simple physical trick with a strange amount of visual authority. Drive a surface at a resonant frequency, scatter sand on it, and the sand migrates away from vibrating regions into nodal lines. You get a drawing made by pressure and absence.
@@ -44,7 +43,7 @@ The second fix was color normalization. The raw pattern was technically renderin
 
 ## Why It Belongs in the Lab First
 
-This is not mainly a post. The post is the supporting document. The actual thing is a tool you can touch — the same reasoning behind [the creative demos collection](/blog/creative-demos-collection/).
+This is not mainly a post. The post is the supporting document. The actual thing is a tool you can touch.
 
 Putting it in the lab makes the shape honest: an experiment with controls, presets, and export buttons. It can still produce assets for posts, show pages, music identity, or album covers, but its first job is to be inspectable.
 
@@ -73,6 +72,6 @@ The preview mode now saves a middle frame rather than frame zero. That avoids th
 
 ## What Comes Next
 
-The next useful step is bridging the browser controls back into the Python renderer: export a preset JSON blob from the [lab page](/lab/chladni-visualizer), then feed it to the CLI for a high-resolution render. After that, the visualizer becomes a small production system instead of a one-off demo. [Monolith Drummer, another audio-reactive study](/blog/monolith-drummer/), takes the same signal in a different direction: rhythm deforming 3D geometry instead of selecting plate modes.
+The next useful step is bridging the browser controls back into the Python renderer: export a preset JSON blob from the lab page, then feed it to the CLI for a high-resolution render. After that, the visualizer becomes a small production system instead of a one-off demo.
 
 That is the line I want more lab projects to cross: interactive enough to explore, deterministic enough to ship.

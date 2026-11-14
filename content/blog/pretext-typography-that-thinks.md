@@ -11,9 +11,6 @@ tags:
 readTime: 6 min
 editorial: true
 ---
-
-# PreText: Typography That Thinks
-
 CSS gives you two options for text layout: a block that fills its container, or `fit-content` that shrinks to the longest line. Neither lets you answer "how tall will this paragraph be at 320px wide?" without rendering it first.
 
 PreText answers that question in 0.002ms, before a single DOM node exists. That changes what's possible.

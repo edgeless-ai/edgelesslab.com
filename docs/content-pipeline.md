@@ -2,6 +2,8 @@
 
 This document defines the content types, templates, and quality gates for every piece of content published on edgelesslab.com.
 
+> **Source of truth:** Registry body is canonical; Markdown copy must match byte-for-byte (enforced by check:blog-integrity).
+
 ## Content Types
 
 ### 1. Editorial / Field Notes

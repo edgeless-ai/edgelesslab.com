@@ -15,14 +15,11 @@ editorial: true
 ctaHook: 10 production hooks, composition patterns, and the damage-control system
   from this post.
 ---
-
-# The Hook That Saved My Codebase
-
 At 2am on a Tuesday, I ran a deploy script. The script did three things: delete the old build artifacts, copy new ones from the output directory, and stage the changes for git. One command, piped together.
 
 The problem: the cleanup step was `rm -rf _next` and the staging step referenced `src/`. A Claude Code hook called `damage-control.py` saw both tokens in the same command scope and blocked execution. The hook's logic is simple: if a destructive operation (`rm -rf`, `git reset --hard`, `git clean -f`) appears alongside a source directory reference, halt and warn.
 
-That night it prevented nothing catastrophic. The command would have worked fine. But the hook doesn't care about intent; it cares about blast radius. And the one time it does catch a real mistake, it pays for itself permanently. I know what unguarded agents cost because [one of mine lost $252 of real money](/blog/agent-lost-252-dollars/) before this pattern existed.
+That night it prevented nothing catastrophic. The command would have worked fine. But the hook doesn't care about intent; it cares about blast radius. And the one time it does catch a real mistake, it pays for itself permanently.
 
 ## What Hooks Actually Are
 
@@ -46,7 +43,7 @@ This is the hook that changes behavior most. When an AI agent knows its "done" c
 
 Hooks aren't just guardrails. The session initialization hook loads memory context at conversation start. The memory flush hook persists important context before the conversation compresses. The cost tracking hook logs token usage per tool call.
 
-The pattern: anything you'd tell the AI to "always do" or "never do" should be a hook, not a prompt instruction. Prompt instructions get forgotten as context compresses. Hooks execute every time, mechanically. This is the core of [harness engineering](/blog/claude-code-hooks-harness-engineering/): the scaffolding around the model matters more than the model.
+The pattern: anything you'd tell the AI to "always do" or "never do" should be a hook, not a prompt instruction. Prompt instructions get forgotten as context compresses. Hooks execute every time, mechanically.
 
 ## The Deep Dive
 

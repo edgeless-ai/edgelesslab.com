@@ -14,9 +14,6 @@ editorial: true
 ctaHook: 'The full agent cookbook: dispatch patterns, bus protocol, and production
   deployment configs.'
 ---
-
-# Building AI Agent Infrastructure as a Solo Developer
-
 When people hear "multi-agent system," they picture a team of engineers, months of planning, and enterprise infrastructure. I built one by myself, and it runs on a single $15/month VPS.
 
 This post covers the architecture decisions, the tools that made it possible, and the parts that surprised me.
@@ -37,7 +34,7 @@ The system has five layers:
 
 ## Why MCP Changes Everything
 
-Before MCP, giving an AI agent access to tools meant writing custom integrations for each model provider. MCP standardizes the protocol: define your tool once, and any MCP-compatible client can use it. I think of [MCP servers as the Unix pipes of AI](/blog/mcp-servers-unix-pipes-of-ai/): small, single-purpose, composable.
+Before MCP, giving an AI agent access to tools meant writing custom integrations for each model provider. MCP standardizes the protocol: define your tool once, and any MCP-compatible client can use it.
 
 I have servers for ChromaDB search, Obsidian vault queries, backlog management, and inter-agent messaging. Adding a new capability means writing one server, not modifying every agent.
 
@@ -47,7 +44,7 @@ The Effect-TS implementation makes the servers composable and type-safe. Error h
 
 The biggest challenge with AI agents isn't reasoning; it's memory. A conversation ends, and everything learned evaporates.
 
-I open-sourced the basic version as the [Claude Memory Kit](https://github.com/edgeless-ai/claude-memory-kit) and built a [Pro version](https://edgelessai.gumroad.com/l/claude-memory-kit) with stack-specific libraries and advanced patterns.
+I open-sourced the basic version as the [Claude Memory Kit](https://github.com/edgeless-ai/claude-memory-kit). The former Pro download is retired; the current [Edgeless Free Kit](https://edgelessai.gumroad.com/l/edgeless-free-kit?wanted=true&price=0) collects the available references and templates in one free download.
 
 The solution is a three-layer memory system:
 
@@ -55,7 +52,7 @@ The solution is a three-layer memory system:
 2. **File-based memory** for structured facts (user preferences, project context, feedback)
 3. **Obsidian vault** for human-curated knowledge that agents can also access
 
-Each layer serves a different retrieval pattern. ChromaDB handles "find me something similar to X." File memory handles "what did the user tell me about Y." The vault handles "what's the canonical documentation for Z." The file layer is the one I've documented most — [file-based memory across sessions](/blog/how-claude-code-memory-works/) covers the exact mechanics.
+Each layer serves a different retrieval pattern. ChromaDB handles "find me something similar to X." File memory handles "what did the user tell me about Y." The vault handles "what's the canonical documentation for Z."
 
 ## The Safety Layer
 
@@ -69,7 +66,7 @@ The hooks system runs on every tool call, 24/7. Its architecture:
 - **Reversibility classifier**: Categorizes actions by blast radius
 - **Completion verifier**: Evidence-based proof that work is actually done
 
-The agent doesn't need to be smart about everything. It needs guardrails that are smarter than its worst impulse. Damage control has already earned its keep — [the hook that saved my codebase](/blog/the-hook-that-saved-my-codebase/) tells that story.
+The key insight: the agent doesn't need to be smart about everything. It needs guardrails that are smarter than its worst impulse.
 
 ## Lessons Learned
 
@@ -85,6 +82,6 @@ The agent doesn't need to be smart about everything. It needs guardrails that ar
 
 ## What's Next
 
-The system keeps growing. Current priorities: improving inter-agent communication (an "agent bus" for real-time messaging — here's [how the agents coordinate](/blog/agents-that-talk-to-each-other/) today), better memory consolidation (merging redundant knowledge), and more sophisticated trading strategies.
+The system keeps growing. Current priorities: improving inter-agent communication (an "agent bus" for real-time messaging), better memory consolidation (merging redundant knowledge), and more sophisticated trading strategies.
 
 The goal isn't to build the most complex system. It's to build the most useful one, with the least moving parts.

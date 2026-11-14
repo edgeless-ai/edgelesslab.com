@@ -13,12 +13,9 @@ editorial: true
 ctaHook: The dispatch architecture, recovery protocol, and monitoring scripts that
   keep a swarm debuggable instead of restartable.
 ---
-
-# How We Debugged a Stuck Multi-Agent Swarm Without Touching the Production Pipeline
-
 The symptom looked simple: an [automated website goal loop](/blog/multi-agent-goal-loops-theory-and-practice/) had been running for days with no visible progress. A naive fix is to restart the loop, flip the status flag, and hope it picks up where it left off. That usually just restarts the same stuck state.
 
-We unstuck it in four moves, none of which touched the production pipeline.
+Here is how we actually unstuck it.
 
 ## 1. Read the ticket, not just the status
 The issue was marked `in_progress`. A related recovery ticket showed the original loop had failed and Paperclip had already [auto-recovered it](/blog/self-healing-ai-infrastructure/). That meant someone had already inspected the run and the blocker state was known. The recovery was done. The problem was not a missing restart.

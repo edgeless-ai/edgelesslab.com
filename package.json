@@ -20,6 +20,8 @@
     "start": "next start",
     "lint": "npm run check:design-system && eslint && node scripts/lint-experiments.mjs && npm run lint:voice",
     "lint:blog-links": "node scripts/lint-blog-links.mjs",
+    "check:blog-integrity": "node scripts/check-blog-integrity.mjs",
+    "test:blog-integrity": "node --test scripts/check-blog-integrity.test.mjs",
     "lint:experiments": "node scripts/lint-experiments.mjs",
     "lint:voice": "../scripts/lint-voice.sh src/lib/data.ts && ../scripts/lint-voice.sh src/lib/product-content.ts && ../scripts/lint-voice.sh src/lib/blog.ts",
     "art-only:inject": "node scripts/inject-art-only-mode.mjs",

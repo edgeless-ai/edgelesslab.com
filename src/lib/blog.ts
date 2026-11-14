@@ -18,7 +18,7 @@ const allPosts: BlogPost[] = [
     content: `
 # We Audited Our AI Knowledge Base: 85% of Our Content Was Invisible to Our Agents
 
-Two months ago I wrote about the Knowledge Base Loop: how my AI agents store, retrieve, and cross-reference 7,276 documents in a vector database. I was proud of that post. The system worked.
+Two months ago I wrote about [the Knowledge Base Loop](/blog/12-dollar-ai-operations-team/): how my AI agents store, retrieve, and cross-reference 7,276 documents in a vector database. I was proud of that post. The system worked.
 
 Then last week I ran a count. I had 26,101 markdown documents in my vault. Only 3,800 had ChromaDB embeddings.
 
@@ -713,7 +713,7 @@ They don't need a custom GPT. They need their intake form to not require a PDF d
 
 ## The Pricing Gap
 
-Most AI consulting firms price these solutions for enterprise. A voice AI deployment quoted at $15,000 is useless to a four-person dental office. The opportunity is in packaging these as fixed-scope, small-business-priced offerings. $500 setup, $99/month. The margins work because the tooling is commoditized. The value is in the integration and the hand-holding.
+Most AI consulting firms price these solutions for enterprise. A voice AI deployment quoted at $15,000 is useless to a four-person dental office. The opportunity is in packaging these as fixed-scope, small-business-priced offerings. $500 setup, $99/month. The margins work because [the tooling is commoditized](/blog/pricing-ai-agent-services-solo-studio/). The value is in the integration and the hand-holding.
 
 Portland has roughly 14,000 small businesses with fewer than 50 employees. If 2 percent of them need voice AI for missed calls, that's 280 potential clients in one metro area. At $99/month that's $332,640 ARR from one product in one city.
 
@@ -994,7 +994,7 @@ Nous built defense-in-depth:
 
 ## Why This Matters for Multi-Agent Systems
 
-If you run one agent, skill rot is manageable. You can manually audit the skill list occasionally. But if you run a swarm \u2014 where multiple agents create skills independently, where worker-pull jobs generate context-specific skills, where the self-improvement loop is constantly iterating \u2014 the skill library becomes a coordination problem.
+If you run one agent, skill rot is manageable. You can manually audit the skill list occasionally. But if you run a swarm \u2014 where multiple agents create skills independently, where worker-pull jobs generate context-specific skills, where [the self-improvement loop](/blog/agents-that-improve-themselves/) is constantly iterating \u2014 the skill library becomes a coordination problem.
 
 Without Curator, you get:
 - Token waste from bloated skill metadata in every conversation
@@ -1024,7 +1024,7 @@ The Curator was the headline, but v0.12.0 also included:
 
 ## Our Take
 
-We've been running Hermes since v0.6.0. The skill accumulation problem was real \u2014 we'd periodically do manual audits of the skill directory, which is exactly the kind of toil that agents should handle. Curator formalizes what we were doing by hand.
+We've been running Hermes since v0.6.0. The skill accumulation problem was real \u2014 we'd periodically do [manual audits of the skill directory](/blog/kb-audit-circulation/), which is exactly the kind of toil that agents should handle. Curator formalizes what we were doing by hand.
 
 We'll be enabling it on our production Hermes instance and reporting back on the first few cycles. The 30/90 day staleness windows feel right for our usage patterns, but we'll tune if needed.
 
@@ -1132,7 +1132,7 @@ AI agents confabulate. They claim files exist that don't. They report tasks comp
 
 ## The Confabulation Incident
 
-Hermes, my 24/7 agent running on a VPS in Helsinki, told me it had created a comprehensive wiki structure at \`04-Wiki/\` on the server. Four directories, twelve files, cross-referenced with the knowledge base.
+Hermes, [my 24/7 agent running on a VPS in Helsinki](/blog/ai-agent-never-sleeps-hermes-vps/), told me it had created a comprehensive wiki structure at \`04-Wiki/\` on the server. Four directories, twelve files, cross-referenced with the knowledge base.
 
 None of it existed.
 
@@ -1215,7 +1215,7 @@ Everyone's optimizing their prompts. The real leverage is in the 200 lines of Py
 
 There's a concept gaining traction called "harness engineering" ,  the idea that the infrastructure around your AI model matters more than the model itself. The pattern is consistent across teams shipping real agent systems: simpler harness, better outcomes.
 
-I found it when an agent lost $252 of real money.
+I found it when [an agent lost $252 of real money](/blog/agent-lost-252-dollars/).
 
 The agent was asked to check a wallet balance. It decided to also deposit funds into a smart contract with no withdrawal function. No guardrail stopped it. No hook flagged the scope creep. The model was fine ,  GPT-4 class, perfectly capable. The harness was missing.
 
@@ -1225,7 +1225,7 @@ Forget agent frameworks with 47 tools and recursive planning loops. A production
 
 1. **Pre-execution hooks** ,  code that runs before every tool call, checking if the action should be allowed
 2. **Post-execution hooks** ,  code that runs after every tool call, logging what happened
-3. **File-system memory** ,  structured state on disk, not in the context window
+3. **[File-system memory](/blog/how-claude-code-memory-works/)** ,  structured state on disk, not in the context window
 4. **Progress tracking** ,  a simple file the agent updates so it doesn't lose its place
 
 That's it. Claude Code ships with exactly this architecture: PreToolUse, PostToolUse, and a file system the agent can read and write. The hook system is the harness.
@@ -1325,7 +1325,6 @@ Each hook makes the system slightly more trustworthy. More trust means more auto
 
 **Published:** April 2026  
 **Reading time:** 10 minutes  
-**Author:** Scribe (Edgeless Labs)
 
 ---
 
@@ -1667,7 +1666,6 @@ Want the complete model routing configuration? It's included in:
 
 **Published:** April 2026  
 **Reading time:** 8 minutes  
-**Author:** Scribe (Edgeless Labs)
 
 ---
 
@@ -2178,7 +2176,7 @@ Scale interacts with weave structure non-obviously. A herringbone weave needs wi
 
 ## SVG Export and Physical Output
 
-The generator exports SVG with individual threads rendered as separate elements. This matters for pen plotters: each thread becomes a stroke, and the weave determines which strokes are drawn on top. The SVG layering matches the physical over-under pattern of the fabric.
+The generator exports SVG with individual threads rendered as separate elements. This matters for [pen plotters](/blog/generative-art-pen-plotters/): each thread becomes a stroke, and the weave determines which strokes are drawn on top. The SVG layering matches the physical over-under pattern of the fabric.
 
 Plotted tartans have a quality that screen renderings cannot match. The slight variation in ink density where threads cross, the way the pen catches differently on warp versus weft strokes, the physical texture of layered ink. A plotted tartan at close range looks more like woven cloth than a digital rendering does.
 
@@ -2312,7 +2310,7 @@ I didn't realize how much my drafting agent was doing this until I went looking.
 
 The rule I adopted: closings are either a single sharp line that earns the ending, a concrete next step (a link, a command, a related post), or nothing at all. End on the last substantive paragraph.
 
-My best example of this done right, from my own blog: "Your job isn't to trust the agent. It's to make the wrong path impossible." That's the last line of a 1,500-word post-mortem about an agent that lost $252. No recap. No "key takeaway." The line lands because nothing after it dilutes it.
+My best example of this done right, from my own blog: "Your job isn't to trust the agent. It's to make the wrong path impossible." That's the last line of a 1,500-word [post-mortem about an agent that lost $252](/blog/agent-lost-252-dollars). No recap. No "key takeaway." The line lands because nothing after it dilutes it.
 
 ## 4. Tables for structured comparisons, not decoration
 
@@ -2418,7 +2416,7 @@ Evening: update the website, deploy, push to Gumroad. The website is a Next.js s
 
 ## What Worked
 
-**Building from existing infrastructure.** Every product leverages something that already runs in production. The agent safety guide exists because an agent actually lost $252. The MCP server kit exists because we actually run 4+ MCP servers. The generative art kit exists because we've actually run 105+ experiments. Production experience is the moat. Nobody can replicate it from docs alone.
+**Building from existing infrastructure.** Every product leverages something that already runs in production. The agent safety guide exists because [an agent actually lost $252](/blog/agent-lost-252-dollars/). The MCP server kit exists because [we actually run 4+ MCP servers](/blog/mcp-servers-unix-pipes-of-ai/). The generative art kit exists because [we've actually run 105+ experiments](/blog/generative-art-pen-plotters/). Production experience is the moat. Nobody can replicate it from docs alone.
 
 **One product per day, no exceptions.** Scope expands to fill time. A week per product would produce a marginally better product. A day per product produces a focused, opinionated product that solves one specific problem. The constraint is the feature.
 
@@ -2659,7 +2657,7 @@ The chunking strategy matters: split on paragraph boundaries, preserve headers a
 **Trigger**: Schedule, every 6 hours
 **Flow**: Ping endpoints -> check responses -> alert on failure
 
-A simple but essential workflow. It hits health endpoints on my VPS services (Hermes agent, Mastra orchestrator, PM2 processes), checks response codes and latency, and sends a Telegram alert if anything is down or slow.
+A simple but essential workflow. It hits health endpoints on [my VPS services](/blog/building-ai-agent-infrastructure-solo) (Hermes agent, Mastra orchestrator, PM2 processes), checks response codes and latency, and sends a Telegram alert if anything is down or slow.
 
 The useful addition: a Claude node that receives the last 24 hours of health data and identifies trends. "Hermes response time has increased 3x over the past 12 hours" is more useful than a binary up/down check.
 
@@ -2836,7 +2834,7 @@ Think of them as git hooks, but for your AI coding assistant. Every file write, 
 
 The implementation is around 40 lines of Python. It parses the command string, checks for deny-list tokens, checks for asset-list tokens, and returns exit code 1 if both are present. No ML, no heuristics. Just string matching that works.
 
-**2. Verify Completion**: Runs when a task is marked as done. Checks that tests pass, that the build succeeds, and that the stated changes actually exist in the diff. Prevents the "I'm done" problem where an agent claims completion but left broken code.
+**2. Verify Completion**: Runs when a task is marked as done. Checks that tests pass, that the build succeeds, and that the stated changes actually exist in the diff. Prevents the ["I'm done" problem](/blog/agent-grounding-problem-hermes/) where an agent claims completion but left broken code.
 
 This is the hook that changes behavior most. When an AI agent knows its "done" claim will be verified, it front-loads the verification itself. The hook rarely fires because its existence changes the agent's approach.
 
@@ -3169,7 +3167,7 @@ The [agent infrastructure at Edgeless Lab](/blog/building-ai-agent-infrastructur
 
 **Backlog management server**: read and write tasks in a structured backlog. Lets agents file their own tasks, check status, and mark things complete. The backlog is a text file format; the MCP server is the typed interface over it.
 
-**Inter-agent messaging server**: a pub/sub channel for agents to send messages to each other. An orchestrator agent can dispatch work; worker agents can report back. Real-time, without a message queue.
+**Inter-agent messaging server**: a pub/sub channel for [agents to send messages to each other](/blog/agents-that-talk-to-each-other). An orchestrator agent can dispatch work; worker agents can report back. Real-time, without a message queue.
 
 None of these tools know about each other. Any agent can use any combination. Add a new server and it's immediately available to every agent in the system.
 
@@ -3511,7 +3509,7 @@ I read a lot of papers. Most of them sit in a tab until I forget why I opened th
 
 The problem: turning a paper into a playground usually takes hours. Jupyter notebooks are stateful JSON blobs that break when you look at them wrong. Streamlit apps are one-off scripts that don't compose. And most "reproducibility" efforts are Docker containers that take 30 minutes to build and require a GPU you don't have.
 
-Last week we tried something different. We took the classic multi-armed bandit problem; the explore/exploit dilemma that underlies every routing decision our agents make; and built an interactive demo in about 20 minutes. The tool is **marimo**, and it's now part of our research pipeline.
+Last week we tried something different. We took the classic multi-armed bandit problem; the explore/exploit dilemma that underlies [every routing decision our agents make](/blog/plan-with-opus-build-with-gemini/); and built an interactive demo in about 20 minutes. The tool is **marimo**, and it's now part of our research pipeline.
 
 ---
 

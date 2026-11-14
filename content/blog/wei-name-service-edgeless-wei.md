@@ -1,47 +1,30 @@
 ---
 slug: wei-name-service-edgeless-wei
-title: edgeless.wei: On-Chain Identity, One Domain at a Time
-description: We registered edgeless.wei as the canonical on-chain identity for the swarm. One domain, one identity, no namespace sprawl.
+title: What an On-Chain Name Can—and Can't—Do
+description: A look at Wei Name Service, the records a name can hold, and the distinction between registering a name and deploying an identity system.
 date: 2026-09-28
 tags:
 - Web3
 - ENS
 - Identity
 - On-Chain
-readTime: 5 min
+readTime: 4 min
 ---
 
-# edgeless.wei: On-Chain Identity, One Domain at a Time
+# What an On-Chain Name Can—and Can't—Do
 
-**Date:** 2026-09-27
-**Status:** Draft — humanizer pass complete
-**Source:** `claude-vault/03-Knowledge/2026-09-27-wei-name-service-edgeless-wei.md`
+A name is easier to share than a long wallet address. That is the appeal of on-chain naming: publish a human-readable identifier and let software look up the record behind it. But registration alone doesn't guarantee that every application can resolve the name, that a website is configured, or that an organization has implemented a complete identity system.
 
----
+[Wei Name Service](https://wei.domains/) is an Ethereum naming project for `.wei` names. Like the Ethereum Name Service (ENS), it associates names with records that compatible software can look up. A name can hold an address and other records, including text and website content references. Those records must be configured; their existence should not be assumed from the name alone.
 
-## What it is
+## What we found
 
-edgeless.wei is a name service on the ENS ecosystem that registers `.wei` domains and links them to on-chain identities. Think ENS, but for a smaller TLD and a sharper focus: one domain, one identity, no namespace sprawl.
+In a September 2026 check, `edgeless.wei` was registered and had an address record. It did not have a website content record configured at the time. That's a snapshot, not a guarantee about its current configuration.
 
-## Why it matters
+A name can be a useful starting point for linking an address, a project and public information. But software support matters: a wallet or application needs an appropriate resolver or bridge to understand the name. Before sending funds, check that the application resolves the intended address and verify it independently. A recognizable name is not a substitute for transaction review.
 
-ENS owns the `.eth` namespace. It's the obvious choice, but it's also crowded, expensive, and increasingly commercialized. `.wei` is a parallel that's:
+## Registration is not deployment
 
-- **Cheaper** — registration and renewal costs are a fraction of `.eth`
-- **Focused** — no speculative flipping, no domain squatters
-- **Verifiable** — every `.wei` resolves to a single on-chain record with a public wallet address
+Our initial exploration considered using subdomains or website records for projects. Those were possibilities to investigate, not proof that every project or agent already had a working identity. Setting records requires authorized transactions; hosting content also introduces availability and gateway considerations.
 
-## What you can do with it
-
-1. **Replace your Twitter handle** — put your `.wei` in your bio instead of a hex address
-2. **Receive crypto** — send to `yourname.wei` instead of `0x71C...`
-3. **Prove ownership** — the ENS resolver record is publicly queryable. No screenshot needed.
-4. **Link projects** — register `project.wei` and point it at a GitHub repo, a Subdomain, or an IPFS hash
-
-## The edgeless angle
-
-We registered `edgeless.wei` as the canonical on-chain identity for the swarm. Every agent, every project, every artifact now has a single resolvable name. No more copying 42-character addresses into chat. No more "which wallet was it again?"
-
-## The one-line version
-
-Your name, on-chain, without the hex.
+The lesson is simple: treat a name as an addressable record, not a magic guarantee of identity, permanence or universal compatibility. Inspect the actual records and the software resolving them before building a workflow around it.

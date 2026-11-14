@@ -30,6 +30,25 @@ describe("LongCapHarness publication", () => {
     expect(matches[0].content).toContain("We haven't run this harness ourselves");
   });
 
+  it("uses supported lists for every comparison, without raw tables or separators", () => {
+    const content = matches[0].content;
+    expect(content).not.toMatch(/^\s*\|/m);
+    expect(content).not.toMatch(/^---\s*$/m);
+    for (const comparison of [
+      "- **Llama3-8B (zero-shot)** — Configuration: 8K context; Avg Score: 15.14.",
+      "- **Llama3-8B with LongCapHarness** — Configuration: 8K context; Avg Score: **79.32**.",
+      "- **Gain:** **+64.18**.",
+      "- **Llama3-8B** — Baseline: NExtLong (128K); LongCapHarness: LongCapHarness; Honest Gain: **+9.17** pts.",
+      "- **Qwen2.5-3B** — Baseline: PolicyLong (128K); LongCapHarness: LongCapHarness; Honest Gain: **+14.63** pts.",
+      "- **Recall** — LongCapHarness: **100.00**; Base Model: 18.00 (Llama).",
+      "- **RULER** — LongCapHarness: **94.62**; Base Model: 17.80 (Llama).",
+      "- **Reranking** — LongCapHarness: **39.67**; Base Model: 7.74.",
+      "- **RRSI** — Input (M): 52.42; Output (M): 3.87; Cost: $331.",
+      "- **LongCapHarness** — Input (M): 814.11; Output (M): 3.35; Cost: **$541**.",
+      "- **NExtLong training** — Input (M): —; Output (M): —; Cost: $3,696.",
+    ]) expect(content).toContain(comparison);
+  });
+
   it("has valid related-post targets", () => {
     const links = [...matches[0].content.matchAll(/\]\(\/blog\/([^/)]+)\)/g)];
     expect(links.length).toBeGreaterThan(0);

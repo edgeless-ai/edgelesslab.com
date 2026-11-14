@@ -3,20 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Live preview of a marimo WASM notebook — same lazy-iframe pattern as
- * DemoPreview (creative demos), pointed at the WASM-exported app under
- * /marimo/<slug>/index.html.
- *
- * marimo's Pyodide runtime takes ~10-15s to boot inside the iframe, so the
- * pulse placeholder behind it is expected to show for longer than the p5.js
- * creative previews before the notebook paints over it.
+ * Lazy preview of a published marimo WASM notebook. Use the catalog's admitted
+ * URL, not a reconstructed legacy-host URL: newer notebooks live on this site.
+ * Pyodide can take ~10-15s to boot before painting over the placeholder.
  */
-// The 12 WASM notebooks (each bundles a 27MB Pyodide runtime → 322MB total) are
-// hosted on Cloudflare Pages, off the main GitHub repo. Swap this base for a custom
-// subdomain (e.g. marimo.edgelesslab.com) once DNS is set.
-const MARIMO_BASE = "https://marimo.edgelesslab.com";
-
-export function MarimoPreview({ slug, title }: { slug: string; title: string }) {
+export function MarimoPreview({ url, title }: { url: string; title: string }) {
+  const publishedUrl = new URL(url);
+  // Keep primary-domain notebooks same-origin in local static-export checks too.
+  const src = publishedUrl.origin === "https://edgelesslab.com"
+    ? `${publishedUrl.pathname}${publishedUrl.search}${publishedUrl.hash}`
+    : url;
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
 
@@ -39,7 +35,7 @@ export function MarimoPreview({ slug, title }: { slug: string; title: string }) 
     >
       {inView && (
         <iframe
-          src={`${MARIMO_BASE}/${slug}/`}
+          src={src}
           title={`${title} — live preview`}
           loading="lazy"
           tabIndex={-1}

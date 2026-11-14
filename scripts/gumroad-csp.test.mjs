@@ -23,6 +23,17 @@ test('overlay iframe permits the catalog merchant, not just the apex domain', ()
   for (const host of hosts) assert.ok(directives.get('frame-src').includes(`https://${host}`), host);
 });
 
+test('marimo previews have only an explicit frame-origin permission', () => {
+  assert.deepEqual(directives.get('frame-src'), [
+    "'self'", 'gumroad.com', 'https://edgelessai.gumroad.com', 'https://marimo.edgelesslab.com',
+  ]);
+  for (const [name, sources] of directives) {
+    if (name !== 'frame-src') {
+      assert.ok(!sources.includes('https://marimo.edgelesslab.com'), `${name} must not be widened`);
+    }
+  }
+});
+
 test('unrelated policy restrictions and ingestion permissions remain intact', () => {
   assert.deepEqual(directives.get('default-src'), ["'self'"]);
   assert.deepEqual(directives.get('font-src'), ["'self'", 'https://assets.gumroad.com']);

@@ -147,7 +147,7 @@ function DemoCard({ demo }: { demo: PublishedMarimoDemo }) {
         borderColor: "var(--border-subtle)",
       }}
     >
-      <MarimoPreview slug={demo.slug} title={demo.title} />
+      <MarimoPreview url={demo.published_url} title={demo.title} />
       <div className="flex items-start justify-between gap-2 mb-3">
         <h3
           className="text-[15px] font-medium leading-tight"

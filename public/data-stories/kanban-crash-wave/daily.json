@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "source": "Edgeless internal task_runs ledger; aggregate snapshot",
+  "observedAt": "2026-11-16T21:04:19.786458+00:00",
+  "query": "SELECT date(started_at,'unixepoch') AS day,COUNT(*) AS runs,SUM(status='crashed') AS crashed,SUM(status='done') AS done FROM task_runs WHERE started_at >= unixepoch('2026-10-05') AND started_at < unixepoch('2026-10-15') GROUP BY day ORDER BY day",
+  "cohort": "UTC start day; status as recorded at snapshot; attempts, not unique tasks",
+  "rows": [
+    {
+      "day": "2026-10-05",
+      "runs": 847,
+      "crashed": 81,
+      "done": 422
+    },
+    {
+      "day": "2026-10-06",
+      "runs": 1388,
+      "crashed": 102,
+      "done": 388
+    },
+    {
+      "day": "2026-10-07",
+      "runs": 828,
+      "crashed": 95,
+      "done": 125
+    },
+    {
+      "day": "2026-10-08",
+      "runs": 958,
+      "crashed": 657,
+      "done": 114
+    },
+    {
+      "day": "2026-10-09",
+      "runs": 607,
+      "crashed": 446,
+      "done": 127
+    },
+    {
+      "day": "2026-10-10",
+      "runs": 161,
+      "crashed": 3,
+      "done": 123
+    },
+    {
+      "day": "2026-10-11",
+      "runs": 164,
+      "crashed": 23,
+      "done": 122
+    },
+    {
+      "day": "2026-10-12",
+      "runs": 190,
+      "crashed": 14,
+      "done": 139
+    },
+    {
+      "day": "2026-10-13",
+      "runs": 200,
+      "crashed": 6,
+      "done": 122
+    },
+    {
+      "day": "2026-10-14",
+      "runs": 195,
+      "crashed": 8,
+      "done": 117
+    }
+  ]
+}

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2610.16426-authgate-action-anchoring</title>
+    <script type="module" crossorigin src="./assets/index-Gv23EHlE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-TXkS1QI3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-BlG0ZrO0.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-Blw4afVn.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-C0195JsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-DOVIEEPN.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-i2ImZxgc.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BUCH2FMc.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-Dun7Qe4B.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-B7U4xkIN.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-XrBBnd7s.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-DYvqRARy.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-B92a4ePY.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-DDGiD1NW.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-CTDqNQr6.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CCi6aOPm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BLN8PNJV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-w-Qo9n0R.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-rzLRd0j9.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-C-Eq0ag8.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BP75_5jJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-4bZlU7jl.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BwJoaaDM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-D91BmmQi.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CkiqGLcK.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-DvLSfCY5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-DKD1r8uL.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-_9WLTEyt.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-BWBBpCkT.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-CDyU_g2F.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BmukRjSi.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-D2igisxY.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-Q7J_6d.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-ImXS-885.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-C8EV1PoE.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-9-v2bhoi.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-lLOBhc-1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CbdaHKzX.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-Bxv9B31g.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-DbOq36rN.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings--BknHX9C.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-CGKw_kwj.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-DoEg0XwL.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DGx5Af-C.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BKO-pHK6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-12S8I4CH.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DYEuVkEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CiVShZKM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BJZAIIze.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-aRc_dRed.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DnjsPBRJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DcwTQG1A.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CPjTeT8p.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DI1-Z60I.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-FMMSUPAS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-Ct2FT81-.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-CWmnYhGI.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-D5tzp-Y6.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BT6B8Bon.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-CsYTPAhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-OiXznToA.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CKO8g4BU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-BNL5rxQw.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-CJLUCcQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C5HnBH5U.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-WiYBwhUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-Bb8Lz8ko.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-BCVepWLJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-JDKr83KO.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-rmawRqQP.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BUSmWJKC.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BFPaAUK_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-4-Qvf4uR.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-5hBv4sjD.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-JxFwu-3G.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-fY-ZfT0b.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-CWQ4BYr-.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BJVx3eBW.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-jlwhGxSb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-BS_NcSch.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-dHmZR8bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-wcQA1Np1.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DZ4glj3f.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bxb1_Gtw.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-3iHFdt22.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-neDQUo4Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-C1rWkDWe.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DbljozeY.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Rxc-B11B.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-BttHlyvs.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-Bxz_8e44.js">
+    <link rel="modulepreload" crossorigin href="./assets/sparkles-DUCpRFlS.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-Cu5WMawt.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-DzTD8LVq.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BOZA7gbn.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CYq4mK5a.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-BiQ4VzX-.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-D-V4psAa.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CN9yTa5s.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-B6HBbAwF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Bg5iAViP.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-A-Ant1Ad.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-Dx_STMJD.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CYQpNADu.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-CzJx-MnJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-Dqxie4gq.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BsxD35VE.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Bcz1Zikb.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-PgHhDa-M.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DwYUg-o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CH2plyy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-j6fR_dBA.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-BSxEOIn2.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-DzmLpc9A.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CCTAhdFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CjNeNXDB.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-D7naiWNs.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-C2LWzsCZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-rtpVEy3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D4GMDkIf.js">
+    <link rel="modulepreload" crossorigin href="./assets/RSPContexts-WiCgGm__.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-D-tcnZC7.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-C_B8Ux9M.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-BOlXZUla.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-dL5J5ZsZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-AgXtozBz.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-72W0TZ3L.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Z-MD3n3J.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D2UI9WX5.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-iDRxid4h.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DNNRTPQJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-C7opZZRp.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-DREOGG_c.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CIPE8AIY.js">
+    <link rel="modulepreload" crossorigin href="./assets/radio-group-CcU5wNVj.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DBlzcHYf.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-OVajJBPR.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-B30N1GS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-CYfbPYQ0.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-DAu6VO6j.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-CJH9JNGH.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-5XI2VU-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CODNoWOy.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-90X9nql5.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-852X_cqy.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-BNTWOaI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-Tp7rARFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-C-qh_et5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-CsW0tABf.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-CsGOoEZv.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-CqjrpwRC.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-W6ZZMHnc.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DtCcemo9.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-sLaKP2vj.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-BYlqbYKI.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-Bl8_FVn8.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-CFj86iac.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CSMoa-ga.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-jdbI9Q8O.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-C-Nli4KG.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-hLJmVjNJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-icFgkNy9.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-gYgfF8y5.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-hMc_3QZy.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CSsM95b1.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-Bd5tsfm_.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-D1xb4gl6.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-aSiY8T7C.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-Dwo3iXzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DS0r7dNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-DFICx2Qv.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-BL4YVsPy.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D0TWQ6iT.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-BVzo2MHf.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-8Nlyq3mV.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\n#   \"marimo==0.23.16\",\n# ]\n# ///\n\nimport marimo\n\n__generated_with = \"0.23.16\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as _mo\n    _mo.md(r\"\"\"\n    # When explicit policy changes an authorization gate\n\n    **Research question:** if the action and trajectory stay fixed while the\n    user's request flips the correct decision, how often do tested model gates\n    ignore that context - and does an explicit policy help?\n\n    This explorer recomputes four-model averages from Tables 3 and 4 of\n    [AuthGateBench, arXiv:2610.16426v2](https://arxiv.org/abs/2610.16426v2).\n    The values are **author-reported results on a synthetic benchmark**. This is\n    a published-table explorer, not an independent model evaluation and not an\n    authorization system.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _():\n    import marimo as _mo\n    policy = _mo.ui.dropdown(\n        options=[\"Implicit safety heuristic\", \"Explicit governing policy\"],\n        value=\"Implicit safety heuristic\",\n        label=\"Gate instruction\",\n    )\n    _mo.hstack([policy, _mo.md(\"Lower invariant rate is better: the gate changed its answer when authorization context changed.\")])\n    return (policy,)\n\n\n@app.cell\ndef _(policy):\n    import marimo as _mo\n\n    _rows = [\n        (\"Scope escalation\", 53.22, 25.36),\n        (\"Credential exploration\", 87.14, 69.29),\n        (\"External sharing\", 95.36, 73.57),\n        (\"Guardrail bypass\", 81.78, 54.64),\n        (\"Inferred parameters\", 52.86, 37.86),\n    ]\n    _explicit = policy.value == \"Explicit governing policy\"\n    _values = [_row[2] if _explicit else _row[1] for _row in _rows]\n    _overall = sum(_values) / len(_values)\n    _marker = \"explicit\" if _explicit else \"implicit\"\n    _bars = \"\".join(\n        f'\u003Ctext x=\"212\" y=\"{73 + 58 * _i}\" text-anchor=\"end\" font-size=\"13\"\u003E{_row[0]}\u003C/text\u003E'\n        f'\u003Crect x=\"224\" y=\"{52 + 58 * _i}\" width=\"{3.9 * _value:.1f}\" height=\"32\" rx=\"6\" fill=\"{(\"#0f766e\" if _explicit else \"#c2410c\")}\"/\u003E'\n        f'\u003Ctext x=\"{234 + 3.9 * _value:.1f}\" y=\"{73 + 58 * _i}\" font-size=\"14\" font-weight=\"700\"\u003E{_value:.2f}%\u003C/text\u003E'\n        for _i, (_row, _value) in enumerate(zip(_rows, _values))\n    )\n    _ticks = \"\".join(\n        f'\u003Cline x1=\"{224 + 78 * _i}\" y1=\"40\" x2=\"{224 + 78 * _i}\" y2=\"338\" stroke=\"#e2e8f0\"/\u003E'\n        f'\u003Ctext x=\"{224 + 78 * _i}\" y=\"358\" text-anchor=\"middle\" font-size=\"11\"\u003E{20 * _i}%\u003C/text\u003E'\n        for _i in range(6)\n    )\n    _svg = f'''\u003Csvg data-chart=\"authgate-anchoring\" data-policy=\"{_marker}\"\n      viewBox=\"0 0 680 380\" style=\"width:100%;height:auto;background:#fff;border:1px solid #cbd5e1;border-radius:12px\"\n      role=\"img\" aria-label=\"AuthGateBench mean invariant rates by failure mode\"\u003E\n      \u003Ctext x=\"24\" y=\"27\" font-size=\"17\" font-weight=\"700\"\u003EMean invariant rate across four tested models\u003C/text\u003E\n      {_ticks}{_bars}\n    \u003C/svg\u003E'''\n    _heading = _mo.md(\n        f\"## {policy.value}: mean invariant rate {_overall:.2f}%\"\n    )\n    _delta = 74.07 - 52.14\n    _note = _mo.md(f\"\"\"\n    Across all 20 model-category cells, explicit policy lowers the published\n    mean invariant rate by **{_delta:.2f} percentage points**. It does not erase\n    action anchoring: Credential Exploration and External Sharing remain above\n    **69%** in the explicit-policy view. A lower invariant rate only shows more\n    context-sensitive decisions; it does not by itself prove the decisions are\n    correct, secure, or ready to authorize effects.\n    \"\"\")\n    _mo.vstack([_heading, _mo.Html(_svg), _note])\n    return\n\n\n@app.cell\ndef _():\n    import marimo as _mo\n    _mo.md(r\"\"\"\n    ## Interpretation contract\n\n    1. **What is reproduced:** arithmetic means of the invariant-rate entries\n       reported in paper Tables 3 and 4; each category contains 70 contrast pairs.\n    2. **What is not reproduced:** model calls, labels, prompts, or raw predictions.\n       The repository exposes 700 synthetic records, but not the predictions needed\n       to independently rederive these tables.\n    3. **Denominator:** the release has 700 records / 350 pairs evaluated with and\n       without synthetic signals - not 1,400 independent scenarios.\n    4. **Deployment boundary:** a model may provide evidence, but final authority\n       should remain with deterministic, identity-scoped policy and an effect gate.\n\n    Sources: arXiv:2610.16426v2; pinned AuthGateBench repository commit\n    `af4048e343778c85bcc89347e7b88dd94b0f57cc`. Dataset license: CC BY-NC-ND\n    4.0. The demo bundles no dataset rows, credentials, model weights, or API calls.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%0A%23%20%20%20%22marimo%3D%3D0.23.16%22%2C%0A%23%20%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.23.16%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20_mo%0A%20%20%20%20_mo.md(r%22%22%22%0A%20%20%20%20%23%20When%20explicit%20policy%20changes%20an%20authorization%20gate%0A%0A%20%20%20%20**Research%20question%3A**%20if%20the%20action%20and%20trajectory%20stay%20fixed%20while%20the%0A%20%20%20%20user's%20request%20flips%20the%20correct%20decision%2C%20how%20often%20do%20tested%20model%20gates%0A%20%20%20%20ignore%20that%20context%20-%20and%20does%20an%20explicit%20policy%20help%3F%0A%0A%20%20%20%20This%20explorer%20recomputes%20four-model%20averages%20from%20Tables%203%20and%204%20of%0A%20%20%20%20%5BAuthGateBench%2C%20arXiv%3A2610.16426v2%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2610.16426v2).%0A%20%20%20%20The%20values%20are%20**author-reported%20results%20on%20a%20synthetic%20benchmark**.%20This%20is%0A%20%20%20%20a%20published-table%20explorer%2C%20not%20an%20independent%20model%20evaluation%20and%20not%20an%0A%20%20%20%20authorization%20system.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20_mo%0A%20%20%20%20policy%20%3D%20_mo.ui.dropdown(%0A%20%20%20%20%20%20%20%20options%3D%5B%22Implicit%20safety%20heuristic%22%2C%20%22Explicit%20governing%20policy%22%5D%2C%0A%20%20%20%20%20%20%20%20value%3D%22Implicit%20safety%20heuristic%22%2C%0A%20%20%20%20%20%20%20%20label%3D%22Gate%20instruction%22%2C%0A%20%20%20%20)%0A%20%20%20%20_mo.hstack(%5Bpolicy%2C%20_mo.md(%22Lower%20invariant%20rate%20is%20better%3A%20the%20gate%20changed%20its%20answer%20when%20authorization%20context%20changed.%22)%5D)%0A%20%20%20%20return%20(policy%2C)%0A%0A%0A%40app.cell%0Adef%20_(policy)%3A%0A%20%20%20%20import%20marimo%20as%20_mo%0A%0A%20%20%20%20_rows%20%3D%20%5B%0A%20%20%20%20%20%20%20%20(%22Scope%20escalation%22%2C%2053.22%2C%2025.36)%2C%0A%20%20%20%20%20%20%20%20(%22Credential%20exploration%22%2C%2087.14%2C%2069.29)%2C%0A%20%20%20%20%20%20%20%20(%22External%20sharing%22%2C%2095.36%2C%2073.57)%2C%0A%20%20%20%20%20%20%20%20(%22Guardrail%20bypass%22%2C%2081.78%2C%2054.64)%2C%0A%20%20%20%20%20%20%20%20(%22Inferred%20parameters%22%2C%2052.86%2C%2037.86)%2C%0A%20%20%20%20%5D%0A%20%20%20%20_explicit%20%3D%20policy.value%20%3D%3D%20%22Explicit%20governing%20policy%22%0A%20%20%20%20_values%20%3D%20%5B_row%5B2%5D%20if%20_explicit%20else%20_row%5B1%5D%20for%20_row%20in%20_rows%5D%0A%20%20%20%20_overall%20%3D%20sum(_values)%20%2F%20len(_values)%0A%20%20%20%20_marker%20%3D%20%22explicit%22%20if%20_explicit%20else%20%22implicit%22%0A%20%20%20%20_bars%20%3D%20%22%22.join(%0A%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22212%22%20y%3D%22%7B73%20%2B%2058%20*%20_i%7D%22%20text-anchor%3D%22end%22%20font-size%3D%2213%22%3E%7B_row%5B0%5D%7D%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20f'%3Crect%20x%3D%22224%22%20y%3D%22%7B52%20%2B%2058%20*%20_i%7D%22%20width%3D%22%7B3.9%20*%20_value%3A.1f%7D%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%7B(%22%230f766e%22%20if%20_explicit%20else%20%22%23c2410c%22)%7D%22%2F%3E'%0A%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7B234%20%2B%203.9%20*%20_value%3A.1f%7D%22%20y%3D%22%7B73%20%2B%2058%20*%20_i%7D%22%20font-size%3D%2214%22%20font-weight%3D%22700%22%3E%7B_value%3A.2f%7D%25%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20for%20_i%2C%20(_row%2C%20_value)%20in%20enumerate(zip(_rows%2C%20_values))%0A%20%20%20%20)%0A%20%20%20%20_ticks%20%3D%20%22%22.join(%0A%20%20%20%20%20%20%20%20f'%3Cline%20x1%3D%22%7B224%20%2B%2078%20*%20_i%7D%22%20y1%3D%2240%22%20x2%3D%22%7B224%20%2B%2078%20*%20_i%7D%22%20y2%3D%22338%22%20stroke%3D%22%23e2e8f0%22%2F%3E'%0A%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22%7B224%20%2B%2078%20*%20_i%7D%22%20y%3D%22358%22%20text-anchor%3D%22middle%22%20font-size%3D%2211%22%3E%7B20%20*%20_i%7D%25%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20for%20_i%20in%20range(6)%0A%20%20%20%20)%0A%20%20%20%20_svg%20%3D%20f'''%3Csvg%20data-chart%3D%22authgate-anchoring%22%20data-policy%3D%22%7B_marker%7D%22%0A%20%20%20%20%20%20viewBox%3D%220%200%20680%20380%22%20style%3D%22width%3A100%25%3Bheight%3Aauto%3Bbackground%3A%23fff%3Bborder%3A1px%20solid%20%23cbd5e1%3Bborder-radius%3A12px%22%0A%20%20%20%20%20%20role%3D%22img%22%20aria-label%3D%22AuthGateBench%20mean%20invariant%20rates%20by%20failure%20mode%22%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2227%22%20font-size%3D%2217%22%20font-weight%3D%22700%22%3EMean%20invariant%20rate%20across%20four%20tested%20models%3C%2Ftext%3E%0A%20%20%20%20%20%20%7B_ticks%7D%7B_bars%7D%0A%20%20%20%20%3C%2Fsvg%3E'''%0A%20%20%20%20_heading%20%3D%20_mo.md(%0A%20%20%20%20%20%20%20%20f%22%23%23%20%7Bpolicy.value%7D%3A%20mean%20invariant%20rate%20%7B_overall%3A.2f%7D%25%22%0A%20%20%20%20)%0A%20%20%20%20_delta%20%3D%2074.07%20-%2052.14%0A%20%20%20%20_note%20%3D%20_mo.md(f%22%22%22%0A%20%20%20%20Across%20all%2020%20model-category%20cells%2C%20explicit%20policy%20lowers%20the%20published%0A%20%20%20%20mean%20invariant%20rate%20by%20**%7B_delta%3A.2f%7D%20percentage%20points**.%20It%20does%20not%20erase%0A%20%20%20%20action%20anchoring%3A%20Credential%20Exploration%20and%20External%20Sharing%20remain%20above%0A%20%20%20%20**69%25**%20in%20the%20explicit-policy%20view.%20A%20lower%20invariant%20rate%20only%20shows%20more%0A%20%20%20%20context-sensitive%20decisions%3B%20it%20does%20not%20by%20itself%20prove%20the%20decisions%20are%0A%20%20%20%20correct%2C%20secure%2C%20or%20ready%20to%20authorize%20effects.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20_mo.vstack(%5B_heading%2C%20_mo.Html(_svg)%2C%20_note%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20_mo%0A%20%20%20%20_mo.md(r%22%22%22%0A%20%20%20%20%23%23%20Interpretation%20contract%0A%0A%20%20%20%201.%20**What%20is%20reproduced%3A**%20arithmetic%20means%20of%20the%20invariant-rate%20entries%0A%20%20%20%20%20%20%20reported%20in%20paper%20Tables%203%20and%204%3B%20each%20category%20contains%2070%20contrast%20pairs.%0A%20%20%20%202.%20**What%20is%20not%20reproduced%3A**%20model%20calls%2C%20labels%2C%20prompts%2C%20or%20raw%20predictions.%0A%20%20%20%20%20%20%20The%20repository%20exposes%20700%20synthetic%20records%2C%20but%20not%20the%20predictions%20needed%0A%20%20%20%20%20%20%20to%20independently%20rederive%20these%20tables.%0A%20%20%20%203.%20**Denominator%3A**%20the%20release%20has%20700%20records%20%2F%20350%20pairs%20evaluated%20with%20and%0A%20%20%20%20%20%20%20without%20synthetic%20signals%20-%20not%201%2C400%20independent%20scenarios.%0A%20%20%20%204.%20**Deployment%20boundary%3A**%20a%20model%20may%20provide%20evidence%2C%20but%20final%20authority%0A%20%20%20%20%20%20%20should%20remain%20with%20deterministic%2C%20identity-scoped%20policy%20and%20an%20effect%20gate.%0A%0A%20%20%20%20Sources%3A%20arXiv%3A2610.16426v2%3B%20pinned%20AuthGateBench%20repository%20commit%0A%20%20%20%20%60af4048e343778c85bcc89347e7b88dd94b0f57cc%60.%20Dataset%20license%3A%20CC%20BY-NC-ND%0A%20%20%20%204.0.%20The%20demo%20bundles%20no%20dataset%20rows%2C%20credentials%2C%20model%20weights%2C%20or%20API%20calls.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.23.16",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "pip"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

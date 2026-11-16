@@ -12,6 +12,19 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("registers the frozen tail-release illustration with its explicit evidence boundary", () => {
+    const entry = marimoDemos.find(d => d.slug === "2609.10964-tail-aware-release");
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2609.10964-tail-aware-release/");
+    expect(entry?.title).toBe("Ready Is Not Released: Preserving Scheduling Choice");
+    expect(entry?.description).toContain("Deterministic six-turn mechanism illustration");
+    expect(entry?.description).toContain("no mean-CVaR estimator, adaptive queue-pressure controller, trace replay");
+    expect(entry?.description).toContain("author-reported, not demo outputs");
+    expect(Object.keys(entry ?? {}).sort()).toEqual([
+      "title", "slug", "description", "category", "tags", "published_url",
+    ].sort());
+    expect(publishedMarimoDemos).toContainEqual(entry);
+  });
+
   it("matches an independently validated raw catalog without a second hand-maintained list", () => {
     expect(publishedMarimoDemos).toEqual(validateMarimoCatalog(marimoDemos));
     expect(marimoDemos.some((demo) => demo.published_url == null)).toBe(true);

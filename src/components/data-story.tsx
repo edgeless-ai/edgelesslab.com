@@ -54,13 +54,7 @@ export function DataStory({ config }: { config: DataStoryConfig }) {
         <span className={styles.unit}>Crash share of runs · 0–100%</span>
       </div>
 
-      <div className={styles.mobilePreview}>
-        <img className={styles.animatedPreview} src={config.previewUrl} alt="Animated preview of the daily crash-status share" />
-        <img className={styles.stillPreview} src={config.posterUrl} alt="Static preview of the daily crash-status share" />
-        <a href="#interactive-data-story">Explore interactive chart ↓</a>
-      </div>
-
-      {error ? <div className={styles.noScript}><p role="alert" className={styles.error}>{error}</p><img src={config.posterUrl} alt="Static chart while daily aggregates are unavailable" /></div> : snapshot && row ? (
+      {error ? <div className={styles.noScript}><p role="alert" className={styles.error}>{error}</p><picture><source media="(prefers-reduced-motion: reduce)" srcSet={config.posterUrl} /><source media="(max-width: 640px)" srcSet={config.previewUrl} /><img src={config.posterUrl} alt="Daily crash-status chart while aggregates are unavailable" /></picture></div> : snapshot && row ? (
         <div id="interactive-data-story">
           <div className={styles.chartScroll}>
             <svg data-testid="data-story-chart" viewBox="0 0 560 268" role="img" aria-label={`Crash share through ${row.day}: ${row.crashed} of ${row.runs} runs`}>
@@ -96,9 +90,9 @@ export function DataStory({ config }: { config: DataStoryConfig }) {
         </div>
       ) : <p role="status">Loading daily aggregates…</p>}
       <div className={styles.source}>
-        <p>Source: aggregate-only internal task-run ledger snapshot. UTC start-day cohorts, not service availability. <a href={config.dataUrl} download>Download JSON</a> · <a href={config.notebookUrl} download>Run the notebook (.py)</a> with <code>uvx marimo run --sandbox notebook.py</code>.</p>
+        <p>Source: aggregate-only internal task-run ledger snapshot. UTC start-day cohorts, not service availability. <a href={config.dataUrl} download>Download JSON</a> · <a href={config.previewUrl}>Animated preview (GIF)</a> · <a href={config.notebookUrl} download>Run the notebook (.py)</a> with <code>uvx marimo run --sandbox notebook.py</code>.</p>
       </div>
-      <noscript><div className={styles.noScript}><img src={config.posterUrl} alt="Static chart of daily crash-status share" /><p>Interactive chart needs JavaScript. <a href={config.dataUrl}>Download the daily aggregates</a>.</p></div></noscript>
+      <noscript><div className={styles.noScript}><picture><source media="(prefers-reduced-motion: reduce)" srcSet={config.posterUrl} /><source media="(max-width: 640px)" srcSet={config.previewUrl} /><img src={config.posterUrl} alt="Daily crash-status chart preview" /></picture><p>Interactive chart needs JavaScript. <a href={config.dataUrl}>Download the daily aggregates</a>.</p></div></noscript>
     </section>
   );
 }

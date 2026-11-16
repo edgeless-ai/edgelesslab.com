@@ -27,20 +27,25 @@ test("scrubbing and playback change the SVG geometry; pause holds it", async ({ 
 test("mobile fallback, controls, and reduced-motion poster fit the viewport", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 780 });
   await page.goto(route);
-  await expect(page.getByAltText("Animated preview of the daily crash-status share")).toBeVisible();
-  await expect(page.getByRole("link", { name: /Explore interactive chart/ })).toBeVisible();
+  await expect(page.getByTestId("data-story-chart")).toBeVisible();
+  await expect(page.getByRole("region", { name: "Crash status by UTC start day", exact: true }).locator("picture")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Animated preview (GIF)" })).toBeVisible();
   await expect(page.getByRole("slider", { name: "Select UTC start day" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+  await page.route("**/data-stories/kanban-crash-wave/daily.json", (request) => request.fulfill({ status: 503, body: "Unavailable" }));
+  await page.reload();
+  const fallback = page.getByAltText("Daily crash-status chart while aggregates are unavailable");
+  await expect(fallback).toBeVisible();
+  await expect.poll(() => fallback.evaluate((image: HTMLImageElement) => image.currentSrc)).toContain("preview.gif");
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await expect(page.getByAltText("Static preview of the daily crash-status share")).toBeVisible();
-  await expect(page.getByAltText("Animated preview of the daily crash-status share")).toBeHidden();
+  await expect.poll(() => fallback.evaluate((image: HTMLImageElement) => image.currentSrc)).toContain("poster.png");
 });
 
 test("no-JavaScript poster and dataset link remain available", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto(route);
-  await expect(page.getByAltText("Static chart of daily crash-status share")).toBeVisible();
+  await expect(page.getByAltText("Daily crash-status chart preview")).toBeVisible();
   await expect(page.getByRole("link", { name: "Download the daily aggregates" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Run the notebook (.py)" })).toBeVisible();
   await context.close();
@@ -50,7 +55,7 @@ test("failed data request shows a poster without inventing data or hiding source
   await page.route("**/data-stories/kanban-crash-wave/daily.json", (route) => route.fulfill({ status: 503, body: "Unavailable" }));
   await page.goto(route);
   await expect(page.getByRole("alert").filter({ hasText: "Data story unavailable:" })).toContainText("HTTP 503");
-  await expect(page.getByAltText("Static chart while daily aggregates are unavailable")).toBeVisible();
+  await expect(page.getByAltText("Daily crash-status chart while aggregates are unavailable")).toBeVisible();
   await expect(page.getByTestId("data-story-chart")).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Run the notebook (.py)" })).toBeVisible();
 });

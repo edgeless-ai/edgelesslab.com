@@ -4,7 +4,7 @@
 .eyebrow, .unit, .axis { color: var(--text-tertiary); font: 11px ui-monospace, monospace; }
 .eyebrow { text-transform: uppercase; letter-spacing: .1em; }
 .chartScroll { width: 100%; overflow-x: auto; }
-.chartScroll svg { width: 100%; min-width: 430px; height: auto; margin-top: .75rem; }
+.chartScroll svg { width: 100%; height: auto; margin-top: .75rem; }
 .grid { stroke: var(--border-subtle); stroke-width: 1; }
 .context { fill: none; stroke: var(--text-secondary); stroke-width: 2; opacity: .35; }
 .line { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
@@ -18,10 +18,9 @@
 .controls button:hover, .controls button:focus-visible { background: var(--accent-muted); }
 .controls input { flex: 1 1 180px; accent-color: var(--accent); min-height: 36px; }
 .source { border-top: 1px solid var(--border-subtle); margin-top: 1rem; padding-top: .75rem; color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
-.source p { margin: .4rem 0; }.source a, .mobilePreview a, .noScript a { color: var(--accent); text-decoration: underline; }
+.source p { margin: .4rem 0; }.source a, .noScript a { color: var(--accent); text-decoration: underline; }
 .source pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: .75rem; background: var(--bg-base); border-radius: 6px; }
 .source summary { cursor: pointer; }.source code { overflow-wrap: anywhere; }
 .error { color: var(--text-primary); border: 1px solid var(--accent); padding: .75rem; margin: 1rem 0; }
-.mobilePreview { display: none; }.mobilePreview img, .noScript img { width: 100%; height: auto; }.stillPreview { display: none; }
-@media (max-width: 640px) { .story { padding: 1rem; }.mobilePreview { display: block; margin-top: 1rem; }.mobilePreview a { display: inline-block; margin-top: .5rem; font-size: 13px; }.readout { display: grid; } }
-@media (prefers-reduced-motion: reduce) { .animatedPreview { display: none; }.stillPreview { display: block; } }
+.noScript img { width: 100%; height: auto; }
+@media (max-width: 640px) { .story { padding: 1rem; }.readout { display: grid; }.axis, .directLabel { font-size: 18px; } }

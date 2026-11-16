@@ -1,10 +1,12 @@
 import { newPosts } from "./blog-new-posts";
+import { dataStoryPost } from "./data-story-post";
 import type { BlogPost } from "./blog-types";
 
 // Re-exported so existing `@/lib/blog` consumers keep importing the type from here.
 export type { BlogPost };
 
 const allPosts: BlogPost[] = [
+  dataStoryPost,
   {
     slug: "kb-audit-circulation",
     editorial: true,

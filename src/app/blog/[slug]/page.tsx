@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/json-ld";
 import { BlogArticle } from "@/components/blog-article";
 import { RelatedPosts } from "@/components/related-posts";
 import { EtsyCallout } from "@/components/etsy-callout";
+import { DataStory } from "@/components/data-story";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -177,6 +178,7 @@ export default async function BlogPostPage({
           </div>
 
           {/* Content */}
+          {post.dataStory && <DataStory config={post.dataStory} />}
           <BlogArticle
             html={html}
             editorial={post.editorial}

@@ -12,6 +12,19 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("registers the live maintainer-flagged sample with selection and inference boundaries", () => {
+    const entry = marimoDemos.find(d => d.slug === "2611.15159-slop-sample-boundary");
+    expect(entry?.title).toBe("Maintainer-Flagged PRs: Selection Before Inference");
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2611.15159-slop-sample-boundary/");
+    expect(entry?.category).toBe("Research");
+    expect(entry?.tags).toEqual(["open-source", "ai-coding", "software-engineering", "dataset-audit", "evidence-boundaries"]);
+    expect(entry?.description).toContain("measured precision separate from unknown recall and causal claims");
+    expect(Object.keys(entry ?? {}).sort()).toEqual([
+      "title", "slug", "description", "category", "tags", "published_url",
+    ].sort());
+    expect(publishedMarimoDemos).toContainEqual(entry);
+  });
+
   it("registers the frozen tail-release illustration with its explicit evidence boundary", () => {
     const entry = marimoDemos.find(d => d.slug === "2609.10964-tail-aware-release");
     expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2609.10964-tail-aware-release/");

@@ -12,6 +12,19 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("registers the verified trigger-boundary demo without overstating probe success", () => {
+    const entry = marimoDemos.find(d => d.slug === "2401.05566-adversarial-training-blind-spot");
+    expect(entry?.title).toBe("When Red-Teaming Teaches the Trigger Boundary");
+    expect(entry?.category).toBe("AI evaluation");
+    expect(entry?.tags).toEqual(["ai-safety", "red-teaming", "backdoors", "evaluation", "distribution-shift"]);
+    expect(entry?.description).toBe("Reproduce Sleeper Agents Figure 3b aggregate response rates and explore why narrow probe success does not establish removal of a held-out trigger-conditioned policy.");
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2401.05566-adversarial-training-blind-spot/");
+    expect(Object.keys(entry ?? {}).sort()).toEqual([
+      "title", "slug", "description", "category", "tags", "published_url",
+    ].sort());
+    expect(publishedMarimoDemos).toContainEqual(entry);
+  });
+
   it("registers the live maintainer-flagged sample with selection and inference boundaries", () => {
     const entry = marimoDemos.find(d => d.slug === "2611.15159-slop-sample-boundary");
     expect(entry?.title).toBe("Maintainer-Flagged PRs: Selection Before Inference");

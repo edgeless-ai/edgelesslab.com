@@ -52,6 +52,8 @@ committing). Install Playwright Chromium first if it is not already available.
 
 `public/marimo/<slug>/` is an approved byte boundary, not a Next.js page.
 Critters excludes that subtree from HTML processing and empty-CSS cleanup.
+Launch-readiness preserves authored notebook metadata while still auditing its
+internal references; it must not inject canonical, OpenGraph or Twitter tags.
 Postbuild restores the complete authoritative public tree after generic source-map
 removal, then `verify-immutable-marimo.mjs` checks every relative path and SHA256
 again after repairs and Pagefind. Missing, changed or extra exported files fail.

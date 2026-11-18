@@ -80,6 +80,24 @@ test("preserves verification content, existing noindex redirects, and developmen
   );
   assert.equal(exclusionFor("/study/", html), null);
 });
+test("immutable marimo metadata is untouched, nested pages included, while references still fail closed", (t) => {
+  for (const route of ["/marimo/slug/", "/marimo/slug/nested/view.html"]) {
+    assert.equal(repairMetadata(html, route).html, html);
+    assert.deepEqual(repairMetadata(html, route).changes, []);
+  }
+  assert.equal(exclusionFor("/marimo-gallery/", html), null);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "launch-marimo-"));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(dir, "marimo/slug"), { recursive: true });
+  fs.writeFileSync(path.join(dir, "sitemap.xml"), "<urlset></urlset>");
+  const file = path.join(dir, "marimo/slug/index.html");
+  const authored = html.replace("</body>", '<img src="/unapproved-missing.png"></body>');
+  fs.writeFileSync(file, authored);
+  const result = auditExport(dir, { repair: true });
+  assert.equal(fs.readFileSync(file, "utf8"), authored);
+  assert.equal(result.summary.changedFiles, 0);
+  assert.ok(result.failures.some(x => x.url?.endsWith("/unapproved-missing.png")));
+});
 test("references include relative images, srcsets, CSS and social assets; ignore inline data and script text", () => {
   const refs = internalReferences(
     '<head><meta property="og:image" content="https://edgelesslab.com/og.webp"></head><img src="poster.png" srcset="small.webp 1x, large.webp 2x"><style>.a{background:url(/bg.webp)}</style><a href="/target/?q=x#section">x</a><script>const fake=`<img src="/fake.png">`</script><img src="data:image/png;base64,a">',

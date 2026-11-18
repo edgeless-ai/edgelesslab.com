@@ -1,0 +1,202 @@
+{
+  "task": "t_749a7410",
+  "publication": "private drafts only; no commercial reproduction attestation, physical sample approval or release",
+  "receipts": [
+    {
+      "master": {
+        "slug": "flow-field-calligraphy",
+        "title": "Flow Field Calligraphy",
+        "hide": "#info",
+        "frames": 240,
+        "file": "flow-field-calligraphy.png",
+        "source": "https://edgelesslab.com/creative-demos/flow-field-calligraphy/",
+        "source_sha256": "057e5c96d2bd22dfbd49117c9f11cbfed8319b0e761162e93bd4bf2135d0e2ba",
+        "sha256": "d4d18f14928a78ebc0457aabdeecc00679d4d0c48aaca53f2efff14856d78445",
+        "width_px": 3600,
+        "height_px": 5400,
+        "print_width_inches": 12,
+        "print_height_inches": 18,
+        "effective_dpi": 300,
+        "seed": 7497410,
+        "native_canvas": {
+          "width": 3600,
+          "height": 5400
+        },
+        "private_only": true
+      },
+      "upload": {
+        "art_id": "art-e7d79386a495ca3c0201c0f683b13386fe52e376408d1f71e18a980acee0befc",
+        "art_url": "/draft-art/art-e7d79386a495ca3c0201c0f683b13386fe52e376408d1f71e18a980acee0befc",
+        "image": {
+          "width_px": 3600,
+          "height_px": 5400,
+          "source_format": "PNG",
+          "has_transparency": false,
+          "source_sha256": "d4d18f14928a78ebc0457aabdeecc00679d4d0c48aaca53f2efff14856d78445",
+          "normalized_sha256": "73d25350504b3f75c8db0bf9a81a645b82026820e10a9453c56a022c7f34e8a7",
+          "normalized_bytes": 317178,
+          "orientation_applied": true,
+          "color_mode": "RGBA",
+          "color_profile": "unverified"
+        },
+        "private": true,
+        "curation": null
+      },
+      "draft": {
+        "art_id": "art-e7d79386a495ca3c0201c0f683b13386fe52e376408d1f71e18a980acee0befc",
+        "title": "Flow Field Calligraphy",
+        "creator": "Edgeless Lab",
+        "kind": "poster",
+        "image": {
+          "width_px": 3600,
+          "height_px": 5400,
+          "source_format": "PNG",
+          "has_transparency": false,
+          "source_sha256": "d4d18f14928a78ebc0457aabdeecc00679d4d0c48aaca53f2efff14856d78445",
+          "normalized_sha256": "73d25350504b3f75c8db0bf9a81a645b82026820e10a9453c56a022c7f34e8a7",
+          "normalized_bytes": 317178,
+          "orientation_applied": true,
+          "color_mode": "RGBA",
+          "color_profile": "unverified"
+        },
+        "validation": {
+          "passed": false,
+          "issues": [
+            "rights_attestation_required: confirm you hold commercial reproduction rights"
+          ],
+          "warnings": [
+            "manual_review_required: confirm color profile, bleed, safe area, placement, provider SKU, physical sample and margin"
+          ],
+          "effective_dpi": 300.0,
+          "print_width_inches": 12.0,
+          "print_height_inches": 18.0
+        },
+        "identity_verified": false,
+        "catalog_variant_id": null,
+        "rights_attested": false,
+        "provenance": {
+          "frame": 240,
+          "master_sha256": "d4d18f14928a78ebc0457aabdeecc00679d4d0c48aaca53f2efff14856d78445",
+          "publication": "private draft only; rights/provider/bleed/sample/margin review required",
+          "seed": 7497410,
+          "source": "https://edgelesslab.com/creative-demos/flow-field-calligraphy/",
+          "source_sha256": "057e5c96d2bd22dfbd49117c9f11cbfed8319b0e761162e93bd4bf2135d0e2ba",
+          "task": "t_749a7410"
+        },
+        "proposed_price": null,
+        "request_sha256": "f31407e9b5e9ac255de47705f7c5233a299dbc853d6ba46ff59f6968742a0d85",
+        "draft_id": "draft-1e95286efb1f814b1b9509e5c9654b68ad9e405051296a587ea2d406c0ff440f",
+        "status": "needs_changes",
+        "ok": true,
+        "listed": false,
+        "private": true,
+        "art_url": "/draft-art/art-e7d79386a495ca3c0201c0f683b13386fe52e376408d1f71e18a980acee0befc",
+        "curation": {
+          "status": "manual_review_required"
+        },
+        "approval": null,
+        "next_action": "Resolve validation issues, then request admin review."
+      },
+      "normalized_art_readback_sha256": "73d25350504b3f75c8db0bf9a81a645b82026820e10a9453c56a022c7f34e8a7",
+      "public_listing_absent": true
+    },
+    {
+      "master": {
+        "slug": "lunar-flow-cartography",
+        "title": "Lunar Flow Cartography",
+        "hide": "#hud-overlay, #controls, #info",
+        "frames": 240,
+        "file": "lunar-flow-cartography.png",
+        "source": "https://edgelesslab.com/creative-demos/lunar-flow-cartography/",
+        "source_sha256": "d1668707371a586356699670abc5741fc245c8469991f3e9162d6712fe6a6cbc",
+        "sha256": "302e74988c81289a66378dc2681f5602001660fbcfd2adce5a66de454ae44441",
+        "width_px": 3600,
+        "height_px": 5400,
+        "print_width_inches": 12,
+        "print_height_inches": 18,
+        "effective_dpi": 300,
+        "seed": 7497410,
+        "native_canvas": {
+          "width": 3600,
+          "height": 5400
+        },
+        "private_only": true
+      },
+      "upload": {
+        "art_id": "art-6656fd8a1a10a712cbda0de44ccc166ddced8c3f2d42cb56d23fbef010b11a31",
+        "art_url": "/draft-art/art-6656fd8a1a10a712cbda0de44ccc166ddced8c3f2d42cb56d23fbef010b11a31",
+        "image": {
+          "width_px": 3600,
+          "height_px": 5400,
+          "source_format": "PNG",
+          "has_transparency": false,
+          "source_sha256": "302e74988c81289a66378dc2681f5602001660fbcfd2adce5a66de454ae44441",
+          "normalized_sha256": "5d4950166998048fde9b21ca9a5900257ae9866ea9682df5852e425657b31230",
+          "normalized_bytes": 13964709,
+          "orientation_applied": true,
+          "color_mode": "RGBA",
+          "color_profile": "unverified"
+        },
+        "private": true,
+        "curation": null
+      },
+      "draft": {
+        "art_id": "art-6656fd8a1a10a712cbda0de44ccc166ddced8c3f2d42cb56d23fbef010b11a31",
+        "title": "Lunar Flow Cartography",
+        "creator": "Edgeless Lab",
+        "kind": "poster",
+        "image": {
+          "width_px": 3600,
+          "height_px": 5400,
+          "source_format": "PNG",
+          "has_transparency": false,
+          "source_sha256": "302e74988c81289a66378dc2681f5602001660fbcfd2adce5a66de454ae44441",
+          "normalized_sha256": "5d4950166998048fde9b21ca9a5900257ae9866ea9682df5852e425657b31230",
+          "normalized_bytes": 13964709,
+          "orientation_applied": true,
+          "color_mode": "RGBA",
+          "color_profile": "unverified"
+        },
+        "validation": {
+          "passed": false,
+          "issues": [
+            "rights_attestation_required: confirm you hold commercial reproduction rights"
+          ],
+          "warnings": [
+            "manual_review_required: confirm color profile, bleed, safe area, placement, provider SKU, physical sample and margin"
+          ],
+          "effective_dpi": 300.0,
+          "print_width_inches": 12.0,
+          "print_height_inches": 18.0
+        },
+        "identity_verified": false,
+        "catalog_variant_id": null,
+        "rights_attested": false,
+        "provenance": {
+          "frame": 240,
+          "master_sha256": "302e74988c81289a66378dc2681f5602001660fbcfd2adce5a66de454ae44441",
+          "publication": "private draft only; rights/provider/bleed/sample/margin review required",
+          "seed": 7497410,
+          "source": "https://edgelesslab.com/creative-demos/lunar-flow-cartography/",
+          "source_sha256": "d1668707371a586356699670abc5741fc245c8469991f3e9162d6712fe6a6cbc",
+          "task": "t_749a7410"
+        },
+        "proposed_price": null,
+        "request_sha256": "276e691ce16beda5f8ab4c467477b675beffb359dd17cee076ae773753e7aaf7",
+        "draft_id": "draft-38edccf9e3ee9f66b2ccbc679b71899b1309134a9725e0795978e5a3b4986f6f",
+        "status": "needs_changes",
+        "ok": true,
+        "listed": false,
+        "private": true,
+        "art_url": "/draft-art/art-6656fd8a1a10a712cbda0de44ccc166ddced8c3f2d42cb56d23fbef010b11a31",
+        "curation": {
+          "status": "manual_review_required"
+        },
+        "approval": null,
+        "next_action": "Resolve validation issues, then request admin review."
+      },
+      "normalized_art_readback_sha256": "5d4950166998048fde9b21ca9a5900257ae9866ea9682df5852e425657b31230",
+      "public_listing_absent": true
+    }
+  ]
+}

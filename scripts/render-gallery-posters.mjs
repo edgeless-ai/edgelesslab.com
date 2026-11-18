@@ -35,7 +35,7 @@ try {
     await page.route(/(?:p5(?:\.min)?\.js)(?:\?.*)?$/, async route => {
       const response = await route.fetch();
       const library = await response.text();
-      await route.fulfill({ response, body: library + `\np5.prototype.registerMethod('beforeSetup', function() { this.randomSeed(7497410); this.noiseSeed(7497410); });\np5.prototype.registerMethod('post', function() { if (this.frameCount >= ${source.frames}) { this.noLoop(); window.__printFrame = this.frameCount; } });` });
+      await route.fulfill({ response, body: library + `\np5.prototype.registerMethod('beforeSetup', function() { this.randomSeed(7497410); this.noiseSeed(7497410); });\np5.prototype.registerMethod('afterSetup', function() { this.pixelDensity(3); });\np5.prototype.registerMethod('post', function() { if (this.frameCount >= ${source.frames}) { this.noLoop(); window.__printFrame = this.frameCount; } });` });
     });
     await page.goto(`http://127.0.0.1:${server.address().port}/${source.slug}/`, { waitUntil: 'load' });
     await page.addStyleTag({ content: `${source.hide} { display: none !important; }` });

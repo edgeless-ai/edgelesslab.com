@@ -1,0 +1,54 @@
+{
+  "base": "http://127.0.0.1:55590",
+  "source": "/Users/djm/claude-projects/edgelesslab.com/.worktrees/t_749a7410/out",
+  "catalog": "https://shop.edgelesslab.com/catalog.json",
+  "checks": [
+    {
+      "name": "legacy route is a redirect, not a catalog"
+    },
+    {
+      "name": "/sitemap.xml does not advertise retired route"
+    },
+    {
+      "name": "/llms.txt does not advertise retired route"
+    },
+    {
+      "name": "/studio/ does not advertise retired route"
+    },
+    {
+      "name": "all exported gallery HTML has no legacy print links",
+      "detail": "143 files"
+    },
+    {
+      "name": "browser redirect (base)",
+      "detail": "https://shop.edgelesslab.com/"
+    },
+    {
+      "name": "browser redirect ?sku=hermes-agent-tshirt",
+      "detail": "https://shop.edgelesslab.com/d/hermes-agent-tshirt/"
+    },
+    {
+      "name": "browser redirect ?sku=algorithmic-fluid-plotter",
+      "detail": "https://shop.edgelesslab.com/"
+    },
+    {
+      "name": "browser redirect ?sku=https%3A%2F%2Fevil.invalid%2F&next=https%3A%2F%2Fevil.invalid",
+      "detail": "https://shop.edgelesslab.com/"
+    },
+    {
+      "name": "rendered /creative-demos/ print CTAs resolve to real listings",
+      "detail": "0 buyable print CTAs (unlisted works have none)"
+    },
+    {
+      "name": "rendered /field-notes/ print CTAs resolve to real listings",
+      "detail": "0 buyable print CTAs (unlisted works have none)"
+    },
+    {
+      "name": "retirement/gallery JavaScript has no page errors",
+      "detail": "0 site errors; 0 external-shop errors (see report)"
+    }
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "checkout": "Not invoked: retirement rescope; no payment or order writes."
+}

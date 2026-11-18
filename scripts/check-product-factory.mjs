@@ -83,11 +83,11 @@ try {
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
   const errors = [];
-  page.on('pageerror', error => errors.push(error.message));
+  page.on('pageerror', error => errors.push({ url: page.url(), error: error.message }));
   // Prove actual browser navigation, not merely an HTML/regex redirect declaration.
   for (const [query, expected] of [
     ['', shop],
-    ['?sku=' + encodeURIComponent(known.slug), shop + '?d=' + encodeURIComponent(known.slug)],
+    ['?sku=' + encodeURIComponent(known.slug), shop + 'd/' + encodeURIComponent(known.slug) + '/'],
     ['?sku=algorithmic-fluid-plotter', shop],
     ['?sku=https%3A%2F%2Fevil.invalid%2F&next=https%3A%2F%2Fevil.invalid', shop],
   ]) await check(`browser redirect ${query || '(base)'}`, async () => {
@@ -95,6 +95,7 @@ try {
     await page.waitForURL(expected, { timeout: 15000 });
     const response = await page.request.get(expected);
     assert(response.ok(), `target HTTP ${response.status()}`);
+    if (expected.includes('/d/')) assert((await response.text()).includes(`href="${expected}"`), 'listing canonical missing (soft 404)');
     return expected;
   });
   const listingURLs = new Set();
@@ -106,7 +107,8 @@ try {
       if (!/\b(buy|view|order)\s+print\b/i.test(link.text)) continue;
       const target = new URL(link.href);
       assert.equal(target.origin, new URL(shop).origin, `not a real-shop print link: ${link.href}`);
-      const item = catalog.designs.find(item => item.slug === target.searchParams.get('d'));
+      const slug = target.pathname.match(/^\/d\/([^/]+)\/$/)?.[1];
+      const item = catalog.designs.find(item => item.slug === slug);
       assert(item?.available && !item.sold_out, `unavailable listing: ${link.href}`);
       assert(item.image && item.price_usd > 0, `missing image/price: ${item.slug}`);
       listingURLs.add(link.href);
@@ -118,8 +120,9 @@ try {
     assert(response.ok(), `HTTP ${response.status()}`);
   });
   await check('retirement/gallery JavaScript has no page errors', async () => {
-    // External shop application errors are recorded separately; the site remains the scope.
-    return `${errors.length} page errors observed across site + external shop (see report)`;
+    const siteErrors = errors.filter(error => error.url.startsWith(base + '/'));
+    assert.deepEqual(siteErrors, [], 'site JavaScript errors');
+    return `0 site errors; ${errors.length - siteErrors.length} external-shop errors (see report)`;
   });
   for (const width of [375, 1440]) {
     await page.setViewportSize({ width, height: 1000 });

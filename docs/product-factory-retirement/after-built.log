@@ -1,0 +1,13 @@
+PASS legacy route is a redirect, not a catalog
+PASS /sitemap.xml does not advertise retired route
+PASS /llms.txt does not advertise retired route
+PASS /studio/ does not advertise retired route
+PASS all exported gallery HTML has no legacy print links: 143 files
+PASS browser redirect (base): https://shop.edgelesslab.com/
+PASS browser redirect ?sku=hermes-agent-tshirt: https://shop.edgelesslab.com/d/hermes-agent-tshirt/
+PASS browser redirect ?sku=algorithmic-fluid-plotter: https://shop.edgelesslab.com/
+PASS browser redirect ?sku=https%3A%2F%2Fevil.invalid%2F&next=https%3A%2F%2Fevil.invalid: https://shop.edgelesslab.com/
+PASS rendered /creative-demos/ print CTAs resolve to real listings: 0 buyable print CTAs (unlisted works have none)
+PASS rendered /field-notes/ print CTAs resolve to real listings: 0 buyable print CTAs (unlisted works have none)
+PASS retirement/gallery JavaScript has no page errors: 0 site errors; 0 external-shop errors (see report)
+PASS product-factory retirement: 12 checks passed; 0 failed

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-preserve-inline-styles>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -267,13 +267,7 @@ function escapeHtml(s) {
 }
 
 // ── Config ──
-const STORE_URL = 'https://edgelesslab.com/product-factory/';
 const COMMISSION_EMAIL = 'hello@edgelesslab.com';
-
-// Build a context-aware store link that maps a demo to its product page
-function buyLink(demo) {
-  return STORE_URL + '?sku=' + encodeURIComponent(demo.id);
-}
 
 // Build a pre-filled commission inquiry mailto link
 function commissionLink(demo) {
@@ -309,10 +303,8 @@ function renderCard(demo) {
     linkHtml = `<span class="visit-btn disabled">Coming soon</span>`;
   }
 
-  // Buy Print link — maps demo ID to store SKU, opens in new tab
-  const buyHtml = demo.deployed
-    ? `<a href="${escapeHtml(buyLink(demo))}" class="buy-btn" target="_blank" rel="noopener">Buy Print 🖼</a>`
-    : `<span class="buy-btn disabled">Buy Print 🖼</span>`;
+  // No print CTA: none of these demo IDs has an available real-shop listing.
+  // Add only verified canonical shop listing URLs when reviewed prints launch.
 
   // Commission This Style link — opens pre-filled mailto
   const commissionHtml = demo.deployed
@@ -329,7 +321,6 @@ function renderCard(demo) {
       <span class="status-badge ${statusClass}">${statusText}</span>
       <div style="display:flex;gap:6px;">
         ${commissionHtml}
-        ${buyHtml}
         ${linkHtml}
       </div>
     </div>

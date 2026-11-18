@@ -47,7 +47,7 @@ const STANDALONE_STUDIES: Entry[] = [
   { title: "Nous Inspired Design System", href: "https://thedavidmurray.github.io/nous-inspired-design-system/", meta: "Visual language & texture pipeline", external: true },
   { title: "Maison Hermès", href: "/maison/", meta: "Autonomous agents, bench-made", external: true },
   { title: "Scoop Scout", href: "/scoop-scout/", meta: "Kate's Ice Cream", external: true },
-  { title: "Edgeless Print Studio", href: "/product-factory/", meta: "Limited-edition prints", external: true },
+  { title: "Edgeless Shop", href: "https://shop.edgelesslab.com/", meta: "Merch & current editions", external: true },
 ];
 
 const NOTEBOOKS: Entry[] = [

@@ -5,6 +5,7 @@ import { Footer } from "@/components/footer";
 import { createPageMetadata } from "@/lib/metadata";
 import { FreeKitButton } from "@/components/free-kit-button";
 import { freeKitContents } from "@/lib/free-kit";
+import { LOOP_PACKS, listingUrl } from "@/lib/etsy-listings";
 
 export const metadata = createPageMetadata({
   title: "Resources",
@@ -36,6 +37,12 @@ export default function ProductsPage() {
                 <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>{item.description}</p>
               </li>)}
             </ul>
+            <h2 className="mb-4 mt-16 text-3xl font-semibold" style={{ color: "var(--text-primary)" }}>From the studio: LineFields</h2>
+            <p className="mb-6 max-w-[720px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>Generative tartan loops for your stream or live background. Explore the Electric Tartan pack on Etsy.</p>
+            {/* Etsy Open API v3, shop 66822827: active listing verified 2026-11-13. No price duplicated here. */}
+            <a href={listingUrl(LOOP_PACKS[0].id, "products")} className="inline-block underline underline-offset-4" style={{ color: "var(--relay)" }}>
+              Electric Tartan Loop Pack on Etsy
+            </a>
             <p className="mt-12 leading-relaxed" style={{ color: "var(--text-secondary)" }}>Need help taking a private AI workflow into production? <Link href="/services/private-ai-systems" className="underline underline-offset-4" style={{ color: "var(--relay)" }}>Explore our private AI systems work.</Link></p>
           </div>
         </section>

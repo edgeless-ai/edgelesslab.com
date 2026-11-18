@@ -36,7 +36,9 @@ tar(['-cf', archive, ...flags, '--exclude=.git', '--exclude=.github', '--exclude
 tar(['-rf', archive, ...flags, './.well-known']);
 const hasMarimo = await exists(path.join(output, 'marimo'));
 if (hasMarimo) tar(['-rf', archive, ...flags, './marimo']);
-const entries = tar(['-tf', archive], true).split('\n');
+// Query only the required ordinary member; full exports can exceed spawnSync's
+// listing buffer. The entire marimo payload is verified by extracted bytes below.
+const entries = tar(['-tf', archive, './.well-known/ai-catalog.json'], true).split('\n');
 if (!entries.includes('./.well-known/ai-catalog.json')) throw new Error('Pages artifact lost ai-catalog.json');
 if (hasMarimo) {
   const extracted = await mkdtemp(path.join(os.tmpdir(), 'pages-marimo-'));

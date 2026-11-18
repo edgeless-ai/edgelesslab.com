@@ -107,6 +107,14 @@ test('actual Pages archive retains all bundle bytes/dotfiles, .well-known and or
   assert.notEqual(run(dir, 'archive-pages.mjs', [archive]).status, 0);
 });
 
+test('Pages packaging handles listings larger than the subprocess capture buffer', async t => {
+  const dir = await fixture(t);
+  // More than 1 MiB of member names, without large file contents.
+  for (let i = 0; i < 5000; i++)
+    await put(dir, { ['out/large/' + String(i).padStart(5, '0') + 'x'.repeat(220)]: '' });
+  passed(run(dir, 'archive-pages.mjs', [path.join(dir, 'large.tar')]));
+});
+
 test('production commands run final integrity verification and the tested archive implementation', async () => {
   const pkg = JSON.parse(await readFile(path.join(repo, 'package.json'), 'utf8'));
   assert.match(pkg.scripts.postbuild, /&& node scripts\/verify-immutable-marimo\.mjs$/);

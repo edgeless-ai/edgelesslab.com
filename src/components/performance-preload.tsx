@@ -1,4 +1,4 @@
-/** Only destination hints needed before an optional analytics choice belong here. */
+/** Outbound GitHub navigation needs no speculative connection before a click. */
 export function PerformancePreload() {
-  return <link rel="dns-prefetch" href="https://github.com" />;
+  return null;
 }

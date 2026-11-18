@@ -25,7 +25,8 @@ export function validateMarimoCatalog(demos: readonly MarimoDemo[]): PublishedMa
     if (demo.published_url == null) continue;
     if (urls.has(demo.published_url)) throw new Error(`Duplicate publication URL: ${demo.published_url}`);
     urls.add(demo.published_url);
-    if (demo.published_url !== `https://marimo.edgelesslab.com/${demo.slug}/`) {
+    if (demo.published_url !== `https://marimo.edgelesslab.com/${demo.slug}/` &&
+        demo.published_url !== `https://edgelesslab.com/marimo/${demo.slug}/`) {
       throw new Error(`Invalid publication URL: ${demo.slug}`);
     }
     published.push({ ...demo, published_url: demo.published_url });

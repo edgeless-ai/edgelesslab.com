@@ -12,6 +12,45 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("registers the verified trigger-boundary demo without overstating probe success", () => {
+    const entry = marimoDemos.find(d => d.slug === "2401.05566-adversarial-training-blind-spot");
+    expect(entry?.title).toBe("When Red-Teaming Teaches the Trigger Boundary");
+    expect(entry?.category).toBe("AI evaluation");
+    expect(entry?.tags).toEqual(["ai-safety", "red-teaming", "backdoors", "evaluation", "distribution-shift"]);
+    expect(entry?.description).toBe("Reproduce Sleeper Agents Figure 3b aggregate response rates and explore why narrow probe success does not establish removal of a held-out trigger-conditioned policy.");
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2401.05566-adversarial-training-blind-spot/");
+    expect(Object.keys(entry ?? {}).sort()).toEqual([
+      "title", "slug", "description", "category", "tags", "published_url",
+    ].sort());
+    expect(publishedMarimoDemos).toContainEqual(entry);
+  });
+
+  it("registers the live maintainer-flagged sample with selection and inference boundaries", () => {
+    const entry = marimoDemos.find(d => d.slug === "2611.15159-slop-sample-boundary");
+    expect(entry?.title).toBe("Maintainer-Flagged PRs: Selection Before Inference");
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2611.15159-slop-sample-boundary/");
+    expect(entry?.category).toBe("Research");
+    expect(entry?.tags).toEqual(["open-source", "ai-coding", "software-engineering", "dataset-audit", "evidence-boundaries"]);
+    expect(entry?.description).toContain("measured precision separate from unknown recall and causal claims");
+    expect(Object.keys(entry ?? {}).sort()).toEqual([
+      "title", "slug", "description", "category", "tags", "published_url",
+    ].sort());
+    expect(publishedMarimoDemos).toContainEqual(entry);
+  });
+
+  it("registers the frozen tail-release illustration with its explicit evidence boundary", () => {
+    const entry = marimoDemos.find(d => d.slug === "2609.10964-tail-aware-release");
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2609.10964-tail-aware-release/");
+    expect(entry?.title).toBe("Ready Is Not Released: Preserving Scheduling Choice");
+    expect(entry?.description).toContain("Deterministic six-turn mechanism illustration");
+    expect(entry?.description).toContain("no mean-CVaR estimator, adaptive queue-pressure controller, trace replay");
+    expect(entry?.description).toContain("author-reported, not demo outputs");
+    expect(Object.keys(entry ?? {}).sort()).toEqual([
+      "title", "slug", "description", "category", "tags", "published_url",
+    ].sort());
+    expect(publishedMarimoDemos).toContainEqual(entry);
+  });
+
   it("matches an independently validated raw catalog without a second hand-maintained list", () => {
     expect(publishedMarimoDemos).toEqual(validateMarimoCatalog(marimoDemos));
     expect(marimoDemos.some((demo) => demo.published_url == null)).toBe(true);
@@ -43,9 +82,42 @@ describe("published marimo gallery", () => {
     "https://marimo.edgelesslab.com/test-notebook/?draft=true",
     "https://marimo.edgelesslab.com/test-notebook/#draft",
     "https://marimo.edgelesslab.com@evil.example/test-notebook/",
-    "https://edgelesslab.com/marimo/test-notebook/",
+    "http://edgelesslab.com/marimo/test-notebook/",
+    "https://edgelesslab.com/test-notebook/",
+    "https://edgelesslab.com/marimo/other-notebook/",
+    "https://edgelesslab.com/marimo/test-notebook",
+    "https://edgelesslab.com/marimo/test-notebook/?draft=true",
+    "https://edgelesslab.com/marimo/test-notebook/#draft",
+    "https://user:pass@edgelesslab.com/marimo/test-notebook/",
+    "https://edgelesslab.com.evil.example/marimo/test-notebook/",
+    "https://edgelesslab.com:443/marimo/test-notebook/",
+    "https://edgelesslab.com/marimo/../marimo/test-notebook/",
+    "https://edgelesslab.com/marimo/%74est-notebook/",
+    "https://edgelesslab.com/marimo/test-notebook/extra/",
   ])("rejects invalid or noncanonical publication URL %j", (published_url) => {
     expect(() => validateMarimoCatalog([{ ...fixture(), published_url }])).toThrow(/Invalid publication URL/);
+  });
+
+  it.each([
+    "https://marimo.edgelesslab.com/test-notebook/",
+    "https://edgelesslab.com/marimo/test-notebook/",
+  ])("accepts the exact canonical publication URL %j", (published_url) => {
+    const demo = { ...fixture(), published_url };
+    expect(validateMarimoCatalog([demo])).toEqual([demo]);
+  });
+
+  it("registers SpecOpt on the live primary-domain bundle without private metadata", () => {
+    const entry = marimoDemos.find(d => d.slug === "2609.21165-specopt-admission-noise");
+    expect(entry?.published_url).toBe("https://edgelesslab.com/marimo/2609.21165-specopt-admission-noise/");
+    expect(entry?.title).toBe("SpecOpt: Noise at the Admission Gate");
+    expect(entry?.category).toBe("Research");
+    expect(entry?.tags).toContain("selection-bias");
+    expect(entry?.description).toContain("synthetic");
+    expect(entry?.description).toContain("clinical claim");
+    expect(Object.keys(entry ?? {}).sort()).toEqual([
+      "title", "slug", "description", "category", "tags", "published_url",
+    ].sort());
+    expect(publishedMarimoDemos).toContainEqual(entry);
   });
 
   it("rejects duplicate slugs and duplicate URLs rather than counting them twice", () => {
@@ -71,6 +143,17 @@ describe("published marimo gallery", () => {
     expect(source).toContain("{publishedMarimoDemos.length} published notebooks");
     expect(source).toContain("href={demo.published_url}");
     expect(source).toContain("url: demo.published_url");
+  });
+
+  it("registers the TRILOGUE known-source ceiling after live control verification", () => {
+    const entry = marimoDemos.find(d => d.slug === "2609.04452-trilogue-pipeline-ceiling");
+    expect(entry).toBeDefined();
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2609.04452-trilogue-pipeline-ceiling/");
+    expect(entry?.title).toBe("TRILOGUE: The Known-Source Ceiling");
+    expect(entry?.category).toBe("Research");
+    expect(entry?.tags).toContain("evaluation-boundary");
+    expect(entry?.description).toContain("supplied article");
+    expect(publishedMarimoDemos).toContainEqual(entry);
   });
 
   it("registers the 2609.04404 ASR hallucination taxonomy notebook after live verification", () => {

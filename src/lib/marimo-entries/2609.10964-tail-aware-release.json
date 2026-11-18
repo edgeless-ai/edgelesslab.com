@@ -1,0 +1,8 @@
+{
+  "title": "Ready Is Not Released: Preserving Scheduling Choice",
+  "slug": "2609.10964-tail-aware-release",
+  "description": "Change release capacity and synthetic tail urgency to see which ready turns remain reorderable outside a congested inference engine. Deterministic six-turn mechanism illustration on analyst-authored inputs: no mean-CVaR estimator, adaptive queue-pressure controller, trace replay, or reproduction of measured P95/throughput results. The 71.4% / 3.50x figures are author-reported, not demo outputs.",
+  "category": "Research",
+  "tags": ["agent-scheduling", "tail-latency", "admission-control", "cvar", "llm-serving"],
+  "published_url": "https://marimo.edgelesslab.com/2609.10964-tail-aware-release/"
+}

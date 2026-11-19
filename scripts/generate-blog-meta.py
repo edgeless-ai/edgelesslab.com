@@ -1,73 +1,125 @@
 #!/usr/bin/env python3
-"""Generate blog-meta.ts from blog.ts by stripping content fields."""
+"""Generate metadata from the evaluated typed registry (read-only unless --write).
 
-import re
-import pathlib
+Run after installing the site's Node dependencies. --check (also the default)
+prints a unified diff and exits 1 for drift, 0 for no change, or 2 for errors.
+Only --write replaces src/lib/blog-meta.ts; it never edits the registry.
+Registry modules are trusted repository code, not untrusted input.
+"""
 
-ROOT = pathlib.Path("/Users/djm/claude-projects/edgelesslab.com/src/lib")
-BLOG = ROOT / "blog.ts"
-META = ROOT / "blog-meta.ts"
+import argparse
+import difflib
+import json
+import os
+from pathlib import Path
+import stat
+import subprocess
+import sys
+import tempfile
 
-content = BLOG.read_text()
 
-def strip_content(text: str) -> str:
-    result = []
-    i = 0
-    while i < len(text):
-        match = re.search(r'content:\s*`', text[i:])
-        if not match:
-            result.append(text[i:])
-            break
-        start = i + match.start()
-        result.append(text[i:start])
-        # Find the end of the template literal (unescaped backtick)
-        j = start + match.end()  # position after opening backtick
-        while j < len(text):
-            if text[j] == '`' and text[j-1] != '\\':
-                # Found closing backtick that is not escaped
-                # Consume optional .trim() after the closing backtick
-                k = j + 1
-                while k < len(text) and text[k].isspace():
-                    k += 1
-                if k < len(text) and text[k:k+7] == '.trim()':
-                    k += 7
-                    # Consume optional trailing comma after .trim()
-                    while k < len(text) and text[k].isspace():
-                        k += 1
-                    if k < len(text) and text[k] == ',':
-                        k += 1
-                # Also consume any trailing comma directly after backtick
-                elif k < len(text) and text[k] == ',':
-                    k += 1
-                result.append('content: "",')
-                i = k
-                break
-            j += 1
-        else:
-            # No closing backtick found
-            result.append(text[start:])
-            i = len(text)
-            break
-    return "".join(result)
+SITE_NAME = "edgeless-scaffold"  # package.json's current site package name
 
-stripped = strip_content(content)
 
-# Source the shared type from blog-types.ts (single source of truth) rather than
-# redeclaring the interface. blog.ts imports + re-exports BlogPost; mirror that
-# here as BlogPostMeta (a structural alias defined in blog-types.ts).
-stripped = stripped.replace(
-    'import type { BlogPost } from "./blog-types";',
-    'import type { BlogPostMeta } from "./blog-types";',
-)
-stripped = stripped.replace("export type { BlogPost };", "export type { BlogPostMeta };")
-stripped = stripped.replace("export const posts: BlogPost[]", "export const postsMeta: BlogPostMeta[]")
+def validate_root(root: Path) -> Path:
+    """Reject unrelated directories before evaluating any repository code."""
+    root = root.resolve(strict=True)
+    package = json.loads((root / "package.json").read_text(encoding="utf-8"))
+    if package.get("name") != SITE_NAME or not (root / "src/lib/blog.ts").is_file():
+        raise ValueError(f"--root must contain src/lib/blog.ts and package.json named {SITE_NAME}")
+    return root
 
-# Remove the blog-new-posts import (meta is derived from blog.ts only) and the
-# trailing `...newPosts` spread that referenced it.
-stripped = re.sub(r'^import \{ newPosts \} from "\.\/blog-new-posts";\n', '', stripped, flags=re.MULTILINE)
-stripped = re.sub(r'^\s*\.\.\.newPosts.*\n', '', stripped, flags=re.MULTILINE)
 
-META.write_text(stripped)
-print(f"Generated {META} ({len(stripped)} bytes)")
-print(f"Original {BLOG} ({len(content)} bytes)")
-print(f"Reduction: {len(content) - len(stripped)} bytes ({(len(content) - len(stripped)) / len(content) * 100:.1f}%)")
+def evaluate(root: Path) -> dict:
+    """Use the site's installed TypeScript compiler, without network or npx."""
+    helper = Path(__file__).resolve().with_name("evaluate-blog-registry.mjs")
+    result = subprocess.run(
+        ["node", str(helper), str(root)], cwd=root, capture_output=True,
+        text=True, encoding="utf-8", timeout=30, check=False,
+    )
+    if result.returncode:
+        raise ValueError(result.stderr.strip() or f"registry evaluator exited {result.returncode}")
+    payload = json.loads(result.stdout)
+    posts, slugs = payload["metadata"], payload["registrySlugs"]
+    if not isinstance(posts, list) or not posts or not isinstance(slugs, list):
+        raise ValueError("registry evaluator returned empty/invalid posts")
+    generated_slugs = [post["slug"] for post in posts]
+    if generated_slugs != slugs or len(set(slugs)) != len(slugs):
+        raise ValueError("generated post count/order/slug set differs from registry")
+    if any("content" in post for post in posts):
+        raise ValueError("content leaked into metadata")
+    return payload
+
+
+def render(posts: list[dict]) -> str:
+    """Serialize values, never copy or regex-edit TypeScript source."""
+    header = (
+        '// Generated by scripts/generate-blog-meta.py --write; do not edit.\n'
+        'import type { BlogPostMeta } from "./blog-types";\n\n'
+        'export type { BlogPostMeta };\n\n'
+        'export const postsMeta: Omit<BlogPostMeta, "content">[] = '
+    )
+    return header + json.dumps(posts, ensure_ascii=False, indent=2, allow_nan=False) + ";\n"
+
+
+def atomic_write(target: Path, content: bytes) -> None:
+    """Publish only fully validated bytes, on the destination filesystem."""
+    temporary = None
+    mode = stat.S_IMODE(target.stat().st_mode) if target.exists() else 0o644
+    try:
+        with tempfile.NamedTemporaryFile(dir=target.parent, prefix=".blog-meta-", suffix=".tmp", delete=False) as handle:
+            temporary = Path(handle.name)
+            handle.write(content)
+            handle.flush()
+            os.fchmod(handle.fileno(), mode)
+            os.fsync(handle.fileno())
+        os.replace(temporary, target)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1], help="Site repository root")
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--check", action="store_true", help="Diff only (default); exit 1 on drift")
+    modes.add_argument("--write", action="store_true", help="Atomically replace metadata after validation")
+    args = parser.parse_args()
+    try:
+        root = validate_root(args.root)
+        target = root / "src/lib/blog-meta.ts"
+        # Never follow a metadata symlink into another checkout.
+        if target.is_symlink():
+            raise ValueError("refusing symlink blog-meta.ts")
+        previous = target.read_bytes() if target.exists() else b""
+        payload = evaluate(root)
+        generated = render(payload["metadata"]).encode("utf-8")
+        summary = f'{len(payload["metadata"])} posts ({payload["rawCount"]} raw allPosts entries)'
+        if previous == generated:
+            print(f"No metadata drift: {summary}")
+            return 0
+        if args.write:
+            # Refuse a lost update if another writer changed the destination during evaluation.
+            current = target.read_bytes() if target.exists() else b""
+            if target.is_symlink() or current != previous:
+                raise ValueError("blog-meta.ts changed during evaluation; nothing written")
+            atomic_write(target, generated)
+            print(f"Generated {target}: {summary}")
+            return 0
+        diff = list(difflib.unified_diff(
+            previous.decode("utf-8").splitlines(keepends=True),
+            generated.decode("utf-8").splitlines(keepends=True),
+            fromfile="src/lib/blog-meta.ts", tofile="src/lib/blog-meta.ts (generated)",
+        ))
+        sys.stdout.writelines(diff)
+        changes = sum(line.startswith(("+", "-")) and not line.startswith(("+++", "---")) for line in diff)
+        print(f"Metadata drift: {summary}; {changes} changed diff lines; no files written")
+        return 1
+    except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

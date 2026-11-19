@@ -12,8 +12,6 @@ A tweet about a paper went viral last week: "LongCapHarness achieves **+64.18 po
 
 Here's what the paper actually demonstrates — and where the framing misleads.
 
----
-
 ## The Claim vs. The Context
 
 The paper (arXiv:2611.10463) by Tao Zhang and Yuhang He introduces LongCapHarness: a framework that improves long-context reasoning without data synthesis or post-training.
@@ -26,28 +24,20 @@ The paper (arXiv:2611.10463) by Tao Zhang and Yuhang He introduces LongCapHarnes
 
 The headline number comes from this comparison:
 
-| Model | Configuration | Avg Score |
-|-------|--------------|-----------|
-| Llama3-8B (zero-shot) | 8K context | 15.14 |
-| Llama3-8B with LongCapHarness | 8K context | **79.32** |
-| **Gain** | | **+64.18** |
+- **Llama3-8B (zero-shot)** — Configuration: 8K context; Avg Score: 15.14.
+- **Llama3-8B with LongCapHarness** — Configuration: 8K context; Avg Score: **79.32**.
+- **Gain:** **+64.18**.
 
 Sounds dramatic. But the comparison needs unpacking on both sides. The 79.32 is LongCapHarness's average score across 8K–128K benchmark input lengths — the paper evaluates at five lengths (§4.2.1, Figure 5), and the harness decomposes tasks so each LLM call stays within Llama3-8B's native 8K window while total inputs run far longer. The +64.18 compares this average to the base Llama3-8B at its native 8K window — not to models already trained for 128K contexts, which is the comparison that actually matters.
-
----
 
 ## The Comparison That Matters
 
 When you compare against models that were actually trained for long-context (the proper baselines), the honest gains are more modest:
 
-| Model | Baseline | LongCapHarness | Honest Gain |
-|-------|----------|----------------|-------------|
-| Llama3-8B | NExtLong (128K) | LongCapHarness | **+9.17** pts |
-| Qwen2.5-3B | PolicyLong (128K) | LongCapHarness | **+14.63** pts |
+- **Llama3-8B** — Baseline: NExtLong (128K); LongCapHarness: LongCapHarness; Honest Gain: **+9.17** pts.
+- **Qwen2.5-3B** — Baseline: PolicyLong (128K); LongCapHarness: LongCapHarness; Honest Gain: **+14.63** pts.
 
 That's a genuinely different setup, and it's worth stating fairly. The baseline models' weights were trained and extended to a 128K context window, while LongCapHarness's execution model keeps its native window — 8K for Llama3-8B, 32K for Qwen2.5-3B. The harness lets that execution model process benchmark inputs up to 128K long while every individual LLM call stays inside its native window, so both sides are scored on the same 8K–128K benchmark inputs (§4.1 metrics, §4.2.1). Against the trained 128K baselines, LongCapHarness still leads — by +9.17 (Llama vs. NExtLong) and +14.63 (Qwen vs. PolicyLong) — but that's the modest part of the story, not the +64.
-
----
 
 ## What LongCapHarness Actually Does
 
@@ -76,25 +66,19 @@ The framework uses GPT-5.6 Sol (an advanced agent model) to iteratively refine h
 
 A key finding: harnesses transfer well between models. Replacing Llama3-8B with Qwen2.5-3B decreases average score by only 0.59 points (79.32 → 78.73), demonstrating that the harness logic matters more than the execution model.
 
----
-
 ## Where It Really Wins
 
 The gains concentrate where code can solve tasks directly:
 
-| Task | LongCapHarness | Base Model |
-|------|-----------------|------------|
-| **Recall** | **100.00** | 18.00 (Llama) |
-| **RULER** | **94.62** | 17.80 (Llama) |
-| Reranking | **39.67** | 7.74 |
+- **Recall** — LongCapHarness: **100.00**; Base Model: 18.00 (Llama).
+- **RULER** — LongCapHarness: **94.62**; Base Model: 17.80 (Llama).
+- **Reranking** — LongCapHarness: **39.67**; Base Model: 7.74.
 
 On tasks where the model must "think through" everything in its context, harnesses provide structure. When the task can be broken into deterministic steps — keyword matching, sorting, counting — the harness can use code to solve perfectly.
 
 ### The Limitation
 
 On tasks that require genuine semantic understanding (RAG, LongQA, ICL), gains are smaller and less consistent. The harness organizes the work but doesn't replace the model's judgment on evidence integration and inference — RRSI actually outperforms LongCapHarness on RAG (Table 1: 64.63 vs. 59.70 with Llama), and LongCapHarness's advantage over RRSI on ICL is narrow (83.85 vs. 83.45, +0.40 pts), though it still shows a large gain over the base model (70.25 pts).
-
----
 
 ## The Real Lesson: Harness Engineering
 
@@ -108,15 +92,11 @@ This separates the expensive reasoning phase (GPT-5.6 Sol harness development at
 
 **Development cost breakdown:**
 
-| Method | Input (M) | Output (M) | Cost |
-|--------|-----------|------------|------|
-| RRSI | 52.42 | 3.87 | $331 |
-| **LongCapHarness** | 814.11 | 3.35 | **$541** |
-| NExtLong training | — | — | $3,696 |
+- **RRSI** — Input (M): 52.42; Output (M): 3.87; Cost: $331.
+- **LongCapHarness** — Input (M): 814.11; Output (M): 3.35; Cost: **$541**.
+- **NExtLong training** — Input (M): —; Output (M): —; Cost: $3,696.
 
 The harness approach has higher development costs than RRSI ($541.47 vs. $331.56) but lower estimated costs than either model-training reference — NExtLong at $3,696 and PolicyLong at $1,858.82 — and enables cheaper execution and reusable workflows, a pattern we see in production agent systems.
-
----
 
 ## What This Means For You
 
@@ -135,8 +115,6 @@ What's genuinely interesting:
 We haven't run this harness ourselves. Readers should verify against the [paper](https://arxiv.org/abs/2611.10463) and [the original tweet](https://x.com/omarsar0/status/2120160305347260443).
 
 The viral framing oversimplifies the trade-offs. The technical contribution — capability-guided auto-harnessing — is worth studying on its own terms.
-
----
 
 **Related:** [The Harness Is the Moat](/blog/harness-is-the-moat) | [Claude Code Hooks: The Harness Engineering That Actually Matters](/blog/claude-code-hooks-harness-engineering)
 

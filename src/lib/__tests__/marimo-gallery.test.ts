@@ -12,6 +12,15 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("keeps the calibrated judge illustration unpublished until exact live verification", () => {
+    const entry = marimoDemos.find(d => d.slug === "2609.35815-calibrated-judge-inference");
+    expect(entry?.title).toBe("LLM-Judge False-Confidence Frontier");
+    expect(entry?.category).toBe("Research");
+    expect(entry?.description).toContain("Analyst-authored Gaussian sensitivity model only");
+    expect(entry?.description).toContain("No evalstats/PPI execution");
+    expect(entry?.published_url).toBeNull();
+    expect(publishedMarimoDemos).not.toContain(entry);
+  });
   it("registers QPRU only after live formula and fixed-uncertainty verification", () => {
     const notebook = marimoDemos.find((demo) => demo.slug === "2609.04354-qpru-evidence-frontier");
     expect(notebook).toEqual({

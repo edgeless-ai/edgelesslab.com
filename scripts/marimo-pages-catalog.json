@@ -18,7 +18,7 @@
     "parent_task": "t_c11976b2",
     "website_commit": "6121d7da58f17df91bbc4952fc8deb5511a0a67c"
   },
-  "redirects": "/2401.05566-adversarial-training-blind-spot/assets/* /assets/:splat 200\n",
+  "redirects": "/2401.05566-adversarial-training-blind-spot/assets/* /assets/:splat 200\n/2203.07895-ghost-floor-shortcut/assets/* /assets/:splat 200\n/2608.05245-search2skill/assets/* /assets/:splat 200\n/2609.04344-sharedsae-vote-normalization/assets/* /assets/:splat 200\n/2609.04404-asr-hallucination-taxonomy/assets/* /assets/:splat 200\n/2609.04452-trilogue-pipeline-ceiling/assets/* /assets/:splat 200\n/2609.05439-criticgen-risk-frontier/assets/* /assets/:splat 200\n/2609.09458-contracteval-denominator/assets/* /assets/:splat 200\n/2609.10739-perfect-aliasing-probes/assets/* /assets/:splat 200\n/2609.10964-tail-aware-release/assets/* /assets/:splat 200\n/2609.21165-specopt-admission-noise/assets/* /assets/:splat 200\n/2609.24343-bandwidth-thermal-envelope/assets/* /assets/:splat 200\n/2609.35806-sfia-extraction-baselines/assets/* /assets/:splat 200\n/2609.38372-self-optimizing-harness/assets/* /assets/:splat 200\n/2609.38385-goldimask-context-weighting/assets/* /assets/:splat 200\n/2610.08936-clean-vs-robustness/assets/* /assets/:splat 200\n/2610.20637-taylor-attention-state-economy/assets/* /assets/:splat 200\n/2610.20686-rolaq-cache-accounting/assets/* /assets/:splat 200\n/2610.26754-tokengate-prefill-envelope/assets/* /assets/:splat 200\n/2610.26942-repair-elbow/assets/* /assets/:splat 200\n/2611.07042-scorer-rank-reversal/assets/* /assets/:splat 200\n/build-a-chip-bench-multiscoring/assets/* /assets/:splat 200\n/embodied-playground-suite-gap/assets/* /assets/:splat 200\n/google-routing-failure-price/assets/* /assets/:splat 200\n/2609.35815-calibrated-judge-inference/assets/* /2607.06560-vision-unified-generation/assets/:splat 200\n/2609.05513-budgeted-teaching-slo/assets/* /2608.15127-cache-binding-regimes/assets/:splat 200\n/2609.05527-team-design-replay/assets/* /2608.15127-cache-binding-regimes/assets/:splat 200\n/2609.10873-update-admission-power/assets/* /2608.15127-cache-binding-regimes/assets/:splat 200\n/2610.04198-alodlm-depth-allocation/assets/* /2608.15127-cache-binding-regimes/assets/:splat 200\n/2611.15159-slop-sample-boundary/assets/* /2608.15127-cache-binding-regimes/assets/:splat 200\n",
   "sources": [
     {
       "files": 710,
@@ -236,6 +236,20 @@
       "path": "2401.05566-adversarial-training-blind-spot/site",
       "root": "outputs",
       "sha256": "8fef129ef37fec3d86c9e6d4c434c5fda63006b975e32febdbf219c723f43ed5"
+    },
+    {
+      "files": 759,
+      "mount": "2607.06560-vision-unified-generation",
+      "path": "2607.06560-vision-unified-generation/site",
+      "root": "outputs",
+      "sha256": "99f67d37df29ce35ff159139f6c2b1a74d287b11f8c531cfe9f3862db6c796ff"
+    },
+    {
+      "files": 759,
+      "mount": "2609.35815-calibrated-judge-inference",
+      "path": "2609.35815-calibrated-judge-inference/site",
+      "root": "outputs",
+      "sha256": "f656122c84ab3de921d75904d46860415518140152fd21890504ab5a6529f71c"
     }
   ],
   "version": 1

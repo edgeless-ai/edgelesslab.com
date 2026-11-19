@@ -120,6 +120,118 @@ cancels superseded runs only; unrelated PRs and main remain independently tested
 This reduces redundant in-flight runs; it does not mute mail or promise that
 legitimate future failure notifications disappear.
 
+## Cloudflare marimo direct uploads: package the entire pinned catalog
+
+`marimo.edgelesslab.com` is the **edgeless-marimo Cloudflare Pages project**,
+not this site's GitHub Pages export. A direct upload replaces the whole project;
+never upload only the new notebook or `out/`. Never re-export, optimize, edit
+approved HTML, remove old notebooks, or upgrade the paid plan to clear capacity.
+Packaging and a live release are separate authorization/verification scopes.
+
+The stdlib-only Python 3.10+ packager is `scripts/package_marimo_pages.py`:
+
+```bash
+npm run test:marimo-pages
+npm run package:marimo-pages -- \
+  --outputs-root /Users/djm/claude-projects/output/marimo-public \
+  --output "$TMPDIR/marimo-upload-unique" \
+  --receipt "$TMPDIR/marimo-upload-receipt.json"
+```
+
+Use a fresh output path **outside the repository and all source roots**. The
+receipt must be outside the upload directory too. No network, export or upload
+is performed. Exit 2 means do not upload. A capacity failure retains a JSON
+receipt and creates **no upload directory**. Only `status: pass` means the
+post-copy and source rehash checks completed. `preflight-pass` is not a package.
+
+### Pinned sources, not candidate discovery
+
+`scripts/marimo-pages-catalog.json` pins the exact full-file SHA256 manifest
+of each existing mount, the root fallback bundle, the original asset rewrite,
+and the known legacy fallback slugs. Its provenance names the immutable parent
+deployment and durable evidence archive. It reconstructs that publication from
+this repo's `public/marimo/<slug>` plus explicitly named approved `site/` trees
+under the outputs root. Sources are read-only; a missing/changed source is a
+blocker, never permission to use another candidate. In particular, several local
+output candidates differ from the actually published repo copies. Do not copy
+all outputs into the upload or infer approval from `gallery-entry.json`.
+
+Preserve original approved site archives outside scratch as well as the JSON
+lock; a digest cannot recover missing bytes. A fresh clone needs those archives
+for the sources marked `root: outputs`. Repository sources can be recovered
+from the catalog's pinned website commit with `git archive` into an isolated
+checkout, not by overwriting a shared checkout. Every source manifest is checked
+before and after packaging. The tool refuses symlinks, unsafe paths, source
+routing files, overlapping mounts and output/input collisions.
+
+For one explicitly critic-approved addition at `OUTPUTS_ROOT/<slug>/site`,
+compute the approved manifest (this measures identity; it does **not** grant
+approval), record it with the critic receipt, then pass it explicitly:
+
+```bash
+python3 -c 'import sys; from pathlib import Path; sys.path.insert(0,"scripts"); from package_marimo_pages import inventory,manifest_digest; print(manifest_digest(inventory(Path(sys.argv[1]))[0]))' /path/to/approved/site
+npm run package:marimo-pages -- \
+  --outputs-root /path/to/outputs --add '<slug>=<approved-manifest-sha256>' \
+  --output "$TMPDIR/marimo-next-unique" --receipt "$TMPDIR/marimo-next.json"
+```
+
+The manifest encoding is sorted compact ASCII JSON of relative POSIX file paths
+to lowercase SHA256 hex, UTF-8 encoded without a trailing newline. Unknown output
+folders are ignored. Existing bundles/fallback slugs cannot be replaced through
+`--add`; intentional migrations need separately reviewed source/routing changes.
+
+### File count, manifests and durable rewrites
+
+- Count **every** packaged file, conservatively including `_redirects`, before
+  upload: maximum 20,000. `--file-limit` can lower but never raise this guard.
+  The receipt reports logical/physical totals, headroom and both manifests.
+  Also refuse files over 25 MiB and excess Pages rewrite rules (100 dynamic).
+- Deduplicate only nonempty **complete assets trees** whose relative-path/file
+  SHA manifests are identical. Subsets, supersets, same-named/different bytes and
+  disjoint trees remain separate. Other files, especially HTML, stay byte-exact.
+- Deliver removed files via same-origin Pages **200 rewrites**, not redirects,
+  CDN substitutions or HTML edits. Preserve historical `_redirects` bytes as a
+  prefix, verify retained source/target manifests, keep destinations physical,
+  reject chains/cycles and conservatively reject overlapping rules. A new broad
+  fallback rule must not hide an old asset rewrite.
+- The receipt includes complete per-tree manifests, every logical delivery hash,
+  the physical package manifest, HTML hashes, retained/generated rules and
+  `next_catalog`. Archive it **outside** the upload. For a reviewed release,
+  extract `next_catalog` to `scripts/marimo-pages-catalog.json`, review that diff
+  via PR, and repackage using the committed catalog. Keep this update durable
+  across every full-project upload; do not reconstruct `_redirects` from only
+  the newest notebook. The original rewrite is pinned even on the first run.
+- Preserve the root SPA fallback: unchanged root HTML, no top-level `404.html`,
+  and no materialized unapproved bundle at a pinned fallback slug. Existing
+  fallback behavior is not evidence that the missing notebook itself works.
+
+### Scoped release gate and rollback
+
+Packaging equivalence is **offline file-delivery evidence**, not Python runtime
+or production evidence. Before a separately authorized upload, compare all
+current published index/fallback hashes and existing rewrite delivery against
+the immutable last-good release; stop on drift. Archive the original full
+package, `_redirects`, source archives, catalog and manifests. Do not deploy this
+capacity refactor merely because unit tests or a local emulator pass.
+
+After an authorized full-project upload, retain its immutable deployment URL;
+fetch every logical file URL and compare response bytes with the approved
+manifest (including removed assets served through rewrites). Reject soft-404
+HTML for JS/CSS/WASM; HTTP 200 alone proves nothing. Verify all historical
+indexes/fallbacks, the gallery iframe, and real notebook controls/reactive output
+at desktop/mobile widths with console/network evidence. Only then change any
+`published_url`. Website PRs still require independent code review and exact-head
+Frontend/E2E checks; never commit `out/` or a generated upload directory.
+
+Rollback means restore the **entire** retained last-good Pages deployment (or
+re-upload its exact archived package including `_redirects`), not just an HTML
+file or a fresh export. Repeat hash and runtime gates on the rollback URL and
+production domain. If release verification fails, do not promote its catalog;
+retain both candidate and last-good receipts and route remediation explicitly.
+The baseline last-good immutable deployment is
+`https://ccc0ae16.edgeless-marimo.pages.dev`; refresh this reference and source
+provenance only with verified release evidence.
+
 ## Publisher audit
 
 The repeated PR69/PR74 failures were coupled to manual notebook totals, ordered

@@ -12,6 +12,18 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("registers QPRU only after live formula and fixed-uncertainty verification", () => {
+    const notebook = marimoDemos.find((demo) => demo.slug === "2609.04354-qpru-evidence-frontier");
+    expect(notebook).toEqual({
+      slug: "2609.04354-qpru-evidence-frontier",
+      title: "QPRU: Parameter Savings Are Not Quantum Advantage",
+      description: "Recompute QPRU parameter-count formulas beside published AAPL uncertainty, while keeping architecture savings separate from unproven accuracy, speed, and quantum-advantage claims.",
+      category: "Research",
+      tags: ["quantum-ml", "time-series", "parameter-counts", "uncertainty", "evidence-boundaries"],
+      published_url: "https://edgelesslab.com/marimo/2609.04354-qpru-evidence-frontier/",
+    });
+    expect(publishedMarimoDemos).toContain(notebook);
+  });
   it("registers the unified vision backbone duplication notebook after live verification", () => {
     const notebook = marimoDemos.find((demo) => demo.slug === "2607.06560-vision-unified-generation");
 

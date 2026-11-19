@@ -12,6 +12,18 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("registers the unified vision backbone duplication notebook after live verification", () => {
+    const notebook = marimoDemos.find((demo) => demo.slug === "2607.06560-vision-unified-generation");
+
+    expect(notebook).toMatchObject({
+      title: "Unified Vision: The Backbone Duplication Ledger",
+      description: "Explore how one shared 7B vision interface changes normalized backbone inventory as the represented task portfolio grows.",
+      category: "Research",
+      tags: ["computer-vision", "multimodal-generation", "model-architecture", "systems-accounting", "evidence-boundaries"],
+      published_url: "https://marimo.edgelesslab.com/2607.06560-vision-unified-generation/",
+    });
+    expect(publishedMarimoDemos).toContain(notebook);
+  });
   it("registers the verified trigger-boundary demo without overstating probe success", () => {
     const entry = marimoDemos.find(d => d.slug === "2401.05566-adversarial-training-blind-spot");
     expect(entry?.title).toBe("When Red-Teaming Teaches the Trigger Boundary");

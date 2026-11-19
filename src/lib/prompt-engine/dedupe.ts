@@ -31,16 +31,19 @@ function findLongestMatch(
   let besti = alo;
   let bestj = blo;
   let bestsize = 0;
-  let j2len = new Map<number, number>();
+  // Two reusable rows instead of one Map allocation per character. Offset
+  // columns by one so j=0 reads the zero sentinel rather than index -1.
+  let previous = new Uint32Array(bhi + 1);
+  let current = new Uint32Array(bhi + 1);
   for (let i = alo; i < ahi; i++) {
-    const newj2len = new Map<number, number>();
+    current.fill(0);
     const indices = b2j.get(a[i]);
     if (indices) {
       for (const j of indices) {
         if (j < blo) continue;
         if (j >= bhi) break;
-        const k = (j2len.get(j - 1) ?? 0) + 1;
-        newj2len.set(j, k);
+        const k = previous[j] + 1;
+        current[j + 1] = k;
         if (k > bestsize) {
           besti = i - k + 1;
           bestj = j - k + 1;
@@ -48,7 +51,7 @@ function findLongestMatch(
         }
       }
     }
-    j2len = newj2len;
+    [previous, current] = [current, previous];
   }
   // With junk=None, bjunk is empty, so difflib's two extension passes
   // collapse into one. (Autojunk's "popular" elements are NOT junk: difflib

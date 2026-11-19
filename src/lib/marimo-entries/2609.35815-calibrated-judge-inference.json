@@ -1,0 +1,14 @@
+{
+  "slug": "2609.35815-calibrated-judge-inference",
+  "title": "LLM-Judge False-Confidence Frontier",
+  "description": "Explore how a fixed systematic judge bias can produce more raw false positives as evaluation size grows, even near apparently strong human-judge agreement. Analyst-authored Gaussian sensitivity model only. No evalstats/PPI execution, LLM judging, human labels, paper Monte Carlo replay, benchmark results, or calibrated performance claims.",
+  "category": "Research",
+  "tags": [
+    "llm-evaluation",
+    "statistics",
+    "llm-as-judge",
+    "prediction-powered-inference",
+    "evidence-boundaries"
+  ],
+  "published_url": "https://marimo.edgelesslab.com/2609.35815-calibrated-judge-inference/"
+}

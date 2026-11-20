@@ -12,6 +12,13 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("registers the live reasoning-energy sensitivity without implying measured GPU energy", () => {
+    const entry = marimoDemos.find(d => d.slug === "2609.05512-reasoning-energy-paradox");
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2609.05512-reasoning-energy-paradox/");
+    expect(entry?.description).toContain("Hypothetical duration sensitivity only");
+    expect(entry?.description).toContain("no model inference, benchmark replay or GPU energy measurement");
+    expect(publishedMarimoDemos).toContain(entry);
+  });
   it("publishes the exact-witnessed calibrated judge illustration with its synthetic-model boundary", () => {
     const entry = marimoDemos.find(d => d.slug === "2609.35815-calibrated-judge-inference");
     expect(entry?.title).toBe("LLM-Judge False-Confidence Frontier");

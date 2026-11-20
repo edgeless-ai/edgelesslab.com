@@ -12,6 +12,14 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("registers the exact-witnessed avatar stage timeline without claiming measured latency", () => {
+    const entry = marimoDemos.find(d => d.slug === "2602.07449-avatar-stage-timeline");
+    expect(entry?.title).toBe("Avatar Latency Needs a Stage Timeline");
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2602.07449-avatar-stage-timeline/");
+    expect(entry?.description).toContain("Separate steady-state video throughput from first speech and first displayed frame");
+    expect(entry?.tags).toContain("evidence-boundaries");
+    expect(publishedMarimoDemos).toContain(entry);
+  });
   it("registers the live ProvenanceGuard queue with its fixed-rate extrapolation boundary", () => {
     const entry = marimoDemos.find(d => d.slug === "2606.18037-provenanceguard-policy");
     expect(entry?.title).toBe("ProvenanceGuard: The Fail-Closed Queue");

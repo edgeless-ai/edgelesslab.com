@@ -12,6 +12,15 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("registers the live ProvenanceGuard queue with its fixed-rate extrapolation boundary", () => {
+    const entry = marimoDemos.find(d => d.slug === "2606.18037-provenanceguard-policy");
+    expect(entry?.title).toBe("ProvenanceGuard: The Fail-Closed Queue");
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2606.18037-provenanceguard-policy/");
+    expect(entry?.description).toContain("Derived sensitivity analysis under fixed rates only");
+    expect(entry?.description).toContain("no model rerun, transfer validation, medical or production readiness claim");
+    expect(entry?.tags).toContain("policy-sensitivity");
+    expect(publishedMarimoDemos).toContain(entry);
+  });
   it("registers the live reasoning-energy sensitivity without implying measured GPU energy", () => {
     const entry = marimoDemos.find(d => d.slug === "2609.05512-reasoning-energy-paradox");
     expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2609.05512-reasoning-energy-paradox/");

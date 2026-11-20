@@ -53,6 +53,14 @@ case "${1:-}" in
     cp -R "$PROJECT_DIR/public/$DASHBOARD/." "$PROJECT_DIR/out/$DASHBOARD/"
     diff -r -x '__next.*' -x 'index.txt' "$PROJECT_DIR/public/$DASHBOARD" "$PROJECT_DIR/out/$DASHBOARD"
     echo "[preserve] Restored and verified $DASHBOARD before indexing."
+    # Approved notebook exports are immutable, including maps and dotfiles.
+    # Restore after generic map deletion; the final postbuild manifest gate
+    # also checks that subsequent repair/indexing steps left them untouched.
+    if [[ -d "$PROJECT_DIR/public/marimo" ]]; then
+      mkdir -p "$PROJECT_DIR/out/marimo"
+      cp -R "$PROJECT_DIR/public/marimo/." "$PROJECT_DIR/out/marimo/"
+    fi
+    node "$SCRIPT_DIR/verify-immutable-marimo.mjs"
     echo "[preserve] Verifying standalone source after build..."
     for dir in "${STANDALONE_DIRS[@]}"; do
       test -d "$PROJECT_DIR/$dir"

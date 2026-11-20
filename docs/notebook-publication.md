@@ -48,6 +48,38 @@ Do not bypass failed local checks with repeated remote pushes or reruns.
 `npm run verify:publication` runs the same gates without pushing (useful before
 committing). Install Playwright Chromium first if it is not already available.
 
+## Immutable standalone exports
+
+`public/marimo/<slug>/` is an approved byte boundary, not a Next.js page.
+Critters excludes that subtree from HTML processing and empty-CSS cleanup.
+Launch-readiness preserves authored notebook metadata while still auditing its
+internal references; it must not inject canonical, OpenGraph or Twitter tags.
+Postbuild restores the complete authoritative public tree after generic source-map
+removal, then `verify-immutable-marimo.mjs` checks every relative path and SHA256
+again after repairs and Pagefind. Missing, changed or extra exported files fail.
+Do not edit approved HTML to add a CSS opt-out attribute.
+
+The Pages workflow calls `scripts/archive-pages.mjs <archive.tar>`. Ordinary
+output retains the existing hidden-file exclusion and `.well-known` exception.
+The entire verified marimo subtree is appended once without dotfile exclusions,
+and extracted archive bytes are checked against public source. `.nojekyll` is
+retained for identity even though workflow-based Pages deploys do not run Jekyll
+(and therefore do not need that marker to disable it). Source maps, nested HTML,
+empty assets and approved hidden assets are part of the same immutable payload.
+
+`public/marimo/` remains ignored to avoid accidentally adding generated exports.
+Only explicitly reviewed payloads should be force-added by scoped path. Never
+place `.DS_Store`, Git metadata, credentials or unreviewed generated files there:
+this boundary intentionally ships **all** approved source bytes, not an extension
+allowlist. The tooling PR must not include or publish a new notebook fixture.
+
+Run `npm run test:font-preloads` for real-Critters, restore, manifest-tamper and
+actual-tar extraction regressions. For a new approved bundle, independently retain
+source, Git-blob, final-export and extracted-archive manifests, then exercise the
+actual notebook controls in a browser. Generic gallery smoke tests cannot prove
+notebook runtime or immutable artifact identity. Review/merge and production
+HTTP/control verification remain separate gates.
+
 ## Merge only after the checks pass
 
 `main` has **no branch protection**, so nothing server-side stops a lane from

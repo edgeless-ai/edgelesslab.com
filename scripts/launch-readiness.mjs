@@ -77,6 +77,10 @@ export function headMetadata(html) {
   };
 }
 export function exclusionFor(route, html) {
+  // Approved exported notebooks are immutable, including authored metadata.
+  // Keep reference auditing below; only generic metadata rewriting is excluded.
+  if (route.startsWith("/marimo/"))
+    return "Immutable standalone marimo export; authored metadata preserved";
   if (
     /^\/google[a-z\d]+\.html$/i.test(route) &&
     /^google-site-verification:/i.test(html.trim())

@@ -20,6 +20,34 @@ describe("published marimo gallery", () => {
     expect(entry?.tags).toContain("evidence-boundaries");
     expect(publishedMarimoDemos).toContain(entry);
   });
+  it("registers Ready Cohorts only after exact live deadline-packing verification", () => {
+    const entry = marimoDemos.find(d => d.slug === "2608.12123-ready-cohort-packing");
+    expect(entry).toEqual({
+      "slug": "2608.12123-ready-cohort-packing",
+      "title": "Ready Cohorts: Deadline-Aware Packing",
+      "description": "Pack same-route control events by launch deadlines and compare fixed-window eligibility, the exact offline opportunity, and a local upper bound.",
+      "category": "Research",
+      "tags": [
+        "agent-systems",
+        "gpu-scheduling",
+        "dynamic-programming",
+        "deadline-packing"
+      ],
+      "published_url": "https://marimo.edgelesslab.com/2608.12123-ready-cohort-packing/"
+    });
+    expect(publishedMarimoDemos).toContain(entry);
+    const catalog = JSON.parse(readFileSync(join(process.cwd(), "scripts/marimo-pages-catalog.json"), "utf8"));
+    expect(catalog.sources.find((source: { mount: string }) => source.mount === entry?.slug)).toMatchObject({
+      files: 759, path: "2608.12123-ready-cohort-packing/site",
+      sha256: "eb6c2d1401ca3feefb21d4d2b3088b9869c3b6591d7b9762eceae31d2f28697e",
+    });
+  });
+  it("lists DistillGuard after independent live reactive verification", () => {
+    const entry = marimoDemos.find(d => d.slug === "2603.07835-distillguard-damage-budget");
+    expect(entry?.description).toContain("not broad distillation resistance or a model rerun");
+    expect(entry?.published_url).toBe('https://edgelesslab.com/marimo/2603.07835-distillguard-damage-budget/')
+    expect(publishedMarimoDemos).toContain(entry)
+  });
   it("registers the exact-witnessed avatar stage timeline without claiming measured latency", () => {
     const entry = marimoDemos.find(d => d.slug === "2602.07449-avatar-stage-timeline");
     expect(entry?.title).toBe("Avatar Latency Needs a Stage Timeline");
@@ -31,6 +59,12 @@ describe("published marimo gallery", () => {
   it("registers the live ProvenanceGuard queue with its fixed-rate extrapolation boundary", () => {
     const entry = marimoDemos.find(d => d.slug === "2606.18037-provenanceguard-policy");
     expect(entry?.title).toBe("ProvenanceGuard: The Fail-Closed Queue");
+    const catalog = JSON.parse(readFileSync(join(process.cwd(), "scripts/marimo-pages-catalog.json"), "utf8"));
+    expect(catalog.sources.find((source: { mount: string }) => source.mount === entry?.slug)).toMatchObject({
+      files: 710,
+      path: "2606.18037-provenanceguard-policy-legend-fix/site",
+      sha256: "1d9139009c0c2a43d50c22ae559f83b7dc6f83b5bfd92f85ef6046cfe88993e3",
+    });
     expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2606.18037-provenanceguard-policy/");
     expect(entry?.description).toContain("Derived sensitivity analysis under fixed rates only");
     expect(entry?.description).toContain("no model rerun, transfer validation, medical or production readiness claim");

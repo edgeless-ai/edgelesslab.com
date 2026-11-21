@@ -18,7 +18,7 @@ describe("published marimo gallery", () => {
       "slug": "2608.12123-ready-cohort-packing",
       "title": "Ready Cohorts: Deadline-Aware Packing",
       "description": "Pack same-route control events by launch deadlines and compare fixed-window eligibility, the exact offline opportunity, and a local upper bound.",
-      "category": "Systems and Scheduling",
+      "category": "Research",
       "tags": [
         "agent-systems",
         "gpu-scheduling",

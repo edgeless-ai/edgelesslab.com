@@ -29,6 +29,12 @@ describe("published marimo gallery", () => {
   it("registers the live ProvenanceGuard queue with its fixed-rate extrapolation boundary", () => {
     const entry = marimoDemos.find(d => d.slug === "2606.18037-provenanceguard-policy");
     expect(entry?.title).toBe("ProvenanceGuard: The Fail-Closed Queue");
+    const catalog = JSON.parse(readFileSync(join(process.cwd(), "scripts/marimo-pages-catalog.json"), "utf8"));
+    expect(catalog.sources.find((source: { mount: string }) => source.mount === entry?.slug)).toMatchObject({
+      files: 710,
+      path: "2606.18037-provenanceguard-policy-legend-fix/site",
+      sha256: "1d9139009c0c2a43d50c22ae559f83b7dc6f83b5bfd92f85ef6046cfe88993e3",
+    });
     expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2606.18037-provenanceguard-policy/");
     expect(entry?.description).toContain("Derived sensitivity analysis under fixed rates only");
     expect(entry?.description).toContain("no model rerun, transfer validation, medical or production readiness claim");

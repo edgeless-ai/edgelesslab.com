@@ -12,6 +12,12 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("keeps DistillGuard unlisted until independent live reactive verification", () => {
+    const entry = marimoDemos.find(d => d.slug === "2603.07835-distillguard-damage-budget");
+    expect(entry?.description).toContain("not broad distillation resistance or a model rerun");
+    expect(entry?.published_url).toBeUndefined();
+    expect(publishedMarimoDemos).not.toContain(entry);
+  });
   it("registers the exact-witnessed avatar stage timeline without claiming measured latency", () => {
     const entry = marimoDemos.find(d => d.slug === "2602.07449-avatar-stage-timeline");
     expect(entry?.title).toBe("Avatar Latency Needs a Stage Timeline");

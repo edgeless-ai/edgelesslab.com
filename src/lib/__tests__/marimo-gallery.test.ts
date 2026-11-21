@@ -12,6 +12,14 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("registers the exact-witnessed Harmonica speed frontier with its RTX 4090 qualification", () => {
+    const entry = marimoDemos.find(d => d.slug === "2609.04640-harmonica-speed-frontier");
+    expect(entry?.title).toBe("Harmonica: Quality-Qualified Speed Frontier");
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2609.04640-harmonica-speed-frontier/");
+    expect(entry?.description).toBe("Raise a minimum RTX 4090 inference-speed requirement and see which selected transcription model leads on an eight-set mean frame-F1 recomputation.");
+    expect(entry?.tags).toContain("evidence-boundaries");
+    expect(publishedMarimoDemos).toContain(entry);
+  });
   it("registers Ready Cohorts only after exact live deadline-packing verification", () => {
     const entry = marimoDemos.find(d => d.slug === "2608.12123-ready-cohort-packing");
     expect(entry).toEqual({

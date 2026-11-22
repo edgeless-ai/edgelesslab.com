@@ -43,5 +43,8 @@ jobs:
       - name: Check launch readiness regressions
         run: npm run test:launch
 
+      - name: Check marimo delivery, restoration and reference regressions
+        run: npm run test:marimo-pages
+
       - name: Run vitest
         run: npx vitest run

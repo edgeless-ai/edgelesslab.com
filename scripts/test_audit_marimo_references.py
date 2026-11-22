@@ -3,6 +3,8 @@ import functools
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import threading
 import unittest
@@ -11,6 +13,24 @@ from audit_marimo_references import Audit, html_references, js_references, mime_
 
 
 class ReferenceTests(unittest.TestCase):
+    def test_cli_rejects_missing_empty_or_unknown_registry_before_network(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            entries = root / 'entries'
+            entries.mkdir()
+            receipt = root / 'receipt.json'
+            receipt.write_text('{"logical_manifest": {}}')
+            command = [sys.executable, str(Path(__file__).with_name('audit_marimo_references.py')),
+                       '--receipt', str(receipt), '--output', str(root / 'output'),
+                       '--legacy-origin', 'http://127.0.0.1:1']
+            for directory, extra in [(root / 'missing', []), (entries, []),
+                                     (entries, ['--slug', 'unknown'])]:
+                with self.subTest(directory=directory, extra=extra):
+                    result = subprocess.run(command + ['--entries', str(directory)] + extra,
+                                            capture_output=True, text=True, timeout=5)
+                    self.assertEqual(result.returncode, 2)
+                    self.assertFalse((root / 'output').exists())
+
     def test_html_uses_real_base_and_module_references(self):
         refs = html_references(b'''<base href="/book/"><script src="assets/index-x.js"></script>
             <link rel="modulepreload" href="assets/import-y.js">

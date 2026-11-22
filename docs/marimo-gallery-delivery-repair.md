@@ -72,17 +72,19 @@ approved first-party bytes.
 
 ```sh
 python3 scripts/audit_marimo_references.py \
-  --origin http://127.0.0.1:8924 \
-  --source-manifest /ABSOLUTE/DISJOINT/NEW/package-receipt.json \
+  --entries src/lib/marimo-entries \
+  --legacy-origin http://127.0.0.1:8924 \
+  --receipt /ABSOLUTE/DISJOINT/NEW/package-receipt.json \
   --browser-receipt /PATH/TO/isolated/receipt.json \
   --output /NEW/serial-evidence
 
 python3 scripts/witness_marimo_gallery.py \
-  --kind isolated --url http://127.0.0.1:8924/2606.04781-pass-semantics/ \
+  --mode isolated --url http://127.0.0.1:8924/2606.04781-pass-semantics/ \
+  --logical-manifest /ABSOLUTE/DISJOINT/NEW/package-receipt.json \
   --output /NEW/isolated-evidence
 
 python3 scripts/witness_marimo_gallery.py \
-  --kind gallery --url https://edgelesslab.com/lab/marimo/ \
+  --mode gallery --url https://edgelesslab.com/lab/marimo/ \
   --output /NEW/live-gallery-evidence
 ```
 

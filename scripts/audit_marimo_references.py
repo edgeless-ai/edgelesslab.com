@@ -101,12 +101,20 @@ def main():
     args = ap.parse_args()
     if not 1 <= args.limit_per_kind <= 10:
         ap.error("limit-per-kind must be between1 and10")
+    if not args.entries.is_dir():
+        ap.error("entries must be an existing canonical registry directory")
+    entries = [json.loads(p.read_text()) for p in sorted(args.entries.glob("*.json"))]
+    entries = [e for e in entries if e.get("published_url")]
+    unknown = set(args.slug) - {e['slug'] for e in entries}
+    if unknown:
+        ap.error("unknown published slug(s): " + ', '.join(sorted(unknown)))
+    entries = [e for e in entries if not args.slug or e['slug'] in args.slug]
+    if not entries:
+        ap.error("no published canonical registry entries selected")
     receipt = json.loads(args.receipt.read_text())
     manifest = receipt["logical_manifest"]
     audit = Audit(args.output, manifest)
     root, _ = audit.fetch(args.legacy_origin + "/", "html", slug="", reference="host-root fallback comparison", logical_path="index.html")
-    entries = [json.loads(p.read_text()) for p in sorted(args.entries.glob("*.json"))]
-    entries = [e for e in entries if e.get("published_url") and (not args.slug or e["slug"] in args.slug)]
     for entry in entries:
         url, slug = entry["published_url"], entry["slug"]
         legacy = urlsplit(url).netloc == "marimo.edgelesslab.com"

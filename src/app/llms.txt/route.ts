@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { creativeDemos } from "@/lib/creative-demos";
 import { publishedMarimoDemos } from "@/lib/marimo-demos";
+import { researchFieldNotes } from "@/lib/research-field-notes";
 
 // /llms.txt: Markdown index for LLM crawlers (https://llmstxt.org spec).
 // Re-rendered at build time, served as text/plain with 1h cache.
@@ -76,6 +77,9 @@ export async function GET(): Promise<Response> {
 - [Support](${SITE_URL}/support): help and contact
 
 ## Field Notes (interactive, readable without JavaScript)
+
+- [Latent Information Archaeology](${SITE_URL}/lia/): a research program about artifact realization and the limits of inference; demos are contextual, not empirical validation
+${researchFieldNotes.map(note => `- [${note.title}](${SITE_URL}${note.href}) (${note.date}, methodological field note): ${note.description}`).join("\n")}
 
 ${fieldNotes.map(fieldNoteLine).join("\n")}
 

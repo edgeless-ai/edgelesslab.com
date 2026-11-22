@@ -3,6 +3,7 @@ import { projects, experiments, products } from '@/lib/data';
 import { posts } from '@/lib/blog';
 import { productContent } from '@/lib/product-content';
 import { getFieldNotes } from '@/lib/field-notes.server';
+import { researchFieldNotes } from '@/lib/research-field-notes';
 
 export const dynamic = 'force-static';
 
@@ -169,6 +170,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     ...staticPages,
+    { url: 'https://edgelesslab.com/lia/', changeFrequency: 'monthly', priority: 0.8 },
+    ...researchFieldNotes.map((note) => ({
+      url: `https://edgelesslab.com${note.href}`,
+      lastModified: new Date(note.date),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
     ...projectPages,
     ...experimentPages,
     ...blogPages,

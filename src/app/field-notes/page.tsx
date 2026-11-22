@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/json-ld";
 import { FieldNotesGallery } from "@/components/field-notes-gallery";
 import { getFieldNotes } from "@/lib/field-notes.server";
 import { createPageMetadata } from "@/lib/metadata";
+import { researchFieldNotes } from "@/lib/research-field-notes";
 
 export const metadata = createPageMetadata({
   title: "Field Notes",
@@ -37,7 +38,7 @@ export default function FieldNotesPage() {
             description:
               "Interactive studies, cited science plots, generative systems, and visual research.",
             url: "https://edgelesslab.com/field-notes",
-            numberOfItems: notes.length + 2,
+            numberOfItems: notes.length + 2 + researchFieldNotes.length,
             itemListElement: [
               {
                 "@type": "ListItem",
@@ -51,9 +52,15 @@ export default function FieldNotesPage() {
                 name: "Tartanism: Field Notes on Generative Plaid",
                 url: "https://edgelesslab.com/tartanism/field-notes/index.html",
               },
-              ...notes.map((note, index) => ({
+              ...researchFieldNotes.map((note, index) => ({
                 "@type": "ListItem",
                 position: index + 3,
+                name: note.title,
+                url: `https://edgelesslab.com${note.href}`,
+              })),
+              ...notes.map((note, index) => ({
+                "@type": "ListItem",
+                position: index + 3 + researchFieldNotes.length,
                 name: note.title,
                 url: `https://edgelesslab.com/creative-demos/${note.slug}/`,
               })),
@@ -100,6 +107,16 @@ export default function FieldNotesPage() {
         </header>
 
         <div className="mx-auto max-w-[1280px] pb-20">
+          <section aria-label="Research field notes" className="border-t px-6 py-10 sm:px-9" style={{ borderColor: "var(--ink)" }}>
+            <p className="lab-metadata mb-5" style={{ color: "var(--malachite)" }}>Research field notes / {researchFieldNotes.length}</p>
+            {researchFieldNotes.map((note) => (
+              <article key={note.href} data-editorial-note>
+                <h2 className="font-editorial text-3xl sm:text-5xl"><a href={note.href} className="underline underline-offset-4">{note.title}</a></h2>
+                <p className="mt-4 max-w-2xl text-base leading-7">{note.description}</p>
+                <p className="mt-3 font-mono text-xs">{note.section} / {note.date}</p>
+              </article>
+            ))}
+          </section>
           <section className="border-y" style={{ borderColor: "var(--ink)" }}>
             <a
               href="/total-serialism/field-notes/index.html"

@@ -13,6 +13,7 @@ const toolLinks = [
 ];
 
 const labLinks = [
+  { label: "LIA", href: "/lia/", external: false },
   { label: "Field Notes", href: "/field-notes", external: false },
   { label: "Experiments", href: "/lab", external: false },
   { label: "Agents", href: "/agents", external: false },

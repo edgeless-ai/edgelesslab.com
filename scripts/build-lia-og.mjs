@@ -1,0 +1,7 @@
+import { chromium } from '@playwright/test';
+const browser = await chromium.launch();
+try {
+  const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
+  await page.setContent(`<!doctype html><html lang="en"><style>*{box-sizing:border-box}body{margin:0;background:#f3eddd;color:#0c0a08;padding:48px 60px;font-family:Georgia,serif}.meta{font:16px monospace;letter-spacing:.05em;color:#684832;border-bottom:1px solid #c5b79c;padding-bottom:20px}.layout{display:grid;grid-template-columns:2fr 1fr;gap:70px;margin-top:54px}h1{font-size:76px;line-height:1.02;font-weight:400;letter-spacing:-.035em;margin:0 0 35px}p{font-size:26px;line-height:1.4;max-width:620px}.strata{background:#ebe3cf;padding:22px}section{border-top:1px solid #684832;font-size:25px;padding:16px 0}section:nth-child(2){padding-top:32px}section:nth-child(3){padding-top:48px}small{font:14px monospace;color:#684832}</style><div class="meta">EDGELESS LAB / LIA / RESEARCH IN DEVELOPMENT</div><div class="layout"><div><h1>Latent Information<br><em>Archaeology.</em></h1><p>What can an artifact tell us?<br>What can it not?</p><small>edgelesslab.com/lia/</small></div><div class="strata"><section>Content</section><section>Realization</section><section>Observation</section></div></div></html>`);
+  await page.screenshot({ path: 'public/lia/og-image.png' });
+} finally { await browser.close(); }

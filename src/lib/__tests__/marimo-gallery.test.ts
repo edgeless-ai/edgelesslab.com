@@ -12,6 +12,19 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("registers the exact live construct-mixture illustration with its synthetic-profile limits", () => {
+    const entry = marimoDemos.find(d => d.slug === "2611.05665-construct-mixture-rank");
+    expect(entry?.title).toBe("One Score, Many Constructs: Watch a Coding-Agent Ranking Flip");
+    expect(entry?.published_url).toBe("https://marimo.edgelesslab.com/2611.05665-construct-mixture-rank/");
+    expect(entry?.description).toContain("analyst-authored agent rates");
+    expect(entry?.description).toContain("not a measurement of any named model");
+    expect(publishedMarimoDemos).toContain(entry);
+    const catalog = JSON.parse(readFileSync(join(process.cwd(), "scripts/marimo-pages-catalog.json"), "utf8"));
+    expect(catalog.sources.find((source: { mount: string }) => source.mount === entry?.slug)).toMatchObject({
+      files: 483, path: "2611.05665-construct-mixture-rank/site",
+      sha256: "336f1f2099ec22e8cdb5c1c2bcc6e569cfabb60d1163475b714d867026b5846c",
+    });
+  });
   it("registers the exact-witnessed Harmonica speed frontier with its RTX 4090 qualification", () => {
     const entry = marimoDemos.find(d => d.slug === "2609.04640-harmonica-speed-frontier");
     expect(entry?.title).toBe("Harmonica: Quality-Qualified Speed Frontier");

@@ -11,8 +11,10 @@ describe("approved warning-boundary field note", () => {
     expect(posts.filter((post) => post.slug === warningBoundaryPost.slug)).toEqual([warningBoundaryPost]);
   });
 
-  it("preserves the approved body without editorial changes", () => {
-    expect(warningBoundaryPost.content).toBe(approved.split("---\n").slice(2).join("---\n").trim());
+  it("preserves the approved prose; the route already renders the title as h1", () => {
+    const body = approved.split("---\n").slice(2).join("---\n").trim();
+    expect(body.startsWith(`# ${warningBoundaryPost.title}\n\n`)).toBe(true);
+    expect(warningBoundaryPost.content).toBe(body.slice(`# ${warningBoundaryPost.title}\n\n`.length));
   });
 
   it("preserves the approved title, date, summary and tags", () => {

@@ -28,6 +28,9 @@ async function walk(dir) {
   const files = [];
   for (const entry of entries) {
     const full = path.join(dir, entry.name);
+    // Approved public/marimo exports own their HTML and runtime-only CSS.
+    // Exclude the entire boundary in both walkers (including empty CSS cleanup).
+    if (full === path.join(OUT_DIR, "marimo")) continue;
     if (entry.isDirectory()) {
       files.push(...(await walk(full)));
     } else if (entry.name.endsWith(".html")) {
@@ -110,6 +113,9 @@ async function walkCSS(dir) {
   const files = [];
   for (const entry of entries) {
     const full = path.join(dir, entry.name);
+    // Approved public/marimo exports own their HTML and runtime-only CSS.
+    // Exclude the entire boundary in both walkers (including empty CSS cleanup).
+    if (full === path.join(OUT_DIR, "marimo")) continue;
     if (entry.isDirectory()) {
       files.push(...(await walkCSS(full)));
     } else if (entry.name.endsWith(".css")) {

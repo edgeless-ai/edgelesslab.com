@@ -11,7 +11,8 @@ function fixture() {
   const root = mkdtempSync(join(tmpdir(), "standalone-build-"));
   roots.push(root);
   mkdirSync(join(root, "scripts"));
-  cpSync("scripts/preserve-standalone.sh", join(root, "scripts/preserve-standalone.sh"));
+  for (const file of ["preserve-standalone.sh", "verify-immutable-marimo.mjs"])
+    cpSync(`scripts/${file}`, join(root, "scripts", file));
   for (const dir of ["pen-plotter", "tartanism", "total-serialism", "public/lab/pen-plotter-autoresearch", "out/lab/pen-plotter-autoresearch", "out/creative-demos/borrow-the-creative-loop"])
     mkdirSync(join(root, dir), { recursive: true });
   return root;

@@ -12,6 +12,20 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("pins the critic-approved SRQ reconstruction instead of its legacy fallback", () => {
+    const slug = "2610.20838-srq-endpoint-weight";
+    const catalog = JSON.parse(readFileSync(join(process.cwd(), "scripts/marimo-pages-catalog.json"), "utf8"));
+    expect(catalog.fallbacks).not.toHaveProperty(slug);
+    expect(catalog.sources.filter((source: { mount: string }) => source.mount === slug)).toEqual([{
+      files: 759, mount: slug, path: `${slug}/site`, root: "outputs",
+      sha256: "f62af79ff49d4526f35a98ec7ae85da02c1685262104dca1548566d1a47c496f",
+    }]);
+    expect(catalog.redirects).toContain(`/${slug}/assets/* /2607.06560-vision-unified-generation/assets/:splat 200\n`);
+    // The already-deployed sibling must survive the full-project upload.
+    expect(catalog.sources.find((source: { mount: string }) => source.mount === "2611.05665-construct-mixture-rank")).toMatchObject({
+      files: 483, sha256: "336f1f2099ec22e8cdb5c1c2bcc6e569cfabb60d1163475b714d867026b5846c",
+    });
+  });
   it("registers the exact-witnessed Harmonica speed frontier with its RTX 4090 qualification", () => {
     const entry = marimoDemos.find(d => d.slug === "2609.04640-harmonica-speed-frontier");
     expect(entry?.title).toBe("Harmonica: Quality-Qualified Speed Frontier");

@@ -1,13 +1,14 @@
 {
   "slug": "2610.20838-srq-endpoint-weight",
-  "title": "SRQ Endpoint Weight",
-  "description": "Explore how executed-trial count and trial/final quality determine the share of PGRR's slot-averaged SRQ that comes from repeated endpoint evidence.",
+  "title": "How Much of SRQ Is the Endpoint?",
+  "description": "Explore how early stopping makes final-gait quality dominate a slot-averaged recovery score. Equation 2 sensitivity only; no robot or task-level replay.",
   "category": "Research",
   "tags": [
     "robotics",
-    "recovery metrics",
-    "sensitivity analysis",
-    "benchmark design"
+    "recovery",
+    "metrics",
+    "evaluation",
+    "sensitivity-analysis"
   ],
   "published_url": "https://marimo.edgelesslab.com/2610.20838-srq-endpoint-weight/"
 }

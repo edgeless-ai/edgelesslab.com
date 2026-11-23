@@ -16,6 +16,7 @@ describe("published marimo gallery", () => {
     const slug = "2502.06785-dca-time-to-target";
     const entry = marimoDemos.find(d => d.slug === slug);
     expect(entry?.title).toBe("DCA: When Fewer Batches Beat Slower Batches");
+    expect(publishedMarimoDemos.find(d => d.slug === slug)?.published_url).toBe(`https://marimo.edgelesslab.com/${slug}/`);
     const catalog = JSON.parse(readFileSync(join(process.cwd(), "scripts/marimo-pages-catalog.json"), "utf8"));
     expect(catalog.sources.filter((s: { mount: string }) => s.mount === slug)).toEqual([{
       files: 759, mount: slug, path: `${slug}/site`, root: "outputs",

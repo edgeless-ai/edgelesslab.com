@@ -189,7 +189,8 @@ def delivered_path(path: str, rewrites: dict[str, str]) -> str:
 
 
 def package(catalog: dict, roots: dict[str, Path], output: Path, receipt: Path,
-            additions: Sequence[tuple[str, str]] = (), file_limit: int = FILE_LIMIT) -> dict:
+            additions: Sequence[tuple[str, str]] = (), file_limit: int = FILE_LIMIT,
+            restorations: Sequence[dict] = ()) -> dict:
     if catalog.get("version") != 1 or not 0 < file_limit <= FILE_LIMIT:
         raise PackagingError("Unsupported catalog version or unsafe file limit")
     if output.exists() or output.is_symlink():
@@ -207,6 +208,20 @@ def package(catalog: dict, roots: dict[str, Path], output: Path, receipt: Path,
         raise PackagingError("Receipt must be outside input roots")
     next_catalog = json.loads(json.dumps(catalog))
     mounts = {r["mount"] for r in catalog["sources"]}
+    # A root-HTML fallback is an observed outage, not an approved notebook.
+    # Require explicit old-state and replacement pins; never discover candidates.
+    for migration in restorations:
+        slug = migration["mount"]
+        old = next_catalog.get("fallbacks", {}).get(slug)
+        if (not old or old != migration.get("expected_fallback_sha256")
+                or not migration.get("review_task") or slug in mounts):
+            raise PackagingError(f"Unreviewed or stale fallback restoration: {slug}")
+        source_inventory(migration, roots)
+        next_catalog["sources"].append({k: migration[k] for k in
+                                        ("mount", "root", "path", "sha256", "files")})
+        del next_catalog["fallbacks"][slug]
+        next_catalog.setdefault("provenance", {}).setdefault("fallback_restorations", []).append(migration)
+        mounts.add(slug)
     for slug, sha in additions:
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", slug) or not re.fullmatch(r"[a-f0-9]{64}", sha):
             raise PackagingError(f"Invalid approved addition: {slug}")
@@ -235,6 +250,11 @@ def package(catalog: dict, roots: dict[str, Path], output: Path, receipt: Path,
         relative(slug)
         if any(p == slug or p.startswith(slug + "/") for p in logical) or logical["index.html"] != sha:
             raise PackagingError(f"Legacy fallback changed: {slug}")
+    for migration in restorations:
+        if logical["index.html"] != migration["expected_fallback_sha256"]:
+            raise PackagingError(f"Root fallback changed since restoration review: {migration['mount']}")
+        if logical.get(migration["mount"] + "/index.html") in (None, logical["index.html"]):
+            raise PackagingError(f"Restoration is still root fallback: {migration['mount']}")
     trees, rewrites, redirects = route_plan(logical, catalog["redirects"])
     physical = {p: sha for p, sha in logical.items() if delivered_path(p, rewrites) == p}
     if redirects:
@@ -263,6 +283,7 @@ def package(catalog: dict, roots: dict[str, Path], output: Path, receipt: Path,
                   asset_manifests={manifest_digest(m): m for m in trees.values()},
                   asset_trees={p: manifest_digest(m) for p, m in trees.items()},
                   rewrites=rewrites, redirects=redirects, next_catalog=next_catalog,
+                  restorations=list(restorations),
                   verification="offline complete logical-path SHA256 equivalence; not live runtime proof")
     receipt.parent.mkdir(parents=True, exist_ok=True)
     receipt.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
@@ -303,6 +324,8 @@ def main() -> int:
     parser.add_argument("--add", action="append", default=[], metavar="SLUG=MANIFEST_SHA256",
                         help="Explicit reviewed addition at OUTPUTS_ROOT/SLUG/site")
     parser.add_argument("--file-limit", type=int, default=FILE_LIMIT, help="May lower but never raise 20000")
+    parser.add_argument("--restore", type=Path,
+                        help="Explicit reviewed JSON list of pinned fallback-to-source migrations")
     args = parser.parse_args()
     try:
         additions = []
@@ -312,7 +335,8 @@ def main() -> int:
             additions.append(tuple(value.split("=", 1)))
         result = package(json.loads(args.catalog.read_text()),
                          {"repository": args.repo_root, "outputs": args.outputs_root},
-                         args.output, args.receipt, additions, args.file_limit)
+                         args.output, args.receipt, additions, args.file_limit,
+                         json.loads(args.restore.read_text()) if args.restore else ())
         print(json.dumps({k: result[k] for k in ("status", "logical_files", "packaged_files",
                                                 "remaining_files", "package_manifest_sha256")}))
         return 0

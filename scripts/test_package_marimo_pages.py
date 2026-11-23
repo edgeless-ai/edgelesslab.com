@@ -198,6 +198,66 @@ class PackagingTests(unittest.TestCase):
         self.assertFalse((self.out / "legacy").exists())
         self.assertFalse((self.out / "404.html").exists())
 
+    def restoration(self):
+        slug = "legacy"
+        old = p.digest((self.repo / "root/index.html").read_bytes())
+        self.catalog["fallbacks"][slug] = old
+        site = self.outputs / slug / "site"
+        shutil.copytree(self.repo / "root", site)
+        (site / "index.html").write_bytes(b"<script src='./assets/main.js'></script>approved legacy")
+        hashes, _ = p.inventory(site)
+        return dict(mount=slug, root="outputs", path=f"{slug}/site", files=len(hashes),
+                    sha256=p.manifest_digest(hashes), expected_fallback_sha256=old,
+                    review_task="fixture-independent-review")
+
+    def test_explicit_restoration_preserves_old_paths_and_recovers_actual_reference(self):
+        migration = self.restoration()
+        before = copy.deepcopy(self.catalog)
+        old, _ = p.source_inventory(self.catalog["sources"][0], self.roots)
+        result = self.run_package(restorations=[migration])
+        self.assertEqual(self.catalog, before)
+        self.assertEqual(result["next_catalog"]["fallbacks"], {})
+        self.assertEqual(result["restorations"], [migration])
+        self.assertEqual(result["next_catalog"]["provenance"]["fallback_restorations"], [migration])
+        self.assertEqual(result["rewrites"]["legacy/assets"], "assets")
+        self.assertNotEqual(p.digest((self.out / "legacy/index.html").read_bytes()), migration["expected_fallback_sha256"])
+        for path, sha in old.items():
+            self.assertEqual(result["logical_manifest"][path], sha)
+        self.out = self.root / "again"
+        replay = p.package(result["next_catalog"], self.roots, self.out, self.receipt)
+        self.assertEqual(replay["package_manifest"], result["package_manifest"])
+
+    def test_restoration_rejects_stale_fallback_wrong_manifest_missing_review_and_alias(self):
+        migration = self.restoration()
+        cases = [dict(migration, expected_fallback_sha256="0" * 64),
+                 dict(migration, sha256="0" * 64), dict(migration, review_task=""),
+                 dict(migration, mount="unknown"), dict(migration, path="../legacy/site"),
+                 dict(migration, path="legacy/site", root="repository")]
+        for candidate in cases:
+            with self.subTest(candidate=candidate):
+                with self.assertRaises((p.PackagingError, OSError)):
+                    self.run_package(restorations=[candidate])
+                self.assertFalse(self.out.exists())
+        with self.assertRaises(p.PackagingError):
+            self.run_package(restorations=[migration, migration])
+        self.assertFalse(self.out.exists())
+
+    def test_restoration_cannot_rebrand_root_html_as_another_notebook(self):
+        migration = self.restoration()
+        site = self.outputs / "legacy/site"
+        (site / "index.html").write_bytes((self.repo / "root/index.html").read_bytes())
+        migration["sha256"] = p.manifest_digest(p.inventory(site)[0])
+        with self.assertRaisesRegex(p.PackagingError, "still root fallback"):
+            self.run_package(restorations=[migration])
+        self.assertFalse(self.out.exists())
+
+    def test_restoration_source_mutation_is_rejected(self):
+        migration = self.restoration()
+        (self.outputs / "legacy/site/assets/main.js").write_bytes(b"unreviewed")
+        with self.assertRaisesRegex(p.PackagingError, "Pinned source mismatch"):
+            self.run_package(restorations=[migration])
+        self.assertFalse(self.out.exists())
+
     def test_symlink_traversal_mount_overlap_and_routing_files_rejected(self):
         self.put("root/assets/link.js").unlink()
         (self.repo / "root/assets/link.js").symlink_to(self.repo / "root/index.html")

@@ -3,7 +3,7 @@ import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
 import { createPageMetadata } from "@/lib/metadata";
 import { publishedMarimoDemos, marimoCategories, type PublishedMarimoDemo } from "@/lib/marimo-demos";
-import { MarimoPreview } from "@/components/marimo-preview";
+import { MarimoPreview, MarimoPreviewGallery } from "@/components/marimo-preview";
 
 export const metadata = createPageMetadata({
   title: "Marimo",
@@ -100,6 +100,7 @@ export default function MarimoPage() {
           </div>
 
           {/* Grouped by category */}
+          <MarimoPreviewGallery>
           {marimoCategories.map((category) => {
             const demos = publishedMarimoDemos.filter((d) => d.category === category);
             if (demos.length === 0) return null;
@@ -127,6 +128,7 @@ export default function MarimoPage() {
               </section>
             );
           })}
+          </MarimoPreviewGallery>
         </div>
       </main>
 

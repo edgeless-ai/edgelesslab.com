@@ -16,6 +16,12 @@ for (const width of [1440, 390]) {
           (window as unknown as { recordPreviewDenial: (url: string) => void }).recordPreviewDenial(event.blockedURI);
         }
       });
+      // Observe every committed DOM state, not only the settled per-card checks.
+      const state = window as unknown as { maxGalleryFrames: number };
+      state.maxGalleryFrames = 0;
+      new MutationObserver(() => {
+        state.maxGalleryFrames = Math.max(state.maxGalleryFrames, document.querySelectorAll("main iframe").length);
+      }).observe(document, { childList: true, subtree: true });
     });
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
@@ -45,14 +51,25 @@ for (const width of [1440, 390]) {
       const card = page.locator("main a:has(h3)").filter({
         has: page.getByRole("heading", { name: demo.title, exact: true }),
       });
-      await card.scrollIntoViewIfNeeded();
+      // A bounded gallery admits the centered row, not every partially visible
+      // row. Center each card to exercise every registered preview in turn.
+      await card.evaluate((el) => el.scrollIntoView({ behavior: "instant", block: "center" }));
       const frame = card.locator("iframe");
       const url = new URL(demo.published_url);
       const expected = url.origin === "https://edgelesslab.com"
         ? `${url.pathname}${url.search}${url.hash}` : demo.published_url;
       await expect(frame).toHaveAttribute("src", expected);
       await expect(frame.contentFrame().locator("body")).toHaveText("Offline notebook preview fixture");
+      expect(await page.locator("main iframe").count()).toBeLessThanOrEqual(6);
     }
+    // Departing rows must release their runtimes, and revisiting must re-admit.
+    const first = page.locator("main a:has(h3)").filter({
+      has: page.getByRole("heading", { name: published[0].title, exact: true }),
+    });
+    await expect(first.locator("iframe")).toHaveCount(0);
+    await first.evaluate((el) => el.scrollIntoView({ behavior: "instant", block: "center" }));
+    await expect(first.frameLocator("iframe").locator("body")).toHaveText("Offline notebook preview fixture");
+    expect(await page.evaluate(() => (window as unknown as { maxGalleryFrames: number }).maxGalleryFrames)).toBeLessThanOrEqual(6);
     expect(violations).toEqual([]);
     expect(errors).toEqual([]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

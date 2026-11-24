@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2602.20031-introspection-information-bound</title>
+    <script type="module" crossorigin src="./assets/index-s-M1OXjs.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-B0Z9INg1.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-DVplv7_D.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-BrajqUja.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-Dfcbgjhg.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-_LrxgvjW.js">
+    <link rel="modulepreload" crossorigin href="./assets/schemas-Dv42wLFq.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-BCaOs5rp.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-oX0TOjjx.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-Cmx0b_zA.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-aFmHgJZY.js">
+    <link rel="modulepreload" crossorigin href="./assets/isArrayLikeObject-DnwgSs_Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseMerge-CQpUq7ep.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-snlMn4yk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-D9cftcHj.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-Ci2dTZ72.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-VPSq73n8.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-B4K466FK.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-DqoWmb7X.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-CrTnjj37.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-DX8Y2WbJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-DB0hHKMi.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-ldLVeaqm.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-B74pBk57.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-B9tHcfpV.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-iaThVDkA.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-BrwnTgyK.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-restore-focus-BxEGwIbk.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-DfJ2oMlA.js">
+    <link rel="modulepreload" crossorigin href="./assets/circle-DXf-VWZG.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-COI-NGrx.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-BQNapYaf.js">
+    <link rel="modulepreload" crossorigin href="./assets/I18nProvider-Cg2I_s1_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-D7O_26UI.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-DTBn5eTb.js">
+    <link rel="modulepreload" crossorigin href="./assets/toast-BGzLGnvw.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-C9TuY18o.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-bkIFVj8h.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-Mq4gc5kS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-DOj9Q6uC.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-B_PMVg8T.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-BaPGzeOK.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-BqUx5USx.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-Haz_uxEL.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-Mk3-CcoU.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-B_ccBZTp.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-BoBxR50a.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-Wu434mLr.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-lt0JK8Jt.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-k9DpjH68.js">
+    <link rel="modulepreload" crossorigin href="./assets/write-secret-modal-DzKAInL2.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-C5silF6g.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-DcgaW8fn.js">
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-uBIymjUX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Cny7_yZb.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DBMV4gqt.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-BJvf-MD4.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-C49f7GXV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DgRODTW6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-qhAY4L2r.js">
+    <link rel="modulepreload" crossorigin href="./assets/marked.esm-B_3iMIUq.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings-B2vv-ENv.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BOfh4hMd.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-crT3E0Rm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DtH-7lot.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BmExfiwX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-1tmpVXyz.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-LSsCJjA3.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DusFODSa.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-Dc5bKD4z.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-COhSHkCj.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-C7aJJz0Y.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es--06brOip.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-BRkCaSsh.js">
+    <link rel="modulepreload" crossorigin href="./assets/coerce-CpE6kUdX.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-DjNf4SIX.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-BmRQipI0.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-yw4sIeJR.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-Bpdo9AvU.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-DKIID_Mo.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-BAJYRhmO.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-C3oDoyFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-CKcCbG2G.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-D8O_CYCG.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-D9Dr-k4J.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-YOKDWASO-BIpRENEC.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-BG3sp2rs.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Djr5m5ac.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-BIiRXh_3.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-B2vUhREg.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-BbOqmHy3.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-D5nfNHOo.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-pdKBv96t.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-iX1eufdl.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-DCrsa1nH.js">
+    <link rel="modulepreload" crossorigin href="./assets/api-BeC_VSGv.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-BZW3tzEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-CbeVJ6OD.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-_Qai_QyX.js">
+    <link rel="modulepreload" crossorigin href="./assets/pair-CaQyK6En.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-Gl5nCA8C.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BOKzA3tF.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-eAtVhbNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-C1rnl-0o.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-DK9Zl1lU.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DCJXy66H.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-CTaiAjrz.js">
+    <link rel="modulepreload" crossorigin href="./assets/tabs-BuQlZFbt.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-DG7Ap4H4.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-CxVozGAC.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-Qw1f8Jhy.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-GM5E_bUs.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-63DyBLHQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-UrX9KO36.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-DyNE-o8o.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-C3rKm8_a.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-C8RhSVii.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-GSoSTiIK.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-Cq6x_5ML.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-DTaqCu_d.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-XsPO8hNi.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-LSth_8hT.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-D60XkCny.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-DA-62E-Y.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-Buu61juQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-q_Ad80ug.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-BbFQ2oE4.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-CNPGWpMu.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-Bq_nmf5u.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-D5bOh7g6.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-CLRkNgm7.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-mT3CGest.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D6tfmvq8.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-CvVTau-c.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-Do6ywDBO.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-CwTkczVN.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-Cd69vvyX.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CaQYvazl.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-yZ06h1Pl.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-vrvqpuKJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Dbe0MrFr.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D6HIIsCb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-C4_v6fQW.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-_W_Lo0P4.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-BfSBcO5B.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-BjoL5P0h.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-BgBraYAr.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-BDD6_xQQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-SQaZqvcO.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-Dl35U6h3.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-BPBVl9pl.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-wZvTj8WY.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CdJgUy-I.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-UdPdIbF7.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-CI_o7NhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAddCell-GR7eEQrT.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-DCSMIsTX.js">
+    <link rel="modulepreload" crossorigin href="./assets/data-grid-types-DgHVN_Zz.js">
+    <link rel="modulepreload" crossorigin href="./assets/glide-utils-CIrAxdjv.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-Cm2D6vyX.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-BPmgQFnh.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-DmIqR8sY.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-Djf4O40e.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-Cqst59WX.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-data-dv4FBHxR.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-export-DzhB1FrN.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-BkVJQ_Zh.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D3tw5rqW.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CiZ_8zS-.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-DFIVN9dn.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-DPmlLd-r.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-XD9FAV-f.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-0PFKL3SH.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DjIHoF9Z.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-B0GmlMnR.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-Bcdzex-3.css">
+  <marimo-wasm hidden="" data-pyodide-index-url="./pyodide/" data-pyodide-lockfile-url="./lockfile/d24785cd717fea2d.json" data-pypi-index-url="./packages/index/"></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\"marimo==0.25.2\"]\n# ///\n\nimport marimo\n\n__generated_with = \"0.25.2\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n\n    return (mo,)\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    # Decodable residue is not source attribution\n\n    **Research question:** what does a reported mutual-information readout actually\n    guarantee about recovering which concept was injected?\n\n    Pearson-Vogel et al. inject one of nine concept directions while constructing\n    a first-turn KV cache, remove steering, then query a fixed second turn. Their\n    Qwen2.5-Coder-32B experiment reports **0.61 \u2192 1.05 bits** for the abstract's\n    matched condition and a selected maximum of **1.66 bits**\n    ([arXiv:2602.20031v3](https://arxiv.org/abs/2602.20031v3)). This app converts\n    those author-reported MI values into a Fano inequality ceiling. This app does not run a model\n    or establish introspection, awareness, or source attribution.\n    \"\"\")\n    return\n\n\n@app.cell\ndef _(mo):\n    mi_hundredths = mo.ui.slider(\n        61, 166, value=105, step=1,\n        label=\"Concept mutual information (hundredths of a bit)\",\n        full_width=True,\n    )\n    mo.vstack([\n        mi_hundredths,\n        mo.md(\"Range: paper's **0.61-bit** no-document anchor to its selected **1.66-bit** maximum.\"),\n    ])\n    return (mi_hundredths,)\n\n\n@app.cell\ndef _(mi_hundredths, mo):\n    import math\n\n    _m = 9\n    _capacity = math.log2(_m)\n    _mi = int(mi_hundredths.value) / 100\n    _conditional = _capacity - _mi\n\n    def _fano_rhs(_p):\n        if _p \u003C= 0:\n            return 0.0\n        _binary = -_p * math.log2(_p) - (1 - _p) * math.log2(1 - _p)\n        return _binary + _p * math.log2(_m - 1)\n\n    _lo, _hi = 0.0, (_m - 1) / _m\n    for _iteration in range(70):\n        _mid = (_lo + _hi) / 2\n        if _fano_rhs(_mid) \u003C _conditional:\n            _lo = _mid\n        else:\n            _hi = _mid\n    _error_floor = (_lo + _hi) / 2\n    _accuracy_ceiling = 100 * (1 - _error_floor)\n\n    _curve = []\n    for _index in range(41):\n        _trial_mi = 0.61 + _index * (1.66 - 0.61) / 40\n        _target = _capacity - _trial_mi\n        _a, _b = 0.0, (_m - 1) / _m\n        for _step in range(55):\n            _p = (_a + _b) / 2\n            if _fano_rhs(_p) \u003C _target:\n                _a = _p\n            else:\n                _b = _p\n        _ceiling = 100 * (1 - (_a + _b) / 2)\n        _x = 78 + 360 * (_trial_mi - 0.61) / 1.05\n        _y = 236 - 2.2 * (_ceiling - 40)\n        _curve.append(f\"{_x:.1f},{_y:.1f}\")\n    _point_x = 78 + 360 * (_mi - 0.61) / 1.05\n    _point_y = 236 - 2.2 * (_accuracy_ceiling - 40)\n    _svg = f'''\u003Csvg data-chart=\"introspection-information-bound\" data-mi=\"{_mi:.2f}\" data-ceiling=\"{_accuracy_ceiling:.1f}\"\n      viewBox=\"0 0 520 310\" style=\"width:100%;height:auto;background:#fff;border:1px solid #cbd5e1;border-radius:12px\"\n      role=\"img\" aria-label=\"Fano accuracy ceiling for nine injected concepts\"\u003E\n      \u003Ctext x=\"260\" y=\"26\" font-size=\"14\" text-anchor=\"middle\" font-weight=\"600\"\u003EInformation readout ceiling, not an attribution score\u003C/text\u003E\n      \u003Cline x1=\"78\" y1=\"60\" x2=\"78\" y2=\"236\" stroke=\"#334155\"/\u003E\n      \u003Cline x1=\"78\" y1=\"236\" x2=\"438\" y2=\"236\" stroke=\"#334155\"/\u003E\n      \u003Ctext x=\"258\" y=\"282\" font-size=\"12\" text-anchor=\"middle\"\u003Emutual information I(concept; readout), bits\u003C/text\u003E\n      \u003Ctext x=\"18\" y=\"150\" font-size=\"12\" text-anchor=\"middle\" transform=\"rotate(-90 18 150)\"\u003Emaximum classification accuracy (%)\u003C/text\u003E\n      \u003Ctext x=\"78\" y=\"255\" font-size=\"11\" text-anchor=\"middle\"\u003E0.61\u003C/text\u003E\n      \u003Ctext x=\"229\" y=\"255\" font-size=\"11\" text-anchor=\"middle\"\u003E1.05\u003C/text\u003E\n      \u003Ctext x=\"438\" y=\"255\" font-size=\"11\" text-anchor=\"middle\"\u003E1.66\u003C/text\u003E\n      \u003Ctext x=\"67\" y=\"236\" font-size=\"11\" text-anchor=\"end\"\u003E40\u003C/text\u003E\n      \u003Ctext x=\"67\" y=\"148\" font-size=\"11\" text-anchor=\"end\"\u003E80\u003C/text\u003E\n      \u003Ctext x=\"67\" y=\"104\" font-size=\"11\" text-anchor=\"end\"\u003E100\u003C/text\u003E\n      \u003Cpolyline points=\"{' '.join(_curve)}\" fill=\"none\" stroke=\"#2563eb\" stroke-width=\"4\"/\u003E\n      \u003Ccircle cx=\"{_point_x:.1f}\" cy=\"{_point_y:.1f}\" r=\"8\" fill=\"#f97316\" stroke=\"#fff\" stroke-width=\"2\"/\u003E\n      \u003Ctext x=\"260\" y=\"302\" font-size=\"10\" text-anchor=\"middle\" fill=\"#475569\"\u003EFano inversion for 9 equiprobable concepts; lower actual accuracy remains compatible.\u003C/text\u003E\n    \u003C/svg\u003E'''\n    mo.vstack([\n        mo.md(f\"## At {_mi:.2f} bits: Fano ceiling = {_accuracy_ceiling:.1f}% concept accuracy\"),\n        mo.Html(_svg),\n        mo.md(f\"The readout still leaves **{_conditional:.2f} bits** of conditional uncertainty. Fano's inequality requires at least **{100*_error_floor:.1f}%** classification error; it does not promise accuracy near the ceiling.\"),\n    ])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ## What survives the calculation\n\n    For nine equiprobable concepts, capacity is `log2(9) = 3.17 bits`. The paper's\n    matched `1.05-bit` result therefore leaves `2.12 bits` unresolved and permits at\n    most about `61.4%` concept accuracy under the Fano bound. The selected `1.66-bit`\n    maximum raises that ceiling to `76.1%`; it does not make recovery perfect.\n\n    **Evidence boundary.** MI establishes statistical dependence between injected\n    concept and readout. It does not encode whether the state was externally\n    injected, self-generated, or supplied by another agent. The paper itself calls\n    the effect context-dependent and does not claim second-order metacognitive\n    monitoring. Its reported `P(\"yes\")` moves from `0.2% \u2192 0.3%` without a document\n    and to `39.9%` under a pro-introspection document with a `0.8%` false-positive\n    level. Those are author-reported model measurements, not outputs of this app.\n\n    This browser demo uses only the exact nine-class information identity and Fano's\n    inequality over the published MI anchors. It performs no inference, activation\n    intervention, source-attribution test, model download, credential use, private\n    file access, paid API call, or runtime network request.\n\n    Sources: Pearson-Vogel et al., [arXiv:2602.20031v3](https://arxiv.org/abs/2602.20031v3),\n    Sections 2.2\u20133.3 and Appendix J; Lederman \u0026 Mahowald,\n    [arXiv:2603.05414v2](https://arxiv.org/abs/2603.05414v2), for the adjacent\n    content-agnostic detection boundary.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%22marimo%3D%3D0.25.2%22%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.25.2%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%0A%20%20%20%20return%20(mo%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%20Decodable%20residue%20is%20not%20source%20attribution%0A%0A%20%20%20%20**Research%20question%3A**%20what%20does%20a%20reported%20mutual-information%20readout%20actually%0A%20%20%20%20guarantee%20about%20recovering%20which%20concept%20was%20injected%3F%0A%0A%20%20%20%20Pearson-Vogel%20et%20al.%20inject%20one%20of%20nine%20concept%20directions%20while%20constructing%0A%20%20%20%20a%20first-turn%20KV%20cache%2C%20remove%20steering%2C%20then%20query%20a%20fixed%20second%20turn.%20Their%0A%20%20%20%20Qwen2.5-Coder-32B%20experiment%20reports%20**0.61%20%E2%86%92%201.05%20bits**%20for%20the%20abstract's%0A%20%20%20%20matched%20condition%20and%20a%20selected%20maximum%20of%20**1.66%20bits**%0A%20%20%20%20(%5BarXiv%3A2602.20031v3%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2602.20031v3)).%20This%20app%20converts%0A%20%20%20%20those%20author-reported%20MI%20values%20into%20a%20Fano%20inequality%20ceiling.%20This%20app%20does%20not%20run%20a%20model%0A%20%20%20%20or%20establish%20introspection%2C%20awareness%2C%20or%20source%20attribution.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mi_hundredths%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%2061%2C%20166%2C%20value%3D105%2C%20step%3D1%2C%0A%20%20%20%20%20%20%20%20label%3D%22Concept%20mutual%20information%20(hundredths%20of%20a%20bit)%22%2C%0A%20%20%20%20%20%20%20%20full_width%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mi_hundredths%2C%0A%20%20%20%20%20%20%20%20mo.md(%22Range%3A%20paper's%20**0.61-bit**%20no-document%20anchor%20to%20its%20selected%20**1.66-bit**%20maximum.%22)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%20(mi_hundredths%2C)%0A%0A%0A%40app.cell%0Adef%20_(mi_hundredths%2C%20mo)%3A%0A%20%20%20%20import%20math%0A%0A%20%20%20%20_m%20%3D%209%0A%20%20%20%20_capacity%20%3D%20math.log2(_m)%0A%20%20%20%20_mi%20%3D%20int(mi_hundredths.value)%20%2F%20100%0A%20%20%20%20_conditional%20%3D%20_capacity%20-%20_mi%0A%0A%20%20%20%20def%20_fano_rhs(_p)%3A%0A%20%20%20%20%20%20%20%20if%20_p%20%3C%3D%200%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20return%200.0%0A%20%20%20%20%20%20%20%20_binary%20%3D%20-_p%20*%20math.log2(_p)%20-%20(1%20-%20_p)%20*%20math.log2(1%20-%20_p)%0A%20%20%20%20%20%20%20%20return%20_binary%20%2B%20_p%20*%20math.log2(_m%20-%201)%0A%0A%20%20%20%20_lo%2C%20_hi%20%3D%200.0%2C%20(_m%20-%201)%20%2F%20_m%0A%20%20%20%20for%20_iteration%20in%20range(70)%3A%0A%20%20%20%20%20%20%20%20_mid%20%3D%20(_lo%20%2B%20_hi)%20%2F%202%0A%20%20%20%20%20%20%20%20if%20_fano_rhs(_mid)%20%3C%20_conditional%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_lo%20%3D%20_mid%0A%20%20%20%20%20%20%20%20else%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_hi%20%3D%20_mid%0A%20%20%20%20_error_floor%20%3D%20(_lo%20%2B%20_hi)%20%2F%202%0A%20%20%20%20_accuracy_ceiling%20%3D%20100%20*%20(1%20-%20_error_floor)%0A%0A%20%20%20%20_curve%20%3D%20%5B%5D%0A%20%20%20%20for%20_index%20in%20range(41)%3A%0A%20%20%20%20%20%20%20%20_trial_mi%20%3D%200.61%20%2B%20_index%20*%20(1.66%20-%200.61)%20%2F%2040%0A%20%20%20%20%20%20%20%20_target%20%3D%20_capacity%20-%20_trial_mi%0A%20%20%20%20%20%20%20%20_a%2C%20_b%20%3D%200.0%2C%20(_m%20-%201)%20%2F%20_m%0A%20%20%20%20%20%20%20%20for%20_step%20in%20range(55)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_p%20%3D%20(_a%20%2B%20_b)%20%2F%202%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20_fano_rhs(_p)%20%3C%20_target%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_a%20%3D%20_p%0A%20%20%20%20%20%20%20%20%20%20%20%20else%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_b%20%3D%20_p%0A%20%20%20%20%20%20%20%20_ceiling%20%3D%20100%20*%20(1%20-%20(_a%20%2B%20_b)%20%2F%202)%0A%20%20%20%20%20%20%20%20_x%20%3D%2078%20%2B%20360%20*%20(_trial_mi%20-%200.61)%20%2F%201.05%0A%20%20%20%20%20%20%20%20_y%20%3D%20236%20-%202.2%20*%20(_ceiling%20-%2040)%0A%20%20%20%20%20%20%20%20_curve.append(f%22%7B_x%3A.1f%7D%2C%7B_y%3A.1f%7D%22)%0A%20%20%20%20_point_x%20%3D%2078%20%2B%20360%20*%20(_mi%20-%200.61)%20%2F%201.05%0A%20%20%20%20_point_y%20%3D%20236%20-%202.2%20*%20(_accuracy_ceiling%20-%2040)%0A%20%20%20%20_svg%20%3D%20f'''%3Csvg%20data-chart%3D%22introspection-information-bound%22%20data-mi%3D%22%7B_mi%3A.2f%7D%22%20data-ceiling%3D%22%7B_accuracy_ceiling%3A.1f%7D%22%0A%20%20%20%20%20%20viewBox%3D%220%200%20520%20310%22%20style%3D%22width%3A100%25%3Bheight%3Aauto%3Bbackground%3A%23fff%3Bborder%3A1px%20solid%20%23cbd5e1%3Bborder-radius%3A12px%22%0A%20%20%20%20%20%20role%3D%22img%22%20aria-label%3D%22Fano%20accuracy%20ceiling%20for%20nine%20injected%20concepts%22%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22260%22%20y%3D%2226%22%20font-size%3D%2214%22%20text-anchor%3D%22middle%22%20font-weight%3D%22600%22%3EInformation%20readout%20ceiling%2C%20not%20an%20attribution%20score%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%2278%22%20y1%3D%2260%22%20x2%3D%2278%22%20y2%3D%22236%22%20stroke%3D%22%23334155%22%2F%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%2278%22%20y1%3D%22236%22%20x2%3D%22438%22%20y2%3D%22236%22%20stroke%3D%22%23334155%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22258%22%20y%3D%22282%22%20font-size%3D%2212%22%20text-anchor%3D%22middle%22%3Emutual%20information%20I(concept%3B%20readout)%2C%20bits%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2218%22%20y%3D%22150%22%20font-size%3D%2212%22%20text-anchor%3D%22middle%22%20transform%3D%22rotate(-90%2018%20150)%22%3Emaximum%20classification%20accuracy%20(%25)%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2278%22%20y%3D%22255%22%20font-size%3D%2211%22%20text-anchor%3D%22middle%22%3E0.61%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22229%22%20y%3D%22255%22%20font-size%3D%2211%22%20text-anchor%3D%22middle%22%3E1.05%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22438%22%20y%3D%22255%22%20font-size%3D%2211%22%20text-anchor%3D%22middle%22%3E1.66%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2267%22%20y%3D%22236%22%20font-size%3D%2211%22%20text-anchor%3D%22end%22%3E40%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2267%22%20y%3D%22148%22%20font-size%3D%2211%22%20text-anchor%3D%22end%22%3E80%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2267%22%20y%3D%22104%22%20font-size%3D%2211%22%20text-anchor%3D%22end%22%3E100%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Cpolyline%20points%3D%22%7B'%20'.join(_curve)%7D%22%20fill%3D%22none%22%20stroke%3D%22%232563eb%22%20stroke-width%3D%224%22%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22%7B_point_x%3A.1f%7D%22%20cy%3D%22%7B_point_y%3A.1f%7D%22%20r%3D%228%22%20fill%3D%22%23f97316%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%22260%22%20y%3D%22302%22%20font-size%3D%2210%22%20text-anchor%3D%22middle%22%20fill%3D%22%23475569%22%3EFano%20inversion%20for%209%20equiprobable%20concepts%3B%20lower%20actual%20accuracy%20remains%20compatible.%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E'''%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mo.md(f%22%23%23%20At%20%7B_mi%3A.2f%7D%20bits%3A%20Fano%20ceiling%20%3D%20%7B_accuracy_ceiling%3A.1f%7D%25%20concept%20accuracy%22)%2C%0A%20%20%20%20%20%20%20%20mo.Html(_svg)%2C%0A%20%20%20%20%20%20%20%20mo.md(f%22The%20readout%20still%20leaves%20**%7B_conditional%3A.2f%7D%20bits**%20of%20conditional%20uncertainty.%20Fano's%20inequality%20requires%20at%20least%20**%7B100*_error_floor%3A.1f%7D%25**%20classification%20error%3B%20it%20does%20not%20promise%20accuracy%20near%20the%20ceiling.%22)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20What%20survives%20the%20calculation%0A%0A%20%20%20%20For%20nine%20equiprobable%20concepts%2C%20capacity%20is%20%60log2(9)%20%3D%203.17%20bits%60.%20The%20paper's%0A%20%20%20%20matched%20%601.05-bit%60%20result%20therefore%20leaves%20%602.12%20bits%60%20unresolved%20and%20permits%20at%0A%20%20%20%20most%20about%20%6061.4%25%60%20concept%20accuracy%20under%20the%20Fano%20bound.%20The%20selected%20%601.66-bit%60%0A%20%20%20%20maximum%20raises%20that%20ceiling%20to%20%6076.1%25%60%3B%20it%20does%20not%20make%20recovery%20perfect.%0A%0A%20%20%20%20**Evidence%20boundary.**%20MI%20establishes%20statistical%20dependence%20between%20injected%0A%20%20%20%20concept%20and%20readout.%20It%20does%20not%20encode%20whether%20the%20state%20was%20externally%0A%20%20%20%20injected%2C%20self-generated%2C%20or%20supplied%20by%20another%20agent.%20The%20paper%20itself%20calls%0A%20%20%20%20the%20effect%20context-dependent%20and%20does%20not%20claim%20second-order%20metacognitive%0A%20%20%20%20monitoring.%20Its%20reported%20%60P(%22yes%22)%60%20moves%20from%20%600.2%25%20%E2%86%92%200.3%25%60%20without%20a%20document%0A%20%20%20%20and%20to%20%6039.9%25%60%20under%20a%20pro-introspection%20document%20with%20a%20%600.8%25%60%20false-positive%0A%20%20%20%20level.%20Those%20are%20author-reported%20model%20measurements%2C%20not%20outputs%20of%20this%20app.%0A%0A%20%20%20%20This%20browser%20demo%20uses%20only%20the%20exact%20nine-class%20information%20identity%20and%20Fano's%0A%20%20%20%20inequality%20over%20the%20published%20MI%20anchors.%20It%20performs%20no%20inference%2C%20activation%0A%20%20%20%20intervention%2C%20source-attribution%20test%2C%20model%20download%2C%20credential%20use%2C%20private%0A%20%20%20%20file%20access%2C%20paid%20API%20call%2C%20or%20runtime%20network%20request.%0A%0A%20%20%20%20Sources%3A%20Pearson-Vogel%20et%20al.%2C%20%5BarXiv%3A2602.20031v3%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2602.20031v3)%2C%0A%20%20%20%20Sections%202.2%E2%80%933.3%20and%20Appendix%20J%3B%20Lederman%20%26%20Mahowald%2C%0A%20%20%20%20%5BarXiv%3A2603.05414v2%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2603.05414v2)%2C%20for%20the%20adjacent%0A%20%20%20%20content-agnostic%20detection%20boundary.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.25.2",
+            "serverToken": "unused",
+            "config": {"ai": {"allow_provider_config": true, "custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "code_lens": true, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "layout": null,
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

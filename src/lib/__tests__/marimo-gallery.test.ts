@@ -12,6 +12,17 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("pins the critic-approved DCA arithmetic sensitivity bundle", () => {
+    const slug = "2502.06785-dca-time-to-target";
+    const entry = marimoDemos.find(d => d.slug === slug);
+    expect(entry?.title).toBe("DCA: When Fewer Batches Beat Slower Batches");
+    expect(publishedMarimoDemos.find(d => d.slug === slug)?.published_url).toBe(`https://marimo.edgelesslab.com/${slug}/`);
+    const catalog = JSON.parse(readFileSync(join(process.cwd(), "scripts/marimo-pages-catalog.json"), "utf8"));
+    expect(catalog.sources.filter((s: { mount: string }) => s.mount === slug)).toEqual([{
+      files: 759, mount: slug, path: `${slug}/site`, root: "outputs",
+      sha256: "fee168e92040fe432d39afc53852d053d82d6dbfff421aa3a42dd088c4d8af45",
+    }]);
+  });
   it("pins the critic-approved SRQ reconstruction instead of its legacy fallback", () => {
     const slug = "2610.20838-srq-endpoint-weight";
     const catalog = JSON.parse(readFileSync(join(process.cwd(), "scripts/marimo-pages-catalog.json"), "utf8"));

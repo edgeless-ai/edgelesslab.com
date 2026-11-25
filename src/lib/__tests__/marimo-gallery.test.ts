@@ -12,6 +12,19 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("pins the live-verified Borwein reconstruction instead of the SPA fallback", () => {
+    const slug = "borwein-falsifier";
+    const entry = publishedMarimoDemos.find(d => d.slug === slug);
+    expect(entry?.published_url).toBe(`https://marimo.edgelesslab.com/${slug}/`);
+    expect(entry?.description).toContain("not numerical quadrature or a new proof");
+    const catalog = JSON.parse(readFileSync(join(process.cwd(), "scripts/marimo-pages-catalog.json"), "utf8"));
+    expect(catalog.fallbacks).not.toHaveProperty(slug);
+    expect(catalog.sources.filter((s: { mount: string }) => s.mount === slug)).toEqual([{
+      files: 759, mount: slug, path: `${slug}/site`, root: "outputs",
+      sha256: "985adb881e3fca995d3dc0a5daca262912457a47fbcc7906e6d6a0d3be15fc6b",
+    }]);
+    expect(catalog.redirects).toContain(`/${slug}/assets/* /2607.06560-vision-unified-generation/assets/:splat 200\n`);
+  });
   it("pins the critic-approved LIFT scoped-constraints sensitivity bundle", () => {
     const slug = "2610.28819-lift-scoped-constraints";
     expect(marimoDemos.find(d => d.slug === slug)).toMatchObject({

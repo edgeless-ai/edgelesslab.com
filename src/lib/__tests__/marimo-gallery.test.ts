@@ -12,6 +12,19 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("pins the critic-approved LIFT scoped-constraints sensitivity bundle", () => {
+    const slug = "2610.28819-lift-scoped-constraints";
+    expect(marimoDemos.find(d => d.slug === slug)).toMatchObject({
+      title: "LIFT: Reward Design Under Scoped Constraints", category: "Research",
+      tags: ["instruction-following", "reward-hacking", "evaluation", "post-training", "synthetic-sensitivity"],
+    });
+    const catalog = JSON.parse(readFileSync(join(process.cwd(), "scripts/marimo-pages-catalog.json"), "utf8"));
+    expect(catalog.sources.filter((s: { mount: string }) => s.mount === slug)).toEqual([{
+      files: 759, mount: slug, path: `${slug}/site`, root: "outputs",
+      sha256: "2acd40b92125beb6e946ae8581224dac8d07be5c6f3f70c350e8572e908d3b73",
+    }]);
+  });
+
   it("pins the critic-approved DCA arithmetic sensitivity bundle", () => {
     const slug = "2502.06785-dca-time-to-target";
     const entry = marimoDemos.find(d => d.slug === slug);

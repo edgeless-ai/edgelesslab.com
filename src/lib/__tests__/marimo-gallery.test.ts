@@ -16,6 +16,7 @@ describe("published marimo gallery", () => {
     const slug = "2610.28819-lift-scoped-constraints";
     expect(marimoDemos.find(d => d.slug === slug)).toMatchObject({
       title: "LIFT: Reward Design Under Scoped Constraints", category: "Research",
+      published_url: "https://marimo.edgelesslab.com/2610.28819-lift-scoped-constraints/",
       tags: ["instruction-following", "reward-hacking", "evaluation", "post-training", "synthetic-sensitivity"],
     });
     const catalog = JSON.parse(readFileSync(join(process.cwd(), "scripts/marimo-pages-catalog.json"), "utf8"));

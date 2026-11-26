@@ -4,6 +4,10 @@
 
 - [Building an Instrument That Can Say No](/lia/building-an-instrument-that-can-say-no/) — A methods note on reading artifacts and the limits of inference, not a definition of LIA or an empirical discovery announcement.
 
+### Founding text
+
+- [Latent Information Archaeology (LIA.md)](https://github.com/thedavidmurray/latent-information-archaeology/blob/main/LIA.md) — Originated by David Murray, CC BY 4.0. The canonical founding text for this discipline.
+
 ### Related creative demos
 
 These existing Edgeless Lab demos are contextual links, not research results or validation of Latent Information Archaeology.

@@ -7,13 +7,17 @@ test('LIA cleared artifacts, registry, privacy and navigation', async ({ page, r
   expect((await request.get('/lia/')).status()).toBe(200);
   await page.goto('/lia/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Archaeology');
-  const definition = 'Latent Information Archaeology studies the intersections between fields: useful, defensible connections across bodies of knowledge.';
-  await expect(page.locator('.hero .deck')).toHaveText(definition);
-  await expect(page.locator('.intro p').first()).toHaveText(definition);
+  const heroDef = 'Latent Information Archaeology studies the intersections between fields: useful, defensible connections across bodies of knowledge.';
+  await expect(page.locator('.hero .deck')).toHaveText(heroDef);
+  // Intro section uses David's canonical definition with supporting paragraphs
+  const canonicalDef = 'Latent Information Archaeology is the systematic identification, reconstruction, and validation of previously unrecognized information, relationships, implications, and opportunities latent within existing informational artifacts.';
+  await expect(page.locator('.intro p strong')).toHaveText(canonicalDef);
   await expect(page.locator('main')).not.toContainText('the way that content takes form');
   await expect(page.getByRole('heading', { name: 'Methods note', exact: true })).toBeVisible();
+  // Founding text is now linked, not the artifact-form methods note
+  await expect(page.getByRole('heading', { name: 'Founding text', exact: true })).toBeVisible();
   const indexed = await page.locator('[data-lia-index] a').evaluateAll(nodes => nodes.map(a => a.getAttribute('href')!));
-  expect(indexed).toEqual([note.href, '/creative-demos/code-as-a-field-of-relation/', '/creative-demos/the-rule-and-the-machine/']);
+  expect(indexed).toEqual([note.href, 'https://github.com/thedavidmurray/latent-information-archaeology/blob/main/LIA.md', '/creative-demos/code-as-a-field-of-relation/', '/creative-demos/the-rule-and-the-machine/']);
   for (const href of indexed) expect((await request.get(href)).status()).toBe(200);
   await page.locator(`[data-lia-index] a[href="${note.href}"]`).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(note.title);
@@ -37,7 +41,7 @@ test('LIA cleared artifacts, registry, privacy and navigation', async ({ page, r
   const schema = schemas.map(value => JSON.parse(value)).find(s => s['@type'] === 'CollectionPage');
   expect(schema.numberOfItems).toBe(schema.itemListElement.length);
   expect(schema.itemListElement.filter((n: {url: string}) => n.url === `https://edgelesslab.com${note.href}`)).toHaveLength(1);
-  await expect(page.locator(`[data-editorial-note] a[href="${note.href}"]`)).toHaveCount(1);
+  await expect(page.locator(`[data-editorial-note] a[href="${note.href}"]`)).toBeVisible();
   const liaRequests: string[] = [];
   page.on('request', request => {
     if (new URL(request.url()).pathname.startsWith('/lia/')) liaRequests.push(request.url());
@@ -47,6 +51,6 @@ test('LIA cleared artifacts, registry, privacy and navigation', async ({ page, r
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Archaeology');
   expect(liaRequests.some(url => /__next\.|index\.txt|_rsc=/.test(url))).toBe(false);
   expect(await (await request.get('/sitemap.xml')).text()).toContain(`https://edgelesslab.com${note.href}`);
-  expect(await (await request.get('/llms.txt')).text()).toContain(`https://edgelesslab.com${note.href}`);
+  expect((await request.get('/llms.txt')).text()).toContain(`https://edgelesslab.com${note.href}`);
   expect((await request.get('/lia/og-image.png')).status()).toBe(200);
 });

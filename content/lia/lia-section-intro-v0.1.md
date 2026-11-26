@@ -2,6 +2,8 @@
 
 **Latent Information Archaeology is the systematic identification, reconstruction, and validation of previously unrecognized information, relationships, implications, and opportunities latent within existing informational artifacts.**
 
-LIA is a proposed discipline for investigating what humanity has recorded but not yet recognized. It asks: what discoveries can be made from information already in existence? A connection needs a mapping, prior art, disanalogies, and a test.
+LIA seeks to discover what is effectively already known by civilization, but not known by any individual within it.
 
-This section collects work in development, not confirmed discoveries. The methods note considers the limits of inference in one area: reading artifacts. It does not define the scope of LIA. The creative demos are exploratory interfaces, not empirical validation. One concerns the software artist LIA, who is distinct from this research program.
+LIA is a proposed discipline for investigating what humanity has recorded but not yet recognized. It asks: what discoveries can be made from information already in existence?
+
+This section collects the founding text, a methods note on reading artifacts and the limits of inference, and related creative demos. One demo concerns the software artist LIA, who is distinct from this research program.

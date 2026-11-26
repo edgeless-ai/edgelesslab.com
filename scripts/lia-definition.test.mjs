@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 test('LIA definition stays cross-field in hero, intro, metadata and agent index', () => {
   const landing = readFileSync('public/lia/index.html', 'utf8');
@@ -20,4 +21,14 @@ test('LIA definition stays cross-field in hero, intro, metadata and agent index'
   const og = readFileSync('scripts/build-lia-og.mjs', 'utf8');
   assert.match(og, /Intersections between fields/);
   assert.doesNotMatch(og, /<section>(Content|Realization|Observation)<\/section>/);
+  assert.match(landing, /LIA seeks to discover what is effectively already known by civilization, but not known by any individual within it\./);
+  assert.doesNotMatch(landing, /not confirmed discoveries|not a discovery to announce|not an announcement|exploratory only|not empirical validation|not research results/i);
+  assert.match(landing, /href="\/lia\/founding-text\/"/);
+});
+
+test('founding Markdown is an unmodified copy of David’s canonical v0.1', () => {
+  const source = readFileSync('content/lia/LIA.md');
+  // Compared byte-for-byte with the authorized LIA.md source on 2026-11-25.
+  assert.equal(createHash('sha256').update(source).digest('hex'), '78ef5ce9ddd3c7fbffa2288a00f3ea57ce410a750b7726a9ed7ca465ec5f8a4c');
+  assert.deepEqual(readFileSync('public/lia/founding-text/LIA.md'), source);
 });

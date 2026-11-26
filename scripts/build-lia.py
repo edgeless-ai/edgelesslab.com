@@ -1,4 +1,4 @@
-"""Render only the three cleared public Markdown inputs as standalone Field Sheets.
+"""Render the cleared public Markdown inputs as standalone Field Sheets.
 
 Run: python3 scripts/build-lia.py
 No private research manifests or receipts are read or published.
@@ -16,16 +16,40 @@ SLUG = 'building-an-instrument-that-can-say-no'
 
 def inline(text):
     text = html.escape(text, quote=False)
+    code = []
+    def protect_code(match):
+        code.append('<code>' + match[1] + '</code>')
+        return f'\x00{len(code) - 1}\x00'
+    text = re.sub(r'`([^`]+)`', protect_code, text)
     text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', lambda m: '<a href="' + html.escape(html.unescape(m[2]), quote=True) + '">' + m[1] + '</a>', text)
     text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
-    return re.sub(r'\*(.+?)\*', r'<em>\1</em>', text)
+    text = re.sub(r'\*(.+?)\*', r'<em>\1</em>', text)
+    return re.sub(r'\x00(\d+)\x00', lambda m: code[int(m[1])], text)
 
 
 def markdown(source):
     source = re.sub(r'^---\n.*?\n---\n', '', source, flags=re.S)
+    fences = []
+    def protect_fence(match):
+        fences.append('<pre><code>' + html.escape(match[1], quote=False) + '</code></pre>')
+        return f'\n\n\x00{len(fences) - 1}\x00\n\n'
+    source = re.sub(r'^```[^\n]*\n(.*?)\n```', protect_fence, source, flags=re.M | re.S)
     parts = []
     for block in source.strip().split('\n\n'):
-        if block.startswith('### '):
+        if not block.strip():
+            continue
+        if re.fullmatch(r'\x00\d+\x00', block):
+            parts.append(fences[int(block[1:-1])])
+        elif block == '---':
+            parts.append('<hr>')
+        elif block.startswith('# '):
+            parts.append('<h1>' + inline(block[2:]) + '</h1>')
+        elif block.startswith('| '):
+            rows = [line.strip('|').split('|') for line in block.splitlines()]
+            parts.append('<div class="table-scroll"><table><thead><tr>' + ''.join('<th scope="col">' + inline(cell.strip()) + '</th>' for cell in rows[0]) + '</tr></thead><tbody>' + ''.join('<tr>' + ''.join('<td>' + inline(cell.strip()) + '</td>' for cell in row) + '</tr>' for row in rows[2:]) + '</tbody></table></div>')
+        elif re.match(r'^\d+\. ', block):
+            parts.append('<ol>' + ''.join('<li>' + inline(re.sub(r'^\d+\. ', '', line)) + '</li>' for line in block.splitlines()) + '</ol>')
+        elif block.startswith('### '):
             parts.append('<h3>' + inline(block[4:]) + '</h3>')
         elif block.startswith('## '):
             label = block[3:]
@@ -46,12 +70,17 @@ CSS = '''
 '''
 
 
+CSS += '''
+.founding-text{min-width:0;overflow-wrap:anywhere}.founding-text pre{max-width:100%;overflow-x:auto;padding:20px;background:var(--deep);font:14px/1.6 ui-monospace,monospace}.table-scroll{max-width:100%;overflow-x:auto}table{border-collapse:collapse;font-size:17px}th,td{padding:12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--rule)}.founding-text li{margin-bottom:12px}.founding-text h1{font-size:clamp(2.5rem,6vw,4.5rem)}
+'''
+
+
 def page(title, description, path, body):
     # Canonical definition from LIA.md §1
     CANONICAL_DEFINITION = "Latent Information Archaeology is the systematic identification, reconstruction, and validation of previously unrecognized information, relationships, implications, and opportunities latent within existing informational artifacts."
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title} | Edgeless Lab</title><meta name="description" content="{CANONICAL_DEFINITION}"><link rel="canonical" href="https://edgelesslab.com{path}"><meta property="og:type" content="article"><meta property="og:title" content="{title}"><meta property="og:description" content="{CANONICAL_DEFINITION}"><meta property="og:url" content="https://edgelesslab.com{path}"><meta property="og:image" content="https://edgelesslab.com/lia/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Latent Information Archaeology: finding in the intersections"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://edgelesslab.com/lia/og-image.png"><style>{CSS}</style></head>
-<body><a class="skip" href="#main-content">Skip to content</a><header><div class="meta"><span>EDGELESS LAB / LATENT INFORMATION ARCHAEOLOGY</span><span>RESEARCH IN DEVELOPMENT</span></div><nav aria-label="Main navigation"><a href="/">Edgeless Lab</a><a href="/field-notes/">Field Notes</a><a href="/lia/"{' aria-current="page"' if path == '/lia/' else ''}>LIA</a><a href="/blog/">Blog</a><a href="https://shop.edgelesslab.com">Shop</a></nav></header><main id="main-content" tabindex="-1">{body}</main><footer><span>Edgeless Lab / public research studio</span><div><a href="/lia/">LIA index</a><a href="/field-notes/">Field Notes</a><a href="/about/">About</a></div></footer></body></html>'''
+<body><a class="skip" href="#main-content">Skip to content</a><header><div class="meta"><span>EDGELESS LAB / LATENT INFORMATION ARCHAEOLOGY</span><span>FOUNDING TEXT &amp; RESEARCH</span></div><nav aria-label="Main navigation"><a href="/">Edgeless Lab</a><a href="/field-notes/">Field Notes</a><a href="/lia/"{' aria-current="page"' if path == '/lia/' else ''}>LIA</a><a href="/blog/">Blog</a><a href="https://shop.edgelesslab.com">Shop</a></nav></header><main id="main-content" tabindex="-1">{body}</main><footer><span>Edgeless Lab / public research studio</span><div><a href="/lia/">LIA index</a><a href="/field-notes/">Field Notes</a><a href="/about/">About</a></div></footer></body></html>'''
 
 
 def build():
@@ -59,7 +88,7 @@ def build():
     intro = (CONTENT / 'lia-section-intro-v0.1.md').read_text()
     index = (CONTENT / 'lia-public-index-v0.1.md').read_text()
     note = (CONTENT / 'field-note-public-draft-v0.3.md').read_text()
-    landing = '''<div class="hero"><div><div class="label">LIA / an Edgeless Lab research program</div><h1>Latent Information<br><em>Archaeology.</em></h1><p class="deck">Latent Information Archaeology studies the intersections between fields: useful, defensible connections across bodies of knowledge.</p></div><figure class="strata"><div>Across fields<br><em>Science, humanities, art, engineering</em></div><div>Map the connection<br><em>Prior art and disanalogies</em></div><div>Test it<br><em>A useful consequence, a discriminating test</em></div><figcaption>A connection is a question to test, not a discovery to announce.</figcaption></figure></div>'''
+    landing = '''<div class="hero"><div><div class="label">LIA / an Edgeless Lab research program</div><h1>Latent Information<br><em>Archaeology.</em></h1><p class="deck">Latent Information Archaeology studies the intersections between fields: useful, defensible connections across bodies of knowledge.</p></div><figure class="strata"><div>Across fields<br><em>Science, humanities, art, engineering</em></div><div>Map the connection<br><em>Prior art and disanalogies</em></div><div>Test it<br><em>A useful consequence, a discriminating test</em></div><figcaption>Evidence precedes assertion. Similarity is a lead, not proof.</figcaption></figure></div>'''
     landing += '<section class="intro reading">' + markdown(intro) + '</section><section class="index" data-lia-index>' + markdown(index) + '</section>'
     (OUT / 'index.html').write_text(page('Latent Information Archaeology', 'LIA studies the intersections between fields: useful, defensible connections across bodies of knowledge.', '/lia/', landing))
     headings = re.findall(r'^## (.+)$', note, flags=re.M)
@@ -68,7 +97,14 @@ def build():
     dest = OUT / SLUG
     dest.mkdir(exist_ok=True)
     (dest / 'index.html').write_text(page(TITLE, 'A research-method field note about reading artifacts without turning a pattern into an unsupported story.', f'/lia/{SLUG}/', body))
-    print('Rendered /lia/ and LIA field note from three public Markdown inputs')
+    founding = (CONTENT / 'LIA.md').read_text()
+    attribution = '<div class="label">Originated by David Murray</div><p>Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. <a href="https://github.com/thedavidmurray/latent-information-archaeology/blob/main/LIA.md">Canonical version on GitHub</a>. <a href="/lia/founding-text/LIA.md">Download the founding Markdown</a>.</p>'
+    founding_body = attribution + '<article class="reading founding-text">' + markdown(founding) + '</article>'
+    dest = OUT / 'founding-text'
+    dest.mkdir(exist_ok=True)
+    (dest / 'index.html').write_text(page('LIA founding text', 'Founding text originated by David Murray, CC BY 4.0.', '/lia/founding-text/', founding_body))
+    (dest / 'LIA.md').write_bytes((CONTENT / 'LIA.md').read_bytes())
+    print('Rendered /lia/, methods note and /lia/founding-text/ from four public Markdown inputs')
 
 
 if __name__ == '__main__':

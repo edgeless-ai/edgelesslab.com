@@ -5,56 +5,68 @@ import { validateMarimoCatalog } from "../src/lib/marimo-gallery-contract";
 const published = validateMarimoCatalog(marimoDemos);
 
 for (const width of [1440, 390]) {
-  test(`gallery previews use registered URLs and pass frame CSP (offline fixtures) at ${width}px`, async ({ page }) => {
-    test.setTimeout(60_000);
+  test(`gallery static cards never boot notebooks at ${width}px`, async ({ page }) => {
+    test.setTimeout(90_000);
     await page.setViewportSize({ width, height: 900 });
-    const violations: string[] = [];
-    await page.exposeFunction("recordPreviewDenial", (url: string) => violations.push(url));
-    await page.addInitScript(() => {
-      document.addEventListener("securitypolicyviolation", (event) => {
-        if (event.effectiveDirective === "frame-src") {
-          (window as unknown as { recordPreviewDenial: (url: string) => void }).recordPreviewDenial(event.blockedURI);
-        }
-      });
-    });
-    const errors: string[] = [];
-    page.on("pageerror", (error) => errors.push(error.message));
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const workers: string[] = [];
+    const frames: string[] = [];
+    const consoleErrors: string[] = [];
+    const runtimeRequests: string[] = [];
+    const pageErrors: string[] = [];
+    const resourceFailures: string[] = [];
+    page.on("worker", (worker) => workers.push(worker.url()));
+    page.context().on("serviceworker", (worker) => workers.push(worker.url()));
+    page.on("frameattached", (frame) => frames.push(frame.url()));
     page.on("console", (message) => {
-      // Next prefetches /feed.xml/__next.* while scrolling the footer;
-      // that unrelated static-export 404 is not a notebook/CSP failure.
-      if (message.type() === "error" && !/\/feed\.xml\/__next\./.test(message.location().url)) {
-        errors.push(message.text());
-      }
+      if (message.type() === "error") consoleErrors.push(message.text());
     });
-    // Explicit offline fixture: exercise actual browser CSP without Pyodide/CDN
-    // availability. Real notebook rendering is a separate publication probe.
-    const urls = new Set(published.map((demo) => demo.published_url));
-    await page.route("**/*", (route) => {
-      const request = route.request();
+    page.on("pageerror", (error) => pageErrors.push(error.message));
+    page.on("requestfailed", (request) => resourceFailures.push(`${request.url()}: ${request.failure()?.errorText}`));
+    page.on("request", (request) => {
       const url = new URL(request.url());
-      const canonical = url.origin.startsWith("http://127.0.0.1:")
-        ? `https://edgelesslab.com${url.pathname}` : request.url();
-      if (request.isNavigationRequest() && urls.has(canonical)) {
-        return route.fulfill({ contentType: "text/html", body: "<!doctype html><p>Offline notebook preview fixture</p>" });
+      const notebook = published.some((demo) => {
+        const target = new URL(demo.published_url);
+        const sameOrigin = target.origin === "https://edgelesslab.com"
+          ? url.origin === new URL(page.url()).origin : url.origin === target.origin;
+        return sameOrigin && url.pathname.startsWith(target.pathname);
+      });
+      if (notebook || /pyodide|\.wasm(?:$|\?)/i.test(request.url())) {
+        runtimeRequests.push(request.url());
       }
-      return route.continue();
     });
     await page.goto("/lab/marimo/");
     await page.getByRole("button", { name: "Reject analytics", exact: true }).click();
+    await expect(page.locator("main a:has(h3)")).toHaveCount(published.length);
     for (const demo of published) {
       const card = page.locator("main a:has(h3)").filter({
         has: page.getByRole("heading", { name: demo.title, exact: true }),
       });
       await card.scrollIntoViewIfNeeded();
-      const frame = card.locator("iframe");
-      const url = new URL(demo.published_url);
-      const expected = url.origin === "https://edgelesslab.com"
-        ? `${url.pathname}${url.search}${url.hash}` : demo.published_url;
-      await expect(frame).toHaveAttribute("src", expected);
-      await expect(frame.contentFrame().locator("body")).toHaveText("Offline notebook preview fixture");
+      await card.hover();
+      await card.focus();
+      await expect(card).toHaveAttribute("href", demo.published_url);
+      await expect(card).toHaveAttribute("target", "_blank");
+      await expect(card).toHaveAttribute("rel", "noopener noreferrer");
+      await expect(card).toContainText(demo.description);
+      await expect(card.locator('[aria-hidden="true"]')).toContainText("Open notebook");
+      await expect(page.locator("iframe")).toHaveCount(0);
     }
-    expect(violations).toEqual([]);
-    expect(errors).toEqual([]);
+    // Exceed the former 20s RPC deadline after every card has been visited.
+    await page.waitForTimeout(21_000);
+    await test.info().attach("gallery-diagnostics", {
+      body: JSON.stringify({ workers, frames, runtimeRequests, pageErrors, consoleErrors, resourceFailures }, null, 2),
+      contentType: "application/json",
+    });
+    await expect(page.locator("iframe")).toHaveCount(0);
+    expect(frames).toEqual([]);
+    expect(workers).toEqual([]);
+    expect(runtimeRequests).toEqual([]);
+    expect(pageErrors).toEqual([]);
+    // Retain unrelated navigation/prefetch aborts; this regression gates removal
+    // of automatic notebook traffic, not global health of catalog destinations.
+
+    expect(resourceFailures.filter((failure) => failure.includes("ERR_INSUFFICIENT_RESOURCES"))).toEqual([]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 

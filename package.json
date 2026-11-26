@@ -6,7 +6,8 @@
     "dev": "next dev",
 
     "prebuild": "node scripts/prepare-pen-plotter-fonts.mjs && ./scripts/preserve-standalone.sh save",
-    "build": "npm run test:marimo && npm run check:design-system && npm run test:font-preloads && npm run test:launch && npm run test:plotter && next build",
+    "build": "npm run test:lia && npm run test:marimo && npm run check:design-system && npm run test:font-preloads && npm run test:launch && npm run test:plotter && next build",
+    "test:lia": "node --test scripts/build-lia.test.mjs",
     "test:marimo": "npm run test:publication-push && vitest run src/lib/__tests__/marimo-gallery.test.ts src/lib/__tests__/marimo-publication.test.ts",
     "verify:publication": "npm run build && vitest run && playwright test && playwright test --config tests/consent.config.ts && npm run test:data-stories && playwright test --config tests/publication.config.ts",
     "test:data-stories": "playwright test --config tests/data-story.config.ts",

@@ -18,6 +18,43 @@ Implementation is not a live-publication claim. A critic must inspect the 375px 
 
 The initial local citation probe saw source-site bot walls at SOAS, Southampton PDF, and Oxford Academic. Browser recovery confirms the 403s are security interstitials, not verified missing documents. The UVA source returns 202 but renders the cited Kable article. Do not claim all citation URLs passed. Do not silently replace the approved citation URLs or alter the cleared prose; resolve access checks in the verifier lane or report an explicit remaining limitation.
 
+## Definition correction — 2026-11-25
+
+LIA studies the intersections between fields: useful, defensible connections
+across bodies of knowledge. The hero, introductory source, description/OG tags,
+OG PNG and llms.txt summary now lead with that definition. The versioned intro
+was edited in place, including the upstream project docs copy, so existing
+long-form references do not import the agent-originated, incorrect definition again.
+LIA is and always was about intersections between fields. The artifact-form framing
+was an assistant proposal carried into the docs and site by agents, never David's
+earlier scope or a project evolution. Public copy states the definition directly,
+without an origin/evolution narrative.
+
+The index labels *Building an Instrument That Can Say No* as a methods note,
+and its opening now bounds it as an artifact-inference example rather than the
+program definition. Its deeper content/realization vocabulary, clay/print/code
+examples, historical discussion and citations remain unchanged. The two creative
+demos remain unchanged: their LIA references concern the software artist, not the
+research program. The archive's methods-note title and description still accurately
+describe that narrower note. No discoveries or empirical validation are claimed.
+
+`npm run test:lia` checks generated-byte drift and the definition in the hero,
+intro, metadata, agent index and OG source. `tests/lia.spec.ts` also checks the
+visible definition, methods label, demo links and mobile overflow in Chromium.
+
+The requested dated correction was appended to the vault's
+`16-Projects/Latent-Information-Archaeology/Scope-and-continuity.md`.
+The AGENTS.md rule edit was **not applied**: the protected-file approval gate
+returned no consent. Do not bypass that gate. An authorized instruction-file edit remains
+required; CLAUDE.md delegates to AGENTS.md. The rule should prohibit artifact-form
+or content-versus-realization as the public definition and require the cross-field
+definition in public summaries and introductions.
+
+Review handoff is not publication. Critic reviews this diff; verifier performs the
+merge/deploy and captures a **live custom-domain** screenshot after checking the
+hero contains `intersections` and the old `the way that content takes form` phrase
+has zero matches. Local screenshots are previews, not live evidence.
+
 ## Optional `lia.edgelesslab.com` redirect (not provisioned by this PR)
 
 The main Pages repository already uses `edgelesslab.com`; **do not change its CNAME, Pages owner, or apex DNS**. A second repository can own the subdomain. Proposed exact redirect repository: `edgeless-ai/lia-redirect`. This repository does not exist as part of this change; create it only when carrying out these steps.

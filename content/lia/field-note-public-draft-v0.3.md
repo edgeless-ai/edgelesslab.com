@@ -15,7 +15,7 @@ editorial: true
 
 A pattern is not yet an explanation. A spelling, a mark in clay, or a repeated source-code idiom can invite a story about the person who made it. The harder question is whether the evidence supports that story rather than another one.
 
-Latent Information Archaeology, or LIA, is our proposal for asking that question across artifact types. This field note presents a working vocabulary and a reading of published examples, **not a report of a new empirical discovery**. Its ambition is an instrument that can help a claim be earned, bounded, or refused. Whether that instrument adds value beyond existing methods remains a question to test, not an achievement announced here.
+Latent Information Archaeology (LIA) studies the intersections between fields: useful, defensible connections across bodies of knowledge. This methods note addresses one narrower question within that work: inference across artifact types. It is not the definition of the research program. This field note presents a working vocabulary and a reading of published examples, **not a report of a new empirical discovery**. Its ambition is an instrument that can help a claim be earned, bounded, or refused. Whether that instrument adds value beyond existing methods remains a question to test, not an achievement announced here.
 
 ## What “latent information” means here
 

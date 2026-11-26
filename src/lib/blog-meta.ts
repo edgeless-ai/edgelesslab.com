@@ -5,6 +5,15 @@ export type { BlogPostMeta };
 
 export const postsMeta: BlogPostMeta[] = [
   {
+    slug: "kanban-crash-wave",
+    title: "The crash wave, and the quieter day after",
+    description: "A ten-day view of crash status among attempts in an internal task-run ledger, with the counts behind each share.",
+    date: "2026-11-16",
+    tags: ["Data Story", "Agent Operations"],
+    readTime: "2 min",
+    content: "",
+  },
+  {
     slug: "kb-audit-circulation",
     editorial: true,
     title: "We Audited Our AI Knowledge Base — 85% of Our Content Was Invisible to Our Agents",

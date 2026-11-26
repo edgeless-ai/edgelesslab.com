@@ -1,7 +1,7 @@
 // checkBatch against the real historical corpus snapshot
 // (public/prompt-engine/corpus.json, exported from the round log).
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   checkBatch,
   checkBatchAsync,
@@ -147,6 +147,46 @@ describe("difflib autojunk emulation (strings >= 200 chars)", () => {
     // Same-shape pair truncated below 200 chars: plain no-junk difflib.
     const shortA = a.slice(0, 150);
     expect(ratio(shortA, shortA)).toBe(1);
+  });
+});
+
+describe("matching-row reuse", () => {
+  it("does not allocate a Map for every scanned character or recursive block", () => {
+    // The 2030-entry corpus amplified per-character Map churn enough to time
+    // out the full browser suite at Checking dupes 18/24. Guard allocation
+    // shape, not machine-dependent milliseconds. Only the b2j index needs a Map.
+    let allocations = 0;
+    const NativeMap = Map;
+    class CountingMap<K, V> extends NativeMap<K, V> {
+      constructor() {
+        super();
+        allocations++;
+      }
+    }
+    let result: number;
+    vi.stubGlobal("Map", CountingMap);
+    try {
+      result = ratio("ab12cd34ef56gh", "cdab34ef12gh56");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+    // Independent CPython difflib result; this pair splits into sub-blocks.
+    expect(result).toBeCloseTo(4 / 7, 12);
+    expect(allocations).toBeLessThanOrEqual(1);
+  });
+
+  it.each<[string, string, number]>([
+    ["", "", 1],
+    ["", "abc", 0],
+    ["abc", "", 0],
+    ["abxcd", "abcd", 8 / 9],
+    ["ababa", "babab", 0.8],
+    ["éΩ漢abc", "Ωé漢cab", 2 / 3],
+    // Same leading mismatch on either side of difflib's autojunk boundary.
+    ["b" + "a".repeat(198), "a".repeat(199), 198 / 199],
+    ["b" + "a".repeat(199), "a".repeat(200), 0],
+  ])("preserves difflib row/column boundaries (%#)", (a, b, expected) => {
+    expect(ratio(a, b)).toBeCloseTo(expected, 12);
   });
 });
 

@@ -96,7 +96,7 @@ export default function RootLayout({
         {/* AgentReady AR-READ-07 / AR-FIND-04: agents reach llms.txt and the AI catalog by following links, rarely by guessing paths. */}
         <link rel="alternate" type="text/markdown" title="llms.txt" href="/llms.txt" />
         <link rel="ai-catalog" href="/.well-known/ai-catalog.json" />
-        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' us.i.posthog.com us-assets.i.posthog.com gumroad.com https://assets.gumroad.com; connect-src 'self' us.i.posthog.com us-assets.i.posthog.com gumroad.com https://edgeless-ingest.djm-claude-assistant.workers.dev; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://assets.gumroad.com; font-src 'self' https://assets.gumroad.com; frame-src 'self' gumroad.com https://edgelessai.gumroad.com;" />
+        <meta httpEquiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' us.i.posthog.com us-assets.i.posthog.com gumroad.com https://assets.gumroad.com; connect-src 'self' us.i.posthog.com us-assets.i.posthog.com gumroad.com https://edgeless-ingest.djm-claude-assistant.workers.dev; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://assets.gumroad.com; font-src 'self' https://assets.gumroad.com; frame-src 'self' gumroad.com https://edgelessai.gumroad.com https://marimo.edgelesslab.com;" />
         {/* Preconnect hints moved to PerformancePreload component for centralized management */}
         <script
           dangerouslySetInnerHTML={{

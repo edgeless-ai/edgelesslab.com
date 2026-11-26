@@ -143,7 +143,13 @@ test.describe("static site smoke", () => {
     await expect(cards).toHaveCount(published.length);
     expect((await cards.evaluateAll((els) => els.map((a) => a.getAttribute("href")))).sort()).toEqual([...urls].sort());
     await expect(page.getByText(`${published.length} published notebooks`, { exact: false })).toBeVisible();
-    await expect(page.locator('a[href^="/marimo/"], a[href^="https://edgelesslab.com/marimo/"]')).toHaveCount(0);
+    // Relative/unregistered bundles remain forbidden; primary-domain links must
+    // match exactly the canonical URLs admitted by the publication contract.
+    await expect(page.locator('a[href^="/marimo/"]')).toHaveCount(0);
+    const primaryUrls = urls.filter((url) => url.startsWith("https://edgelesslab.com/marimo/"));
+    const primaryLinks = page.locator('a[href^="https://edgelesslab.com/marimo/"]');
+    await expect(primaryLinks).toHaveCount(primaryUrls.length);
+    expect((await primaryLinks.evaluateAll((els) => els.map((a) => a.getAttribute("href")))).sort()).toEqual([...primaryUrls].sort());
     for (const demo of published) {
       const card = cards.filter({ has: page.getByRole("heading", { name: demo.title, exact: true }) });
       await expect(card).toHaveCount(1);

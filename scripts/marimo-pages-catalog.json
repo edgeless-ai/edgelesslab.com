@@ -1,0 +1,324 @@
+{
+  "fallbacks": {
+    "2606.04781-pass-semantics": "813c7d42b411ff7563fcc172bac93678dd8d1093ca9ad4eb0122bbcb4f5f4fbb",
+    "2607.00908-tasa-knapsack": "813c7d42b411ff7563fcc172bac93678dd8d1093ca9ad4eb0122bbcb4f5f4fbb",
+    "2608.11227-directional-side-effects": "813c7d42b411ff7563fcc172bac93678dd8d1093ca9ad4eb0122bbcb4f5f4fbb",
+    "2609.04379-tsne-symmetry-sectors": "813c7d42b411ff7563fcc172bac93678dd8d1093ca9ad4eb0122bbcb4f5f4fbb",
+    "2609.27051-anytime-valid-referee": "813c7d42b411ff7563fcc172bac93678dd8d1093ca9ad4eb0122bbcb4f5f4fbb",
+    "2609.38201-speculative-tool-exec": "813c7d42b411ff7563fcc172bac93678dd8d1093ca9ad4eb0122bbcb4f5f4fbb",
+    "2610.14244-hbm-power-underbound": "813c7d42b411ff7563fcc172bac93678dd8d1093ca9ad4eb0122bbcb4f5f4fbb",
+    "2610.40221-dissipation-plateau": "813c7d42b411ff7563fcc172bac93678dd8d1093ca9ad4eb0122bbcb4f5f4fbb"
+  },
+  "provenance": {
+    "evidence_archive_sha256": "054912c94e9bdaa6c96c899337a7e989fa2ac69f49eeda520eb431b850a4b58a",
+    "immutable_deployment": "https://ccc0ae16.edgeless-marimo.pages.dev",
+    "note": "Exact source reconstruction; no candidate discovery at packaging time. Source manifest JSON encoding is specified in package_marimo_pages.py.",
+    "parent_task": "t_c11976b2",
+    "website_commit": "6121d7da58f17df91bbc4952fc8deb5511a0a67c"
+  },
+  "redirects": "/2401.05566-adversarial-training-blind-spot/assets/* /assets/:splat 200\n/2203.07895-ghost-floor-shortcut/assets/* /assets/:splat 200\n/2608.05245-search2skill/assets/* /assets/:splat 200\n/2609.04344-sharedsae-vote-normalization/assets/* /assets/:splat 200\n/2609.04404-asr-hallucination-taxonomy/assets/* /assets/:splat 200\n/2609.04452-trilogue-pipeline-ceiling/assets/* /assets/:splat 200\n/2609.05439-criticgen-risk-frontier/assets/* /assets/:splat 200\n/2609.09458-contracteval-denominator/assets/* /assets/:splat 200\n/2609.10739-perfect-aliasing-probes/assets/* /assets/:splat 200\n/2609.10964-tail-aware-release/assets/* /assets/:splat 200\n/2609.21165-specopt-admission-noise/assets/* /assets/:splat 200\n/2609.24343-bandwidth-thermal-envelope/assets/* /assets/:splat 200\n/2609.35806-sfia-extraction-baselines/assets/* /assets/:splat 200\n/2609.38372-self-optimizing-harness/assets/* /assets/:splat 200\n/2609.38385-goldimask-context-weighting/assets/* /assets/:splat 200\n/2610.08936-clean-vs-robustness/assets/* /assets/:splat 200\n/2610.20637-taylor-attention-state-economy/assets/* /assets/:splat 200\n/2610.20686-rolaq-cache-accounting/assets/* /assets/:splat 200\n/2610.26754-tokengate-prefill-envelope/assets/* /assets/:splat 200\n/2610.26942-repair-elbow/assets/* /assets/:splat 200\n/2611.07042-scorer-rank-reversal/assets/* /assets/:splat 200\n/build-a-chip-bench-multiscoring/assets/* /assets/:splat 200\n/embodied-playground-suite-gap/assets/* /assets/:splat 200\n/google-routing-failure-price/assets/* /assets/:splat 200\n/2609.35815-calibrated-judge-inference/assets/* /2607.06560-vision-unified-generation/assets/:splat 200\n/2609.05513-budgeted-teaching-slo/assets/* /2608.15127-cache-binding-regimes/assets/:splat 200\n/2609.05527-team-design-replay/assets/* /2608.15127-cache-binding-regimes/assets/:splat 200\n/2609.10873-update-admission-power/assets/* /2608.15127-cache-binding-regimes/assets/:splat 200\n/2610.04198-alodlm-depth-allocation/assets/* /2608.15127-cache-binding-regimes/assets/:splat 200\n/2611.15159-slop-sample-boundary/assets/* /2608.15127-cache-binding-regimes/assets/:splat 200\n/2609.05512-reasoning-energy-paradox/assets/* /2607.06560-vision-unified-generation/assets/:splat 200\n/2606.18037-provenanceguard-policy/assets/* /assets/:splat 200\n/2602.07449-avatar-stage-timeline/assets/* /2607.06560-vision-unified-generation/assets/:splat 200\n/2609.04640-harmonica-speed-frontier/assets/* /2607.06560-vision-unified-generation/assets/:splat 200\n/2608.12123-ready-cohort-packing/assets/* /2607.06560-vision-unified-generation/assets/:splat 200\n/2611.05665-construct-mixture-rank/assets/* /2608.15127-cache-binding-regimes/assets/:splat 200\n/2610.20838-srq-endpoint-weight/assets/* /2607.06560-vision-unified-generation/assets/:splat 200\n/2502.06785-dca-time-to-target/assets/* /2607.06560-vision-unified-generation/assets/:splat 200\n/2610.28819-lift-scoped-constraints/assets/* /2607.06560-vision-unified-generation/assets/:splat 200\n/borwein-falsifier/assets/* /2607.06560-vision-unified-generation/assets/:splat 200\n",
+  "sources": [
+    {
+      "files": 759,
+      "mount": "2610.28819-lift-scoped-constraints",
+      "path": "2610.28819-lift-scoped-constraints/site",
+      "root": "outputs",
+      "sha256": "2acd40b92125beb6e946ae8581224dac8d07be5c6f3f70c350e8572e908d3b73"
+    },
+    {
+      "files": 710,
+      "mount": "",
+      "path": "2610.20637-taylor-attention-state-economy/site",
+      "root": "outputs",
+      "sha256": "7d72a847befcd2123c667f5a866e3171af1ea92d80071801f340f5981e97df0a"
+    },
+    {
+      "files": 710,
+      "mount": "2203.07895-ghost-floor-shortcut",
+      "path": "public/marimo/2203.07895-ghost-floor-shortcut",
+      "root": "repository",
+      "sha256": "3bd2d439efe7f4bf631ea611a7df11d7b11fec3460e2568a7ead1d222db7e84e"
+    },
+    {
+      "files": 709,
+      "mount": "2608.05245-search2skill",
+      "path": "public/marimo/2608.05245-search2skill",
+      "root": "repository",
+      "sha256": "e932078e91c19b8a9841c2901ee02b3107275dd89fdd9bfb8997d24e4cf8ad8b"
+    },
+    {
+      "files": 483,
+      "mount": "2608.15127-cache-binding-regimes",
+      "path": "public/marimo/2608.15127-cache-binding-regimes",
+      "root": "repository",
+      "sha256": "cab9ad40487207e9f8ee30f925032e3acd389634adcf5538dceb8587b81e4045"
+    },
+    {
+      "files": 710,
+      "mount": "2609.04344-sharedsae-vote-normalization",
+      "path": "public/marimo/2609.04344-sharedsae-vote-normalization",
+      "root": "repository",
+      "sha256": "b780c9fe73b840a18e5c7304adbc2a613a798e777d2710d88d85cb1e51e4ca00"
+    },
+    {
+      "files": 709,
+      "mount": "2609.04404-asr-hallucination-taxonomy",
+      "path": "public/marimo/2609.04404-asr-hallucination-taxonomy",
+      "root": "repository",
+      "sha256": "503ce806d7496b635688781f6ac522fc887a89f85447e94c5fe61e3ff8f9a92a"
+    },
+    {
+      "files": 710,
+      "mount": "2609.05439-criticgen-risk-frontier",
+      "path": "public/marimo/2609.05439-criticgen-risk-frontier",
+      "root": "repository",
+      "sha256": "98c0fe5fafa40195c598a90b78b3d77225c97bd50b00de956c02e766a6a426c7"
+    },
+    {
+      "files": 483,
+      "mount": "2609.05513-budgeted-teaching-slo",
+      "path": "public/marimo/2609.05513-budgeted-teaching-slo",
+      "root": "repository",
+      "sha256": "96bbba53bb5d9ff8af00601755e93a6d75410c278b1b28b431ccb09ce0911b04"
+    },
+    {
+      "files": 483,
+      "mount": "2609.05527-team-design-replay",
+      "path": "public/marimo/2609.05527-team-design-replay",
+      "root": "repository",
+      "sha256": "1c764419d203c0e0f28ef27a50548e8305268ae0aa12c2d81fbf86e944dfb2ea"
+    },
+    {
+      "files": 710,
+      "mount": "2609.09458-contracteval-denominator",
+      "path": "public/marimo/2609.09458-contracteval-denominator",
+      "root": "repository",
+      "sha256": "d90e6af9dc238931b37b80e02fa61bc775a2bbdf50f5b72f7926d93a81cad9dd"
+    },
+    {
+      "files": 710,
+      "mount": "2609.10739-perfect-aliasing-probes",
+      "path": "public/marimo/2609.10739-perfect-aliasing-probes",
+      "root": "repository",
+      "sha256": "fcb0e39a7bc1ba80ca07d30902b71968a60c30d0b40a0389b04a1d9f07511b06"
+    },
+    {
+      "files": 483,
+      "mount": "2609.10873-update-admission-power",
+      "path": "public/marimo/2609.10873-update-admission-power",
+      "root": "repository",
+      "sha256": "8a9c069a06f67ed99ee2947842c5142045c9f78079dff14f654b41c0e82eee69"
+    },
+    {
+      "files": 710,
+      "mount": "2609.21165-specopt-admission-noise",
+      "path": "public/marimo/2609.21165-specopt-admission-noise",
+      "root": "repository",
+      "sha256": "d913d8847bea1bbaa1f2ffcc8496010a808eff5060d30888ee7a33480af38d8b"
+    },
+    {
+      "files": 709,
+      "mount": "2609.24343-bandwidth-thermal-envelope",
+      "path": "public/marimo/2609.24343-bandwidth-thermal-envelope",
+      "root": "repository",
+      "sha256": "bd25a37882b2c5c9029af129b282c195e0d417b33dac42e923ce828343c1f21d"
+    },
+    {
+      "files": 710,
+      "mount": "2609.35806-sfia-extraction-baselines",
+      "path": "public/marimo/2609.35806-sfia-extraction-baselines",
+      "root": "repository",
+      "sha256": "6c0458bfcb21315a18edde85a5f73cc303927d2862d9086f5c638f2205d665db"
+    },
+    {
+      "files": 709,
+      "mount": "2609.38372-self-optimizing-harness",
+      "path": "public/marimo/2609.38372-self-optimizing-harness",
+      "root": "repository",
+      "sha256": "940e116affa90f6dea2b35351709c1472732faff4fa6d410a7100d3d18d3bac5"
+    },
+    {
+      "files": 710,
+      "mount": "2609.38385-goldimask-context-weighting",
+      "path": "public/marimo/2609.38385-goldimask-context-weighting",
+      "root": "repository",
+      "sha256": "0894a6911ffaab2f2c07f69692ca6dd22795e7d6d417545a9ad50fdd1a26fc79"
+    },
+    {
+      "files": 483,
+      "mount": "2610.04198-alodlm-depth-allocation",
+      "path": "public/marimo/2610.04198-alodlm-depth-allocation",
+      "root": "repository",
+      "sha256": "2e80a9835d1fdfba801d32e992bf4d3d862ea00f1d34ab9fe5392bc9a9bf3bdf"
+    },
+    {
+      "files": 710,
+      "mount": "2610.08936-clean-vs-robustness",
+      "path": "public/marimo/2610.08936-clean-vs-robustness",
+      "root": "repository",
+      "sha256": "7090e8afe6288b426aca8c01ab8d6f5bbe0e4942127f92d292a2f935ee8d226f"
+    },
+    {
+      "files": 710,
+      "mount": "2610.20686-rolaq-cache-accounting",
+      "path": "public/marimo/2610.20686-rolaq-cache-accounting",
+      "root": "repository",
+      "sha256": "fcbf37b36f07850d0f663ccfc1928a1115761d80c918e1bb8fa8b90bf70e83bb"
+    },
+    {
+      "files": 710,
+      "mount": "2610.26754-tokengate-prefill-envelope",
+      "path": "public/marimo/2610.26754-tokengate-prefill-envelope",
+      "root": "repository",
+      "sha256": "0d2bfb20f937149acd16148358da9e27b2abae0bb4ca0d5f0f0f5302bec3f2d7"
+    },
+    {
+      "files": 710,
+      "mount": "2610.26942-repair-elbow",
+      "path": "public/marimo/2610.26942-repair-elbow",
+      "root": "repository",
+      "sha256": "82187050ba729f55a26794bea530c7f33c8f48c8ac9cc2018ada213bb76bd720"
+    },
+    {
+      "files": 710,
+      "mount": "2611.07042-scorer-rank-reversal",
+      "path": "public/marimo/2611.07042-scorer-rank-reversal",
+      "root": "repository",
+      "sha256": "791dde7a47c4bf53d5714fb2f47358b34e804fd98deb6f3c89f94cfe9b7e85c3"
+    },
+    {
+      "files": 709,
+      "mount": "build-a-chip-bench-multiscoring",
+      "path": "public/marimo/build-a-chip-bench-multiscoring",
+      "root": "repository",
+      "sha256": "b3b2bf4cb6d06407c32f7d5bfb8b6b225db230bfa15619b680d242009663248c"
+    },
+    {
+      "files": 710,
+      "mount": "embodied-playground-suite-gap",
+      "path": "public/marimo/embodied-playground-suite-gap",
+      "root": "repository",
+      "sha256": "5ed5ebecf668f7f418bd63e17d68b314d2f68bee350e5e56abfe00c60998be96"
+    },
+    {
+      "files": 710,
+      "mount": "google-routing-failure-price",
+      "path": "public/marimo/google-routing-failure-price",
+      "root": "repository",
+      "sha256": "24610518a9a3cd5d242a23264f6e901b341787dd68115432eb8b6884e9666c68"
+    },
+    {
+      "files": 710,
+      "mount": "2609.04452-trilogue-pipeline-ceiling",
+      "path": "2609.04452-trilogue-pipeline-ceiling/site",
+      "root": "outputs",
+      "sha256": "2aeac22ea0b226c6d3877c47a195954069cf9424c4fbf8fdc2970cbd8657511c"
+    },
+    {
+      "files": 710,
+      "mount": "2609.10964-tail-aware-release",
+      "path": "2609.10964-tail-aware-release/site",
+      "root": "outputs",
+      "sha256": "bb8e631b6182e38f9c1eb5b25b91551b56ab525ef3fdf8ea645a82295cb8b48a"
+    },
+    {
+      "files": 710,
+      "mount": "2610.20637-taylor-attention-state-economy",
+      "path": "2610.20637-taylor-attention-state-economy/site",
+      "root": "outputs",
+      "sha256": "7d72a847befcd2123c667f5a866e3171af1ea92d80071801f340f5981e97df0a"
+    },
+    {
+      "files": 525,
+      "mount": "2611.15159-slop-sample-boundary",
+      "path": "2611.15159-slop-sample-boundary/site",
+      "root": "outputs",
+      "sha256": "b8e193cdd045bdd72e31e27c89db23f96fdd1016de66e6a0e8ffe6905e9cec18"
+    },
+    {
+      "files": 710,
+      "mount": "2401.05566-adversarial-training-blind-spot",
+      "path": "2401.05566-adversarial-training-blind-spot/site",
+      "root": "outputs",
+      "sha256": "8fef129ef37fec3d86c9e6d4c434c5fda63006b975e32febdbf219c723f43ed5"
+    },
+    {
+      "files": 759,
+      "mount": "2607.06560-vision-unified-generation",
+      "path": "2607.06560-vision-unified-generation/site",
+      "root": "outputs",
+      "sha256": "99f67d37df29ce35ff159139f6c2b1a74d287b11f8c531cfe9f3862db6c796ff"
+    },
+    {
+      "files": 759,
+      "mount": "2609.35815-calibrated-judge-inference",
+      "path": "2609.35815-calibrated-judge-inference/site",
+      "root": "outputs",
+      "sha256": "f656122c84ab3de921d75904d46860415518140152fd21890504ab5a6529f71c"
+    },
+    {
+      "files": 759,
+      "mount": "2609.05512-reasoning-energy-paradox",
+      "path": "2609.05512-reasoning-energy-paradox/site",
+      "root": "outputs",
+      "sha256": "b40edca6db5364515be7148d64f1c27409a2a89c117695b0d1d3267f75d74bdf"
+    },
+    {
+      "files": 710,
+      "mount": "2606.18037-provenanceguard-policy",
+      "path": "2606.18037-provenanceguard-policy-legend-fix/site",
+      "root": "outputs",
+      "sha256": "1d9139009c0c2a43d50c22ae559f83b7dc6f83b5bfd92f85ef6046cfe88993e3"
+    },
+    {
+      "files": 759,
+      "mount": "2602.07449-avatar-stage-timeline",
+      "path": "2602.07449-avatar-stage-timeline-axis-approved/site",
+      "root": "outputs",
+      "sha256": "bd65d9fb3871d5c3afa36face3e1dd4069d9e7abb779b9dc7b30d7964e567e5a"
+    },
+    {
+      "files": 759,
+      "mount": "2609.04640-harmonica-speed-frontier",
+      "path": "2609.04640-harmonica-speed-frontier/site",
+      "root": "outputs",
+      "sha256": "270fdb27a9f64f02e8cd42914e82043f9a1c2a05da3da833337d500dd6489f6a"
+    },
+    {
+      "files": 759,
+      "mount": "2608.12123-ready-cohort-packing",
+      "path": "2608.12123-ready-cohort-packing/site",
+      "root": "outputs",
+      "sha256": "eb6c2d1401ca3feefb21d4d2b3088b9869c3b6591d7b9762eceae31d2f28697e"
+    },
+    {
+      "files": 483,
+      "mount": "2611.05665-construct-mixture-rank",
+      "path": "2611.05665-construct-mixture-rank/site",
+      "root": "outputs",
+      "sha256": "336f1f2099ec22e8cdb5c1c2bcc6e569cfabb60d1163475b714d867026b5846c"
+    },
+    {
+      "files": 759,
+      "mount": "2610.20838-srq-endpoint-weight",
+      "path": "2610.20838-srq-endpoint-weight/site",
+      "root": "outputs",
+      "sha256": "f62af79ff49d4526f35a98ec7ae85da02c1685262104dca1548566d1a47c496f"
+    },
+    {
+      "files": 759,
+      "mount": "2502.06785-dca-time-to-target",
+      "path": "2502.06785-dca-time-to-target/site",
+      "root": "outputs",
+      "sha256": "fee168e92040fe432d39afc53852d053d82d6dbfff421aa3a42dd088c4d8af45"
+    },
+    {
+      "files": 759,
+      "mount": "borwein-falsifier",
+      "path": "borwein-falsifier/site",
+      "root": "outputs",
+      "sha256": "985adb881e3fca995d3dc0a5daca262912457a47fbcc7906e6d6a0d3be15fc6b"
+    }
+  ],
+  "version": 1
+}

@@ -24,6 +24,16 @@ export interface BlogPost {
   image?: string;
   /** One-line statement of how this piece was produced, matching Substack's "how I made this" disclosure pattern. E.g., "AI-generated, human-reviewed" or "Human-written, AI-assisted editing." */
   processNote?: string;
+  /** Serializable, public data-story asset paths. Loaded only on the article route. */
+  dataStory?: DataStoryConfig;
+}
+
+export interface DataStoryConfig {
+  title: string;
+  dataUrl: string;
+  previewUrl: string;
+  posterUrl: string;
+  notebookUrl: string;
 }
 
 /**

@@ -52,6 +52,9 @@ jobs:
       - name: Run analytics consent regression tests
         run: npx playwright test --config tests/consent.config.ts
 
+      - name: Run data-story interaction and fallback regressions
+        run: npm run test:data-stories
+
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v4

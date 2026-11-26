@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>2603.07835-distillguard-damage-budget</title>
+    <script type="module" crossorigin src="./assets/index-s-M1OXjs.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-B0Z9INg1.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-DVplv7_D.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-BrajqUja.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-Dfcbgjhg.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-_LrxgvjW.js">
+    <link rel="modulepreload" crossorigin href="./assets/schemas-Dv42wLFq.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-BCaOs5rp.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-oX0TOjjx.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-Cmx0b_zA.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-aFmHgJZY.js">
+    <link rel="modulepreload" crossorigin href="./assets/isArrayLikeObject-DnwgSs_Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseMerge-CQpUq7ep.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-snlMn4yk.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-D9cftcHj.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-Ci2dTZ72.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-VPSq73n8.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-B4K466FK.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-DqoWmb7X.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-CrTnjj37.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-DX8Y2WbJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-DB0hHKMi.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-ldLVeaqm.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-B74pBk57.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-B9tHcfpV.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-iaThVDkA.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-BrwnTgyK.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-restore-focus-BxEGwIbk.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-DfJ2oMlA.js">
+    <link rel="modulepreload" crossorigin href="./assets/circle-DXf-VWZG.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-COI-NGrx.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-BQNapYaf.js">
+    <link rel="modulepreload" crossorigin href="./assets/I18nProvider-Cg2I_s1_.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-D7O_26UI.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-DTBn5eTb.js">
+    <link rel="modulepreload" crossorigin href="./assets/toast-BGzLGnvw.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-C9TuY18o.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-bkIFVj8h.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-Mq4gc5kS.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-DOj9Q6uC.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-B_PMVg8T.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-BaPGzeOK.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-BqUx5USx.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-Haz_uxEL.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-Mk3-CcoU.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-B_ccBZTp.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-BoBxR50a.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-Wu434mLr.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-lt0JK8Jt.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-k9DpjH68.js">
+    <link rel="modulepreload" crossorigin href="./assets/write-secret-modal-DzKAInL2.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-C5silF6g.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-DcgaW8fn.js">
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-uBIymjUX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Cny7_yZb.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DBMV4gqt.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-BJvf-MD4.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-C49f7GXV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-DgRODTW6.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-qhAY4L2r.js">
+    <link rel="modulepreload" crossorigin href="./assets/marked.esm-B_3iMIUq.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings-B2vv-ENv.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BOfh4hMd.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-crT3E0Rm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DtH-7lot.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BmExfiwX.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-1tmpVXyz.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-LSsCJjA3.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DusFODSa.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-Dc5bKD4z.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-COhSHkCj.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-C7aJJz0Y.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es--06brOip.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-BRkCaSsh.js">
+    <link rel="modulepreload" crossorigin href="./assets/coerce-CpE6kUdX.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-DjNf4SIX.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-BmRQipI0.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-yw4sIeJR.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-Bpdo9AvU.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-DKIID_Mo.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-BAJYRhmO.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-C3oDoyFe.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-CKcCbG2G.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-D8O_CYCG.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-D9Dr-k4J.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-YOKDWASO-BIpRENEC.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-BG3sp2rs.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Djr5m5ac.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-BIiRXh_3.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-B2vUhREg.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-BbOqmHy3.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-D5nfNHOo.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-pdKBv96t.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-iX1eufdl.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-DCrsa1nH.js">
+    <link rel="modulepreload" crossorigin href="./assets/api-BeC_VSGv.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-BZW3tzEX.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-CbeVJ6OD.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-_Qai_QyX.js">
+    <link rel="modulepreload" crossorigin href="./assets/pair-CaQyK6En.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-Gl5nCA8C.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BOKzA3tF.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-eAtVhbNZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-C1rnl-0o.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-DK9Zl1lU.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DCJXy66H.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-CTaiAjrz.js">
+    <link rel="modulepreload" crossorigin href="./assets/tabs-BuQlZFbt.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-DG7Ap4H4.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-CxVozGAC.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-Qw1f8Jhy.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-GM5E_bUs.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-63DyBLHQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-UrX9KO36.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-DyNE-o8o.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-C3rKm8_a.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-C8RhSVii.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-GSoSTiIK.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-Cq6x_5ML.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-DTaqCu_d.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-XsPO8hNi.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-LSth_8hT.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-D60XkCny.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-DA-62E-Y.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-Buu61juQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-q_Ad80ug.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-BbFQ2oE4.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-CNPGWpMu.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-Bq_nmf5u.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-D5bOh7g6.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-CLRkNgm7.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-mT3CGest.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-D6tfmvq8.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-CvVTau-c.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-Do6ywDBO.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-CwTkczVN.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-Cd69vvyX.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-CaQYvazl.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-yZ06h1Pl.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-vrvqpuKJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Dbe0MrFr.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-D6HIIsCb.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-C4_v6fQW.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-_W_Lo0P4.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-BfSBcO5B.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-BjoL5P0h.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-BgBraYAr.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-BDD6_xQQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-SQaZqvcO.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-Dl35U6h3.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-BPBVl9pl.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-wZvTj8WY.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-CdJgUy-I.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-UdPdIbF7.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-CI_o7NhW.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAddCell-GR7eEQrT.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-DCSMIsTX.js">
+    <link rel="modulepreload" crossorigin href="./assets/data-grid-types-DgHVN_Zz.js">
+    <link rel="modulepreload" crossorigin href="./assets/glide-utils-CIrAxdjv.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-Cm2D6vyX.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-BPmgQFnh.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-DmIqR8sY.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-Djf4O40e.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-Cqst59WX.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-data-dv4FBHxR.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-export-DzhB1FrN.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-BkVJQ_Zh.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-D3tw5rqW.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CiZ_8zS-.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-DFIVN9dn.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-DPmlLd-r.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-XD9FAV-f.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-0PFKL3SH.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DjIHoF9Z.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-B0GmlMnR.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-Bcdzex-3.css">
+  <marimo-wasm hidden="" data-pyodide-index-url="./pyodide/" data-pyodide-lockfile-url="./lockfile/d24785cd717fea2d.json" data-pypi-index-url="./packages/index/"></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "# /// script\n# requires-python = \"\u003E=3.11\"\n# dependencies = [\"marimo==0.25.2\"]\n# ///\n\nimport marimo\n\n__generated_with = \"0.25.2\"\napp = marimo.App(width=\"medium\")\n\n\n@app.cell\ndef _():\n    import marimo as mo\n    mo.md(r\"\"\"\n    # DistillGuard: when does an output defense buy real protection?\n\n    **Research question:** under a maximum tolerable loss to legitimate users,\n    which tested output defense most reduces the quality retained by a distilled\n    student?\n\n    DistillGuard reports **distillation effectiveness (DE)** and mean user-side\n    **distillation cost (DC)** for nine defenses in one Qwen3-14B \u2192\n    Qwen2.5-7B-Instruct experiment\n    ([arXiv:2603.07835v1](https://arxiv.org/abs/2603.07835)). This demo recomputes\n    a budget-qualified choice from published Table 2. It does not train models,\n    replay the benchmarks, or test an adaptive attacker.\n    \"\"\")\n    return (mo,)\n\n\n@app.cell\ndef _(mo):\n    damage_budget = mo.ui.slider(\n        0, 35, value=5, step=5,\n        label=\"Maximum acceptable mean user damage (DC, %)\",\n        full_width=True,\n    )\n    mo.vstack([\n        damage_budget,\n        mo.md(\"The selected defense must stay at or below this published mean collateral-damage budget.\"),\n    ])\n    return (damage_budget,)\n\n\n@app.cell\ndef _(damage_budget, mo):\n\n    _rows = [\n        (\"No defense\", 1.000, 0.000, [1.000, 1.000, 1.000]),\n        (\"Paraphrase 0.3\", .990, .030, [.973, 1.013, .985]),\n        (\"Paraphrase 0.7\", .978, .034, [.935, .993, 1.005]),\n        (\"Paraphrase 1.0\", 1.012, .070, [1.024, .986, 1.026]),\n        (\"Poison 5%\", .979, .017, [.982, 1.000, .956]),\n        (\"Poison 15%\", .962, .052, [.968, .973, .945]),\n        (\"Poison 30%\", .980, .098, [.982, 1.026, .930]),\n        (\"CoT removal\", .811, .311, [.463, 1.026, .944]),\n        (\"Token limit 512\", .986, .046, [.950, 1.020, .988]),\n        (\"Token limit 1024\", .985, .014, [.994, .973, .989]),\n    ]\n    _budget = int(damage_budget.value)\n    _eligible = [_row for _row in _rows if 100 * _row[2] \u003C= _budget + 1e-9]\n    _winner = min(_eligible, key=lambda _row: _row[1])\n    _protection = 100 * (1 - _winner[1])\n    _bars = []\n    for _index, (_name, _de, _dc, _bench) in enumerate(_rows):\n        _y = 70 + 33 * _index\n        _value = 100 * (1 - _de)\n        _eligible_row = 100 * _dc \u003C= _budget + 1e-9\n        _selected = _name == _winner[0]\n        _x = 290 + 11 * min(20, _value)\n        _x0, _width = min(290, _x), max(2, abs(_x - 290))\n        _fill = \"#2563eb\" if _selected else (\"#93c5fd\" if _eligible_row else \"#cbd5e1\")\n        _bars.append(\n            f'\u003Ctext data-row-label=\"true\" x=\"8\" y=\"{_y+5}\" font-size=\"12\"\u003E{_name}\u003C/text\u003E'\n            f'\u003Crect data-defense-bar=\"true\" x=\"{_x0:.1f}\" y=\"{_y-10}\" width=\"{_width:.1f}\" height=\"16\" rx=\"3\" fill=\"{_fill}\"/\u003E'\n            f'\u003Ctext x=\"525\" y=\"{_y+4}\" font-size=\"11\"\u003EDC {100*_dc:.1f}%\u003C/text\u003E'\n        )\n    _svg = f'''\u003Csvg data-chart=\"distillguard-damage-budget\" data-budget=\"{_budget}\" data-selected=\"{_winner[0]}\"\n      viewBox=\"0 0 620 410\" style=\"width:100%;height:auto;background:#fff;border:1px solid #cbd5e1;border-radius:12px\"\n      role=\"img\" aria-label=\"Aggregate distillation protection by defense and user-damage budget\"\u003E\n      \u003Ctext x=\"8\" y=\"26\" font-size=\"13\" font-weight=\"600\"\u003EPublished Table 2: aggregate protection = 100 \u00d7 (1 \u2212 mean DE)\u003C/text\u003E\n      \u003Ctext x=\"8\" y=\"46\" font-size=\"11\" fill=\"#475569\"\u003Eblue = selected \u00b7 light blue = budget-qualified \u00b7 gray = over budget\u003C/text\u003E\n      \u003Cline x1=\"290\" y1=\"54\" x2=\"290\" y2=\"395\" stroke=\"#64748b\" stroke-width=\"1\"/\u003E\n      {''.join(_bars)}\n    \u003C/svg\u003E'''\n    mo.vstack([\n        mo.md(f\"## With \u2264{_budget}% mean user damage: {_winner[0]} buys {_protection:.1f}% aggregate protection\"),\n        mo.Html(_svg),\n        mo.md(\n            f\"**Selected published DE:** MATH {_winner[3][0]:.3f} \u00b7 HumanEval+ {_winner[3][1]:.3f} \u00b7 MT-Bench {_winner[3][2]:.3f}. \"\n            \"Lower DE means less student quality retained. Negative bars mean the defended student scored above baseline.\"\n        ),\n    ])\n    return\n\n\n@app.cell\ndef _(mo):\n    mo.md(r\"\"\"\n    ## Interpretation contract\n\n    1. **This is a published-table recomputation.** DE is the defended student's\n       score divided by the no-defense student's score; DC is teacher-output\n       degradation. \u201cProtection\u201d here is the analyst-authored transform\n       `100 \u00d7 (1 \u2212 mean DE)`.\n    2. **The headline is task-dependent.** CoT removal cuts MATH-500 retention to\n       0.463 but leaves HumanEval+ at 1.026 and MT-Bench at 0.944. A single mean\n       must not be read as broad prevention.\n    3. **The threat model is narrow.** Results use cached teacher outputs, 10,000\n       prompts, a same-family Qwen teacher/student pair, LoRA SFT, and a naive\n       one-query attacker. No adaptive filtering, consensus, RL, cross-family\n       student, uncertainty interval, or independent replication is included.\n    4. **A budget is a policy choice.** Moving the slider does not rerun the\n       experiment; it only filters the paper's ten published operating points.\n\n    Source: Bo Jiang, [DistillGuard: Evaluating Defenses Against LLM Knowledge\n    Distillation](https://arxiv.org/abs/2603.07835), Table 2, v1 submitted\n    2026-03-08. Paper and demo code are used for research commentary. No private\n    files, credentials, network calls, model weights, or paid APIs are used.\n    \"\"\")\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">%23%20%2F%2F%2F%20script%0A%23%20requires-python%20%3D%20%22%3E%3D3.11%22%0A%23%20dependencies%20%3D%20%5B%22marimo%3D%3D0.25.2%22%5D%0A%23%20%2F%2F%2F%0A%0Aimport%20marimo%0A%0A__generated_with%20%3D%20%220.25.2%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%20DistillGuard%3A%20when%20does%20an%20output%20defense%20buy%20real%20protection%3F%0A%0A%20%20%20%20**Research%20question%3A**%20under%20a%20maximum%20tolerable%20loss%20to%20legitimate%20users%2C%0A%20%20%20%20which%20tested%20output%20defense%20most%20reduces%20the%20quality%20retained%20by%20a%20distilled%0A%20%20%20%20student%3F%0A%0A%20%20%20%20DistillGuard%20reports%20**distillation%20effectiveness%20(DE)**%20and%20mean%20user-side%0A%20%20%20%20**distillation%20cost%20(DC)**%20for%20nine%20defenses%20in%20one%20Qwen3-14B%20%E2%86%92%0A%20%20%20%20Qwen2.5-7B-Instruct%20experiment%0A%20%20%20%20(%5BarXiv%3A2603.07835v1%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2603.07835)).%20This%20demo%20recomputes%0A%20%20%20%20a%20budget-qualified%20choice%20from%20published%20Table%202.%20It%20does%20not%20train%20models%2C%0A%20%20%20%20replay%20the%20benchmarks%2C%20or%20test%20an%20adaptive%20attacker.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%20(mo%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20damage_budget%20%3D%20mo.ui.slider(%0A%20%20%20%20%20%20%20%200%2C%2035%2C%20value%3D5%2C%20step%3D5%2C%0A%20%20%20%20%20%20%20%20label%3D%22Maximum%20acceptable%20mean%20user%20damage%20(DC%2C%20%25)%22%2C%0A%20%20%20%20%20%20%20%20full_width%3DTrue%2C%0A%20%20%20%20)%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20damage_budget%2C%0A%20%20%20%20%20%20%20%20mo.md(%22The%20selected%20defense%20must%20stay%20at%20or%20below%20this%20published%20mean%20collateral-damage%20budget.%22)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%20(damage_budget%2C)%0A%0A%0A%40app.cell%0Adef%20_(damage_budget%2C%20mo)%3A%0A%0A%20%20%20%20_rows%20%3D%20%5B%0A%20%20%20%20%20%20%20%20(%22No%20defense%22%2C%201.000%2C%200.000%2C%20%5B1.000%2C%201.000%2C%201.000%5D)%2C%0A%20%20%20%20%20%20%20%20(%22Paraphrase%200.3%22%2C%20.990%2C%20.030%2C%20%5B.973%2C%201.013%2C%20.985%5D)%2C%0A%20%20%20%20%20%20%20%20(%22Paraphrase%200.7%22%2C%20.978%2C%20.034%2C%20%5B.935%2C%20.993%2C%201.005%5D)%2C%0A%20%20%20%20%20%20%20%20(%22Paraphrase%201.0%22%2C%201.012%2C%20.070%2C%20%5B1.024%2C%20.986%2C%201.026%5D)%2C%0A%20%20%20%20%20%20%20%20(%22Poison%205%25%22%2C%20.979%2C%20.017%2C%20%5B.982%2C%201.000%2C%20.956%5D)%2C%0A%20%20%20%20%20%20%20%20(%22Poison%2015%25%22%2C%20.962%2C%20.052%2C%20%5B.968%2C%20.973%2C%20.945%5D)%2C%0A%20%20%20%20%20%20%20%20(%22Poison%2030%25%22%2C%20.980%2C%20.098%2C%20%5B.982%2C%201.026%2C%20.930%5D)%2C%0A%20%20%20%20%20%20%20%20(%22CoT%20removal%22%2C%20.811%2C%20.311%2C%20%5B.463%2C%201.026%2C%20.944%5D)%2C%0A%20%20%20%20%20%20%20%20(%22Token%20limit%20512%22%2C%20.986%2C%20.046%2C%20%5B.950%2C%201.020%2C%20.988%5D)%2C%0A%20%20%20%20%20%20%20%20(%22Token%20limit%201024%22%2C%20.985%2C%20.014%2C%20%5B.994%2C%20.973%2C%20.989%5D)%2C%0A%20%20%20%20%5D%0A%20%20%20%20_budget%20%3D%20int(damage_budget.value)%0A%20%20%20%20_eligible%20%3D%20%5B_row%20for%20_row%20in%20_rows%20if%20100%20*%20_row%5B2%5D%20%3C%3D%20_budget%20%2B%201e-9%5D%0A%20%20%20%20_winner%20%3D%20min(_eligible%2C%20key%3Dlambda%20_row%3A%20_row%5B1%5D)%0A%20%20%20%20_protection%20%3D%20100%20*%20(1%20-%20_winner%5B1%5D)%0A%20%20%20%20_bars%20%3D%20%5B%5D%0A%20%20%20%20for%20_index%2C%20(_name%2C%20_de%2C%20_dc%2C%20_bench)%20in%20enumerate(_rows)%3A%0A%20%20%20%20%20%20%20%20_y%20%3D%2070%20%2B%2033%20*%20_index%0A%20%20%20%20%20%20%20%20_value%20%3D%20100%20*%20(1%20-%20_de)%0A%20%20%20%20%20%20%20%20_eligible_row%20%3D%20100%20*%20_dc%20%3C%3D%20_budget%20%2B%201e-9%0A%20%20%20%20%20%20%20%20_selected%20%3D%20_name%20%3D%3D%20_winner%5B0%5D%0A%20%20%20%20%20%20%20%20_x%20%3D%20290%20%2B%2011%20*%20min(20%2C%20_value)%0A%20%20%20%20%20%20%20%20_x0%2C%20_width%20%3D%20min(290%2C%20_x)%2C%20max(2%2C%20abs(_x%20-%20290))%0A%20%20%20%20%20%20%20%20_fill%20%3D%20%22%232563eb%22%20if%20_selected%20else%20(%22%2393c5fd%22%20if%20_eligible_row%20else%20%22%23cbd5e1%22)%0A%20%20%20%20%20%20%20%20_bars.append(%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20data-row-label%3D%22true%22%20x%3D%228%22%20y%3D%22%7B_y%2B5%7D%22%20font-size%3D%2212%22%3E%7B_name%7D%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Crect%20data-defense-bar%3D%22true%22%20x%3D%22%7B_x0%3A.1f%7D%22%20y%3D%22%7B_y-10%7D%22%20width%3D%22%7B_width%3A.1f%7D%22%20height%3D%2216%22%20rx%3D%223%22%20fill%3D%22%7B_fill%7D%22%2F%3E'%0A%20%20%20%20%20%20%20%20%20%20%20%20f'%3Ctext%20x%3D%22525%22%20y%3D%22%7B_y%2B4%7D%22%20font-size%3D%2211%22%3EDC%20%7B100*_dc%3A.1f%7D%25%3C%2Ftext%3E'%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20_svg%20%3D%20f'''%3Csvg%20data-chart%3D%22distillguard-damage-budget%22%20data-budget%3D%22%7B_budget%7D%22%20data-selected%3D%22%7B_winner%5B0%5D%7D%22%0A%20%20%20%20%20%20viewBox%3D%220%200%20620%20410%22%20style%3D%22width%3A100%25%3Bheight%3Aauto%3Bbackground%3A%23fff%3Bborder%3A1px%20solid%20%23cbd5e1%3Bborder-radius%3A12px%22%0A%20%20%20%20%20%20role%3D%22img%22%20aria-label%3D%22Aggregate%20distillation%20protection%20by%20defense%20and%20user-damage%20budget%22%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%228%22%20y%3D%2226%22%20font-size%3D%2213%22%20font-weight%3D%22600%22%3EPublished%20Table%202%3A%20aggregate%20protection%20%3D%20100%20%C3%97%20(1%20%E2%88%92%20mean%20DE)%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%228%22%20y%3D%2246%22%20font-size%3D%2211%22%20fill%3D%22%23475569%22%3Eblue%20%3D%20selected%20%C2%B7%20light%20blue%20%3D%20budget-qualified%20%C2%B7%20gray%20%3D%20over%20budget%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%22290%22%20y1%3D%2254%22%20x2%3D%22290%22%20y2%3D%22395%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%221%22%2F%3E%0A%20%20%20%20%20%20%7B''.join(_bars)%7D%0A%20%20%20%20%3C%2Fsvg%3E'''%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mo.md(f%22%23%23%20With%20%E2%89%A4%7B_budget%7D%25%20mean%20user%20damage%3A%20%7B_winner%5B0%5D%7D%20buys%20%7B_protection%3A.1f%7D%25%20aggregate%20protection%22)%2C%0A%20%20%20%20%20%20%20%20mo.Html(_svg)%2C%0A%20%20%20%20%20%20%20%20mo.md(%0A%20%20%20%20%20%20%20%20%20%20%20%20f%22**Selected%20published%20DE%3A**%20MATH%20%7B_winner%5B3%5D%5B0%5D%3A.3f%7D%20%C2%B7%20HumanEval%2B%20%7B_winner%5B3%5D%5B1%5D%3A.3f%7D%20%C2%B7%20MT-Bench%20%7B_winner%5B3%5D%5B2%5D%3A.3f%7D.%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%22Lower%20DE%20means%20less%20student%20quality%20retained.%20Negative%20bars%20mean%20the%20defended%20student%20scored%20above%20baseline.%22%0A%20%20%20%20%20%20%20%20)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20mo.md(r%22%22%22%0A%20%20%20%20%23%23%20Interpretation%20contract%0A%0A%20%20%20%201.%20**This%20is%20a%20published-table%20recomputation.**%20DE%20is%20the%20defended%20student's%0A%20%20%20%20%20%20%20score%20divided%20by%20the%20no-defense%20student's%20score%3B%20DC%20is%20teacher-output%0A%20%20%20%20%20%20%20degradation.%20%E2%80%9CProtection%E2%80%9D%20here%20is%20the%20analyst-authored%20transform%0A%20%20%20%20%20%20%20%60100%20%C3%97%20(1%20%E2%88%92%20mean%20DE)%60.%0A%20%20%20%202.%20**The%20headline%20is%20task-dependent.**%20CoT%20removal%20cuts%20MATH-500%20retention%20to%0A%20%20%20%20%20%20%200.463%20but%20leaves%20HumanEval%2B%20at%201.026%20and%20MT-Bench%20at%200.944.%20A%20single%20mean%0A%20%20%20%20%20%20%20must%20not%20be%20read%20as%20broad%20prevention.%0A%20%20%20%203.%20**The%20threat%20model%20is%20narrow.**%20Results%20use%20cached%20teacher%20outputs%2C%2010%2C000%0A%20%20%20%20%20%20%20prompts%2C%20a%20same-family%20Qwen%20teacher%2Fstudent%20pair%2C%20LoRA%20SFT%2C%20and%20a%20naive%0A%20%20%20%20%20%20%20one-query%20attacker.%20No%20adaptive%20filtering%2C%20consensus%2C%20RL%2C%20cross-family%0A%20%20%20%20%20%20%20student%2C%20uncertainty%20interval%2C%20or%20independent%20replication%20is%20included.%0A%20%20%20%204.%20**A%20budget%20is%20a%20policy%20choice.**%20Moving%20the%20slider%20does%20not%20rerun%20the%0A%20%20%20%20%20%20%20experiment%3B%20it%20only%20filters%20the%20paper's%20ten%20published%20operating%20points.%0A%0A%20%20%20%20Source%3A%20Bo%20Jiang%2C%20%5BDistillGuard%3A%20Evaluating%20Defenses%20Against%20LLM%20Knowledge%0A%20%20%20%20Distillation%5D(https%3A%2F%2Farxiv.org%2Fabs%2F2603.07835)%2C%20Table%202%2C%20v1%20submitted%0A%20%20%20%202026-03-08.%20Paper%20and%20demo%20code%20are%20used%20for%20research%20commentary.%20No%20private%0A%20%20%20%20files%2C%20credentials%2C%20network%20calls%2C%20model%20weights%2C%20or%20paid%20APIs%20are%20used.%0A%20%20%20%20%22%22%22)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.25.2",
+            "serverToken": "unused",
+            "config": {"ai": {"allow_provider_config": true, "custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "code_lens": true, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "layout": null,
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

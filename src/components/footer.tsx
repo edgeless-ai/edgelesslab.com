@@ -91,6 +91,15 @@ export function Footer() {
                       {item.label}
                       <ArrowUpRight size={11} />
                     </a>
+                  ) : item.href === "/lia/" ? (
+                    // Standalone HTML has no Next RSC payload or client route.
+                    <a
+                      href={item.href}
+                      className="text-[13px] hover:text-white transition-colors"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {item.label}
+                    </a>
                   ) : (
                     <Link
                       href={item.href}

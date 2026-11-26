@@ -33,8 +33,14 @@ test('LIA cleared artifacts, registry, privacy and navigation', async ({ page, r
   expect(schema.numberOfItems).toBe(schema.itemListElement.length);
   expect(schema.itemListElement.filter((n: {url: string}) => n.url === `https://edgelesslab.com${note.href}`)).toHaveLength(1);
   await expect(page.locator(`[data-editorial-note] a[href="${note.href}"]`)).toHaveCount(1);
+  const liaRequests: string[] = [];
+  page.on('request', request => {
+    if (new URL(request.url()).pathname.startsWith('/lia/')) liaRequests.push(request.url());
+  });
   await page.locator('footer a[href="/lia/"]').click();
   await expect(page).toHaveURL(/\/lia\/$/);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Archaeology');
+  expect(liaRequests.some(url => /__next\.|index\.txt|_rsc=/.test(url))).toBe(false);
   expect(await (await request.get('/sitemap.xml')).text()).toContain(`https://edgelesslab.com${note.href}`);
   expect(await (await request.get('/llms.txt')).text()).toContain(`https://edgelesslab.com${note.href}`);
   expect((await request.get('/lia/og-image.png')).status()).toBe(200);

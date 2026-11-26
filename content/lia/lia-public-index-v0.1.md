@@ -1,8 +1,8 @@
 ## Explore LIA
 
-### Field note
+### Methods note
 
-- [Building an Instrument That Can Say No](/lia/building-an-instrument-that-can-say-no/) — A methodological proposal with public sources and explicit limits; not an empirical discovery announcement.
+- [Building an Instrument That Can Say No](/lia/building-an-instrument-that-can-say-no/) — A methods note on reading artifacts and the limits of inference, not a definition of LIA or an empirical discovery announcement.
 
 ### Related creative demos
 

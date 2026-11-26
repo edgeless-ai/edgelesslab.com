@@ -7,6 +7,11 @@ test('LIA cleared artifacts, registry, privacy and navigation', async ({ page, r
   expect((await request.get('/lia/')).status()).toBe(200);
   await page.goto('/lia/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Archaeology');
+  const definition = 'Latent Information Archaeology studies the intersections between fields: useful, defensible connections across bodies of knowledge.';
+  await expect(page.locator('.hero .deck')).toHaveText(definition);
+  await expect(page.locator('.intro p').first()).toHaveText(definition);
+  await expect(page.locator('main')).not.toContainText('the way that content takes form');
+  await expect(page.getByRole('heading', { name: 'Methods note', exact: true })).toBeVisible();
   const indexed = await page.locator('[data-lia-index] a').evaluateAll(nodes => nodes.map(a => a.getAttribute('href')!));
   expect(indexed).toEqual([note.href, '/creative-demos/code-as-a-field-of-relation/', '/creative-demos/the-rule-and-the-machine/']);
   for (const href of indexed) expect((await request.get(href)).status()).toBe(200);

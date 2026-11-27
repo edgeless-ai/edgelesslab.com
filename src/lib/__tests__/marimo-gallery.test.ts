@@ -12,6 +12,18 @@ const fixture = (slug = "test-notebook"): MarimoDemo => ({
 });
 
 describe("published marimo gallery", () => {
+  it("registers live-verified RefusalBench calibration with its exact approved bundle", () => {
+    const slug = "2605.21545-refusalbench-calibration";
+    const entry = publishedMarimoDemos.find(d => d.slug === slug);
+    expect(entry?.title).toBe("Same Refusal Rate, Opposite Safety Calibration");
+    expect(entry?.published_url).toBe(`https://marimo.edgelesslab.com/${slug}/`);
+    const catalog = JSON.parse(readFileSync(join(process.cwd(), "scripts/marimo-pages-catalog.json"), "utf8"));
+    expect(catalog.fallbacks).not.toHaveProperty(slug);
+    expect(catalog.sources.filter((s: { mount: string }) => s.mount === slug)).toEqual([{
+      files: 759, mount: slug, path: `${slug}/site`, root: "outputs",
+      sha256: "f118bbf944be06796497c728bca4f41c491864502e562b1055aa8faa783d9a74",
+    }]);
+  });
   it("pins the live-verified Borwein reconstruction instead of the SPA fallback", () => {
     const slug = "borwein-falsifier";
     const entry = publishedMarimoDemos.find(d => d.slug === slug);

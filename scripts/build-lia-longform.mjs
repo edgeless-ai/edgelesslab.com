@@ -124,10 +124,10 @@ async function prepareFigures(tokens, source) {
     const [width, height] = [png.readUInt32BE(16), png.readUInt32BE(20)];
     const svg = `figures/${id}.svg`;
     await readFile(new URL(svg, reader));
-    const { alt, caption } = metadata[id];
+    const { alt, caption, source: provenance } = metadata[id];
     const cleanCaption = caption.replace(/ Use the interactive companion for anchors, qualifications, and sources\.$/, "");
     token.type = "figure";
-    token.meta = { id, imagePath, svg, width, height, alt, caption: cleanCaption };
+    token.meta = { id, imagePath, svg, width, height, alt, caption: cleanCaption, provenance };
     tokens[index - 1].hidden = true;
     tokens[index + 1].hidden = true;
   }
@@ -135,10 +135,11 @@ async function prepareFigures(tokens, source) {
 }
 
 markdown.renderer.rules.figure = (tokens, index) => {
-  const { id, imagePath, svg, width, height, alt, caption } = tokens[index].meta;
+  const { id, imagePath, svg, width, height, alt, caption, provenance } = tokens[index].meta;
+  const sourceLine = provenance ? `<p class="figure-source">Sources: ${escape(provenance)}</p>` : "";
   return `<figure id="figure-${id.toLowerCase()}">
   <div class="figure-frame"><img src="${imagePath}" alt="${escape(alt)}" width="${width}" height="${height}" loading="lazy" decoding="async"></div>
-  <figcaption><span class="figure-label">Figure ${id.slice(1)}</span><p>${escape(caption)}</p><a href="${svg}" aria-label="Open Figure ${id.slice(1)} as SVG">Open SVG</a></figcaption>
+  <figcaption><span class="figure-label">Figure ${id.slice(1)}</span><p>${escape(caption)}</p>${sourceLine}<a href="${svg}" aria-label="Open Figure ${id.slice(1)} as SVG">Open SVG</a></figcaption>
 </figure>\n`;
 };
 
@@ -149,7 +150,7 @@ function contents(headings) {
     else groups.at(-1).chapters.push(heading);
   }
   const link = ({ id, label }) => {
-    const chapter = /^([PC]|[IVX]+-\d+)\. (.+)$/.exec(label);
+    const chapter = /^((?:[PC]|[IVX]+-\d+)\.) (.+)$/.exec(label);
     const text = chapter ? `<span class="chapter-no">${chapter[1]}</span><span>${escape(chapter[2])}</span>` : escape(label);
     return `<a href="#${id}">${text}</a>`;
   };

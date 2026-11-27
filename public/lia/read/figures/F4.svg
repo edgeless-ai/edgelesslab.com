@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1008pt" height="576pt" viewBox="0 0 1008 576" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-27T09:49:49.616822</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.3, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 576 
+L 1008 576 
+L 1008 0 
+L 0 0 
+z
+" style="fill: #faf8f2"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 369.432 406.3392 
+C 447.945272 406.3392 523.253413 392.08592 578.77068 366.71848 
+C 634.287947 341.35104 665.4816 306.940578 665.4816 271.0656 
+C 665.4816 235.190622 634.287947 200.78016 578.77068 175.41272 
+C 523.253413 150.04528 447.945272 135.792 369.432 135.792 
+C 290.918728 135.792 215.610587 150.04528 160.09332 175.41272 
+C 104.576053 200.78016 73.3824 235.190622 73.3824 271.0656 
+C 73.3824 306.940578 104.576053 341.35104 160.09332 366.71848 
+C 215.610587 392.08592 290.918728 406.3392 369.432 406.3392 
+z
+" clip-path="url(#p495541c483)" style="fill: #d6e9e3; stroke: #146b68; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 674.4528 406.3392 
+C 744.638906 406.3392 811.959821 392.08592 861.588892 366.71848 
+C 911.217964 341.35104 939.1032 306.940578 939.1032 271.0656 
+C 939.1032 235.190622 911.217964 200.78016 861.588892 175.41272 
+C 811.959821 150.04528 744.638906 135.792 674.4528 135.792 
+C 604.266694 135.792 536.945779 150.04528 487.316708 175.41272 
+C 437.687636 200.78016 409.8024 235.190622 409.8024 271.0656 
+C 409.8024 306.940578 437.687636 341.35104 487.316708 366.71848 
+C 536.945779 392.08592 604.266694 406.3392 674.4528 406.3392 
+z
+" clip-path="url(#p495541c483)" style="fill: #e3e5e6; stroke: #182b38; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 369.432 406.3392 
+C 447.945272 406.3392 523.253413 392.08592 578.77068 366.71848 
+C 634.287947 341.35104 665.4816 306.940578 665.4816 271.0656 
+C 665.4816 235.190622 634.287947 200.78016 578.77068 175.41272 
+C 523.253413 150.04528 447.945272 135.792 369.432 135.792 
+C 290.918728 135.792 215.610587 150.04528 160.09332 175.41272 
+C 104.576053 200.78016 73.3824 235.190622 73.3824 271.0656 
+C 73.3824 306.940578 104.576053 341.35104 160.09332 366.71848 
+C 215.610587 392.08592 290.918728 406.3392 369.432 406.3392 
+L 369.432 406.3392 
+z
+" clip-path="url(#p495541c483)" style="fill: none; stroke: #146b68; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 18px; font-family: 'DejaVu Sans'; fill: #182b38" transform="translate(100.296 239.065987)">L(C, t, M)</text>
+    <text style="font-weight: 700; font-size: 18px; font-family: 'DejaVu Sans'; fill: #182b38" transform="translate(100.296 259.22205)">Candidate space</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; fill: #182b38" transform="translate(459.144 245.047725)">Overlap</text>
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; fill: #182b38" transform="translate(459.144 258.4851)">Already explicit</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 14px; font-family: 'DejaVu Sans'; fill: #182b38" transform="translate(701.3664 246.567412)">E(t)</text>
+    <text style="font-size: 14px; font-family: 'DejaVu Sans'; fill: #182b38" transform="translate(701.3664 262.24435)">Explicit record</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #182b38" x="100.296" y="431.268525" transform="rotate(-0 100.296 431.268525)">H(C(t), M): claims recoverable or constructible with the specified methods</text>
+   </g>
+  </g>
+  <g id="text_5">
+   <text style="font-weight: 700; font-size: 23px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #182b38" x="55.44" y="46.276406" transform="rotate(-0 55.44 46.276406)">The discovery boundary</text>
+  </g>
+  <g id="text_6">
+   <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #586873" x="55.44" y="78.238125" transform="rotate(-0 55.44 78.238125)">L(C, t, M) = H(C(t), M) \ E(t)</text>
+  </g>
+  <g id="text_7">
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #182b38" transform="translate(55.44 506.598281)">Conceptual model, not a measured inventory. The diagram does not assume that all explicit claims are recoverable. Membership</text>
+   <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #182b38" transform="translate(55.44 520.587531)">depends on corpus, time, methods, and reference record; candidate status is not validation.</text>
+  </g>
+  <g id="text_8">
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #586873" x="55.44" y="555.84" transform="rotate(-0 55.44 555.84)">Sources: LIA §4  |  Internal draft</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p495541c483">
+   <rect x="55.44" y="109.44" width="897.12" height="351.36"/>
+  </clipPath>
+ </defs>
+</svg>

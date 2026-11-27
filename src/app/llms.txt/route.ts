@@ -79,7 +79,7 @@ export async function GET(): Promise<Response> {
 ## Field Notes (interactive, readable without JavaScript)
 
 - [Latent Information Archaeology](${SITE_URL}/lia/): a research program studying intersections between fields and useful, defensible connections across bodies of knowledge; demos are contextual, not empirical validation
-${researchFieldNotes.map(note => `- [${note.title}](${SITE_URL}${note.href}) (${note.date}, methodological field note): ${note.description}`).join("\n")}
+${researchFieldNotes.map(note => `- [${note.title}](${SITE_URL}${note.href}) (${note.date}, ${note.kind}): ${note.description}`).join("\n")}
 
 ${fieldNotes.map(fieldNoteLine).join("\n")}
 

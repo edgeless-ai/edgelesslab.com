@@ -13,9 +13,14 @@ export function findLiaLongformSource() {
     return source;
   }
 
+  const vendoredFirst = resolve("content/lia/lia-longform-v2.md");
+  if (statSync(vendoredFirst, { throwIfNoEntry: false })?.isFile()) return vendoredFirst;
+
   for (let workspace = resolve(); dirname(workspace) !== workspace; workspace = dirname(workspace)) {
     const source = join(workspace, manuscript);
     if (statSync(source, { throwIfNoEntry: false })?.isFile()) return source;
   }
+  const vendored = resolve("content/lia/lia-longform-v2.md");
+  if (statSync(vendored, { throwIfNoEntry: false })?.isFile()) return vendored;
   return undefined;
 }

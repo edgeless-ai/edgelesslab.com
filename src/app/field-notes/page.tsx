@@ -110,7 +110,7 @@ export default function FieldNotesPage() {
           <section aria-label="Research field notes" className="border-t px-6 py-10 sm:px-9" style={{ borderColor: "var(--ink)" }}>
             <p className="lab-metadata mb-5" style={{ color: "var(--malachite)" }}>Research field notes / {researchFieldNotes.length}</p>
             {researchFieldNotes.map((note) => (
-              <article key={note.href} data-editorial-note>
+              <article key={note.href} data-editorial-note className="[&+&]:mt-8 [&+&]:border-t [&+&]:border-[var(--paper-rule)] [&+&]:pt-8">
                 <h2 className="font-editorial text-3xl sm:text-5xl"><a href={note.href} className="underline underline-offset-4">{note.title}</a></h2>
                 <p className="mt-4 max-w-2xl text-base leading-7">{note.description}</p>
                 <p className="mt-3 font-mono text-xs">{note.section} / {note.date}</p>

@@ -1,0 +1,1056 @@
+{
+  "status": "internal draft; complete static pack",
+  "figures": {
+    "F1": {
+      "chapter": "I-02",
+      "alt": "A conceptual flow links recorded artifacts, unmade connections, and explicit claims.",
+      "caption": "Conceptual diagram, not a measured ratio. The sizes do not estimate how much remains unrecognized. The economic thesis is a research proposition, not an established universal law.",
+      "source": "LIA §2; Framing §6; RA01",
+      "files": [
+        "F1.svg",
+        "F1.png"
+      ]
+    },
+    "F2": {
+      "chapter": "II-02",
+      "alt": "Four approved layers: stated and indexed; stated but scattered; unstated connection; unstated implication. Google works largely in layer one, deep research agents in the first two, and LIA in the third and fourth.",
+      "caption": "Definitions and placement reproduce the decided outline verbatim. Google largely operates in the first layer. Layers measure distance from being stated, not evidence strength or validation. Schematic areas are not measured quantities.",
+      "source": "OUTLINE.md decided box; Framing §1; David Murray",
+      "files": [
+        "F2.svg",
+        "F2.png"
+      ]
+    },
+    "F3": {
+      "chapter": "II-01",
+      "alt": "Five non-exclusive latency classes with one source-ledger example each.",
+      "caption": "Definitions reproduce the founding text. Examples illustrate a class, not an exclusive taxonomy; the finance warning is an oversight case, not proof of previously unknown fraud.",
+      "source": "LIA §3; RB-018; RB-016; RB-004; RB-023; RB-006",
+      "files": [
+        "F3.svg",
+        "F3.png"
+      ]
+    },
+    "F4": {
+      "chapter": "II-03",
+      "alt": "Overlapping sets show recoverable candidates minus the explicit record; the left-only region is L.",
+      "caption": "Conceptual model, not a measured inventory. The diagram does not assume that all explicit claims are recoverable. Membership depends on corpus, time, methods, and reference record; candidate status is not validation.",
+      "source": "LIA §4",
+      "files": [
+        "F4.svg",
+        "F4.png"
+      ]
+    },
+    "F5": {
+      "chapter": "III-01",
+      "alt": "Fish oil connects through blood viscosity and platelets to Raynaud’s. Hypothesis 1986; trial 1989.",
+      "caption": "The antecedent literatures are not dated here. RA05–RA06 support the reconstruction; RA02 is only a bibliographic record. The trial reported benefit for primary, not secondary, Raynaud’s.",
+      "source": "RA02; RA04; RA05; RA06; RB-016",
+      "files": [
+        "F5.svg",
+        "F5.png"
+      ]
+    },
+    "F10": {
+      "chapter": "III-02 → III-04",
+      "alt": "A dated precedent timeline links Swanson, Arrowsmith/LBD, Tshitoyan, and Co-Scientist.",
+      "caption": "Dates are publication years from RA citations. Arrowsmith is one LBD milestone, not the origin of the whole field. Materials ranking is retrospective; the Co-Scientist entry is a preprint, not clinical validation.",
+      "source": "RA01; RA05; RA09; RA12",
+      "files": [
+        "F10.svg",
+        "F10.png"
+      ]
+    },
+    "F6": {
+      "chapter": "III-10",
+      "alt": "A domain-by-class matrix lists every RB case, its ledger lag or an unknown marker, and weak-source flags.",
+      "caption": "Cells show RB suffix: calendar-year lag. ? = unknown, never zero; * = partly secondary evidence. A case can occupy several cells. Intervals have different endpoints and are not comparable discovery speeds. Use the interactive companion for anchors, qualifications, and sources.",
+      "source": "RB case ledger; all entries",
+      "files": [
+        "F6.svg",
+        "F6.png",
+        "F6.html"
+      ]
+    },
+    "F7": {
+      "chapter": "IV-03",
+      "alt": "The founding text’s eight method stages form a loop from boundary-setting through findings and rejected hypotheses.",
+      "caption": "Repeat with the enriched record. Publication is subject to rights, privacy, safety, and project authorization. Rejected and unresolved candidates remain part of the evidence record.",
+      "source": "LIA §7; David Murray, CC BY 4.0",
+      "files": [
+        "F7.svg",
+        "F7.png"
+      ]
+    },
+    "F11": {
+      "chapter": "IV-01",
+      "alt": "Six unscored rows ask about novelty, provenance, validity, falsifiability, utility, and temporal integrity.",
+      "caption": "Questions reproduce the framing. Record evidence and test outcomes separately. No composite score, thresholds, or case performance values are asserted.",
+      "source": "Framing §5; David Murray",
+      "files": [
+        "F11.svg",
+        "F11.png"
+      ]
+    }
+  },
+  "gated": {},
+  "input_sha256": {
+    "RA-sources.json": "226b57454ac8f161179562d585fc6beefde806bcb7a267e9679db85b64075b77",
+    "RB-cases.json": "0adea2fdd4cf89cad6b9ce2259c0acdfcc5946aa1346aa142f6a81abfa7255c5"
+  },
+  "values": [
+    {
+      "figure": "F5",
+      "source": "RB-016",
+      "field": "availability_year",
+      "value": 1986
+    },
+    {
+      "figure": "F5",
+      "source": "RB-016",
+      "field": "recognition_year",
+      "value": 1989
+    },
+    {
+      "figure": "F10",
+      "source": "RA01",
+      "field": "citation",
+      "value": "Swanson, D. R. (1986). Undiscovered Public Knowledge. The Library Quarterly 56(2), 103–118."
+    },
+    {
+      "figure": "F10",
+      "source": "RA05",
+      "field": "citation",
+      "value": "Smalheiser et al. (2006). Collaborative development of the Arrowsmith two node search interface designed for laboratory investigators."
+    },
+    {
+      "figure": "F10",
+      "source": "RA09",
+      "field": "citation",
+      "value": "Tshitoyan et al. (2019). Unsupervised word embeddings capture latent knowledge from materials science literature. Nature 571, 95–98."
+    },
+    {
+      "figure": "F10",
+      "source": "RA12",
+      "field": "citation",
+      "value": "Gottweis et al. (2025). Towards an AI co-scientist. arXiv:2502.18864v1."
+    },
+    {
+      "figure": "F6",
+      "source": "RB-003",
+      "field": "lag_years",
+      "value": 2
+    },
+    {
+      "figure": "F6",
+      "source": "RB-001",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-005",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-001",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-002",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-003",
+      "field": "lag_years",
+      "value": 2
+    },
+    {
+      "figure": "F6",
+      "source": "RB-004",
+      "field": "lag_years",
+      "value": 8
+    },
+    {
+      "figure": "F6",
+      "source": "RB-002",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-004",
+      "field": "lag_years",
+      "value": 8
+    },
+    {
+      "figure": "F6",
+      "source": "RB-005",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-007",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-009",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-007",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-009",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-006",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-008",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-006",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-008",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-010",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-011",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-012",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-010",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-011",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-012",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-015",
+      "field": "lag_years",
+      "value": 0
+    },
+    {
+      "figure": "F6",
+      "source": "RB-016",
+      "field": "lag_years",
+      "value": 3
+    },
+    {
+      "figure": "F6",
+      "source": "RB-013",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-014",
+      "field": "lag_years",
+      "value": 33
+    },
+    {
+      "figure": "F6",
+      "source": "RB-016",
+      "field": "lag_years",
+      "value": 3
+    },
+    {
+      "figure": "F6",
+      "source": "RB-013",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-014",
+      "field": "lag_years",
+      "value": 33
+    },
+    {
+      "figure": "F6",
+      "source": "RB-015",
+      "field": "lag_years",
+      "value": 0
+    },
+    {
+      "figure": "F6",
+      "source": "RB-017",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-018",
+      "field": "lag_years",
+      "value": 1
+    },
+    {
+      "figure": "F6",
+      "source": "RB-019",
+      "field": "lag_years",
+      "value": 105
+    },
+    {
+      "figure": "F6",
+      "source": "RB-020",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-017",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-020",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-019",
+      "field": "lag_years",
+      "value": 105
+    },
+    {
+      "figure": "F6",
+      "source": "RB-018",
+      "field": "lag_years",
+      "value": 1
+    },
+    {
+      "figure": "F6",
+      "source": "RB-021",
+      "field": "lag_years",
+      "value": 151
+    },
+    {
+      "figure": "F6",
+      "source": "RB-022",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-023",
+      "field": "lag_years",
+      "value": 30
+    },
+    {
+      "figure": "F6",
+      "source": "RB-024",
+      "field": "lag_years",
+      "value": 6
+    },
+    {
+      "figure": "F6",
+      "source": "RB-024",
+      "field": "lag_years",
+      "value": 6
+    },
+    {
+      "figure": "F6",
+      "source": "RB-021",
+      "field": "lag_years",
+      "value": 151
+    },
+    {
+      "figure": "F6",
+      "source": "RB-022",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-023",
+      "field": "lag_years",
+      "value": 30
+    },
+    {
+      "figure": "F6",
+      "source": "RB-026",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-027",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-025",
+      "field": "lag_years",
+      "value": 6
+    },
+    {
+      "figure": "F6",
+      "source": "RB-026",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-027",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-025",
+      "field": "lag_years",
+      "value": 6
+    },
+    {
+      "figure": "F6",
+      "source": "RB-028",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-029",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-030",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-031",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-028",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-030",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-031",
+      "field": "lag_years",
+      "value": null
+    },
+    {
+      "figure": "F6",
+      "source": "RB-029",
+      "field": "lag_years",
+      "value": null
+    }
+  ],
+  "case_map": [
+    {
+      "id": "RB-001",
+      "title": "Customer–supplier links and delayed incorporation of customer news",
+      "domain": "Finance",
+      "latency_class": [
+        "Relational",
+        "Inferential"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The sample window and paper date do not identify when the particular connection first became available or recognized.",
+      "validation": "Retrospective observational return-predictability study with factor and other controls; the authors report supplier returns predictably followed customer returns. This is not prospective validation, causal proof, or evidence of present-day net trading profits. Source text and receipt have been inspected; independent replication not established.",
+      "weak_source": false,
+      "case_type": "retrospective prediction"
+    },
+    {
+      "id": "RB-002",
+      "title": "Distinguishing routine from opportunistic insider trades",
+      "domain": "Finance",
+      "latency_class": [
+        "Inferential",
+        "Contextual"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The sample window and paper date do not identify when the particular connection first became available or recognized.",
+      "validation": "In this retrospective working-paper analysis the authors report that opportunistic insider trading predicts subsequent abnormal returns and news more than routine trading. The classification is a noisy proxy, not proof of illegal trading, and is not an independently replicated prospective test.",
+      "weak_source": false,
+      "case_type": "retrospective prediction"
+    },
+    {
+      "id": "RB-003",
+      "title": "Enron board warnings in pre-collapse records",
+      "domain": "Finance",
+      "latency_class": [
+        "Archival",
+        "Inferential"
+      ],
+      "lag_years": 2,
+      "availability_year": 1999,
+      "recognition_year": 2001,
+      "lag_explanation": "Two calendar years from documented board warning to collapse; the warning was not necessarily public information.",
+      "validation": "A Senate committee report documents warnings and oversight failure. This does not imply that every investor had access to board materials in 1999 or that collapse was mechanically predictable.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-004",
+      "title": "Madoff return and options-volume red flags",
+      "domain": "Finance",
+      "latency_class": [
+        "Inferential",
+        "Contextual"
+      ],
+      "lag_years": 8,
+      "availability_year": 2000,
+      "recognition_year": 2008,
+      "lag_explanation": "Eight calendar years from the first reported warning to public exposure; this is an oversight interval, not a discovery interval for all observers.",
+      "validation": "Congressional oversight records show substantive complaints and anomalous return claims; the 2008 exposure confirms fraud, but no single public statistic alone proved it.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-005",
+      "title": "Parking-lot imagery joined to retailer earnings",
+      "domain": "Finance",
+      "latency_class": [
+        "Relational",
+        "Contextual"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "Commercial availability and later publication do not establish when investors first recognized or used the signal.",
+      "validation": "Published observational backtests report incremental prediction; trading costs, access costs and live deployment are separate questions.",
+      "weak_source": false,
+      "case_type": "retrospective prediction"
+    },
+    {
+      "id": "RB-006",
+      "title": "Thermoelectric candidates from pre-cutoff word embeddings",
+      "domain": "Materials",
+      "latency_class": [
+        "Representational",
+        "Inferential"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "A corpus cutoff and a retrospective publication year are not a single candidate’s availability-to-recognition interval.",
+      "validation": "Historical enrichment and computed-property checks support a retrospective ranking result; they do not establish experimental performance for every suggested compound.",
+      "weak_source": false,
+      "case_type": "retrospective prediction"
+    },
+    {
+      "id": "RB-007",
+      "title": "Synthesis recipes recovered from inorganic papers",
+      "domain": "Materials",
+      "latency_class": [
+        "Archival",
+        "Relational"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "The authors report a dataset of extracted entries and evaluate extraction quality; text extraction is not independent proof that a recipe will reproduce.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-008",
+      "title": "Phase diagrams reconstructed from materials text",
+      "domain": "Materials",
+      "latency_class": [
+        "Representational",
+        "Inferential"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "The paper reports reconstruction of known phase diagrams and prediction for compounds absent from its database; this is computational validation, not new physical measurement of all predictions.",
+      "weak_source": false,
+      "case_type": "retrospective prediction"
+    },
+    {
+      "id": "RB-009",
+      "title": "MOF synthesis conditions mined into DigiMOF",
+      "domain": "Materials",
+      "latency_class": [
+        "Archival",
+        "Relational"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "The publication reports a large mined dataset; extraction and linkage error remain material, and no blanket synthesis-success claim follows.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-010",
+      "title": "Lithography and CAD combined in stereolithography patent",
+      "domain": "Patents",
+      "latency_class": [
+        "Relational",
+        "Contextual"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "The granted patent documents the proposed apparatus and claims; patent grant is not proof of broad commercial performance or of unrecognized prior art before filing.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-011",
+      "title": "Laser sintering and computer-controlled layer fabrication",
+      "domain": "Patents",
+      "latency_class": [
+        "Relational",
+        "Contextual"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "The patent establishes a disclosed cross-field engineering design, not measured reliability of later machines or a lag from expiration to adoption.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-012",
+      "title": "Microfabrication techniques applied to drug-delivery needles",
+      "domain": "Patents",
+      "latency_class": [
+        "Relational",
+        "Contextual"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "Patent claims show the engineering proposal; clinical efficacy, manufacturing economics and patent validity require separate evidence.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-013",
+      "title": "Sildenafil moved from angina studies to erectile dysfunction",
+      "domain": "Pharma",
+      "latency_class": [
+        "Contextual",
+        "Inferential"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "The historical review documents the pivot; efficacy rests on subsequent clinical trials and approval, not on the early anecdote alone.",
+      "weak_source": true,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-014",
+      "title": "Thalidomide response in erythema nodosum leprosum",
+      "domain": "Pharma",
+      "latency_class": [
+        "Contextual",
+        "Inferential"
+      ],
+      "lag_years": 33,
+      "availability_year": 1965,
+      "recognition_year": 1998,
+      "lag_explanation": "Thirty-three calendar years from reported ENL response to US regulatory approval; the therapeutic connection was already recognized in 1965.",
+      "validation": "A published regulatory history records 1998 FDA approval based on historical data. This is a regulatory interval, not an efficacy estimate and not a general safety endorsement.",
+      "weak_source": true,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-015",
+      "title": "Baricitinib knowledge-graph hypothesis and ACTT-2",
+      "domain": "Pharma",
+      "latency_class": [
+        "Relational",
+        "Contextual"
+      ],
+      "lag_years": 0,
+      "availability_year": 2020,
+      "recognition_year": 2020,
+      "lag_explanation": "Both candidate and trial publication occurred in 2020; zero calendar-year difference masks an approximately ten-month interval.",
+      "validation": "ACTT-2 reported median recovery of 7 versus 8 days for combination versus remdesivir control. The trial tests that regimen and population, not every mechanism proposed in the original hypothesis.",
+      "weak_source": false,
+      "case_type": "prospective confirmation"
+    },
+    {
+      "id": "RB-016",
+      "title": "Fish-oil and Raynaud literature joined before a clinical trial",
+      "domain": "Pharma",
+      "latency_class": [
+        "Relational",
+        "Inferential"
+      ],
+      "lag_years": 3,
+      "availability_year": 1986,
+      "recognition_year": 1989,
+      "lag_explanation": "Three calendar years from explicit hypothesis to the first reported trial, a validation interval; pre-1986 antecedent literature availability is not dated here.",
+      "validation": "Swanson’s later report notes an independent favorable trial. The trial is a limited clinical test, not a universal recommendation for primary and secondary Raynaud’s.",
+      "weak_source": false,
+      "case_type": "prospective confirmation"
+    },
+    {
+      "id": "RB-017",
+      "title": "Venice Time Machine joins dispersed archival media",
+      "domain": "Historical reconstruction",
+      "latency_class": [
+        "Archival",
+        "Relational"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "EPFL’s project chronology documents data and demonstrations; digitization alone does not validate every inferred historical network or event.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-018",
+      "title": "Vesuvius Challenge recovers text from sealed scroll scans",
+      "domain": "Historical reconstruction",
+      "latency_class": [
+        "Archival",
+        "Representational"
+      ],
+      "lag_years": 1,
+      "availability_year": 2023,
+      "recognition_year": 2024,
+      "lag_explanation": "One calendar year from challenge data release to prize announcement; the ancient inscription age is not a discovery lag.",
+      "validation": "The organizers report papyrologist review of recovered columns and code audit. The result covers passages from a scroll, not the whole library.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-019",
+      "title": "Antikythera gears reconstructed with X-ray tomography",
+      "domain": "Historical reconstruction",
+      "latency_class": [
+        "Archival",
+        "Inferential"
+      ],
+      "lag_years": 105,
+      "availability_year": 1901,
+      "recognition_year": 2006,
+      "lag_explanation": "105 calendar years from recovery to the 2006 CT-based reconstruction, not to first recognition of the mechanism.",
+      "validation": "The 2006 team reported gear-function reconstruction and additional deciphered inscriptions. Earlier scholars had already recognized an astronomical mechanism; this interval measures a specific new reconstruction.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-020",
+      "title": "Zenon archive reassembled across collections",
+      "domain": "Historical reconstruction",
+      "latency_class": [
+        "Archival",
+        "Relational"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "The catalog documents the dispersed archive and 1980 guide; a complete network reconstruction is not demonstrated by this source alone.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-021",
+      "title": "Heat-equation methods transferred to option pricing",
+      "domain": "Cross-field transfers",
+      "latency_class": [
+        "Relational",
+        "Contextual"
+      ],
+      "lag_years": 151,
+      "availability_year": 1822,
+      "recognition_year": 1973,
+      "lag_explanation": "151 calendar years from Fourier’s 1822 heat treatise to the 1973 option-pricing paper; this is a method-transfer chronology, not evidence the formula was knowable in 1822.",
+      "validation": "The mapping is an exact mathematical reduction under the model assumptions; it does not validate frictionless-market assumptions or trading profitability.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-022",
+      "title": "Citation ranking adapted to web hyperlinks",
+      "domain": "Cross-field transfers",
+      "latency_class": [
+        "Relational",
+        "Contextual"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The preexisting citation-analysis corpus has no single defensible availability year; a direct Leontief lineage is not claimed.",
+      "validation": "The primary paper documents the comparison and ranking algorithm. It does not establish a direct historical derivation from Leontief input-output models.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-023",
+      "title": "House-allocation cycles adapted to kidney exchange",
+      "domain": "Cross-field transfers",
+      "latency_class": [
+        "Relational",
+        "Contextual"
+      ],
+      "lag_years": 30,
+      "availability_year": 1974,
+      "recognition_year": 2004,
+      "lag_explanation": "Thirty calendar years from the cited 1974 house-allocation model to the 2004 kidney-exchange formulation; not a delay in performing transplants.",
+      "validation": "The paper contains theoretical analysis and simulations; later clinical programs are separate empirical validation. Pairwise medical feasibility constraints prevent a literal house-market transfer.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-024",
+      "title": "Fourier separation generalized beyond heat",
+      "domain": "Cross-field transfers",
+      "latency_class": [
+        "Relational",
+        "Inferential"
+      ],
+      "lag_years": 6,
+      "availability_year": 1822,
+      "recognition_year": 1828,
+      "lag_explanation": "Six calendar years from Fourier’s 1822 treatise to Ostrogradsky’s 1828 presentation; publication lag would instead end in 1831.",
+      "validation": "A scholarly history identifies a 1828 presentation and 1831 publication; the six-year interval uses presentation, and does not establish exclusivity of the insight.",
+      "weak_source": true,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-025",
+      "title": "Google Flu Trends search signal failed out of sample",
+      "domain": "Negative connections",
+      "latency_class": [
+        "Inferential",
+        "Representational"
+      ],
+      "lag_years": 6,
+      "availability_year": 2008,
+      "recognition_year": 2014,
+      "lag_explanation": "Six calendar years from original model publication to the 2014 critique; errors emerged within that interval, so this is not a precise failure-onset lag.",
+      "validation": "The primary critique reported substantial overestimation and showed how a high-dimensional query proxy can fail as public behavior changes.",
+      "weak_source": false,
+      "case_type": "failed hypothesis"
+    },
+    {
+      "id": "RB-026",
+      "title": "Constraint-distillation cross-field ratio law closed at stage zero",
+      "domain": "Negative connections",
+      "latency_class": [
+        "Relational",
+        "Inferential"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "Internal verdict killed novelty and specification; no corpus intervention or mutual-information estimate was run. This preserves a rejected candidate, not a production-model premise.",
+      "weak_source": false,
+      "case_type": "failed hypothesis"
+    },
+    {
+      "id": "RB-027",
+      "title": "Historical-survival weighting analogy closed at stage zero",
+      "domain": "Negative connections",
+      "latency_class": [
+        "Relational",
+        "Inferential"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "Internal verdict killed novelty and specification and deferred corpus work. No historic inclusion probabilities or empirical feature distribution were recovered.",
+      "weak_source": false,
+      "case_type": "failed hypothesis"
+    },
+    {
+      "id": "RB-028",
+      "title": "Sleeping-beauty coefficient measures delayed recognition",
+      "domain": "Economics of delay",
+      "latency_class": [
+        "Archival",
+        "Inferential"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "The study reports a continuum of delayed citation recognition; citations are an attention proxy, not proof of when usefulness or truth became known.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-029",
+      "title": "Patent citations can awaken dormant scientific papers",
+      "domain": "Economics of delay",
+      "latency_class": [
+        "Relational",
+        "Contextual"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "The paper measures aggregate lags and examples; a patent citation is use or attention evidence, not proof of commercial value.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-030",
+      "title": "Unusual cross-context combinations and later impact",
+      "domain": "Economics of delay",
+      "latency_class": [
+        "Relational",
+        "Inferential"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "The reported association with top-decile impact is observational and does not prove that novelty caused citation success or that every surprising bridge is useful.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    },
+    {
+      "id": "RB-031",
+      "title": "Cost shifts between connecting and synthesizing inventions",
+      "domain": "Economics of delay",
+      "latency_class": [
+        "Relational",
+        "Inferential"
+      ],
+      "lag_years": null,
+      "availability_year": null,
+      "recognition_year": null,
+      "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
+      "validation": "The article gives a mechanism for varying search and synthesis costs, not a universal estimate of years saved by LIA.",
+      "weak_source": false,
+      "case_type": "reconstruction"
+    }
+  ],
+  "layers": [
+    {
+      "layer": "Layer 1",
+      "name": "Stated and indexed",
+      "definition": "A claim that one artifact states outright, so a single lookup can return it.",
+      "placement": "Search engines; deep research agents."
+    },
+    {
+      "layer": "Layer 2",
+      "name": "Stated but scattered",
+      "definition": "A claim that no single artifact states, but whose parts are all written down across several artifacts, vocabularies or formats, so answering a question means collecting and assembling them.",
+      "placement": "Deep research agents."
+    },
+    {
+      "layer": "Layer 3",
+      "name": "Unstated connection",
+      "definition": "A relationship between artifacts, or encoded in a model trained on them, that no record states. Each side is on the record, the link between them is not, and the finding is the link itself: that A bears on B.",
+      "placement": "LIA."
+    },
+    {
+      "layer": "Layer 4",
+      "name": "Unstated implication",
+      "definition": "A claim, hypothesis, opportunity or question that goes beyond the link, which no artifact contains and which follows only once such connections are made. This includes questions nobody has asked.",
+      "placement": "LIA."
+    }
+  ],
+  "output_sha256": {
+    "F3.svg": "a8ccb70760bc98f00822a8a4e3a97c0532c7c1008d291fd3ca1e865585550e32",
+    "F2.svg": "6fb999ca5fe73788a1a732f6b2590fc5609a7f43bcfa3cda4f6ee70068859379",
+    "F1.svg": "ee18b7e77c7109f6570deb86c28c08006b4720ae06eb596dc2ea8753dbb7aa60",
+    "F5.svg": "db77270b75656ed1d3b7b644212e8628302e8ee5790d13423f0f1127063e2abe",
+    "F6.html": "eeda1c3eb0fef384f3827195e1c24b9efc3af5e7c935547ae27e37ba3d1d1014",
+    "F4.svg": "59025d9e530b692a1673b4b40221ff3feb0e475f12a534f9ae167323af26a585",
+    "F6.svg": "87eff3376aa173925d88f4774e023fb444bc61a111265947a04bc12ddb8ed0d0",
+    "F7.svg": "0553c0489ebf3a12d82cb7d0900f289ea1fbce2f35827a97c67edd2e699f8ba0",
+    "F7.png": "8bee7149d34840feaf693c9d7c6a5f0e03303ca80ba4c6cc0da290e3acf14477",
+    "F6.png": "ffeb10a0de58abcff3560e632d9a351ae79ab8e4d95eae934a26180f4802a7ad",
+    "F4.png": "c8d356bb7b920b3ea8428f9c8944b6cd2b7da5a74b8539798051fb6542aa47bf",
+    "F5.png": "072b6b515aec973e38f52fa79e7369b73336b32c1718ea0343e618f24581e2dd",
+    "F1.png": "f561adb0b91e68bad5018e5e85018275284194e06303f3a824667d99318c36b6",
+    "F2.png": "94afb4dac9e15ee49d2077728f64ff1b2fa1cebc3cc2b0bb7010e62f2db442fa",
+    "F3.png": "536f9f65ec826b24f331a3cc89c1bbd85bceff217f825bf4ffccb9a02e5e0485",
+    "F10.png": "35939fdaaa55eaf2c7ad0e18ceb13d7debddedf5a31dd0aac9873d49d39a4af5",
+    "F11.png": "3a8d9732e7786e44a93ec327748b41642ecc48883a15bb1e6a7aeb73d107f5de",
+    "F11.svg": "ed6d247e03a406c1f0154d2b63e8493b17da094219161cf87b1f889865f2abb9",
+    "F10.svg": "62e25379bcccd7c8ac33220f7f0b33edbd4404f99e7c6d0b801db9a27bf0a5b1"
+  }
+}

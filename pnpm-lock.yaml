@@ -66,6 +66,9 @@ importers:
       eslint-config-next:
         specifier: 16.3.0
         version: 16.3.0(@typescript-eslint/parser@8.62.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
+      markdown-it:
+        specifier: 14.3.0
+        version: 14.3.0
       pagefind:
         specifier: ^1.5.2
         version: 1.5.2

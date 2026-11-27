@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-preserve-inline-styles>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{title}} | Edgeless Lab</title>
+  <meta name="description" content="The long-form expansion of the founding text by David Murray, with case studies, an excavation method, and a research agenda.">
+  <link rel="canonical" href="https://edgelesslab.com/lia/read/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{title}}">
+  <meta property="og:description" content="The long-form expansion of the founding text by David Murray, with case studies, an excavation method, and a research agenda.">
+  <meta property="og:url" content="https://edgelesslab.com/lia/read/">
+  <meta property="og:image" content="https://edgelesslab.com/lia/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://edgelesslab.com/lia/og-image.png">
+  <link rel="stylesheet" href="reader.css">
+  <script src="reader.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#prologue">Skip to the long read</a>
+  <header class="masthead" data-pagefind-ignore>
+    <nav class="shell" aria-label="Main navigation">
+      <a class="wordmark" href="/">Edgeless Lab</a>
+      <ul>
+        <li><a href="/field-notes/">Field Notes</a></li>
+        <li><a href="/lia/">LIA index</a></li>
+        <li><a href="https://shop.edgelesslab.com">Shop</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main class="shell">
+    <header class="hero">
+      <p class="edition">Long-form field note</p>
+      <h1>{{displayTitle}}</h1>
+      <div class="hero-meta">
+        <div>
+          <p class="deck">{{subtitle}}</p>
+          <p class="byline"><a href="https://github.com/thedavidmurray/latent-information-archaeology">Originated by David Murray · CC BY 4.0</a></p>
+        </div>
+        <div class="reading-time">
+          <time datetime="PT{{minutes}}M">{{readingTime}}</time>
+          <span>Main text at 240 wpm</span>
+        </div>
+      </div>
+    </header>
+    <div class="reader-layout">
+      <aside class="toc-rail" data-pagefind-ignore>
+        <details class="toc" open>
+          <summary>Contents</summary>
+          <div class="toc-title" aria-hidden="true">Contents</div>
+          <nav aria-label="Contents">{{contents}}</nav>
+        </details>
+      </aside>
+      <article class="reading" aria-label="{{title}}">
+        <div class="manuscript" data-reading-body data-reading-words="{{words}}">{{body}}</div>
+        <section class="endnotes" id="endnotes" aria-labelledby="endnotes-title" tabindex="-1">
+          <h2 id="endnotes-title">Endnotes</h2>
+          <ol>{{endnotes}}</ol>
+        </section>
+        <section class="appendix" id="appendix-a" aria-labelledby="appendix-title" tabindex="-1">
+          <h2 id="appendix-title">{{appendixTitle}}</h2>
+          {{appendix}}
+        </section>
+      </article>
+    </div>
+  </main>
+  <footer class="footer" data-pagefind-ignore>
+    <div class="shell">
+      <a class="wordmark" href="/">Edgeless Lab</a>
+      <nav aria-label="Footer"><a href="/lia/">LIA index</a><a href="/field-notes/">Field Notes</a></nav>
+    </div>
+  </footer>
+</body>
+</html>

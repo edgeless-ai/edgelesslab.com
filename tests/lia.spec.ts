@@ -63,9 +63,14 @@ test('founding text navigation, attribution and complete source prose', async ({
   await page.locator('[data-lia-index] a[href="/lia/founding-text/"]').click();
   await expect(page).toHaveURL(/\/lia\/founding-text\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Latent Information Archaeology (LIA)');
-  await expect(page.getByText('Originated by David Murray', { exact: true })).toBeVisible();
+  // The page carries the license and source link only; it does not talk about the author.
   await expect(page.getByRole('link', { name: 'CC BY 4.0', exact: true })).toHaveAttribute('href', 'https://creativecommons.org/licenses/by/4.0/');
-  await expect(page.getByRole('link', { name: 'Canonical version on GitHub' })).toHaveAttribute('href', 'https://github.com/thedavidmurray/latent-information-archaeology/blob/main/LIA.md');
+  await expect(page.getByRole('link', { name: 'Source on GitHub', exact: true })).toHaveAttribute('href', 'https://github.com/thedavidmurray/latent-information-archaeology');
+  for (const route of ['/lia/', '/lia/founding-text/', '/lia/read/']) {
+    await page.goto(route);
+    expect(await page.locator('body').innerText()).not.toMatch(/Murray|Originated by/);
+  }
+  await page.goto('/lia/founding-text/');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://edgelesslab.com/lia/founding-text/');
   const source = readFileSync('content/lia/LIA.md', 'utf8');
   expect(await (await request.get('/lia/founding-text/LIA.md')).text()).toBe(source);

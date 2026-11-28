@@ -14,6 +14,11 @@
   <meta property="og:image" content="https://edgelesslab.com/lia/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://edgelesslab.com/lia/og-image.png">
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=boska@300,301,400,401,500,501,700,701&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap">
   <link rel="stylesheet" href="reader.css">
   <script src="reader.js" defer></script>
 </head>
@@ -21,7 +26,7 @@
   <a class="skip" href="#prologue">Skip to the long read</a>
   <header class="masthead" data-pagefind-ignore>
     <nav class="shell" aria-label="Main navigation">
-      <a class="wordmark" href="/">Edgeless Lab</a>
+      <a class="wordmark" href="/">Edgeless Lab<span>/ Latent Information Archaeology</span></a>
       <ul>
         <li><a href="/field-notes/">Field Notes</a></li>
         <li><a href="/lia/">LIA index</a></li>
@@ -29,22 +34,23 @@
       </ul>
     </nav>
   </header>
-  <main class="shell">
-    <header class="hero">
-      <p class="edition">Long-form field note</p>
-      <h1>{{displayTitle}}</h1>
-      <div class="hero-meta">
-        <div>
-          <p class="deck">{{subtitle}}</p>
-          <p class="byline"><a href="https://github.com/thedavidmurray/latent-information-archaeology">Originated by David Murray · CC BY 4.0</a></p>
-        </div>
-        <div class="reading-time">
-          <time datetime="PT{{minutes}}M">{{readingTime}}</time>
-          <span>Main text at 240 wpm</span>
-        </div>
+  <main>
+    <header class="hero shell">
+      <div class="hero-title">
+        <h1>{{displayTitle}}</h1>
+        <p class="deck">{{subtitle}}</p>
       </div>
+      <dl class="filing">
+        <div><dt>Field note</dt><dd>Long form</dd></div>
+        <div><dt>Filed</dt><dd>27 November 2026</dd></div>
+        <div class="reading-time"><dt>Reading time</dt><dd><time datetime="PT{{minutes}}M">{{readingTime}}</time></dd></div>
+        <div><dt>Length</dt><dd>{{wordsLabel}} words, main text</dd></div>
+        <div class="byline"><dt>License</dt><dd><a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a></dd></div>
+        <div class="byline"><dt>Repository</dt><dd><a href="https://github.com/thedavidmurray/latent-information-archaeology">Source on GitHub</a></dd></div>
+      </dl>
     </header>
-    <div class="reader-layout">
+    {{heroPlate}}
+    <div class="reader-layout shell">
       <aside class="toc-rail" data-pagefind-ignore>
         <details class="toc" open>
           <summary>Contents</summary>
@@ -68,7 +74,7 @@
   <footer class="footer" data-pagefind-ignore>
     <div class="shell">
       <a class="wordmark" href="/">Edgeless Lab</a>
-      <nav aria-label="Footer"><a href="/lia/">LIA index</a><a href="/field-notes/">Field Notes</a></nav>
+      <nav aria-label="Footer"><a href="/lia/">LIA index</a><a href="/field-notes/">Field Notes</a><a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a><a href="https://github.com/thedavidmurray/latent-information-archaeology">Source on GitHub</a></nav>
     </div>
   </footer>
 </body>

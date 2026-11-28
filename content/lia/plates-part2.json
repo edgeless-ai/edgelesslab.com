@@ -1,0 +1,58 @@
+{
+  "plates": [
+    {
+      "id": "II-01-2",
+      "file": "II-01-2.webp",
+      "png": null,
+      "kind": "illustration",
+      "alt": "Engraving of three clamped glass frames holding papyrus fragments; a green thread joins a fragment in one frame to the torn edge of a fragment in another.",
+      "caption": "The Zenon papyri were sold in bundles, and fragments that fell off in handling were sold separately, so a letter and the piece broken from its edge could sit in different collections. Illustration; the dispersal is documented in Trismegistos, Archive of Zenon.",
+      "after_heading": "Relational"
+    },
+    {
+      "id": "II-03-2",
+      "file": "II-03-2.webp",
+      "png": null,
+      "kind": "illustration",
+      "alt": "Engraving of a long shelf of bound volumes; a brass divider with a green tag stands two thirds along, and every volume after it is wrapped in paper and tied with string.",
+      "caption": "A corpus with a date on it: each of the eighteen historical collections held only the abstracts published before a cutoff year, from 2001 to 2018. Illustration; the experiment is reported in Tshitoyan et al. 2019.",
+      "after_heading": "First consequence: corpus, boundary, method"
+    },
+    {
+      "id": "II-04-1",
+      "file": "II-04-1.svg",
+      "png": "II-04-1.png",
+      "kind": "infographic",
+      "alt": "Infographic titled 'A candidate comes out of its test smaller than it went in'. A top band lists five kinds of claim the record can yield, each with an example: a deductive consequence (Madoff's stated options trading could not have happened), marked as holding once its premises are granted; and four marked as able to be wrong: a statistical pattern (materials ranked near the word thermoelectric), an explanatory hypothesis (mobile genetic elements spreading via diverse phage tails), an analogy (the option-pricing equation as the heat-transfer equation) and a proposed transfer between domains (baricitinib for a viral pneumonia). Below, three lanes run from candidate to test to what the test supports, each ending in a ribbon that narrows from left to right. Baricitinib: a grid of 378 dots for the AAK1 inhibitors in the knowledge graph, 47 darkened for those with approval for medical use, 6 ringed for high affinity and 1 green for baricitinib; the ACTT-2 trial of 1,033 hospitalized adults on remdesivir with baricitinib or placebo; median recovery 7 versus 8 days overall and 10 versus 18 days in patients on high-flow oxygen or noninvasive ventilation; 28-day mortality 5.1 versus 7.8 percent with a hazard ratio of 0.65 and a 95 percent interval from 0.39 to 1.09 that includes 1, so deaths are left open. Fish oil: Swanson's 1986 link between two literatures with no articles in common; the 1989 double-blind trial of 32 patients with visits at the start and at 6, 12 and 17 weeks; in primary Raynaud's, 5 of 11 on fish oil and 1 of 9 on placebo could no longer have an attack induced, and median time before an attack rose from 31.3 to 46.5 minutes; benefit only in the primary form. Co-Scientist: KIRA6 showed an 18-fold separation between one leukaemia cell line and a control line, and fibrosis targets were tested in human hepatic organoids; clinical efficacy is not established. A closing quotation gives LIA's distinction between an archaeological candidate and a validated discovery.",
+      "caption": "Three candidates generated from existing information, each set beside the test it met and the narrower claim that test supports. Sources: Richardson et al. 2020; Kalil et al. 2020; DiGiacomo et al. 1989; Gottweis et al. 2026.",
+      "after_heading": "Candidate and validated discovery"
+    },
+    {
+      "id": "II-04-2",
+      "file": "II-04-2.webp",
+      "png": null,
+      "kind": "illustration",
+      "alt": "Engraving of a wooden tray of small glass vials, with six vials standing in a row in front of it; one of the six has a green cap.",
+      "caption": "Of the inhibitors of one enzyme with approval for medical use, six bound it with high affinity, and the letter gave a reason to try one of them. Illustration; source: Richardson et al. 2020.",
+      "after_heading": "Two activities"
+    },
+    {
+      "id": "II-05-1",
+      "file": "II-05-1.svg",
+      "png": "II-05-1.png",
+      "kind": "diagram",
+      "alt": "Diagram titled 'Novelty and validity are separate axes'. A two-by-two field sets novelty relative to a named record (already on some record, or absent from it) against validity (supported as far as tests reached, or not established). New and supported: CuGaTe2, in the top five of a ranking built from abstracts before 2009 and reported as a thermoelectric in 2012; fish oil for Raynaud's, absent from both literatures in 1986 and supported by a 1989 trial for the primary form. New and not established: HgZnTe and SmInO3 from the same 2009 list, not studied. Not new and true: the cf-PICI phage-tail hypothesis, a rediscovery relative to the laboratory that posed it; the 2006 Antikythera reconstruction, which added gear functions and inscriptions to an astronomical reading already reached. The fourth cell, not new and not established, is left empty with a note. A ledger at right shows the proposed record fields: novelty_check for the novelty axis with the status rediscovered; validation for the validity axis with candidate, corroborated and validated, plus rejected and unresolved; and available_at for the date of each piece of evidence. Three small timelines below ask which event each date marks: thalidomide, reported effective in ENL in 1965 and given FDA marketing approval for it on July 16, 1998, an interval of 33 years that measures regulation; the cf-PICI hypothesis, absent from the published literature but present in the laboratory on the day of the test; and a corpus cut at 1985 compared with a model whose training text runs past the 1986 hypothesis and the 1989 trial.",
+      "caption": "Whether a claim is new and whether it is true are recorded separately, each against a named record and a date. Sources: Tshitoyan et al. 2019; Gottweis et al. 2026; Freeth et al. 2006; Chen et al. 2012 and the FDA orphan drug listing.",
+      "after_heading": "Two axes"
+    },
+    {
+      "id": "II-05-2",
+      "file": "II-05-2.webp",
+      "png": null,
+      "kind": "illustration",
+      "alt": "Engraving-style plate in black ink and stipple on cream paper. A rod-shaped bacterial cell lies across the centre with four bacteriophages attached by tails of different kinds: one with a contractile sheath and bent tail fibres, two with long thin tails, and one with a very short tail. Several small tailless capsids tinted green float beside the cell.",
+      "caption": "The top-ranked hypothesis was that cf-PICIs interact with diverse phage tails to expand their host range, a result the laboratory that posed the question already held but had not published. Illustration; source: Gottweis et al. 2026.",
+      "after_heading": "A sentence about novelty"
+    }
+  ]
+}

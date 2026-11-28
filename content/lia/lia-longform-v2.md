@@ -2,9 +2,9 @@
 
 *The systematic excavation of what the world could already know.*
 
-A long-form expansion of the founding text by David Murray.
+Originated by David Murray · CC BY 4.0
 
-**Reading time:** approximately 245 minutes for the main text at 240 words per minute; endnotes and Appendix A are additional.
+**Reading time:** approximately 242 minutes for the main text at 240 words per minute; endnotes and Appendix A are additional.
 
 ## Contents
 
@@ -95,29 +95,27 @@ So two bodies of careful work could stand in the published record for years, eac
 
 #### The asymmetry
 
-The founding text of Latent Information Archaeology, written by David Murray and published under a CC BY 4.0 license, opens with a general statement of the situation that Swanson's case shows in miniature. Its preamble observes that papers, patents, observations, failures, and archives each enter a particular context and are usually interpreted within the discipline, institution, language, or moment that produced them, and that the relationships between them are not necessarily exhausted when their original purpose is fulfilled. Then it says:
+Swanson's case shows in miniature a general situation. Papers, patents, observations, failures, and archives each enter a particular context and are usually interpreted within the discipline, institution, language, or moment that produced them, and the relationships between them are not necessarily exhausted when their original purpose is fulfilled.
 
-> There is an asymmetry between what humanity has recorded and what humanity has recognized. [LIA Preamble]
+> There is an asymmetry between what humanity has recorded and what humanity has recognized.
 
-The next line names the subject of this piece:
-
-> **Latent Information Archaeology (LIA) is the proposed discipline of investigating that asymmetry.** [LIA Preamble]
+> **Latent Information Archaeology (LIA) is the proposed discipline of investigating that asymmetry.**
 
 The fish-oil reports and the Raynaud reports were recorded. That one bore on the other was not recognized. The asymmetry in that case was one sentence wide, and it took one reader to close it and one trial to test what he found.
 
-The preamble gives three forms the asymmetry can take. A finding can travel between fields, an experiment that failed can prove useful later, and facts established separately can imply a conclusion no one has drawn. [LIA Preamble] Swanson drew just such a conclusion by applying findings from cardiovascular research to a disorder of the hands.
+The asymmetry can take three forms. A finding can travel between fields, an experiment that failed can prove useful later, and facts established separately can imply a conclusion no one has drawn. Swanson drew just such a conclusion by applying findings from cardiovascular research to a disorder of the hands.
 
-The founding text is precise about how far its premise goes. "Its premise is not that all future discoveries have already been made. It is that some discoveries can be made from information already in existence, and that the systematic exploration of this possibility deserves to be a discipline in its own right." [LIA Preamble]
+LIA is precise about how far its premise goes. Its premise is not that all future discoveries have already been made. It is that some discoveries can be made from information already in existence, and that the systematic exploration of this possibility deserves to be a discipline in its own right.
 
 The word to hold on to is *some*. Swanson's hypothesis could be assembled from the library. Its test could not. Someone had to recruit 32 patients and fill the water baths. [^3] The claim is that there is a class of discoveries, and of candidates for discovery, for which the necessary observations have already been made and recorded, and that finding the members of that class is work that can be done on purpose, with method, and checked.
 
-Swanson saw the same thing from the side of the library. He wrote that the growth of scientific knowledge is usually thought of as wresting new discoveries from the physical world, and that the world of recorded knowledge is a second frontier, open-ended in the same way. He added that making discoveries from the literature was neither unprecedented nor unusual. His point was that the structure of unintended connections, and the process of finding them, deserved to be studied in their own right. [^1] The founding text takes that step, and takes it past the biomedical library to every kind of record.
+Swanson saw the same thing from the side of the library. He wrote that the growth of scientific knowledge is usually thought of as wresting new discoveries from the physical world, and that the world of recorded knowledge is a second frontier, open-ended in the same way. He added that making discoveries from the literature was neither unprecedented nor unusual. His point was that the structure of unintended connections, and the process of finding them, deserved to be studied in their own right. [^1] LIA takes that step, and takes it past the biomedical library to every kind of record.
 
 #### The route
 
-The rest of this piece follows the order of the founding text and is built from cases like the one above. Each chapter begins with something that happened and can be checked, and then gives the part of the founding text that the case bears on.
+The rest of this piece follows the order of LIA's own argument and is built from cases like the one above. Each chapter begins with something that happened and can be checked, and then gives the part of LIA that the case bears on.
 
-Part I is about the backlog: the definition of LIA, the central thesis and the reasons the founding text gives for it, the cost of making a connection, and the reason for the word *archaeology*. Part II is about what is latent. It covers the kinds of latency the founding text names, the boundary it draws around the space of possible discoveries, and its distinctions between a candidate and a validated discovery and between novelty and truth. Part III is the excavations, domain by domain, starting from the lineage that begins with Swanson and including connections that were proposed, checked, and rejected. Part IV is the discipline: the fundamental problem of telling a plausible inference from an actual discovery, the principles, the method, the excavation record, and the research agenda by which the whole proposal is to be judged.
+Part I is about the backlog: the definition of LIA, the central thesis and the reasons for it, the cost of making a connection, and the reason for the word *archaeology*. Part II is about what is latent. It covers the kinds of latency LIA names, the boundary it draws around the space of possible discoveries, and its distinctions between a candidate and a validated discovery and between novelty and truth. Part III is the excavations, domain by domain, starting from the lineage that begins with Swanson and including connections that were proposed, checked, and rejected. Part IV is the discipline: the fundamental problem of telling a plausible inference from an actual discovery, the principles, the method, the excavation record, and the research agenda by which the whole proposal is to be judged.
 
 In 1986 the evidence for a testable treatment was sitting in the published record in two places, and the record did not contain the sentence that joined them. The chapters that follow ask how much else is in that condition, how it can be found, and how a real finding of this kind is told from a persuasive mistake.
 
@@ -145,9 +143,9 @@ The ink was recorded in them as a signal that no one could yet separate from the
 
 #### The definition
 
-The founding text gives the canonical definition in one sentence.
+The definition is one sentence.
 
-> **Latent Information Archaeology is the systematic identification, reconstruction, and validation of previously unrecognized information, relationships, implications, and opportunities latent within existing informational artifacts.** [LIA §1]
+> **Latent Information Archaeology is the systematic identification, reconstruction, and validation of previously unrecognized information, relationships, implications, and opportunities latent within existing informational artifacts.**
 
 The sentence has one adverb, three nouns that name activities, four objects, and a location. Each is doing work.
 
@@ -161,11 +159,11 @@ The sentence has one adverb, three nouns that name activities, four objects, and
 
 The submissions were anonymized before the papyrologists read them. The papyrologists worked independently of one another. A separate technical team reran the code. The winning entry used three different model architectures whose results supported one another, along with other measures the organizers list against overfitting and hallucination. [^4] For Swanson's hypothesis the validation was a clinical trial, run by other people and published three years after the hypothesis. [^2]
 
-The three activities come in that order, and the definition does not allow the third to be dropped. A pattern that has been identified and reconstructed and never tested is not yet a finding. The founding text's own word for it, introduced in §5, is a candidate.
+The three activities come in that order, and the definition does not allow the third to be dropped. A pattern that has been identified and reconstructed and never tested is not yet a finding. LIA's word for it, taken up in Part II, is a candidate.
 
 #### Four things that can be latent
 
-The definition lists four objects: "information, relationships, implications, and opportunities." [LIA §1] They are different things, and the cases so far already separate the first three.
+The definition lists four objects: "information, relationships, implications, and opportunities." They are different things, and the cases so far already separate the first three.
 
 *Information* is the plainest. The columns of Greek in the scroll are information in the ordinary sense: text that someone wrote, that was preserved, and that could not be read. [^4] Nothing had to be inferred to get it. It had to be recovered.
 
@@ -173,7 +171,7 @@ A *relationship* is a connection between two artifacts, or between things record
 
 An *implication* is what follows once a relationship is seen. That fish oil might benefit patients with Raynaud's is not a relationship between papers. It is a claim about patients, and it is the product of the argument. Swanson was careful to call it a hypothesis that existed implicitly and had not been published explicitly. [^1]
 
-An *opportunity* is something that could now be done. The founding text spells this out at the end of the same section: LIA is concerned with what can be recovered, inferred, or reconstructed from the existing record, "including what can be identified as a promising candidate for subsequent empirical investigation." [LIA §1]
+An *opportunity* is something that could now be done. LIA is concerned with what can be recovered, inferred, or reconstructed from the existing record, including what can be identified as a promising candidate for subsequent empirical investigation.
 
 The trial that DiGiacomo and colleagues ran was an opportunity that the two literatures had contained since the later of them was published, and that became visible when the implication was written down. [^2] An opportunity found this way is still only a candidate. It tells someone where to look. It does not tell them what they will find.
 
@@ -181,15 +179,15 @@ The phrase "previously unrecognized" governs all four. It does not mean unrecord
 
 #### Informational artifacts
 
-The location in the definition is "within existing informational artifacts," and the founding text defines the term immediately.
+The location in the definition is "within existing informational artifacts," and the term has its own definition.
 
-> An informational artifact is any preserved representation of an observation, claim, process, decision, or event: a scientific paper, dataset, patent, photograph, recording, software repository, experimental notebook, model, or other record. [LIA §1]
+> An informational artifact is any preserved representation of an observation, claim, process, decision, or event: a scientific paper, dataset, patent, photograph, recording, software repository, experimental notebook, model, or other record.
 
 Two words in that sentence set the scope. *Preserved* means the thing has to exist now, in some form that can be consulted. A conversation nobody wrote down is not an artifact. *Representation* means the artifact stands for something else: an observation that was made, a claim someone advanced, a process that was followed, a decision that was taken, an event that occurred. It is a record of the world and not the world.
 
 The list that follows is deliberately wide. A scientific paper is the artifact in Swanson's case: a claim, the observations offered for it, and a list of the earlier papers it rests on. [^1] A dataset is the artifact in the scroll case. A CT scan is a preserved representation of an observation, namely how strongly each small volume of the scroll absorbed X-rays, and nothing in it is text until someone reads it as text. [^4]
 
-A patent preserves a claim and the date on which it was disclosed. A photograph and a recording preserve an event. A software repository preserves a process, together with the sequence of decisions that changed it. An experimental notebook preserves observations that may never have reached print, including the ones that did not work. A model, in the sense of a trained computational model, preserves structure taken from whatever it was trained on, and the founding text gives that case separate treatment and separate cautions in §3.
+A patent preserves a claim and the date on which it was disclosed. A photograph and a recording preserve an event. A software repository preserves a process, together with the sequence of decisions that changed it. An experimental notebook preserves observations that may never have reached print, including the ones that did not work. A model, in the sense of a trained computational model, preserves structure taken from whatever it was trained on, and LIA gives that case separate treatment and separate cautions, taken up in Part II.
 
 The list ends with "or other record," so it is open. What the items share is that each one was made for a purpose, and each one contains more than its purpose required.
 
@@ -197,9 +195,9 @@ The scans were made to show the internal structure of a scroll. They also held i
 
 #### A new understanding of what is already available
 
-The next sentence of the founding text states what kind of result LIA produces.
+LIA produces a particular kind of result.
 
-> An archaeological discovery is not necessarily new information about the physical world. It may instead be a new understanding of the information already available about that world. [LIA §1]
+> An archaeological discovery is not necessarily new information about the physical world. It may instead be a new understanding of the information already available about that world.
 
 The two cases sit at the two ends of what that sentence covers. In the scrolls, the discovery is close to plain recovery. The text was there, and after the work it could be read. Nobody's understanding of physics or of papyrus changed. What changed was that a record which had been opaque became legible, and the proof was that independent readers read the same letters. [^4]
 
@@ -209,17 +207,17 @@ Between those ends lie the cases the later parts of this piece take up, in which
 
 #### A discipline, not a tool
 
-The first section of the founding text closes with a sentence about what LIA is not.
+The definition closes with a sentence about what LIA is not.
 
-> It is a discipline, not a specific algorithm, architecture, product, or model. Artificial intelligence is an important enabling technology, but it is not a prerequisite for doing LIA. [LIA §1]
+> It is a discipline, not a specific algorithm, architecture, product, or model. Artificial intelligence is an important enabling technology, but it is not a prerequisite for doing LIA.
 
 The two cases show both halves of that sentence. The scroll text was recovered with machine learning. The strongest images in the winning entry came from a model trained to detect ink, and a large share of the surface was traced by software one of the winners wrote. [^4] Without those tools the scans would have stayed unread. That is what an enabling technology looks like.
 
 Swanson's hypothesis was produced by a person searching indexes and reading articles. He was a professor in a library school, and his paper is as much about the limits of retrieval as about medicine. The method he used on the two literatures was to search, read what the search returned, revise the search, and reason about what he found. [^1] No model was involved, and the result meets every term of the definition: it was systematic enough that he could set out his steps, it identified a relationship, reconstructed an implication, and was validated by a trial. [^2]
 
-A discipline is defined by its object and its standards. The object here is the gap between what existing artifacts contain and what has been recognized in them. The standards are the ones the word *validation* brings with it. Methods will change, and the founding text says so in its ninth principle: methods are replaceable, standards are not. A definition tied to one tool would expire with the tool.
+A discipline is defined by its object and its standards. The object here is the gap between what existing artifacts contain and what has been recognized in them. The standards are the ones the word *validation* brings with it. Methods will change, and LIA's ninth principle, taken up in Part IV, says so: methods are replaceable, standards are not. A definition tied to one tool would expire with the tool.
 
-The definition says what LIA does and where it works. Why there should be much for it to find depends on how large the gap is and why it exists, which is the subject of the founding text's second section and of the next chapter.
+The definition says what LIA does and where it works. Why there should be much for it to find depends on how large the gap is and why it exists, which is the subject of the next chapter.
 
 <a id="chapter-i-02"></a>
 
@@ -235,19 +233,19 @@ A paper that drew few citations for decades may have been read and used without 
 
 #### The thesis
 
-The second section of the founding text begins with the sentence that this piece treats as the central thesis.
+The central thesis is one sentence.
 
-> The informational state of civilization exceeds its articulated understanding of that information. [LIA §2]
+> The informational state of civilization exceeds its articulated understanding of that information.
 
-The preamble puts the same point in terms of what people do: "Humanity has become extraordinarily good at producing information and comparatively poor at exhausting its implications." [LIA Preamble]
+Put in terms of what people do, the point is the same. Humanity has become extraordinarily good at producing information and comparatively poor at exhausting its implications.
 
 The thesis compares two quantities. One is what has been recorded, in all the artifacts that exist. The other is what has been stated about those artifacts: the conclusions drawn, the connections written down, the uses noticed.
 
 The thesis says the first is larger than the second. Swanson made a claim of the same shape about the library. In his account the world of published knowledge contains more than any one person can know, and more than the sum of what all persons know. [^1]
 
-The founding text then gives the reasons in one sentence.
+The reasons also fit in one sentence.
 
-> The gap arises because knowledge production is distributed, specialization is necessary, archives are incomplete, vocabulary changes, incentives favor certain questions, and the possible relationships between artifacts grow faster than our ability to investigate them. [LIA §2]
+> The gap arises because knowledge production is distributed, specialization is necessary, archives are incomplete, vocabulary changes, incentives favor certain questions, and the possible relationships between artifacts grow faster than our ability to investigate them.
 
 That sentence names six causes. None of them is a failure of effort or intelligence, and each can be seen in a case.
 
@@ -259,7 +257,7 @@ A system built this way produces a great deal. It also means that no participant
 
 *Specialization is necessary.* Swanson stated the constraint plainly: the quantity of published information is far larger than one person can read in any reasonable span of time. [^1] The response of every field is to divide. A specialist reads the journals of the specialty and can be thorough there.
 
-The cost falls at the borders. The fish-oil authors and the Raynaud authors were each reading their own literature, and the two sets of papers did not cite each other. [^1] The founding text calls specialization necessary and not regrettable. The alternative to reading narrowly is not reading everything. It is reading nothing well.
+The cost falls at the borders. The fish-oil authors and the Raynaud authors were each reading their own literature, and the two sets of papers did not cite each other. [^1] Specialization is necessary, and not regrettable. The alternative to reading narrowly is not reading everything. It is reading nothing well.
 
 *Archives are incomplete.* An archive can be incomplete because something was never kept, and it can be incomplete in practice because what was kept cannot be reached by the means at hand. When Olga Kononova and colleagues built a dataset of synthesis procedures from materials science papers in 2019, they used articles from six publishers that had granted permission for large downloads, and they processed only papers published after 2000, because earlier full texts were mostly in PDF, which was hard to parse. [^7]
 
@@ -283,9 +281,9 @@ Incentives give no one the job of looking. Incomplete archives remove some of th
 
 #### The backlog
 
-From these causes the founding text draws its central term.
+From these causes comes the central term.
 
-> These conditions create an **epistemic backlog**: a collection of recoverable observations, potentially meaningful relationships, unresolved contradictions, and unexamined implications. [LIA §2]
+> These conditions create an **epistemic backlog**: a collection of recoverable observations, potentially meaningful relationships, unresolved contradictions, and unexamined implications.
 
 A backlog, in ordinary use, is work that has arrived and has not been done. The word fits. The observations have been made and recorded. What has not been done is the reading across them. *Epistemic* marks the kind of work outstanding: it is the work of coming to know.
 
@@ -307,23 +305,23 @@ The people who saw a use for the paper were usually not the people who wrote it.
 
 #### What the backlog is not
 
-The founding text does not leave the term there. The paragraph that follows is as much a part of the definition as the term itself.
+The term does not stand there alone. What follows is as much a part of the definition as the term itself.
 
-> This backlog is not a fixed inventory of truths waiting to be retrieved. Its boundaries depend on the accessible corpus, the available methods of inference, the questions being investigated, and the standards of evidence applied. Some candidates will be false, others trivial, and others impossible to resolve without new observations. [LIA §2]
+> This backlog is not a fixed inventory of truths waiting to be retrieved. Its boundaries depend on the accessible corpus, the available methods of inference, the questions being investigated, and the standards of evidence applied. Some candidates will be false, others trivial, and others impossible to resolve without new observations.
 
 Each clause removes a tempting picture. The backlog is not a warehouse with a list of contents.
 
 What can be found depends first on the accessible corpus: the Kononova dataset contains nothing from papers before 2000, because those papers were not in the corpus. [^7] It depends on the available methods of inference: the text in the Herculaneum scans was there before the methods that could read it. It depends on the questions being investigated: the fish-oil papers yielded a hypothesis about Raynaud's syndrome because someone asked about Raynaud's syndrome. [^1] And it depends on the standards of evidence applied, because whether something counts as found depends on what is required before saying so.
 
-The last sentence of the paragraph gives three ways a candidate can fail to be worth having. It can be false: two records can seem to imply a third thing that is not so. It can be trivial: true, unstated, and of no interest to anyone. Or it can be impossible to resolve without new observations, in which case the existing record can raise the question and cannot answer it. Swanson's hypothesis was of that third kind until the trial was run. [^2]
+The last sentence gives three ways a candidate can fail to be worth having. It can be false: two records can seem to imply a third thing that is not so. It can be trivial: true, unstated, and of no interest to anyone. Or it can be impossible to resolve without new observations, in which case the existing record can raise the question and cannot answer it. Swanson's hypothesis was of that third kind until the trial was run. [^2]
 
-Then comes the shortest sentence in the section.
+Then comes the shortest sentence of all.
 
-> LIA exists to distinguish among them. [LIA §2]
+> LIA exists to distinguish among them.
 
 That sentence assigns the discipline its job. Generating candidates from the backlog is the easier half, and the arithmetic of pairs shows why: there are always more possible connections than anyone can check. The work that makes LIA a discipline is sorting the candidates into the false, the trivial, the unresolvable, and the few that hold.
 
-The founding text adds one more paragraph to this section, an economic thesis about the cost of investigating the backlog, which has its own chapter below. Before it comes the framing's statement of what kind of knowledge the backlog holds, which is easy to confuse with two older ideas.
+One more claim belongs here, an economic thesis about the cost of investigating the backlog, which has its own chapter below. Before it comes the question of what kind of knowledge the backlog holds, which is easy to confuse with two older ideas.
 
 <a id="chapter-i-03"></a>
 
@@ -345,15 +343,15 @@ Mendel himself knew what he had found, so the case is not a pure example of a re
 
 #### The key distinction
 
-The framing, David Murray's companion statement to the founding text, states what it calls the key distinction in two sentences.
+The key distinction can be put in two sentences.
 
-> The key distinction: conventional research seeks to produce new information. LIA seeks to discover what is effectively already known by civilization, but not known by any individual within it. [Framing, Intro]
+> The key distinction: conventional research seeks to produce new information. LIA seeks to discover what is effectively already known by civilization, but not known by any individual within it.
 
 The first sentence is about the ordinary business of science. An experiment, a survey, a field season, or an observing run adds something to the record that was not there before. The second sentence sets a different target. The thing sought is already in the record, in the sense that the record supports it. What is missing is a person who knows it.
 
 The word *effectively* matters. Civilization does not know things the way a person does. What it has is the record: the papers, the data, the patents, the notebooks. To say that civilization effectively knows something is to say that the record contains what is needed to establish it, so that a reader who gathered the right artifacts and reasoned correctly could arrive at it without making a new observation. To say that no individual knows it is to say that no one has yet done so.
 
-The founding text carries the same distinction in the terms of its preamble, as the asymmetry between what humanity has recorded and what humanity has recognized. [LIA Preamble] The record is on one side and persons are on the other.
+The same distinction appears at the start of this piece, as the asymmetry between what humanity has recorded and what humanity has recognized. The record is on one side and persons are on the other.
 
 Two older ideas sit close to this one and are often mistaken for it. One concerns knowledge that is spread across many people. The other concerns discoveries that are made more than once. LIA borrows from the facts each idea rests on, and it is a different claim from both.
 
@@ -367,7 +365,7 @@ Each piece is in someone's head. Nobody has all the pieces, and nobody could, be
 
 Michael Polanyi asked a version of the same question about science. In his account, scientists choose problems independently and coordinate by adjusting to one another's published results, and the outcome is a joint achievement that none of them planned. His image for it was a group of people working on one very large jigsaw puzzle within sight of each other. [^6]
 
-Both writers give an account of a real feature of the world that LIA depends on. It is the first of the six causes the founding text gives for the backlog: knowledge production is distributed. [LIA §2] And both are writing about a different situation from the one the framing's distinction picks out. In Hayek's economy and Polanyi's republic, every piece of knowledge has a holder.
+Both writers give an account of a real feature of the world that LIA depends on. It is the first of the six causes of the backlog: knowledge production is distributed. And both are writing about a different situation from the one the key distinction picks out. In Hayek's economy and Polanyi's republic, every piece of knowledge has a holder.
 
 What is distributed is the holding. The problem is coordination among people who each know their part.
 
@@ -397,9 +395,9 @@ Mendel's case has sometimes been told as a multiple, with three men converging i
 
 #### Three examples
 
-With those two ideas set to one side, the framing's distinction can be read against the three examples the founding text gives in its preamble.
+With those two ideas set to one side, the key distinction can be read against the three forms of the asymmetry given at the start of this piece.
 
-> An observation made in one field may resolve a problem in another. A failed experiment may contain the evidence needed for a future invention. Two independently established facts may imply a third that nobody has articulated. [LIA Preamble]
+> An observation made in one field may resolve a problem in another. A failed experiment may contain the evidence needed for a future invention. Two independently established facts may imply a third that nobody has articulated.
 
 In each of the three, the record holds the material and no individual holds the result.
 
@@ -407,11 +405,11 @@ In the first, an observation has a holder, the person who made it, and a problem
 
 In the second, the experiment was run and written up as a failure, judged against the purpose it was run for. The record of it holds measurements that mean something else under a different question, and the person who made them filed them under the question they were asking at the time. The evidence is recorded. Its bearing on a later invention is not known to anyone until someone reads the old result with the new purpose in mind.
 
-In the third, two facts are each established, each with its own evidence and its own readers, and a third fact follows from them together. This is the form of Swanson's case, and it is the cleanest illustration of the framing's sentence. Both premises were known. The conclusion was, in the framing's word, effectively known by civilization, because the record supported it. It was not known by any individual, because no one had drawn it. [^1]
+In the third, two facts are each established, each with its own evidence and its own readers, and a third fact follows from them together. This is the form of Swanson's case, and it is the cleanest illustration of the key distinction. Both premises were known. The conclusion was, in the sense given above, effectively known by civilization, because the record supported it. It was not known by any individual, because no one had drawn it. [^1]
 
-None of these is a failure of the people involved. The fish-oil researchers were not negligent for not reading the literature on a circulatory disorder, and Mendel's contemporaries were not fools. The six causes in the founding text's second section explain how careful people, each doing their own work well, leave results of this kind lying in the record. [LIA §2]
+None of these is a failure of the people involved. The fish-oil researchers were not negligent for not reading the literature on a circulatory disorder, and Mendel's contemporaries were not fools. The six causes of the backlog explain how careful people, each doing their own work well, leave results of this kind lying in the record.
 
-A result of this kind does not surface on its own, because someone has to pay for the search and for the reasoning. The founding text and the framing both make a claim about that cost, and the next chapter takes it up.
+A result of this kind does not surface on its own, because someone has to pay for the search and for the reasoning. LIA makes a claim about that cost, and the next chapter takes it up.
 
 <a id="chapter-i-04"></a>
 
@@ -429,19 +427,19 @@ The study is a mechanism and a pattern in citation data. It does not put a price
 
 #### The premise
 
-The framing closes with a section headed "The bigger idea," and that section opens with an economic premise.
+The bigger idea behind LIA starts from an economic premise.
 
-> LIA could be formalized around an economic premise: the marginal cost of generating information has historically been lower than the aggregate cost of connecting all available information. [Framing §6]
+> LIA could be formalized around an economic premise: the marginal cost of generating information has historically been lower than the aggregate cost of connecting all available information.
 
-The next line gives the consequence.
+The consequence follows.
 
-> Civilization has accumulated an enormous backlog of unmade connections. [Framing §6]
+> Civilization has accumulated an enormous backlog of unmade connections.
 
 The premise compares two costs. The first is marginal: what it takes to add one more item to the record, one more paper, dataset, patent, or filing. The second is aggregate: what it would take to check everything in the record against everything else. The premise says that, historically, the first has been lower than the second.
 
-The arithmetic from the chapter on the backlog shows why the comparison comes out that way. Adding one artifact to a record that already holds *n* artifacts is one unit of work for its author. It also creates *n* new possible pairs, one with each artifact already there, and someone would have to examine each of those to know whether it means anything. The cost of producing grows with the number of artifacts.
+The arithmetic from the chapter on the backlog shows why the comparison comes out that way. Adding one artifact to a record that already holds *n* artifacts is one unit of work for the person who made it. It also creates *n* new possible pairs, one with each artifact already there, and someone would have to examine each of those to know whether it means anything. The cost of producing grows with the number of artifacts.
 
-The cost of connecting all of them grows with the number of relationships among them, which is far larger. As long as people produce steadily and can read only so much, the unexamined share rises. That is how a backlog accumulates without anyone neglecting anything. The founding text states the same cause in its list: the possible relationships between artifacts grow faster than our ability to investigate them. [LIA §2]
+The cost of connecting all of them grows with the number of relationships among them, which is far larger. As long as people produce steadily and can read only so much, the unexamined share rises. That is how a backlog accumulates without anyone neglecting anything. The same cause is the last on the list of six: the possible relationships between artifacts grow faster than our ability to investigate them.
 
 Hsieh's two costs add a refinement. The price of a connection is not uniform across the record. Connections between distant things are costly to find. [^13]
 
@@ -463,15 +461,15 @@ All three are measures of citation and attention, and none of them is a direct m
 
 #### What changes the price
 
-The framing then says what might alter the comparison.
+Something might alter the comparison.
 
-> Agentic AI, cheap inference, multimodal analysis and persistent computational systems potentially change the economics of excavating that backlog. [Framing §6]
+> Agentic AI, cheap inference, multimodal analysis and persistent computational systems potentially change the economics of excavating that backlog.
 
-The founding text makes the corresponding claim in the last paragraph of its second section, and names four improvements.
+The corresponding claim, the economic thesis, names four improvements.
 
-> The economic thesis is that improvements in search, machine reasoning, representation learning, and computational capacity can reduce the cost of investigating this backlog. If true, activities that were previously impractical may become routine. [LIA §2]
+> The economic thesis is that improvements in search, machine reasoning, representation learning, and computational capacity can reduce the cost of investigating this backlog. If true, activities that were previously impractical may become routine.
 
-The two lists give one change from two sides. The founding text names capabilities: search, machine reasoning, representation learning, computational capacity. The framing names the forms in which those capabilities now arrive.
+The two lists give one change from two sides. The second names capabilities: search, machine reasoning, representation learning, computational capacity. The first names the forms in which those capabilities now arrive.
 
 Cheap inference means each act of machine reading or reasoning costs little. Multimodal analysis means the reading is not confined to text, so that images, tables, and scans come within reach. Agentic AI means a system can carry out a chain of steps, searching, reading, comparing, and checking, without a person directing each one. Persistent computational systems are ones that keep working over a corpus for a long time, where a single query is asked once and answered once.
 
@@ -491,29 +489,29 @@ The second use is the one that matters to the premise. If the backlog is deepest
 
 #### A research proposition
 
-The founding text ends its statement of the economic thesis with a sentence that fixes its status.
+The economic thesis ends with a sentence that fixes its status.
 
-> This is a research proposition, not an established universal law. [LIA §2]
+> This is a research proposition, not an established universal law.
 
-The framing's wording is in step with it: the new tools "potentially change" the economics. [Framing §6] Both texts state the thesis as something to be found out.
+The wording about tools is in step with it: the new tools "potentially change" the economics. Both statements give the thesis as something to be found out.
 
 There are concrete reasons for the status. The thesis says the cost of *investigating* the backlog can be reduced, and investigating includes validating. A system that proposes connections cheaply may also propose false ones cheaply, and each proposal still has to be checked.
 
 If checking stays expensive, then lowering the price of generation moves the cost downstream to the reviewer and leaves the total where it was. Hsieh's second cost applies here too: finding that two things are related is not the same as showing that the combination is worth anything. [^13] Tshitoyan's ranking produced fifty candidates a year at little cost, and whether a given candidate is in fact a good thermoelectric is settled in a laboratory. [^15]
 
-The founding text says how the proposition is to be tested. Its research agenda in §10 includes an entry for this purpose.
+The proposition comes with a way to test it. LIA's research agenda, taken up in Part IV, includes an entry for this purpose.
 
-> **Excavation economics.** Measure cost per defensible finding, reviewer time, reproducibility, and the marginal benefit of additional computation or data. [LIA §10]
+> **Excavation economics.** Measure cost per defensible finding, reviewer time, reproducibility, and the marginal benefit of additional computation or data.
 
 Each measurement answers a part of the question. *Cost per defensible finding* is the figure the thesis is about. It counts everything spent, on computation and on people, and divides by the number of findings that survive scrutiny, with the candidates that were generated and discarded counted in the cost.
 
 *Reviewer time* isolates the human share, which is where a downstream bottleneck would show. *Reproducibility* asks whether a second team following the same record reaches the same finding, since a result that cannot be reproduced was not cheap at any price. *The marginal benefit of additional computation or data* asks whether spending more keeps yielding more, or whether returns flatten.
 
-The same section lists "cost per validated result" among the useful metrics, and adds that no single score can adequately represent all of the dimensions it names. [LIA §10]
+The same agenda lists "cost per validated result" among the useful metrics, and adds that no single score can adequately represent all of the dimensions it names.
 
-The founding text commits to the measurement and not to the answer. The first line of its agenda says the discipline should be judged by what it can demonstrate, not by the ambition of its premise. [LIA §10]
+LIA commits to the measurement and not to the answer. The first line of its agenda says the discipline should be judged by what it can demonstrate, not by the ambition of its premise.
 
-The framing's "bigger idea" ends by naming what a favorable answer would allow: a system that is more than a better research assistant, an autonomous discovery engine that continually searches the space of things humanity could already know, but doesn't. [Framing §6] Part IV takes up what such a system would have to be, and the next chapter settles why a discipline with this object is named after the study of buried things.
+The bigger idea ends by naming what a favorable answer would allow: a system that is more than a better research assistant, an autonomous discovery engine that continually searches the space of things humanity could already know, but doesn't. Part IV takes up what such a system would have to be, and the next chapter settles why a discipline with this object is named after the study of buried things.
 
 <a id="chapter-i-05"></a>
 
@@ -527,13 +525,13 @@ One hundred and five years separate the recovery in 1901 from the publication in
 
 The fragments were a known object in a museum for a century. What changed was how much of them could be read.
 
-That is a case from archaeology in the ordinary sense, and it has the features that led the founding text to choose its name.
+That is a case from archaeology in the ordinary sense, and it has the features that led LIA to its name.
 
 #### The name
 
-The eleventh section of the founding text is titled "Why archaeology?" and its first sentence gives the reason.
+Why archaeology? The reason is one sentence.
 
-> Archaeology is an appropriate metaphor because the investigator encounters a record shaped by time, loss, preservation, selection, and context. [LIA §11]
+> Archaeology is an appropriate metaphor because the investigator encounters a record shaped by time, loss, preservation, selection, and context.
 
 The sentence names five forces, and each of them acts on informational artifacts as it acts on objects in the ground.
 
@@ -551,9 +549,9 @@ An investigator of the existing record does not get to design the record. It arr
 
 #### Position matters
 
-The second paragraph of the section turns to the single artifact.
+The single artifact comes next.
 
-> An artifact rarely explains itself. Its position relative to other artifacts matters. [LIA §11]
+> An artifact rarely explains itself. Its position relative to other artifacts matters.
 
 The archive of Zenon shows what position is worth. Zenon, son of Agreophon, was born about 285 BC in Kaunos, a city in Caria, and made his career in Egypt. He worked first as business representative and private secretary to Apollonios, the finance minister, and later managed Apollonios's estate at Philadelpheia in the Fayum. He kept his papers. The archive dates from 263 to 229 BC and holds more than 1,800 texts, most of them in Greek, which makes it the largest archive of Ptolemaic times. [^18]
 
@@ -569,9 +567,9 @@ The same principle governs artifacts that have nothing to do with antiquity. A p
 
 #### What an absence means
 
-The paragraph ends with a sentence about what is not there.
+One more sentence concerns what is not there.
 
-> An absence may be meaningful, or it may simply reflect what was never recorded or what failed to survive. [LIA §11]
+> An absence may be meaningful, or it may simply reflect what was never recorded or what failed to survive.
 
 The sentence allows three readings of a gap, and from where the investigator stands they look alike. The thing may be absent because it did not happen. It may have happened and never been recorded. It may have been recorded and the record may not have survived.
 
@@ -581,13 +579,13 @@ The absence of an offprint from the archive is consistent with Mendel never havi
 
 The discipline here is to leave unresolved what the record leaves unresolved. Swanson practiced the same restraint about the literature. Having found no article that linked fish oil to Raynaud's syndrome, he reported that his search had found none, said the search was not exhaustive, and asked readers to tell him of any he had missed. [^1] He did not convert "I found nothing" into "there is nothing."
 
-An absence can also be evidence. That the fish-oil literature and the Raynaud literature shared no articles and did not cite each other was the observation on which Swanson's case rested. [^2] An absence of that kind has to be established with care, by a stated search over a stated body of records, and it holds only for that body. The founding text builds this into its account of the epistemic boundary in §4, where every claim about what is or is not in the record is relative to a corpus, a date, and a method.
+An absence can also be evidence. That the fish-oil literature and the Raynaud literature shared no articles and did not cite each other was the observation on which Swanson's case rested. [^2] An absence of that kind has to be established with care, by a stated search over a stated body of records, and it holds only for that body. LIA builds this into its account of the epistemic boundary, taken up in Part II, where every claim about what is or is not in the record is relative to a corpus, a date, and a method.
 
 #### The rule
 
-The third paragraph of the section is two sentences long.
+The rule is two sentences long.
 
-> The archaeologist cannot legitimately manufacture missing evidence and present it as recovered material. Neither can the information archaeologist. [LIA §11]
+> The archaeologist cannot legitimately manufacture missing evidence and present it as recovered material. Neither can the information archaeologist.
 
 In field archaeology the rule is easy to picture. An excavator who carves an inscription and reports having dug it up has committed fraud. An excavator who restores a broken vessel with new plaster, and marks the plaster as new, has not. The offense lies in presenting what was made as what was found.
 
@@ -605,9 +603,9 @@ A filled gap presented as a find destroys the value of the finds beside it, beca
 
 #### Four words for the work
 
-The section closes by naming the work.
+Last comes the name of the work itself.
 
-> The work is excavation, reconstruction, interpretation, and verification. It is as much about understanding the limits of the record as it is about discovering what the record contains. [LIA §11]
+> The work is excavation, reconstruction, interpretation, and verification. It is as much about understanding the limits of the record as it is about discovering what the record contains.
 
 *Excavation* is getting the material out with its context intact: finding the artifacts, and recording where each came from and what lay beside it. The scanning of the fragments from Antikythera in 2005 was excavation of this kind, carried out on an object that had left the sea a century earlier. [^17]
 
@@ -617,11 +615,11 @@ The section closes by naming the work.
 
 *Verification* is the check: independent readers, reproduced code, a clinical trial. [^4] [^2]
 
-The second sentence of the closing paragraph gives the limits of the record equal weight with its contents. Every case in Part I has come with a statement of what it does not show.
+The second sentence gives the limits of the record equal weight with its contents. Every case in Part I has come with a statement of what it does not show.
 
 The trial of fish oil supported a benefit in one subgroup of 32 patients. [^3] The scroll result covers passages from one scroll. [^4] The citation studies measure attention. [^5] The Zenon catalogue documents a dispersal and a guide. [^18] These statements are part of each finding.
 
-Part I has set out what LIA is, why there is a backlog for it to work on, what the work costs, and why it carries the name it does. All of it rests on the word *latent*, which the founding text divides into classes in its third section, and Part II begins there.
+Part I has set out what LIA is, why there is a backlog for it to work on, what the work costs, and why it carries the name it does. All of it rests on the word *latent*, which LIA divides into classes, and Part II begins there.
 
 <a id="part-ii"></a>
 
@@ -644,17 +642,17 @@ For most of the twentieth century, then, the archive was hidden in two different
 
 #### Latency is relational
 
-The third section of the founding text is titled "What is latent?" It begins with a statement about the word itself.
+The question of what is latent begins with a statement about the word itself.
 
-> Latency is relational. A claim can be explicit in one archive, invisible to another community, and genuinely unarticulated when considered across an entire body of evidence. [LIA §3]
+> Latency is relational. A claim can be explicit in one archive, invisible to another community, and genuinely unarticulated when considered across an entire body of evidence.
 
 The sentence gives three positions a single claim can occupy. It can be written out plainly in one place. It can be unknown to people who do not read that place. And it can be something no one has written at all, which appears only when a whole body of evidence is considered together. A Zenon letter in Florence was explicit to the papyrologist who had it on the table.
 
 What it meant for a letter in London was not explicit to anyone until the two were read together. Asking whether something is latent therefore always needs a second term: latent to whom, in which record.
 
-The founding text then names the kinds.
+LIA names the kinds.
 
-> LIA recognizes several kinds of latency: [LIA §3]
+> LIA recognizes several kinds of latency:
 
 | Class | Description |
 | --- | --- |
@@ -716,9 +714,9 @@ The class definition ends with a condition the other four do not carry. Such str
 
 #### More than one class at once
 
-The founding text adds a sentence after the table.
+One more sentence follows the table.
 
-> These classes are not exclusive. An excavation may recover an obscure observation, connect it to a separate field, and reveal its usefulness in a new technological context. [LIA §3]
+> These classes are not exclusive. An excavation may recover an obscure observation, connect it to a separate field, and reveal its usefulness in a new technological context.
 
 That sentence walks through three classes in order. Recovering an obscure observation is archival. Connecting it to a separate field is relational. Finding its use in a new technological context is contextual.
 
@@ -726,9 +724,9 @@ Real cases combine classes in the same way. Zenon is archival and relational. Th
 
 #### The care that models need
 
-Section 3 closes with a caution.
+The account of what is latent closes with a caution.
 
-> A model's ability to articulate a claim does not establish that the claim was encoded as truthful knowledge, nor that the claim is supported by its training data. Representational latency requires particular care because the original evidentiary trail may be inaccessible. [LIA §3]
+> A model's ability to articulate a claim does not establish that the claim was encoded as truthful knowledge, nor that the claim is supported by its training data. Representational latency requires particular care because the original evidentiary trail may be inaccessible.
 
 Two separate things are denied here. A model producing a statement does not show that the model holds the statement as knowledge. And it does not show that the texts the model was trained on support it.
 
@@ -738,7 +736,7 @@ The method stopped classifying the sentiment of the review and classified Alice'
 
 The second half of the caution concerns the trail. Swanson could list the articles behind each premise. A reader of the Zenon guide can go to the papyrus. When a claim comes out of a trained model, the documents that produced the association may be impossible to name. Part IV returns to what that requires of a system that uses models.
 
-The five classes say how a thing can be hidden. The framing adds a second sorting, into four layers of latent information, and the next chapter takes it up.
+The five classes say how a thing can be hidden. LIA adds a second sorting, into four layers of latent information, and the next chapter takes it up.
 
 <a id="chapter-ii-02"></a>
 
@@ -748,11 +746,11 @@ In 2019, Olga Kononova and colleagues published a dataset of 19,488 synthesis en
 
 A reader can find an individual procedure in the article that reports it. To find all the published procedures that used a particular combination of starting compound and operation, the reader needs details from many articles. In both cases the details are already on the page. What changes is how much of the record a reader has to put together. [^7]
 
-> There are four distinct layers of latent information. Google largely operates in the first layer. Deep research agents operate in the first two. The third and fourth layers are where LIA becomes particularly interesting. [Framing §1]
+> There are four distinct layers of latent information. Google largely operates in the first layer. Deep research agents operate in the first two. The third and fourth layers are where LIA becomes particularly interesting.
 
-The framing's four layers sort findings by how far they are from being stated in the record. A finding's validity is a separate question. An explicit statement can be false, and an unstated connection can be well supported.
+The four layers sort findings by how far they are from being stated in the record. A finding's validity is a separate question. An explicit statement can be false, and an unstated connection can be well supported.
 
-| Layer | Name | Definition | Who works here (David's placement) |
+| Layer | Name | Definition | Who works here |
 | --- | --- | --- | --- |
 | **Layer 1** | Stated and indexed | A claim that one artifact states outright, so a single lookup can return it. | Search engines; deep research agents. |
 | **Layer 2** | Stated but scattered | A claim that no single artifact states, but whose parts are all written down across several artifacts, vocabularies or formats, so answering a question means collecting and assembling them. | Deep research agents. |
@@ -783,7 +781,7 @@ A word in a title is there to be looked up at layer 1. Gathering the titles that
 
 A layer-3 link can be enough to report. Two archives might turn out to hold independent accounts of the same event, or results in one field might rule out an explanation in another. Either finding has value before anyone proposes an intervention. If someone does propose one, the record needs to show how they got there and what evidence would settle it. [^1][^23]
 
-A link can also be found in a model trained on the records. The previous chapter calls this representational latency and requires an independent check. A model can give a reader an association even when the reader cannot trace it to particular training documents. An unstated association is layer 3. A further claim drawn from it is layer 4. [LIA §3]
+A link can also be found in a model trained on the records. The previous chapter calls this representational latency and requires an independent check. A model can give a reader an association even when the reader cannot trace it to particular training documents. An unstated association is layer 3. A further claim drawn from it is layer 4.
 
 #### What the implication adds
 
@@ -791,23 +789,23 @@ In February 2020, Richardson and colleagues used a knowledge graph built from th
 
 In December 2020, the ACTT-2 trial reported a median recovery time of seven days with baricitinib plus remdesivir, against eight days with remdesivir alone, in the trial population. The trial supplies evidence for that combination in that population. The mechanisms in the original argument would need their own tests. The same implication can start as a candidate and acquire separate empirical support later. [^55]
 
-Once the hypothesis has been published, a search can return it as a layer-1 statement. In February, when the researchers put the proposal together, the letter itself was outside the record they were working from. A later reader can look it up because it is now part of the record. The same claim can occupy different layers as the record changes. [LIA §4] [^25]
+Once the hypothesis has been published, a search can return it as a layer-1 statement. In February, when the researchers put the proposal together, the letter itself was outside the record they were working from. A later reader can look it up because it is now part of the record. The same claim can occupy different layers as the record changes. [^25]
 
-A question can also occupy layer 4. A connection can suggest an experiment nobody has thought to run. A layer-4 record gives the question, the link that led to it, and what the experiment would distinguish. Look for the question in the record first, and judge its novelty, provenance, and validity separately. [LIA §4, LIA §8]
+A question can also occupy layer 4. A connection can suggest an experiment nobody has thought to run. A layer-4 record gives the question, the link that led to it, and what the experiment would distinguish. Look for the question in the record first, and judge its novelty, provenance, and validity separately.
 
 #### Two maps of the same record
 
-The five classes in the founding text ask how information is hidden. An overlooked statement can be archival and layer 1, and a set of statements gathered from scattered papers can be archival and layer 2. An unstated link can be relational or contextual and layer 3. A hypothesis drawn from that link is inferential and layer 4. [LIA §3]
+The five classes ask how information is hidden. An overlooked statement can be archival and layer 1, and a set of statements gathered from scattered papers can be archival and layer 2. An unstated link can be relational or contextual and layer 3. A hypothesis drawn from that link is inferential and layer 4.
 
 Representational latency tells the reader where the information was found. A model can be the place where an investigator finds anything from a fact already on the page to a hypothesis the record has yet to state.
 
 Kononova's team did extensive computational work, and the resulting recipes still belong in the first two layers. Swanson could state his link in a short sentence, and it belongs in the third because the relationship was absent from the papers he examined. The layer-4 hypothesis goes a step further. Its distance from the original statements says nothing about its odds of holding up in a trial. [^7][^1]
 
-The framing places search mainly in the first layer, deep research agents in the first two, and LIA's particular interest in the third and fourth. The founding text calls for independent verification of associations elicited from models. [Framing §1, LIA §3]
+Search operates mainly in the first layer, deep research agents in the first two, and LIA's particular interest lies in the third and fourth. Associations elicited from models call for independent verification.
 
 Each step leaves something a reader can check. A lookup needs a source, and assembly needs a record of which statements came from which places. A connection needs evidence from both sides and has to survive a challenge. An implication needs its own test. Give the reader only the model's layer-4 claim and there is no way to check how it was reached. [^23]
 
-The layers establish what sort of output is being sought. To decide whether that output was latent at a particular time, rather than already explicit in the available record, the inquiry needs a boundary around the corpus, a cutoff, and a method. That is the boundary the next chapter makes formal. [LIA §4]
+The layers establish what sort of output is being sought. To decide whether that output was latent at a particular time, rather than already explicit in the available record, the inquiry needs a boundary around the corpus, a cutoff, and a method. That is the boundary the next chapter makes formal.
 
 <a id="chapter-ii-03"></a>
 
@@ -830,7 +828,7 @@ The design has four parts, and each can be named.
 
 The first is a collection of documents with a date on it: all the abstracts published before a given year. The second is a method: the embedding algorithm, the choice of the target word, and the rule for ranking. The third is the list of everything the method puts forward from that collection. The fourth is a record of what had already been said, which the authors used to remove from the list every material that had already appeared with a thermoelectric keyword. What remained after that removal was their set of predictions. [^15]
 
-The fourth section of the founding text, "The epistemic boundary," gives those four parts symbols.
+The epistemic boundary gives those four parts symbols.
 
 > Let `C(t)` be a defined corpus containing artifacts available at or before time `t`. Let `E(t)` denote the claims explicitly documented within a specified reference record by that time. Let `M` denote a specified set of retrieval, reasoning, and analytical methods.
 >
@@ -841,8 +839,6 @@ The fourth section of the founding text, "The epistemic boundary," gives those f
 > ```text
 > L(C, t, M) = H(C(t), M) \ E(t)
 > ```
->
-> [LIA §4]
 
 Read against the experiment, the symbols fall into place. `C(t)` is the set of abstracts published before the cutoff year `t`. `M` is the embedding and the ranking.
 
@@ -860,25 +856,23 @@ The word "candidate" in the definition of `H` is also chosen with care. `H` hold
 
 #### What the subtraction means
 
-Two sentences follow the formula in the founding text, and both limit it.
+Two sentences follow the formula, and both limit it.
 
-> The subtraction is semantic rather than literal: paraphrasing an existing claim does not make it novel. This is a conceptual model, not an assertion that the sets are fully enumerable or that membership can always be established. [LIA §4]
+> The subtraction is semantic rather than literal: paraphrasing an existing claim does not make it novel. This is a conceptual model, not an assertion that the sets are fully enumerable or that membership can always be established.
 
 The first sentence closes an easy loophole. If `E(t)` were a list of exact sentences, any claim could be made to look new by rewording it. The subtraction removes meanings.
 
-A claim already documented in other words is in `E(t)` and comes out. The experiment handled this for one narrow kind of claim by matching nine different keywords, from "thermoelectric" to "seebeck" and "thermopower," so that a material studied under any of those names counted as already known. [^15] For claims in general, deciding that two sentences say the same thing is a judgment, and the founding text does not pretend otherwise.
+A claim already documented in other words is in `E(t)` and comes out. The experiment handled this for one narrow kind of claim by matching nine different keywords, from "thermoelectric" to "seebeck" and "thermopower," so that a material studied under any of those names counted as already known. [^15] For claims in general, deciding that two sentences say the same thing is a judgment, and LIA does not pretend otherwise.
 
 The second sentence states what kind of object the formula is. It is a conceptual model. Nobody can list every claim constructible from 3.3 million abstracts, and for many claims nobody can say with certainty whether the record already holds them. The formula fixes what has to be specified before the word "latent" means anything definite. It does not promise a count.
 
-The founding text then draws out what follows.
+Consequences follow from the formula.
 
 > Three important consequences follow:
 >
 > - Latency is relative to a corpus, a historical boundary, and a method of investigation.
 > - A candidate in the discovery space is not necessarily true. The space includes unsupported conjectures and erroneous inferences.
 > - Novelty is relative to a documented reference record. The absence of an earlier publication cannot prove that no person previously knew a claim.
->
-> [LIA §4]
 
 #### First consequence: corpus, boundary, method
 
@@ -934,11 +928,11 @@ So a claim of novelty has the same structure as a claim of latency. It needs a n
 
 #### What the boundary does not decide
 
-The section ends with one sentence.
+The boundary is completed by one sentence.
 
-> A separate validation process determines what epistemic status each candidate warrants. [LIA §4]
+> A separate validation process determines what epistemic status each candidate warrants.
 
-The formula marks out a space of candidates. It says what would have to be specified for a claim to count as latent, and it says nothing about which candidates are true, which are trivial, and which cannot be resolved. That work belongs to validation, and the founding text keeps it separate on purpose. The next chapter takes up the line between a candidate and a discovery.
+The formula marks out a space of candidates. It says what would have to be specified for a claim to count as latent, and it says nothing about which candidates are true, which are trivial, and which cannot be resolved. That work belongs to validation, and LIA keeps it separate on purpose. The next chapter takes up the line between a candidate and a discovery.
 
 <a id="chapter-ii-04"></a>
 
@@ -954,15 +948,15 @@ No patient had been given the drug for this disease. Nothing in the letter was a
 
 In December 2020 the New England Journal of Medicine published the results of ACTT-2, a double-blind, randomized, placebo-controlled trial. It randomized 1,033 hospitalized adults. All received the antiviral remdesivir, and they received either baricitinib or a placebo with it. Patients given baricitinib had a median time to recovery of 7 days, against 8 days for the control group. Among patients who were on high-flow oxygen or noninvasive ventilation when they enrolled, the figures were 10 days and 18 days. [^55]
 
-Those are two events with two dates, about ten months apart. The first produced a candidate from existing information. The second tested it on patients. The fifth section of the founding text is about the difference between them.
+Those are two events with two dates, about ten months apart. The first produced a candidate from existing information. The second tested it on patients. This chapter is about the difference between them.
 
 #### What counts as a discovery from the record
 
-The section opens by refusing a narrow reading of what the record can yield.
+LIA refuses a narrow reading of what the record can yield.
 
-> LIA does not require that discoveries be logically entailed by the historical record. Some are deductive consequences; others are statistical patterns, explanatory hypotheses, analogies, or proposed transfers between domains. [LIA §5]
+> LIA does not require that discoveries be logically entailed by the historical record. Some are deductive consequences; others are statistical patterns, explanatory hypotheses, analogies, or proposed transfers between domains.
 
-A claim is logically entailed when it must be true if the premises are. The founding text names that kind and then four others that carry no such guarantee. The cases in this part supply one of each.
+A claim is logically entailed when it must be true if the premises are. LIA names that kind and then four others that carry no such guarantee. The cases in this part supply one of each.
 
 A deductive consequence: the email that showed Madoff's stated options trading was impossible. If the exchange volume was insufficient and no private counterparty could exist, the trades as reported did not happen. Given those premises the conclusion follows. [^19]
 
@@ -974,13 +968,13 @@ An analogy: Black and Scholes observing that their equation for an option's valu
 
 A proposed transfer between domains: baricitinib, a drug approved for another purpose, put forward for a viral pneumonia. [^25]
 
-Only the first of the five is safe from being wrong once its premises are granted. The other four can each fail, and section 4 already said that the discovery space includes erroneous inferences. Section 5 includes all four among the possibilities the record can yield.
+Only the first of the five is safe from being wrong once its premises are granted. The other four can each fail, and the previous chapter already said that the discovery space includes erroneous inferences. LIA includes all four among the possibilities the record can yield.
 
 #### Where the evidence came from
 
-The next sentence of the section draws the line that gives it its title.
+The next sentence draws the line that gives this chapter its title.
 
-> The distinction is the origin of the evidentiary substrate, not whether the investigator employed creativity. [LIA §5]
+> The distinction is the origin of the evidentiary substrate, not whether the investigator employed creativity.
 
 The evidentiary substrate is the material a claim rests on. The sentence says that what sets an archaeological finding apart from other intellectual work is that this material already existed. It explicitly denies that the difference lies in creativity.
 
@@ -998,9 +992,9 @@ Hull's patent illustrates a distinction relevant to excavation. The origin of th
 
 #### Candidate and validated discovery
 
-The third paragraph of the section gives two terms.
+Two terms follow.
 
-> A useful boundary is between an **archaeological candidate**, generated from existing information, and a **validated discovery**, which has survived the appropriate tests. A candidate may require new experiments before it becomes a discovery about the physical world. [LIA §5]
+> A useful boundary is between an **archaeological candidate**, generated from existing information, and a **validated discovery**, which has survived the appropriate tests. A candidate may require new experiments before it becomes a discovery about the physical world.
 
 The definitions are short. A candidate is defined by its source: existing information. A validated discovery is defined by what it has come through: the appropriate tests.
 
@@ -1024,11 +1018,11 @@ An interval that includes 1 is compatible with no difference, so the trial suppo
 
 #### Two activities
 
-The section ends with two sentences that assign the work.
+Two sentences assign the work.
 
 > In that case, LIA identified the research opportunity; experimental science established its empirical validity.
 >
-> Neither activity replaces the other. [LIA §5]
+> Neither activity replaces the other.
 
 "In that case" refers to a candidate that needs new experiments. The division is exact for baricitinib. The search of the knowledge graph found the opportunity: one drug, out of hundreds of inhibitors, worth giving to patients. ACTT-2, run by other people under a different discipline, established what happened when patients received it. [^25]
 
@@ -1036,7 +1030,7 @@ The last sentence cuts both ways. The record cannot substitute for the experimen
 
 The experiment cannot substitute for the record either. A trial tests the candidates that someone has proposed, and it can only be run on a question that has been asked. The knowledge graph alone held 47 approved inhibitors of a single enzyme. The letter gave a reason to try one of them and reasons to leave others aside. [^25]
 
-The founding text therefore places LIA beside experimental science and does not rank them. One works on what has been recorded and produces candidates. The other produces new observations and decides what the candidates are worth. The next chapter takes up a question the boundary leaves open. A candidate can be new or already known, and that is a separate matter from whether it is true.
+This therefore places LIA beside experimental science and does not rank them. One works on what has been recorded and produces candidates. The other produces new observations and decides what the candidates are worth. The next chapter takes up a question the boundary leaves open. A candidate can be new or already known, and that is a separate matter from whether it is true.
 
 <a id="chapter-ii-05"></a>
 
@@ -1052,11 +1046,11 @@ The system was given only minimal background information. It worked for two days
 
 Whether the hypothesis was new depends on where one looks. The published literature did not contain it, so a search of that literature on the day would have found nothing. The people who had asked the question already knew it. One hypothesis, on one day, was absent from one record and present in another.
 
-#### The sentence in section 4
+#### A sentence about novelty
 
-The founding text anticipated the case in the third consequence of its formal boundary, which the chapter before last quoted.
+The third consequence of the formal boundary, quoted in chapter II-03, anticipated the case.
 
-> Novelty is relative to a documented reference record. The absence of an earlier publication cannot prove that no person previously knew a claim. [LIA §4]
+> Novelty is relative to a documented reference record. The absence of an earlier publication cannot prove that no person previously knew a claim.
 
 In the cf-PICI case the second sentence is literally true. No earlier publication existed, and persons did previously know the claim.
 
@@ -1076,7 +1070,7 @@ What took until 1998 was regulatory approval in one country for a drug with a ca
 
 Asking "new as of when?" therefore requires a second question: which event does each date mark? A report, a recognition, an approval, and a first use are four different events. Subtracting one date from another gives a number in every case. Only some of those numbers measure how long something lay unrecognized.
 
-#### A connection its authors did not call new
+#### A connection the authors did not call new
 
 A third case shows the honest handling of novelty from the inside. In 1998 Lawrence Page, Sergey Brin, and two colleagues at Stanford wrote a technical report, "The PageRank Citation Ranking: Bringing Order to the Web." It proposed ranking web pages by the structure of the links between them. Their estimate of the web at the time was over 150 million pages, and they reported computing the ranking over as many as 518 million hyperlinks. [^31]
 
@@ -1086,15 +1080,15 @@ They then stated where the web differs. Academic papers are scrupulously reviewe
 
 The paper claims a method and its application to the web. It does not claim to have discovered that citations carry information about importance, and it names the prior literature in its own text. The source documents the comparison and the ranking algorithm. It does not establish any direct line of descent from earlier work in other fields, such as input-output models in economics, and none is claimed here. [^31]
 
-The founding text asks for exactly this behavior in its third principle.
+LIA's third principle asks for exactly this behavior.
 
-> **Novelty is investigated, not presumed.** Rediscovery is valuable, but must not be misrepresented as original discovery. [LIA §6]
+> **Novelty is investigated, not presumed.** Rediscovery is valuable, but must not be misrepresented as original discovery.
 
 #### Two axes
 
-Section 8 of the founding text proposes a record format for findings and a set of statuses. One sentence in it carries the point of this chapter.
+LIA proposes a record format for findings and a set of statuses. One sentence about it carries the point of this chapter.
 
-> Suggested statuses are `candidate`, `corroborated`, `validated`, `rediscovered`, `rejected`, and `unresolved`. Novelty and validity are separate axes: a rediscovery can be true, and a novel candidate can be false. A mature standard should record those dimensions independently. [LIA §8]
+> Suggested statuses are `candidate`, `corroborated`, `validated`, `rediscovered`, `rejected`, and `unresolved`. Novelty and validity are separate axes: a rediscovery can be true, and a novel candidate can be false. A mature standard should record those dimensions independently.
 
 There are two questions about any claim drawn from the record. Is it new, relative to a named record at a named date? Is it true, as far as the appropriate tests have reached? The answers are independent. The cases in this part illustrate three of the possible combinations.
 
@@ -1108,9 +1102,9 @@ A familiar claim can also remain unestablished when nobody has tested it.
 
 The six statuses record positions on these axes. `candidate`, `corroborated`, and `validated` mark how far testing has gone. `rejected` marks a test that went against the claim. `unresolved` marks a claim that could not be settled.
 
-`rediscovered` is a statement about novelty: the claim was already on some record. The founding text does not treat it as a failure. A rediscovery made from the record alone shows that the method can find things that are real. It also gives the earlier discoverer their due.
+`rediscovered` is a statement about novelty: the claim was already on some record. LIA does not treat it as a failure. A rediscovery made from the record alone shows that the method can find things that are real. It also gives the earlier discoverer their due.
 
-The section asks for the two dimensions to be recorded independently because a single label hides one of them. A finding marked only "rediscovered" says nothing about whether it is true. A finding marked only "validated" says nothing about whether anyone knew it before. The proposed record has separate fields for the two: `novelty_check`, which holds the scope, methods, and results of the search for prior statements, and `validation`, which holds the tests and their results. [LIA §8]
+The two dimensions are to be recorded independently because a single label hides one of them. A finding marked only "rediscovered" says nothing about whether it is true. A finding marked only "validated" says nothing about whether anyone knew it before. The proposed record has separate fields for the two: `novelty_check`, which holds the scope, methods, and results of the search for prior statements, and `validation`, which holds the tests and their results.
 
 #### The clock
 
@@ -1122,15 +1116,15 @@ The original discoveries were never developed rigorously as a gold standard. And
 
 Replication was at least clean with respect to time when the system was a program reading a dated set of abstracts. The input could be cut at 1985, and nothing later could get in.
 
-A large language model does not read a dated set. It has been trained on text gathered up to some recent point, and that text includes the later papers, the reviews, and the textbook accounts of the very discoveries used as tests. The contamination paper cited in chapter II-03 states the difficulty: the training data could explicitly or implicitly include test data, and the opacity of that data and black-box access to the models make contamination hard to detect. Its authors report finding a high potential for contamination in one widely used model on one standard benchmark. [^27]
+A large language model does not read a dated set. It has been trained on text gathered up to some recent point, and that text includes the later papers, the reviews, and the textbook accounts of the very discoveries used as tests. The contamination paper cited in chapter II-03 states the difficulty: the training data could explicitly or implicitly include test data, and the opacity of that data and black-box access to the models make contamination hard to detect. The paper's authors report finding a high potential for contamination in one widely used model on one standard benchmark. [^27]
 
 A model asked today to connect fish oil and Raynaud's from pre-1986 literature may simply have read that the connection exists. Its answer is no evidence that the connection was recoverable from the 1985 record by that method. The same is true, less visibly, of any historical case a model might have seen discussed.
 
-That is why the cf-PICI test was built on an unpublished result. It is one way of holding the clock still: choose a claim that cannot be in the training text because it is in no text. The seventh principle of the founding text states the general rule.
+That is why the cf-PICI test was built on an unpublished result. It is one way of holding the clock still: choose a claim that cannot be in the training text because it is in no text. LIA's seventh principle states the general rule.
 
-> **Time is an evidentiary constraint.** Claims about what could have been discovered earlier must exclude information unavailable at the historical cutoff, including information introduced through model training or retrieval. [LIA §6]
+> **Time is an evidentiary constraint.** Claims about what could have been discovered earlier must exclude information unavailable at the historical cutoff, including information introduced through model training or retrieval.
 
-The last clause names the two routes by which later information gets in: what a model learned in training and what it fetches at the time of the question. The proposed record gives each source an `available_at` field for "date or documented uncertainty," so the date of each piece of evidence is written down with it. [LIA §8]
+The last clause names the two routes by which later information gets in: what a model learned in training and what it fetches at the time of the question. The proposed record gives each source an `available_at` field for "date or documented uncertainty," so the date of each piece of evidence is written down with it.
 
 Part II has set out what is buried. There are five ways a thing can be latent. There is a formal boundary that says latent relative to which corpus, which date, and which method.
 
@@ -1150,11 +1144,11 @@ The paper is mostly philosophy and information retrieval. It sets out a view of 
 
 It appeared the same year. The bibliographic record gives the title as "Fish oil, Raynaud's syndrome, and undiscovered public knowledge," in *Perspectives in Biology and Medicine*, volume 30, pages 7 to 18. [^32] The Prologue told the fish-oil example as Swanson gave it in the library paper. This chapter takes the rest: the argument that surrounds the example, the model he later made of it, the trial, and the second case.
 
-The founding text and the framing both put this work first in their lists of precedents.
+LIA puts this work first in its list of precedents.
 
-> Don R. Swanson demonstrated how separately developed bodies of biomedical literature could support a previously unrecognized hypothesis. His 1986 work on fish oil and Raynaud's syndrome is a foundational precedent. [LIA §9]
+> Don R. Swanson demonstrated how separately developed bodies of biomedical literature could support a previously unrecognized hypothesis. His 1986 work on fish oil and Raynaud's syndrome is a foundational precedent.
 
-> Don Swanson connected two separate bodies of medical literature to hypothesize a previously unrecognized application of fish oil. [Framing §2]
+> Don Swanson connected two separate bodies of medical literature to hypothesize a previously unrecognized application of fish oil.
 
 Both sentences are about the medical case. The library paper is where Swanson explained why such a case should exist at all, and why there should be more of them.
 
@@ -1215,11 +1209,11 @@ Swanson's later accounts give the outline. Eleven indirect connections between t
 
 A second connection in the same passage runs through epilepsy, which the update says has been associated with migraine. The same update reports that, after the analysis was published, more than 12 groups of medical researchers reported a systemic or local magnesium deficiency in migraine or a favorable response of migraine patients to dietary magnesium. [^33]
 
-The evidence for this second case is of a different grade from the first. For fish oil there is a trial abstract that can be read apart from Swanson. For magnesium, what is held is a title and the author's retrospective summary. An author's account of what followed his own prediction is not an independent review of those later studies. [^34] [^33]
+The evidence for this second case is of a different grade from the first. For fish oil there is a trial abstract that can be read apart from Swanson. For magnesium, what is held is a title and Swanson's retrospective summary. An author's account of what followed his own prediction is not an independent review of those later studies. [^34] [^33]
 
 #### The case in LIA's terms
 
-The founding text names five kinds of latency, and two of them apply to the fish-oil case. Relational latency is "Meaningful connections among artifacts that have not been recognized or documented together." Inferential latency is "Conclusions or hypotheses obtainable by combining observations, claims, or constraints." [LIA §3] The first is the condition Swanson found: two sets of informational artifacts, each in print, that shared no article and no citation. The second is what he produced from them: a hypothesis obtained by combining a claim about fish oil with a claim about the blood of patients. [^2] [^1]
+LIA names five kinds of latency, and two of them apply to the fish-oil case. Relational latency is "Meaningful connections among artifacts that have not been recognized or documented together." Inferential latency is "Conclusions or hypotheses obtainable by combining observations, claims, or constraints." The first is the condition Swanson found: two sets of informational artifacts, each in print, that shared no article and no citation. The second is what he produced from them: a hypothesis obtained by combining a claim about fish oil with a claim about the blood of patients. [^2] [^1]
 
 The case also has two dates with two different standings. In 1986 the hypothesis was an archaeological candidate. It had been generated entirely from existing information, with its premises and citations laid out for criticism, and it had been tested on no one. In 1989 it became a tested claim, supported for one form of the condition by one trial. [^2] [^3]
 
@@ -1237,9 +1231,9 @@ Swanson and Smalheiser had given an earlier account of the same design in 1996. 
 
 In both searches the program retrieves, intersects, filters, and arranges, and a person reads the paired titles and decides whether a shared word carries an argument. Swanson and Smalheiser stated the reason in 1996: recognizing a meaningful association takes a high level of subject expertise, the natural language of titles and abstracts is an obstacle to fuller automation, and their aids were designed to stimulate the human ability to see connections. [^33] The one-node search generates hypotheses. The two-node search assesses and ranks hypotheses the user already has. Swanson had first emphasized the one-node search; the 2006 paper reports that the two-node search turned out to be more generally applicable and closer to the way most biomedical investigators handle information. [^24]
 
-The founding text names literature-based discovery in the first of its precedents, beside Swanson, and then says what it proposes to add.
+Literature-based discovery stands in the first of LIA's precedents, beside Swanson, and what LIA proposes to add is this.
 
-> The proposed contribution of LIA is to place the informational backlog itself at the center of a general, cross-domain discipline: to investigate its structure, develop methods for its excavation, and establish shared standards for the resulting findings. [LIA §9]
+> The proposed contribution of LIA is to place the informational backlog itself at the center of a general, cross-domain discipline: to investigate its structure, develop methods for its excavation, and establish shared standards for the resulting findings.
 
 The rest of this chapter covers what happened when investigators used the tool, and the difficulty the field reports in judging its own results.
 
@@ -1290,13 +1284,13 @@ The remaining techniques each cover less. Expert review, by one or two domain ex
 
 #### What LIA takes from this
 
-The founding text's research agenda takes up the same problem and keeps both designs. Its first priority is historical replay.
+LIA's research agenda takes up the same problem and keeps both designs. Its first priority is historical replay.
 
-> Freeze a corpus at an earlier date and measure whether a method recovers discoveries documented afterward. Control for training-data leakage, hindsight in selecting tasks, and selection bias. [LIA §10]
+> Freeze a corpus at an earlier date and measure whether a method recovers discoveries documented afterward. Control for training-data leakage, hindsight in selecting tasks, and selection bias.
 
-The controls in the second sentence correspond to what the LBD reviewers found. Tuning a system toward a known answer is hindsight in selecting tasks. Scoring against a dozen famous discoveries is selection bias. The agenda's second priority, publishing timestamped candidates before their outcomes are known, is the prospective form of the same test, and its third names literature-based discovery systems among the baselines that LIA methods are to be compared with. [LIA §10] [^23]
+The controls in the second sentence correspond to what the LBD reviewers found. Tuning a system toward a known answer is hindsight in selecting tasks. Scoring against a dozen famous discoveries is selection bias. The agenda's second priority, publishing timestamped candidates before their outcomes are known, is the prospective form of the same test, and its third names literature-based discovery systems among the baselines that LIA methods are to be compared with. [^23]
 
-LIA takes from this field the A-B-C form, the distinction between generating a hypothesis and assessing one, the place of the expert reader, and an evaluation problem already mapped by the people who have worked on it longest. The field has been biomedical in its literature, its reviews, and its application areas. [^35] [^23] What §9 proposes to add is scope and a center: the epistemic backlog itself, across domains and across kinds of informational artifact, as the object of study.
+LIA takes from this field the A-B-C form, the distinction between generating a hypothesis and assessing one, the place of the expert reader, and an evaluation problem already mapped by the people who have worked on it longest. The field has been biomedical in its literature, its reviews, and its application areas. [^35] [^23] What LIA proposes to add is scope and a center: the epistemic backlog itself, across domains and across kinds of informational artifact, as the object of study.
 
 Literature-based discovery is established here as a working tradition with tools, a common model, and a candid account of how hard its results are to score. The next chapter turns to a method that needs no shared title word, the word embeddings that Tshitoyan and colleagues trained on materials science abstracts in 2019.
 
@@ -1310,15 +1304,15 @@ The text contained a vocabulary of about 500,000 words. They ran a standard algo
 
 The authors then asked which material formulas had embeddings close to the embedding of the word "thermoelectric," which labels a class of functional materials whose performance is scored by a figure of merit called zT. Some formulas ranked high although they had never appeared in an abstract together with that word or with any related keyword. The authors treated those formulas as predictions and tested them three ways: against computed properties, against measured properties, and against the later literature. [^15]
 
-Earlier chapters used this paper for the cost of search, for the formal boundary, and for novelty. This chapter takes it as a whole, because the framing singles it out.
+Earlier chapters used this paper for the cost of search, for the formal boundary, and for novelty. This chapter takes it as a whole, because LIA singles it out.
 
-> The 2019 Nature paper, "Unsupervised word embeddings capture latent knowledge from materials science literature," is particularly relevant. It suggests some future scientific discoveries are already implicitly encoded in existing publications. [Framing §2]
+> The 2019 Nature paper, "Unsupervised word embeddings capture latent knowledge from materials science literature," is particularly relevant. It suggests some future scientific discoveries are already implicitly encoded in existing publications.
 
-The founding text lists the same work as the second tradition in its lineage, in more guarded words.
+LIA lists the same work as the second tradition in its lineage, in more guarded words.
 
-> **Computational extraction of latent scientific knowledge.** Tshitoyan and colleagues demonstrated in 2019 that representations learned from materials science literature could recover domain relationships and retrospectively recommend materials before their later documented investigation. [3] [LIA §9]
+> **Computational extraction of latent scientific knowledge.** Tshitoyan and colleagues demonstrated in 2019 that representations learned from materials science literature could recover domain relationships and retrospectively recommend materials before their later documented investigation. [3]
 
-The founding text's sentence has two parts. One is about relationships the representation recovers. The other is about recommendations made in retrospect. The paper supports the two parts with different evidence, and the sections below take them in turn.
+That sentence has two parts. One is about relationships the representation recovers. The other is about recommendations made in retrospect. The paper supports the two parts with different evidence, and the sections below take them in turn.
 
 #### What the embedding holds
 
@@ -1328,9 +1322,9 @@ The authors first checked that the resulting geometry agreed with chemistry they
 
 Taking the embedding of "ferromagnetic," subtracting that of the alloy NiFe, and adding that of IrMn gave a point whose nearest word was "antiferromagnetic," which is the correct answer for IrMn. The step from a metal to its principal oxide pointed in a consistent direction for zirconium, chromium, and nickel, and so did the step from each metal to its crystal structure. Across categories of such analogies, accuracy was close to 50 percent, which the authors compare to the baseline set by the original study of the algorithm on general text. When the embeddings of the chemical elements were projected onto two dimensions, their arrangement reflected their positions in the periodic table. [^15]
 
-None of these facts was new. What the check showed is where the knowledge resided after training: in the positions of the embeddings, which no person had arranged. This is the first half of the founding text's sentence, the recovery of domain relationships. It is also an instance of the class the founding text's table of latency calls representational, which the table defines in one line.
+None of these facts was new. What the check showed is where the knowledge resided after training: in the positions of the embeddings, which no person had arranged. This is the first half of that sentence, the recovery of domain relationships. It is also an instance of the class LIA's table of latency calls representational, which has a one-line definition.
 
-> Structure or associations encoded in a computational representation, such as an embedding or trained model, that require elicitation and independent verification. [LIA §3]
+> Structure or associations encoded in a computational representation, such as an embedding or trained model, that require elicitation and independent verification.
 
 The line has two requirements, elicitation and independent verification. The ranking against the word "thermoelectric" is the elicitation. The three tests are the verification, and each one reaches a different distance.
 
@@ -1358,11 +1352,11 @@ The whole test was run in 2019 on collections cut to look like the past. No list
 
 The paper also shows how a single prediction arises, which matters for anyone who has to check one. For the third-ranked candidate, CsAgGa2Se4, the authors traced the context words that link the formula to the target word. The compound's embedding sits near "chalcogenide," "band gap," "optoelectronic," and "photovoltaic applications." Many good thermoelectrics are chalcogenides, most need a bandgap, and thermoelectric materials overlap heavily with optoelectronic and photovoltaic ones. The prediction is the sum of those associations. [^15]
 
-The closing paragraph of the founding text's section on latency applies here.
+LIA's closing caution on latency applies here.
 
-> A model's ability to articulate a claim does not establish that the claim was encoded as truthful knowledge, nor that the claim is supported by its training data. Representational latency requires particular care because the original evidentiary trail may be inaccessible. [LIA §3]
+> A model's ability to articulate a claim does not establish that the claim was encoded as truthful knowledge, nor that the claim is supported by its training data. Representational latency requires particular care because the original evidentiary trail may be inaccessible.
 
-In this paper the trail is unusually accessible. The corpus is a dated list of abstracts, the method is public, and the path from a formula to the target word can be drawn. The paper supports the framing's "some": in one field, for one kind of claim, a representation of past publications ranked materials in a way that anticipated later study. It does not show that every future result is recoverable from present publications.
+In this paper the trail is unusually accessible. The corpus is a dated list of abstracts, the method is public, and the path from a formula to the target word can be drawn. The paper supports the word "some" in that claim: in one field, for one kind of claim, a representation of past publications ranked materials in a way that anticipated later study. It does not show that every future result is recoverable from present publications.
 
 The authors name limits of their own. Word embeddings of this kind register which words occur together and cannot represent negation. Abstracts were workable partly because they tend to state positive relationships. Full texts hold more negative and more varied statements and would require more powerful methods. [^15]
 
@@ -1396,13 +1390,13 @@ A first account of the system had appeared as a preprint on February 26, 2025, u
 
 In the preprint's account, the goal a scientist supplies can be anything from a single statement to a long document accompanied by hundreds of earlier publications, and it can carry constraints specific to that scientist's laboratory. The system parses the goal into a plan that fixes, among other things, the criteria by which hypotheses will be judged. While a run is under way the Supervisor agent periodically computes statistics on its progress and uses them to decide where to spend further computation and when to stop. The two documents are versions of one report, fifteen months apart, and this chapter cites each for what it says. [^37]
 
-Both canon documents list the system among the precedents.
+LIA lists the system among its precedents.
 
-> **AI-assisted scientific discovery.** Co-Scientist illustrates how multi-agent hypothesis generation and criticism can be integrated into scientific investigation. [4] [LIA §9]
+> **AI-assisted scientific discovery.** Co-Scientist illustrates how multi-agent hypothesis generation and criticism can be integrated into scientific investigation. [4]
 
-> **Google AI Co-Scientist (2025):** Multi-agent systems designed to generate, challenge and refine scientific hypotheses. [Framing §2]
+> **Google AI Co-Scientist (2025):** Multi-agent systems designed to generate, challenge and refine scientific hypotheses.
 
-The founding text's sentence has three parts: generation, criticism, and integration into investigation. The design above supplies the first two. The third depends on what happened when the hypotheses reached a laboratory, and the paper reports three such cases, each tested to a different level.
+The first of these sentences has three parts: generation, criticism, and integration into investigation. The design above supplies the first two. The third depends on what happened when the hypotheses reached a laboratory, and the paper reports three such cases, each tested to a different level.
 
 #### Generation and criticism
 
@@ -1448,13 +1442,13 @@ The weaker respect is that the case is one question, chosen by people who knew i
 
 Across the three cases the division of work is constant. A scientist wrote the goal. The system generated, criticized, and ranked. Experts chose which hypotheses to test, and laboratory scientists ran the experiments.
 
-The paper says that all three validations included an expert in the loop and that experts set the priorities for laboratory work. [^28] That is what "integrated into scientific investigation" means in the founding text's sentence: the system occupies the stage where hypotheses are formed and screened, and the stages on either side remain with people.
+The paper says that all three validations included an expert in the loop and that experts set the priorities for laboratory work. [^28] That is what "integrated into scientific investigation" means in LIA's sentence: the system occupies the stage where hypotheses are formed and screened, and the stages on either side remain with people.
 
 The paper's stated limitations bear on LIA directly. The system relies on open-access literature, so it can miss earlier work behind paywalls and has systematically little access to negative results. The quality of its hypotheses depends on a source literature of mixed and contradictory quality, which carries a risk of propagating erroneous or irreproducible findings. It inherits imperfect factuality from the underlying model. The authors call their validation preliminary, and they name as future work agents that can trace a claim to the specific figure or data behind it. [^28]
 
 Each of these is a statement about the corpus and about provenance. A method that excavates the published record is bounded by what the record contains and by how well each claim can be followed back to its source.
 
-Co-Scientist shows hypothesis generation and criticism joined to laboratory work, with results that reach in vitro activity, organoid activity, and one recapitulated mechanism. In every case it began from a question that a scientist had already asked. Part IV takes up what changes when a system has to find the questions, and the next chapter turns to the first of the framing's six domains, materials.
+Co-Scientist shows hypothesis generation and criticism joined to laboratory work, with results that reach in vitro activity, organoid activity, and one recapitulated mechanism. In every case it began from a question that a scientist had already asked. Part IV takes up what changes when a system has to find the questions, and the next chapter turns to the first of LIA's six domains, materials.
 
 <a id="chapter-iii-05"></a>
 
@@ -1470,13 +1464,13 @@ The structure collection covered 43,281 unique publications. From it the parsers
 
 None of this was secret. Each fact had been printed in a journal article that the structure database itself pointed to. It was absent only from the place where a person screening frameworks for a use would look.
 
-> **Materials science:** Forgotten polymers, alloys, catalysts and manufacturing techniques that become commercially viable under new conditions. [Framing §4]
+> **Materials science:** Forgotten polymers, alloys, catalysts and manufacturing techniques that become commercially viable under new conditions.
 
-This is the first of the six domains the framing names. The founding text gives the reason the MOF record counts as latent at all.
+This is the first of the six domains LIA names. The reason the MOF record counts as latent at all is this.
 
-> Latency is relational. A claim can be explicit in one archive, invisible to another community, and genuinely unarticulated when considered across an entire body of evidence. [LIA §3]
+> Latency is relational. A claim can be explicit in one archive, invisible to another community, and genuinely unarticulated when considered across an entire body of evidence.
 
-The synthesis details were explicit in the journal archive and invisible in the structure archive. DigiMOF is an excavation of the first into the second, and its limits are stated by its authors. On a test set of 50 randomly chosen papers the parsers reached an overall precision of 77 percent, so roughly one extracted pairing in four is wrong. The parsers favored precision over recall and so missed much of what the papers contain.
+The synthesis details were explicit in the journal archive and invisible in the structure archive. DigiMOF is an excavation of the first into the second, and its limits are stated by the DigiMOF authors. On a test set of 50 randomly chosen papers the parsers reached an overall precision of 77 percent, so roughly one extracted pairing in four is wrong. The parsers favored precision over recall and so missed much of what the papers contain.
 
 A compound that a paper labels only "1" or "2" could not be tied to any property. Some articles could not be accessed, and some were not in English. The parsers found 5,677 hydrothermal syntheses and 3,672 solvothermal ones, which the authors call surprising, since solvothermal routes are the usual laboratory method; many papers imply that route by naming the solvents and never use the word. A mined database reports what the text said in the forms the parser could read. It does not show that any synthesis will succeed when repeated. [^38]
 
@@ -1502,15 +1496,15 @@ The pipeline then predicted. In a series of rare-earth orthochromites the mined 
 
 The level of this evidence is computational. The reconstructions were checked against known diagrams, and the predictions for missing compounds against published values where those existed. No new sample was measured for the paper, and the predictions with no reference value remain untested. The authors state that their models predict for known compounds and that predicting new classes of compounds is a goal still ahead. Chapter III-03 told the neighboring case in full, in which word embeddings trained on dated abstracts ranked thermoelectric candidates; that result too was retrospective. [^39] [^21]
 
-#### What the framing names and what the cases show
+#### What LIA names and what the cases show
 
-The framing's sentence is about materials and techniques: polymers, alloys, catalysts, and ways of manufacturing that were set aside and that become commercially viable when conditions change. In the founding text's terms that is contextual latency. None of the three audited cases shows it. No forgotten alloy returns to use in them, and none of them reports a commercial result.
+The domain's sentence is about materials and techniques: polymers, alloys, catalysts, and ways of manufacturing that were set aside and that become commercially viable when conditions change. In LIA's terms that is contextual latency. None of the three audited cases shows it. No forgotten alloy returns to use in them, and none of them reports a commercial result.
 
 What the cases show lies under that. The record of how things were made, and of what was measured, exists as prose in tens of thousands of papers, and it can be recovered into a form that can be searched, counted, and computed on, at error rates the excavators publish. That is archival and relational latency in DigiMOF and the recipe dataset, and representational latency in the phase diagrams.
 
 A search for an abandoned material that has become viable would need exactly this kind of record to work from. The cases establish that the record can be built. They do not establish that such a search has succeeded.
 
-Three excavations of the materials literature have recovered synthesis conditions, recipes, and phase behavior into usable form, each validated as extraction or computation and none as a new measurement. The next chapter, III-06, takes up patents, the second of the framing's domains.
+Three excavations of the materials literature have recovered synthesis conditions, recipes, and phase behavior into usable form, each validated as extraction or computation and none as a new measurement. The next chapter, III-06, takes up patents, the second of LIA's domains.
 
 <a id="chapter-iii-06"></a>
 
@@ -1522,9 +1516,9 @@ The patent's answer is to build the part as a stack of thin cross sections. A ve
 
 A platform then moves the solid lamina away from the surface by the thickness of one layer, fresh liquid flows over it, and the spot draws the next cross section, which adheres to the one before. The steps repeat until the whole object exists. A computer generates the cross sections and sends the commands, so that a designer who is satisfied with a shape on the screen can have the part made directly from it, with no drawings and no tooling. [^29]
 
-> **Patent archaeology:** Abandoned inventions whose original technological constraints no longer exist. [Framing §4]
+> **Patent archaeology:** Abandoned inventions whose original technological constraints no longer exist.
 
-This is the second of the six domains the framing names. Its sentence is about inventions that were given up. The audited cases in this chapter are about something else that the patent record holds, and the chapter returns to the framing's own phrase at the end. What the cases show is that a patent is a dated public document in which someone joins fields and says which ones.
+This is the second of the six domains LIA names. Its sentence is about inventions that were given up. The audited cases in this chapter are about something else that the patent record holds, and the chapter returns to the domain's own phrase at the end. What the cases show is that a patent is a dated public document in which someone joins fields and says which ones.
 
 #### Three records of joined fields
 
@@ -1542,9 +1536,9 @@ The third patent crosses a wider gap. United States 6,334,856, to Mark Allen, Ma
 
 The proposal is an array of needles small enough to pass through that outer layer without reaching the nerves beneath it. The means of making them comes from another industry. The patent states that its fabrication processes are based on well-established methods used to make integrated circuits and other microelectronic devices, and it lists lithography, etching, thermal oxidation of silicon, and electroplating among them. In one process, deep plasma etching of a silicon wafer, "Needles are patterned directly using photolithography," which the text says gives greater control over needle geometry. [^41]
 
-In each document the fields being joined are named by the inventors themselves, and the document carries a date. The founding text has a sentence for this shape of work.
+In each document the fields being joined are named by the inventors themselves, and the document carries a date. One sentence covers this shape of work.
 
-> These classes are not exclusive. An excavation may recover an obscure observation, connect it to a separate field, and reveal its usefulness in a new technological context. [LIA §3]
+> These classes are not exclusive. An excavation may recover an obscure observation, connect it to a separate field, and reveal its usefulness in a new technological context.
 
 #### What a patent proves
 
@@ -1552,9 +1546,9 @@ A patent shows that a combination was disclosed on a date. The three records abo
 
 A patent does not show more than that. Hull's patent says its production costs should be similar to injection molding for short runs; the sentence is a forecast in an application, and the grant does not test it. Deckard's patent establishes a disclosed design and nothing about the reliability of later machines.
 
-Allen's patent states that the devices can be mass-produced at low unit cost; clinical efficacy, manufacturing economics, and the validity of the patent itself each need separate evidence. None of the three shows that no one had seen the combination before the filing. In the founding text's terms each is an archaeological candidate set down in public, and section 5 is specific about what stands between that and anything further. [^29] [^40] [^41]
+Allen's patent states that the devices can be mass-produced at low unit cost; clinical efficacy, manufacturing economics, and the validity of the patent itself each need separate evidence. None of the three shows that no one had seen the combination before the filing. In LIA's terms each is an archaeological candidate set down in public, and the boundary between candidate and discovery is specific about what stands between that and anything further. [^29] [^40] [^41]
 
-> A candidate may require new experiments before it becomes a discovery about the physical world. [LIA §5]
+> A candidate may require new experiments before it becomes a discovery about the physical world.
 
 #### Patents as readers
 
@@ -1568,9 +1562,9 @@ A second set held 176 papers with no journal citations at all for five years. Pa
 
 The study counts citations. The authors note that a patent's references come from examiners as well as inventors and do not necessarily mark the scientific basis of the invention. A patent citation is evidence that a paper was noticed in a technical setting. It is not proof of commercial value. [^8]
 
-#### The framing's phrase
+#### The domain's phrase
 
-The framing's words for this domain are "Abandoned inventions whose original technological constraints no longer exist." [Framing §4] The idea is contextual latency in its plainest form: a design set aside because something it needed was missing, and a later date at which the missing thing is available. No audited case of that kind is in the record used here. The chapter therefore leaves the phrase as the framing states it, without an example.
+LIA's words for this domain are "Abandoned inventions whose original technological constraints no longer exist." The idea is contextual latency in its plainest form: a design set aside because something it needed was missing, and a later date at which the missing thing is available. No audited case of that kind is in the record used here. The chapter therefore leaves the phrase as LIA states it, without an example.
 
 The patent record is established here as a dated archive of cross-field combinations and as a reader of neglected papers, each at the level of disclosure or citation. The next chapter, III-07, takes up pharmaceuticals.
 
@@ -1582,9 +1576,9 @@ Ghofrani, Osterloh and Grimminger report that in 1986, researchers at Pfizer's l
 
 The observation was at first not thought to be of major significance, and cardiovascular uses stayed the focus of the clinical work through 1992 and 1993. By the middle of 1993 the compound looked less promising for angina. Its half-life in the blood was about four hours, so it would have had to be taken at least three times a day, and it interacted with the nitrates that angina patients already took. The first clinical study in patients with erectile dysfunction was run late in 1993. [^57] The Food and Drug Administration's approval history for Viagra carries the entry "03/27/1998 ORIG-1 Approval Type 1 - New Molecular Entity." [^59]
 
-Pharmaceutical research is the third of the six domains in which the framing expects the most from this work.
+Pharmaceutical research is the third of the six domains in which LIA expects the most from this work.
 
-> **Pharmaceutical research:** Unexplored relationships between compounds, biological pathways and diseases. [Framing §4]
+> **Pharmaceutical research:** Unexplored relationships between compounds, biological pathways and diseases.
 
 Each of the four cases in this chapter is a relationship between a compound and a disease that existing records pointed to before anyone had tested it. They differ in who noticed the relationship, in how it was noticed, and in what kind of test or approval followed.
 
@@ -1610,7 +1604,7 @@ Chapter II-04 told the baricitinib case in full. In February 2020 a group at Ben
 
 "We identified baricitinib, which is predicted to reduce the ability of the virus to infect lung cells." Their route ran through AAK1, an enzyme that regulates the process by which most viruses enter cells. Baricitinib was an approved inhibitor of janus kinases, and it also bound AAK1 at ordinary doses. The authors proposed that it be trialled to reduce both viral entry and inflammation. [^25]
 
-What matters for this chapter is how the candidate reached a trial and what the trial was. The letter was a published candidate and no more: its authors called their suggestions initial thoughts that required further detailed work. [^25] The trial was designed by other people. The investigators of ACTT-2, in their own paper, noted that baricitinib had been predicted with the use of artificial intelligence algorithms to be a potential therapeutic, and they also cited three case series in which patients given the drug had shown better oxygenation. Enrollment began on May 8, 2020, and ended on July 1, 2020, at 67 sites in 8 countries.
+What matters for this chapter is how the candidate reached a trial and what the trial was. The letter was a published candidate and no more: the letter's authors called their suggestions initial thoughts that required further detailed work. [^25] The trial was designed by other people. The investigators of ACTT-2, in their own paper, noted that baricitinib had been predicted with the use of artificial intelligence algorithms to be a potential therapeutic, and they also cited three case series in which patients given the drug had shown better oxygenation. Enrollment began on May 8, 2020, and ended on July 1, 2020, at 67 sites in 8 countries.
 
 The trial randomized 1,033 hospitalized adults. All received the antiviral remdesivir for up to 10 days, and they received either baricitinib, 4 milligrams daily for up to 14 days, or a matching placebo. "Patients receiving baricitinib had a median time to recovery of 7 days," against 8 days in the control group. [^55]
 
@@ -1624,9 +1618,9 @@ The third case began with a search. Nobody had seen baricitinib help a patient w
 
 Swanson's fish-oil hypothesis, told in chapter III-01, is the fourth point of comparison, and it sits with baricitinib. He found one set of articles on what dietary fish oil does to the blood and a second on blood changes that might benefit patients with Raynaud's syndrome, and in his words "these two literatures had no articles in common." The BenevolentAI group queried a graph that machines had built, but the route is the same: a candidate stated from the literature, then a trial run independently by others. The lag is three years from the explicit hypothesis in 1986 to the first reported trial in 1989, a validation interval. [^2]
 
-The founding text draws the line that all four cases cross.
+The line that all four cases cross is this one.
 
-> A useful boundary is between an **archaeological candidate**, generated from existing information, and a **validated discovery**, which has survived the appropriate tests. A candidate may require new experiments before it becomes a discovery about the physical world. [LIA §5]
+> A useful boundary is between an **archaeological candidate**, generated from existing information, and a **validated discovery**, which has survived the appropriate tests. A candidate may require new experiments before it becomes a discovery about the physical world.
 
 Each case here stands at a different point between the two. Sildenafil has a trial program and an approval. Thalidomide has an approval on historical data.
 
@@ -1642,9 +1636,9 @@ A firm in the United States that sells a large share of its output to one buyer 
 
 The authors ran a phonetic string-matching algorithm to produce candidate matches and then matched each one by hand, checking the firm's name, segment, and industry. The final sample held 30,622 distinct firm-year relationships, representing 11,484 unique supplier-customer relationships. They then joined the links to stock returns. Their paper, published in the Journal of Finance in August 2008, opens with its result: "This paper finds evidence of return predictability across economically linked firms." A supplier's stock returns predictably followed the returns of its customers. [^26]
 
-Financial research is the fourth of the six domains the framing lists.
+Financial research is the fourth of the six domains LIA lists.
 
-> **Financial research:** Structural relationships buried across regulatory filings, supply chains, patents and economic data. [Framing §4]
+> **Financial research:** Structural relationships buried across regulatory filings, supply chains, patents and economic data.
 
 The three studies in this chapter each join a public or purchasable record to market outcomes. One uses customer disclosures, one uses insiders' trade reports, and one uses satellite images of parking lots. All three are retrospective.
 
@@ -1684,11 +1678,11 @@ These are published observational backtests. Trading costs, the cost of access t
 
 All three studies are retrospective and observational. None shows a profit available today after costs. Each reports a pattern in past data over a stated window, the latest of which closed in 2017. [^26] [^43] [^44]
 
-What they establish is narrower and is the point of the chapter: the relationships were in the record. The customer's name was in the supplier's filing. The insider's habit was in years of that insider's own filings. In each case the pieces sat in separate places and the study's contribution was the join, performed under a rule that kept later information out. The founding text's first consequence of its formal boundary names the three things such a study has to fix.
+What they establish is narrower and is the point of the chapter: the relationships were in the record. The customer's name was in the supplier's filing. The insider's habit was in years of that insider's own filings. In each case the pieces sat in separate places and the study's contribution was the join, performed under a rule that kept later information out. The first consequence of LIA's formal boundary names the three things such a study has to fix.
 
-> Latency is relative to a corpus, a historical boundary, and a method of investigation. [LIA §4]
+> Latency is relative to a corpus, a historical boundary, and a method of investigation.
 
-Each study names its corpus, dates what was available when, and states its method of sorting. The second consequence applies as well: "A candidate in the discovery space is not necessarily true." [LIA §4] A pattern found in past returns is a candidate about future ones, and these studies did not test it prospectively.
+Each study names its corpus, dates what was available when, and states its method of sorting. The second consequence applies as well: "A candidate in the discovery space is not necessarily true." A pattern found in past returns is a candidate about future ones, and these studies did not test it prospectively.
 
 Three retrospective studies have shown structural relationships present in filings, trade reports, and imagery before prices reflected them. The next chapter, III-09, turns to organizations, where the records are internal and the reconstruction is of what an institution had been told.
 
@@ -1706,9 +1700,9 @@ Two years separate the documented board warning in 1999 from the collapse in 200
 
 #### The fifth domain
 
-Section 4 of the framing lists six domains under the heading "Where the greatest potential is." The fifth concerns organizations.
+LIA names six domains where the greatest potential is. The fifth concerns organizations.
 
-> **Organizational intelligence:** Reconstructing how companies actually function from fragmented operational records. [Framing §4]
+> **Organizational intelligence:** Reconstructing how companies actually function from fragmented operational records.
 
 The Enron report shows what "fragmented" means inside one company. The board had 15 members in 2001 and worked through five committees. It normally met five times a year.
 
@@ -1734,9 +1728,9 @@ That interval measures the SEC's delay. The warning was on file in 2000, eight y
 
 #### Where the records disagreed
 
-The fifth principle of the founding text names the feature the two cases share.
+LIA's fifth principle names the feature the two cases share.
 
-> **Contradictions are excavation sites.** Inconsistencies can indicate missing variables, incompatible assumptions, errors, or genuine opportunities for explanation. [LIA §6]
+> **Contradictions are excavation sites.** Inconsistencies can indicate missing variables, incompatible assumptions, errors, or genuine opportunities for explanation.
 
 At Enron the contradiction lay between what directors said they had known and what their own minutes and presentations recorded. One director testified that the board could not be criticized for failing to address problems that had been concealed from it, and the report answers that much of what was wrong was not concealed. The board was also told that gross revenues had risen from $40 billion in 1999 to $100 billion in 2000, and the report notes that apparently no member questioned the figure. [^45] At the SEC the contradictions were between Madoff's statements and outside records, and the inspector general testified that examiners caught Madoff in contradictions and inconsistencies and then accepted his answers at face value. [^19]
 
@@ -1763,9 +1757,9 @@ The engine was shown to the public in 2018. It combines text search, visual sear
 
 #### The sixth domain
 
-The last of the six domains in section 4 of the framing is the one this chapter covers.
+The last of LIA's six domains is the one this chapter covers.
 
-> **Historical reconstruction:** Recovering events, networks and relationships from incomplete archives. [Framing §4]
+> **Historical reconstruction:** Recovering events, networks and relationships from incomplete archives.
 
 The sentence names three things to recover and one condition on the source. The four cases here are four different kinds of incomplete archive: a city's records that survive in bulk and were unsearchable, a library that survives and could not be opened, a machine that survives as corroded fragments, and one man's papers that survive scattered across more than twenty collections. In each the reconstruction is real and bounded, and the bound can be stated.
 
@@ -1773,7 +1767,7 @@ The sentence names three things to recover and one condition on the source. The 
 
 The chronology documents a body of data and a set of tools. It reports that the handwriting recognition system developed from the annotated Venetian documents, presented in 2018, performed better than an Italian reader without archival training. A document segmentation system built for the project was released as open source. These are statements about access. They say that a page can now be found by a name written on it, by an image that resembles another image, or by a location in the city. [^46]
 
-The chronology also records one historical result drawn from digitized records. In 2020 EPFL researchers published an analysis of daily death records from the city's Patriarchal Archives covering the plague in Venice between 1630 and 1631. The deaths showed a first peak in 1630 that reached over 400 per day at its worst and a less acute but longer peak in 1631. [^46] That finding is an event recovered from an archive, which is the framing's first item, and it rests on one named series of records that could be counted.
+The chronology also records one historical result drawn from digitized records. In 2020 EPFL researchers published an analysis of daily death records from the city's Patriarchal Archives covering the plague in Venice between 1630 and 1631. The deaths showed a first peak in 1630 that reached over 400 per day at its worst and a less acute but longer peak in 1631. [^46] That finding is an event recovered from an archive, which is the domain's first item, and it rests on one named series of records that could be counted.
 
 Networks and relationships are a different matter. A search that returns every page on which a name appears has returned candidates for a network. Whether two entries refer to the same person, and whether the tie between them was what it appears to be, are questions for the documents and for a historian. The project's own chronology supports the data and the demonstrations, and digitization alone does not validate every historical network or event inferred from them. The cited record also gives no pair of dates from which a discovery lag could be inferred, and none is stated here. [^46]
 
@@ -1805,15 +1799,15 @@ Yet the catalogue reports that it is not always easy to decide which documents b
 
 #### The limits as part of the finding
 
-Section 11 of the founding text closes its account of the archaeological metaphor with two sentences.
+LIA's account of the archaeological metaphor closes with two sentences.
 
-> The work is excavation, reconstruction, interpretation, and verification. It is as much about understanding the limits of the record as it is about discovering what the record contains. [LIA §11]
+> The work is excavation, reconstruction, interpretation, and verification. It is as much about understanding the limits of the record as it is about discovering what the record contains.
 
 Each of the four cases carries its limit inside the source that reports the result. The Venice chronology counts digitized documents and annotations, which are measures of access. [^46] The prize announcement puts the unread share of the scroll beside the columns that were read. [^4] The Antikythera abstract separates what was reconstructed from what is only suggested and what is lost. [^17] The Zenon catalogue lists the texts still unpublished and the attributions still disputed. [^18]
 
-The same section says that an absence in the record "may be meaningful, or it may simply reflect what was never recorded or what failed to survive." [LIA §11] In all four cases the record is incomplete for reasons unrelated to the question being asked of it: an eruption, a shipwreck, a sale in bundles on the antiquities market. A reconstruction from such a record states where the evidence stops.
+An absence in the record may be meaningful, or it may simply reflect what was never recorded or what failed to survive. In all four cases the record is incomplete for reasons unrelated to the question being asked of it: an eruption, a shipwreck, a sale in bundles on the antiquities market. A reconstruction from such a record states where the evidence stops.
 
-Historical reconstruction from incomplete archives recovers events, texts, and mechanisms that can be checked against the artifact, and it leaves networks as archaeological candidates until someone tests them. With this the six domains of the framing have each been shown on cases. The next chapter takes up what happens between fields, when a method made in one is carried into another.
+Historical reconstruction from incomplete archives recovers events, texts, and mechanisms that can be checked against the artifact, and it leaves networks as archaeological candidates until someone tests them. With this the six domains of LIA have each been shown on cases. The next chapter takes up what happens between fields, when a method made in one is carried into another.
 
 <a id="chapter-iii-11"></a>
 
@@ -1825,13 +1819,13 @@ The paper credits David Gale with a procedure for this market called top trading
 
 In 2004 Alvin Roth, Tayfun Sönmez, and Utku Ünver published "Kidney Exchange" in the Quarterly Journal of Economics. Their subject was patients who have a willing living donor whose kidney they cannot receive, because of blood type or because a test before transplantation shows the patient carries antibodies against the donor's tissue. The paper reports that more than 55,000 patients were on the United States waiting list for a cadaver kidney, that about 3,400 died while waiting in 2002, and that buying or selling an organ is a felony under a 1984 federal law. A market with indivisible goods, differing preferences, and no money was the market Shapley and Scarf had modeled. The authors called their proposal a "generalization of the TTC mechanism, for kidney exchange." [^47]
 
-The founding text has this kind of event in view from its third paragraph.
+LIA has this kind of event in view from the start.
 
-> An observation made in one field may resolve a problem in another. [LIA Preamble]
+> An observation made in one field may resolve a problem in another.
 
-It returns to the point in §10, where the list of early research priorities includes this one.
+The point returns in the list of early research priorities, which includes this one.
 
-> **Cross-domain transfer.** Test whether useful principles, technologies, and explanations can be recovered across distinct vocabularies and institutional boundaries. [LIA §10]
+> **Cross-domain transfer.** Test whether useful principles, technologies, and explanations can be recovered across distinct vocabularies and institutional boundaries.
 
 This chapter takes four transfers of method between fields and asks the same three things of each: what was carried over, what had to change, and how far apart in time the two sides stand.
 
@@ -1861,9 +1855,9 @@ The same entry reports that his larger aim was a single method covering hydromec
 
 #### The form of a problem
 
-In none of these cases was the earlier work lost. The housing model was cited in economics, the heat equation was taught, and citation counts were in use. Something else was missing, and the fourth principle of the founding text names it.
+In none of these cases was the earlier work lost. The housing model was cited in economics, the heat equation was taught, and citation counts were in use. Something else was missing, and LIA's fourth principle names it.
 
-> **The question may itself be the discovery.** Recognizing that a problem can be asked differently is a legitimate outcome. [LIA §6]
+> **The question may itself be the discovery.** Recognizing that a problem can be asked differently is a legitimate outcome.
 
 Roth, Sönmez, and Ünver asked a question about organ shortage as a question about trading indivisible goods without money. Black and Scholes asked a question about the value of a security and arrived at an equation whose solution was in print. Page and Brin asked which web pages matter as a question about who cites whom.
 
@@ -1891,9 +1885,9 @@ The 45 best-scoring queries were combined into a single measure, and a linear mo
 
 In March 2014 Lazer, Kennedy, King, and Vespignani published a critique in Science. Its central figure carries the finding: "GFT overestimated the prevalence" of flu in the 2012–2013 season, and overshot the actual level in 2011–2012 by more than 50 percent. From 21 August 2011 to 1 September 2013, Google Flu Trends reported flu prevalence that was too high in 100 out of 108 weeks. The critique opens on February 2013, when Nature reported that the model was predicting more than double the proportion of doctor visits for influenza-like illness that the CDC was, although it had been built to predict the CDC's reports. [^61]
 
-The founding text has a principle for a case like this one.
+LIA has a principle for a case like this one.
 
-> **Negative results belong in the record.** Failed connections, rejected hypotheses, and uncertainty should be retained when possible so future investigators do not repeat the same excavation. [LIA §6]
+> **Negative results belong in the record.** Failed connections, rejected hypotheses, and uncertainty should be retained when possible so future investigators do not repeat the same excavation.
 
 This chapter gives failed connections the treatment the preceding chapters gave successful ones: what was proposed, what was checked, what the verdict was, and what remains for the next investigator.
 
@@ -1933,11 +1927,11 @@ Each of these failures leaves something a later investigator can use. Google Flu
 
 A fourth failure, from machine learning, left tools behind in the same way. Burns and colleagues had proposed finding what a language model knows from its internal activations without labels, using the idea that knowledge satisfies a consistency structure. In 2023 Farquhar and colleagues at Google DeepMind proved that arbitrary features satisfy that structure too, and showed in experiments that the method returned classifiers predicting some other prominent feature. They contributed sanity checks for evaluating future methods. Their result concerns the methods they tested and does not show that no such recovery is possible. [^22]
 
-The founding text said in advance that outcomes like these would be common.
+LIA expects outcomes like these to be common.
 
-> Some candidates will be false, others trivial, and others impossible to resolve without new observations. [LIA §2]
+> Some candidates will be false, others trivial, and others impossible to resolve without new observations.
 
-The record now holds one example of each kind. The sign law in the first candidate was false: its algebra ran backwards. The qualitative core of the same candidate was trivial in the sense that matters here, since the review file reports that the candidate's own text called it textbook material and carried an instruction not to claim novelty. The physical survival of archives is impossible to resolve from survivors alone, because no reweighting recovers what was destroyed on account of its features. Sorting candidates into these kinds is ordinary work, and §2 follows the sentence with one more: "LIA exists to distinguish among them." [LIA §2]
+The record now holds one example of each kind. The sign law in the first candidate was false: its algebra ran backwards. The qualitative core of the same candidate was trivial in the sense that matters here, since the review file reports that the candidate's own text called it textbook material and carried an instruction not to claim novelty. The physical survival of archives is impossible to resolve from survivors alone, because no reweighting recovers what was destroyed on account of its features. Sorting candidates into these kinds is ordinary work, and the sentence above has a sequel: LIA exists to distinguish among them.
 
 Part III has now followed excavation from Swanson's two literatures through materials, patents, pharmaceuticals, finance, organizations, historical reconstruction, and the space between fields, and has shown through these cases that discoveries are made from existing informational artifacts and that some candidates fail. Part IV, "The discipline," takes up what turns excavation into a discipline: the fundamental problem, the principles, the method, the record, and the tests.
 
@@ -1953,20 +1947,20 @@ In 2022 Burns, Ye, Klein, and Steinhardt posted a preprint proposing a way to fi
 
 In 2023 Farquhar and colleagues at Google DeepMind and Google Research tested that claim. They proved that the consistency condition at the center of the method is satisfied by arbitrary features of the activations, and is not satisfied only by knowledge. They then built experiments in which a second, irrelevant feature was planted in the prompts. In those experiments the method returned a classifier for the planted feature. Their conclusion was that the unsupervised methods they tested do not find knowledge and instead find whatever feature of the activations is most prominent. [^22]
 
-Chapter II-01 introduced this result when it took up the fifth kind of latency, and Chapter III-12 listed it among the connections that failed. This chapter uses it for what the framing uses it for.
+Chapter II-01 introduced this result when it took up the fifth kind of latency, and Chapter III-12 listed it among the connections that failed. This chapter uses it to state the fundamental problem.
 
 
 ![Six questions for evaluating a candidate discovery](figures/F11.png)
 
-#### The problem as the framing states it
+#### The problem as LIA states it
 
-The framing lists latent knowledge elicitation among its scientific precedents.
+LIA lists latent knowledge elicitation among its scientific precedents.
 
-> **Latent Knowledge Elicitation:** Attempts to extract information encoded within neural networks that isn't reliably expressed through normal prompting. [Framing §2]
+> **Latent Knowledge Elicitation:** Attempts to extract information encoded within neural networks that isn't reliably expressed through normal prompting.
 
 The problem behind that line was posed in general terms a year before the Burns preprint. On December 14, 2021, the Alignment Research Center announced its first technical report, on eliciting latent knowledge, and called it an open problem that the authors believed to be central to the alignment of AI systems. The announcement gives the core difficulty as learning how to map between an AI's model of the world and a human's model. The announcement presents a problem. It does not present a technique that extracts truth from a model. [^54]
 
-Contrast-consistent search was one attempt at a part of that problem, and the 2023 paper was a test of the attempt. The framing draws its warning from that sequence.
+Contrast-consistent search was one attempt at a part of that problem, and the 2023 paper was a test of the attempt. LIA draws its warning from that sequence.
 
 > The biggest risk is confusing a plausible inference with an actual discovery. DeepMind researchers showed that some unsupervised latent knowledge extraction techniques identify prominent neural features without actually identifying truthful knowledge.
 >
@@ -1977,8 +1971,6 @@ Contrast-consistent search was one attempt at a part of that problem, and the 20
 > - **Falsifiability:** Can we design a test that disproves it?
 > - **Utility:** Does discovering it actually matter?
 > - **Temporal integrity:** Could this genuinely have been discovered using only information available at the time?
->
-> [Framing §5]
 
 The second sentence of the first paragraph refers to the 2023 paper. The rest of this chapter takes that result in more detail and then goes through the six questions, each with a case already told in which a claim fails on that question.
 
@@ -2000,11 +1992,11 @@ A fourth experiment planted nothing. The authors took a question-answering datas
 
 The paper states the scope of its result. It concludes that existing unsupervised methods are insufficient for discovering latent knowledge. It does not prove that latent knowledge can never be recovered from a model. Its experiments cover the methods that existed, and the authors mark the extension to future methods as a hypothesis: a model that can simulate the beliefs of other agents will hold features for those beliefs, and such features satisfy the same consistency properties that knowledge does. It contributes its modified prompts as sanity checks for any later method. [^22]
 
-In each planted-feature experiment the method produced a classifier that met its consistency condition. The output looked the same whether it tracked the review or tracked Alice. Only an independent check against a known answer told the two apart. That is the framing's first sentence in a laboratory setting: the inference was plausible, and it was not the discovery it was taken for.
+In each planted-feature experiment the method produced a classifier that met its consistency condition. The output looked the same whether it tracked the review or tracked Alice. Only an independent check against a known answer told the two apart. That is the warning's first sentence in a laboratory setting: the inference was plausible, and it was not the discovery it was taken for.
 
 #### Six questions, six failures
 
-The framing asks for evaluation "along several independent dimensions." The cases already told in this piece show each question failing while others are answered well.
+LIA asks for evaluation "along several independent dimensions." The cases already told in this piece show each question failing while others are answered well.
 
 Novelty asks whether anybody already knows the claim. Chapters II-01 and III-09 told the case of Bernard Madoff, whose reported returns and claimed options trading could not both be real given the size of the options market. An analyst who reached that conclusion in 2005 from public figures would have made a sound inference and would have failed on novelty. The inspector general of the Securities and Exchange Commission testified that the agency received six substantive complaints between June 1992 and December 2008.
 
@@ -2028,19 +2020,19 @@ Public exposure in 2008 confirmed the fraud. The earlier inference depended on c
 
 #### Why the questions are separate
 
-The framing calls the dimensions independent, and the cases show what that word requires. Each question is settled by a different act upon a different record. Novelty is settled by searching a reference record, provenance by tracing each premise to its source, validity by checking the reasoning against data, falsifiability by naming the observation that would defeat the claim, utility by comparison with what is already available, and temporal integrity by dating every piece of evidence.
+LIA calls the dimensions independent, and the cases show what that word requires. Each question is settled by a different act upon a different record. Novelty is settled by searching a reference record, provenance by tracing each premise to its source, validity by checking the reasoning against data, falsifiability by naming the observation that would defeat the claim, utility by comparison with what is already available, and temporal integrity by dating every piece of evidence.
 
 A good answer to one question supplies no answer to another. The flu model had a correlation of 0.97 and unpublished inputs. The Madoff inference was valid and was not new. The Alice probe was consistent and had no traceable source. [^50] [^19] [^22]
 
-The founding text applies this with special force to claims that come out of a model. Its section on the kinds of latency ends with two sentences on the representational kind.
+LIA applies this with special force to claims that come out of a model. Its account of the kinds of latency ends with two sentences on the representational kind.
 
-> A model's ability to articulate a claim does not establish that the claim was encoded as truthful knowledge, nor that the claim is supported by its training data. Representational latency requires particular care because the original evidentiary trail may be inaccessible. [LIA §3]
+> A model's ability to articulate a claim does not establish that the claim was encoded as truthful knowledge, nor that the claim is supported by its training data. Representational latency requires particular care because the original evidentiary trail may be inaccessible.
 
 The first sentence is the DeepMind result in general form. A model that can state a claim, or a probe that can extract a consistent answer, has shown that something in the model supports the statement. It has not shown that the something is truthful knowledge, and the Alice experiments show one concrete alternative, the represented opinion of someone else. [^22]
 
-The second sentence concerns provenance. When an archaeological candidate comes from documents, each premise can be followed to a page, a date, and an author, and the remaining five questions can be put to it. When a candidate comes from a model's internal representation, that trail runs into the model's training and stops, because the documents that produced the representation are not attached to it. The founding text's remedy is in its definition of the representational class: such structure requires elicitation and independent verification. The elicited claim is treated as an archaeological candidate, and the six questions are answered from records outside the model. [LIA §3]
+The second sentence concerns provenance. When an archaeological candidate comes from documents, each premise can be followed to a page, a date, and an author, and the remaining five questions can be put to it. When a candidate comes from a model's internal representation, that trail runs into the model's training and stops, because the documents that produced the representation are not attached to it. LIA's remedy is in its definition of the representational class: such structure requires elicitation and independent verification. The elicited claim is treated as an archaeological candidate, and the six questions are answered from records outside the model.
 
-The fundamental problem is now stated in the framing's words, with a failure on each of the six dimensions drawn from cases this piece has already told. The next chapter prints the founding text's ten principles and shows each one deciding a case.
+The fundamental problem is now stated in LIA's own words, with a failure on each of the six dimensions drawn from cases this piece has already told. The next chapter states LIA's ten principles and shows each one deciding a case.
 
 <a id="chapter-iv-02"></a>
 
@@ -2052,11 +2044,11 @@ The organizers then spent January checking the entries before any money moved. I
 
 A claim to have read a sealed scroll was made, then tested by people with no stake in it, and then accepted. About one year separates the release of the challenge data in 2023 from the prize announcement in 2024, and the age of the ancient text is not a discovery lag. [^4]
 
-The founding text turns that order into a rule, and into nine more. Its sixth section begins:
+LIA turns that order into a rule, and into nine more.
 
-> The following principles define the proposed discipline. [LIA §6]
+> The following principles define the proposed discipline.
 
-The ten follow as §6 prints them, each beside one decision from a case already told in this piece.
+The ten follow in order, each beside one decision from a case already told in this piece.
 
 #### Evidence, provenance, novelty, questions, contradictions
 
@@ -2078,7 +2070,7 @@ The catalogue's open attributions matter here because a dated endorsement and a 
 
 3. **Novelty is investigated, not presumed.** Rediscovery is valuable, but must not be misrepresented as original discovery.
 
-Chapter II-05 used the 1998 technical report by Page, Brin, and two Stanford colleagues to show novelty handled honestly from the inside. The report proposed ranking web pages by the structure of the links between them. Its authors did not present the underlying idea as theirs. Their first section says "there is already a large literature on academic citation analysis," and the report treats a link from one page to another as a kind of citation. [^31]
+Chapter II-05 used the 1998 technical report by Page, Brin, and two Stanford colleagues to show novelty handled honestly from the inside. The report proposed ranking web pages by the structure of the links between them. The authors did not present the underlying idea as theirs. Their first section says "there is already a large literature on academic citation analysis," and the report treats a link from one page to another as a kind of citation. [^31]
 
 The investigation the principle asks for is visible in what the authors did next. Having named the earlier literature, they stated where the web departs from it. Academic papers are reviewed, and web pages are not. A plain count also ignores who is doing the citing, so their method weighted each link by the rank of the page it came from. [^31]
 
@@ -2142,11 +2134,11 @@ A candidate from an index search and a candidate from a tournament of agents eac
 
 Several cases in the piece exist because someone circulated material. The Vesuvius Challenge released its high-resolution scans to anyone who wanted to work on them. [^4] Swanson sent a fuller account of his hypothesis to a biomedical journal, where readers in a position to criticize it would see it, and invited readers to tell him of any connection he had missed. [^1] The customer links in the finance study were public because an accounting standard requires a firm to name any customer that represents more than 10 percent of its sales. [^26] The cf-PICI case shows the reverse condition: while the laboratory's finding was unpublished, it was absent from the record everyone else could search. [^28]
 
-The principle places four limits beside the instruction, in its own words: "privacy, source rights, safety, and the legitimate interests of affected people." [LIA §6] The cases show where they bear. The scanned scrolls belong to the Institut de France, a holder with rights in the source. [^4]
+The principle places four limits beside the instruction, in its own words: "privacy, source rights, safety, and the legitimate interests of affected people." The cases show where they bear. The scanned scrolls belong to the Institut de France, a holder with rights in the source. [^4]
 
 The Co-Scientist paper lists safety among the system's default criteria for a hypothesis. [^28] The complaints about Madoff concerned a named person and the accounts of his customers. [^19] The affected people in the 2004 paper are patients waiting for a kidney. [^47]
 
-The ten principles of §6 are now printed in full, each with a case in which it decided something. Chapter IV-03 takes up the archaeological method of §7, the cycle of steps in which these principles are applied in sequence.
+The ten principles are now stated in full, each with a case in which it decided something. Chapter IV-03 takes up the archaeological method, the cycle of steps in which these principles are applied in sequence.
 
 <a id="chapter-iv-03"></a>
 
@@ -2162,9 +2154,9 @@ Chapters II-03 and III-08 used this study for its rule about time and its result
 
 #### The cycle
 
-The founding text opens its section on method with one sentence and a diagram.
+The method can be put in one sentence and a diagram.
 
-> LIA can be practiced as a recurring cycle rather than a one-time search. [LIA §7]
+> LIA can be practiced as a recurring cycle rather than a one-time search.
 
 ```text
 Define the excavation boundary
@@ -2218,7 +2210,7 @@ For value-weighted portfolios sorted on one-year customer returns, they report t
 
 Two paragraphs of instruction follow the diagram. A third, on a persistent system, is the subject of Chapter IV-05.
 
-> The investigator should define the corpus and temporal boundary, retain primary sources, normalize entities without erasing meaningful context, and explore both expected and unexpected relationships. [LIA §7]
+> The investigator should define the corpus and temporal boundary, retain primary sources, normalize entities without erasing meaningful context, and explore both expected and unexpected relationships.
 
 The first three clauses are the first three steps, restated as duties. The study shows the first two.
 
@@ -2232,7 +2224,7 @@ The last clause, on expected and unexpected relationships, has a counterpart in 
 
 #### The second instruction
 
-> Candidate discoveries should be subjected to competing explanations, counterexamples, source independence checks, and appropriate empirical or logical tests. Wherever possible, independent investigators should be able to reconstruct the reasoning. [LIA §7]
+> Candidate discoveries should be subjected to competing explanations, counterexamples, source independence checks, and appropriate empirical or logical tests. Wherever possible, independent investigators should be able to reconstruct the reasoning.
 
 Competing explanations are what the customer-link study supplies in quantity: own-firm momentum, industry momentum, lead-lag effects, and illiquidity, each named and each tested. Its handling of industry also shows what a source independence check is for. The authors note that, because the customers in the sample are large, a customer's return is likely to be highly correlated with the return of its industry. Two signals that move together are not two pieces of evidence, so the test portfolios were re-examined after industry effects were controlled. [^26]
 
@@ -2250,7 +2242,7 @@ The record states that no corpus was acquired, no intervention was performed, an
 
 A record of that kind makes the last line of the diagram a return. The rejection itself turned on an earlier publication, the 2024 study, that was already part of the record when the review searched it. [^51] Once the 2008 paper was in print, the customer-supplier link and its test were themselves informational artifacts, available to any later excavation in that corpus. [^26] The published record, with its findings and its rejections, becomes part of the next boundary to be defined.
 
-The cycle of §7 has now been walked on one study, with its two instructions and the step most often left out. Chapter IV-04 takes up the form in which a single finding is written down so that others can audit it: the excavation record.
+The cycle has now been walked on one study, with its two instructions and the step most often left out. Chapter IV-04 takes up the form in which a single finding is written down so that others can audit it: the excavation record.
 
 <a id="chapter-iv-04"></a>
 
@@ -2262,9 +2254,9 @@ He set out his reasoning three years later in the *Bulletin of the Medical Libra
 
 The 1989 trial supplies the test. DiGiacomo, Kremer, and Shah randomly assigned 32 patients to fish oil or an olive-oil placebo and reported benefit for primary Raynaud's alone. [^3] The published record puts three years between the hypothesis and its first reported clinical test. [^2]
 
-Chapter III-01 told this case at length. Those two paragraphs hold nearly everything a reader needs in order to check it: the claim, the material searched, the date, the reasoning, the search for earlier statements, the test. They hold it in the order of a story. The founding text proposes a fixed order.
+Chapter III-01 told this case at length. Those two paragraphs hold nearly everything a reader needs in order to check it: the claim, the material searched, the date, the reasoning, the search for earlier statements, the test. They hold it in the order of a story. LIA proposes a fixed order.
 
-> A finding should be packaged in a form that other investigators can audit, challenge, reproduce, and build upon. The following is a proposed minimal record format, not a finalized technical standard. [LIA §8]
+> A finding should be packaged in a form that other investigators can audit, challenge, reproduce, and build upon. The following is a proposed minimal record format, not a finalized technical standard.
 
 ```yaml
 lia_version: "0.1"
@@ -2314,7 +2306,7 @@ novelty_check: "Scope: the two sets of articles. Method: look for shared article
 status: "candidate"
 validation: "None. No clinical trial reported."
 limitations:
-  - "Both evidence lines come from a 1989 summary by the author of the hypothesis, not from the individual articles."
+  - "Both evidence lines come from a 1989 summary by Swanson, who proposed the hypothesis, not from the individual articles."
   - "Publication years of the antecedent articles are not established."
 next_test: "A controlled clinical trial of dietary fish oil in patients with Raynaud's syndrome."
 ```
@@ -2344,7 +2336,7 @@ limitations:
 next_test: "A second, independent trial in the primary form. None is recorded in the sources used here."
 ```
 
-The claim is smaller than it was. In 1986 it covered patients with Raynaud's syndrome in general, and in 1989 it covers the primary form, because that is what the trial's authors concluded. [^3] The secondary form moves into `contradictory_evidence`. The status is set to `corroborated` and not `validated` because the support is one trial of 32 people, and the trial is a limited clinical test, not a universal recommendation for primary and secondary Raynaud's. [^2] The founding text lists its statuses without setting thresholds for them, so the `validation` field carries the reason for the choice, where a reader can dispute it.
+The claim is smaller than it was. In 1986 it covered patients with Raynaud's syndrome in general, and in 1989 it covers the primary form, because that is what the trial's authors concluded. [^3] The secondary form moves into `contradictory_evidence`. The status is set to `corroborated` and not `validated` because the support is one trial of 32 people, and the trial is a limited clinical test, not a universal recommendation for primary and secondary Raynaud's. [^2] LIA lists its statuses without setting thresholds for them, so the `validation` field carries the reason for the choice, where a reader can dispute it.
 
 #### What the fields are for
 
@@ -2358,7 +2350,7 @@ The `next_test` field is required because a candidate that names no test cannot 
 
 #### Six statuses
 
-> Suggested statuses are `candidate`, `corroborated`, `validated`, `rediscovered`, `rejected`, and `unresolved`. Novelty and validity are separate axes: a rediscovery can be true, and a novel candidate can be false. A mature standard should record those dimensions independently. [LIA §8]
+> Suggested statuses are `candidate`, `corroborated`, `validated`, `rediscovered`, `rejected`, and `unresolved`. Novelty and validity are separate axes: a rediscovery can be true, and a novel candidate can be false. A mature standard should record those dimensions independently.
 
 The fish-oil record supplies two of the six. It was a `candidate` in 1986 and is `corroborated` in the 1989 record above. [^2] [^3]
 
@@ -2374,11 +2366,11 @@ The cases bound to this chapter supply no record marked `validated` and none mar
 
 The second sentence of the passage is why one `status` word is not enough. The survival-weighting candidate failed on novelty and on specification at once. [^52] The fish-oil claim was new relative to two literatures in 1986 and untested, and by 1989 it was supported for one form of the condition. [^2] [^3]
 
-Each of these is a pair of answers, one about novelty and one about validity. The proposed format holds the first in `novelty_check` and the second in `validation`, and the founding text says that a mature standard should record the two independently. It calls the format proposed and minimal, and the six statuses suggested.
+Each of these is a pair of answers, one about novelty and one about validity. The proposed format holds the first in `novelty_check` and the second in `validation`, and a mature standard should record the two independently. The format is proposed and minimal, and the six statuses suggested.
 
 #### A row from the dossier
 
-The cases in Part III were drawn from a ledger of 31 entries, `projects/latent-information-archaeology/docs/longform-v2/research/RB-cases.json`. Its rows are not in the §8 format. They carry several of the same things under other names: an identifier, latency classes, dated events, a validation statement, and sources with the date each was fetched and the words relied on. This is the row for the rejected candidate, as the file holds it.
+The cases in Part III were drawn from a ledger of 31 entries, `projects/latent-information-archaeology/docs/longform-v2/research/RB-cases.json`. Its rows are not in the LIA record format. They carry several of the same things under other names: an identifier, latency classes, dated events, a validation statement, and sources with the date each was fetched and the words relied on. This is the row for the rejected candidate, as the file holds it.
 
 ```json
     {
@@ -2416,7 +2408,7 @@ The cases in Part III were drawn from a ledger of 31 entries, `projects/latent-i
     }
 ```
 
-The three year fields are null because, as the row states, the cited record does not establish both anchors, and so no lag is inferred. The row has no field for alternatives, for contradictory evidence, or for a next test, which a §8 record would add.
+The three year fields are null because, as the row states, the cited record does not establish both anchors, and so no lag is inferred. The row has no field for alternatives, for contradictory evidence, or for a next test, which a full LIA record would add.
 
 The record format is now set out, filled twice for one case, and read against a rejection, a rediscovery, and a narrowed claim. The next chapter turns from the single record to the system that would produce such records continually without waiting to be asked.
 
@@ -2428,26 +2420,26 @@ A run of Co-Scientist, the multi-agent system that Chapter III-04 presented, sta
 
 A Supervisor agent then builds a queue of tasks from that configuration and assigns them to the specialized agents. While the run proceeds, the Supervisor periodically computes statistics on progress toward the specified goal and uses them to decide where further computation goes and whether the computation has reached its terminal state. When it has, the scientist receives a ranked list of hypotheses and a research overview, and reviews the top of the list. For the leukemia study, the paper gives the human time at each end: writing the initial prompt took less than one hour of an expert clinician's time, and the final review and selection of candidates for testing took roughly three hours. Everything the system did in between followed from the goal that the clinician wrote. [^28]
 
-The framing asks for a system that starts somewhere else.
+LIA asks for a system that starts somewhere else.
 
 > **3. What an LIA system might look like**
 > Rather than asking an AI a question and receiving an answer, you build a persistent system that actively searches for questions worth asking.
 >
-> The important architectural distinction: the system is discovery-driven rather than query-driven. [Framing §3]
+> The important architectural distinction: the system is discovery-driven rather than query-driven.
 
-The passage makes two demands. The system is persistent, so it does not end when one answer has been delivered. And the thing it searches for is a question, where a query-driven system is handed the question and searches for the answer. The cycle in §7 of the founding text supplies the parts of such a system, and §7 attaches one requirement to it.
+The passage makes two demands. The system is persistent, so it does not end when one answer has been delivered. And the thing it searches for is a question, where a query-driven system is handed the question and searches for the answer. The cycle of the archaeological method, set out in Chapter IV-03, supplies the parts of such a system, and LIA attaches one requirement to it.
 
 #### What exists
 
-Co-Scientist is query-driven by design, and its authors say so. The 2025 preprint states that the work does not aim to automate the scientific process completely and that the system is purpose-built for a scientist who stays in the loop. [^37] The 2026 paper lists the points at which the scientist acts: defining the goal, refining the goal in light of the hypotheses returned, supplying reviews, contributing hypotheses of their own to the tournament, and making the final selection for experiment. [^28] The goal reaches into every agent's work: the Generation agent produces hypotheses that address it, and the Ranking agent's ordered list is a list of proposals aligned with it. [^28]
+Co-Scientist is query-driven by design, and the authors say so. The 2025 preprint states that the work does not aim to automate the scientific process completely and that the system is purpose-built for a scientist who stays in the loop. [^37] The 2026 paper lists the points at which the scientist acts: defining the goal, refining the goal in light of the hypotheses returned, supplying reviews, contributing hypotheses of their own to the tournament, and making the final selection for experiment. [^28] The goal reaches into every agent's work: the Generation agent produces hypotheses that address it, and the Ranking agent's ordered list is a list of proposals aligned with it. [^28]
 
-Inside a run, the system has some of the persistence the framing asks for. The paper reports that it operates continuously and asynchronously, that its state is written periodically to a context memory and used as feedback in later rounds, and that this memory allows a restart after a component fails. [^28] That persistence serves one goal and stops at the terminal state for that goal. The query is large and the run is long, and the arrangement is still a question followed by an answer.
+Inside a run, the system has some of the persistence LIA asks for. The paper reports that it operates continuously and asynchronously, that its state is written periodically to a context memory and used as feedback in later rounds, and that this memory allows a restart after a component fails. [^28] That persistence serves one goal and stops at the terminal state for that goal. The query is large and the run is long, and the arrangement is still a question followed by an answer.
 
 A much older tool took a step toward the other arrangement. Chapter III-02 introduced Arrowsmith, the search tool that Don Swanson and Neil Smalheiser built on Swanson's procedure, and its two kinds of search. In the two-node search the user names both literatures and the tool lists the title words they share.
 
 In the one-node search the user names one literature, for example the articles on a disease, and the search looks for a second literature, unknown to the user, that holds complementary knowledge. The 2006 paper on the tool says of it: "In a sense, the one node search is a way of generating new hypotheses." [^24] The 2019 review of literature-based discovery gives the general form under the name open discovery, in which "only the concept A is known in advance and concepts B and C are identified by the LBD process." [^23]
 
-The one-node search proposes something the user did not ask for by name, which is the first half of what the framing wants. The 2006 paper reports field testers arriving at problems that called for it. One wanted a list of genes known to be expressed in the amygdala that had not been studied in the context of fear conditioning and could plausibly play a role in it. [^24] That request is a search for a gap, and a person still chose the amygdala and fear conditioning. The same paper reports which search the investigators preferred: the two-node search proved more generally applicable and "better aligned to the information practices of most biomedical investigators," and the interface built for the field testers focused on two-node searches exclusively. [^24]
+The one-node search proposes something the user did not ask for by name, which is the first half of what LIA wants. The 2006 paper reports field testers arriving at problems that called for it. One wanted a list of genes known to be expressed in the amygdala that had not been studied in the context of fear conditioning and could plausibly play a role in it. [^24] That request is a search for a gap, and a person still chose the amygdala and fear conditioning. The same paper reports which search the investigators preferred: the two-node search proved more generally applicable and "better aligned to the information practices of most biomedical investigators," and the interface built for the field testers focused on two-node searches exclusively. [^24]
 
 The third piece concerns direction. Chapter I-04 and Chapter III-03 reported the 2023 study by Jamshid Sourati and James Evans, held in the research record as an abstract only. Their models take in the distribution of human expertise, and the abstract says that such a model can be tuned to avoid the crowd and generate "scientifically promising ‘alien’ hypotheses unlikely to be imagined or pursued without intervention until the distant future." [^16] A system that has to choose its own questions needs a rule for where to look, and this is one: look where the experts are not positioned to look. The abstract supports no statement here about how well those hypotheses held up.
 
@@ -2455,21 +2447,21 @@ Each of the three supplies one piece: a literature the user did not name, hypoth
 
 #### The parts, taken from the cycle
 
-The founding text gives the method as a cycle, which Chapter IV-03 reproduced and walked through step by step. A discovery-driven system is that cycle kept running, and its parts can be read off the steps.
+LIA gives the method as a cycle, which Chapter IV-03 reproduced and walked through step by step. A discovery-driven system is that cycle kept running, and its parts can be read off the steps.
 
-The first part is a corpus with dates. The cycle begins with "Define the excavation boundary" and "Acquire and preserve artifacts," and the paragraph under the diagram tells the investigator to define the corpus and temporal boundary. [LIA §7]
+The first part is a corpus with dates. The cycle begins with "Define the excavation boundary" and "Acquire and preserve artifacts," and the paragraph under the diagram tells the investigator to define the corpus and temporal boundary.
 
 A system that chooses its own questions cannot take the boundary from the question, so the boundary has to be a standing property of the system. The dates matter because of how such a system can be checked. The literature-based discovery review reports that time-sliced evaluation requires a cut-off date that divides the data into a segment before it and a segment after it, with the method run on the first and judged against the second. [^23] Artifacts without dates cannot be divided that way.
 
-The second part is a map, the step the cycle calls "Map entities, claims, and relationships." [LIA §7] Arrowsmith's list of shared title terms is a small map of where two literatures touch. [^24] Co-Scientist's Proximity agent builds a graph of how close its hypotheses are to one another. [^28] The first maps the corpus and the second maps the system's own output. A discovery-driven system needs the first kind, because the map is where it looks for something to ask.
+The second part is a map, the step the cycle calls "Map entities, claims, and relationships." Arrowsmith's list of shared title terms is a small map of where two literatures touch. [^24] Co-Scientist's Proximity agent builds a graph of how close its hypotheses are to one another. [^28] The first maps the corpus and the second maps the system's own output. A discovery-driven system needs the first kind, because the map is where it looks for something to ask.
 
-The third part is a generator, covering "Detect gaps, anomalies, and possible connections" and "Construct candidate discoveries." [LIA §7] In a discovery-driven system the detection step replaces the user's question. The amygdala request above shows what its output looks like: a named region of the map where two things that plausibly belong together have not been studied together. [^24]
+The third part is a generator, covering "Detect gaps, anomalies, and possible connections" and "Construct candidate discoveries." In a discovery-driven system the detection step replaces the user's question. The amygdala request above shows what its output looks like: a named region of the map where two things that plausibly belong together have not been studied together. [^24]
 
-The fourth part is a challenger, for "Challenge evidence, novelty, and inference." [LIA §7] Co-Scientist's Reflection agent does part of this work. It searches for previous work, weighs the existing experimental evidence for and against a hypothesis, and filters out inaccurate hypotheses and, when the goal stipulates novelty, non-novel ones. [^28]
+The fourth part is a challenger, for "Challenge evidence, novelty, and inference." Co-Scientist's Reflection agent does part of this work. It searches for previous work, weighs the existing experimental evidence for and against a hypothesis, and filters out inaccurate hypotheses and, when the goal stipulates novelty, non-novel ones. [^28]
 
-The fifth part is an evaluator that is separate from the generator, for "Validate or classify the remaining uncertainty." [LIA §7] The separation matters because of a fact the Co-Scientist paper states about its own scoring. The Elo rating that ranks its hypotheses is auto-evaluated and is not based on independent ground truth. [^28] The independent evaluation it reports came from outside the system: experts who selected candidates, and laboratory experiments on those candidates. [^28]
+The fifth part is an evaluator that is separate from the generator, for "Validate or classify the remaining uncertainty." The separation matters because of a fact the Co-Scientist paper states about its own scoring. The Elo rating that ranks its hypotheses is auto-evaluated and is not based on independent ground truth. [^28] The independent evaluation it reports came from outside the system: experts who selected candidates, and laboratory experiments on those candidates. [^28]
 
-The sixth part is the record, for "Publish findings and rejected hypotheses," followed by the arrow that makes the cycle a cycle: "Repeat with the enriched record." [LIA §7] The record is what makes persistence useful. The eighth principle gives the reason for keeping rejected hypotheses in it: "so future investigators do not repeat the same excavation." [LIA §6] A system that runs indefinitely is its own future investigator.
+The sixth part is the record, for "Publish findings and rejected hypotheses," followed by the arrow that makes the cycle a cycle: "Repeat with the enriched record." The record is what makes persistence useful. The eighth principle gives the reason for keeping rejected hypotheses in it: "so future investigators do not repeat the same excavation." A system that runs indefinitely is its own future investigator.
 
 One implementation assigns these roles by name. The project file `../../RESCOPE.md` sets out a research method in which source scouts map a diverse corpus, domain readers extract relations without seeing a desired target conclusion, bridge agents propose mappings, prior-art challengers search for earlier formulations and synonyms in both domains, a critic tests disanalogies and easier explanations, a separate evaluator scores evidence and testability, and the owner integrates accepted results and retains the failures. The companion file `../../discovery/README.md` documents an offline instrument that holds the record.
 
@@ -2479,25 +2471,25 @@ Two facts about this implementation bound what it shows. `RESCOPE.md` states tha
 
 #### Rejecting more than it accepts
 
-The founding text adds one requirement to a system built this way.
+LIA adds one requirement to a system built this way.
 
-> A persistent LIA system could autonomously propose new lines of inquiry, but it must be designed to reject more than it accepts when the evidence warrants it. The objective is not maximal hypothesis production. It is the efficient identification of consequential, defensible findings. [LIA §7]
+> A persistent LIA system could autonomously propose new lines of inquiry, but it must be designed to reject more than it accepts when the evidence warrants it. The objective is not maximal hypothesis production. It is the efficient identification of consequential, defensible findings.
 
 The requirement follows from the change in architecture. A query-driven system is limited by the number of questions people bring to it. A discovery-driven system has no such limit, and generation is the cheap part. Arrowsmith showed the proportions on a single pair of literatures: a search on retinal detachment against aortic aneurysm returned a raw list of 741 shared title terms, and the user was led to one syndrome that involves both conditions. [^24] Reporting all 741 as findings would have produced more and identified nothing.
 
-The existing systems already reject most of what they generate when they are used well. In the leukemia work that Chapter III-04 reported, 30 top-ranked candidates went to oncologists, who chose five for testing, and three of the five inhibited the viability of leukemia cells in culture. In a second run experts chose three candidates, and one of the three did. [^28] Those are in vitro results on cell lines, and the rejections along the way were made by experts and by experiments. The founding text asks that a persistent system carry that behavior in its design.
+The existing systems already reject most of what they generate when they are used well. In the leukemia work that Chapter III-04 reported, 30 top-ranked candidates went to oncologists, who chose five for testing, and three of the five inhibited the viability of leukemia cells in culture. In a second run experts chose three candidates, and one of the three did. [^28] Those are in vitro results on cell lines, and the rejections along the way were made by experts and by experiments. LIA asks that a persistent system carry that behavior in its design.
 
 The clause "when the evidence warrants it" keeps the requirement from becoming a quota. The project instrument makes the point with three deliberately weak controls, one that accepts every candidate, one that rejects every candidate, and one that abstains on every candidate. `discovery/README.md` states that all three must fail the configured gates.
 
 On its twelve synthetic fixtures, which fall into three categories whose correct decisions are accept, reject, and abstain, each control has a macro accuracy of 1/3. The accept-all control has an acceptance precision of 1/3 and an unsupported acceptance rate of 1. The file states that abstaining or rejecting everything cannot pass. Two of the three categories call for a refusal to accept, and a control that only refuses still fails.
 
-The last two sentences of the passage name what is being optimized. A count of hypotheses is the wrong measure, and the literature-based discovery review explains one reason evaluations drift toward it. When a method is tested by replicating a known discovery, only the associations in that discovery are checked, and "the remaining associations in the LBD output are not assessed." [^23] The founding text's objective puts the cost on the other side of the ledger. The word "efficient" refers to what each finding costs, including the hours of the people who review it, and the Co-Scientist paper's figures of less than one hour to set the goal and roughly three hours to review the output are the kind of number the word calls for. [^28]
+The last two sentences of the passage name what is being optimized. A count of hypotheses is the wrong measure, and the literature-based discovery review explains one reason evaluations drift toward it. When a method is tested by replicating a known discovery, only the associations in that discovery are checked, and "the remaining associations in the LBD output are not assessed." [^23] LIA's objective puts the cost on the other side of the ledger. The word "efficient" refers to what each finding costs, including the hours of the people who review it, and the Co-Scientist paper's figures of less than one hour to set the goal and roughly three hours to review the output are the kind of number the word calls for. [^28]
 
-The framing ends its own argument on the system this chapter has laid out.
+LIA's own argument ends on the system this chapter has laid out.
 
-> The most interesting version of LIA wouldn't simply be a better research assistant. It would be an autonomous discovery engine that continually searches the space of things humanity could already know, but doesn't. [Framing §6]
+> The most interesting version of LIA wouldn't simply be a better research assistant. It would be an autonomous discovery engine that continually searches the space of things humanity could already know, but doesn't.
 
-The parts of a discovery-driven system exist separately in the lineage, a person still supplies the starting point in each of them, and the founding text's condition on joining them is that the result reject more than it accepts when the evidence warrants it. The next chapter takes up the research agenda of §10, which says how such a system, and the discipline, would be judged.
+The parts of a discovery-driven system exist separately in the lineage, a person still supplies the starting point in each of them, and LIA's condition on joining them is that the result reject more than it accepts when the evidence warrants it. The next chapter takes up LIA's research agenda, which says how such a system, and the discipline, would be judged.
 
 <a id="chapter-iv-06"></a>
 
@@ -2507,17 +2499,17 @@ In 2019 Vahe Tshitoyan and colleagues ran one test eighteen times. They had abou
 
 Each held only the abstracts published before its cutoff. They trained separate word embeddings on each collection from the start, and from each they took the 50 highest-ranked materials that had not yet appeared in an abstract beside a thermoelectric keyword. Then, for every year after each cutoff, they counted the share of those 50 that had since been reported in the literature beside such a keyword. [^15]
 
-Averaged over the runs, a material from a top-50 list was eight times more likely to be studied as a thermoelectric within the next five years than an unstudied material drawn at random from the collection as it stood at that date, and three times more likely than a random material with a nonzero computed bandgap. [^15] Chapter II-03 went through the experiment step by step and Chapter III-03 gave the paper in full. It returns here because of its design. The corpora were frozen at stated dates, the method was fixed before the outcomes were read, and the outcomes were checked against what was published afterward. Among the cases in this piece it is the nearest thing to a finished example of the first item on a list that the founding text sets for itself.
+Averaged over the runs, a material from a top-50 list was eight times more likely to be studied as a thermoelectric within the next five years than an unstudied material drawn at random from the collection as it stood at that date, and three times more likely than a random material with a nonzero computed bandgap. [^15] Chapter II-03 went through the experiment step by step and Chapter III-03 gave the paper in full. It returns here because of its design. The corpora were frozen at stated dates, the method was fixed before the outcomes were read, and the outcomes were checked against what was published afterward. Among the cases in this piece it is the nearest thing to a finished example of the first item on a list that LIA sets for itself.
 
-That list is section 10 of the founding text, and it opens with the standard by which the rest is to be read.
+That list is LIA's research agenda, and it opens with the standard by which the rest is to be read.
 
-> The discipline should be judged by what it can demonstrate, not by the ambition of its premise. [LIA §10]
+> The discipline should be judged by what it can demonstrate, not by the ambition of its premise.
 
-Seven priorities follow, which the founding text calls early ones, and then a set of metrics. This chapter takes them in order and reports, for each, what the cases in this piece have done and what they have left undone.
+Seven priorities follow, which LIA calls early ones, and then a set of metrics. This chapter takes them in order and reports, for each, what the cases in this piece have done and what they have left undone.
 
 #### Replay and its three controls
 
-> **Historical replay.** Freeze a corpus at an earlier date and measure whether a method recovers discoveries documented afterward. Control for training-data leakage, hindsight in selecting tasks, and selection bias. [LIA §10]
+> **Historical replay.** Freeze a corpus at an earlier date and measure whether a method recovers discoveries documented afterward. Control for training-data leakage, hindsight in selecting tasks, and selection bias.
 
 The first sentence is the eighteen-cutoff experiment. The second names three ways in which a replay can report more than the method earned.
 
@@ -2533,7 +2525,7 @@ The key scores both as misses, and it would do so whether or not either compound
 
 #### Candidates published before the outcome
 
-> **Prospective excavation.** Publish timestamped candidate discoveries before their outcomes are known, including failed predictions and null results. [LIA §10]
+> **Prospective excavation.** Publish timestamped candidate discoveries before their outcomes are known, including failed predictions and null results.
 
 A prospective candidate is issued before the later record exists. Chapter II-04 told the one case in this piece with that form. In February 2020 a group at BenevolentAI published a letter in the Lancet naming baricitinib, an approved drug found through a knowledge graph built in part from the literature. "We identified baricitinib, which is predicted to reduce the ability of the virus to infect lung cells." [^25]
 
@@ -2545,7 +2537,7 @@ The second half of the priority is the part one case cannot meet. A single candi
 
 #### Comparison and cost
 
-> **Comparative performance.** Compare LIA methods with conventional search, literature-based discovery systems, domain experts, and simple statistical baselines under comparable resource constraints. [LIA §10]
+> **Comparative performance.** Compare LIA methods with conventional search, literature-based discovery systems, domain experts, and simple statistical baselines under comparable resource constraints.
 
 The materials paper compared its ranking with two baselines: a material chosen at random from those not yet studied, and a random material with a nonzero bandgap. [^15] The literature-based discovery review explains why a shared, dated task matters for this priority. When two systems each claim to have replicated a famous discovery, nothing says which is better, and expert judgments are hard to quantify. Time-slicing gives numbers by which one system can be set against another. [^23]
 
@@ -2555,7 +2547,7 @@ A simple baseline can come near a costly method, and only a test that includes b
 
 Each of these sets one computational method against another or against a statistical baseline. A matched comparison with domain experts, under comparable limits of time and resources, is not supplied by the sources of this piece.
 
-> **Excavation economics.** Measure cost per defensible finding, reviewer time, reproducibility, and the marginal benefit of additional computation or data. [LIA §10]
+> **Excavation economics.** Measure cost per defensible finding, reviewer time, reproducibility, and the marginal benefit of additional computation or data.
 
 Chapter I-04 used Chihmao Hsieh's 2011 study of patented inventions for the cost of a connection. His finding was that the cost has two parts that move in opposite directions: "difficulty shifts from the cost of connecting unrelated features to the cost of synthesizing overly related ones." [^13] That is a mechanism. The ledger states that it is not a universal estimate of years saved by LIA, and it sets no price on any finding. [^13]
 
@@ -2563,23 +2555,23 @@ The materials paper offers one observation on marginal benefit: larger corpora t
 
 #### Transfer, negative knowledge, and infrastructure
 
-> **Cross-domain transfer.** Test whether useful principles, technologies, and explanations can be recovered across distinct vocabularies and institutional boundaries. [LIA §10]
+> **Cross-domain transfer.** Test whether useful principles, technologies, and explanations can be recovered across distinct vocabularies and institutional boundaries.
 
 Two findings from earlier chapters say where such tests should look. Qing Ke and colleagues, studying citation histories in 2015, found that papers recognized late often reached their importance in disciplines different from the ones in which they were published. [^5] Hsieh found that connecting unrelated features is the costly kind of search. [^13]
 
 The computational tests in this chapter, however, each stayed inside one literature: materials abstracts in one, papers on artificial intelligence in the other. [^15] [^36] The literature-based discovery reviewers note that most earlier reviews of their field confined themselves to medical studies. [^23] A replay whose corpus spans two vocabularies, with the outcome checked in the second, is still to be run.
 
-> **Negative knowledge.** Develop representations for disproven claims, failed experiments, unresolved contradictions, and previously discarded approaches whose constraints may have changed. [LIA §10]
+> **Negative knowledge.** Develop representations for disproven claims, failed experiments, unresolved contradictions, and previously discarded approaches whose constraints may have changed.
 
 The methods in this chapter register that two terms occur together. The materials authors say so about their own: the effects of negation were somewhat reduced in their study because abstracts tend to emphasize positive relationships, and full texts would contain more negative ones and more complex sentences. [^15] The time-sliced answer key has the same blind side. It lists associations that appeared after the cut-off, and it has no entry for an association that was tried and found false. [^23] A method scored against it earns nothing for knowing that a connection fails.
 
-> **Epistemic infrastructure.** Develop interoperable excavation records, provenance standards, public benchmarks, and mechanisms for correction and replication. [LIA §10]
+> **Epistemic infrastructure.** Develop interoperable excavation records, provenance standards, public benchmarks, and mechanisms for correction and replication.
 
-The reviewers report that literature-based discovery has no comprehensive gold standard datasets and no consistent formal approach to evaluation. [^23] Science4Cast is one public benchmark for one field, and its authors report numerous tests to exclude data leakage, overfitting, and duplication in it. [^36] Chapter IV-04 presented the excavation record of section 8, which is the founding text's proposal for the first item in this priority.
+The reviewers report that literature-based discovery has no comprehensive gold standard datasets and no consistent formal approach to evaluation. [^23] Science4Cast is one public benchmark for one field, and the benchmark's authors report numerous tests to exclude data leakage, overfitting, and duplication in it. [^36] Chapter IV-04 presented the excavation record, which is LIA's proposal for the first item in this priority.
 
 #### The metrics
 
-> Useful metrics include verified novelty relative to a defined record, precision of validated claims, recall against bounded benchmarks, calibration of uncertainty, provenance completeness, reproducibility, and cost per validated result. No single score can adequately represent all of these dimensions. [LIA §10]
+> Useful metrics include verified novelty relative to a defined record, precision of validated claims, recall against bounded benchmarks, calibration of uncertainty, provenance completeness, reproducibility, and cost per validated result. No single score can adequately represent all of these dimensions.
 
 The cases show how far apart these quantities lie. The materials experiment defined its record with a list of keywords and counted a material as new only if it had appeared beside none of them, which is novelty relative to a defined record. Its eightfold figure is a ratio against a baseline. It is not a precision of validated claims, because the endpoint was later study and not a measurement.
 
@@ -2589,13 +2581,13 @@ Recall needs a bounded list of things that were there to be found. Ke and collea
 
 The limit is the one Chapter I-02 stated. Citations are a proxy for attention, not proof of when usefulness or truth became known, and the ledger infers no discovery lag from the study. [^5] A benchmark built this way measures recall of later attention, the same endpoint the materials replay used.
 
-A method can rank well against later attention and yield few validated claims. It can be precise and too costly to check. It can be cheap and leave no trail a second investigator could follow. That is the content of the founding text's last sentence on metrics.
+A method can rank well against later attention and yield few validated claims. It can be precise and too costly to check. It can be cheap and leave no trail a second investigator could follow. That is the content of LIA's last sentence on metrics.
 
-Section 9 of the founding text, after naming the traditions LIA draws on, applies the same standard to the proposal as a whole.
+After naming the traditions it draws on, LIA applies the same standard to the proposal as a whole.
 
-> Whether this synthesis merits recognition as a distinct discipline is a question for the community and for the results it produces. [LIA §9]
+> Whether this synthesis merits recognition as a distinct discipline is a question for the community and for the results it produces.
 
-The first priority has a worked example with stated limits, the second has a single case, and the others have partial results or none. The Coda takes up section 12 of the founding text, which says who is invited to run those tests and on what terms.
+The first priority has a worked example with stated limits, the second has a single case, and the others have partial results or none. The Coda takes up LIA's open invitation, which says who is invited to run those tests and on what terms.
 
 <a id="coda"></a>
 
@@ -2611,21 +2603,21 @@ The review was arranged the same way. In 2024 the organizers reported that papyr
 
 Chapter I-01 opened on this case and Chapter III-10 returned to it. The coda needs one fact from it. The people who read the record were not the people who released it, and the papyrologists who checked the reading saw the submissions without names attached. [^4]
 
-The founding text closes by asking for the same arrangement around itself.
+LIA closes by asking for the same arrangement around itself.
 
-> LIA is proposed as a shared intellectual project. No particular institution, model provider, or implementation should define its boundaries by default. [LIA §12]
+> LIA is proposed as a shared intellectual project. No particular institution, model provider, or implementation should define its boundaries by default.
 
-The three things named are the three that could most easily come to own a method like this one: an organization that funds the work, a company whose model does the reading, and a piece of software that happens to be built first. The founding text gives none of them the authority to settle what counts as LIA.
+The three things named are the three that could most easily come to own a method like this one: an organization that funds the work, a company whose model does the reading, and a piece of software that happens to be built first. LIA gives none of them the authority to settle what counts as LIA.
 
-> Researchers, engineers, archivists, historians, scientists, artists, and independent investigators are invited to adopt the term, challenge its assumptions, build tools, publish excavations, establish benchmarks, and extend the canon. [LIA §12]
+> Researchers, engineers, archivists, historians, scientists, artists, and independent investigators are invited to adopt the term, challenge its assumptions, build tools, publish excavations, establish benchmarks, and extend the canon.
 
-The sentence names seven kinds of people and six things to do. Challenging the assumptions comes second, directly after adopting the term, and it is part of the invitation. Publishing excavations and establishing benchmarks are how an archaeological candidate comes to be tested by someone other than the person who proposed it. Extending the canon comes last, and the next paragraph of the founding text gives the terms on which that is done.
+The sentence names seven kinds of people and six things to do. Challenging the assumptions comes second, directly after adopting the term, and it is part of the invitation. Publishing excavations and establishing benchmarks are how an archaeological candidate comes to be tested by someone other than the person who proposed it. Extending the canon comes last, and the terms on which that is done follow.
 
-> The vocabulary is meant to be useful, not proprietary. The founding text is meant to be amended when better ideas or better evidence emerge. Where possible, preserve attribution and a visible history of revisions so that the development of the discipline remains itself an intelligible record. [LIA §12]
+> The vocabulary is meant to be useful, not proprietary. The founding text is meant to be amended when better ideas or better evidence emerge. Where possible, preserve attribution and a visible history of revisions so that the development of the discipline remains itself an intelligible record.
 
-The condition for amendment is better ideas or better evidence. The request that goes with it is the one the method makes of every excavation: keep the provenance. A founding text revised with attribution and a visible history of revisions is an informational artifact that a later reader can examine in the way this piece has examined its cases.
+The condition for amendment is better ideas or better evidence. The request that goes with it is the one the method makes of every excavation: keep the provenance. LIA, revised with attribution and a visible history of revisions, is an informational artifact that a later reader can examine in the way this piece has examined its cases.
 
-> The ambition is not to establish a single system that knows everything. It is to establish a practice through which more of what is already available to humanity becomes intelligible, testable, and useful. [LIA §12]
+> The ambition is not to establish a single system that knows everything. It is to establish a practice through which more of what is already available to humanity becomes intelligible, testable, and useful.
 
 **The frontier of discovery is not only ahead of us. Some of it is behind us, buried in the record we have already made.**
 
@@ -2693,7 +2685,7 @@ The condition for amendment is better ideas or better evidence. The request that
 [^60]: RB-021:kohn — Kohn, PDE for Finance, Section 2 (2014), mathematical exposition. https://math.nyu.edu/~kohn/pde.finance/2014/section2.pdf
 [^61]: RB-025:lazer — Lazer et al., The Parable of Google Flu: Traps in Big Data Analysis, Science (2014). https://www.dhi.ac.uk/san/waysofbeing/data/data-crone-lazer-2014.pdf
 
-## Appendix A: The founding text, v0.1
+## Appendix A: LIA v0.1, the short form
 
 Originated by David Murray · CC BY 4.0
 

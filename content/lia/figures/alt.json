@@ -5,7 +5,7 @@
       "chapter": "I-02",
       "alt": "A conceptual flow links recorded artifacts, unmade connections, and explicit claims.",
       "caption": "Conceptual diagram, not a measured ratio. The sizes do not estimate how much remains unrecognized. The economic thesis is a research proposition, not an established universal law.",
-      "source": "LIA §2; Framing §6; RA01",
+      "source": "RA01",
       "files": [
         "F1.svg",
         "F1.png"
@@ -13,9 +13,9 @@
     },
     "F2": {
       "chapter": "II-02",
-      "alt": "Four approved layers: stated and indexed; stated but scattered; unstated connection; unstated implication. Google works largely in layer one, deep research agents in the first two, and LIA in the third and fourth.",
-      "caption": "Definitions and placement reproduce the decided outline verbatim. Google largely operates in the first layer. Layers measure distance from being stated, not evidence strength or validation. Schematic areas are not measured quantities.",
-      "source": "OUTLINE.md decided box; Framing §1; David Murray",
+      "alt": "Four layers: stated and indexed; stated but scattered; unstated connection; unstated implication. Google works largely in layer one, deep research agents in the first two, and LIA in the third and fourth.",
+      "caption": "Google largely operates in the first layer. Layers measure distance from being stated, not evidence strength or validation. Schematic areas are not measured quantities.",
+      "source": "chapter II-02",
       "files": [
         "F2.svg",
         "F2.png"
@@ -24,8 +24,8 @@
     "F3": {
       "chapter": "II-01",
       "alt": "Five non-exclusive latency classes with one source-ledger example each.",
-      "caption": "Definitions reproduce the founding text. Examples illustrate a class, not an exclusive taxonomy; the finance warning is an oversight case, not proof of previously unknown fraud.",
-      "source": "LIA §3; RB-018; RB-016; RB-004; RB-023; RB-006",
+      "caption": "Definitions are LIA's own, verbatim. Examples illustrate a class, not an exclusive taxonomy; the finance warning is an oversight case, not proof of previously unknown fraud.",
+      "source": "RB-018; RB-016; RB-004; RB-023; RB-006",
       "files": [
         "F3.svg",
         "F3.png"
@@ -35,7 +35,7 @@
       "chapter": "II-03",
       "alt": "Overlapping sets show recoverable candidates minus the explicit record; the left-only region is L.",
       "caption": "Conceptual model, not a measured inventory. The diagram does not assume that all explicit claims are recoverable. Membership depends on corpus, time, methods, and reference record; candidate status is not validation.",
-      "source": "LIA §4",
+      "source": "chapter II-03",
       "files": [
         "F4.svg",
         "F4.png"
@@ -74,9 +74,9 @@
     },
     "F7": {
       "chapter": "IV-03",
-      "alt": "The founding text’s eight method stages form a loop from boundary-setting through findings and rejected hypotheses.",
+      "alt": "LIA’s eight method stages form a loop from boundary-setting through findings and rejected hypotheses.",
       "caption": "Repeat with the enriched record. Publication is subject to rights, privacy, safety, and project authorization. Rejected and unresolved candidates remain part of the evidence record.",
-      "source": "LIA §7; David Murray, CC BY 4.0",
+      "source": "chapter IV-03",
       "files": [
         "F7.svg",
         "F7.png"
@@ -85,8 +85,8 @@
     "F11": {
       "chapter": "IV-01",
       "alt": "Six unscored rows ask about novelty, provenance, validity, falsifiability, utility, and temporal integrity.",
-      "caption": "Questions reproduce the framing. Record evidence and test outcomes separately. No composite score, thresholds, or case performance values are asserted.",
-      "source": "Framing §5; David Murray",
+      "caption": "The questions are LIA's own, verbatim. Record evidence and test outcomes separately. No composite score, thresholds, or case performance values are asserted.",
+      "source": "chapter IV-01",
       "files": [
         "F11.svg",
         "F11.png"
@@ -96,7 +96,7 @@
   "gated": {},
   "input_sha256": {
     "RA-sources.json": "226b57454ac8f161179562d585fc6beefde806bcb7a267e9679db85b64075b77",
-    "RB-cases.json": "0adea2fdd4cf89cad6b9ce2259c0acdfcc5946aa1346aa142f6a81abfa7255c5"
+    "RB-cases.json": "0a752f2b768cd728dbe0549a78607a6a14da90c9fc2f43d68ceee38ba0672531"
   },
   "values": [
     {
@@ -713,7 +713,7 @@
       "availability_year": null,
       "recognition_year": null,
       "lag_explanation": "The cited record does not establish both first-availability and first-recognition anchors; no discovery lag is inferred.",
-      "validation": "The historical review documents the pivot; efficacy rests on subsequent clinical trials and approval, not on the early anecdote alone.",
+      "validation": "The historical reviews give different dates for the early studies and pivot. Efficacy rests on subsequent clinical trials and approval, not on the early anecdote alone.",
       "weak_source": true,
       "case_type": "reconstruction"
     },
@@ -1033,24 +1033,24 @@
     }
   ],
   "output_sha256": {
-    "F3.svg": "a8ccb70760bc98f00822a8a4e3a97c0532c7c1008d291fd3ca1e865585550e32",
-    "F2.svg": "6fb999ca5fe73788a1a732f6b2590fc5609a7f43bcfa3cda4f6ee70068859379",
-    "F1.svg": "ee18b7e77c7109f6570deb86c28c08006b4720ae06eb596dc2ea8753dbb7aa60",
-    "F5.svg": "db77270b75656ed1d3b7b644212e8628302e8ee5790d13423f0f1127063e2abe",
-    "F6.html": "eeda1c3eb0fef384f3827195e1c24b9efc3af5e7c935547ae27e37ba3d1d1014",
-    "F4.svg": "59025d9e530b692a1673b4b40221ff3feb0e475f12a534f9ae167323af26a585",
-    "F6.svg": "87eff3376aa173925d88f4774e023fb444bc61a111265947a04bc12ddb8ed0d0",
-    "F7.svg": "0553c0489ebf3a12d82cb7d0900f289ea1fbce2f35827a97c67edd2e699f8ba0",
-    "F7.png": "8bee7149d34840feaf693c9d7c6a5f0e03303ca80ba4c6cc0da290e3acf14477",
-    "F6.png": "ffeb10a0de58abcff3560e632d9a351ae79ab8e4d95eae934a26180f4802a7ad",
-    "F4.png": "c8d356bb7b920b3ea8428f9c8944b6cd2b7da5a74b8539798051fb6542aa47bf",
-    "F5.png": "072b6b515aec973e38f52fa79e7369b73336b32c1718ea0343e618f24581e2dd",
-    "F1.png": "f561adb0b91e68bad5018e5e85018275284194e06303f3a824667d99318c36b6",
-    "F2.png": "94afb4dac9e15ee49d2077728f64ff1b2fa1cebc3cc2b0bb7010e62f2db442fa",
-    "F3.png": "536f9f65ec826b24f331a3cc89c1bbd85bceff217f825bf4ffccb9a02e5e0485",
-    "F10.png": "35939fdaaa55eaf2c7ad0e18ceb13d7debddedf5a31dd0aac9873d49d39a4af5",
-    "F11.png": "3a8d9732e7786e44a93ec327748b41642ecc48883a15bb1e6a7aeb73d107f5de",
-    "F11.svg": "ed6d247e03a406c1f0154d2b63e8493b17da094219161cf87b1f889865f2abb9",
-    "F10.svg": "62e25379bcccd7c8ac33220f7f0b33edbd4404f99e7c6d0b801db9a27bf0a5b1"
+    "F3.svg": "2a56a425623be313bcec0bd4d509049f04c12cf8259b4936261179de6552e431",
+    "F2.svg": "bd083af818689d13606b36cd5a9bc480959a2ffd11659f79c11d6ac5f268c8fb",
+    "F1.svg": "f46d73b5ffe902584943b18d9b3b34ae47f6daa308535ea6e398ffb61618b485",
+    "F5.svg": "e9d5a992f6fe8309dba1d83bdeacfb907733691fbf86edbae004456ded05a1c6",
+    "F6.html": "efdf33851d85b326fb2088532e0932754930c3104f8452adc045108161c4b304",
+    "F4.svg": "eb7dff55743479cf52b48e9363b90f75bec51a7d369eaea6b2a2f6079ab39068",
+    "F6.svg": "47b400892ca5918b004df1729ecd9c75cce818ca48c20970c0fd1be2f345c10f",
+    "F7.svg": "24927ee41298b9f26acfabbb99d0e1d096c9561bde80b4920a960d9876bf3c43",
+    "F7.png": "962a30f06e72b15e648ca3d60220a4539653a4e08824c0159a3ecfb7fa4d1bee",
+    "F6.png": "a2e85a570a67ffbf1fabf8f37ef1905e5e580a1711a32e17fddc65e9ec31001e",
+    "F4.png": "73ff5e1e057a05bd4d1e5d1bbc1c6d2c699ea0b75d39ef2c9a88387260f8f08c",
+    "F5.png": "a0dac11a84118e144bc5e91395203740602622b019c8eaf8be65112dfa384009",
+    "F1.png": "c4d83388b015f58fd2603cc3414bb118eb81b1b379d7e4556d5904cf5eed16d4",
+    "F2.png": "fecf45c9dea0c83e3ed4fb50a9c3a7b438a15a511f483a7de449d37dbe3016a7",
+    "F3.png": "93404387a6f7d5a39e6585479a7675a5d41828b8742893bf6a1ce19ae7d14a9c",
+    "F10.png": "15df6ee44ebe52ffaa9cf31af47c67986d7f5afe004b29c4ab1ff46919ced296",
+    "F11.png": "157e5147fe126ceb07e459b117fa5335040d0c7288a8218b4fc0185f7d9e985c",
+    "F11.svg": "cff0e1101ca0520f06e055b4e47fce8de6af1807cbd3816fae8f1639e103b145",
+    "F10.svg": "85f6212ef3853312be577dcf966ba1ada5b250a02d74e71911aa645d368dc374"
   }
 }

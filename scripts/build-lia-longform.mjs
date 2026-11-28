@@ -192,7 +192,7 @@ if (!source) {
     if (/^heading_(open|close)$/.test(token.type)) token.tag = `h${Math.min(6, Number(token.tag[1]) + 2)}`;
   }
   const appendixHtml = markdown.renderer.render(appendix, markdown.options, env);
-  headings.push({ id: "endnotes", label: "Endnotes", level: 2 }, { id: "appendix-a", label: "Appendix A · Founding text", level: 2 });
+  headings.push({ id: "endnotes", label: "Endnotes", level: 2 }, { id: "appendix-a", label: "Appendix A · LIA v0.1, short form", level: 2 });
 
   const layout = await readFile(new URL("lia-longform.html", import.meta.url), "utf8");
   const title = escape(manuscript.title);

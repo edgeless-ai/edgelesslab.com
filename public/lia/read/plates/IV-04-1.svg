@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1698" viewBox="0 0 1500 1698" role="img" aria-labelledby="t d"><title id="t">The excavation record, filled twice for one case</title><desc id="d">LIA&#x27;s proposed minimal record format filled for Swanson&#x27;s fish-oil and Raynaud&#x27;s hypothesis as of 1986 and as of 1989, with the nine changed fields marked, the six suggested statuses, and novelty and validity drawn as separate axes.</desc><rect x="0.0" y="0.0" width="1500.0" height="1698.0" fill="#f3eddd" stroke="none" stroke-width="1" />
+<line x1="18.0" y1="18.0" x2="32.0" y2="18.0" stroke="#56524a" stroke-width="0.8" />
+<line x1="18.0" y1="18.0" x2="18.0" y2="32.0" stroke="#56524a" stroke-width="0.8" />
+<line x1="1482.0" y1="18.0" x2="1468.0" y2="18.0" stroke="#56524a" stroke-width="0.8" />
+<line x1="1482.0" y1="18.0" x2="1482.0" y2="32.0" stroke="#56524a" stroke-width="0.8" />
+<line x1="18.0" y1="1680.0" x2="32.0" y2="1680.0" stroke="#56524a" stroke-width="0.8" />
+<line x1="18.0" y1="1680.0" x2="18.0" y2="1666.0" stroke="#56524a" stroke-width="0.8" />
+<line x1="1482.0" y1="1680.0" x2="1468.0" y2="1680.0" stroke="#56524a" stroke-width="0.8" />
+<line x1="1482.0" y1="1680.0" x2="1482.0" y2="1666.0" stroke="#56524a" stroke-width="0.8" />
+<text x="76.0" y="50.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="11.5" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start" letter-spacing="0.9">EDGELESS LAB / LATENT INFORMATION ARCHAEOLOGY / PLATE IV-04-1</text>
+<text x="1440.0" y="50.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="11.5" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="end" letter-spacing="0.9">THE EXCAVATION RECORD</text>
+<circle cx="64.0" cy="46.0" r="4.0" fill="#1a6847" stroke="none" stroke-width="1"/>
+<line x1="60.0" y1="64.0" x2="1440.0" y2="64.0" stroke="#0c0a08" stroke-width="1.2" />
+<text x="60.0" y="112.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="33" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">One finding written twice: the fish-oil record as of 1986 and as of 1989</text>
+<text x="60.0" y="146.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="17" font-weight="normal" font-style="italic" fill="#2a2520" text-anchor="start">The record has 15 top-level fields, and each entry under sources carries three of its own. When the 1989 trial arrives, nine fields change; sources and limitations gain</text>
+<text x="60.0" y="169.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="17" font-weight="normal" font-style="italic" fill="#2a2520" text-anchor="start">entries, and the other six stand as they were.</text>
+<text x="60.0" y="228.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="11.5" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start" letter-spacing="0.9">FIELD</text>
+<text x="290.0" y="228.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="11.5" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start" letter-spacing="0.9">AS OF 1986: PUBLISHED HYPOTHESIS</text>
+<text x="854.0" y="228.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="11.5" font-weight="normal" font-style="normal" fill="#1a6847" text-anchor="start" letter-spacing="0.9">AS OF 1989: AFTER THE FIRST REPORTED TRIAL</text>
+<line x1="60.0" y1="240.0" x2="1440.0" y2="240.0" stroke="#0c0a08" stroke-width="1" />
+<text x="60.0" y="284.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">lia_version</text>
+<text x="290.0" y="284.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13.5" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">&quot;0.1&quot;</text>
+<text x="854.0" y="284.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="12" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start">unchanged</text>
+<line x1="60.0" y1="298.0" x2="1440.0" y2="298.0" stroke="#d4cab4" stroke-width="0.8" />
+<text x="60.0" y="320.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">id</text>
+<text x="290.0" y="320.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13.5" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">fish-oil-raynaud-1986 (made up for the chapter)</text>
+<text x="854.0" y="320.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="12" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start">unchanged</text>
+<line x1="60.0" y1="334.0" x2="1440.0" y2="334.0" stroke="#d4cab4" stroke-width="0.8" />
+<rect x="830.0" y="334.0" width="610.0" height="54.0" fill="#ebe3cf" stroke="none" stroke-width="1" />
+<rect x="830.0" y="334.0" width="4.0" height="54.0" fill="#1a6847" stroke="none" stroke-width="1" />
+<text x="60.0" y="356.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="bold" font-style="normal" fill="#0c0a08" text-anchor="start">claim</text>
+<text x="290.0" y="356.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">Dietary fish oil might benefit patients with Raynaud&#x27;s syndrome.</text>
+<text x="854.0" y="356.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">Dietary fish oil improves tolerance to cold and delays the onset of vasospasm in patients with</text>
+<text x="854.0" y="374.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">primary Raynaud&#x27;s syndrome.</text>
+<line x1="60.0" y1="388.0" x2="1440.0" y2="388.0" stroke="#d4cab4" stroke-width="0.8" />
+<text x="60.0" y="410.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">corpus</text>
+<text x="290.0" y="410.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">Two sets of published medical articles: one on dietary fish oil, one on Raynaud&#x27;s</text>
+<text x="290.0" y="428.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">syndrome.</text>
+<text x="854.0" y="410.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="12" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start">unchanged</text>
+<line x1="60.0" y1="442.0" x2="1440.0" y2="442.0" stroke="#d4cab4" stroke-width="0.8" />
+<rect x="830.0" y="442.0" width="610.0" height="36.0" fill="#ebe3cf" stroke="none" stroke-width="1" />
+<rect x="830.0" y="442.0" width="4.0" height="36.0" fill="#1a6847" stroke="none" stroke-width="1" />
+<text x="60.0" y="464.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="bold" font-style="normal" fill="#0c0a08" text-anchor="start">cutoff</text>
+<text x="290.0" y="464.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">1986</text>
+<text x="854.0" y="464.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">1989</text>
+<line x1="60.0" y1="478.0" x2="1440.0" y2="478.0" stroke="#d4cab4" stroke-width="0.8" />
+<text x="60.0" y="500.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">latency_class</text>
+<text x="290.0" y="500.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">Relational, Inferential</text>
+<text x="854.0" y="500.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="12" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start">unchanged</text>
+<line x1="60.0" y1="514.0" x2="1440.0" y2="514.0" stroke="#d4cab4" stroke-width="0.8" />
+<rect x="830.0" y="514.0" width="610.0" height="72.0" fill="#ebe3cf" stroke="none" stroke-width="1" />
+<rect x="830.0" y="514.0" width="4.0" height="72.0" fill="#1a6847" stroke="none" stroke-width="1" />
+<text x="60.0" y="536.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="bold" font-style="normal" fill="#0c0a08" text-anchor="start">sources</text>
+<text x="290.0" y="536.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">Two entries, each from Swanson&#x27;s 1989 summary: fish oil leads to blood and</text>
+<text x="290.0" y="554.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">vascular changes; similar changes might benefit Raynaud patients. available_at:</text>
+<text x="290.0" y="572.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">before 1986, year not dated.</text>
+<text x="854.0" y="536.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">Adds DiGiacomo, Kremer and Shah (1989): 32 patients randomized to fish oil or olive-oil</text>
+<text x="854.0" y="554.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">placebo; median time to onset rose from 31.3 to 46.5 minutes at six weeks (p = 0.04).</text>
+<text x="854.0" y="572.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">available_at: 1989.</text>
+<line x1="60.0" y1="586.0" x2="1440.0" y2="586.0" stroke="#d4cab4" stroke-width="0.8" />
+<text x="60.0" y="608.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">inference</text>
+<text x="290.0" y="608.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">If fish oil produces these changes, and these changes might benefit Raynaud</text>
+<text x="290.0" y="626.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">patients, then fish oil might benefit Raynaud patients.</text>
+<text x="854.0" y="608.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="12" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start">unchanged</text>
+<line x1="60.0" y1="640.0" x2="1440.0" y2="640.0" stroke="#d4cab4" stroke-width="0.8" />
+<rect x="830.0" y="640.0" width="610.0" height="54.0" fill="#ebe3cf" stroke="none" stroke-width="1" />
+<rect x="830.0" y="640.0" width="4.0" height="54.0" fill="#1a6847" stroke="none" stroke-width="1" />
+<text x="60.0" y="662.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="bold" font-style="normal" fill="#0c0a08" text-anchor="start">alternatives</text>
+<text x="290.0" y="662.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">[ ] none recorded as of 1986</text>
+<text x="854.0" y="662.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">The trial abstract gives its own rationale, a favorable vascular response to ischemia; the benefit</text>
+<text x="854.0" y="680.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">does not confirm each link of the 1986 inference.</text>
+<line x1="60.0" y1="694.0" x2="1440.0" y2="694.0" stroke="#d4cab4" stroke-width="0.8" />
+<rect x="830.0" y="694.0" width="610.0" height="36.0" fill="#ebe3cf" stroke="none" stroke-width="1" />
+<rect x="830.0" y="694.0" width="4.0" height="36.0" fill="#1a6847" stroke="none" stroke-width="1" />
+<text x="60.0" y="716.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="bold" font-style="normal" fill="#0c0a08" text-anchor="start">contradictory_evidence</text>
+<text x="290.0" y="716.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">[ ] none recorded as of 1986</text>
+<text x="854.0" y="716.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">No benefit concluded for patients with secondary Raynaud&#x27;s syndrome.</text>
+<line x1="60.0" y1="730.0" x2="1440.0" y2="730.0" stroke="#d4cab4" stroke-width="0.8" />
+<text x="60.0" y="752.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">novelty_check</text>
+<text x="290.0" y="752.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">Scope: the two sets of articles. Method: shared articles, joint citation, mention.</text>
+<text x="290.0" y="770.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">Result: no articles in common; never cited together; neither set mentioned the</text>
+<text x="290.0" y="788.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">other.</text>
+<text x="854.0" y="752.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="12" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start">unchanged</text>
+<line x1="60.0" y1="802.0" x2="1440.0" y2="802.0" stroke="#d4cab4" stroke-width="0.8" />
+<rect x="830.0" y="802.0" width="610.0" height="36.0" fill="#ebe3cf" stroke="none" stroke-width="1" />
+<rect x="830.0" y="802.0" width="4.0" height="36.0" fill="#1a6847" stroke="none" stroke-width="1" />
+<text x="60.0" y="824.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="bold" font-style="normal" fill="#0c0a08" text-anchor="start">status</text>
+<text x="290.0" y="824.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">candidate</text>
+<text x="854.0" y="824.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13.5" font-weight="bold" font-style="normal" fill="#0c0a08" text-anchor="start">corroborated</text>
+<line x1="60.0" y1="838.0" x2="1440.0" y2="838.0" stroke="#d4cab4" stroke-width="0.8" />
+<rect x="830.0" y="838.0" width="610.0" height="54.0" fill="#ebe3cf" stroke="none" stroke-width="1" />
+<rect x="830.0" y="838.0" width="4.0" height="54.0" fill="#1a6847" stroke="none" stroke-width="1" />
+<text x="60.0" y="860.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="bold" font-style="normal" fill="#0c0a08" text-anchor="start">validation</text>
+<text x="290.0" y="860.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">None. No clinical trial reported.</text>
+<text x="854.0" y="860.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">One double-blind, placebo-controlled trial: among primary patients, an episode could no</text>
+<text x="854.0" y="878.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">longer be induced in 5 of 11 on fish oil against 1 of 9 on olive oil (p = 0.05).</text>
+<line x1="60.0" y1="892.0" x2="1440.0" y2="892.0" stroke="#d4cab4" stroke-width="0.8" />
+<rect x="830.0" y="892.0" width="610.0" height="54.0" fill="#ebe3cf" stroke="none" stroke-width="1" />
+<rect x="830.0" y="892.0" width="4.0" height="54.0" fill="#1a6847" stroke="none" stroke-width="1" />
+<text x="60.0" y="914.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="bold" font-style="normal" fill="#0c0a08" text-anchor="start">limitations</text>
+<text x="290.0" y="914.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">Both evidence lines come from Swanson&#x27;s own summary; publication years of the</text>
+<text x="290.0" y="932.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">antecedent articles are not established.</text>
+<text x="854.0" y="914.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">Adds: one trial, one regimen, 32 patients; the trial is held as an abstract only.</text>
+<line x1="60.0" y1="946.0" x2="1440.0" y2="946.0" stroke="#d4cab4" stroke-width="0.8" />
+<rect x="830.0" y="946.0" width="610.0" height="36.0" fill="#ebe3cf" stroke="none" stroke-width="1" />
+<rect x="830.0" y="946.0" width="4.0" height="36.0" fill="#1a6847" stroke="none" stroke-width="1" />
+<text x="60.0" y="968.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="13" font-weight="bold" font-style="normal" fill="#0c0a08" text-anchor="start">next_test</text>
+<text x="290.0" y="968.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">A controlled clinical trial of dietary fish oil in patients with Raynaud&#x27;s syndrome.</text>
+<text x="854.0" y="968.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">A second, independent trial in the primary form. None is recorded in the sources used here.</text>
+<line x1="60.0" y1="982.0" x2="1440.0" y2="982.0" stroke="#d4cab4" stroke-width="0.8" />
+<text x="1440.0" y="1006.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="11.5" font-weight="normal" font-style="normal" fill="#1a6847" text-anchor="end" letter-spacing="0.9">NINE FIELDS CHANGED</text>
+<text x="60.0" y="1072.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="22" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">Six suggested statuses</text>
+<text x="60.0" y="1098.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="14" font-weight="normal" font-style="italic" fill="#2a2520" text-anchor="start">LIA lists them without thresholds, so the validation field carries the reason for the choice.</text>
+<rect x="60.0" y="1134.0" width="300.0" height="88.0" fill="#ebe3cf" stroke="#d4cab4" stroke-width="1" />
+<text x="76.0" y="1162.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="17" font-weight="bold" font-style="normal" fill="#1a6847" text-anchor="start">candidate</text>
+<text x="76.0" y="1188.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="14" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">fish oil, 1986</text>
+<rect x="380.0" y="1134.0" width="300.0" height="88.0" fill="#ebe3cf" stroke="#d4cab4" stroke-width="1" />
+<text x="396.0" y="1162.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="17" font-weight="bold" font-style="normal" fill="#1a6847" text-anchor="start">corroborated</text>
+<text x="396.0" y="1188.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="14" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">fish oil, 1989</text>
+<rect x="60.0" y="1238.0" width="300.0" height="88.0" fill="#f3eddd" stroke="#d4cab4" stroke-width="1" />
+<text x="76.0" y="1266.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="17" font-weight="bold" font-style="normal" fill="#56524a" text-anchor="start">validated</text>
+<text x="76.0" y="1292.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="14" font-weight="normal" font-style="italic" fill="#56524a" text-anchor="start">no case in this chapter</text>
+<rect x="380.0" y="1238.0" width="300.0" height="88.0" fill="#ebe3cf" stroke="#d4cab4" stroke-width="1" />
+<text x="396.0" y="1266.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="17" font-weight="bold" font-style="normal" fill="#1a6847" text-anchor="start">rediscovered</text>
+<text x="396.0" y="1292.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="14" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">thalidomide in ENL, if recovered today</text>
+<text x="396.0" y="1311.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="14" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">from the 1965 report</text>
+<rect x="60.0" y="1342.0" width="300.0" height="88.0" fill="#ebe3cf" stroke="#d4cab4" stroke-width="1" />
+<text x="76.0" y="1370.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="17" font-weight="bold" font-style="normal" fill="#1a6847" text-anchor="start">rejected</text>
+<text x="76.0" y="1396.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="14" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">survival-weighting analogy, 2026</text>
+<rect x="380.0" y="1342.0" width="300.0" height="88.0" fill="#f3eddd" stroke="#d4cab4" stroke-width="1" />
+<text x="396.0" y="1370.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="17" font-weight="bold" font-style="normal" fill="#56524a" text-anchor="start">unresolved</text>
+<text x="396.0" y="1396.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="14" font-weight="normal" font-style="italic" fill="#56524a" text-anchor="start">no case in this chapter</text>
+<text x="60.0" y="1468.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="14" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">“Each of these is a pair of answers, one about novelty and one about validity.” One status word</text>
+<text x="60.0" y="1487.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="14" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">cannot hold both, so the format keeps the first in novelty_check and the second in validation.</text>
+<text x="760.0" y="1072.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="22" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">Novelty and validity are separate axes</text>
+<text x="760.0" y="1098.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="14" font-weight="normal" font-style="italic" fill="#2a2520" text-anchor="start">A rediscovery can be true, and a novel candidate can be false.</text>
+<line x1="800.0" y1="1472.0" x2="1420.0" y2="1472.0" stroke="#0c0a08" stroke-width="1.2" />
+<line x1="800.0" y1="1142.0" x2="800.0" y2="1472.0" stroke="#0c0a08" stroke-width="1.2" />
+<line x1="800.0" y1="1252.0" x2="1420.0" y2="1252.0" stroke="#d4cab4" stroke-width="1" stroke-dasharray="4 4" />
+<line x1="800.0" y1="1362.0" x2="1420.0" y2="1362.0" stroke="#d4cab4" stroke-width="1" stroke-dasharray="4 4" />
+<text x="808.0" y="1494.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="12" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start">already in the record</text>
+<text x="1420.0" y="1494.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="12" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="end">new relative to a defined record</text>
+<text x="1110.0" y="1514.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="12.5" font-weight="bold" font-style="normal" fill="#2a2520" text-anchor="middle">novelty_check</text>
+<text x="790.0" y="1201.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="12" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="end">supported</text>
+<text x="790.0" y="1311.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="12" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="end">untested</text>
+<text x="790.0" y="1421.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="12" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="end">failed</text>
+<text x="790.0" y="1132.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="12.5" font-weight="bold" font-style="normal" fill="#2a2520" text-anchor="end">validation</text>
+<path d="M 1283.6 1295.0 L 1283.6 1211.0" fill="none" stroke="#1a6847" stroke-width="1.6" />
+<path d="M 1277.6 1219.0 L 1283.6 1209.0 L 1289.6 1219.0" fill="none" stroke="#1a6847" stroke-width="1.6" />
+<circle cx="1283.6" cy="1307.0" r="8.0" fill="#f3eddd" stroke="#1a6847" stroke-width="2"/>
+<circle cx="1283.6" cy="1197.0" r="8.0" fill="#1a6847" stroke="none" stroke-width="1"/>
+<text x="1267.6" y="1312.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="end">fish oil, 1986</text>
+<text x="1267.6" y="1195.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="end">fish oil, 1989</text>
+<text x="1267.6" y="1212.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="11.5" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="end">primary form only</text>
+<circle cx="924.0" cy="1197.0" r="8.0" fill="#0c0a08" stroke="none" stroke-width="1"/>
+<text x="940.0" y="1195.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">thalidomide in ENL</text>
+<text x="940.0" y="1212.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="11.5" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start">response reported 1965</text>
+<circle cx="924.0" cy="1417.0" r="8.0" fill="#f3eddd" stroke="#0c0a08" stroke-width="2"/>
+<line x1="919.0" y1="1412.0" x2="929.0" y2="1422.0" stroke="#0c0a08" stroke-width="1.6" />
+<line x1="919.0" y1="1422.0" x2="929.0" y2="1412.0" stroke="#0c0a08" stroke-width="1.6" />
+<text x="940.0" y="1415.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13" font-weight="normal" font-style="normal" fill="#0c0a08" text-anchor="start">survival-weighting analogy</text>
+<text x="940.0" y="1432.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="11.5" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start">KILL-NOVELTY + KILL-SPECIFICATION</text>
+<text x="760.0" y="1546.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">Scope sits inside novelty_check: the Antikythera mechanism was recovered in 1901, and the 2006 reconstruction</text>
+<text x="760.0" y="1565.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">is new where the earlier recognition of an astronomical mechanism is not. The 105 years run to the</text>
+<text x="760.0" y="1584.0" font-family="Boska, Georgia, 'Times New Roman', serif" font-size="13.5" font-weight="normal" font-style="normal" fill="#2a2520" text-anchor="start">reconstruction, not to first recognition.</text>
+<line x1="60.0" y1="1626.0" x2="1440.0" y2="1626.0" stroke="#d4cab4" stroke-width="1" />
+<text x="60.0" y="1648.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="11.5" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start">Sources: Swanson 1989, Bulletin of the Medical Library Association; DiGiacomo, Kremer and Shah 1989 (abstract); ledger rows RB-016, RB-014, RB-027, RB-019; LIA</text>
+<text x="60.0" y="1664.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="11.5" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="start">long-form, Chapter IV-04. Field names are the LIA v0.1 template&#x27;s own.</text>
+<text x="1440.0" y="1648.0" font-family="'JetBrains Mono', Menlo, ui-monospace, monospace" font-size="11.5" font-weight="normal" font-style="normal" fill="#56524a" text-anchor="end" letter-spacing="0.9">EDGELESS LAB</text></svg>

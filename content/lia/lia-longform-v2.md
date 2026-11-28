@@ -2,8 +2,6 @@
 
 *The systematic excavation of what the world could already know.*
 
-Originated by David Murray · CC BY 4.0
-
 **Reading time:** approximately 242 minutes for the main text at 240 words per minute; endnotes and Appendix A are additional.
 
 ## Contents
@@ -2687,7 +2685,7 @@ The condition for amendment is better ideas or better evidence. The request that
 
 ## Appendix A: LIA v0.1, the short form
 
-Originated by David Murray · CC BY 4.0
+CC BY 4.0
 
 # Latent Information Archaeology (LIA)
 

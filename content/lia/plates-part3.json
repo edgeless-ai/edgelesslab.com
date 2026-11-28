@@ -1,0 +1,124 @@
+{
+  "plates": [
+    {
+      "id": "III-01-1",
+      "file": "III-01-1.webp",
+      "png": null,
+      "kind": "illustration",
+      "alt": "Engraving of a reading-room table with two separate stacks of bound journals and, in the gap between them, a glass dish of green fish-oil capsules.",
+      "caption": "Two literatures that shared no article, and the hypothesis that sat between them. Illustration.",
+      "after_heading": "III-01. Swanson and undiscovered public knowledge",
+      "after_subheading": "The case restated as a model"
+    },
+    {
+      "id": "III-03-1",
+      "file": "III-03-1.svg",
+      "png": "III-03-1.png",
+      "kind": "infographic",
+      "alt": "Field Sheet plate. A ledger strip gives the corpus: about 3.3 million abstracts published 1922 to 2018 in more than 1,000 journals, a vocabulary of about 500,000 words, 200 numbers per word. Test 1: of 9,483 compounds with computed power factors that appear in the abstracts, 1,820 were already beside a thermoelectric keyword and 7,663 were candidates; the top ten candidates by embedding rank average 40.8 against 17.0 for known thermoelectrics and 11.5 for all candidates. Test 2: for 83 measured materials, rank correlation with experiment was 59% for power factor and 52% for zT, against 31% for the computed dataset. Test 3: 18 collections cut at 2001 to 2018; top-50 lists were studied as thermoelectrics within five years at eight times the rate of random unstudied materials and three times the rate of random materials with a nonzero bandgap. A trace links CsAgGa2Se4 to thermoelectric through chalcogenide, band gap, optoelectronic and photovoltaic applications.",
+      "caption": "Each test reaches a different distance from text toward measurement: computed properties, already-measured materials, and later literature, with no new candidate measured. Source: Tshitoyan et al. 2019, Nature.",
+      "after_heading": "III-03. Latent knowledge in materials science",
+      "after_subheading": "Three tests"
+    },
+    {
+      "id": "III-03-2",
+      "file": "III-03-2.webp",
+      "png": null,
+      "kind": "illustration",
+      "alt": "Engraving-style plate of a geological cross-section whose strata are made of countless thin layers of blank paper, darker and more compressed toward the bottom. In a cavity in a middle stratum a cluster of clear prismatic crystals has grown, one of them tinted malachite green.",
+      "caption": "What a corpus can hold without any one page stating it. Illustration.",
+      "after_heading": "III-03. Latent knowledge in materials science",
+      "after_subheading": "What the embedding holds"
+    },
+    {
+      "id": "III-04-1",
+      "file": "III-04-1.svg",
+      "png": "III-04-1.png",
+      "kind": "diagram",
+      "alt": "Field Sheet plate. Left: a scientist passes a goal to a Supervisor agent, which assigns work to six agents (Generation, Reflection, Ranking, Evolution, Proximity, Meta-review); a ranked overview returns to the scientist. Right: Elo ratings across 203 goals and 15 expert-written goals are the system scoring itself; experts who wrote 11 goals rated novelty 3.64 and impact 3.09 on a five-point scale. Below, a table of laboratory cases: AML run 1, 2,300 drugs across 34 cancer types, 30 candidates, 5 tested, 3 active in cultured cells; AML run 2, 3 tested, KIRA6 active at 10 nanomolar against 180 in a control line; liver fibrosis, 2 of 3 drugs active in human hepatic organoids; the cf-PICI case, top hypothesis matched an unpublished laboratory finding. Of 8 single drugs tested, 4 showed activity. None reached animals or patients.",
+      "caption": "The system generated, criticized and ranked; scientists set the goals, experts chose what to test, and laboratories ran the experiments, with results in cells, organoids and one recapitulated mechanism. Source: Gottweis et al. 2026, Nature.",
+      "after_heading": "III-04. The co-scientist",
+      "after_subheading": "Leukemia and liver fibrosis"
+    },
+    {
+      "id": "III-05-1",
+      "file": "III-05-1.svg",
+      "png": "III-05-1.png",
+      "kind": "infographic",
+      "alt": "Field Sheet plate with three section drawings, one per text-mining pipeline, each layer labeled with its exact count. DigiMOF: more than 100,000 MOF structures, 43,281 publications, 15,501 name and property pairings, precision 77% on 50 papers, 5,677 hydrothermal against 3,672 solvothermal mentions. Kononova et al.: 4,204,170 papers, 6,218,136 paragraphs, 188,198 on inorganic synthesis, 53,538 solid-state, 19,488 recipes; of 100 random paragraphs 30 were incomplete and 42 of the other 70 were not rebuilt; hand checks of 97% for targets, 95% for balanced reactions, 93% for chemistry and 51% for every item. Court and Cole: 74,000 articles, about 20,400 records from 3,668 articles; five missing orthochromites predicted with a best mean absolute error of 3.1%.",
+      "caption": "Three excavations recovered synthesis conditions, recipes and phase behavior from prose, each validated as extraction or computation and none as a new measurement. Sources: Glasby et al. 2023; Kononova et al. 2019; Court and Cole 2020.",
+      "after_heading": "III-05. Materials",
+      "after_subheading": "What LIA names and what the cases show"
+    },
+    {
+      "id": "III-06-1",
+      "file": "III-06-1.svg",
+      "png": "III-06-1.png",
+      "kind": "diagram",
+      "alt": "Field Sheet plate. A timeline shows Hull, US 4,575,330, filed 1984 and published 1986; Deckard, US 4,863,538, filed 1986 and published 1989; Allen et al., US 6,334,856, priority 1998 and published 2002. Three simplified apparatus drawings follow: a vat of ultraviolet-curable liquid with a moving spot of light and a lowering platform; a laser steered by two galvanometer mirrors over a powder bed under CAD/CAM control; and an array of microneedles patterned on a silicon wafer passing the outer layer of skin above the nerves. Each lists the fields joined and what the patent does not show. A lower panel shows first patent citations of neglected papers: 44 of 282 papers, 1 to 18 years, 8.5 on average; 18 of 176 papers, 1 to 14 years, 6.7 on average.",
+      "caption": "Each patent is a dated public record in which the inventors joined fields and named them; it does not establish performance or that no one saw the combination first. Sources: US patents 4,575,330, 4,863,538 and 6,334,856; van Raan and Winnink 2018.",
+      "after_heading": "III-06. Patents",
+      "after_subheading": "What a patent proves"
+    },
+    {
+      "id": "III-07-1",
+      "file": "III-07-1.svg",
+      "png": "III-07-1.png",
+      "kind": "diagram",
+      "alt": "Field Sheet plate with four dated rows, all on one shared 1960 to 2021 time axis, with enlarged panels for sildenafil and baricitinib. Sildenafil, 1985 to 1998: PDE5 inhibitors identified in 1986, volunteer studies and erection reports dated differently by a 2006 and a 2021 review, first study in erectile dysfunction late 1993, 21 trials with more than 4,500 subjects by 1997, FDA approval 03/27/1998. Thalidomide: response in erythema nodosum leprosum reported 1965, marketing approval 07/16/1998, thirty-three years. Fish oil: hypothesis 1986, first trial 1989, a three-year validation interval. Baricitinib: knowledge-graph letter February 2020, trial enrollment May 8 to July 1, 2020, ACTT-2 published December 2020 with 1,033 adults and median recovery 7 against 8 days.",
+      "caption": "Two connections were noticed at the bedside and two were searched for in the literature, and each stands only at the level of its own trial or approval. Sources: Ghofrani et al. 2006; Cruz-Burgos et al. 2021; FDA approval records; Chen et al. 2012; Swanson 1989; Richardson et al. 2020; Kalil et al. 2020.",
+      "after_heading": "III-07. Pharmaceuticals",
+      "after_subheading": "Noticed and searched for"
+    },
+    {
+      "id": "III-08-1",
+      "file": "III-08-1.svg",
+      "png": "III-08-1.png",
+      "kind": "diagram",
+      "alt": "Field Sheet plate. Top: two lanes for Callaway Golf and its supplier Coastcast, half of whose 2001 sales went to Callaway. On June 8, 2001 Callaway cut its revenue projection and its shares fell 30 percent; Coastcast’s price did not move until it announced earnings of minus 4 cents a share on July 19. Below: three studies on a shared axis with their sample windows: Cohen and Frazzini, 1980 to 2004, 30,622 firm-year relationships, 1.55% a month; Cohen, Malloy and Pomorski, 1986 to 2007, opportunistic insider trades 82 basis points a month; Katona et al., 2011 to 2017, 4.7 million daily car counts at 67,078 stores, plus 1.6% and nearly minus 3% around announcements.",
+      "caption": "Each study joined a record to later prices under a rule that kept later information out; all three are retrospective and observational. Sources: Cohen and Frazzini 2008; Cohen, Malloy and Pomorski 2010; Katona, Painter, Patatoukas and Zeng 2024.",
+      "after_heading": "III-08. Finance",
+      "after_subheading": "What the three show"
+    },
+    {
+      "id": "III-09-1",
+      "file": "III-09-1.svg",
+      "png": "III-09-1.png",
+      "kind": "diagram",
+      "alt": "Field Sheet plate with two dated ledgers. Enron, 1999 to 2002: an Audit Committee warning in February 1999, three LJM approvals in 1999 and 2000, three Raptors approvals in 2000, an October 2000 presentation of $60 billion in assets with about $27 billion off the statements, a report in April 2001 that 64 percent of assets were troubled, bankruptcy on December 2, 2001, and the Senate report of July 8, 2002; a bracket marks two years from warning to collapse. SEC and Madoff, 1992 to 2009: complaints dated May 2000, May 2003, April 2004 and October 2005, two articles in 2001, the confession in December 2008, and the inspector general report of over 450 pages; a bracket marks eight years from 2000 to 2008. A list gives four contradictions inside the SEC files.",
+      "caption": "Each investigation put scattered records into one dated sequence, and the places where two records disagreed were where the digging started, late. Sources: U.S. Senate subcommittee report on Enron’s board, 2002; U.S. Senate Banking Committee hearing on the SEC and Madoff, 2009.",
+      "after_heading": "III-09. Organizations",
+      "after_subheading": "Where the records disagreed"
+    },
+    {
+      "id": "III-11-1",
+      "file": "III-11-1.svg",
+      "png": "III-11-1.png",
+      "kind": "diagram",
+      "alt": "Field Sheet plate. Two schematic cycle drawings: houses whose owners point to the house they prefer, closing into a trading cycle, and incompatible patient and donor pairs doing the same, with a chain ending at the waiting list. A table lists what carried over and what had to change. A chronology on one time scale shows four transfers: Fourier 1822 to Black and Scholes 1973, 151 years; Shapley and Scarf 1974 to kidney exchange 2004, 30 years; Fourier 1822 to Ostrogradsky presented 1828 and published 1831, 6 years; citation analysis, with no single year, to Page et al. 1998. A tally shows seven of eight cross-field candidates killed and one kept as exploratory.",
+      "caption": "In each transfer the earlier work was not lost; the step was seeing that one problem had the form of another and listing where the forms part. Sources: Roth, Sönmez and Ünver 2004; Black and Scholes 1973; Page et al. 1998; Dictionary of Scientific Biography.",
+      "after_heading": "III-11. Between fields",
+      "after_subheading": "What carried over and what did not"
+    },
+    {
+      "id": "III-12-1",
+      "file": "III-12-1.svg",
+      "png": "III-12-1.png",
+      "kind": "infographic",
+      "alt": "Field Sheet plate. A flow shows the 2008 model: 50 million queries tested separately against physician visits in nine regions, 45 combined into one measure, one linear model, with a mean correlation of 0.97 on held-out data and a reporting delay of about one day against one to two weeks. A timeline from 2003 to 2014 marks publication in November 2008, the missed 2009 pandemic, related-term suggestions in 2011, 86 search changes in mid-2012, February 2013 estimates more than double the CDC’s, and the March 2014 critique. A grid of 108 weeks shows 100 too high. Bars give mean absolute errors of 0.486 for Google Flu Trends, 0.311 for lagged CDC data and 0.232 for the two combined.",
+      "caption": "The model passed its first validation and then failed as the search service that produced its data changed. Sources: Ginsberg et al. 2009, Nature; Lazer et al. 2014, Science.",
+      "after_heading": "III-12. Connections that failed",
+      "after_subheading": "How the model drifted"
+    },
+    {
+      "id": "III-12-2",
+      "file": "III-12-2.svg",
+      "png": "III-12-2.png",
+      "kind": "diagram",
+      "alt": "Field Sheet ledger of two rejected cross-field candidates, both closed with the verdict KILL-NOVELTY + KILL-SPECIFICATION + DEFER-CORPUS. For each: the proposal, the checks on algebra or estimator, specification and prior art, what was never run, and what kind of failure it was. A bar chart shows authorship attribution on 590 Python files by 59 authors falling from 67.86% on original files to 52.68% formatted and 50.00% minified. A list gives what each failure leaves for the next investigator.",
+      "caption": "Both candidates were closed before any data were touched, and each leaves corrected reasoning and prior art for the next investigator. Sources: the project’s stage-zero review files; Balla, Gabbrielli and Zacchiroli 2024.",
+      "after_heading": "III-12. Connections that failed",
+      "after_subheading": "Two candidates closed at first review"
+    }
+  ]
+}

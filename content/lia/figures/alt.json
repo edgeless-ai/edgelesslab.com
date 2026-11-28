@@ -1,10 +1,10 @@
 {
-  "status": "internal draft; complete static pack",
+  "status": "complete static pack",
   "figures": {
     "F1": {
       "chapter": "I-02",
-      "alt": "A conceptual flow links recorded artifacts, unmade connections, and explicit claims.",
-      "caption": "Conceptual diagram, not a measured ratio. The sizes do not estimate how much remains unrecognized. The economic thesis is a research proposition, not an established universal law.",
+      "alt": "Four complete graphs of 4, 8, 16 and 32 artifacts, drawn at the same size, hold 6, 28, 120 and 496 possible pairs; one pair in the largest is marked as the one that matters. A key below shows the four kinds of content in the epistemic backlog.",
+      "caption": "Pair counts are arithmetic, n(n − 1)/2, not counts from any corpus. Every graph is drawn at the same size, so density stands for the growth: partners per artifact grow in step with n, pairs with its square. Nothing in the record marks which pairs matter.",
       "source": "RA01",
       "files": [
         "F1.svg",
@@ -13,8 +13,8 @@
     },
     "F2": {
       "chapter": "II-02",
-      "alt": "Four layers: stated and indexed; stated but scattered; unstated connection; unstated implication. Google works largely in layer one, deep research agents in the first two, and LIA in the third and fourth.",
-      "caption": "Google largely operates in the first layer. Layers measure distance from being stated, not evidence strength or validation. Schematic areas are not measured quantities.",
+      "alt": "Four layers: stated and indexed; stated but scattered; unstated connection; unstated implication. Search engines work in layer one, deep research agents in the first two, and LIA in the third and fourth.",
+      "caption": "Search engines largely operate in the first layer. Layers measure distance from being stated, not evidence strength or validation. Band heights carry no meaning.",
       "source": "chapter II-02",
       "files": [
         "F2.svg",
@@ -23,9 +23,9 @@
     },
     "F3": {
       "chapter": "II-01",
-      "alt": "Five non-exclusive latency classes with one source-ledger example each.",
-      "caption": "Definitions are LIA's own, verbatim. Examples illustrate a class, not an exclusive taxonomy; the finance warning is an oversight case, not proof of previously unknown fraud.",
-      "source": "RB-018; RB-016; RB-004; RB-023; RB-006",
+      "alt": "Five non-exclusive latency classes with one source-ledger example each, and a matrix of how often the ledger assigns two classes to the same case.",
+      "caption": "Definitions are LIA's own, verbatim. Examples illustrate a class, not an exclusive taxonomy; the finance warning is an oversight case, not proof of previously unknown fraud. Matrix counts are computed from the case ledger and are not frequencies in the world.",
+      "source": "RB-018; RB-016; RB-004; RB-023; RB-006; RB case ledger",
       "files": [
         "F3.svg",
         "F3.png"
@@ -33,8 +33,8 @@
     },
     "F4": {
       "chapter": "II-03",
-      "alt": "Overlapping sets show recoverable candidates minus the explicit record; the left-only region is L.",
-      "caption": "Conceptual model, not a measured inventory. The diagram does not assume that all explicit claims are recoverable. Membership depends on corpus, time, methods, and reference record; candidate status is not validation.",
+      "alt": "Overlapping regions show the recoverable candidates H minus the explicit record E; the hatched region left of the overlap is L. A glossary gives each symbol, and an inset shows a candidate leaving L once it is documented.",
+      "caption": "Conceptual model, not a measured inventory. The diagram does not assume that all explicit claims are recoverable. Membership depends on corpus, time, methods, and reference record; candidate status is not validation. Region sizes and point positions are schematic.",
       "source": "chapter II-03",
       "files": [
         "F4.svg",
@@ -43,9 +43,9 @@
     },
     "F5": {
       "chapter": "III-01",
-      "alt": "Fish oil connects through blood viscosity and platelets to Raynaud’s. Hypothesis 1986; trial 1989.",
-      "caption": "The antecedent literatures are not dated here. RA05–RA06 support the reconstruction; RA02 is only a bibliographic record. The trial reported benefit for primary, not secondary, Raynaud’s.",
-      "source": "RA02; RA04; RA05; RA06; RB-016",
+      "alt": "Fish oil connects through blood viscosity and platelet aggregability to Raynaud’s syndrome. Hypothesis 1986; trial 1989.",
+      "caption": "The antecedent literatures are not dated here, and the paper stacks are not article counts. RA05–RA06 support the reconstruction; RA02 is only a bibliographic record. The trial reported benefit for primary, not secondary, Raynaud’s, and did not test the two intermediate links.",
+      "source": "RA01; RA02; RA03; RA04; RA05; RA06; RB-016",
       "files": [
         "F5.svg",
         "F5.png"
@@ -53,9 +53,9 @@
     },
     "F10": {
       "chapter": "III-02 → III-04",
-      "alt": "A dated precedent timeline links Swanson, Arrowsmith/LBD, Tshitoyan, and Co-Scientist.",
-      "caption": "Dates are publication years from RA citations. Arrowsmith is one LBD milestone, not the origin of the whole field. Materials ranking is retrospective; the Co-Scientist entry is a preprint, not clinical validation.",
-      "source": "RA01; RA05; RA09; RA12",
+      "alt": "A dated precedent timeline in five strands links Swanson, Arrowsmith/LBD, Tshitoyan, and Co-Scientist to related work on dispersed knowledge, multiple discovery and latent knowledge in models.",
+      "caption": "Dates are publication years from the cited sources. Arrowsmith is one literature-based discovery milestone, not the origin of the whole field. Materials ranking is retrospective; the Co-Scientist entries report in vitro and organoid results, not clinical validation. Strands group sources for reading and are not a claim of direct influence.",
+      "source": "RA01; RA03; RA05; RA06; RA07; RA08; RA09; RA10; RA11; RA12; RA13; RA14; RA16; RA17; RA18; RA21",
       "files": [
         "F10.svg",
         "F10.png"
@@ -63,8 +63,8 @@
     },
     "F6": {
       "chapter": "III-10",
-      "alt": "A domain-by-class matrix lists every RB case, its ledger lag or an unknown marker, and weak-source flags.",
-      "caption": "Cells show RB suffix: calendar-year lag. ? = unknown, never zero; * = partly secondary evidence. A case can occupy several cells. Intervals have different endpoints and are not comparable discovery speeds. Use the interactive companion for anchors, qualifications, and sources.",
+      "alt": "A domain-by-class matrix lists every RB case, its ledger lag or an unknown marker, weak-source flags and a mark for the kind of evidence, with an index of case titles.",
+      "caption": "Cells show the RB case number and its calendar-year lag. A case can occupy several cells. Intervals have different endpoints and are not comparable discovery speeds. The RB case ledger gives the anchors, qualifications, and sources for each entry.",
       "source": "RB case ledger; all entries",
       "files": [
         "F6.svg",
@@ -74,8 +74,8 @@
     },
     "F7": {
       "chapter": "IV-03",
-      "alt": "LIA’s eight method stages form a loop from boundary-setting through findings and rejected hypotheses.",
-      "caption": "Repeat with the enriched record. Publication is subject to rights, privacy, safety, and project authorization. Rejected and unresolved candidates remain part of the evidence record.",
+      "alt": "LIA’s eight method stages sit on a drafted cycle from boundary-setting through findings and rejected hypotheses; the return arc and the record at its centre show the loop.",
+      "caption": "Publication is subject to rights, privacy, safety, and project authorization. Rejected and unresolved candidates remain part of the evidence record. Stage spacing is schematic, not a measure of effort.",
       "source": "chapter IV-03",
       "files": [
         "F7.svg",
@@ -84,7 +84,7 @@
     },
     "F11": {
       "chapter": "IV-01",
-      "alt": "Six unscored rows ask about novelty, provenance, validity, falsifiability, utility, and temporal integrity.",
+      "alt": "Six unscored rows ask about novelty, provenance, validity, falsifiability, utility, and temporal integrity, with blank fields for evidence, test and outcome, and the six record statuses.",
       "caption": "The questions are LIA's own, verbatim. Record evidence and test outcomes separately. No composite score, thresholds, or case performance values are asserted.",
       "source": "chapter IV-01",
       "files": [
@@ -112,10 +112,82 @@
       "value": 1989
     },
     {
+      "figure": "F5",
+      "source": "RB-016",
+      "field": "lag_years",
+      "value": 3
+    },
+    {
+      "figure": "F5",
+      "source": "RA01",
+      "field": "citation",
+      "value": "Swanson, D. R. (1986). Undiscovered Public Knowledge. The Library Quarterly 56(2), 103–118."
+    },
+    {
+      "figure": "F5",
+      "source": "RA02",
+      "field": "citation",
+      "value": "Swanson, D. R. (1986). Fish oil, Raynaud’s syndrome, and undiscovered public knowledge. Perspectives in Biology and Medicine 30, 7–18."
+    },
+    {
+      "figure": "F5",
+      "source": "RA03",
+      "field": "citation",
+      "value": "Swanson, D. R. (1988). Migraine and magnesium: eleven neglected connections. Perspectives in Biology and Medicine 31, 526–557."
+    },
+    {
+      "figure": "F5",
+      "source": "RA04",
+      "field": "citation",
+      "value": "DiGiacomo, R. A., Kremer, J. M., and Shah, D. M. (1989). Fish-oil dietary supplementation in patients with Raynaud’s phenomenon: a double-blind, controlled, prospective study."
+    },
+    {
+      "figure": "F5",
+      "source": "RA06",
+      "field": "citation",
+      "value": "Swanson, D. R. (1996). Undiscovered Public Knowledge: A Ten-Year Update. KDD."
+    },
+    {
+      "figure": "F5",
+      "source": "RA05",
+      "field": "citation",
+      "value": "Smalheiser et al. (2006). Collaborative development of the Arrowsmith two node search interface designed for laboratory investigators."
+    },
+    {
+      "figure": "F10",
+      "source": "RA18",
+      "field": "citation",
+      "value": "Ogburn, W. F., and Thomas, D. (1922). Are Inventions Inevitable? A Note on Social Evolution."
+    },
+    {
+      "figure": "F10",
+      "source": "RA21",
+      "field": "citation",
+      "value": "Hayek, F. A. (1945). The Use of Knowledge in Society."
+    },
+    {
+      "figure": "F10",
+      "source": "RA17",
+      "field": "citation",
+      "value": "Merton, R. K. (1961). Singletons and multiples in scientific discovery: A chapter in the sociology of science. Proceedings of the American Philosophical Society 105(5), 470–486."
+    },
+    {
       "figure": "F10",
       "source": "RA01",
       "field": "citation",
       "value": "Swanson, D. R. (1986). Undiscovered Public Knowledge. The Library Quarterly 56(2), 103–118."
+    },
+    {
+      "figure": "F10",
+      "source": "RA03",
+      "field": "citation",
+      "value": "Swanson, D. R. (1988). Migraine and magnesium: eleven neglected connections. Perspectives in Biology and Medicine 31, 526–557."
+    },
+    {
+      "figure": "F10",
+      "source": "RA06",
+      "field": "citation",
+      "value": "Swanson, D. R. (1996). Undiscovered Public Knowledge: A Ten-Year Update. KDD."
     },
     {
       "figure": "F10",
@@ -125,15 +197,57 @@
     },
     {
       "figure": "F10",
+      "source": "RA07",
+      "field": "citation",
+      "value": "Henry, S., and McInnes, B. T. (2017). Literature Based Discovery: Models, methods, and trends."
+    },
+    {
+      "figure": "F10",
+      "source": "RA08",
+      "field": "citation",
+      "value": "Thilakaratne et al. (2019). A systematic review on literature-based discovery workflow. PeerJ Computer Science."
+    },
+    {
+      "figure": "F10",
       "source": "RA09",
       "field": "citation",
       "value": "Tshitoyan et al. (2019). Unsupervised word embeddings capture latent knowledge from materials science literature. Nature 571, 95–98."
     },
     {
       "figure": "F10",
+      "source": "RA10",
+      "field": "citation",
+      "value": "Krenn et al. (2023). Forecasting the future of artificial intelligence with machine learning-based link prediction in an exponentially growing knowledge network. Nature Machine Intelligence."
+    },
+    {
+      "figure": "F10",
+      "source": "RA11",
+      "field": "citation",
+      "value": "Sourati, J., and Evans, J. A. (2023). Accelerating science with human-aware artificial intelligence. Nature Human Behaviour 7, 1682–1696."
+    },
+    {
+      "figure": "F10",
+      "source": "RA14",
+      "field": "citation",
+      "value": "Alignment Research Center (2021). ARC’s first technical report: Eliciting Latent Knowledge. Announcement, 14 December 2021."
+    },
+    {
+      "figure": "F10",
+      "source": "RA16",
+      "field": "citation",
+      "value": "Farquhar et al. (2023). Challenges with unsupervised LLM knowledge discovery. arXiv:2312.10029."
+    },
+    {
+      "figure": "F10",
       "source": "RA12",
       "field": "citation",
       "value": "Gottweis et al. (2025). Towards an AI co-scientist. arXiv:2502.18864v1."
+    },
+    {
+      "figure": "F10",
+      "source": "RA13",
+      "field": "citation",
+      "value": "Gottweis et al. (2026). Accelerating scientific discovery with Co-Scientist. Nature 655, 487–496."
     },
     {
       "figure": "F6",
@@ -1006,6 +1120,28 @@
       "case_type": "reconstruction"
     }
   ],
+  "pairs": [
+    {
+      "n": 4,
+      "pairs": 6,
+      "partners": 3
+    },
+    {
+      "n": 8,
+      "pairs": 28,
+      "partners": 7
+    },
+    {
+      "n": 16,
+      "pairs": 120,
+      "partners": 15
+    },
+    {
+      "n": 32,
+      "pairs": 496,
+      "partners": 31
+    }
+  ],
   "layers": [
     {
       "layer": "Layer 1",
@@ -1032,25 +1168,42 @@
       "placement": "LIA."
     }
   ],
+  "class_overlap": {
+    "Archival|Relational": 4,
+    "Archival|Inferential": 3,
+    "Relational|Inferential": 7,
+    "Archival|Contextual": 0,
+    "Relational|Contextual": 9,
+    "Inferential|Contextual": 4,
+    "Archival|Representational": 1,
+    "Relational|Representational": 0,
+    "Inferential|Representational": 3,
+    "Contextual|Representational": 0
+  },
+  "consequences": [
+    "Latency is relative to a corpus, a historical boundary, and a method of investigation.",
+    "A candidate in the discovery space is not necessarily true. The space includes unsupported conjectures and erroneous inferences.",
+    "Novelty is relative to a documented reference record. The absence of an earlier publication cannot prove that no person previously knew a claim."
+  ],
   "output_sha256": {
-    "F3.svg": "2a56a425623be313bcec0bd4d509049f04c12cf8259b4936261179de6552e431",
-    "F2.svg": "bd083af818689d13606b36cd5a9bc480959a2ffd11659f79c11d6ac5f268c8fb",
-    "F1.svg": "f46d73b5ffe902584943b18d9b3b34ae47f6daa308535ea6e398ffb61618b485",
-    "F5.svg": "e9d5a992f6fe8309dba1d83bdeacfb907733691fbf86edbae004456ded05a1c6",
-    "F6.html": "efdf33851d85b326fb2088532e0932754930c3104f8452adc045108161c4b304",
-    "F4.svg": "eb7dff55743479cf52b48e9363b90f75bec51a7d369eaea6b2a2f6079ab39068",
-    "F6.svg": "47b400892ca5918b004df1729ecd9c75cce818ca48c20970c0fd1be2f345c10f",
-    "F7.svg": "24927ee41298b9f26acfabbb99d0e1d096c9561bde80b4920a960d9876bf3c43",
-    "F7.png": "962a30f06e72b15e648ca3d60220a4539653a4e08824c0159a3ecfb7fa4d1bee",
-    "F6.png": "a2e85a570a67ffbf1fabf8f37ef1905e5e580a1711a32e17fddc65e9ec31001e",
-    "F4.png": "73ff5e1e057a05bd4d1e5d1bbc1c6d2c699ea0b75d39ef2c9a88387260f8f08c",
-    "F5.png": "a0dac11a84118e144bc5e91395203740602622b019c8eaf8be65112dfa384009",
-    "F1.png": "c4d83388b015f58fd2603cc3414bb118eb81b1b379d7e4556d5904cf5eed16d4",
-    "F2.png": "fecf45c9dea0c83e3ed4fb50a9c3a7b438a15a511f483a7de449d37dbe3016a7",
-    "F3.png": "93404387a6f7d5a39e6585479a7675a5d41828b8742893bf6a1ce19ae7d14a9c",
-    "F10.png": "15df6ee44ebe52ffaa9cf31af47c67986d7f5afe004b29c4ab1ff46919ced296",
-    "F11.png": "157e5147fe126ceb07e459b117fa5335040d0c7288a8218b4fc0185f7d9e985c",
-    "F11.svg": "cff0e1101ca0520f06e055b4e47fce8de6af1807cbd3816fae8f1639e103b145",
-    "F10.svg": "85f6212ef3853312be577dcf966ba1ada5b250a02d74e71911aa645d368dc374"
+    "F1.png": "8a99e71baf40fb31884a69f7a1d3c2689b39664acbc9a13efc5d61187ac590d9",
+    "F1.svg": "59e5d3d91b77f7e059b60f428060dd88d3487792c91d7751464686b13f1aa3db",
+    "F10.png": "4c37108065064ab37bd73ac8446c428133b1ec99b710d1366cab9a9c1fe448b0",
+    "F10.svg": "38124458b0798ff48bf8e0bdb7a1e006ca315802c0f27fa3dec523b39f7281c1",
+    "F11.png": "3bcfbb1efd9ed2464965f9759fadbc2d841829390ec47e4430ae6de8c4cdc8a0",
+    "F11.svg": "bfe0c02d81b4ca439e6f54bf79f04e15046b6226d927b92bcf629d6756c79022",
+    "F2.png": "f3653e5e8c069cc195a2ae23ba13f38ba6813cd21edd909de6408912be3d72e3",
+    "F2.svg": "3c2ddb36aeb60a629c53390f582143f3b2a4c41953e8c344aa21f31e0b5b6cf6",
+    "F3.png": "7ce92763d3cc76a48b89f7c857fb0f49d7740994c1dbf79c41448c45b441032e",
+    "F3.svg": "c5011834bf3219d6f85c504929727aa99d024c301139e9d39564be678a6456d7",
+    "F4.png": "e85378ce966b082217bccdbe42978ec9504f1ae5b440ed765c4df1d5b2e35900",
+    "F4.svg": "67338c43b0f93b0f115f977d1a5ef50152cd6f35983436085cb33c1fe4f92d0b",
+    "F5.png": "4fcc172e369781aa1d724ef57faea893ce52b98975a19a4bdfacf0a589103ce7",
+    "F5.svg": "b34ca00d2a16b39f9ab4ee6e994df52e675ea452828d40be2857dc7c605b0ad4",
+    "F6.html": "aa7bbc560ddb1b397010e9db7b88e723e079fb0671ba6899b924e1fbc135d3f2",
+    "F6.png": "6c702d5c7089908fd7c39b98f98cfc12ca10848357b65ecc7c77a0feb0a5d933",
+    "F6.svg": "f008b0439f4bf144b53eebd8a0afd9e996e1a3b0b07ee938fdfbff89c7806828",
+    "F7.png": "bc27ff4ce7711d77a46428bc801e45f8ace1df28a91c4ee41eaf81024d02eb89",
+    "F7.svg": "88dbe31bf1f67026a1c17e8ba0476399cd6d9d811e8805f9101f095328665eef"
   }
 }

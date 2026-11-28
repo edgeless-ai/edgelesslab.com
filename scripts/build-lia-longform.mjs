@@ -1,11 +1,16 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import MarkdownIt from "markdown-it";
 import { findLiaLongformSource } from "../src/lib/lia-longform-source.mjs";
+import { loadPlates, placePlates, renderPlate, renderPlateGroup } from "./lia-plates.mjs";
 
-const out = new URL("../out/", import.meta.url);
+// LIA_OUT_DIR and LIA_MANIFEST_DIR exist for tests; the build uses the defaults.
+const out = process.env.LIA_OUT_DIR ? pathToFileURL(resolve(process.env.LIA_OUT_DIR) + "/") : new URL("../out/", import.meta.url);
 const reader = new URL("lia/read/", out);
-const markdown = new MarkdownIt({ html: false, linkify: true });
+const manifestDir = process.env.LIA_MANIFEST_DIR ? resolve(process.env.LIA_MANIFEST_DIR) : fileURLToPath(new URL("../content/lia/", import.meta.url));
+// Typographer for curly quotes only; the replacements rule (dashes, (c)) stays off.
+const markdown = new MarkdownIt({ html: false, linkify: true, typographer: true }).disable("replacements");
 markdown.linkify.set({ fuzzyLink: false, fuzzyEmail: false, fuzzyIP: false });
 const escape = markdown.utils.escapeHtml;
 
@@ -25,7 +30,11 @@ markdown.inline.ruler.before("link", "endnote_ref", (state, silent) => {
   if (state.src.charAt(state.pos) !== "[") return false;
   const match = /^\[\^(\d+)\]/.exec(state.src.slice(state.pos));
   if (!match) return false;
-  if (!silent) state.push("endnote_ref", "sup", 0).content = match[1];
+  if (!silent) {
+    // The manuscript writes "sentence. [^1]"; set the marker tight to the text.
+    state.pending = state.pending.replace(/[ \t]+$/, "");
+    state.push("endnote_ref", "sup", 0).content = match[1];
+  }
   state.pos += match[0].length;
   return true;
 });
@@ -36,7 +45,7 @@ markdown.renderer.rules.endnote_ref = (tokens, index, options, env) => {
   if (!note) throw new Error(`LIA text cites missing endnote ${number}`);
   const ref = `note-ref-${number}-${note.references.length + 1}`;
   note.references.push(ref);
-  return `<sup id="${ref}" class="note-ref" data-pagefind-ignore><a href="#note-${number}" role="doc-noteref" aria-label="Endnote ${number}">[${number}]</a></sup>`;
+  return `<sup id="${ref}" class="note-ref" data-pagefind-ignore><a href="#note-${number}" role="doc-noteref" aria-label="Endnote ${number}">${number}</a></sup>`;
 };
 
 markdown.renderer.rules.table_open = () => '<div class="table-scroll" role="region" aria-label="Table" tabindex="0"><table>\n';
@@ -80,6 +89,35 @@ function parseNotes(source) {
   return notes;
 }
 
+const CHAPTER = /^((?:[PC]|[IVX]+-\d+)\.) (.+)$/;
+
+// Set the chapter number apart so the heading can carry it as a mono label.
+// Labels drop the trailing period ("I-01." shows as I-01); the text still reads in order.
+const labelText = value => escape(value.replace(/\.$/, ""));
+
+function prefixLabel(inline, pattern, className) {
+  const first = inline.children?.[0];
+  const match = first?.type === "text" ? pattern.exec(first.content) : null;
+  if (!match) return false;
+  const Token = first.constructor;
+  const label = new Token("html_inline", "", 0);
+  label.content = `<span class="${className}">${labelText(match[1])}</span> `;
+  first.content = first.content.slice(match[0].length);
+  inline.children.unshift(label);
+  return true;
+}
+
+// Chapter numbers ("I-01.") and part numbers ("Part I:") become mono labels.
+function markHeading(token, inline) {
+  if (token.tag === "h3") {
+    if (prefixLabel(inline, /^((?:[IVX]+-\d+)\.) /, "chapter-no")) return;
+    // Prologue and coda chapters ("P.", "C.") repeat their part heading.
+    prefixLabel(inline, /^([PC]\.) /, "chapter-no chapter-no--letter");
+  } else if (!prefixLabel(inline, /^(Part [IVX]+):? /, "part-no")) {
+    token.attrJoin("class", "part-label");
+  }
+}
+
 function prepareMain(tokens) {
   const headings = [];
   const ids = new Set();
@@ -98,6 +136,7 @@ function prepareMain(tokens) {
       headings.push({ id: anchor, label, level: Number(token.tag[1]) });
       token.attrSet("id", anchor);
       token.attrSet("tabindex", "-1");
+      markHeading(token, tokens[index + 1]);
       anchor = undefined;
     } else if (anchor) {
       throw new Error(`Unattached LIA heading anchor ${anchor}`);
@@ -134,12 +173,14 @@ async function prepareFigures(tokens, source) {
   return figures.size;
 }
 
+markdown.renderer.rules.lia_plates = renderPlateGroup;
+
 markdown.renderer.rules.figure = (tokens, index) => {
   const { id, imagePath, svg, width, height, alt, caption, provenance } = tokens[index].meta;
   const sourceLine = provenance ? `<p class="figure-source">Sources: ${escape(provenance)}</p>` : "";
   return `<figure id="figure-${id.toLowerCase()}">
-  <div class="figure-frame"><img src="${imagePath}" alt="${escape(alt)}" width="${width}" height="${height}" loading="lazy" decoding="async"></div>
-  <figcaption><span class="figure-label">Figure ${id.slice(1)}</span><p>${escape(caption)}</p>${sourceLine}<a href="${svg}" aria-label="Open Figure ${id.slice(1)} as SVG">Open SVG</a></figcaption>
+  <div class="figure-frame"><img src="${imagePath}" alt="${escape(alt)}" width="${width}" height="${height}" loading="lazy" decoding="async" data-diagram></div>
+  <figcaption><span class="figure-label">Figure ${id.slice(1)}</span><p class="visually-hidden">${escape(caption)}</p>${sourceLine.replace('class="figure-source"', 'class="figure-source visually-hidden"')}<a href="${svg}" data-zoom aria-label="Open Figure ${id.slice(1)} full size">Open full size</a></figcaption>
 </figure>\n`;
 };
 
@@ -150,8 +191,8 @@ function contents(headings) {
     else groups.at(-1).chapters.push(heading);
   }
   const link = ({ id, label }) => {
-    const chapter = /^((?:[PC]|[IVX]+-\d+)\.) (.+)$/.exec(label);
-    const text = chapter ? `<span class="chapter-no">${chapter[1]}</span><span>${escape(chapter[2])}</span>` : escape(label);
+    const chapter = CHAPTER.exec(label);
+    const text = chapter ? `<span class="chapter-no">${labelText(chapter[1])}</span><span>${escape(chapter[2])}</span>` : escape(label);
     return `<a href="#${id}">${text}</a>`;
   };
   return `<ol>${groups.map(group => `<li>${link(group)}${group.chapters.length ? `<ol>${group.chapters.map(chapter => `<li>${link(chapter)}</li>`).join("")}</ol>` : ""}</li>`).join("")}</ol>`;
@@ -185,6 +226,9 @@ if (!source) {
   const { content, headings } = prepareMain(markdown.parse(manuscript.main, env));
   const figureCount = await prepareFigures(content, source);
   const words = readingWords(content);
+  const plates = loadPlates(manifestDir, reader);
+  const plateHeadings = placePlates(content, headings, plates);
+  const hero = plates.find(plate => plate.role === "hero");
   const minutes = Math.ceil(words / 240);
   const body = markdown.renderer.render(content, markdown.options, env);
   const appendix = markdown.parse(manuscript.appendix, env);
@@ -201,7 +245,9 @@ if (!source) {
     displayTitle: title.replace(/ Archaeology$/, " <em>Archaeology</em>"),
     subtitle: manuscript.subtitle,
     words,
+    wordsLabel: words.toLocaleString("en-US"),
     minutes,
+    heroPlate: hero ? renderPlate(hero) : "",
     readingTime: `${Math.floor(minutes / 60)} hr ${minutes % 60} min`,
     contents: contents(headings),
     body,
@@ -218,7 +264,7 @@ if (!source) {
   const landing = await readFile(landingPath, "utf8");
   const marker = '<section class="index" data-lia-index>';
   if (!landing.includes(marker)) throw new Error("LIA landing page index is missing");
-  const preview = '<section class="index" aria-label="Long-form field note"><h2><a href="/lia/read/">Read the long-form edition</a></h2></section>';
+  const preview = `<section class="longform" aria-label="Long-form field note"><a href="/lia/read/"><span class="label">Long-form field note / ${values.readingTime} / ${values.wordsLabel} words</span><span class="longform-title">Read the long-form edition</span><span class="longform-deck">${manuscript.subtitle}</span></a></section>`;
   if (!landing.includes('href="/lia/read/"')) await writeFile(landingPath, landing.replace(marker, preview + marker));
-  console.log(`LIA longform: ${words.toLocaleString("en-US")} main-text words, ${minutes} min at 240 wpm, ${headings.length} contents links, ${notes.size} endnotes, ${figureCount} figures`);
+  console.log(`LIA longform: ${words.toLocaleString("en-US")} main-text words, ${minutes} min at 240 wpm, ${headings.length} contents links, ${notes.size} endnotes, ${figureCount} figures, ${plates.length} manifest plates (${hero ? "1 hero, " : ""}${plateHeadings} headings)`);
 }

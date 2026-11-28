@@ -12,7 +12,7 @@ export const researchFieldNotes = [{
 }, ...(findLiaLongformSource() ? [{
   title: "Latent Information Archaeology",
   href: "/lia/read/",
-  description: "The long-form expansion of the founding text, with case studies, an excavation method, and a research agenda.",
+  description: "Latent Information Archaeology at full length, with case studies, an excavation method, and a research agenda.",
   date: "2026-11-27",
   section: "Latent Information Archaeology",
   kind: "long-form field note",

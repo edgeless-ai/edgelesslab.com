@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-27T09:49:49.616822</dc:date>
+    <dc:date>2026-11-27T21:16:37.808496</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -40,7 +40,7 @@ C 104.576053 200.78016 73.3824 235.190622 73.3824 271.0656
 C 73.3824 306.940578 104.576053 341.35104 160.09332 366.71848 
 C 215.610587 392.08592 290.918728 406.3392 369.432 406.3392 
 z
-" clip-path="url(#p495541c483)" style="fill: #d6e9e3; stroke: #146b68; stroke-width: 2; stroke-linejoin: miter"/>
+" clip-path="url(#pbdc0f06d5d)" style="fill: #d6e9e3; stroke: #146b68; stroke-width: 2; stroke-linejoin: miter"/>
    </g>
    <g id="patch_3">
     <path d="M 674.4528 406.3392 
@@ -53,7 +53,7 @@ C 437.687636 200.78016 409.8024 235.190622 409.8024 271.0656
 C 409.8024 306.940578 437.687636 341.35104 487.316708 366.71848 
 C 536.945779 392.08592 604.266694 406.3392 674.4528 406.3392 
 z
-" clip-path="url(#p495541c483)" style="fill: #e3e5e6; stroke: #182b38; stroke-width: 2; stroke-linejoin: miter"/>
+" clip-path="url(#pbdc0f06d5d)" style="fill: #e3e5e6; stroke: #182b38; stroke-width: 2; stroke-linejoin: miter"/>
    </g>
    <g id="patch_4">
     <path d="M 369.432 406.3392 
@@ -67,7 +67,7 @@ C 73.3824 306.940578 104.576053 341.35104 160.09332 366.71848
 C 215.610587 392.08592 290.918728 406.3392 369.432 406.3392 
 L 369.432 406.3392 
 z
-" clip-path="url(#p495541c483)" style="fill: none; stroke: #146b68; stroke-width: 2; stroke-linejoin: miter"/>
+" clip-path="url(#pbdc0f06d5d)" style="fill: none; stroke: #146b68; stroke-width: 2; stroke-linejoin: miter"/>
    </g>
    <g id="text_1">
     <text style="font-weight: 700; font-size: 18px; font-family: 'DejaVu Sans'; fill: #182b38" transform="translate(100.296 239.065987)">L(C, t, M)</text>
@@ -96,11 +96,11 @@ z
    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #182b38" transform="translate(55.44 520.587531)">depends on corpus, time, methods, and reference record; candidate status is not validation.</text>
   </g>
   <g id="text_8">
-   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #586873" x="55.44" y="555.84" transform="rotate(-0 55.44 555.84)">Sources: LIA §4  |  Internal draft</text>
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #586873" x="55.44" y="555.84" transform="rotate(-0 55.44 555.84)">Sources: chapter II-03</text>
   </g>
  </g>
  <defs>
-  <clipPath id="p495541c483">
+  <clipPath id="pbdc0f06d5d">
    <rect x="55.44" y="109.44" width="897.12" height="351.36"/>
   </clipPath>
  </defs>
